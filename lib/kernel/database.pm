@@ -98,13 +98,10 @@ sub Connect
       }
    }
    else{
-      if (($self->{dbconnect}=~m/^dbi:odbc:/i) ||
-          ($self->{dbconnect}=~m/^dbi:db2:/i) ||
+      if (
+         # ($self->{dbconnect}=~m/^dbi:odbc:/i) ||  # try to allow odbc and
+         # ($self->{dbconnect}=~m/^dbi:db2:/i) ||   # db2 via connect_cached
           ($BackendSessionName eq "ForceUncached")){  
-         # cached funktioniert nicht bzw. nicht korrekt mit 
-         # ODBC und DB2 Datenverbindungen. Zusätzlich kann eine
-         # uncached Verbindung erzwungen werden, wenn der BackendSessionName
-         # auf "ForceUncached" gesetzt wird.
          $self->{'db'}=DBI->connect(
             $self->{dbconnect},
             $self->{dbuser},$self->{dbpass},{ }
