@@ -115,22 +115,29 @@ sub Connect
       }
       else{
          my $private_foo_cachekey=$dbname."-".$$.".".$BackendSessionName;
-         $self->{'db'}=DBI->connect_cached(
+         my @connectParam=(
             $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
                mysql_enable_utf8 => 0,
                AutoCommit=>1,
+               RaiseError=>0,            
+               PrintError=>0,            
                private_foo_cachekey=>$private_foo_cachekey
-            });
+            }
+         );
+         $self->{'db'}=DBI->connect_cached(@connectParam);
          if (!defined($self->{'db'})){
-            # retry hack
-            sleep(3);
-            printf STDERR ("fifi retry Hack key:$private_foo_cachekey\n");
-            $self->{'db'}=DBI->connect_cached(
-               $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
-                  mysql_enable_utf8 => 0,
-                  AutoCommit=>1,
-                  private_foo_cachekey=>$private_foo_cachekey
-               });
+            msg(WARN,"1st retry connect to $dbname");sleep(1);
+            $self->{'db'}=DBI->connect_cached(@connectParam);
+            if (!defined($self->{'db'})){
+               msg(WARN,"2nd retry connect to $dbname");sleep(3);
+               $self->{'db'}=DBI->connect_cached(@connectParam);
+               if (defined($self->{'db'})){
+                  msg(WARN,"2nd retry got success to $dbname");
+               }
+            }
+            else{
+               msg(WARN,"1st retry got success to $dbname");
+            }
          }
          if (defined($self->{'db'})){
             if ($self->{'db'}->{private_inW5Transaction} ne ""){
