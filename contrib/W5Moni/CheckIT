@@ -265,7 +265,6 @@ if ($loginuser ne "" && $loginpass ne ""){
    if (!$quiet){
       msg(INFO,"auth W5API base '$base'");
    }
-   my $Config;
    eval(' 
     $Config=createConfig($base,$loginuser,$loginpass,$lang,$apidebug,undef,undef,quiet=>1); 
    ');
