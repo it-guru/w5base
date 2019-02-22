@@ -136,6 +136,9 @@ if ((defined($servicedef) && ref($servicedef) ne "HASH") ||
                $err++;
             }
          }
+         if ($verbose>2){
+            msg(INFO,"Filter:".Dumper($flt));
+         }
       }
       else{
          $err++;
@@ -330,6 +333,9 @@ else{
          push(@view,$idfield);
          $o->SetFilter($servicedef->{$s}->{filter});
          my @l=$o->getHashList(@view);
+         if ($verbose>2){
+            msg(INFO,"RecordList:".Dumper(\@l));
+         }
          if ($serviceres->{$s}->{singlerec}){
             if ($#l==-1){
                LogPerformance("state",
