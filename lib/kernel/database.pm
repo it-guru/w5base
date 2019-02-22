@@ -121,6 +121,17 @@ sub Connect
                AutoCommit=>1,
                private_foo_cachekey=>$private_foo_cachekey
             });
+         if (!defined($self->{'db'})){
+            # retry hack
+            sleep(3);
+            printf STDERR ("fifi retry Hack key:$private_foo_cachekey\n");
+            $self->{'db'}=DBI->connect_cached(
+               $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
+                  mysql_enable_utf8 => 0,
+                  AutoCommit=>1,
+                  private_foo_cachekey=>$private_foo_cachekey
+               });
+         }
          if (defined($self->{'db'})){
             if ($self->{'db'}->{private_inW5Transaction} ne ""){
                $self->{'db'}->{AutoCommit}=0;
