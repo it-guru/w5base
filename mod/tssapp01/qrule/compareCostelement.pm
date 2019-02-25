@@ -129,12 +129,14 @@ sub qcheckRecord
       if ($rec->{cistatusid} < 6){
          my @nomsg;
          my $noerrorlevel;
-         $self->IfComp($dataobj,
-                       $rec,"shortdesc",
-                       $parrec,"description",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       \@nomsg,\@nomsg,\$noerrorlevel,
-                       mode=>'string');
+         if ($rec->{shortdesc} eq "" || $autocorrect){
+            $self->IfComp($dataobj,
+                          $rec,"shortdesc",
+                          $parrec,"description",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          \@nomsg,\@nomsg,\$noerrorlevel,
+                          mode=>'string');
+         }
       }
       if ($par->Self() eq "tssapp01::costcenter"){
          if ($rec->{costcentertype} ne "costcenter"){
