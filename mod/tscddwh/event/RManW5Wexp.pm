@@ -39,6 +39,7 @@ sub RManW5Wexp
    my $exitcode=0;
 
    my $wf=getModuleObject($self->Config,"base::workflow");
+   my $wf2=getModuleObject($self->Config,"base::workflow");
    my $os=getModuleObject($self->Config,"W5Warehouse::objectsnap");
 
    $os->SnapStart("RMAWF");
@@ -119,21 +120,75 @@ sub RManW5Wexp
    my ($rec,$msg)=$wf->getFirst();
    if (defined($rec)){
       do{
+          my %relids=();
+          if (ref($rec->{relations}) eq "ARRAY"){
+             foreach my $relrec (@{$rec->{relations}}){
+                if ($relrec->{name} eq "riskmesure"){
+                   $relids{$relrec->{dstwfid}}++;
+                }
+             }
+          }
+          if (keys(%relids)){
+             $wf2->ResetFilter();
+             $wf2->SetFilter({
+                id=>[keys(%relids)],
+                class=>\'itil::workflow::opmeasure'
+             });
+             my @l=$wf2->getHashList(qw(
+                id 
+                wffields.plannedstart 
+                wffields.plannedend
+                detaildescription
+                eventstart
+                eventend
+                name
+                shortactionlog
+                state
+             ));
+             if ($#l!=-1){
+                my @m;
+                foreach my $mrec (@l){
+                    my $subrec={
+                       raw=>$mrec
+                    };
+                    for my $reqlang (qw(en de)){
+                       $ENV{HTTP_FORCE_LANGUAGE}=$reqlang;
+                       foreach my $fname (qw(state)){
+                          my $fld=$wf2->getField($fname,$mrec);
+                          my $xname=$fname;
+                          $xname=~s/^.*\.//;
+                          $subrec->{fancy}->{$reqlang}->{$xname}=
+                             $fld->FormatedDetail($mrec,"XmlV01");
+                       }
+                       delete($ENV{HTTP_FORCE_LANGUAGE});
+                    }
+                    push(@m,$subrec);
+                }
+                $rec->{measureworkflow}=\@m;
+             }
+          }
+
+
           my $xrec={
              xmlroot=>{
                 raw=>$rec
              }
           };
-          foreach my $fname (@fancy){
-             my $fld=$wf->getField($fname,$rec);
-             my $xname=$fname;
-             $xname=~s/^.*\.//;
-             $xrec->{xmlroot}->{fancy}->{en}->{$xname}=
-                $fld->FormatedDetail($rec,"XmlV01");
+          for my $reqlang (qw(en de)){
+             $ENV{HTTP_FORCE_LANGUAGE}=$reqlang;
+             foreach my $fname (@fancy){
+                my $fld=$wf->getField($fname,$rec);
+                my $xname=$fname;
+                $xname=~s/^.*\.//;
+                $xrec->{xmlroot}->{fancy}->{$reqlang}->{$xname}=
+                   $fld->FormatedDetail($rec,"XmlV01");
+             }
+             delete($ENV{HTTP_FORCE_LANGUAGE});
           }
           $xrec->{xmlroot}->{xmlstate}="OK";
           
           my $d=hash2xml($xrec);
+          #print $d;
           $os->SnapRecord($rec->{id},$rec->{name},"base::workflow",$d);
 
           ($rec,$msg)=$wf->getNext();
