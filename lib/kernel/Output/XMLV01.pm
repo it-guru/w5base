@@ -67,7 +67,7 @@ sub getHttpHeader
    my $app=$self->getParent->getParent();
    my $d="";
    if ($self->{charset} eq "utf-8"){
-      $d.="Content-type:".$self->MimeType().";charset=UTF8\n\n";
+      $d.="Content-type:".$self->MimeType().";charset=UTF-8\n\n";
    }
    else{
       $d.="Content-type:".$self->MimeType()."\n\n";
