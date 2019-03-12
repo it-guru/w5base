@@ -95,7 +95,8 @@ sub SSLcertMon
       my $skiplevel=0;
       my $recno=0;
       $datastream->SetFilter(\%flt);
-      $datastream->SetCurrentView(qw(ictono ipaddress port protocol 
+      $datastream->SetCurrentView(qw(ictono ipaddress port protocol  
+                                 os
                                  sslparsedw5baseref sslparsedvalidtill
                                  sdate srcid));
       $datastream->SetCurrentOrder("+sdate","+srcid");
@@ -192,6 +193,15 @@ sub analyseRecord
    }
 
    msg(INFO,"PROCESS: $rec->{srcid} $rec->{sdate} validtil='$validtill'");
+
+   if (($rec->{os}=~m/^Windows/i) && $rec->{port} eq "3389"){
+      # On Windows-Systems Port 3389 is RDP and if it is secured by
+      # by SSL, Windows installes a self signed cert. This cert is
+      # automaticly renewed by the server self, if expiration is
+      # near (next 30 days).
+      # No notification is needed in this case.
+      return();
+   }
 
    if ($d->{days}<8*7 && $d->{days}>3){   # 8 weeks
       if (defined($rec->{sslparsedw5baseref})){
