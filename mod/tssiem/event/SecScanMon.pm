@@ -106,6 +106,8 @@ sub SecScanMon
                if ($rec->{id} ne $lastid){
                   $skiplevel=3;
                }
+            }
+            if ($skiplevel==2){
                if ($rec->{sdate} ne $laststamp){
                   msg(WARN,"record with id '$lastid' missing in datastream");
                   msg(WARN,"this can result in skiped records!");
@@ -148,11 +150,13 @@ sub SecScanMon
       }
    }
 
+   my $ncnt=0;
    {  # handle results
 
       my $a=1;
       if (keys(%{$res->{new}})){
          foreach my $icto (keys(%{$res->{new}})){
+            $ncnt++;
             $self->doNotify($datastream,$wfa,$user,$appl,$icto,
                             $res->{new}->{$icto});
          }
@@ -162,7 +166,7 @@ sub SecScanMon
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
                                   exitmsg=>$exitmsg,
-                                  exitstate=>"ok"},
+                                  exitstate=>"ok - $ncnt messages"},
                                  {id=>\$jobid});
    return({exitcode=>0,exitmsg=>'ok'});
 }
@@ -266,7 +270,10 @@ sub doNotify
       $wfa->Notify("INFO",$subject,$tmpl, 
          emailto=>\@emailto, 
          emailcc=>\@emailcc, 
-         emailbcc=>[11634953080001,12663941300002]
+         emailbcc=>[
+         #   11634953080001, # HV
+            12663941300002  # Roland
+         ]
       );
    }
    if ($lastlang ne ""){

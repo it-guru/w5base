@@ -108,6 +108,8 @@ sub SSLcertMon
                if ($rec->{srcid} ne $lastid){
                   $skiplevel=3;
                }
+            }
+            if ($skiplevel==2){
                if ($rec->{sdate} ne $laststamp){
                   msg(WARN,"record with id '$lastid' missing in datastream");
                   msg(WARN,"this can result in skiped records!");
@@ -150,11 +152,13 @@ sub SSLcertMon
       }
    }
 
+   my $ncnt=0;
    {  # handle results
 
       my $a=1;
       if (keys(%{$res->{invalid}})){
          foreach my $icto (keys(%{$res->{invalid}})){
+            $ncnt++;
             $self->doNotify($datastream,$wfa,$user,$appl,$icto,
                             $res->{invalid}->{$icto});
          }
@@ -165,7 +169,7 @@ sub SSLcertMon
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
                                   exitmsg=>$exitmsg,
-                                  exitstate=>"ok"},
+                                  exitstate=>"ok - $ncnt messages"},
                                  {id=>\$jobid});
    return({exitcode=>0,exitmsg=>'ok'});
 }
@@ -287,10 +291,12 @@ sub doNotify
             DEBUG=>$debug
          }
       });
-
       $wfa->Notify( "WARN",$subject,$tmpl, 
          emailto=>\@emailto, 
-         emailbcc=>[11634953080001,12663941300002]
+         emailbcc=>[
+   #         11634953080001,   # HV
+            12663941300002    # Roland
+         ]
       );
    }
    if ($lastlang ne ""){

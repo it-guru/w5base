@@ -167,6 +167,18 @@ sub isWriteValid
    return(undef);
 }
 
+sub isDeleteValid
+{
+   my $self=shift;
+   return(0) if (!$self->IsMemberOf("admin"));
+   if (($self->Config->Param("W5BaseOperationMode") eq "dev") ||
+       ($self->Config->Param("W5BaseOperationMode") eq "test")){
+      return(1);
+   }
+   return(0);
+}
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
