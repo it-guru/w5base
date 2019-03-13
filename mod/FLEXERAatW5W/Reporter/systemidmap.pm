@@ -55,10 +55,12 @@ sub Process             # will be run as a spereate Process (PID)
    my $fchk=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
    my $smapop=getModuleObject($self->Config,"FLEXERAatW5W::syssystemidmap");
    $smap->SetFilter({mapstate=>[undef,""]});
-   $smap->Limit(500);
+   $smap->Limit(501);
    my $sys=getModuleObject($self->Config,"itil::system");
    my $amsys=getModuleObject($self->Config,"tsacinv::system");
+   my $mcreccnt=0;
    foreach my $mrec ($smap->getHashList(qw(ALL))){
+      $mcreccnt++;
       my $systemname=$mrec->{systemname};
       $systemname=~s/\*//g;
       $systemname=~s/\?//g;
@@ -125,6 +127,7 @@ sub Process             # will be run as a spereate Process (PID)
    }
    $rmap->ResetFilter();
    $rmap->BulkDeleteRecord({mapstate=>\'NOT FOUND',mdate=>'<now-14d'});
+   msg(WARN,"record count=$mcreccnt");
    return(0);
 }
 
