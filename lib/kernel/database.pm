@@ -118,6 +118,7 @@ sub Connect
          my @connectParam=(
             $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
                mysql_enable_utf8 => 0,
+               mysql_auto_reconnect=>1,
                AutoCommit=>1,
                RaiseError=>0,            
                PrintError=>0,            
