@@ -39,7 +39,8 @@ select ID,
        VERSIONWEIGHT,
        PUBLISHERNAME,
        DISCDATE,
-       CLASSIFICATION 
+       CLASSIFICATION,
+       EDITION
 from dbo.customDarwinExportDeviceInst@flexerap;
 
 CREATE INDEX "FLEXERA_instsoftware_id1"
