@@ -17,6 +17,8 @@ $SIG{INT} = \&Shutdown;
 $SIG{TERM} = \&Shutdown;
 $SIG{HUP} = \&Reload;
 
+$0="extSimpleHandler.pl";
+
 sub Reload
 {
    msg("ERROR","reload extSimpleHandler not suppored");
