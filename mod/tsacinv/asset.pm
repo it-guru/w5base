@@ -228,6 +228,11 @@ sub new
                 depend        =>[qw(lassetid)],
                 onRawValue    =>\&CalcSystemsOnAsset),
 
+      new kernel::Field::Text(
+                name          =>'aperturestat',
+                htmldetail    =>'NotEmpty',
+                label         =>'Aperture Status',
+                dataobjattr   =>'"Aperture_Status"'),
 
       new kernel::Field::TextDrop(
                 name          =>'maintlevel',

@@ -360,6 +360,7 @@ sub mkAcFtpRecAsset
    my $self=shift;
    my $rec=shift;
    my %param=@_;
+   my $app=$self->getParent;
 
    my $CurrentEventId="Process Asset '$rec->{name}'";
 
@@ -367,6 +368,20 @@ sub mkAcFtpRecAsset
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
    return(undef) if ($rec->{locationid} eq "");
+
+   my $accurrec;
+
+
+   if ($rec->{name}=~m/^A.{3,10}$/){
+      my $acass=$app->getPersistentModuleObject("tsacasset","tsacinv::asset");
+      $acass->SetFilter({assetid=>\$rec->{name}});
+      my ($arec,$msg)=$acass->getOnlyFirst(qw(assetid aperturestat 
+                                              srcsys srcid));
+      if (defined($arec)){
+         $accurrec=$arec;
+      }
+   }
+
 
    if (!exists($locmap{$rec->{locationid}})){
       msg(INFO,"try to find ac location for $rec->{locationid}");
@@ -422,7 +437,11 @@ sub mkAcFtpRecAsset
    $cpucount="1" if ($cpucount eq "");
    my $cpuspeed=$rec->{cpuspeed};
    $cpuspeed="1" if ($cpuspeed eq "");
-   
+
+
+
+
+
    my $acrec={
                Asset=>{
                     EventID=>$CurrentEventId,
@@ -442,12 +461,17 @@ sub mkAcFtpRecAsset
                     Remarks=>$rec->{comments},
                     Security_Unit=>"TS.DE",
                     bDelete=>'0',
-                    Location_Code=>$locmap{$rec->{locationid}},
                     AssignmentGroup=>$cfmassign,
                     IncidentAG=>$inmassign,
                     Model_Code=>'MGER033048'
                }
              };
+
+   if (!defined($accurrec) ||
+        (!defined($accurrec->{aperturestat}) ||
+         ($accurrec->{aperturestat}=~m/deleted/i))){
+      $acrec->{Asset}->{Location_Code}=$locmap{$rec->{locationid}};
+   }
 
    if ($rec->{mandator}=~m/^TelekomIT.*/){
   #   $acrec->{Asset}->{SC_Location_ID}="4787.0000.0000";# T-Com Bonn Land
