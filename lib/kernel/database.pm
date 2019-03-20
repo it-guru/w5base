@@ -127,17 +127,24 @@ sub Connect
          );
          $self->{'db'}=DBI->connect_cached(@connectParam);
          if (!defined($self->{'db'})){
-            msg(WARN,"1st retry connect to $dbname");sleep(1);
+            my $sRetry=1;
+            if (lc($self->getParent->Config->Param('SilentRetryDataObjConnect'))
+                 eq "no"){
+               $sRetry=0;
+            }
+            msg(WARN,"1st retry connect to $dbname") if (!$sRetry);
+            sleep(1);
             $self->{'db'}=DBI->connect_cached(@connectParam);
             if (!defined($self->{'db'})){
-               msg(WARN,"2nd retry connect to $dbname");sleep(3);
+               msg(WARN,"2nd retry connect to $dbname") if (!$sRetry);
+               sleep(3);
                $self->{'db'}=DBI->connect_cached(@connectParam);
                if (defined($self->{'db'})){
-                  msg(WARN,"2nd retry got success to $dbname");
+                  msg(WARN,"2nd retry got success to $dbname") if (!$sRetry);
                }
             }
             else{
-               msg(WARN,"1st retry got success to $dbname");
+               msg(WARN,"1st retry got success to $dbname") if (!$sRetry);
             }
          }
          if (defined($self->{'db'})){
