@@ -39,6 +39,7 @@ select ID,
        VERSIONWEIGHT,
        PUBLISHERNAME,
        DISCDATE,
+       INVENTORYDATE,
        CLASSIFICATION,
        EDITION
 from dbo.customDarwinExportDeviceInst@flexerap;

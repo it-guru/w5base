@@ -106,12 +106,20 @@ sub new
                 name          =>'scandate',
                 group         =>'source',
                 sqlorder      =>'desc',
-                label         =>'Scan-Date',
+                label         =>'First-Scan-Date',
                 dataobjattr   =>'DISCDATE'),
+
+      new kernel::Field::Date(
+                name          =>'lastscandate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                label         =>'Last-Scan-Date',
+                dataobjattr   =>'FLEXERA_instsoftware.INVENTORYDATE')
 
    );
    $self->setWorktable("FLEXERA_instsoftware");
-   $self->setDefaultView(qw(systemname publisher software version edition classification));
+   $self->setDefaultView(qw(systemname publisher software version 
+                            edition classification));
    return($self);
 }
 
