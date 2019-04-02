@@ -80,7 +80,7 @@ sub new
 
       new kernel::Field::Databoss(),
 
-      new kernel::Field::Text(
+      new kernel::Field::Link(
                 name          =>'databossid',
                 dataobjattr   =>"'15506528210001'"),
 
