@@ -4,7 +4,34 @@ create materialized view "mview_FLEXERA_system"
    refresh complete start with sysdate
    next sysdate+(1/24)*3
    as
-select * from dbo.customDarwinExportDevice@flexerap;
+select 
+   FLEXERADEVICEID,
+   FLEXERADEVICEID flexerasystemid,
+   UUID,
+   TENANTID,
+   SYSTEMNAME,
+   SYSTEMOS,
+   SYSTEMOSPATCHLEVEL,
+   SYSTEMCPUCOUNT,
+   SYSTEMLOGICALCPUCOUNT,
+   SYSTEMCORECOUNT,
+   SYSTEMCPUTTYPE,
+   SYSTEMCPUSPEED,
+   SYSTEMINVHOSTTYPE,
+   SYSTEMMEMORY,
+   ASSETMODELL ASSETMODLEL,
+   ASSETSERIALNO,
+   HOSTID,
+   IPADDRLIST,
+   INVENTORYDATE,
+   HARDWAREINVENTORYDATE,
+   SERVICESINVENTORYDATE,
+   CDATE,
+   SYSTEMID "SystemID_at_Flexera",
+   BEACONID,
+   ISVM,
+   ISVMHOSTMISSING
+from dbo.customDarwinExportDevice@flexerap;
 
 CREATE INDEX "FLEXERA_system_id1"
    ON "mview_FLEXERA_system"(flexerasystemid) online;
