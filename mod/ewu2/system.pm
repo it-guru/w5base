@@ -78,6 +78,12 @@ sub new
                 label         =>"system type",
                 dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"TYPE\""),
 
+      new kernel::Field::Databoss(),
+
+      new kernel::Field::Text(
+                name          =>'databossid',
+                dataobjattr   =>"'15506528210001'"),
+
       new kernel::Field::Boolean(
                 name          =>'deleted',
                 label         =>"marked as delete",

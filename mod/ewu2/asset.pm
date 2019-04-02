@@ -59,6 +59,12 @@ sub new
                 label         =>"Common Name",
                 dataobjattr   =>"\"PHYSICAL_ELEMENTS\".\"COMMON_NAME\""),
 
+      new kernel::Field::Databoss(),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>"'15506528210001'"),
+
       new kernel::Field::Text(
                 name          =>'model',
                 label         =>"Model",

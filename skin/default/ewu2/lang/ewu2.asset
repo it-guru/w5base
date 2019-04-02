@@ -3,6 +3,7 @@
   de=>'EWU2: Asset'
 },
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
 'Serialnumber'=>{de=>'Seriennummer' },
 'full assetname'=>{de=>'vollständiger Assetname'},
 'Delivered At'=>{de=>'Inbetriebnahmedatum'},

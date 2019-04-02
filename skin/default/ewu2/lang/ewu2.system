@@ -8,6 +8,7 @@
 'fieldgroup.virtualisation'=>{de=>'Virtualisierung',en=>'Virtualisation'},
 'fieldgroup.contracts'=>{de=>'Verträge',en=>'Contracts'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
 'IP-Adresses'=>{de=>'IP-Adressen'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},
 'Memory'=>{de=>'Arbeitsspeicher'},
