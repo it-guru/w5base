@@ -1098,7 +1098,8 @@ sub Validate
       }
       else{
          if (defined($oldrec)){
-            my $posibleinstanceidentify=effVal($oldrec,$newrec,"posibleinstanceidentify");
+            my $posibleinstanceidentify=effVal($oldrec,$newrec,
+                                               "posibleinstanceidentify");
             my @k=$self->getPosibleInstanceTypes($posibleinstanceidentify);
             @posible=();
             while(my $k=shift(@k)){
@@ -1112,7 +1113,31 @@ sub Validate
       }
       if ($swnature ne trim(effVal($oldrec,$newrec,"swnature"))){
          if (defined($oldrec)){
-            $self->LastMsg(WARN,"automatic swnature changed");
+            if ($self->isDataInputFromUserFrontend()){ # prevent QC Messages
+               $self->LastMsg(WARN,"automatic swnature changed");
+            }
+            ############################################################
+            # prevent doublicate enties on automatic swnature change to Other
+            if ($swnature eq "Other"){
+               my $iname=effVal($oldrec,$newrec,"name");
+               my $iswtype=effVal($oldrec,$newrec,"swtype");
+               my $iswport=effVal($oldrec,$newrec,"swport");
+               my $o=$self->Clone();
+               $o->SetFilter({
+                  id=>"!".$oldrec->{id},
+                  name=>\$iname,
+                  cistatusid=>"<6",
+                  swnature=>\"Other",
+                  swtype=>\$iswtype,
+                  swport=>\$iswport
+               });
+               my @l=$o->getHashList(qw(id));
+               if ($#l!=-1){
+                  $iname.="-old".time();
+                  $newrec->{name}=$iname;
+               }
+            }
+            ############################################################
          }
          $newrec->{rawswnature}=$swnature;
          $newrec->{swnature}=$swnature;
