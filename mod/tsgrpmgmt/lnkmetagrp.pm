@@ -121,6 +121,17 @@ sub new
                 sqlorder      =>'NONE',
                 dataobjattr   =>'lnkmetagrp.parentobj'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"lnkmetagrp.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(lnkmetagrp.id,35,'0')"),
       );
 
 
