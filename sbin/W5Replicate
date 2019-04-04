@@ -1564,7 +1564,7 @@ sub InsertOrUpdate
                push(@v,"$fieldname=to_date(?,'YYYY-MM-DD HH24:MI:SS')");
             }
             else {
-               push(@v,"$fieldname=?");
+               push(@v,'"'.uc($fieldname).'"'."=?");
             }
          }
       }
@@ -1590,7 +1590,7 @@ sub InsertOrUpdate
             delete($rec->{$fieldname});
          }
          else{
-            push(@insview,$fieldname);
+            push(@insview,'"'.uc($fieldname).'"');
             push(@values,$rec->{$fieldname});
             if ($col->{$fieldname}->{type} =~ m/^[timestamp|date]/i) {
                push(@place,"to_date(?,'YYYY-MM-DD HH24:MI:SS')");
