@@ -69,7 +69,7 @@ create table "W5SIEM_secent" (
    times_detected       NUMBER(20,0),
    solution             clob,
    constraint W5SIEM_secent_pk foreign key (ref)
-   REFERENCES "W5SIEM_secscan" (ref),
+   REFERENCES "W5SIEM_secscan" (ref) ON DELETE CASCADE,
    constraint W5SIEM_secent_pk1 PRIMARY KEY (id)
 );
 grant select on "W5SIEM_secent" to W5I;
