@@ -174,7 +174,7 @@ sub qcheckRecord
       my @cc=@{$self->{sapAdmins}};
       $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
          emailcc=>\@cc,
-         emailbcc=>['11634953080001','11634955120001'], # hv,mz
+       #  emailbcc=>['11634953080001','11634955120001'], # hv,mz
       },{
          autosubject=>1,
          autotext=>1,

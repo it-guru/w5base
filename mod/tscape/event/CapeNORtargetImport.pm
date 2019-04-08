@@ -204,11 +204,7 @@ sub CapeNORtargetImport
                     }
           
                     $appl->NotifyWriteAuthorizedContacts($arec,{},{
-                          emailcc=>\@emailcc,
-                          emailbcc=>[
-                                11634953080001,  # Vogler
-                                13796024310000   # Maske
-                          ]
+                          emailcc=>\@emailcc
                        },
                        {
                           autosubject=>1,

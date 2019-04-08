@@ -92,7 +92,7 @@ sub qcheckRecord
 
    if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
       $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
-         emailcc=>['11634953080001'],
+       #  emailcc=>['11634953080001'],
       },{
          autosubject=>1,
          autotext=>1,
