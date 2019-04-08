@@ -108,7 +108,7 @@ sub qcheckRecord
 
 
    return(undef,undef) if ($rec->{srcsys} ne ""  &&           # exclude f.e.
-                           $rec->{srcsys} ne "W5Base" &&      # EWU2 elements
+                           lc($rec->{srcsys}) ne "w5base" &&  # EWU2 elements
                            $rec->{srcsys} ne "AssetManager");
 
 
