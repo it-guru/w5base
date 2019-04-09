@@ -307,7 +307,8 @@ sub new
                 xlswidth      =>10,
                 group         =>'physasset',
                 label         =>'CPU-Count',
-                dataobjattr   =>'asset.cpucount'),
+                wrdataobjattr =>"asset.cpucount",
+                dataobjattr   =>"if (asset.class='BUNDLE',1,asset.cpucount)"),
 
       new kernel::Field::Number(
                 name          =>'cpuspeed',
@@ -315,14 +316,16 @@ sub new
                 group         =>'physasset',
                 unit          =>'MHz',
                 label         =>'CPU-Speed',
-                dataobjattr   =>'asset.cpuspeed'),
+                wrdataobjattr =>"asset.cpuspeed",
+                dataobjattr   =>"if (asset.class='BUNDLE',1,asset.cpuspeed)"),
 
       new kernel::Field::Number(
                 name          =>'corecount',
                 xlswidth      =>10,
                 group         =>'physasset',
                 label         =>'Core-Count',
-                dataobjattr   =>'asset.corecount'),
+                wrdataobjattr =>"asset.corecount",
+                dataobjattr   =>"if (asset.class='BUNDLE',1,asset.cpuspeed)"),
 
       new kernel::Field::Number(
                 name          =>'memory',
@@ -330,7 +333,8 @@ sub new
                 xlswidth      =>10,
                 label         =>'Memory',
                 unit          =>'MB',
-                dataobjattr   =>'asset.memory'),
+                wrdataobjattr =>"asset.memory",
+                dataobjattr   =>"if (asset.class='BUNDLE',1,asset.memory)"),
 
       new kernel::Field::TextDrop(
                 name          =>'location',
@@ -350,24 +354,28 @@ sub new
                 name          =>'room',
                 group         =>'location',
                 label         =>'Room',
+                htmldetail    =>\&hideOnBundle,
                 dataobjattr   =>'asset.room'),
                                                    
       new kernel::Field::Text(
                 name          =>'place',
                 group         =>'location',
                 label         =>'Place',
+                htmldetail    =>\&hideOnBundle,
                 dataobjattr   =>'asset.place'),
                                                    
       new kernel::Field::Text(
                 name          =>'rack',
                 group         =>'location',
                 label         =>'Rack identifier',
+                htmldetail    =>\&hideOnBundle,
                 dataobjattr   =>'asset.rack'),
 
       new kernel::Field::Text(
                 name          =>'slotno',
                 label         =>'Slot number',
                 group         =>"location",
+                htmldetail    =>\&hideOnBundle,
                 dataobjattr   =>'asset.slotno'),
 
       new kernel::Field::Textarea(
@@ -867,6 +875,16 @@ EOF
    return($d);
 }
 
+sub hideOnBundle{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   if (exists($param{current}) &&
+       $param{current}->{'class'} eq "BUNDLE"){
+      return(0);
+   }
+   return(1);
+}
 
 sub PhoneUsage
 {
@@ -1179,6 +1197,17 @@ sub Validate
       }
    }
 
+   if ($oldrec->{class} eq "BUNDLE"){
+      foreach my $fld (qw(room place rack slotno)){
+         if (effVal($oldrec,$newrec,$fld) ne ""){
+            $newrec->{$fld}="";
+         }
+      }
+   }
+
+
+
+
    if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
       return(0);
    }
@@ -1216,6 +1245,10 @@ sub isViewValid
    if ($rec->{class} eq "NATIVE"){
       push(@all,qw(guardian physasset location sec financeco
                    phonenumbers));
+
+   }
+   if ($rec->{class} eq "BUNDLE"){
+      push(@all,qw(location));
 
    }
    if (($rec->{acqumode} eq "PURCHASE" && $rec->{deprstart} ne "") ||
