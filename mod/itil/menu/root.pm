@@ -235,6 +235,11 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.system.interface",
+                      "itil::sysiface",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.system.systemnfsnas",
                       "itil::systemnfsnas",
                       defaultacl=>['valid_user']);

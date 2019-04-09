@@ -281,6 +281,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.system.interface",
+                      "AL_TCom::sysiface",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system.dnsalias",
                       "itil::dnsalias",
                       func=>'MainWithNew',

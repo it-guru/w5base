@@ -1,6 +1,7 @@
 'itil::system'=>{de=>'logisches System',en=>'logical System'},
 'fieldgroup.default'=>{de=>'Allgemeine Systemdaten',en=>'Generic Systeminformations'},
 'fieldgroup.logsys'=>{de=>'logische Systemdaten',en=>'logical Systemdata'},
+'fieldgroup.sysiface'=>{de=>'System-Interface',en=>'System-Interface'},
 'fieldgroup.upd'=>{de=>'OS Update/Upgrade Möglichkeiten',en=>'OS Update/Upgrade posibilities'},
 'fieldgroup.physys'=>{de=>'physikalische Systemdaten',en=>'physical Systemdata'},
 'fieldgroup.opmode'=>{de=>'Betriebsart',en=>'Operation mode'},

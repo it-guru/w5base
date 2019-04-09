@@ -1733,3 +1733,24 @@ create table lnknetinterconipnet (
 ) ENGINE=INNODB;
 alter table system add is_cbreakdown bool default '0';
 alter table ipaddress add lastqcheck datetime default NULL,add key(lastqcheck);
+create table sysiface (
+  id         bigint(20) NOT NULL,
+  system     bigint(20) NOT NULL,
+  asset      bigint(20) NOT NULL,
+  name       varchar(45) NOT NULL, 
+  macaddr    varchar(45) NOT NULL, 
+  additional longtext   default NULL,
+  comments   longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  PRIMARY KEY  (id),key(system),key(asset),key(name),
+  UNIQUE KEY `srcsys` (srcsys,srcid),UNIQUE KEY `ifname` (system,name),
+  FOREIGN KEY fk_sys  (system) REFERENCES system (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

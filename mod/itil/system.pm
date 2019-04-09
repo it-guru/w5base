@@ -1112,6 +1112,15 @@ sub new
                                  'srcsys']),
 
       new kernel::Field::SubList(
+                name          =>'sysiface',
+                label         =>'Interface',
+                group         =>'sysiface',
+                subeditmsk    =>'subedit.system',
+                vjointo       =>'itil::sysiface',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['name','mac']),
+
+      new kernel::Field::SubList(
                 name          =>'ipaddresseslist',
                 label         =>'IP-Adresses list',
                 group         =>'ipaddresses',
@@ -1920,7 +1929,7 @@ sub isViewValid
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(header default swinstances 
               software admin logsys contacts monisla misc opmode 
-              physys ipaddresses phonenumbers sec applications
+              physys ipaddresses sysiface phonenumbers sec applications
               location source customer history upd
               attachments individualAttr control systemclass interview qc);
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
@@ -1957,7 +1966,8 @@ sub isWriteValid
 
    my @databossedit=qw(default software admin logsys contacts 
                        monisla misc opmode upd  
-                       physys ipaddresses phonenumbers sec cluster autodisc
+                       physys ipaddresses sysiface
+                       phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
    if (defined($rec) && $rec->{'systemtype'} eq "abstract"){
       @databossedit=grep(!/^physys$/,@databossedit);
@@ -2123,7 +2133,7 @@ sub getDetailBlockPriority
           qw(header default admin phonenumbers logsys location 
              vhost physys systemclass cluster
              opmode sec applications customer software 
-             swinstances ipaddresses
+             swinstances sysiface ipaddresses
              contacts monisla misc upd 
              attachments individualAttr control source));
 }

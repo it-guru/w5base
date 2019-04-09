@@ -1,0 +1,5 @@
+'itil::sysiface'=>{de=>'System-Interface',en=>'System-Interface'},
+'MAC-Address'=>{de=>'MAC-Adresse'},
+'invalid interface name specified'=>{de=>'ungültiger System-Interface Name'},
+"invalid MAC address '\%s' specified"=>{de=>"ungültiges MAC-Adress Format '\%s'"},
+'no write access to specifed system'=>{de=>'kein Schreibzugriff auf das angegebene System'},

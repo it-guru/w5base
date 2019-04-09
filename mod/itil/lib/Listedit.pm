@@ -238,6 +238,23 @@ sub isWriteOnSwinstanceValid
 }
 
 
+sub isWriteOnSystemValid
+{
+   my $self=shift;
+   my $systemid=shift;
+   my $group=shift;
+
+   my $system=$self->getPersistentModuleObject("itil::system");
+   $system->SetFilter({id=>\$systemid});
+   my ($srec,$msg)=$system->getOnlyFirst(qw(ALL));
+   my @g=$system->isWriteValid($srec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
+
 sub isWriteOnApplgrpValid
 {
    my $self=shift;

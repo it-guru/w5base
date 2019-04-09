@@ -155,6 +155,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itts.system.interface",
+                      "TS::sysiface",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.system.dnsalias",
                       "itil::dnsalias",
                       func=>'MainWithNew',
