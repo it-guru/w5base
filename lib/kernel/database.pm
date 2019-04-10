@@ -499,13 +499,20 @@ sub do
    my $self=shift;
    my $cmd=shift;
 
-   $cmd.=" /* W5BaseUser: $ENV{REMOTE_USER}($$) */" if ($ENV{REMOTE_USER} ne "");
+   if ($ENV{REMOTE_USER} ne ""){
+      $cmd.=" /* W5BaseUser: $ENV{REMOTE_USER}($$) */";
+   }
    if ($self->{'db'}){
       if (my $rows=$self->{'db'}->do($cmd,{},@_)){
          return($rows); # return of "0E0" means not lines effedted (see DBI)
       }
       else{
-         msg(ERROR,"do('%s') rows='$rows' result $DBI::errstr",$cmd);
+         # hide Error-Message, if deadlockHandler Handler flag is set (this
+         # means deadlocks are handled from caller method)
+         if (!exists($self->{deadlockHandler}) ||
+             !($DBI::errstr=~m/^Deadlock found when trying to get lock/)){
+            msg(ERROR,"do('%s') rows='$rows' result $DBI::errstr",$cmd);
+         }
       }
    }
    return(undef);

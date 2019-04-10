@@ -804,7 +804,7 @@ sub InsertRecord
    else{
       $self->Log(INFO,"sqlwrite","(long insert >64k)");
    }
-
+   $workdb->{deadlockHandler}=1;
    my $bk=$workdb->do($cmd);
    if (!$bk){
       my $retrycnt=0;
@@ -821,6 +821,7 @@ sub InsertRecord
         }
       }
    }
+   delete($workdb->{deadlockHandler});
    if ($bk){
       $workdb->finish();
       if (!defined($id)){
