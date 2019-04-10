@@ -325,7 +325,7 @@ sub new
                 group         =>'physasset',
                 label         =>'Core-Count',
                 wrdataobjattr =>"asset.corecount",
-                dataobjattr   =>"if (asset.class='BUNDLE',1,asset.cpuspeed)"),
+                dataobjattr   =>"if (asset.class='BUNDLE',1,asset.corecount)"),
 
       new kernel::Field::Number(
                 name          =>'memory',
