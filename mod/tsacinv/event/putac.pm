@@ -439,8 +439,13 @@ sub mkAcFtpRecAsset
    $cpuspeed="1" if ($cpuspeed eq "");
 
 
+   my $modelcode="MGER033048";
 
-
+   if ($rec->{class} eq "BUNDLE"){
+      $modelcode="M1696818"; # =OTC - ich hatte zwar einen ModelCode "BUNDLE"
+                             # angefordert, hab aber dann OTC bekommen.
+                             # - thats life :-[
+   }
 
    my $acrec={
                Asset=>{
@@ -463,7 +468,7 @@ sub mkAcFtpRecAsset
                     bDelete=>'0',
                     AssignmentGroup=>$cfmassign,
                     IncidentAG=>$inmassign,
-                    Model_Code=>'MGER033048'
+                    Model_Code=>$modelcode
                }
              };
 
