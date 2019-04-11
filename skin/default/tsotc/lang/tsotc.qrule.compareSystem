@@ -1,0 +1,4 @@
+'tsotc::qrule::compareSystem'=>{de=>'OTC Abgleich log. System',en=>'OTC compare of log. system'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'can not identify availability zone asset from OTC'=>{de=>'Availability-Zone Asset für OTC nicht auffindbar'},
+
