@@ -115,8 +115,8 @@ sub qcheckRecord
        $rec->{cistatusid}==5){
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "OTC"){
          if (!defined($parrec)){
-            push(@qmsg,'given srcid not found as up in OTC');
-            push(@dataissue,'given srcid not found as up in OTC');
+            push(@qmsg,'given id not found in OTC');
+            push(@dataissue,'given id not found in OTC');
             $errorlevel=3 if ($errorlevel<3);
          }
          else{
