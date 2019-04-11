@@ -38,6 +38,8 @@ sub new
                 label         =>'OTC-SystemID',
                 dataobjattr   =>"otc4darwin_server_vw.server_uuid"),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'name',
                 sqlorder      =>'desc',
@@ -220,5 +222,130 @@ sub isQualityCheckValid
    return(0);
 }
 
+
+sub Import
+{
+   my $self=shift;
+   my $param=shift;
+
+   my $flt;
+   if ($param->{importname} ne ""){
+      $flt={name=>[$param->{importname}]};
+   }
+   else{
+      return(undef);
+   }
+   $self->ResetFilter();
+   $self->SetFilter($flt);
+   my @l=$self->getHashList(qw(name cdate id contactemail availability_zone));
+   if ($#l==-1){
+      $self->LastMsg(ERROR,"Systemname not found in OTC");
+      return(undef);
+   }
+   if ($#l>0){
+      $self->LastMsg(ERROR,"Systemname not unique in OTC");
+      return(undef);
+   }
+   my $sysrec=$l[0];
+
+   #if ($sysrec->{status} eq "out of operation"){
+   #   $self->LastMsg(ERROR,"SystemID is out of operation");
+   #   return(undef);
+   #}
+
+
+
+
+
+   my $sys=getModuleObject($self->Config,"itil::system");
+   $sys->SetFilter($flt);
+   my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   my $identifyby;
+   if (defined($w5sysrec)){
+      if ($w5sysrec->{cistatusid}==4){
+         $self->LastMsg(ERROR,"Systemname already exists in W5Base");
+         return(undef);
+      }
+
+      my %newrec=(cistatusid=>4);
+      my $userid;
+
+      if ($self->isDataInputFromUserFrontend() &&
+          !$self->IsMemberOf("admin")) {
+         $userid=$self->getCurrentUserId();
+         $newrec{databossid}=$userid;
+      }
+
+      if ($sys->ValidatedUpdateRecord($w5sysrec,\%newrec,
+                                      {id=>\$w5sysrec->{id}})) {
+         $identifyby=$w5sysrec->{id};
+      }
+   }
+   else{
+      # check 1: Assigmenen Group registered
+      #if ($sysrec->{lassignmentid} eq ""){
+      #   $self->LastMsg(ERROR,"SystemID has no Assignment Group");
+      #   return(undef);
+      #}
+      # check 2: Assingment Group active
+      #my $acgroup=getModuleObject($self->Config,"tsacinv::group");
+      #$acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
+      #my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisoremail));
+      #if (!defined($acgrouprec)){
+      #   $self->LastMsg(ERROR,"Can't find Assignment Group of system");
+      #   return(undef);
+      #}
+      # check 3: Supervisor registered
+      #if ($acgrouprec->{supervisoremail} eq ""){
+      #   $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
+      #   return(undef);
+      #}
+      my $importname=$sysrec->{contactemail};
+      # check 4: load Supervisor ID in W5Base
+      my $user=getModuleObject($self->Config,"base::user");
+      my $databossid;
+      if ($importname ne ""){
+         $databossid=$user->GetW5BaseUserID($importname,"email");
+      }
+      else{
+         $self->LastMsg(ERROR,"no contact email found in otc sysrec");
+         return(undef);
+      }
+      if (!defined($databossid)){
+         $self->LastMsg(ERROR,"can not create databoss contact record");
+         return(undef);
+
+      }
+      #my @mandators=$self->getMandatorsOf($databossid,"write","direct");
+      my $mandatorid=200;  # We use TelekomIT as Default
+
+      if ($mandatorid eq ""){
+         $self->LastMsg(ERROR,"Can't find any mandator");
+         return(undef);
+      }
+
+      # final: do the insert operation
+      my $newrec={name=>$sysrec->{name},
+                  srcid=>$sysrec->{id},
+                  srcsys=>'OTC',
+                  databossid=>$databossid,
+                  allowifupdate=>1,
+                  mandatorid=>$mandatorid,
+                  cistatusid=>4};
+print Dumper($newrec);
+      $identifyby=$sys->ValidatedInsertRecord($newrec);
+   }
+   if (defined($identifyby) && $identifyby!=0){
+      $sys->ResetFilter();
+      $sys->SetFilter({'id'=>\$identifyby});
+      my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
+         my $qc=getModuleObject($self->Config,"base::qrule");
+         $qc->setParent($sys);
+         $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
+      }
+   }
+   return($identifyby);
+}
 
 1;
