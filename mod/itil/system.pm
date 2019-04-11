@@ -357,6 +357,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'assetserialno',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 weblinkto     =>'none',
                 translation   =>'itil::asset',
                 label         =>'Serialnumber',
@@ -379,6 +380,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'assetroom',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 weblinkto     =>'none',
                 label         =>'Room',
                 group         =>'location',
@@ -389,6 +391,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'assetplace',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 weblinkto     =>'none',
                 label         =>'Place',
                 group         =>'location',
@@ -399,6 +402,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'assetrack',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 weblinkto     =>'none',
                 label         =>'Rack',
                 group         =>'location',
@@ -536,6 +540,7 @@ sub new
                 label         =>'Productline',
                 htmldetail    =>'1',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 dataobjattr   =>'system.productline'),
 
       new kernel::Field::Number(
@@ -848,6 +853,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'hwmodel',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 weblinkto     =>'none',
                 group         =>'physys',
                 label         =>'Hardwaremodel',
@@ -865,6 +871,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'hwproducer',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 searchable    =>0,
                 weblinkto     =>'none',
                 group         =>'physys',
@@ -876,6 +883,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'hwcpucount',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'physys',
                 label         =>'phys. CPU-Count',
                 dataobjattr   =>"$vmifexp,vasset.cpucount,asset.cpucount)"),
@@ -883,6 +891,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'hwcorecount',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'physys',
                 label         =>'phys. Core-Count',
                 dataobjattr   =>"$vmifexp,vasset.corecount,asset.corecount)"),
@@ -890,6 +899,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'hwmemory',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'physys',
                 label         =>'phys. Memory',
                 unit          =>'MB',
@@ -898,13 +908,16 @@ sub new
       new kernel::Field::Text(
                 name          =>'systemhandle',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'physys',
                 label         =>'Producer System-Handle',
-                dataobjattr   =>"$vmifexp,vasset.systemhandle,asset.systemhandle)"),
+                dataobjattr   =>"$vmifexp,vasset.systemhandle,".
+                                "asset.systemhandle)"),
 
       new kernel::Field::Text(
                 name          =>'assetservicesupport',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'physys',
                 vjointo       =>'itil::servicesupport',
                 vjoinon       =>['assetservicesupportid'=>'id'],
@@ -1242,12 +1255,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-Id',
                 dataobjattr   =>'system.srcid'),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
                 history       =>0,
+                htmldetail    =>'NotEmpty',
                 group         =>'source',
                 label         =>'Source-Load',
                 dataobjattr   =>'system.srcload'),

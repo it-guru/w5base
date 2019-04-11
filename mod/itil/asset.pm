@@ -737,12 +737,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-Id',
                 dataobjattr   =>'asset.srcid'),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
                 history       =>0,
+                htmldetail    =>'NotEmpty',
                 group         =>'source',
                 label         =>'Source-Load',
                 dataobjattr   =>'asset.srcload'),
