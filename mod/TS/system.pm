@@ -468,7 +468,7 @@ sub isViewValid
             push(@l,"amrel");
          }
       }
-      if ($rec->{srcsys} eq "w5base"){
+      else{
          if (in_array(\@l,"default")){
             push(@l,"inmchm");
          }
@@ -484,7 +484,7 @@ sub isWriteValid
    my @l=$self->SUPER::isWriteValid($rec);
 
    if (defined($rec)){
-      if ($rec->{srcsys} eq "w5base"){
+      if ($rec->{srcsys} ne "AssetManager"){
          if (in_array(\@l,"default")){
             push(@l,"inmchm");
          }
