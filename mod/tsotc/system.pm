@@ -223,6 +223,40 @@ sub isQualityCheckValid
 }
 
 
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),
+          qw(ImportSystem));
+}
+
+
+sub ImportSystem
+{
+   my $self=shift;
+
+   my $importname=trim(Query->Param("importname"));
+   if (Query->Param("DOIT")){
+      if ($self->Import({importname=>$importname})){
+         Query->Delete("importname");
+         $self->LastMsg(OK,"system has been successfuly imported");
+      }
+      Query->Delete("DOIT");
+   }
+
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importname},
+                           body=>1,form=>1,
+                           title=>"OTC System Import");
+   print $self->getParsedTemplate("tmpl/minitool.system.import",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
 sub Import
 {
    my $self=shift;
@@ -262,18 +296,37 @@ sub Import
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
    my $identifyby;
    if (defined($w5sysrec)){
-      if ($w5sysrec->{cistatusid}==4){
+      if ($w5sysrec->{cistatusid}==4 &&
+          $w5sysrec->{srcsys} eq "OTC"){
          $self->LastMsg(ERROR,"Systemname already exists in W5Base");
          return(undef);
       }
 
-      my %newrec=(cistatusid=>4);
+      my %newrec=();
       my $userid;
 
       if ($self->isDataInputFromUserFrontend() &&
           !$self->IsMemberOf("admin")) {
          $userid=$self->getCurrentUserId();
-         $newrec{databossid}=$userid;
+         if ($w5sysrec->{cistatusid}<6){
+            if ($userid ne $w5sysrec->{databossid}){
+               $self->LastMsg(ERROR,
+                              "reimport only posible by current databoss");
+               return(undef);
+            }
+         }
+      }
+      if ($w5sysrec->{cistatusid} ne "4"){
+         $newrec{cistatusid}="4";
+      }
+      if ($w5sysrec->{srcsys} ne "OTC"){
+         $newrec{srcsys}="OTC";
+      }
+      if ($w5sysrec->{srcid} ne $sysrec->{id}){
+         $newrec{srcid}=$sysrec->{id};
+      }
+      if ($w5sysrec->{systemtype} ne "standard"){
+         $newrec{systemtype}="standard";
       }
 
       if ($sys->ValidatedUpdateRecord($w5sysrec,\%newrec,
@@ -300,16 +353,21 @@ sub Import
       #   $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
       #   return(undef);
       #}
-      my $importname=$sysrec->{contactemail};
-      # check 4: load Supervisor ID in W5Base
-      my $user=getModuleObject($self->Config,"base::user");
       my $databossid;
-      if ($importname ne ""){
-         $databossid=$user->GetW5BaseUserID($importname,"email");
+      if ($self->isDataInputFromUserFrontend()){
+         $databossid=$self->getCurrentUserId();
       }
       else{
-         $self->LastMsg(ERROR,"no contact email found in otc sysrec");
-         return(undef);
+         my $importname=$sysrec->{contactemail};
+         # check 4: load Supervisor ID in W5Base
+         my $user=getModuleObject($self->Config,"base::user");
+         if ($importname ne ""){
+            $databossid=$user->GetW5BaseUserID($importname,"email");
+         }
+         else{
+            $self->LastMsg(ERROR,"no contact email found in otc sysrec");
+            return(undef);
+         }
       }
       if (!defined($databossid)){
          $self->LastMsg(ERROR,"can not create databoss contact record");
@@ -332,7 +390,6 @@ sub Import
                   allowifupdate=>1,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
-print Dumper($newrec);
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){
