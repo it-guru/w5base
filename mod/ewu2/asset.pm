@@ -101,6 +101,52 @@ sub new
                 label         =>"Serialnumber",
                 dataobjattr   =>"\"PHYSICAL_ELEMENTS\".\"SERIAL_NUMBER\""),
 
+      new kernel::Field::Number(
+                name          =>'cpucount',
+                xlswidth      =>10,
+                label         =>'CPU-Count',
+                dataobjattr   =>"COMPUTER_SYSTEMS.CPU_COUNT"),
+
+      new kernel::Field::Number(
+                name          =>'cpuspeed',
+                xlswidth      =>10,
+                unit          =>'MHz',
+                label         =>'CPU-Speed',
+                dataobjattr   =>
+                  "NULLIF(case when instr(".
+                         "lower(\"COMPUTER_SYSTEMS\".CPU_SPEED),'ghz')>1 then ".
+                     "(nvl(to_number( ".
+                       "regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
+                                     "'^\\s*([0-9]+)',1,1,NULL,1)),0)+ ".
+                      "(nvl(to_number( ".
+                        "rpad(regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
+                                      "'^\\s*[0-9]+[,.]([0-9]{1,3})', ".
+                                      "1,1,NULL,1),3,'0')),0)*0.001))*1000 ".
+                      "else ".
+                     "(nvl(to_number( ".
+                       "regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
+                                     "'^\\s*([0-9]+)',1,1,NULL,1)),0)+ ".
+                      "(nvl(to_number( ".
+                         "rpad(regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
+                                       "'^\\s*[0-9]+[,.]([0-9]{1,3})', ".
+                                       "1,1,NULL,1),3,'0')),0)*0.001)) ".
+                  "end,0)"),
+
+      new kernel::Field::Number(
+                name          =>'corecount',
+                xlswidth      =>10,
+                label         =>'Core-Count',
+                dataobjattr   =>"COMPUTER_SYSTEMS.CPU_CORES_TOTAL"),
+
+      new kernel::Field::Number(
+                name          =>'memory',
+                xlswidth      =>10,
+                label         =>'Memory',
+                unit          =>'MB',
+                dataobjattr   =>"COMPUTER_SYSTEMS.RAM_MB"),
+
+
+
       new kernel::Field::SubList(
                 name          =>'systems',
                 label         =>'Systems',
@@ -222,6 +268,32 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from=
+      "(".
+            "select PE.*, ".
+                   "(SELECT COMPUTER_SYSTEM_ID ".
+                    "FROM COMPUTER_SYSTEMS ".
+                    "WHERE PE.PHYSICAL_ELEMENT_ID ".
+                            "=COMPUTER_SYSTEMS.PHYSICAL_ELEMENT_ID ".
+                          "AND STATUS='up' ".
+                          "AND TYPE='PhysicalMachine' ".
+                          "AND ROWNUM = 1 ".
+                   ") PhySysID ".
+            "from PHYSICAL_ELEMENTS PE ".
+         ") PHYSICAL_ELEMENTS ".
+         "join COMPUTER_SYSTEMS ".
+            "on PHYSICAL_ELEMENTS.PhySysID ".
+                "=COMPUTER_SYSTEMS.COMPUTER_SYSTEM_ID";
+   return($from);
+}
+
+
 
 
 

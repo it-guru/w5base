@@ -135,32 +135,32 @@ sub qcheckRecord
                               $autocorrect,$forcedupd,$wfrequest,
                               \@qmsg,\@dataissue,\$errorlevel,mode=>'string');
 
-#               $self->IfComp($dataobj,
-#                             $rec,"memory",
-#                             $parrec,"memory",
-#                             $autocorrect,$forcedupd,$wfrequest,
-#                             \@qmsg,\@dataissue,\$errorlevel,
-#                             tolerance=>5,mode=>'integer');
-#
-#               $self->IfComp($dataobj,
-#                             $rec,"cpucount",
-#                             $parrec,"cpucount",
-#                             $autocorrect,$forcedupd,$wfrequest,
-#                             \@qmsg,\@dataissue,\$errorlevel,
-#                             mode=>'integer');
-#               $self->IfComp($dataobj,
-#                             $rec,"corecount",
-#                             $parrec,"corecount",
-#                             $autocorrect,$forcedupd,$wfrequest,
-#                             \@qmsg,\@dataissue,\$errorlevel,
-#                             mode=>'integer');
-#
-#               $self->IfComp($dataobj,
-#                             $rec,"cpuspeed",
-#                             $parrec,"cpuspeed",
-#                             $autocorrect,$forcedupd,$wfrequest,
-#                             \@qmsg,\@dataissue,\$errorlevel,
-#                             mode=>'integer');
+               $self->IfComp($dataobj,
+                             $rec,"memory",
+                             $parrec,"memory",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             tolerance=>5,mode=>'integer');
+
+               $self->IfComp($dataobj,
+                             $rec,"cpucount",
+                             $parrec,"cpucount",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'integer');
+               $self->IfComp($dataobj,
+                             $rec,"corecount",
+                             $parrec,"corecount",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'integer');
+
+               $self->IfComp($dataobj,
+                             $rec,"cpuspeed",
+                             $parrec,"cpuspeed",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'integer');
 
                $self->IfComp($dataobj,
                              $rec,"hwmodel",
