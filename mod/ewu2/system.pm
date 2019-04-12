@@ -216,7 +216,25 @@ sub new
                 name          =>'cpuspeed',
                 group         =>'sysdata',
                 label         =>"CPU-Speed",
-                dataobjattr   =>"\"COMPUTER_SYSTEMS\".\"CPU_SPEED\""),
+                dataobjattr   =>
+                  "NULLIF(case when instr(".
+                         "lower(\"COMPUTER_SYSTEMS\".CPU_SPEED),'ghz')>1 then ".
+                     "(nvl(to_number( ".
+                       "regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
+                                     "'^\\s*([0-9]+)',1,1,NULL,1)),0)+ ".
+                      "(nvl(to_number( ".
+                        "rpad(regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
+                                      "'^\\s*[0-9]+[,.]([0-9]{1,3})', ".
+                                      "1,1,NULL,1),,3,'0')),0)*0.001))*1000 ".
+                      "else ".
+                     "(nvl(to_number( ".
+                       "regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
+                                     "'^\\s*([0-9]+)',1,1,NULL,1)),0)+ ".
+                      "(nvl(to_number( ".
+                         "rpad(regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
+                                       "'^\\s*[0-9]+[,.]([0-9]{1,3})', ".
+                                       "1,1,NULL,1),3,'0')),0)*0.001)) ".
+                  "end,0)"),
 
       new kernel::Field::Text(
                 name          =>'cpucount',
@@ -651,6 +669,7 @@ sub Import
                name=>$arec->{commonname},
                serialno=>$arec->{serialno},
                cistatusid=>4,
+               allowifupdate=>1,
                mandatorid=>$mandatorid,
                locationid=>$arec->{locationid},
                srcsys=>'EWU2',
