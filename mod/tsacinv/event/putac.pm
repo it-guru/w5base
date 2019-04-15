@@ -1045,6 +1045,7 @@ sub SendXmlToAM_appl
    my $applappl=getModuleObject($self->Config,"itil::lnkapplappl");
    my $applsys=getModuleObject($self->Config,"itil::lnkapplsystem");
    my $acapplsys=getModuleObject($self->Config,"tsacinv::lnkapplsystem");
+   my $acsys=getModuleObject($self->Config,"tsacinv::system");
    my $acgrp=getModuleObject($self->Config,"tsacinv::group");
    my $app=getModuleObject($self->Config,"AL_TCom::appl");
    my $user=getModuleObject($self->Config,"base::user");
@@ -1138,6 +1139,7 @@ sub SendXmlToAM_appl
                                               shortdesc systemid
                                               srcsys srcid));
                my @alreadyManuellRelated;
+               my @isProtectedNetworkDev;
                if ($rec->{applid} ne ""){
                   $acapplsys->ResetFilter();
                   $acapplsys->SetFilter({applid=>\$rec->{applid}});
@@ -1151,8 +1153,30 @@ sub SendXmlToAM_appl
                      }
                   }
                }
+               # check if there are protected network devices
+               {
+                  my @chks;
+                  foreach my $lnk (@l){
+                     if ($lnk->{systemsystemid} ne ""){
+                        push(@chks,$lnk->{systemsystemid});
+                     }
+                  }
+                  if ($#chks!=-1){
+                     $acsys->ResetFilter();
+                     $acsys->SetFilter({systemid=>\@chks});
+                     foreach my $r ($acsys->getHashList(qw(systemid 
+                                                           isprotnetdev))){
+                        if ($r->{isprotnetdev}){
+                           push(@isProtectedNetworkDev,$r->{systemid});
+                        }
+                     }
+                  }
+               
+               }
                foreach my $lnk (@l){
                   next if (in_array(\@alreadyManuellRelated,
+                                    $lnk->{systemsystemid}));
+                  next if (in_array(\@isProtectedNetworkDev,
                                     $lnk->{systemsystemid}));
                   my $SysU=0;
                   $SysU=20 if ($SysU<20 && $lnk->{istest}); 

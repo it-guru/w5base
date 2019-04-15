@@ -67,4 +67,5 @@
 'SystemID is out of operation'=>{de=>'SystemID ist "out of operation"'},
 'full CI-Name'=>{de=>'vollständiger CI-Name'},
 'marked as delete'=>{de=>'gelöscht markiert'},
+'is protected network device'=>{de=>'ist geschütztes Netzwerk System'},
 
