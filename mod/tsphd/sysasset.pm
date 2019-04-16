@@ -39,19 +39,178 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'PHD-AssetID',
-                dataobjattr   =>'PHD_PM_JOIN_L1_L_ASSET_IAM_ASS.asset_assetid'),
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_assetid"),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Asset-Name',
-                dataobjattr   =>'PHD_PM_JOIN_L1_L_ASSET_IAM_ASS.asset_assetname'),
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_assetname"),
+
+      new kernel::Field::Text(
+                name          =>'typ',
+                label         =>'Typ',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_systemtyp"),
+
+      new kernel::Field::Text(
+                name          =>'subtyp',
+                label         =>'Subtyp',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_systemsubtyp"),
+
+      new kernel::Field::Text(
+                name          =>'function',
+                label         =>'Function',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_funktion"),
+
+      new kernel::Field::Text(
+                name          =>'status',
+                label         =>'Status',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_systemstatus"),
+
+      new kernel::Field::Text(
+                name          =>'model',
+                label         =>'Model',
+                group         =>'asset',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "modell_bezeichnung"),
+
+      new kernel::Field::Text(
+                name          =>'modelprod',
+                label         =>'Model Producer',
+                group         =>'asset',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "modell_hersteller"),
+
+      new kernel::Field::Text(
+                name          =>'osrelease',
+                label         =>'OS-Release',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_os"),
+
+      new kernel::Field::Email(
+                name          =>'semail',
+                label         =>'SE-EMail',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "se_mail"),
+
+      new kernel::Field::Email(
+                name          =>'svmail',
+                label         =>'SV-EMail',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "sv_mail"),
+
+      new kernel::Field::Number(
+                name          =>'cpucount',
+                group         =>'asset',
+                label         =>'CPU-Count (default=1)',
+                dataobjattr   =>"'1'"),
+
+      new kernel::Field::Number(
+                name          =>'cpuspeed',
+                xlswidth      =>10,
+                group         =>'asset',
+                unit          =>'MHz',
+                label         =>'CPU-Speed',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_takt"),
+
+      new kernel::Field::Number(
+                name          =>'corecount',
+                xlswidth      =>10,
+                group         =>'asset',
+                label         =>'Core-Count (default=1)',
+                dataobjattr   =>"'1'"),
+
+      new kernel::Field::Number(
+                name          =>'memory',
+                group         =>'asset',
+                label         =>'Memory',
+                unit          =>'MB',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_mb"),
+
+      new kernel::Field::Text(
+                name          =>'serialno',
+                xlswidth      =>15,
+                group         =>'asset',
+                label         =>'Serialnumber',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_seriennummer"),
+
+      new kernel::Field::TextDrop(
+                name          =>'location',
+                group         =>'asset',
+                label         =>'Location',
+                vjointo       =>'base::location',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['locationid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'locationid',
+                group         =>'asset',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "sto_w5baseid"),
+
+      new kernel::Field::Text(
+                name          =>'room',
+                group         =>'asset',
+                label         =>'Room',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_raum"),
+      new kernel::Field::Text(
+                name          =>'rack',
+                group         =>'asset',
+                label         =>'Rack',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_rack"),
+
+      new kernel::Field::Text(
+                name          =>'place',
+                group         =>'asset',
+                label         =>'Place',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_einbauplatz"),
+
+      new kernel::Field::Text(
+                name          =>'ifmac',
+                group         =>'addr',
+                label         =>'Interface MAC',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_mac_adresse_1"),
+
+      new kernel::Field::Text(
+                name          =>'ipaddress',
+                group         =>'addr',
+                label         =>'IP-Address',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_ip_adresse__"),
+
+      new kernel::Field::Text(
+                name          =>'dnsname',
+                group         =>'addr',
+                label         =>'DNS Name (only FQDN useable)',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_dns_name_des_systems__"),
+
+      new kernel::Field::Text(
+                name          =>'ipsubnetmask',
+                group         =>'addr',
+                label         =>'IP-SubNetMask',
+                dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
+                                "asset_subnet_mask__"),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
                 label         =>'Modification-Date',
                 group         =>'source',
                 dataobjattr   =>"(to_date('19700101','YYYYMMDD')+(".
-                                "PHD_PM_JOIN_L1_L_ASSET_IAM_ASS.modified_date".
+                                "IAM_ASSET.SI_ZULETZT_GEAENDERT_AM".
                                 "/86400))"),
 
       new kernel::Field::CDate(
@@ -59,7 +218,7 @@ sub new
                 label         =>'Creation-Date',
                 group         =>'source',
                 dataobjattr   =>"(to_date('19700101','YYYYMMDD')+(".
-                                "PHD_PM_JOIN_L1_L_ASSET_IAM_ASS.create_date".
+                                "IAM_ASSET.SI_ERSTELLT_AM".
                                 "/86400))"),
 
 #
@@ -88,10 +247,19 @@ sub new
 #                dataobjattr   =>'isocountry.realeditor'),
 #
    );
-   $self->setDefaultView(qw(name  id cdate));
-   $self->setWorktable("PHD_PM_JOIN_L1_L_ASSET_IAM_ASS");
+   $self->setDefaultView(qw(name status id typ osrelease ipaddress cdate));
+   $self->setWorktable("DARWIN_JOIN_L4_ASSETS_STO_MD_S");
    return($self);
 }
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
 
 
 sub Initialize
@@ -104,6 +272,29 @@ sub Initialize
    return(0);
 }
 
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(
+          qw(header default addr asset source));
+}
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable ".
+            "left outer join PHD_PM_JOIN_L1_L_ASSET_IAM_ASS ".
+            "on $worktable.\"ASSET_ASSETID\"=".
+                "\"PHD_PM_JOIN_L1_L_ASSET_IAM_ASS\".\"ASSET_ASSETID\" ".
+            "left outer join IAM_ASSET ".
+            "on $worktable.\"ASSET_ASSETID\"=".
+                "\"IAM_ASSET\".\"ASSETID\" ";
+
+   return($from);
+}
 
 
 
