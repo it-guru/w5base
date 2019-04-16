@@ -225,7 +225,7 @@ sub new
                       "(nvl(to_number( ".
                         "rpad(regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
                                       "'^\\s*[0-9]+[,.]([0-9]{1,3})', ".
-                                      "1,1,NULL,1),,3,'0')),0)*0.001))*1000 ".
+                                      "1,1,NULL,1),3,'0')),0)*0.001))*1000 ".
                       "else ".
                      "(nvl(to_number( ".
                        "regexp_substr(\"COMPUTER_SYSTEMS\".CPU_SPEED, ".
