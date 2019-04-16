@@ -744,6 +744,10 @@ sub Validate
       $self->LastMsg(ERROR,$self->T($errmsg,"itil::lib::Listedit"));
       return(0);
    }
+   if (!$self->isValidClientIP($name)){
+      $self->LastMsg(ERROR,$self->T("invalid Client IP Address - Blacklisted"));
+      return(0);
+   }
 
    foreach my $okt (split(/:/,$ip6str)){
       $binnamekey.=unpack("B16",pack("H4",$okt));

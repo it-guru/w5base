@@ -67,11 +67,29 @@ sub URLValidate
    return(kernel::Field::TextURL::URLValidate($name));
 }
 
-sub IPValidate {
+sub IPValidate 
+{
    my $self=shift;
    my $ip=shift;
    my $msg=shift;
    return(kernel::Field::TextURL::IPValidate($ip,$msg));
+}
+
+sub isValidClientIP
+{
+   my $self=shift;
+   my $ip=shift;
+
+   if (in_array($ip,[qw(
+          127.0.0.1 127.0.0.1 127.0.1.1 127.1.1.1
+          0.0.0.0 0.0.0.255 0.0.255.255 0.255.255.255 
+          255.255.255.255
+          255.255.255.0
+          255.0.0.0
+       )])){
+      return(0);
+   }
+   return(1);
 }
 
 
