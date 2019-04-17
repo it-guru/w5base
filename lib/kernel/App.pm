@@ -255,6 +255,11 @@ sub getMandatorsOf
    @roles=@{$roles[0]} if (ref($roles[0]) eq "ARRAY");
    my $userid;
    my $UserCache=$self->Cache->{User}->{Cache};
+   if ($AccountOrUserID=~m/^\d+$/){
+      if (!defined($UserCache->{$AccountOrUserID})){
+         $self->_LoadUserInUserCache($AccountOrUserID);
+      }
+   }
    if (defined($UserCache->{$AccountOrUserID})){
       $UserCache=$UserCache->{$AccountOrUserID}->{rec};
    }
@@ -270,6 +275,10 @@ sub getMandatorsOf
    my %m=();
   # my %m=map({($_=>1);}@grps);
    my $MandatorCache=$self->Cache->{Mandator}->{Cache};
+   if (!defined($MandatorCache)){
+      $self->ValidateMandatorCache(0);  # load Cache, if call is from Event (not in Web-Context)
+      $MandatorCache=$self->Cache->{Mandator}->{Cache};
+   }
    my $isadmin=$self->IsMemberOf("admin");
    CHK: foreach my $mid (keys(%{$MandatorCache->{id}})){
       my $mc=$MandatorCache->{id}->{$mid};
