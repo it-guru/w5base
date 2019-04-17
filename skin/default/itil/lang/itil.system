@@ -111,3 +111,4 @@
 'individual attributes'=>{de=>'individuelle Attribute'},
 'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},
 'Productline'=>{de=>'Produktlinie'},
+'MAC-Addresses'=>{de=>'MAC-Adressen'},

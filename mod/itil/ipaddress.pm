@@ -379,6 +379,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'dnsname',
                 label         =>'DNS-Name',
+                htmlwidth     =>'100px',
                 dataobjattr   =>'ipaddress.dnsname'),
 
       new kernel::Field::Select(
@@ -411,6 +412,17 @@ sub new
                 htmlwidth     =>'130px',
                 label         =>'Interface name',
                 dataobjattr   =>'ipaddress.ifname'),
+
+      new kernel::Field::Text(
+                name          =>'mac',
+                label         =>'MAC-Address',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'(select macaddr '.
+                   ' from sysiface  '.
+                   'where sysiface.system=ipaddress.system and '.
+                   'ipaddress.system is not null and '.
+                   'sysiface.name=ipaddress.ifname limit 1)'),
 
       new kernel::Field::Text(
                 name          =>'accountno',
@@ -490,9 +502,12 @@ sub new
                                        length($d)){
                                       $d.="...";
                                    }
+                                   if ($current->{ifname} ne ""){
+                                      $d.=":".$current->{ifname};
+                                   }
                                    return($d);
                                 },
-                depend        =>['comments']),
+                depend        =>['comments','ifname']),
 
       new kernel::Field::Container(
                 name          =>'additional',

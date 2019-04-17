@@ -1133,6 +1133,16 @@ sub new
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['name','mac']),
 
+      new kernel::Field::Text(
+                name          =>'macadresses',
+                label         =>'MAC-Adresses',
+                group         =>'sysiface',
+                readonly      =>1,
+                htmldetail    =>0,
+                vjointo       =>'itil::sysiface',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['mac']),
+
       new kernel::Field::SubList(
                 name          =>'ipaddresseslist',
                 label         =>'IP-Adresses list',
@@ -1545,6 +1555,7 @@ sub initSearchQuery
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
 }
+
 
 sub getFieldObjsByView
 {

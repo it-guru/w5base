@@ -201,6 +201,12 @@ sub Validate
       $self->LastMsg(ERROR,"invalid interface name specified");
       return(undef);
    }
+   if (defined($newrec) && exists($newrec->{mac})){
+      if ($newrec->{mac}=~m/^[0-9a-f]{12}$/i){
+         my @l=($newrec->{mac}=~m/../g);
+         $newrec->{mac}=join(":",@l);
+      }
+   }
 
    if (defined($newrec) && exists($newrec->{mac})){
       my $mac=effVal($oldrec,$newrec,"mac");
