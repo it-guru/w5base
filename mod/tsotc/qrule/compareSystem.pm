@@ -209,22 +209,33 @@ sub qcheckRecord
                   # can be in one networkcard record
                   #
                   my %cleanAmIPlist;
-                  foreach my $otciprec (@{$parrec->{ipaddresses}}){
+                  my %cleanAmIflist;
+                  my $ifnum=0;
+                  foreach my $otciprec (sort(@{$parrec->{ipaddresses}})){
                      my $mappedCIStatus=4;
                      if ($otciprec->{name} ne ""){
+                        my $ifname=sprintf("eth%d",$ifnum);
                         if ($otciprec->{name}=~
                             m/^\d{1,3}(\.\d{1,3}){3,3}$/){
                            $cleanAmIPlist{$otciprec->{name}}={
                               cistatusid=>$mappedCIStatus,
                               ipaddress=>$otciprec->{name},
+                              ifname=>$ifname,
                               comments=>trim($otciprec->{comments})
                            };
+                           if ($otciprec->{hwaddr} ne ""){
+                              $cleanAmIflist{$ifname}={
+                                 name=>$ifname,
+                                 mac=>$otciprec->{hwaddr}
+                              };
+                           }
                         }
                         else{
                            msg(WARN,"ignoring IPv4 invalid ".
                                     "'$otciprec->{name}' ".
                                     "for $parrec->{id}");
                         }
+                        $ifnum++;
                      }
                   }
                   my @cleanAmIPlist=values(%cleanAmIPlist);
@@ -238,6 +249,8 @@ sub qcheckRecord
                                    $eq=1 if ($a->{srcsys} eq "OTC" &&
                                              $a->{cistatusid} eq 
                                              $b->{cistatusid}       &&
+                                             $a->{ifname} eq 
+                                             $b->{ifname}   &&
                                              $a->{comments} eq 
                                              $b->{comments});
                                 }
@@ -282,6 +295,7 @@ sub qcheckRecord
                                               type      =>$type,
                                               networkid =>$networkid,
                                               comments  =>$newrec->{comments},
+                                              ifname    =>$newrec->{ifname},
                                               systemid  =>$p{refid}
                                               }
                                            });
@@ -306,6 +320,69 @@ sub qcheckRecord
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
                   }
+
+
+                  my @cleanAmIflist=values(%cleanAmIflist);
+                  @opList=();
+                  my $res=OpAnalyse(
+                             sub{  # comperator 
+                                my ($a,$b)=@_;
+                                my $eq;
+                                if ($a->{name} eq $b->{name}){
+                                  $eq=0;
+                                   $eq=1 if ($a->{srcsys} eq "OTC" &&
+                                             $a->{mac} eq 
+                                             $b->{mac});
+                                }
+                                return($eq);
+                             },
+                             sub{  # oprec generator
+                                my ($mode,$oldrec,$newrec,%p)=@_;
+                                if ($mode eq "insert" || $mode eq "update"){
+                                   #if ($mode eq "insert" && 
+                                   #    $newrec->{cistatusid} eq "6"){
+                                   #   return(); # do not insert 
+                                   #             # already unconfigured ip's
+                                   #}
+                                   my $identifyby=undef;
+                                   if ($mode eq "update"){
+                                      $identifyby=$oldrec->{id};
+                                   }
+                                   if ($newrec->{name}=~m/^\s*$/){
+                                      $mode="nop";
+                                   }
+                                   return({OP=>$mode,
+                                           MSG=>"$mode if $newrec->{name} ".
+                                                "in W5Base",
+                                           IDENTIFYBY=>$identifyby,
+                                           DATAOBJ=>'itil::sysiface',
+                                           DATA=>{
+                                              name      =>$newrec->{name},
+                                              mac       =>$newrec->{mac},
+                                              srcsys    =>'OTC',
+                                              systemid  =>$p{refid}
+                                              }
+                                           });
+                                }
+                                elsif ($mode eq "delete"){
+                                   return({OP=>$mode,
+                                           MSG=>"delete ip $oldrec->{name} ".
+                                               "from W5Base",
+                                           DATAOBJ=>'itil::ipaddress',
+                                           IDENTIFYBY=>$oldrec->{id},
+                                           });
+                                }
+                                return(undef);
+                             },
+                             $rec->{sysiface},\@cleanAmIflist,\@opList,
+                             refid=>$rec->{id});
+                  if (!$res){
+                     my $opres=ProcessOpList($self->getParent,\@opList);
+                  }
+
+
+
+
                }
             }
             if (!($parrec->{availability_zone}=~m/^eu[0-9a-z-]{3,10}$/)){
