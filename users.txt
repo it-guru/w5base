@@ -1,6 +1,0 @@
-w5base = w5base <system@w5base.net>
-voglerh = Vogler, Hartmut <hartmut.vogler@t-systems.com>
-it-guru = Vogler, Hartmut <hartmut.vogler@t-systems.com>
-zeism = Zeis,Markus <markus.zeis@t-systems.com>
-basedowh = Basedow, Holm <holm.basedow@t-systems.com>
-wieschoa = Wieschollek, Andreas <andreas.wieschollek@t-systems.com>
