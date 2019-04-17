@@ -24,6 +24,18 @@ use kernel::Event;
 
 
 
+
+sub Init
+{
+   my $self=shift;
+
+
+   $self->RegisterEvent("ScanNewSystems","ScanNewSystems",timeout=>600);
+}
+
+
+
+
 # Modul to detect expiered SSL Certs based on Qualys scan data
 sub ScanNewSystems
 {
@@ -173,6 +185,7 @@ sub analyseRecord
    my $res=shift;
 
    msg(INFO,"PROCESS: $rec->{id} $rec->{cdate} name='$rec->{name}'");
+   msg(INFO,"         contact='$rec->{contactemail}'");
 
    if (!($rec->{name}=~m/^[a-z0-9_-]{2,35}$/)){
       msg(ERROR,"skip OTC Systemname $rec->{name} - invalid systemname");
@@ -184,22 +197,105 @@ sub analyseRecord
    }
 
    my $sys=$self->getPersistentModuleObject("W5BaseOTCSys","tsotc::system");
+   my $w5sys=$self->getPersistentModuleObject("W5BaseSys","itil::system");
+   my $wfa=$self->getPersistentModuleObject("W5BaseWa","base::workflowaction");
+   my $user=$self->getPersistentModuleObject("W5BaseUser","base::user");
 
    my $w5baseid=$sys->Import({importname=>$rec->{name}});
 
-
-#   my $sys=$self->getPersistentModuleObject("W5BaseSys","itil::system");
-#
-#   $sys->SetFilter({name=>$rec->{name},cistatusid=>[4]});
-#   my ($srec)=$sys->getOnlyFirst(qw(id name cistatusid srcsys srcid));
-#
-#   if (defined($srec)){
-#      print Dumper($srec);
-#
-#   }
-#   else{   # try to create new
-#   }
+   if (defined($w5baseid)){   # create Notification
+      $w5sys->SetFilter({id=>\$w5baseid});
+      my ($srec)=$w5sys->getOnlyFirst(qw(id databossid urlofcurrentrec name));
+      if (!defined($srec)){
+         msg(ERROR,"something went wron while import of OTC Systemname $srec->{name}");
+         return();
+      }
+      msg(INFO,"start doNotify $srec->{name}");
+      $self->doNotify($sys,$wfa,$user,$srec);
+   }
 }
+
+
+
+sub doNotify
+{
+   my $self=shift;
+   my $datastream=shift;
+   my $wfa=shift;
+   my $user=shift;
+   my $rec=shift;
+   my $debug="";
+
+
+   my %uid;
+
+   $uid{to}->{$rec->{databossid}}++;
+   my @targetuids=grep(!/^$/,keys(%{$uid{to}}),keys(%{$uid{cc}}));
+
+
+print STDERR "fifi targetuids=".Dumper(\@targetuids);
+print STDERR "fifi srec=".Dumper($rec);
+   my %nrec;
+   $user->ResetFilter(); 
+   $user->SetFilter({userid=>\@targetuids});
+   foreach my $urec ($user->getHashList(qw(fullname userid lastlang lang))){
+      my $lang=$urec->{lastlang};
+      $lang=$urec->{lang} if ($lang eq "");
+      $lang="en" if ($lang eq "");
+      $nrec{$lang}->{$urec->{userid}}++;
+   }
+   my $lastlang;
+   if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
+      $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+   }
+   foreach my $lang (keys(%nrec)){
+      $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+      my @emailto;
+      my @emailcc;
+      foreach my $userid (keys(%{$nrec{$lang}})){
+         if (exists($uid{to}->{$userid})){
+            push(@emailto,$userid);
+         }
+         if (exists($uid{cc}->{$userid})){
+            push(@emailcc,$userid);
+         }
+      }
+      my $subject=$datastream->T("automatic system import from OTC",
+                                 'tsotc::event::ScanNewSystems')." : ".$rec->{name};
+
+#      my @scans;
+#      foreach my $url (sort(keys(%$rec))){
+#         push(@scans,sprintf("<b>%s</b>\n%s\n",$rec->{$url}->{name},$url));
+#      }
+
+
+
+      my $tmpl=$datastream->getParsedTemplate("tmpl/ScanNewSystems_MailNotify",{
+         static=>{
+            URL=>$rec->{urlofcurrentrec},
+            SYSTEMNAME=>$rec->{name}
+         }
+      });
+
+      $wfa->Notify("INFO",$subject,$tmpl, 
+         emailto=>\@emailto, 
+         emailcc=>\@emailcc, 
+         emailbcc=>[
+            11634953080001, # HV
+         ]
+      );
+   }
+   if ($lastlang ne ""){
+      $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+   }
+   else{
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+   }
+}
+
+
+
+
 
 
 

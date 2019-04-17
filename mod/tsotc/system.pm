@@ -297,7 +297,7 @@ sub Import
    my $identifyby;
    if (defined($w5sysrec)){
       if ($w5sysrec->{cistatusid}==4 &&
-          $w5sysrec->{srcsys} eq "OTC"){
+          uc($w5sysrec->{srcsys}) eq "OTC"){
          $self->LastMsg(ERROR,"Systemname already exists in W5Base");
          return(undef);
       }
@@ -353,43 +353,54 @@ sub Import
       #   $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
       #   return(undef);
       #}
-      my $databossid;
-      if ($self->isDataInputFromUserFrontend()){
-         $databossid=$self->getCurrentUserId();
-      }
-      else{
-         my $importname=$sysrec->{contactemail};
-         # check 4: load Supervisor ID in W5Base
-         my $user=getModuleObject($self->Config,"base::user");
-         if ($importname ne ""){
-            $databossid=$user->GetW5BaseUserID($importname,"email");
-         }
-         else{
-            $self->LastMsg(ERROR,"no contact email found in otc sysrec");
-            return(undef);
-         }
-      }
-      if (!defined($databossid)){
-         $self->LastMsg(ERROR,"can not create databoss contact record");
-         return(undef);
-
-      }
-      #my @mandators=$self->getMandatorsOf($databossid,"write","direct");
-      my $mandatorid=200;  # We use TelekomIT as Default
-
-      if ($mandatorid eq ""){
-         $self->LastMsg(ERROR,"Can't find any mandator");
-         return(undef);
-      }
+      #}
 
       # final: do the insert operation
       my $newrec={name=>$sysrec->{name},
                   srcid=>$sysrec->{id},
                   srcsys=>'OTC',
-                  databossid=>$databossid,
                   allowifupdate=>1,
-                  mandatorid=>$mandatorid,
                   cistatusid=>4};
+
+      my $user=getModuleObject($self->Config,"base::user");
+      if ($self->isDataInputFromUserFrontend()){
+         $newrec->{databossid}=$self->getCurrentUserId();
+      }
+      else{
+         my $importname=$sysrec->{contactemail};
+         $user->SetFilter({cistatusid=>[4], emails=>$importname});
+         my @l=$user->getHashList(qw(ALL));
+         if ($#l==0){
+            $newrec->{databossid}=$l[0]->{userid};
+         }
+         else{
+            if ($self->isDataInputFromUserFrontend()){
+               $self->LastMsg(ERROR,"can not find databoss contact record");
+            }
+            return();
+         }
+      }
+      if (!exists($newrec->{mandatorid})){
+         my @m=$user->getMandatorsOf($newrec->{databossid},
+                                     ["write","direct"]);
+         if ($#m==-1){
+            # no writeable mandator for new databoss
+            if ($self->isDataInputFromUserFrontend()){
+               $self->LastMsg(ERROR,"can not find a writeable mandator");
+            }
+            return();
+         }
+         $newrec->{mandatorid}=$m[0];
+      }
+
+
+      if ($newrec->{mandatorid} eq ""){
+         $self->LastMsg(ERROR,
+                        "can't get mandator for ".
+                        "OTC System $sysrec->{name}");
+         return();
+      }
+
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){

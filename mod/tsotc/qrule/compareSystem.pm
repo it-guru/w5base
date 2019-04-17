@@ -317,7 +317,8 @@ sub qcheckRecord
             else{  # handling AssetID
                my $ass=getModuleObject($self->getParent->Config(),
                                        "itil::asset");
-               my $k="OTC: Availability Zone ".$parrec->{availability_zone};
+               my $otclabel="OTC: Availability Zone";
+               my $k="$otclabel ".$parrec->{availability_zone};
                msg(INFO,"checking assetid for '$k'");
                $ass->SetFilter({
                   kwords=>\$k,
@@ -329,11 +330,44 @@ sub qcheckRecord
                   my $msg='can not identify availability zone asset from OTC';
                   push(@qmsg,$msg);
                   push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+
+                  # try to notify
+                  $ass->ResetFilter();
+                  $ass->SetFilter({
+                     kwords=>"\"$otclabel *\"",
+                     cistatusid=>[4],
+                     srcsys=>\'w5base'
+                  }); 
+                  my @l=$ass->getHashList(qw(id databossid));
+                  my %uid;
+                  foreach my $arec (@l){
+                     if ($arec->{databossid} ne ""){
+                        $uid{$arec->{databossid}}++;
+                     }
+                  }
+                  if (keys(%uid)){
+                     my $wfa=getModuleObject($ass->Config,"base::workflowaction");
+                     $wfa->Notify("ERROR","missing OTC Asset for $parrec->{availability_zone}",
+                        "Ladies and Gentlemen,\n\n".
+                        "Please create an asset record in it-inventory\n".
+                        "for OTC availability zone ".
+                        "with '$k' in keywords.\n\n".
+                        "(as already done, like for other availability zones)",
+                        emailto=>[keys(%uid)],
+                        emailbcc=>[
+                           11634953080001, # HV
+                        ]
+                     );
+
+
+                  }
                }
                elsif ($#l>0){
                   my $msg='availability zone asset not unique from OTC';
                   push(@qmsg,$msg);
                   push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
                }
                else{
                   $self->IfComp($dataobj,
