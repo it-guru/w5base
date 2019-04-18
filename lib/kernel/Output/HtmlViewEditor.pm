@@ -403,7 +403,9 @@ sub getViewFieldSelect
          $d.="<option value=\"$field\">[$field]</option>";
       }
       else{
-         my $fobj=$app->getField($field);
+         my $purefieldname=$field;
+         $purefieldname=~s/^[+-]+//; # stripe order
+         my $fobj=$app->getField($purefieldname);
          if ($fobj){
             my $label=$fobj->Label();
             my $ext="";
