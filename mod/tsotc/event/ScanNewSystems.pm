@@ -233,8 +233,6 @@ sub doNotify
    my @targetuids=grep(!/^$/,keys(%{$uid{to}}),keys(%{$uid{cc}}));
 
 
-print STDERR "fifi targetuids=".Dumper(\@targetuids);
-print STDERR "fifi srec=".Dumper($rec);
    my %nrec;
    $user->ResetFilter(); 
    $user->SetFilter({userid=>\@targetuids});
