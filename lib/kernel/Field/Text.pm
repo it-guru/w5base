@@ -37,6 +37,7 @@ sub getBackendName
    my $self=shift;
    my $mode=shift;
    my $db=shift;
+   my $ordername=shift;
 
    if ($self->{multilang} && (($mode=~m/^where/) || $mode eq "select")){
       my $lang=$self->getParent->Lang();
@@ -44,7 +45,7 @@ sub getBackendName
       my $f="trim(replace(if (instr($dataobjattr,concat(\"[$lang:]\")),if(instr(substr($dataobjattr,instr($dataobjattr,concat(\"[$lang:]\"))+6),\"[\"),substr(substr($dataobjattr,instr($dataobjattr,concat(\"[$lang:]\"))+6),1,instr(substr($dataobjattr,instr($dataobjattr,concat(\"[$lang:]\"))+6),\"[\")-1),substr($dataobjattr,instr($dataobjattr,concat(\"[$lang:]\"))+6)),if(instr($dataobjattr,\"[\"),substr($dataobjattr,1,instr($dataobjattr,\"[\")-1),$dataobjattr)),char(10),\" \"))";
       return($f);
    }
-   return($self->SUPER::getBackendName($mode,$db));
+   return($self->SUPER::getBackendName($mode,$db,$ordername));
 }
 
 

@@ -61,6 +61,7 @@ sub getBackendName
    my $self=shift;
    my $mode=shift;
    my $db=shift;
+   my $ordername=shift;
 
    return(undef) if (!defined($self->{dataobjattr}));
    return(undef) if (ref($self->{dataobjattr}) eq "ARRAY");
@@ -75,7 +76,7 @@ sub getBackendName
 #         };
 #      }
 #   }
-   return($self->SUPER::getBackendName($mode,$db));
+   return($self->SUPER::getBackendName($mode,$db,$ordername));
 }
 
 
