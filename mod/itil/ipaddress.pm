@@ -503,6 +503,9 @@ sub new
                                       $d.="...";
                                    }
                                    if ($current->{ifname} ne ""){
+                                      if (length($d)){
+                                         $d.=" ";
+                                      }
                                       $d.="(".$current->{ifname}.")";
                                    }
                                    return($d);
