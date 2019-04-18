@@ -177,7 +177,7 @@ sub ScanNewSystems
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
                                   exitmsg=>$exitmsg,
-                                  exitstate=>"ok - checked=$cnt imported=$imp"},
+                                  exitstate=>"ok - $cnt/impcnt=$imp"},
                                  {id=>\$jobid});
    return({exitcode=>0,exitmsg=>'ok'});
 }
