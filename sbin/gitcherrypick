@@ -20,7 +20,7 @@ sub in_array
 }
 
 
-use vars qw($opt_d $opt_h $opt_v);
+use vars qw($opt_d $opt_h $opt_v $opt_f);
 use Getopt::Long;
 #$ENV{PATH}="/usr/bin:/bin:/usr/contrib/bin:/usr/sbin:/sbin:".
 #           "/usr/local/bin:/usr/local/sbin:/opt/openssh/bin:".
@@ -28,6 +28,7 @@ use Getopt::Long;
 my @ARGV_bak=@ARGV;
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_d,
+                        'force'=>\$opt_f,
                         'help'=>\$opt_h));
 my @picklst=@ARGV;
 
@@ -207,11 +208,13 @@ for(my $c=0;$c<=$#picklst;$c++){
          if ($incheck){
             if (in_array($files,$commitlst{$commitlst[$s]})){
                if (!in_array(\@picklst,$commitlst[$s])){
-                  printf STDERR ("ERROR: %s (%s) is not allowed for cherry-pick\n",
-                     $picklst[$c],$commitdt{$picklst[$c]});
-                  printf STDERR ("       %s (%s) works on the at least on same file\n",
-                     $commitlst[$s],$commitdt{$commitlst[$s]});
-                  exit(1);
+                  if (!$opt_f){
+                     printf STDERR ("ERROR: %s (%s) is not allowed for cherry-pick\n",
+                        $picklst[$c],$commitdt{$picklst[$c]});
+                     printf STDERR ("       %s (%s) works on the at least on same file\n",
+                        $commitlst[$s],$commitdt{$commitlst[$s]});
+                     exit(1);
+                  }
                }
             }
          }
@@ -222,6 +225,8 @@ for(my $c=0;$c<=$#picklst;$c++){
 if ($opt_v){
    printf("\nOK, all picks are allowed and in correct order\n");
 }
+
+printf("\n\ncherry-pick -x ".join(" ",@picklst));
 
 for(my $c=0;$c<=$#picklst;$c++){
    #my @out=$repo->command("cherry-pick","-x","-X","theirs",$picklst[$c]);
