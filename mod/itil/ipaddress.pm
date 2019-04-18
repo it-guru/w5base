@@ -503,7 +503,7 @@ sub new
                                       $d.="...";
                                    }
                                    if ($current->{ifname} ne ""){
-                                      $d.=":".$current->{ifname};
+                                      $d.="(".$current->{ifname}.")";
                                    }
                                    return($d);
                                 },

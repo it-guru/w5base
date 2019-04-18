@@ -73,8 +73,11 @@ sub ScanNewSystems
    );
    my $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
    msg(DEBUG,"jobid=$jobid");
+   
 
    my $res={};
+   my $cnt=0;
+   my $imp=0;
 
    my $lastSuccessRun;
    my $startstamp="now-${firstDayRange}d";        # intial scan over 14 days
@@ -139,7 +142,10 @@ sub ScanNewSystems
             }
             if ($skiplevel==0 ||  # = no records to skip
                 $skiplevel==3){   # = all skips are done
-               $self->analyseRecord($datastream,$rec,$res);
+               $cnt++;
+               if ($self->analyseRecord($datastream,$rec,$res)){
+                  $imp++;
+               }
                $recno++;
                $exitmsg="last:".$rec->{cdate}.";".$rec->{id};
             }
@@ -171,7 +177,7 @@ sub ScanNewSystems
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
                                   exitmsg=>$exitmsg,
-                                  exitstate=>"ok"},
+                                  exitstate=>"ok - checked=$cnt imported=$imp"},
                                  {id=>\$jobid});
    return({exitcode=>0,exitmsg=>'ok'});
 }
@@ -212,7 +218,9 @@ sub analyseRecord
       }
       msg(INFO,"start doNotify $srec->{name}");
       $self->doNotify($sys,$wfa,$user,$srec);
+      return(1);
    }
+   return(0);
 }
 
 
