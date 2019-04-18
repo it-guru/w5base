@@ -1,7 +1,7 @@
 use w5base;
 create table appl (
   id         bigint(20) NOT NULL,
-  name       varchar(40) NOT NULL,
+  name       varchar(45) NOT NULL,
   cistatus   int(2)      NOT NULL,
     applid         varchar(20) default NULL,
     conumber       varchar(40) default NULL,
@@ -59,7 +59,7 @@ create table lnkapplcustcontract (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table system (
   id         bigint(20) NOT NULL,
-  name       varchar(40) NOT NULL,
+  name       varchar(45) NOT NULL,
     adm            bigint(20)  default NULL,itcloudarea bigint(20) default NULL,
     adm2           bigint(20)  default NULL,
     admteam        bigint(20)  default NULL,

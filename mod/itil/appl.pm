@@ -2239,8 +2239,10 @@ sub Validate
       return(1);
    }
    my $name=trim(effVal($oldrec,$newrec,"name"));
+   my $purename=$name;
+   $purename=~s/\[[0-9]+\]\s*$//;
    
-   if (length($name)<3 || haveSpecialChar($name) ||
+   if (length($name)<3 ||length($purename)>40|| haveSpecialChar($name) ||
        ($name=~m/^\d+$/)){   # only numbers as application name is not ok!
       $self->LastMsg(ERROR,
            sprintf($self->T("invalid application name '%s' specified"),$name));

@@ -1741,7 +1741,9 @@ sub Validate
 
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   if (length($name)<3 || haveSpecialChar($name) ||
+   my $purename=$name;
+   $purename=~s/\[[0-9]+\]\s*$//;
+   if (length($name)<3 ||length($purename)>40 || haveSpecialChar($name) ||
        ($name=~m/^\d+$/)){  # only a number as system name ist not ok
       $self->LastMsg(ERROR,"invalid system name '%s' specified",$name);
       return(0);
