@@ -305,6 +305,28 @@ sub new
                 name          =>'admid',
                 dataobjattr   =>'system.adm'),
 
+      new kernel::Field::Contact(
+                name          =>'relperson',
+                AllowEmpty    =>1,
+                group         =>'relperson',
+                label         =>'responsible person',
+                vjoinon       =>['relpersonid'=>'userid']),
+
+      new kernel::Field::Link(
+                name          =>'relpersonid',
+                dataobjattr   =>'system.relperson'),
+
+      #new kernel::Field::Contact(
+      #          name          =>'relperson2',
+      #          AllowEmpty    =>1,
+      #          group         =>'relperson',
+      #          label         =>'responsible person deputy',
+      #          vjoinon       =>['relperson2id'=>'userid']),
+      #
+      #new kernel::Field::Link(
+      #          name          =>'relperson2id',
+      #          dataobjattr   =>'system.relperson2'),
+
       new kernel::Field::TextDrop(
                 name          =>'admemail',
                 group         =>'admin',
@@ -534,6 +556,38 @@ sub new
                                  'abstract'
                                  ],
                 dataobjattr   =>'system.systemtype'),
+
+      new kernel::Field::Select(
+                name          =>'defaultonlinestate',
+                default       =>'ONLINE',
+                htmleditwidth =>'40%',
+                selectfix     =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   if (defined($rec)){
+                      return(1);
+                   }
+                   return(0);
+                },
+                label         =>'default online state',
+                value         =>['ONLINE',
+                                 'HOTSTANDBY',
+                                 'COLDSTANDBY',
+                                 'OFFLINE'
+                                 ],
+                dataobjattr   =>'system.defonlinestate'),
+
+      new kernel::Field::Select(
+                name          =>'relationmodel',
+                default       =>'APPL',
+                htmleditwidth =>'40%',
+                selectfix     =>1,
+                label         =>'relation model',
+                value         =>['APPL',
+                                 'PERSON'
+                                 ],
+                dataobjattr   =>'system.relmodel'),
 
       new kernel::Field::Text(
                 name          =>'productline',
@@ -1958,7 +2012,7 @@ sub isViewValid
    my @all=qw(header default swinstances 
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses sysiface phonenumbers sec applications
-              location source customer history upd
+              location source customer history upd relperson
               attachments individualAttr control systemclass interview qc);
    if (defined($rec) && in_array($self->needVMHost(),$rec->{'systemtype'})){
       push(@all,"vhost");
@@ -1980,6 +2034,12 @@ sub isViewValid
       @all=grep(!/^swinstances$/,@all);
       @all=grep(!/^software$/,@all);
    }
+   if (defined($rec) && $rec->{'relationmodel'} ne "APPL"){
+      @all=grep(!/^swinstances$/,@all);
+      @all=grep(!/^applications$/,@all);
+      @all=grep(!/^sec$/,@all);
+   }
+   
    #if ($self->IsMemberOf("admin")){
    #   push(@all,"qc");
    #}
@@ -1994,7 +2054,7 @@ sub isWriteValid
 
    my @databossedit=qw(default software admin logsys contacts 
                        monisla misc opmode upd  
-                       physys ipaddresses sysiface
+                       physys ipaddresses sysiface relperson
                        phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
    if (defined($rec) && $rec->{'systemtype'} eq "abstract"){
@@ -2158,7 +2218,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default admin phonenumbers logsys location 
+          qw(header default relperson admin phonenumbers logsys location 
              vhost physys systemclass cluster
              opmode sec applications customer software 
              swinstances sysiface ipaddresses

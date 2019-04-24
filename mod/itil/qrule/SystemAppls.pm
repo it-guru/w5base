@@ -85,6 +85,7 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
    return(0,undef) if (!($rec->{isapplserver}) && ($rec->{isworkstation}));
+   return(0,undef) if ($rec->{relationmodel} ne "APPL");
 
    if ($rec->{isinfrastruct}) {
       if (ref($rec->{applications}) ne "ARRAY" || $#{$rec->{applications}}==-1){
