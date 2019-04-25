@@ -2,4 +2,4 @@
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
 'can not identify availability zone asset from OTC'=>{de=>'Availability-Zone Asset für OTC nicht auffindbar'},
 'given id not found in OTC'=>{de=>'die gegebene ID konnte in der OTC nicht gefunden werden'},
-
+'set system CI-Status to disposed of waste store due missing on OTC'=>{de=>'Setze CI-Status auf veraltet/gelöscht wegen Fehlen auf der OTC'},

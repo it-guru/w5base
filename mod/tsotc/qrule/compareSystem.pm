@@ -115,9 +115,18 @@ sub qcheckRecord
        $rec->{cistatusid}==5){
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "OTC"){
          if (!defined($parrec)){
-            push(@qmsg,'given id not found in OTC');
-            push(@dataissue,'given id not found in OTC');
-            $errorlevel=3 if ($errorlevel<3);
+            if ($rec->{owner} eq "0" ||   # system is not touched from any
+                $rec->{owner} eq ""  ||   # real person
+                $rec->{owner} eq "NONE"){
+               $forcedupd->{cistatusid}=6;
+               push(@qmsg,
+                'set system CI-Status to disposed of waste due missing on OTC');
+            }
+            else{
+               push(@qmsg,'given id not found in OTC');
+               push(@dataissue,'given id not found in OTC');
+               $errorlevel=3 if ($errorlevel<3);
+            }
          }
          else{
             if ($rec->{srcsys} eq "OTC"){
