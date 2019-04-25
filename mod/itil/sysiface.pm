@@ -190,10 +190,12 @@ sub Validate
          delete($newrec->{systemid});
       }
    }
-   if (!$self->itil::lib::Listedit::isWriteOnSystemValid(
-           effVal($oldrec,$newrec,"systemid"),"sysiface")){
-      $self->LastMsg(ERROR,"no write access to specifed system");
-      return(undef);
+   if (isDataInputFromUserFrontend()){
+      if (!$self->itil::lib::Listedit::isWriteOnSystemValid(
+              effVal($oldrec,$newrec,"systemid"),"sysiface")){
+         $self->LastMsg(ERROR,"no write access to specifed system");
+         return(undef);
+      }
    }
 
    if (effVal($oldrec,$newrec,"name") eq "" ||
@@ -256,7 +258,6 @@ sub isWriteValid
    if (defined($rec)){
       return("default") if ($self->IsMemberOf("admin"));
       if (!$self->isParentWriteable($rec)){
-         $self->LastMsg(ERROR,"no write access to specifed system");
          return(undef);
       }
    }
