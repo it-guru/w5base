@@ -3701,6 +3701,29 @@ sub getSubList
       my @view=$self->GetCurrentView();
       return($self->getHashList(@view));
    }
+   if ($mode eq "FIRSTTEXT"){ # create a array structure with first text field
+                              # in view (for non multidimension outputs)
+      my @view=$self->GetCurrentView();
+      my @fl=$self->getFieldObjsByView(\@view);
+      my $fo;
+      foreach my $chkfo (@fl){
+         my $type=$chkfo->Type();
+         if (in_array([$type],[qw(TextDrop Text)])){
+            $fo=$chkfo;
+            last;
+         }
+      }
+      if (defined($fo)){
+         my @l=$self->getHashList(@view);
+         my @result;
+         foreach my $rec (@l){
+            my $d=$fo->FormatedResult($rec,"OneLine");
+            push(@result,$d);
+         }
+         return(\@result);
+      }
+      return();
+   }
    my $output=new kernel::Output($self);
    if (!($output->setFormat($mode,%opt,%param))){
       msg(ERROR,"can't set output format '$mode'");

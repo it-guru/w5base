@@ -194,6 +194,20 @@ EOF
       }
       return($d);
    }
+   if ($mode eq "Csv01"){   # Format a SubList in a SubList
+      my $d=$self->getSubListData($current,"FIRSTTEXT",%param);
+      if (ref($d) eq "ARRAY"){
+         return("[".join(", ",map({
+               $_=~s/\n/ /g;
+               $_=~s/,/ /g;
+               $_=~s/[\[\]]//g;
+               $_
+            } @$d))."]");
+      }
+      return($d);
+   }
+
+
    return("unknown mode '$mode'");
 }
 
