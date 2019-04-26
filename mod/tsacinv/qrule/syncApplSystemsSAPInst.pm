@@ -198,6 +198,8 @@ sub qcheckRecord
                            systemid=>$sys2add,
                            databossid=>\$databoss,
                            mandatorid=>$rec->{mandatorid},
+                           srcsys=>'AssetManager',
+                           srcid=>$sys2add,
                            allowifupdate=>1,
                            cistatusid=>4};
                my $assetid=$self->chkAsset($newrec,$rec,
@@ -215,7 +217,26 @@ sub qcheckRecord
                   my ($s,$msg)=$sysobj->getOnlyFirst(qw(id));
 
                   if (!defined($s)) {
-                     $w5id=$sysobj->ValidatedInsertRecord($newrec);
+                     $sysobj->SetFilter({
+                        srcsys=>\'AssetManager',
+                        srcid=>\$newrec->{srcid},
+                     });
+                     my ($chkrec,$msg)=$sysobj->getOnlyFirst(qw(ALL));
+                     if (defined($chkrec)){
+                        $w5id=$chkrec->{id};
+                        my $fixrec={};
+                        if ($chkrec->{cistatusid} ne "4"){
+                           $fixrec->{cistatusid}='4';
+                        }
+                        if (keys(%$fixrec)){
+                           $sysobj->ValidatedUpdateRecord($chkrec,$fixrec,{
+                              id=>\$w5id
+                           });
+                        }
+                     }
+                     else{
+                        $w5id=$sysobj->ValidatedInsertRecord($newrec);
+                     }
                   }
 
                   if (defined($w5id)) {
@@ -392,7 +413,8 @@ sub chkAsset {
 
    $asset->SetFilter([{srcid=>$assetasset->{assetid}},
                       {name=>$assetasset->{assetid}}]);
-   my @foundassets=$asset->getHashList(qw(id name srcid srcsys cistatus));
+   my @foundassets=$asset->getHashList(qw(id name srcid srcsys 
+                                          cistatus cistatusid));
    my $id;
 
    if ($#foundassets==-1) {
@@ -401,6 +423,8 @@ sub chkAsset {
                   databossid=>\$databoss,
                   mandatorid=>$rec->{mandatorid},
                   allowifupdate=>1,
+                  srcsys=>'AssetManager',
+                  srcid=>$assetasset->{assetid},
                   cistatusid=>4};
       $id=$asset->ValidatedInsertRecord($newrec);
 
@@ -429,6 +453,16 @@ sub chkAsset {
    }
    elsif ($#foundassets==0) {
       $id=$foundassets[0]->{id};
+      if ($foundassets[0]->{srcsys} ne "AssetManager" ||
+          $foundassets[0]->{srcid} ne $assetasset->{assetid} ||
+          $foundassets[0]->{cistatusid} ne "4"){
+         # fix parameters of already existing asset
+         $asset->ValidatedUpdateRecord($foundassets[0],{
+            cistatusid=>'4',
+            srcsys=>'AssetManager',
+            srcid=>$assetasset->{assetid}
+         },{id=>\$id});
+      }
    }
    else {
       msg(ERROR,"multiple assets found by qrule 'syncApplSystemsSAPInst':\n".
