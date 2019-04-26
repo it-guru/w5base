@@ -615,12 +615,12 @@ sub AutoDiscFormatEntry
    }
    my $label=$adrec->{scanname};
    if ($adrec->{scanextra2} ne ""){
-      $label.=" - ".$adrec->{scanextra2};
+      $label.="-".$adrec->{scanextra2};
    }
    $d.="<div class='AutoDiscTitle' adid='$adrec->{id}'>".
        "<table padding=0 margin=0>".
        "<tr><td valign=middle>$s1".
-       $adrec->{section}.": <b>".$label."</b> @ ";
+       $adrec->{section}.":<b>".$label."</b> @ ";
   
    if ($adrec->{disc_on_systemid} ne ""){
       my $onclick=
@@ -632,6 +632,20 @@ sub AutoDiscFormatEntry
    if ($adrec->{disc_on_systemid} ne ""){
       $d.="</span>";
    }
+   if ($adrec->{section} eq "SOFTWARE"){
+      if ($adrec->{scanextra1} ne ""){
+         my $dir=$adrec->{scanextra1};
+         $dir=~s/[^a-z0-9_\/\\:-]/_/gi;
+         my $maxdirlen=30;
+         if (length($dir)>$maxdirlen){  # limit lenght of dir to maxdirlen
+            my $start=int($maxdirlen/2)-1;
+            $dir=substr($dir,0,$start)."...".
+                   substr($dir,length($dir)-$start,$start);
+         }
+         $d.=":".$dir;
+      }
+   }
+
 
 
    $d.="$s2</td>".
