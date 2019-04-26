@@ -39,7 +39,7 @@ sub new
                 searchable    =>0,
                 readonly      =>1,
                 async         =>'1',
-                vjointo       =>'tsacinv::asset',
+                vjointo       =>\'tsacinv::asset',
                 vjoinon       =>['name'=>'assetid'],
                 vjoindisp     =>'assignmentgroup'),
 
