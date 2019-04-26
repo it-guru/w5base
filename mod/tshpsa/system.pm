@@ -197,6 +197,10 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
                                 $rec->{name}.": SOFTWARE: ".
                                 $swp->{softwarename}
                );
+               if ($e{scanextra1} ne ""){
+                  $e{scanextra1}=~s/\/\//\//g; # fix doublicate path seperators
+                  $e{scanextra1}=~s/\\\\/\\/g; # fix doublicate path seperators
+               }
                push(@res,\%e);
             }
          }
