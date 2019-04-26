@@ -383,11 +383,22 @@ sub Validate
             #               "state='$newrec->{state}'.\n");
             if ($oldrec->{state} eq "20" &&
                 effVal($oldrec,$newrec,"state") eq "20"){
-            #   printf STDERR ("AutoDiscRec - do automatic Update!\n");
+               #printf STDERR ("AutoDiscRec - do automatic Update!\n");
+               #printf STDERR ("AutoDiscRec - old=%s\n",Dumper($oldrec));
+               #printf STDERR ("AutoDiscRec - new=%s\n",Dumper($newrec));
                my ($exitcode,$exitmsg)=$self->doTakeAutoDiscData($oldrec,
                                                                  $newrec);
-               if ($exitcode){
-                  return(0);
+               if ($exitcode){  # automatic update can not be applied
+                  # revert adrec to unprocessed - f.e. inst directory errors
+                  my $userid=$self->getCurrentUserId();
+                  $newrec->{state}=1;
+                  $newrec->{lnkto_lnksoftware}=undef;     #link to softwareinst 
+                  $newrec->{approve_date}=NowStamp("en"); #seems to be bad
+                  $newrec->{approve_user}=$userid;
+                  print STDERR "Revert AutoDisc AutoUpdate ".
+                               "to unprocessed for adrec:".Dumper($oldrec);
+                  print STDERR "Update it with:".Dumper($newrec);
+                  #return(0);
                }
             }
             if ($oldrec->{state} eq "10" &&
