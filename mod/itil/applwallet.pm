@@ -101,6 +101,16 @@ sub new
                 htmldetail    =>0,
                 dataobjattr   =>'wallet.sslcertdocname'),
 
+      new kernel::Field::Select(
+                name          =>'expnotifyleaddays',
+                htmleditwidth =>'280px',
+                default       =>'56',
+                label         =>'Expiration notify lead time',
+                value         =>['14','21','28','56','70'],
+                transprefix   =>'EXPNOTIFYLEAD.',
+                translation   =>'itil::applwallet',
+                dataobjattr   =>'wallet.expnotifyleaddays'),
+
       new kernel::Field::Date(
                 name          =>'sslexpnotify1',
                 history       =>0,
@@ -331,8 +341,12 @@ sub Validate
       return(0);
    }
 
+   if (effChanged($oldrec,$newrec,"expnotifyleaddays")){
+      $newrec->{sslexpnotify1}=undef;
+   }
+
+
    if (effChangedVal($oldrec,$newrec,'sslcert')) {
-   #if (1) {
       my $sslcertfile=effVal($oldrec,$newrec,"sslcert");
       my $x509;
       # try multiple file formats

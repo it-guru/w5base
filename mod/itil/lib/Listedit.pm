@@ -1242,13 +1242,20 @@ sub handleCertExpiration
       Stacktrace();
       return(0);
    }
+   my $expnotifyleaddays=$param->{expnotifyleaddays};
+
+   if ($expnotifyleaddays eq "" ||
+       $expnotifyleaddays<14    ||
+       $expnotifyleaddays>70){
+      $expnotifyleaddays=8*7;   # default Handling=8 weeks
+   }
 
    return(0) if (!defined($param->{expdatefld}));
 
    my $endfld=$param->{expdatefld};
    my $notifyfld=$param->{expnotifyfld};
 
-   my $notifylevel=8*7; # 8 weeks - mail notification
+   my $notifylevel=$expnotifyleaddays;
    my $issuelevel =2*7; # 2 week  - dataissue
 
    $notifylevel=$param->{notifylevel} if (exists($param->{notifylevel}));

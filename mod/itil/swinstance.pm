@@ -575,6 +575,17 @@ sub new
                 vjoinon       =>['ssl_networkid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Select(
+                name          =>'ssl_expnotifyleaddays',
+                htmleditwidth =>'280px',
+                group         =>'ssl',
+                default       =>'56',
+                label         =>'SSL Expiration notify lead time',
+                value         =>['14','21','28','56','70'],
+                transprefix   =>'EXPNOTIFYLEAD.',
+                translation   =>'itil::applwallet',
+                dataobjattr   =>'swinstance.ssl_expnotifyleaddays'),
+
       new kernel::Field::Link(
                 name          =>'ssl_networkid',
                 label         =>'NetworkID',
@@ -1260,6 +1271,11 @@ sub Validate
       $newrec->{ssl_cert_issuerdn}=undef;
       $newrec->{sslcheck}=undef;
    }
+   if (effChanged($oldrec,$newrec,"ssl_expnotifyleaddays")){
+      $newrec->{sslcheck}=undef;
+      $newrec->{sslexpnotify1}=undef;
+   }
+
    if ((effChanged($oldrec,$newrec,"systemid") ||
         effChanged($oldrec,$newrec,"itclustsid")) &&  # reset software inst
        !exists($newrec->{lnksoftwaresystemid})){

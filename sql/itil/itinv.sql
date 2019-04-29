@@ -1754,3 +1754,5 @@ create table sysiface (
   UNIQUE KEY `srcsys` (srcsys,srcid),UNIQUE KEY `ifname` (system,name),
   FOREIGN KEY fk_sys  (system) REFERENCES system (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table wallet add expnotifyleaddays int(22) default '56';
+alter table swinstance add ssl_expnotifyleaddays int(22) default '56';

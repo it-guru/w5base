@@ -203,8 +203,11 @@ sub qcheckRecord
          my $ok=$self->itil::lib::Listedit::handleCertExpiration(
                                      $dataobj,$oldrec,undef,undef,
                                      \@qmsg,\@dataissue,\$errorlevel,
-                                     {expnotifyfld=>'sslexpnotify1',
-                                      expdatefld=>'sslend'});
+                                     {
+            expnotifyfld=>'sslexpnotify1',
+            expnotifyleaddays=>$rec->{ssl_expnotifyleaddays},
+            expdatefld=>'sslend'
+         });
          if (!$ok) {
             msg(ERROR,sprintf("QualityCheck of '%s' (%d) failed",
                               $dataobj->Self(),$rec->{id}));
