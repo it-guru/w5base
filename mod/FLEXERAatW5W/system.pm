@@ -140,6 +140,12 @@ sub new
 
 
       new kernel::Field::Text(
+                name          =>'beaconid',
+                group         =>'source',
+                label         =>'BeaconID',
+                dataobjattr   =>'BEACONID'),
+
+      new kernel::Field::Text(
                 name          =>'uuid',
                 group         =>'source',
                 label         =>'UUID',
@@ -175,7 +181,8 @@ sub new
 
    );
    $self->setWorktable("FLEXERA_system");
-   $self->setDefaultView(qw(systemname systemid osrelease hwmodel scandate));
+   $self->setDefaultView(qw(systemname systemid osrelease hwmodel 
+                            beaconid scandate));
    return($self);
 }
 
@@ -235,6 +242,29 @@ sub isQualityCheckValid
    my $rec=shift;
    return(0);
 }
+
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where="";
+
+   my $userid=$self->getCurrentUserId();
+   $userid=-1 if (!defined($userid) || $userid==0);
+
+   if ($self->isDataInputFromUserFrontend()){
+      if (!$self->IsMemberOf([qw(admin
+                                 w5base.tsflexera.read
+                              )],
+          "RMember")){
+         $where="(BEACONID is null)";
+      }
+   }
+
+   return($where);
+}
+
+
 
 
 #sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
