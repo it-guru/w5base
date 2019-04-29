@@ -263,8 +263,16 @@ sub Import
    my $param=shift;
 
    my $flt;
+   my $importname;
    if ($param->{importname} ne ""){
-      $flt={name=>[$param->{importname}]};
+      $importname=$param->{importname};
+      $importname=~s/[^a-z0-9_-].*$//i; # prevent wildcard and or filters
+      if ($importname ne ""){
+         $flt={name=>$importname};
+      }
+      else{
+         return(undef);
+      }
    }
    else{
       return(undef);
@@ -298,7 +306,10 @@ sub Import
    if (defined($w5sysrec)){
       if ($w5sysrec->{cistatusid}==4 &&
           uc($w5sysrec->{srcsys}) eq "OTC"){
-         $self->LastMsg(ERROR,"Systemname already exists in W5Base");
+         my $msg=sprintf(
+                    $self->T("Systemname '%s' already imported in W5Base"),
+                    $w5sysrec->{name});
+         $self->LastMsg(ERROR,$msg);
          return(undef);
       }
 
