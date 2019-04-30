@@ -33,59 +33,55 @@ sub buildChart
    $param{legend}=$param{label} if (!defined($param{legend}));
    my $w=$param{width};
    my $h=$param{height};
-   my $swfobjcode="static/open-flash-chart/actionscript/open-flash-chart.swf";
    my $so="SO_$name";
 
+print STDERR "Data:".Dumper($data);
+print STDERR "param:".Dumper(\%param);
+
+
+   my $maxdataset=0; 
+   my $datacode="";
 
    my $vstring="";
    my $ymax=9;
-   if (defined($param{minymax})){
-      $ymax=$param{minymax};
-   }
-   if (ref($data) eq "ARRAY"){
-      foreach my $d (@$data){
-         $vstring.="," if ($vstring ne "");
-         if (defined($d)){
-            $vstring.=$d;
-            $ymax=$d if ($ymax<$d);
-         }
-         else{
-            $vstring.="null";
-         }
-      }
-   }
-   $ymax=calcScaleMax($ymax*1.01);
-  
-   
-   my $datacode;
-  
-   my $maxdataset; 
-   if (defined($param{greenline})){
-      my @grline;
-      for(my $c=0;$c<12;$c++){
-         push(@grline,$param{greenline});
-      }
-      my $grline=join(",",@grline);
-      $datacode="$so.addVariable(\"values\",\"$grline\");\n".
-                "$so.addVariable(\"line\",\"1,0x00ff00\");\n".
-                "$so.addVariable(\"values_2\",\"$vstring\");\n".
-                "$so.addVariable(\"$param{mode}_2\",\"3,0xff0000,".
-                $param{legend}.",10,4\");\n";
-      $maxdataset=2;
-   }
-   else{
-      $datacode="$so.addVariable(\"values\",\"$vstring\");\n".
-                "$so.addVariable(\"$param{mode}\",\"3,0xff0000,".
-                $param{legend}.",10,4\");\n";
-      $maxdataset=1;
-   }
-   if (defined($param{avg})){
+   {
       $maxdataset++;
-      $datacode.="$so.addVariable(\"values_$maxdataset\",\"".
-                 join(",",@{$param{avg}})."\");\n".
-                 "$so.addVariable(\"line_$maxdataset\",\"1,0x86B34B,".
-                 $self->T("averange").",10,4\");\n";
+      if (defined($param{minymax})){
+         $ymax=$param{minymax};
+      }
+      if (ref($data) eq "ARRAY"){
+         foreach my $d (@$data){
+            $vstring.="," if ($vstring ne "");
+            if (defined($d)){
+               $vstring.=$d;
+               $ymax=$d if ($ymax<$d);
+            }
+            else{
+               $vstring.="null";
+            }
+         }
+      }
+      $ymax=calcScaleMax($ymax*1.01);
+  
+      $datacode.="{\n";
+      $datacode.="var vset={\n";
+      $datacode.="   label: '$param{legend}',\n";
+      $datacode.="   fill: false,\n";
+      $datacode.="   backgroundColor: 'rgb(255, 99, 132)',\n";
+      $datacode.="   borderColor: 'rgb(255, 99, 132)',\n";
+      $datacode.="   data: [$vstring]\n";
+      $datacode.="};\n";
+      $datacode.="config.data.datasets.push(vset);\n";
+      $datacode.="}\n";
+      
    }
+#   if (defined($param{avg})){
+#      $maxdataset++;
+#      $datacode.="$so.addVariable(\"values_$maxdataset\",\"".
+#                 join(",",@{$param{avg}})."\");\n".
+#                 "$so.addVariable(\"line_$maxdataset\",\"1,0x86B34B,".
+#                 $self->T("averange").",10,4\");\n";
+#   }
    if (defined($param{employees})){
       $maxdataset++;
       my $y2max=19;
@@ -100,54 +96,86 @@ sub buildChart
             $vstring.="null";
          }
       }
-      $y2max=calcScaleMax($y2max*1.01);
-      $datacode.="$so.addVariable(\"values_$maxdataset\",\"$vstring\");\n".
-                 "$so.addVariable(\"line_$maxdataset\",\"1,0x0000ff,".
-                 $self->T("count of employees").",10,4\");\n".
-                 "$so.addVariable(\"y2_lines\",\"$maxdataset\");\n".
-                 "$so.addVariable(\"y2_max\",\"$y2max\");\n".
-                 "$so.addVariable(\"y2_legend\",\"".
-                 $self->T("employees").",10,4\");\n".
-                 "$so.addVariable(\"show_y2\",\"true\");\n";
+      my $label=$self->T("count of employees");
+      $datacode.="{\n";
+      $datacode.="var vset={\n";
+      $datacode.="   label: '$label',\n";
+      $datacode.="   fill: false,\n";
+      $datacode.="   backgroundColor: 'rgb(54, 162, 235)',\n";
+      $datacode.="   borderColor: 'rgb(54, 162, 235)',\n";
+      $datacode.="   data: [$vstring]\n";
+      $datacode.="};\n";
+      $datacode.="config.data.datasets.push(vset);\n";
+      $datacode.="}\n";
    }
    if (defined($param{ymax})){
-     $datacode.="$so.addVariable(\"y_max\",\"$param{ymax}\");\n";
+     $datacode.="config.options.scales.yAxes.push({\n";
+     $datacode.=" display:true,";
+     $datacode.=" ticks:{suggestedMin:0,";
+     $datacode.=" suggestedMax:$param{ymax}}";
+     $datacode.="};\n";
    }
    else{
-     $datacode.="$so.addVariable(\"y_max\",\"$ymax\");\n";
+     $datacode.="config.options.scales.yAxes.push({\n";
+     $datacode.=" display:true,";
+     $datacode.=" ticks:{suggestedMin:0,";
+     $datacode.=" suggestedMax:$ymax}";
+     $datacode.="});\n";
    }
+
+
    my $xlabel;
    if (!defined($param{xlabel}) || ref($param{xlabel}) ne "ARRAY"){
-      $xlabel="Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Okt,Nov,Dez";
+      $xlabel="'Jan','Feb','Mar','Apr','May','Jun',".
+              "'Jul','Aug','Sep','Okt','Nov','Dez'";
    }
    else{
-      $xlabel=join(",",@{$param{xlabel}});
+      $xlabel=join(",",map({"'".$_."'";} @{$param{xlabel}}));
+   }
+   my $titlecode="";
+   if ($maxdataset>1){
+      $titlecode="title: {display: true,text: '$param{legend}'},";
    }
 
-
    $d=<<EOF;
-<div id="$name" style="padding:0px;margin:10px;border:1px solid #30579f;
-                       width:${w}px;height:${h}px;"></div>
+<canvas id="$name" style="padding:0px;margin:4px;border:1px solid #30579f;
+                       width:${w}px;height:${h}px;"></canvas>
 <script language="JavaScript">
 function buildChart$name()
 {
-   var $so=new SWFObject("../../../$swfobjcode","$name",
-                         "$w","$h","9","#FFFFFF");
+   var config = {
+         type: 'line',
+         data: { labels: [$xlabel], datasets: [] },
+         options: {
+            responsive: true,$titlecode
+            tooltips: {
+               mode: 'index',
+               intersect: false,
+            },
+            hover: {
+               mode: 'nearest',
+               intersect: true
+            },
+            layout:{
+               padding: {
+                left: 10,
+                right: 20,
+                top: 10,
+                bottom: 10
+               }
+            },
+            scales: {
+               xAxes: [{ display: true }], yAxes: []
+            }
+         }
+      }; 
+   var $so=document.getElementById('$name').getContext('2d');
    if ($so){
-      $so.addVariable("variables","true");
-      $so.addVariable("title","$param{label},{font-size: 15;}");
-      $so.addVariable("bg_colour","#f4f4f4");
-      $so.addVariable("y_label_size","15");
-      $so.addVariable("y_ticks","5,10,5");
-      $datacode
-      $so.addVariable("x_labels","$xlabel");
-      //$so.addVariable("x_axis_steps","2");
-      $so.addParam("allowScriptAccess", "always" );//"sameDomain");
-      //$so.addParam("onmouseout", "onrollout2();" );
-      $so.write("$name");
+      $datacode;
+      window.$so=new Chart($so,config);
    }
    else{
-      alert("error: can not create a flash object");
+      alert("error: can not create a canvas object");
    }
 }
 addEvent(window,"load",buildChart$name);

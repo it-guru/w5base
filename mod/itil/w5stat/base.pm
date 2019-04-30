@@ -204,7 +204,6 @@ sub displaySystem
                               setUndefZero=>1);
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcSystem",$data,
-   #                greenline=>4,
                    employees=>$user,
                    label=>$app->T('logical systems'),
                    legend=>$app->T('count of logical systems'));
@@ -249,7 +248,6 @@ sub displayAsset
                               setUndefZero=>1);
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcAsset",$data,
-#                   greenline=>4,
                    employees=>$user,
                    label=>$app->T('assets'),
                    legend=>$app->T('count of physical systems'));
@@ -275,7 +273,6 @@ sub displayChange
    my $data=$app->extractYear($primrec,$hist,"ITIL.Change.Finish.Count");
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcChange",$data,
-#                   greenline=>4,
                    label=>$app->T('changes'),
                    legend=>$app->T('count of changes by businessteam'));
 
@@ -319,7 +316,6 @@ sub displaySWInstance
                               setUndefZero=>1);
    return(undef) if (!defined($data));
    my $chart=$app->buildChart("ofcSWInstance",$data,
-#                   greenline=>4,
                    employees=>$user,
                    label=>$app->T('swinstance'),
                    legend=>$app->T('count of software instances'));

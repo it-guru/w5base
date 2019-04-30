@@ -588,7 +588,7 @@ Quality Report $label - $primrec->{fullname}
 $subtitle
 </div>
 <script type="text/javascript" 
-        src="../../../static/open-flash-chart/js/swfobject.js"></script>
+        src="../load/Chart.min.js"></script>
 EOF
       my $ucnt;
       $ucnt=$primrec->{stats}->{User} if (ref($primrec) eq "HASH" &&
