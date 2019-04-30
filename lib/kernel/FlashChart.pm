@@ -35,9 +35,6 @@ sub buildChart
    my $h=$param{height};
    my $so="SO_$name";
 
-print STDERR "Data:".Dumper($data);
-print STDERR "param:".Dumper(\%param);
-
 
    my $maxdataset=0; 
    my $datacode="";
