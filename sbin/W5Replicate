@@ -709,11 +709,13 @@ sub objectReplicationPhase1
    $p1smallpack=$p1smallpack*5 if ($ctrl->{name} eq "base::workflow");
    my $oldreplkey;
    my $recinqueue=1;
+   my $replkeypriwarn;
    SPLOOP: while($ReplicationStart+$MaximumReplicationTime-10>time() &&
          $start+$phaselimit>time()){
       my $syncstart;
       my $replkey;
       my $replkeysec;
+      $replkeypriwarn=undef;
       my $cmd="select max(w5replkey) sstart from \"_$ctrl->{name}\"";
       foreach my $rec ($dbi->getHashList($cmd)){
          $syncstart=$rec->{'sstart'};
@@ -746,8 +748,8 @@ sub objectReplicationPhase1
             if ($n>$p1smallpack-1){  # if multiple records have the same
                                      # replkeypri - all must be synced in
                                      # one "smallpack"
-               msg(WARN,"found $n records with the same replkey ".
-                        "'%s' in '%s'",
+               $replkeypriwarn=sprintf(
+                  "found $n records with the same replkey '%s' in '%s'",
                    $replkey,$ctrl->{name});
                $obj->Limit($n+$p1smallpack,0,0);
             }
@@ -771,16 +773,6 @@ sub objectReplicationPhase1
       my $processed=0;
       if (defined($srcrec)){
          $recinqueue=1;
-         #my $lockwait=int($phaselimit*1.5);  # macht eigentlich keinen Sinn! HV
-         #$lockwait=300 if ($lockwait<300);
-         #my $lockres=$dbi->doCmd("lock table \"$ctrl->{name}\" ".
-         #                        "IN EXCLUSIVE MODE WAIT $lockwait");
-         #if ($lockres ne "0E0"){
-         #   msg(ERROR,"can not get exclusive lock on \"$ctrl->{name}\" - ".
-         #             "hard break of phase 1");
-         #   exit(1);
-         #}
-
          my $lockres=$dbi->doCmd("lock table \"_$ctrl->{name}\" ".
                                  "IN EXCLUSIVE MODE");
          if ($lockres ne "0E0"){
@@ -821,12 +813,19 @@ sub objectReplicationPhase1
             ($srcrec,$msg)=$obj->getNext();
          } until(!defined($srcrec));
          my $bk=$dbi->commit();
+         if (defined($replkeypriwarn)){  # clear posible existing big block
+            $replkeypriwarn=undef;       # waring, because it seems to be
+         }                               # completly handled
       }
       if ($processed<2 && $candidates<2){
          $recinqueue=0;
          last;
       }
    }
+   if (defined($replkeypriwarn)){
+      msg(WARN,$replkeypriwarn);
+   }
+   
 
    msg(INFO,"end:   phase 1 replication for $ctrl->{name}");
 
