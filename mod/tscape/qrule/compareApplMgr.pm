@@ -127,7 +127,11 @@ sub qcheckRecord
       return(undef,undef) if (!$par->Ping());
       if (defined($parrec)){
          my $user=getModuleObject($self->getParent->Config,"base::user");
-         if ($parrec->{applmgremail} ne ""){
+         if ($parrec->{applmgremail} ne "" &&
+             ($parrec->{applmgremail}=~m/\@/)  &&          # looks like a email
+             !($parrec->{applmgremail}=~m/^pn-dup.*\@external.*$/) # no pn-dups
+             ){
+
             my $applmgrid=$user->GetW5BaseUserID($parrec->{applmgremail},
                           "email",{quiet=>1});
             if ($applmgrid ne $rec->{applmgrid}){

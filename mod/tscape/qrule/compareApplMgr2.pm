@@ -107,7 +107,9 @@ sub qcheckRecord
             my $user=getModuleObject($self->getParent->Config,"base::user");
             foreach my $r (@{$parrec->{roles}}){
                if (($r->{role} eq "Application Manager Deputy") &&
-                   $r->{email} ne ""){
+                   ($r->{email}=~m/\@/)  &&                # looks like a email 
+                   !($r->{email}=~m/^pn-dup.*\@external.*$/) # no pn-dups
+                   ){
                   my $amid=$user->GetW5BaseUserID($r->{email},"email",
                                                   {quiet=>1});
                   if ($amid ne ""){

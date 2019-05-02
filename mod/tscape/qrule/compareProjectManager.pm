@@ -109,7 +109,9 @@ sub qcheckRecord
             foreach my $r (@{$parrec->{roles}}){
                if (($r->{role} eq "Project Manager IT-System" ||
                     $r->{role} eq "Project Manager IT-Application") &&
-                   $r->{email} ne ""){
+                   ($r->{email}=~m/\@/)  &&                # looks like a email
+                   !($r->{email}=~m/^pn-dup.*\@external.*$/) # no pn-dups
+                   ){
                   my $pmid=$user->GetW5BaseUserID($r->{email},"email",
                                                   {quiet=>1});
                   if ($pmid ne ""){
