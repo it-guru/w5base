@@ -192,14 +192,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 }
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_cistatus"))){
-#     Query->Param("search_cistatus"=>
-#                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
-#   }
-#}
 
 sub isViewValid
 {
@@ -304,25 +296,62 @@ sub Import
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
    my $identifyby;
    if (defined($w5sysrec)){
-      if ($w5sysrec->{cistatusid}==4 &&
-          uc($w5sysrec->{srcsys}) eq "OTC"){
+      if (uc($w5sysrec->{srcsys}) eq "OTC"){
          my $msg=sprintf(
                     $self->T("Systemname '%s' already imported in W5Base"),
                     $w5sysrec->{name});
-         $self->LastMsg(ERROR,$msg);
+         if ($w5sysrec->{srcid} ne "" &&
+             $sysrec->{id} ne "" &&
+             $w5sysrec->{srcid} ne $sysrec->{id}){
+            my $qc=getModuleObject($self->Config,"base::qrule");
+            $qc->setParent($sys);
+            $qc->nativQualityCheck($sys->getQualityCheckCompat($w5sysrec),
+                                   $w5sysrec);
+            $sys->ResetFilter();
+            $sys->SetFilter($flt);
+            my ($w5sysrec2)=$sys->getOnlyFirst(qw(ALL));
+            if (defined($w5sysrec2)){
+               $msg=sprintf(
+                       $self->T("Systemname '%s' already imported with ".
+                                "different ids '%s' - '%s'"),
+                       $w5sysrec->{name},$w5sysrec->{srcid},$sysrec->{id});
+            }
+            else{
+               $msg=undef;
+               $w5sysrec=undef;
+            }
+         }
+         if (defined($msg)){
+            $self->LastMsg(ERROR,$msg);
+            return(undef);
+         }
+      }
+   }
+   if (defined($w5sysrec)){
+      if ($w5sysrec->{srcsys} ne "OTC" &&
+          lc($w5sysrec->{srcsys}) ne "w5base" &&
+          $w5sysrec->{srcsys} ne ""){
+         $self->LastMsg(ERROR,"name colision - systemname $w5sysrec->{name} ".
+                              "already in use. Import failed");
          return(undef);
       }
-
+   }
+   if (defined($w5sysrec)){
       my %newrec=();
       my $userid;
 
-      if ($self->isDataInputFromUserFrontend() &&
-          !$self->IsMemberOf("admin")) {
-         $userid=$self->getCurrentUserId();
+      if (!$self->isDataInputFromUserFrontend() ||  # only admins (and databoss)
+                                                    # can force
+          !$self->IsMemberOf("admin")) {            # reimport over webrontend
+         $userid=$self->getCurrentUserId();         # if record already exists
          if ($w5sysrec->{cistatusid}<6){
             if ($userid ne $w5sysrec->{databossid}){
                $self->LastMsg(ERROR,
                               "reimport only posible by current databoss");
+               if (!$self->isDataInputFromUserFrontend()){
+                  msg(ERROR,"fail to import $sysrec->{name} with ".
+                            "id $sysrec->{id}");
+               }
                return(undef);
             }
          }

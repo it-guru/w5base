@@ -118,7 +118,9 @@ sub qcheckRecord
             if ($rec->{owner} eq "0" ||   # system is not touched from any
                 $rec->{owner} eq ""  ||   # real person
                 $rec->{owner} eq "NONE"){
+               return(undef,undef) if (!$par->Ping());
                $forcedupd->{cistatusid}=6;
+               $forcedupd->{mdate}=NowStamp("en");
                push(@qmsg,
                 'set system CI-Status to disposed of waste due missing on OTC');
             }
