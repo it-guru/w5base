@@ -435,9 +435,21 @@ sub getPosibleActions
       push(@l,"wfapprovalreq"); # Genehmigung anfordern      (durch Bearbeiter)
       push(@l,"wfapprovalcan"); # Genehmigung abbrechen      (durch Bearbeiter)
    }
-   if ($userid==$creator && $stateid<17){
-      push(@l,"wffollowup"); # add a followup note for current worker
-      push(@l,"wfmailsend"); # add a mailsend note for current worker
+   if ($stateid<17){
+      if ($userid==$creator){
+         push(@l,"wffollowup"); # add a followup note for current worker
+         push(@l,"wfmailsend"); # add a mailsend note for current worker
+      }
+      else{
+         if (ref($WfRec->{shortactionlog}) eq "ARRAY"){
+            foreach my $action (reverse(@{$WfRec->{shortactionlog}})){
+               if ($action->{creator}==$userid){
+                  push(@l,"wfmailsend"); # wer im Verlauf eines Workflows
+                  last;                  # schon mal beteiligt war, darf nun 
+               }                         # auch Mails aus dem
+            }                            # Workflow heraus senden.
+         }
+      }
    }
    if ((($isadmin && !$iscurrent) || ($userid==$creator && !$iscurrent)) &&
        $stateid<3 && $stateid>1){
