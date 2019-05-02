@@ -35,14 +35,18 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
-                label         =>'CapeID',
+                label         =>'RoleID',
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>"Internal_Key"),
+                dataobjattr   =>"CONVERT(VARCHAR(32), ".
+                                "HashBytes('MD5',".
+                                "Internal_Key+':'+Mail+'+'+Role),2)"),
 
       new kernel::Field::Text(
                 name          =>'ictoid',
                 label         =>'ICTO-ID',
+                weblinkto     =>\'tscape::archappl',
+                weblinkon     =>['ictoid'=>'archapplid'],
                 dataobjattr   =>'ICTO_Nummer'),
 
       new kernel::Field::Text(
@@ -82,6 +86,18 @@ sub getDetailBlockPriority
    my %param=@_;
    return("header","default");
 }
+
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
 
 
 sub getRecordImageUrl

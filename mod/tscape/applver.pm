@@ -154,6 +154,18 @@ sub initSearchQuery
 
 
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
+
+
+
 sub getDetailBlockPriority
 {
    my $self=shift;
