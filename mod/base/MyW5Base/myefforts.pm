@@ -70,7 +70,7 @@ sub Result
                                    'kernel.App.Web.css','myw5base.css'],
                       js=>['toolbox.js',
                            'jquery.js',
-                           '../../../static/open-flash-chart/js/swfobject.js'],
+                           '../load/Chart.min.js'],
                       body=>1,form=>1,
                       title=>'my effort state');
    return("") if ($ENV{REMOTE_USER} eq "anonymous");
