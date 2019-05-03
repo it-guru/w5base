@@ -62,6 +62,16 @@ sub storedParamHandler
 }
 
 
+sub PostponeMaxDays   # postpone max days after WfStart
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(365*3);
+}
+
+
+
 sub IsModuleSelectable
 {
    my $self=shift;
@@ -698,9 +708,11 @@ sub getPosibleActions
          push(@l,"wfforcerevise");
       }
    }
-   if ($WfRec->{stateid}<16 && $WfRec->{stateid}>=4){
+   if ($WfRec->{stateid}<16 && 
+       $WfRec->{stateid}==4){
       if ($iscurrent){
          push(@l,"wfaddopmeasure");
+         push(@l,"wfdefer");
       }
    }
    if ($WfRec->{stateid}<17){  # noch nicht geschlossen
@@ -733,6 +745,7 @@ sub getPosibleActions
    }
    if ($iscurrent){
       push(@l,"wfaddnote");
+      push(@l,"iscurrent");
    }
    if ($WfRec->{stateid}>=20){  # ab beendet ist nichts mehr machbar
       @l=();

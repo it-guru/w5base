@@ -298,6 +298,45 @@ sub Validate
    return($StepObj->Validate($oldrec,$newrec,$origrec));
 }
 
+
+sub PostponeMaxDays   # postpone max days after WfStart
+{
+   my $self=shift;
+   my $WfRec=shift;
+
+   return(365*1);
+}
+
+
+sub ValidatePostpone    #validate postpone operation
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $Postpone=shift;
+   my $dFromNow=shift;
+   my $dFromStart=shift;
+
+   my $maxPostponeDays=$self->PostponeMaxDays($WfRec);
+   if (!defined($dFromStart) || 
+       $dFromStart->{totaldays}>$maxPostponeDays){
+      my $msg=sprintf($self->T(
+         "defer not allowed! ".
+         "- Target date is more then %d days after start of workflow"),
+         $maxPostponeDays);
+      $self->LastMsg(ERROR,$msg);
+      return(0);
+   }
+   if ($dFromNow->{totalminutes}<720){
+      $self->LastMsg(ERROR,"target date must be behind now");
+      return(0);
+   }
+
+
+   return(1);
+}
+
+
+
 sub isMarkDeleteValid
 {
    my $self=shift;

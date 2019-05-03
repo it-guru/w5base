@@ -695,26 +695,30 @@ sub Process
          $oprec->{postponeduntil}=$app->ExpandTimeExpression($postponeduntil);
          if ($oprec->{postponeduntil} ne ""){
             my $from=$WfRec->{eventstart};
-            my $d=CalcDateDuration($from,$oprec->{postponeduntil});
-            if ($d->{totaldays}>300){
-               $self->LastMsg(ERROR,"defer not allowed! ".
-                 "- Target date is more then 300 days after start of workflow");
-               return(undef);
+            my $d1=CalcDateDuration(NowStamp("en"),$oprec->{postponeduntil});
+            my $d2=CalcDateDuration($from,$oprec->{postponeduntil});
+            if ($self->getParent->ValidatePostpone(
+                   $WfRec,$oprec->{postponeduntil},$d1,$d2)){
+               if ($app->Action->StoreRecord($WfRec->{id},"wfdefer",
+                   {translation=>'base::workflow::request'},$note)){
+                  $self->StoreRecord($WfRec,$oprec);
+                  $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+                  $self->PostProcess($action.".".$op,$WfRec,$actions,
+                                     note=>$note);
+                  Query->Delete("note");
+                  Query->Delete("OP");
+                  return(1);
+               }
+               if ($app->LastMsg()==0){
+                  $app->LastMsg(ERROR,
+                                "store postponeduntil action record failed");
+               }
             }
-            my $d=CalcDateDuration(NowStamp("en"),$oprec->{postponeduntil});
-            if ($d->{totalminutes}<720){
-               $self->LastMsg(ERROR,"target date must be behind now");
+            else{
+               if ($app->LastMsg()==0){
+                  $app->LastMsg(ERROR,"postponeduntil rejected");
+               }
                return(undef);
-            }
-            if ($app->Action->StoreRecord($WfRec->{id},"wfdefer",
-                {translation=>'base::workflow::request'},$note)){
-               $self->StoreRecord($WfRec,$oprec);
-               $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-               $self->PostProcess($action.".".$op,$WfRec,$actions,
-                                  note=>$note);
-               Query->Delete("note");
-               Query->Delete("OP");
-               return(1);
             }
          }
          else{
