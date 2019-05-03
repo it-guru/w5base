@@ -4,7 +4,8 @@ create materialized view "mview_W5I_ACT_costelement"
    next sysdate+(1/24)*3
    as
 select "ID","ACCAREA","SAPNAME","NAME","SHORTNAME",
-       "BPMARK","SAPHIER","COTYPE","OFIENTITY" from (
+       "BPMARK","SAPHIER","COTYPE","OFIENTITY",
+       "RESPONSIBLEWIW" from (
    select cast("W5I_tssapp01::psp".w5id as VARCHAR2(40)) ID,
           "W5I_tssapp01::psp".w5name SAPNAME,
           "W5I_tssapp01::psp".w5name NAME,
@@ -13,8 +14,9 @@ select "ID","ACCAREA","SAPNAME","NAME","SHORTNAME",
           "W5I_tssapp01::psp".bpmark BPMARK,
           'psp' COTYPE,
           "W5I_tssapp01::psp".w5accarea ACCAREA,
-          NULL RAWOFIENTITY,
-          NULL OFIENTITY
+          cast(NULL as varchar2(40)) RAWOFIENTITY,
+          cast(NULL as varchar2(40)) OFIENTITY,
+          W5RESPONSIBLEWIW RESPONSIBLEWIW
    from "W5I_tssapp01::psp"
    where isdeleted=0 or isdeleted is null
    
@@ -28,8 +30,9 @@ select "ID","ACCAREA","SAPNAME","NAME","SHORTNAME",
           '-none-' BPMARK,
           'costcenter' COTYPE,
           w5accarea ACCAREA,
-          NULL RAWOFIENTITY,
-          NULL OFIENTITY
+          cast(NULL as varchar2(40)) RAWOFIENTITY,
+          cast(NULL as varchar2(40)) OFIENTITY,
+          W5RESPONSIBLEWIW RESPONSIBLEWIW
    from "W5I_tssapp01::costcenter"
 ) costelement;
 
@@ -46,7 +49,8 @@ select
    "BPMARK",
    "SAPHIER",
    "COTYPE",
-   "OFIENTITY"
+   "OFIENTITY",
+   "RESPONSIBLEWIW"
 from "mview_W5I_ACT_costelement";
 
 
