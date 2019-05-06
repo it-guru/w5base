@@ -752,6 +752,11 @@ sub getPosibleActions
          push(@l,"wfmailsend");
          push(@l,"wfforward");
       }
+      else{
+         if ($self->isRiskWfAuthorized("view",$WfRec)){
+            push(@l,"wfmailsend");
+         }
+      }
    }
    if ($WfRec->{stateid}<20){  # noch nicht beendet
       if ($isRiskWfAuthorized){
