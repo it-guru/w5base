@@ -1750,7 +1750,7 @@ create table sysiface (
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
-  PRIMARY KEY  (id),key(system),key(asset),key(name),
+  PRIMARY KEY  (id),key(system),key(asset),key(name),UNIQUE KEY `mac` (system,macaddr),
   UNIQUE KEY `srcsys` (srcsys,srcid),UNIQUE KEY `ifname` (system,name),
   FOREIGN KEY fk_sys  (system) REFERENCES system (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

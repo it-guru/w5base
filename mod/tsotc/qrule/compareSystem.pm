@@ -377,9 +377,9 @@ sub qcheckRecord
                                 }
                                 elsif ($mode eq "delete"){
                                    return({OP=>$mode,
-                                           MSG=>"delete ip $oldrec->{name} ".
+                                           MSG=>"delete if $oldrec->{name} ".
                                                "from W5Base",
-                                           DATAOBJ=>'itil::ipaddress',
+                                           DATAOBJ=>'itil::sysiface',
                                            IDENTIFYBY=>$oldrec->{id},
                                            });
                                 }
@@ -387,13 +387,10 @@ sub qcheckRecord
                              },
                              $rec->{sysiface},\@cleanAmIflist,\@opList,
                              refid=>$rec->{id});
+
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
                   }
-
-
-
-
                }
             }
             if (!($parrec->{availability_zone}=~m/^eu[0-9a-z-]{3,10}$/)){
