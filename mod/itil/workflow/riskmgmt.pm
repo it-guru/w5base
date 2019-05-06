@@ -88,6 +88,42 @@ sub IsModuleSelectable
 }
 
 
+sub getcachedArec
+{
+   my $self=shift;
+   my $rec=shift;
+   my $cachedArec;
+   my $applid=$rec->{affectedapplicationid};
+   my $appl=getModuleObject($self->Config,"itil::appl");
+   $appl->SetFilter({id=>$applid});
+   my ($arec,$msg)=$appl->getOnlyFirst(qw(applmgrid databossid mandatorid));
+   if (defined($arec)){
+      $cachedArec=$arec;
+   }
+   return($cachedArec);
+}
+
+
+
+sub isCurrentApplMgr
+{
+   my $self=shift;
+   my $rec=shift;
+   my $cachedArec=shift;
+
+   if (!defined($cachedArec)){
+      $cachedArec=$self->getcachedArec($rec);
+   }
+   my $userid=$self->getParent->getCurrentUserId();
+   if (!defined($cachedArec)){
+      return(0);
+   }
+   if ($userid eq $cachedArec->{applmgrid}){
+      return(1);
+   }
+   return(0);
+}
+
 
 sub isRiskWfAuthorized
 {
@@ -97,13 +133,7 @@ sub isRiskWfAuthorized
    my $cachedArec=shift;
 
    if (!defined($cachedArec)){
-      my $applid=$rec->{affectedapplicationid};
-      my $appl=getModuleObject($self->Config,"itil::appl");
-      $appl->SetFilter({id=>$applid});
-      my ($arec,$msg)=$appl->getOnlyFirst(qw(applmgrid databossid mandatorid));
-      if (defined($arec)){
-         $cachedArec=$arec;
-      }
+      $cachedArec=$self->getcachedArec($rec);
    }
    my $userid=$self->getParent->getCurrentUserId();
    if (!defined($cachedArec)){
@@ -684,6 +714,8 @@ sub getPosibleActions
    my $creator=$WfRec->{openuser};
    my $initiatorid=$WfRec->{initiatorid};
    my $isRiskWfAuthorized=$self->isRiskWfAuthorized("modify",$WfRec);
+   my $isCurrentApplMgr=$self->isCurrentApplMgr($WfRec);
+
 
    my $openSubWf=0;
    my $haveSubWf=0;
@@ -724,6 +756,9 @@ sub getPosibleActions
    if ($WfRec->{stateid}<20){  # noch nicht beendet
       if ($isRiskWfAuthorized){
          push(@l,"wfforward");
+      }
+      if ($isCurrentApplMgr && !$iscurrent){
+         push(@l,"wfhardtake");
       }
    }
    if ($WfRec->{stateid} eq "17"){

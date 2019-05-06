@@ -390,6 +390,31 @@ sub getPosibleActions
 
    # Genehmigungsanforderung herausnehmen
    @l=grep(!/^wfapprovalreq$/,@l);
+
+   if ($WfRec->{stateid}<16){
+      if ($#l==-1){ # aktueller User darf nix
+         if ($#{$WfRec->{relations}}!=-1){
+            foreach my $rel (@{$WfRec->{relations}}){
+               if ($rel->{name} eq "riskmesure"){
+                  my $wfid=$rel->{srcwfid};
+                  if ($wfid ne ""){
+                     my $wf=$self->getParent->Clone();
+                     $wf->SetFilter({id=>\$wfid});
+                     my ($wfrec,$msg)=$wf->getOnlyFirst(qw(ALL));
+                     if (defined($wfrec)){
+                        my $a=$wfrec->{posibleactions};
+                        if (ref($a) eq "ARRAY"){
+                           if (in_array($a,["wfhardtake","wfforward"])){
+                              push(@l,"wfhardtake");
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
    
    return(@l);
 }
