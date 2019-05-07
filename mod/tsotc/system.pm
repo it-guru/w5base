@@ -46,6 +46,12 @@ sub new
                 label         =>'Systemname',
                 dataobjattr   =>"server_name"),
 
+      new kernel::Field::Text(
+                name          =>'state',
+                sqlorder      =>'desc',
+                label         =>'System State',
+                dataobjattr   =>"otc4darwin_server_vw.vm_state"),
+
       new kernel::Field::Email(
                 name          =>'contactemail',
                 label         =>'Contact email',
@@ -140,7 +146,8 @@ sub new
                 dataobjattr   =>"otc4darwin_server_vw.db_timestamp"),
 
    );
-   $self->setDefaultView(qw(name projectname id availability_zone ));
+   $self->setDefaultView(qw(name state projectname cpucount memory
+                            id availability_zone cdate ));
    $self->setWorktable("otc4darwin_server_vw");
    return($self);
 }
