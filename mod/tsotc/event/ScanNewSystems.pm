@@ -31,6 +31,7 @@ sub Init
 
 
    $self->RegisterEvent("ScanNewSystems","ScanNewSystems",timeout=>600);
+   $self->RegisterEvent("OTCScan","ScanNewSystems",timeout=>600);
 }
 
 
@@ -95,7 +96,7 @@ sub ScanNewSystems
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
             $exitmsg=$lastmsg;
             %flt=( 
-               cdate=>">=\"$laststamp GMT\""
+               cdate=>">=\"$laststamp GMT\" AND <now-5m"
             );
          }
       }
