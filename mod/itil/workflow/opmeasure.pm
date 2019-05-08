@@ -535,6 +535,15 @@ sub isContactInRelationToApp
               exists($g{$arec->{businessteamid}}))){
             return(1);
          }
+         foreach my $con (@$c){# if target is registered in a group in contacts
+            if ($fwd->{fwdtarget} eq "base::user" &&
+                $con->{target} eq "base::grp"){
+               # check if $fwd->{fwdtargetid} is in $con->{targetid} group
+               if (exists($g{$con->{targetid}})){
+                  return(1);
+               }
+            } 
+         }
       }
       if ($fwd->{fwdtarget} eq "base::grp"){
          if (in_array([$fwd->{fwdtargetid}],[
@@ -774,9 +783,31 @@ sub nativProcess
                 (!$self->getParent->IsMemberOf("admin")) &&
                 ($arec->{businessteamid} ne "" && 
                  !$self->getParent->IsMemberOf($arec->{businessteamid})))){
-               $self->LastMsg(ERROR,"You are not authorised to create ".
-                                    "measures for the desired application");
-               return(0);
+                # ok, now we should check the contacts
+               my $found=0;
+               foreach my $crec (@{$arec->{contacts}}){
+                  my $r=$crec->{roles};
+                  if (in_array(['businessemployee','applmgr2'],$r)){
+                     if ($crec->{target} eq "base::user"){
+                        if ($crec->{targetid} eq $userid){
+                           $found++;
+                           last;
+                        }
+                     }
+                     if ($crec->{target} eq "base::grp"){
+                        if ($self->getParent->IsMemberOf($crec->{targetid})){
+                           $found++;
+                           last;
+                        }
+                     }
+                  }
+
+               }
+               if (!$found){
+                  $self->LastMsg(ERROR,"You are not authorised to create ".
+                                       "measures for the desired application");
+                  return(0);
+               }
             }
             my $fo=$self->getField("fwdtargetname");
             my $fwdres=$fo->Validate($WfRec,{$fo->Name=>$h->{$fo->Name}});
