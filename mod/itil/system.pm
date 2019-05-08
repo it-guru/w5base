@@ -959,6 +959,16 @@ sub new
                 unit          =>'MB',
                 dataobjattr   =>"$vmifexp,vasset.memory,asset.memory)"),
 
+      new kernel::Field::Number(
+                name          =>'actsystemsonassetcount',
+                readonly      =>1,
+                htmldetail    =>'0',
+                group         =>'physys',
+                label         =>'active Systems on same Hardware',
+                dataobjattr   =>"(select count(*) from system s ".
+                                "where system.asset=s.asset ".
+                                "and s.cistatus=4)"),
+
       new kernel::Field::Text(
                 name          =>'systemhandle',
                 readonly      =>1,

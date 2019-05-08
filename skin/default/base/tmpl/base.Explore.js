@@ -479,8 +479,10 @@ requirejs.config({
    paths: {
         app: '../app',
         J5Base: '../auth/base/load/J5Base',
+        'jquery': '../auth/base/load/jquery',
         'jquery.flot': '../auth/base/load/jquery.flot',
         'jquery.flot.pie': '../auth/base/load/jquery.flot.pie',
+        'jquery.dataTables': '../auth/base/load/jquery.dataTables',
         ellipsis: '../public/base/load/jquery.ellipsis',
         datadumper: '../public/base/load/datadumper',
         visjs: '../public/base/load/vis.min'

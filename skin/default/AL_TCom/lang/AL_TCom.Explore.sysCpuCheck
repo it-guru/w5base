@@ -1,0 +1,4 @@
+'AL_TCom::Explore::sysCpuCheck'=>{de=>'System CPU-Anzahl Check',en=>'System CPU-Count Check'},
+'description'=>{de=>'logische Analyse der CPU Anzahl auf Hardware-Bezug' ,en=>'logical analyse of cpu count in hardware relation'},
+'sublabel'=>{de=>'Werkzeuge',en=>'Tools'},
+
