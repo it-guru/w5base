@@ -1185,7 +1185,7 @@ sub new
                                  'dnsname','shortcomments'],
                 vjoininhash   =>['id','name','addresstyp',
                                  'cistatusid','networkid',
-                                 'dnsname','comments',
+                                 'dnsname','comments','ifname',
                                  'srcsys']),
 
       new kernel::Field::SubList(

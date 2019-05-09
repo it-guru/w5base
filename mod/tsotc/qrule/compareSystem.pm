@@ -221,22 +221,64 @@ sub qcheckRecord
                   #
                   my %cleanAmIPlist;
                   my %cleanAmIflist;
+
+
+                  # dynamic assign Interface names - if none given
+                  my %ifnum;
                   my $ifnum=0;
-                  foreach my $otciprec (sort(@{$parrec->{ipaddresses}})){
+                     # 1st try to find already assinged ifnames on MACs
+                  foreach my $ifrec (@{$rec->{sysiface}}){
+                     foreach my $otciprec (@{$parrec->{ipaddresses}}){
+                        if ($ifrec->{mac} eq $otciprec->{hwaddr}){
+                           $otciprec->{ifname}=$ifrec->{name};
+                           $ifnum{$otciprec->{ifname}}++;
+                        }
+                     } 
+                  }
+                    # 2nd check if IPs have already ifnames 
+                  foreach my $iprec (@{$rec->{ipaddresses}}){
+                     foreach my $otciprec (@{$parrec->{ipaddresses}}){
+                        if ($otciprec->{name} eq $iprec->{name} &&
+                            $otciprec->{ifname} eq ""){
+                           if ($iprec->{ifname} ne ""){
+                              $otciprec->{ifname}=$iprec->{ifname};
+                              $ifnum{$otciprec->{ifname}}++;
+                           }
+                        }
+                     }
+                  }
+                    # 3rd fillup missing ifnames with unused names
+                  foreach my $iprec (@{$rec->{ipaddresses}}){
+                     foreach my $otciprec (@{$parrec->{ipaddresses}}){
+                        if ($otciprec->{name} eq $iprec->{name}){
+                           if ($iprec->{ifname} eq ""){
+                              my $ifname;
+                              do{
+                                 $ifname=sprintf("eth%d",$ifnum);
+                                 $ifnum++;
+                              }while(exists($ifnum{$ifname}));
+                              $otciprec->{ifname}=$ifname; 
+                              $ifnum{$otciprec->{ifname}}++;
+                           }
+                        }
+                     }
+                  }
+
+
+                  foreach my $otciprec (@{$parrec->{ipaddresses}}){
                      my $mappedCIStatus=4;
                      if ($otciprec->{name} ne ""){
-                        my $ifname=sprintf("eth%d",$ifnum);
                         if ($otciprec->{name}=~
                             m/^\d{1,3}(\.\d{1,3}){3,3}$/){
                            $cleanAmIPlist{$otciprec->{name}}={
                               cistatusid=>$mappedCIStatus,
                               ipaddress=>$otciprec->{name},
-                              ifname=>$ifname,
+                              ifname=>$otciprec->{ifname},
                               comments=>trim($otciprec->{comments})
                            };
                            if ($otciprec->{hwaddr} ne ""){
-                              $cleanAmIflist{$ifname}={
-                                 name=>$ifname,
+                              $cleanAmIflist{$otciprec->{ifname}}={
+                                 name=>$otciprec->{ifname},
                                  mac=>$otciprec->{hwaddr}
                               };
                            }
@@ -246,7 +288,6 @@ sub qcheckRecord
                                     "'$otciprec->{name}' ".
                                     "for $parrec->{id}");
                         }
-                        $ifnum++;
                      }
                   }
                   my @cleanAmIPlist=values(%cleanAmIPlist);
@@ -340,10 +381,8 @@ sub qcheckRecord
                                 my ($a,$b)=@_;
                                 my $eq;
                                 if ($a->{name} eq $b->{name}){
-                                  $eq=0;
-                                   $eq=1 if ($a->{srcsys} eq "OTC" &&
-                                             $a->{mac} eq 
-                                             $b->{mac});
+                                   $eq=0;
+                                   $eq=1 if ( $a->{mac} eq $b->{mac});
                                 }
                                 return($eq);
                              },
@@ -387,7 +426,6 @@ sub qcheckRecord
                              },
                              $rec->{sysiface},\@cleanAmIflist,\@opList,
                              refid=>$rec->{id});
-
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
                   }
@@ -468,7 +506,6 @@ sub qcheckRecord
    }
 
    if (keys(%$forcedupd)){
-      #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
          my @fld=grep(!/^srcload$/,keys(%$forcedupd));
          if ($#fld!=-1){
