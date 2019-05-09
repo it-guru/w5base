@@ -2049,6 +2049,9 @@ sub isViewValid
       @all=grep(!/^applications$/,@all);
       @all=grep(!/^sec$/,@all);
    }
+   if (defined($rec) && $rec->{'relationmodel'} ne "PERSON"){
+      @all=grep(!/^relperson$/,@all);
+   }
    
    #if ($self->IsMemberOf("admin")){
    #   push(@all,"qc");
