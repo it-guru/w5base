@@ -562,14 +562,6 @@ sub new
                 default       =>'ONLINE',
                 htmleditwidth =>'40%',
                 selectfix     =>1,
-                readonly      =>sub{
-                   my $self=shift;
-                   my $rec=shift;
-                   if (defined($rec)){
-                      return(1);
-                   }
-                   return(0);
-                },
                 label         =>'default online state',
                 value         =>['ONLINE',
                                  'HOTSTANDBY',
@@ -583,6 +575,14 @@ sub new
                 default       =>'APPL',
                 htmleditwidth =>'40%',
                 selectfix     =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   if (defined($rec)){
+                      return(1);
+                   }
+                   return(0);
+                },
                 label         =>'relation model',
                 value         =>['APPL',
                                  'PERSON'
