@@ -359,6 +359,17 @@ sub new
                 name          =>'techrelstring',
                 group         =>'softwareinst',
                 htmldetail    =>0,
+                #htmldetail    =>sub{
+                #   my $self=shift;
+                #   my $mode=shift;
+                #   my %param=@_;
+                #   if (defined($param{current})){
+                #      if ($self->getParent->IsMemberOf("admin")){
+                #         return(1);
+                #      }
+                #   }
+                #   return(0);
+                #},
                 label         =>'technical release string from instance',
                 dataobjattr   =>'swinstance.techrelstring'),
 
@@ -366,8 +377,38 @@ sub new
                 name          =>'techproductstring',
                 group         =>'softwareinst',
                 htmldetail    =>0,
+                #htmldetail    =>sub{
+                #   my $self=shift;
+                #   my $mode=shift;
+                #   my %param=@_;
+                #   if (defined($param{current})){
+                #      if ($self->getParent->IsMemberOf("admin")){
+                #         return(1);
+                #      }
+                #   }
+                #   return(0);
+                #},
                 label         =>'technical product string from instance',
                 dataobjattr   =>'swinstance.techprodstring'),
+
+      new kernel::Field::Date(
+                name          =>'techdataupdate',
+                group         =>'softwareinst',
+                history       =>0,
+                htmldetail    =>0,
+                #htmldetail    =>sub{
+                #   my $self=shift;
+                #   my $mode=shift;
+                #   my %param=@_;
+                #   if (defined($param{current})){
+                #      if ($self->getParent->IsMemberOf("admin")){
+                #         return(1);
+                #      }
+                #   }
+                #   return(0);
+                #},
+                label         =>'technical date last update',
+                dataobjattr   =>'swinstance.techdataupd'),
 
       new kernel::Field::SubList(
                 name          =>'relations',
@@ -1068,6 +1109,12 @@ sub Validate
             $newrec->{$v}=undef;
          }
       }
+   }
+   if (effChanged($oldrec,$newrec,"techrelstring") ||
+       effChanged($oldrec,$newrec,"techproductstring") ||
+       (defined($newrec) && exists($newrec->{techrelstring})) ||
+       (defined($newrec) && exists($newrec->{techproductstring}))){
+      $newrec->{techdataupdate}=NowStamp("en");
    }
 
    my $applid=effVal($oldrec,$newrec,"applid");

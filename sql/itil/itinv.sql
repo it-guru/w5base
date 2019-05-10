@@ -1756,3 +1756,4 @@ create table sysiface (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table wallet add expnotifyleaddays int(22) default '56';
 alter table swinstance add ssl_expnotifyleaddays int(22) default '56';
+alter table swinstance add techdataupd datetime default NULL;
