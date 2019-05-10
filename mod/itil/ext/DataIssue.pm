@@ -96,6 +96,11 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'itil::lnkitclustsvc',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'itil::mgmtitemgroup',
              target    =>'name',
              targetid  =>'id'
@@ -129,6 +134,7 @@ sub DataIssueCompleteWriteRequest
        ($affectedobject=~m/::businessservice$/) ||
        ($affectedobject=~m/::itfarm$/) ||
        ($affectedobject=~m/::itcloud$/) ||
+       ($affectedobject=~m/::lnkitclustsvc$/) ||
        ($affectedobject=~m/::applnor$/) ||
        ($affectedobject=~m/::appladv$/) ||
        ($affectedobject=~m/::lnkapplurl$/) ||

@@ -262,12 +262,24 @@ sub new
                 group         =>'clustinfo',
                 dataobjattr   =>'itclust.cistatus'),
 
+      new kernel::Field::Mandator(
+                htmldetail    =>0,
+                readonly      =>1),
+
       new kernel::Field::Link(
                 name          =>'mandatorid',
                 label         =>'Mandator ID of Cluster',
                 readonly      =>1,
                 group         =>'clustinfo',
                 dataobjattr   =>'itclust.mandator'),
+
+      new kernel::Field::Databoss(
+                htmldetail    =>0,
+                readonly      =>1),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'itclust.databoss'),
 
       new kernel::Field::Text(
                 name          =>'clustid',
@@ -306,9 +318,28 @@ sub new
                 vjointo       =>'itil::swinstance',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'itclustsid'],
-                vjoindisp     =>['fullname','swnature']),
+                vjoindisp     =>['fullname','swnature'],
+                vjoininhash   =>['fullname','swnature',
+                                 'softwareinstname',
+                                 'techproductstring',
+                                 'techrelstring',
+                                 'techdataupdate']),
+
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'qlnkitclustsvc.lastqcheck'),
+      new kernel::Field::QualityResponseArea()
 
    );
+   $self->{workflowlink}={ };
+
+   $self->{workflowlink}->{workflowtyp}=[qw(base::workflow::DataIssue
+                                            base::workflow::mailsend)];
+
+
    $self->setDefaultView(qw(fullname applications  cdate));
    $self->setWorktable("lnkitclustsvc");
    return($self);
