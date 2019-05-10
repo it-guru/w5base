@@ -73,7 +73,7 @@ sub new
 
 sub getPosibleTargets
 {
-   return(["itil::system"]);
+   return(["itil::system","itil::lnkitclustsvc"]);
 }
 
 sub qcheckRecord
@@ -83,7 +83,9 @@ sub qcheckRecord
    my $rec=shift;
    my @msg;
 
-   return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   if ($dataobj->SelfAsParentObject() eq "itil::system"){
+      return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
+   }
 
    my %swneeded=();
    my %swifound=();
@@ -93,17 +95,19 @@ sub qcheckRecord
          if ($swi->{softwareinstname} eq ""){ # this is a instance with no
             $swneeded{$swi->{swnature}}++;    # assinged software installation
          }
-         if ($swi->{techproductstring} ne ""){
-            if (!defined($swiprod{$swi->{techproductstring}})){
-               $swiprod{$swi->{techproductstring}}={};
+         #if ($swi->{techdataupdate} ne ""){
+            if ($swi->{techproductstring} ne ""){
+               if (!defined($swiprod{$swi->{techproductstring}})){
+                  $swiprod{$swi->{techproductstring}}={};
+               }
+               if ($swi->{techrelstring}=~m/[0-9.]+/){
+                  $swiprod{$swi->{techproductstring}}->{$swi->{techrelstring}}++;
+               }
+               else{
+                  $swiprod{$swi->{techproductstring}}->{'ANY'}++;
+               }
             }
-            if ($swi->{techrelstring}=~m/[0-9.]+/){
-               $swiprod{$swi->{techproductstring}}->{$swi->{techrelstring}}++;
-            }
-            else{
-               $swiprod{$swi->{techproductstring}}->{'ANY'}++;
-            }
-         }
+         #}
       }
    }
    my %checkedswiprod;
@@ -116,7 +120,6 @@ sub qcheckRecord
          }
       }
    }
-
    if (ref($rec->{software}) eq "ARRAY"){
       foreach my $swrec (@{$rec->{software}}){
          my @swname=($swrec->{software});

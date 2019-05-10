@@ -292,7 +292,8 @@ sub new
                 vjoininhash   =>['fullname','swnature',
                                  'softwareinstname',
                                  'techproductstring',
-                                 'techrelstring']),
+                                 'techrelstring',
+                                 'techdataupdate']),
 
       new kernel::Field::Contact(
                 name          =>'adm',
