@@ -256,22 +256,25 @@ sub new
                       my $p=$self->getParent();
                       my $o=getModuleObject($p->Config,"itil::lnkitclustsvc");
                       $o->SetFilter({id=>\$current->{itclustsid}});
-                      my ($itclrec)=$o->getOnlyFirst(qw(clustid)); 
-                      if (defined($itclrec) && $itclrec->{clustid} ne ""){
-                         my $o=getModuleObject($p->Config,"itil::system");
-                         $o->SetFilter({itclustid=>\$itclrec->{clustid},
-                                        cistatusid=>"<6"});
-                         my @sysid=$o->getVal("id");
-                         if ($#sysid!=-1){
-                            my $o=getModuleObject($p->Config,
-                                  "itil::lnksoftware");
-                            $o->SetFilter([
-                                  {itclustsvcid=>\$current->{itclustsid}},
-                                  {systemid=>\@sysid}]);
-                            my @swinstid=$o->getVal("id");
-                            if ($#swinstid!=-1){
-                               return({id=>\@swinstid});
-                            }
+                      my ($itclrec)=$o->getOnlyFirst(qw(
+                         clustid 
+                         posiblesystems
+                      )); 
+                      if (defined($itclrec) && 
+                          exists($itclrec->{posiblesystems})){
+                         my @sysflt;
+                         foreach my $sys (@{$itclrec->{posiblesystems}}){
+                            push(@sysflt,$sys->{syssystemid});
+                         }
+                         @sysflt=(-1) if ($#sysflt==-1);
+                         my $o=getModuleObject($p->Config,
+                               "itil::lnksoftware");
+                         $o->SetFilter([
+                               {itclustsvcid=>\$current->{itclustsid}},
+                               {systemid=>\@sysflt}]);
+                         my @swinstid=$o->getVal("id");
+                         if ($#swinstid!=-1){
+                            return({id=>\@swinstid});
                          }
                       }
                       return({itclustsvcid=>\$current->{itclustsid}});

@@ -293,7 +293,7 @@ sub new
                                  'softwareinstname',
                                  'techproductstring',
                                  'techrelstring',
-                                 'techdataupdate']),
+                                 'techdataupdate','id','lnksoftwaresystem']),
 
       new kernel::Field::Contact(
                 name          =>'adm',

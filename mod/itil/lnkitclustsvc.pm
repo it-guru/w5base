@@ -136,7 +136,8 @@ sub new
                                  }],
                 vjoinon       =>['id'=>'itclustsvcid'],
                 vjoindisp     =>['name','systemid','cistatus','shortdesc'],
-                vjoininhash   =>['system','systemid','runpolicy']),
+                vjoininhash   =>['system','systemid','runpolicy',
+                                 'syssystemid']),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
@@ -323,7 +324,7 @@ sub new
                                  'softwareinstname',
                                  'techproductstring',
                                  'techrelstring',
-                                 'techdataupdate']),
+                                 'techdataupdate','id','lnksoftwaresystem']),
 
       new kernel::Field::IssueState(),
       new kernel::Field::QualityText(),
