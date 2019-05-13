@@ -443,7 +443,7 @@ sub isWriteValid
 
    return("default") if (!defined($oldrec) && !defined($newrec));
    return("default","applications","ipaddresses","software") if ($self->IsMemberOf("admin"));
-   return("default","applications","ipaddresses","software") if ($self->isWriteOnClusterValid($itclustid));
+   return("default","applications","ipaddresses","software") if ($self->isWriteOnClusterValid($itclustid,"services"));
    return(undef);
 }
 
