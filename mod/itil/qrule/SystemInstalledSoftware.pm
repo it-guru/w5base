@@ -95,7 +95,16 @@ sub qcheckRecord
          if ($swi->{softwareinstname} eq ""){ # this is a instance with no
             $swneeded{$swi->{swnature}}++;    # assinged software installation
          }
-         #if ($swi->{techdataupdate} ne ""){
+         my $techdatavalid=0;
+
+         if ($swi->{techdataupdate} ne ""){
+            my $d=CalcDateDuration($swi->{techdataupdate},NowStamp("en"));
+            if (defined($d) && $d->{days}<90){
+               $techdatavalid=1;
+            }
+         }
+
+         if ($techdatavalid){
             if ($swi->{techproductstring} ne ""){
                if (!defined($swiprod{$swi->{techproductstring}})){
                   $swiprod{$swi->{techproductstring}}={};
@@ -107,10 +116,27 @@ sub qcheckRecord
                   $swiprod{$swi->{techproductstring}}->{'ANY'}++;
                }
             }
-         #}
+         }
+         else{
+            if ($swi->{techproductstring} ne "" ||
+                $swi->{techrelstring} ne ""){
+               # reset techdata (autodisc)
+               my $swinst=getModuleObject($dataobj->Config,"itil::swinstance");
+               $swinst->SetFilter({id=>\$swi->{id}});
+               my ($old,$msg)=$swinst->getOnlyFirst(qw(ALL));
+               if (defined($old)){
+                  msg(INFO,"reset techdata on swinstance $swi->{id}");
+                  $swinst->ValidatedUpdateRecord($old,{
+                     techproductstring=>undef,
+                     techrelstring=>undef
+                  },{id=>\$swi->{id}});
+               }
+            }
+         }
       }
    }
    my %checkedswiprod;
+
    if (keys(%swiprod)){
       my $sw=getModuleObject($dataobj->Config,"itil::software");
       $sw->SetFilter({name=>[keys(%swiprod)]});
@@ -122,20 +148,6 @@ sub qcheckRecord
    }
    if (ref($rec->{software}) eq "ARRAY"){
       foreach my $swrec (@{$rec->{software}}){
-         my @swname=($swrec->{software});
-         if ($swrec->{software}=~m/^oracle_database.*/i){
-            push(@swname,"Oracle_Database_Enterprise_Edition");
-         }
-         foreach my $swname (@swname){
-            $swifound{$swname}++;
-            if (exists($checkedswiprod{$swname})){
-               delete($checkedswiprod{$swname}->{$swrec->{version}});
-               delete($checkedswiprod{$swname}->{'ANY'});
-               if (!keys(%{$checkedswiprod{$swname}})){
-                  delete($checkedswiprod{$swname});
-               }
-            }
-         }
          if ($swrec->{softwarecistatusid}!=4 &&
              $swrec->{softwarecistatusid}!=5 &&
              $swrec->{softwarecistatusid}!=3){
@@ -145,6 +157,52 @@ sub qcheckRecord
          }
       }
    }
+
+
+   # check if assign of a plausible software-installation is posible. If
+   # we on an logical system, only all software on this system are candidats.
+   # if we on a clusterservice, all software on the clusterservice and all
+   # nodes are candidats
+   my $softinst=getModuleObject($dataobj->Config,"itil::lnksoftwaresystem");
+   my @softinstid;
+
+   if (ref($rec->{software}) eq "ARRAY"){
+      foreach my $swrec (@{$rec->{software}}){
+         push(@softinstid,$swrec->{id});
+      }
+   }
+   @softinstid=(-1) if ($#softinstid==-1);
+
+   my @softinstflt=({id=>\@softinstid});
+   if ($dataobj->SelfAsParentObject() eq "itil::lnkitclustsvc"){
+      my @sys;
+      foreach my $sys (@{$rec->{posiblesystems}}){
+         push(@sys,$sys->{syssystemid});
+      } 
+      @sys=(-1) if ($#sys==-1);
+      push(@softinstflt,{systemid=>\@sys});
+   }
+   $softinst->SetFilter(\@softinstflt);
+
+   foreach my $swrec ($softinst->getHashList(qw(id software version))){
+      my @swname=($swrec->{software});
+      if ($swrec->{software}=~m/^oracle_database.*/i){
+         push(@swname,"Oracle_Database_Enterprise_Edition");
+      }
+      foreach my $swname (@swname){
+         $swifound{$swname}++;
+         if (exists($checkedswiprod{$swname})){
+            delete($checkedswiprod{$swname}->{$swrec->{version}});
+            delete($checkedswiprod{$swname}->{'ANY'});
+            if (!keys(%{$checkedswiprod{$swname}})){
+               delete($checkedswiprod{$swname});
+            }
+         }
+      }
+   }
+
+
+
    if (keys(%checkedswiprod)){
       foreach my $software (sort(keys(%checkedswiprod))){
          foreach my $version (sort(keys(%{$checkedswiprod{$software}}))){
