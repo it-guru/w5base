@@ -257,7 +257,9 @@ sub initSqlWhere
                                  w5base.tsflexera.read
                               )],
           "RMember")){
-         $where="(BEACONID is null)";
+         $where="(BEACONID is null ".
+                "or BEACONID='DEU0360DEVLAB' ".
+                "or BEACONID='DEU0360WSICTS')";
       }
    }
 
