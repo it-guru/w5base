@@ -1,0 +1,10 @@
+'itil::qrule::SWInstanceAutoDiscCheck'=>{
+de=>'Überprüfung der AutoDisc Daten gegen die zugeordnete Software-Installation',
+en=>'check AutoDisc data against assigned software installation'
+},
+"version in software installation '\%s' does not match version from autodiscovery '\%s'"=>{de=>"Version in Softwareinstallation '\%s' passt nicht zur Version aus AutoDiscovery '\%s'"},
+"software product in installation '\%s' does not match product from autodiscovery '\%s'"=>{
+de=>"Software in Softwareinstallation '\%s' passt nicht zu Softwareproduct aus AutoDiscovery '\%s'"
+},
+
+
