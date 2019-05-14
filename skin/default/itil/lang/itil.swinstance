@@ -46,9 +46,9 @@
 'cluster service application and instance application does not match'=>{
  de=>'Cluster Service Anwendung passt nicht zur Anwendung in dieser Software Instanz'},
 'url did not looks like a ssl url'=>{de=>'URL entspricht nicht den SSL vorgaben'},
-'technical release string from instance'=>{de=>'technische Versionsbezeichnung durch Instanz geliefert (AutoDisc)'},
-'technical product string from instance'=>{de=>'technische Softwarebezeichnung durch Instanz geliefert (AutoDisc)'},
-'technical date last update'=>{de=>'technische Softwaredaten letztes Update (AutoDisc)'},
+'technical release string from instance (AutoDisc)'=>{de=>'technische Versionsbezeichnung durch Instanz geliefert (AutoDisc)'},
+'technical product string from instance (AutoDisc)'=>{de=>'technische Softwarebezeichnung durch Instanz geliefert (AutoDisc)'},
+'technical date last update (AutoDisc)'=>{de=>'technische Softwaredaten letztes Update (AutoDisc)'},
 'Instance uses SSL technologie'=>{de=>'Instanz verwendet SSL Technologie'},
 'SSL.UNKNOWN'=>{de=>'nicht bekannt'},
 'SSL.YES'=>{de=>'ja'},

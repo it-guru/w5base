@@ -373,7 +373,7 @@ sub new
                 #   }
                 #   return(0);
                 #},
-                label         =>'technical release string from instance',
+                label         =>'technical release string from instance (AutoDisc)',
                 dataobjattr   =>'swinstance.techrelstring'),
 
       new kernel::Field::Textarea(
@@ -391,7 +391,7 @@ sub new
                 #   }
                 #   return(0);
                 #},
-                label         =>'technical product string from instance',
+                label         =>'technical product string from instance (AutoDisc)',
                 dataobjattr   =>'swinstance.techprodstring'),
 
       new kernel::Field::Date(
@@ -410,7 +410,7 @@ sub new
                 #   }
                 #   return(0);
                 #},
-                label         =>'technical date last update',
+                label         =>'technical date last update (AutoDisc)',
                 dataobjattr   =>'swinstance.techdataupd'),
 
       new kernel::Field::SubList(
