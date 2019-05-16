@@ -1852,13 +1852,13 @@ sub Validate
       if (effVal($oldrec,$newrec,"isclusternode")){
          $clusemberror=1;
       }
-      if (ref($oldrec->{swinstances}) eq "ARRAY" &&
+      if (defined($oldrec) && ref($oldrec->{swinstances}) eq "ARRAY" &&
           $#{$oldrec->{swinstances}}!=-1){
          $self->LastMsg(ERROR,
                     "an embedded systems can not have software instances");
          return(0);
       }
-      if (ref($oldrec->{software}) eq "ARRAY" &&
+      if (defined($oldrec) && ref($oldrec->{software}) eq "ARRAY" &&
           $#{$oldrec->{software}}!=-1){
          $self->LastMsg(ERROR,
                     "an embedded systems can not have software installations");
