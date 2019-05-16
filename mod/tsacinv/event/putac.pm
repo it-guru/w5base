@@ -299,7 +299,7 @@ sub SendXmlToAM_system
    my $acasset=getModuleObject($self->Config,"tsacinv::asset");
    my $acsystem=getModuleObject($self->Config,"tsacinv::system");
 
-   my %filter=(srcsys=>\'w5base',cistatusid=>[2,3,4,5]);
+   my %filter=(srcsys=>'!AssetManager',cistatusid=>[2,3,4,5]);
    $self->{DebugMode}=0;
    if ($#systemname!=-1){
       if (grep(/^debug$/i,@systemname)){
