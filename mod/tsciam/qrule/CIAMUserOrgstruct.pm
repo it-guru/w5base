@@ -445,7 +445,10 @@ sub addGrpLinkToUser
             @origroles=@{$lnkrec->{roles}};
          }
          if (!in_array($roles,"RBoss")){
-            my @orgRoles=grep(!/^RBoss$/,orgRoles()); # RBoss muss bleiben!
+            my @orgRoles=grep(!/^RBoss.*$/,orgRoles()); # RBoss muss bleiben!
+            # RBoss wird von einer anderen CIAM QualityRule behandelt und 
+            # RBoss2 muss in Darwin vergeben werden können (z.B. für 
+            # Reporting Rechte) - d.h. RBoss2 steht nicht unter CIAM Authorität
             $oldrolestring=join(",",sort(@{$lnkrec->{roles}}));
             foreach my $r (@{$lnkrec->{roles}}){
                push(@oldroles,$r) if (!in_array(\@orgRoles,$r));
