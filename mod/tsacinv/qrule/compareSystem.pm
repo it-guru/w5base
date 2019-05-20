@@ -106,16 +106,11 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-
-   return(undef,undef) if ($rec->{srcsys} ne ""  &&           # exclude f.e.
-                           lc($rec->{srcsys}) ne "w5base" &&  # EWU2 elements
-                           $rec->{srcsys} ne "AssetManager");
-
-
-
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
 
+   # ATTENTION: AssetManager qrule needs to be run in every case of srcsys!
+   #            This is needed to allow to get ervery system a systemid from AM!
 
    #
    # Level 0
@@ -170,11 +165,11 @@ sub qcheckRecord
          $forcedupd->{systemid}=$parrec->{systemid};
       }
       if ($parrec->{srcsys} eq "W5Base"){
-         if ($rec->{srcsys} ne "w5base"){
+         if ($rec->{srcsys} eq "AssetManager"){
             $forcedupd->{srcsys}="w5base";
-         }
-         if ($rec->{srcid} ne ""){
-            $forcedupd->{srcid}=undef;
+            if ($rec->{srcid} ne ""){
+               $forcedupd->{srcid}=undef;
+            }
          }
       }
       else{
