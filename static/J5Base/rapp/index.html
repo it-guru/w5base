@@ -1,0 +1,44 @@
+<html>
+<head>
+<script src="js/jquery.js"></script>
+<script src="js/js.cookie.min.js"></script>
+<script src="etc/config.js"></script>
+</head>
+<style>
+body{
+   margin:0;padding:0;overflow:hidden;
+}
+#apphead{
+   margin:0;padding:0;
+}
+</style>
+<script>
+$(document).ready(function(){
+   var curpath=document.location.pathname;
+   if (curpath.match(/\/$/)){
+      document.location.pathname+="index.html";
+   }
+   var auth=Cookies.get('BASICAUTH'); // it is a session cookie
+   if (auth=="1"){
+      var run=window.location.search.substring(1); 
+      if (run==undefined || run==""){ 
+         document.getElementById('welcome').src="welcome.html";
+      }
+      else{
+         document.getElementById('welcome').src=run;
+      }
+   }
+   var pheight=$(document).height();
+   var apph=$("#apphead").height();
+   var iframeh=pheight-apph-10;
+   $("#welcome").height(iframeh);
+});
+</script>
+<body><div id=apphead>
+<h1 align=center>This is a J5Base full application sample</h1>
+</div>
+<center><iframe id=welcome 
+  style="width:100%;height:20%;border-width:1;padding:0;margin:0" 
+  src="preauth.welcome.html">
+</iframe></center></body>
+</html>

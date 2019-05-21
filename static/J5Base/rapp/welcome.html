@@ -1,0 +1,38 @@
+<html>
+<head>
+<script src="js/jquery.js"></script>
+<script src="js/js.cookie.min.js"></script>
+<script src="etc/config.js"></script>
+</head>
+<script>
+$(document).ready(function(){
+   var auth=Cookies.get("BASICAUTH");
+   if (auth==undefined){
+      var cpath=document.location.pathname;
+      cpath=cpath.replace(/\/[^\/]+\/[^\/]*?$/,"/");
+      Cookies.set('BASICAUTH','1',{expires:undefined,path:cpath});
+   }
+   if (top.location == self.location){
+      document.location.href="index.html";
+   }
+});
+</script>
+<body>
+    <form>
+      <br> <br> <br> <br>
+      Successfull logged in!!!
+      <br>
+      <br>
+      <br>
+      <ul>
+      <li><a href="app1.html"> Simple Query : app1.html</a> 
+      <li><a href="app2.html"> User Info : app2.html</a>
+      <li><a href="app3.html"> Loop Query : app3.html</a>
+      <li><a href="app4.html"> MyW5Base Query : app4.html</a>
+      </ul>
+      <br>
+      <br>
+      <br>
+    </form>
+</body>
+</html>

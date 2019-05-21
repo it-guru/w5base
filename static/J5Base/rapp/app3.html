@@ -1,0 +1,49 @@
+<html>
+<head>
+<script src="js/datadumper.js"></script>
+<script src="js/jquery.js"></script>
+<script src="etc/config.js"></script>
+<script src="js/tools.js"></script>
+</head>
+<script>
+function runApp(){
+   var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+   var userInfo=W5Base.ContextInfo();
+
+   $("#op").html("app3.html : - loop query - "+
+                 "<input id=restart type=button value='rerun'>");
+   $("#restart").click(function(){
+       runApp();
+   });
+   $("#out").text("");
+   setInterval(function(){
+      var o=getModuleObject(W5Base,"itil::appl");
+      o.SetFilter({name:'W*',cistatusid:'4'});
+      o.findRecord("name,id",function(l){
+         var t="";
+         t+=Date.now()+" Count W* Apps:"+l.length+"\n";
+         $("#out").append(t);
+      });
+   }, 2500);
+}
+
+$(document).ready(function(){
+   forceLocationPath("app3.html");
+   $.ajax({url:getCurrentJ5BaseURL(),dataType:"script",success:runApp});
+});
+</script>
+<body>
+  <center>
+    <form>
+      <br> - <a href="welcome.html"> MAIN </a> - <br> 
+      <div id=op>
+      app3.html running
+      </div>
+      <br> <br>
+      <div style="width:60%;border: 1px solid black;text-align:left">
+      <xmp id=out></xmp> 
+      </div>
+    </form>
+  </center>
+</body>
+</html>
