@@ -923,7 +923,8 @@ sub ValidateUserCache
             return(1);
          }
          else{
-            return($self->HandleNewUser());
+            my $bk=$self->HandleNewUser();
+            return($bk);
          }
       }
       else{
@@ -956,10 +957,17 @@ sub HandleNewUser
 
    my $ua=getModuleObject($self->Config,"base::useraccount");
    $ua->SetFilter({'account'=>[$ENV{REMOTE_USER}]});
-   $ua->SetCurrentView(qw(account userid requestemail requestemailwf));
+   $ua->SetCurrentView(qw(account userid requestemail 
+                          requestcode
+                          requestemailwf posturi));
    my ($uarec,$msg)=$ua->getFirst();
    if (!defined($uarec)){
-      $ua->ValidatedInsertRecord({account=>$ENV{REMOTE_USER}});
+      my $newacc={account=>$ENV{REMOTE_USER}};
+      my $posturi=Query->Param("POSTURI");
+      if ($posturi ne ""){
+         $newacc->{posturi}=$posturi;
+      }
+      $ua->ValidatedInsertRecord($newacc);
       ($uarec,$msg)=$ua->getFirst();
       if (!defined($uarec)){
          if ($self->LastMsg()==0){
@@ -974,7 +982,7 @@ sub HandleNewUser
    if (!defined($uarec->{userid})){
       if (defined(Query->Param("verify"))){
          my $code=Query->Param("code");
-         if ($code==$uarec->{requestemailwf}){
+         if ($code ne "" && $code eq $uarec->{requestcode}){
             my $user=getModuleObject($self->Config,"base::user");
             my $useremail=getModuleObject($self->Config,"base::useremail");
             my $uerec;
@@ -1013,7 +1021,8 @@ sub HandleNewUser
                   return(0);
                }
                $ua->ValidatedUpdateRecord($uarec,{userid=>$urec->{userid},
-                                                  requestemailwf=>undef},
+                                                  requestemailwf=>undef,
+                                                  requestcode=>undef},
                                    {account=>$ENV{REMOTE_USER}});
                #
                # update user record because the user is inactive or
@@ -1062,17 +1071,26 @@ sub HandleNewUser
             $user->SetFilter({accounts=>\$ENV{REMOTE_USER}});
             my ($urec,$msg)=$user->getFirst();
             if (defined($uarec)){
-               print $self->HttpHeader("text/html");
-               print $self->HtmlHeader(style=>['default.css','work.css'],
-                                       body=>1,form=>1,action=>$ENV{SCRIPT_URI},
-                                       title=>'W5Base - account verification');
-               print $self->getParsedTemplate("tmpl/accountverificationok",{
-                                      static=>{ 
-                                            email=>$uarec->{requestemail},
-                                            account=>$ENV{REMOTE_USER}},
-                                      translation=>'base::accountverification',
-                                      skinbase=>'base'
-                                       });
+               if ($uarec->{posturi} ne ""){
+                  $self->HtmlGoto($uarec->{posturi});
+               }
+               else{
+                  print $self->HttpHeader("text/html");
+                  print $self->HtmlHeader(
+                     style=>['default.css','work.css'],
+                     body=>1,
+                     form=>1,
+                     action=>$ENV{SCRIPT_URI},
+                     title=>'W5Base - account verification'
+                  );
+                  print $self->getParsedTemplate("tmpl/accountverificationok",{
+                     static=>{ 
+                           email=>$uarec->{requestemail},
+                           account=>$ENV{REMOTE_USER}},
+                     translation=>'base::accountverification',
+                     skinbase=>'base'
+                  });
+               }
                my %p=(eventname=>'UserVerified',
                       spooltag=>'UserVerified-'.$ENV{REMOTE_USER},
                       redefine=>'1',
@@ -1085,7 +1103,7 @@ sub HandleNewUser
              #                      $ENV{REMOTE_USER});
                $self->W5ServerCall("rpcCacheInvalidate","User",
                                    $ENV{REMOTE_USER});
-               return(1);
+               return(0);
             }
             else{
                $self->LastMsg(ERROR,"verification failed - unknown error");
@@ -1103,6 +1121,7 @@ sub HandleNewUser
       if (defined(Query->Param("save"))){
          my $em=Query->Param("email");
          my $id;
+         my $requestcode;
          if ($ua->ValidatedUpdateRecord($uarec,{requestemail=>$em},
                                         {account=>$ENV{REMOTE_USER}})){
             my $res;
@@ -1129,6 +1148,10 @@ sub HandleNewUser
                   $fromemail=$urec->{email};
                }
 
+               my @chars=("a".."z","0".."9");
+               $requestcode="";
+               $requestcode.=$chars[rand @chars] for 1..10;
+
                if ($id=$wf->Store(undef,{
                       id       =>$id,
                       class    =>'base::workflow::mailsend',
@@ -1140,6 +1163,7 @@ sub HandleNewUser
                                    "tmpl/accountverificationmail",
                                    { static=>{ email=>$em,
                                                id=>$id,
+                                               requestcode=>$requestcode,
                                                initialsite=>$ENV{SERVER_NAME},
                                                currenturl=>$currenturl,
                                                account=>$ENV{REMOTE_USER}
@@ -1150,7 +1174,12 @@ sub HandleNewUser
                      })){
                   my %d=(step=>'base::workflow::mailsend::waitforspool');
                   my $r=$wf->Store($id,%d);
-                  $ua->ValidatedUpdateRecord($uarec,{requestemailwf=>$id},
+
+                  my $newreq={
+                     requestemailwf=>$id,
+                     requestcode=>$requestcode
+                  };
+                  $ua->ValidatedUpdateRecord($uarec,$newreq,
                                              {account=>$ENV{REMOTE_USER}});
                }
             }
@@ -1159,7 +1188,7 @@ sub HandleNewUser
          msg(INFO,"  ---------------------------------------------------".
                   "---------------------------");
          msg(INFO,"  --- Account request code %s has been sent to '%s' ".
-                  "---",$id,$ENV{REMOTE_USER});
+                  "---",$requestcode,$ENV{REMOTE_USER});
          msg(INFO,"  ---------------------------------------------------".
                   "---------------------------");
       }
@@ -1196,11 +1225,12 @@ sub HandleNewUser
                                      skinbase=>'base'
                                       });
       }
-      print("\n<script type=\"text/javascript\" language=\"JavaScript\">".
-            "if (top.location != self.location){".
-            "top.location=self.location.href;".
-            "}</script>\n");
-
+      if (!defined($uarec) || $uarec->{posturi} eq ""){
+         print("\n<script type=\"text/javascript\" language=\"JavaScript\">".
+               "if (top.location != self.location){".
+               "top.location=self.location.href;".
+               "}</script>\n");
+      }
       print $self->HtmlBottom(body=>1,form=>1);
       return(0);
    }

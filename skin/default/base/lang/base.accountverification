@@ -79,11 +79,11 @@ mit der Kennung '%account%' wurde erstmalig eine Anmeldung auf der Site 'http://
 
 Wurde diese Anmeldung von Ihnen persönlich durchgeführt, so bestätigen Sie diese E-Mail Adresse bitte durch klick auf diesen Link ...
 
-    %currenturl%?verify=1&code=%id%
+    %currenturl%?verify=1&code=%requestcode%
 
 ... oder geben Sie auf der Web-Seite den ...
 
-    <b>Bestätigungscode %id%</b> 
+    Bestätigungscode <b>%requestcode%</b> 
 
 ... ein. Ignorieren Sie diese Mail bitte, falls die o.g. Anmeldung nicht von Ihnen durchgeführt wurde.
 EOF
@@ -94,11 +94,11 @@ with the account '%account%' there was done an initial logon at site 'http://%in
 
 If you have done this personally, you must verificate the email by click at thisLink ...
 
-    %currenturl%?verify=1&code=%id%
+    %currenturl%?verify=1&code=%requestcode%
 
 ... or type in the ...
 
-    <b>Verification-Code %id%</b> 
+    Verification-Code <b>%requestcode%</b> 
 
 ... at the Web-Site. If the login has not been done by you, you can ignore this mail.
 EOF

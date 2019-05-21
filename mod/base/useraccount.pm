@@ -105,6 +105,16 @@ sub new
                 label         =>'request E-Mail Workflow',
                 dataobjattr   =>'useraccount.requestemailwf'),
                                   
+      new kernel::Field::Link(
+                name          =>'posturi',
+                label         =>'post uri',
+                dataobjattr   =>'useraccount.posturi'),
+                                  
+      new kernel::Field::Link(
+                name          =>'requestcode',
+                label         =>'requestcode',
+                dataobjattr   =>'useraccount.requestcode'),
+                                  
       new kernel::Field::Email(
                 name          =>'email',
                 label         =>'E-Mail',

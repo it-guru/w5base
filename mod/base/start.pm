@@ -31,7 +31,32 @@ sub new
    return($self);
 }
 
-sub Run
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return(qw(Main login));
+}
+
+
+
+sub login
+{
+   my $self=shift;
+
+   my $posturi=Query->Param("POSTURI");
+   if ($posturi ne ""){
+      $self->HtmlGoto($posturi);
+   }
+   else{
+      print $self->HttpHeader("text/html");
+      printf("Hä?");
+   }
+}
+
+
+
+sub Main
 {
    my $self=shift;
 
@@ -102,7 +127,7 @@ EOF
       return(undef);
    }
 
-   return($self->kernel::TemplateParsing(@_));
+   return($self->kernel::TemplateParsing::findtemplvar(@_));
 }
 
 

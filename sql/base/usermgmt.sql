@@ -121,7 +121,7 @@ CREATE TABLE contact (
 CREATE TABLE useraccount (
   account varchar(40) NOT NULL default '',
   userid bigint(20),password varchar(128),
-  requestemail char(128),
+  requestemail char(128),posturi text,requestcode varchar(20),
   requestemailwf bigint(20),
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (account),

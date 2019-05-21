@@ -9,7 +9,7 @@ korrekt. Bitte überprüfen Sie Ihre Login-Daten. Nähere Information
 zum Anmeldeprozess finden Sie auf der Login-Seite.
 </td></tr>
 <tr>
-<td colspan=2 align=center><input type=button onclick="document.location.href='/';" value=" zurück zur Login-Seite "></td>
+<td colspan=2 align=center><input type=button onclick="if (top.location.href!=document.location.href){top.location.href=top.location.href}else{document.location.href='/'};" value=" zurück zur Login-Seite "></td>
 </tr>
 </table>
 </div>

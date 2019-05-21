@@ -8,7 +8,7 @@
 Your username or password is not correct. Please verify your login information. You can find further information about the login procedure on the login page.
 </td></tr>
 <tr>
-<td colspan=2 align=center><input type=button onclick="document.location.href='/';" value=" back to login page "></td>
+<td colspan=2 align=center><input type=button onclick="if (top.location.href!=document.location.href){top.location.href=top.location.href}else{document.location.href='/'};" value=" back to login page "></td>
 </tr>
 </table>
 </div>
