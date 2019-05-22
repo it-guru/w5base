@@ -1,0 +1,117 @@
+<html>
+<head>
+<title>Simple App Search</title>
+<link rel="stylesheet" href="../../../auth/base/load/jquery.ui.css"></link>
+
+<script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+
+<script language="JavaScript" src="../../../auth/base/load/jquery.ui.js">
+</script>
+
+<script language="JavaScript">
+document.w5baseurl='https://w5base-testenv.telekom.de/darwin';
+
+var W5Base=createConfig({ 
+   useUTF8:false, 
+   mode:'auth',
+   transfer:'JSON' 
+},document.w5baseurl);
+
+function displayApps(res)
+{
+   var d="";
+   console.log(res);
+   for(c=0;c<res.length;c++){
+      d+="<b>"+res[c].name+"</b>";
+      if (res[c].interfaces && res[c].interfaces.length>0){
+         d+=" (Interfaces:";
+         for(ifnum=0;ifnum<res[c].interfaces.length;ifnum++){
+            d+=" "+res[c].interfaces[ifnum].toappl+" ";
+         }
+         d+=")";
+      }
+      if (res[c].systems && res[c].systems.length>0){
+         d+="<ul>";
+         for(sysnum=0;sysnum<res[c].systems.length;sysnum++){
+            d+="<li>"+res[c].systems[sysnum].system+"</li>\n";
+         }
+         d+="</ul>";
+      }
+      d+="<br>";
+      d+="<br>";
+   }
+   $('#result').html(d);
+   $('#state').html("<font color=darkred>Step1 - "+res.length+
+                    " App loaded</font>");
+}
+
+
+function errorHandler(e){
+   $('#state').html("<font color=darkred>ERROR:"+e.LastMsg+"</font>");
+}
+
+
+function loadData()
+{
+   $('#state').html("<font color=darkred>loading data ...</font>");
+   var o=getModuleObject(W5Base,"itil::appl");
+
+   o.SetFilter({cistatusid:"4",name:$('#appname').val()});  
+   o.findRecord("name,id,applid,systems,interfaces",displayApps,errorHandler);
+}
+
+
+$(document).ready(function (){
+   $('#addr').html(document.w5baseurl);
+   $('#state').html("<font color=darkred>Ready for queries ...</font>");
+   $('#loadData').click(loadData);
+});
+
+
+
+</script>
+
+</head>
+<body>
+<!-- CONTROL -->
+<table border=0 width=100%>
+   <tr>
+      <td width=1% nowrap>W5BaseSite URL:</td>
+      <td><div id=addr></div>
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Appfilter:</td>
+      <td>
+         <input style="width:100%" type=text id=appname value="W5*">
+      </td>
+      <td width=1% colspan=1 align=right>
+         <input type=button id=loadData value="Load Data">
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Status:</td>
+      <td><div id=state></div>
+      </td>
+      <td width=1% colspan=1 align=right>&nbsp;
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap></td>
+      <td><div id=processbar></div>
+      </td>
+      <td width=1% colspan=1 align=right>&nbsp;
+      </td>
+   </tr>
+</table>
+
+<!-- RESULT -->
+
+<div id=result>
+</div>
+
+
+</body>
+</html>
+
