@@ -12,7 +12,6 @@ function runApp(){
       mode:'auth',
       transfer:'JSON' 
    },getCurrentW5BaseURL());
-   var userInfo=W5Base.ContextInfo();
 
    $("#op").html("app4.html : - MyW5Base Query - "+
                  "<input id=restart type=button value='rerun'>");
@@ -35,7 +34,7 @@ function runApp(){
       });
    };
    loopQuery();
-   setInterval(loopQuery,2500);
+   setInterval(loopQuery,5500);
 }
 
 $(document).ready(function(){
