@@ -16,7 +16,11 @@ function errorHandler(e){
 }
 
 function runApp(){
-   var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+   var W5Base=createConfig({ 
+      useUTF8:false, 
+      mode:'auth',
+      transfer:'JSON' 
+   },getCurrentW5BaseURL());
    var o=getModuleObject(W5Base,"itil::appl");
    o.SetFilter({name:'W5*'});
    o.findRecord("name,id",function(l){
@@ -31,7 +35,9 @@ function runApp(){
 
 $(document).ready(function(){
    forceLocationPath("app1.html");
-   $.ajax({url:getCurrentJ5BaseURL(),dataType:"script",success:runApp});
+   var CurrentJ5BaseURL=getCurrentJ5BaseURL();
+   console.log("load J5Base from ",CurrentJ5BaseURL);
+   $.ajax({url:CurrentJ5BaseURL,dataType:"script",success:runApp});
 });
 </script>
 <body>

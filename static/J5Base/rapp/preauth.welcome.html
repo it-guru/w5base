@@ -2,11 +2,12 @@
 <head>
 <script src="js/jquery.js"></script>
 <script src="etc/config.js"></script>
+<script src="js/tools.js"></script>
 </head>
 <script>
 $(document).ready(function(){
-   var run=top.location.search.substring(1);
-   if (run==undefined || run==""){
+   var run=top.location.search.substring(1);  // at this point it is stored
+   if (run==undefined || run==""){            // which app should be executed
       run="welcome.html";
       $("#loginbox").html('<input id=login type="button" value=" Login ">');
       $("#login").click(doLogin);
@@ -15,8 +16,7 @@ $(document).ready(function(){
       doLogin();
    }
    function doLogin(){
-      var target=document.w5basesite+"/"+
-                 document.w5baseconfig+"/auth/base/start/login";
+      var target=getCurrentW5BaseURL()+"/auth/base/start/login";
       var posturi=document.location.href;
       posturi=posturi.replace(/preauth\.welcome\.html/,run);
       target+="?POSTURI="+encodeURIComponent(posturi);

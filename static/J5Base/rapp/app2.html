@@ -7,7 +7,11 @@
 </head>
 <script>
 function runApp(){
-   var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
+   var W5Base=createConfig({ 
+      useUTF8:false, 
+      mode:'auth',
+      transfer:'JSON' 
+   },getCurrentW5BaseURL());
    var userInfo=W5Base.ContextInfo();
 
    var t="Current logged in User data=\n";

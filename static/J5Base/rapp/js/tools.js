@@ -8,9 +8,14 @@ function forceLocationPath(curapp){
    }
 }
 
+function getCurrentW5BaseURL(){
+   var w5baseurl=document.w5basesite+"/"+document.w5baseconfig;
+   return(w5baseurl);
+
+}
+
 function getCurrentJ5BaseURL(){
-   var j5baseurl=document.w5basesite+"/"+document.w5baseconfig+"/auth"+
-                 "/base/load/J5Base.js";
+   var j5baseurl=getCurrentW5BaseURL()+"/public"+"/base/load/J5Base.js";
    return(j5baseurl);
 }
 
