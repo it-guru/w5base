@@ -6,6 +6,15 @@
 <script src="js/tools.js"></script>
 </head>
 <script>
+function errorHandler(e){
+  var msg="Error: Somethin went wrong\n";
+
+  if (e.LastMsg){
+     msg+=e.LastMsg+"\n";
+  }
+  $("#out").html(msg);
+}
+
 function runApp(){
    var W5Base=createConfig({ useUTF8:false, mode:'auth',transfer:'JSON' });
    var o=getModuleObject(W5Base,"itil::appl");
@@ -17,7 +26,7 @@ function runApp(){
       $("#restart").click(function(){
           runApp();
       });
-   });
+   },errorHandler);
 }
 
 $(document).ready(function(){

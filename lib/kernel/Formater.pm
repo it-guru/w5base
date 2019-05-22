@@ -220,7 +220,7 @@ sub getErrorDocument
    if ($param{HttpHeader}){
       $d.=$self->getHttpHeader();
    }
-   $d.=join("\n",$self->getParent->getParent->LastMsg());
+   $d.=join("\n",map({rmNonLatin1($_)} $self->getParent->getParent->LastMsg()));
    return($d);
 }
 

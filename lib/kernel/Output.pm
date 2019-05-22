@@ -249,10 +249,7 @@ sub WriteToStdout
       }
    }
    if ($msg ne ""){
-      if ($self->getParent->can("HttpHeader")){
-         print $app->HttpHeader("text/plain");
-         printf("%s",rmNonLatin1($msg));
-      }
+      $self->WriteToStdoutErrorDocument(HttpHeader=>1);
       close(TMP);
       close($fh);
       return(); 

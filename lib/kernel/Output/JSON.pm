@@ -245,18 +245,26 @@ sub getErrorDocument
    if ($param{HttpHeader}){
       $d.=$self->getHttpHeader();
    }
-   my @msg=$self->getParent->getParent->LastMsg();
+   my $JSONP=Query->Param("callback");
+   $d.="$JSONP(" if ($JSONP ne "");
+
+   my @msg;
+   if ($param{msg}){
+      push(@msg,$param{msg});
+   }
+   push(@msg,$self->getParent->getParent->LastMsg());
    if (defined($self->{JSON})){
       if ($self->{charset} eq "latin1"){
          $self->{JSON}->property(latin1 => 1);
          $self->{JSON}->property(utf8 => 0);
       }
-      #$d=$self->{JSON}->pretty->encode(\%rec);
+      map({$_=~s/\s*$//} @msg);  #remove trailing linefeeds from msg list
       $d.=$self->{JSON}->encode({LastMsg=>\@msg});
    }
    else{
       msg(ERROR,"no JSON Object! - not good!");
    }
+   $d.=");" if ($JSONP ne "");
 
    return($d);
 }
