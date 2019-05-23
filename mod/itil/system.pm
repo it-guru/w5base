@@ -341,7 +341,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'vhostsystem',
                 group         =>'vhost',
-                label         =>'Host system (parent of virtual system)',
+                label         =>'Host-System (parent of virtual system)',
                 AllowEmpty    =>1,
                 vjointo       =>'itil::system',
                 vjoineditbase =>{'cistatusid'=>"<=5",

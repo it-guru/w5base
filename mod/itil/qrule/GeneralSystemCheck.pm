@@ -13,13 +13,15 @@ General base check of logical systems.
 NONE
 
 =head3 HINTS
+
 Some generel structure informations in logical systems are validated:
 
-* a systemname needs to be the correct systemname which is
-configured on the host (not a fullqualified dns name!).
+* a system name needs to be the correct system name which is 
+configured on the host (not a full qualified DNS name!).
 
-* a system which is based on a "Host system" (f.e. virtualiziedSystem)
-needs to have a valid (and active) Host system entry.
+* a system which is based on a "host system" (f.e. virtualiziedSystem) 
+needs to have a valid (and active) host system entry.
+
 
 [de:]
 
@@ -29,8 +31,8 @@ werden überprüft:
 * ein Systemname muß der korrekte Systemname sein, der auf dem Host
 konfiguriert ist (nicht der vollqualifizierte DNS Name!)
 
-* ein System das auf einem "Host system" basiert (z.B. virualziedSystem)
-braucht einen gültigen (und aktiven) "Host system" Eintrag.
+* ein System das auf einem "Host-System" basiert (z.B. virualziedSystem)
+braucht einen gültigen (und aktiven) "Host-System" Eintrag.
 
 
 =cut
@@ -100,7 +102,7 @@ sub qcheckRecord
       if (in_array($vmtypes,$rec->{systemtype})){
          my $vhostsystemid=$rec->{vhostsystemid};
          if ($vhostsystemid eq "" || $vhostsystemid==0){
-            my $msg="no Host system documented";
+            my $msg="no Host-System documented";
             push(@qmsg,$msg);
             push(@dataissue,$msg);
             $errorlevel=3 if ($errorlevel<3);
@@ -111,7 +113,7 @@ sub qcheckRecord
                $sys->SetFilter({id=>\$vhostsystemid});
                my ($prec,$msg)=$sys->getOnlyFirst(qw(id cistatusid));
                if (!defined($prec) || $prec->{cistatusid}!=4){
-                  my $msg="Host system entry not active or invalid";
+                  my $msg="Host-System entry not active or invalid";
                   push(@qmsg,$msg);
                   push(@dataissue,$msg);
                   $errorlevel=3 if ($errorlevel<3);

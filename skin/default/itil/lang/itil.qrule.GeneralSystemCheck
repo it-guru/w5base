@@ -1,5 +1,5 @@
-'itil::qrule::GeneralSystemCheck'=>{de=>'Allgemeiner Systemcheck',en=>'generel system check'},
+'itil::qrule::GeneralSystemCheck'=>{de=>'General system check',en=>'general system check'},
 'systemname seems to be a fullqualified dns name - this is not allowed'=>{de=>'Systemname scheint ein vollqualifizierter DNS Name zu sein - das ist nicht erlaubt'},
-'no Host system documented'=>{de=>'kein "Host system" Eintrag dokumentiert'},
-'Host system entry not active or invalid'=>{de=>'"Host system" nicht aktiv oder ungültig'},
+'no Host-System documented'=>{de=>'kein "Host-System" Eintrag dokumentiert'},
+'Host-System entry not active or invalid'=>{de=>'"Host-System" nicht aktiv oder ungültig'},
 
