@@ -7,6 +7,8 @@
 'fieldgroup.iaccontacts'=>{de=>'IaC Kontakte',en=>'IaC Contacts'},
 'Contact email'=>{de=>'Kontakt E-Mail'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},
+'Application'=>{de=>'Anwendung'},
+'Application W5BaseID'=>{de=>'Anwendung W5BaseID'},
 'Memory'=>{de=>'Arbeitsspeicher'},
 'Project'=>{de=>'Projekt'},
 'Description'=>{de=>'Beschreibung'},

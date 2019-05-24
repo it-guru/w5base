@@ -131,6 +131,27 @@ sub new
                 timezone      =>'CET',
                 dataobjattr   =>"date_created"),
 
+      new kernel::Field::Text(
+                name          =>'appl',
+                htmlwidth     =>'150px',
+                group         =>'source',
+                label         =>'Application',
+                vjointo       =>\'itil::appl',
+                vjoinon       =>['appw5baseid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Text(
+                name          =>'appw5baseid',
+                group         =>'source',
+                label         =>'Application W5BaseID',
+                dataobjattr   =>
+                  "lower(".
+                  "case when ".
+                  "otc4darwin_ias_srv_metadata_vw.darwin_app_w5baseid is null ".
+                  "then otc4darwin_iac_srv_metadata_vw.darwin_app_w5baseid ".
+                  "else otc4darwin_ias_srv_metadata_vw.darwin_app_w5baseid ".
+                  "end)"),
+
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
