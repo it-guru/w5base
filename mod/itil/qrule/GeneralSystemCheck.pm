@@ -14,7 +14,7 @@ NONE
 
 =head3 HINTS
 
-Some generel structure informations in logical systems are validated:
+Some general structural information of logical systems are validated:
 
 * a system name needs to be the correct system name which is 
 configured on the host (not a full qualified DNS name!).
