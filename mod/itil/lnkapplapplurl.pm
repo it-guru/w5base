@@ -467,7 +467,7 @@ sub Validate
    my $TargetIsFromAppl=0;
    my $networkid;
 
-   {  # check from as ip
+   if ($srchost ne ""){  # check from as ip
       $ip->ResetFilter();
       $ip->SetFilter([
          {name=>\$srchost,cistatusid=>"<6"},
@@ -493,7 +493,7 @@ sub Validate
       }
    }
 
-   {  # check to as ip
+   if ($dsthost ne ""){  # check to as ip
       $ip->ResetFilter();
       $ip->SetFilter([
           {name=>\$dsthost,cistatusid=>"<6"},
