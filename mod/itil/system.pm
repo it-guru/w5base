@@ -2080,7 +2080,8 @@ sub isWriteValid
    }
    if (!defined($rec)){
       return("default","physys","admin","monisla","misc","cluster",
-             "opmode","control","systemclass","sec");
+             "opmode","control","systemclass","sec","logsys","vhost",
+             "upd");
    }
    else{
       if ($rec->{databossid}==$userid){
