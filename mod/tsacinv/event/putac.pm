@@ -1416,6 +1416,10 @@ sub SendXmlToAM_appl
                foreach my $lnk (@l){
                   $CurrentEventId="Add Interface '$lnk->{toappl}' ".
                                   "to $CurrentAppl";
+                  my $replmode=$lnk->{conmode}; #batch, manual, online, Package
+                  if ($lnk->{conmode} eq "manuell"){
+                     $replmode="manual";
+                  }
                   my $acftprec={
                                    APPL_APPL_REL=>{
                                       EventID=>$CurrentEventId,
@@ -1425,7 +1429,7 @@ sub SendXmlToAM_appl
                                       C_Appl_ExternalID=>$lnk->{toapplid},
                                       UseAssignment=>'Parent',
                                       Type=>$lnk->{conproto},
-                                      ReplMode=>$lnk->{conmode},
+                                      ReplMode=>$replmode,
                                       Description=>$lnk->{comments},
                                       Qty=>'1',
                                       bDelete=>'0',
