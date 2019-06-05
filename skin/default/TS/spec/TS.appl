@@ -54,5 +54,6 @@ Lässt sich die ICTO-ID Default nicht eintragen bitte die Freigabe bei FMB SD-PQI
 The value is generated when an ICTO object is created in Cape according 
 to the TIAB decision and made available for further references to the 
 application in W5Base/Darwin.
-If the ICTO-ID Default can not be entered please request the release at FMB SD-PQIT-NC.
+If you are unable to enter the ICTO-ID Default, please request 
+the release at "FMB SD-PQIT-NC".
 '},

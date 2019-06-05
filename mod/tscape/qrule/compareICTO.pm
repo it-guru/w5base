@@ -50,10 +50,10 @@ has been given already.
 The rule which lead to this issue won't be executed on 
 this application anymore. 
 
-If the ICTO-ID can not be recorded, it may be because this 
+If the ICTO-ID can not be entered, it may be because this 
 default is not provided from Cape. In this case please 
-contact the "FMB SD-PQIT-NC" and ask to provide the ICTO-ID 
-for the entry in Darwin.
+contact the "FMB SD-PQIT-NC" and ask to provide 
+the ICTO-ID for the entry in Darwin.
 
 [de:]
 
@@ -91,11 +91,11 @@ ICTO-ID angegeben werden.
 Die Regel, die zu diesem Data-Issue führte, wird dann auf 
 die Anwendung nicht mehr angewendet.
 
-Sollte die ICTO-ID nicht erfasst werden können kann es daran 
+Sollte die ICTO-ID nicht erfasst werden können, kann es daran 
 liegen, dass diese Default nicht aus Cape zur Verfügung 
-gestellt wird. In diesem Fall wenden sie sich bitte an 
-das "FMB SD-PQIT-NC" und bitten um Bereitstellung 
-der ICTO-ID um den Eintrag in Darwin durchführen zu können.
+gestellt wird. In diesem Fall wenden Sie sich bitte an 
+das "FMB SD-PQIT-NC" und bitten um Bereitstellung der 
+ICTO-ID, um den Eintrag in Darwin durchführen zu können.
 
 
 =cut
