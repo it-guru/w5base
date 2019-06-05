@@ -256,7 +256,11 @@ sub initSqlWhere
       if (!$self->IsMemberOf([qw(admin
                                  w5base.tsflexera.read
                               )],
-          "RMember")){
+          "RMember") &&
+          !$self->IsMemberOf([qw(
+                                 DTAG.GHQ.VTI.DTIT.E-DTO.E-DTOPL
+                              )],
+          "RMember","up") ){
          $where="(BEACONID is null ".
                 "or BEACONID='DEU0360DEVLAB' ".
                 "or BEACONID='DEU0360WSICTS')";
