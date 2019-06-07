@@ -32,6 +32,7 @@ use MIME::Base64;
 use vars qw($opt_v $opt_h $opt_c  
             $opt_k 
             $opt_archivemode
+            $opt_A
             $opt_q 
             $opt_w 
             $opt_p 
@@ -47,6 +48,7 @@ exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'keycol=i'=>\$opt_k,
                         'quietmode'=>\$opt_q,
                         'archive'=>\$opt_archivemode,    # archive old records
+                        'purgearchive=i'=>\$opt_A,
                         'limittime=i'=>\$opt_l,
                         'warnlevel=i'=>\$opt_w,
                         'post=s'=>\$opt_p,
@@ -68,6 +70,9 @@ if (!defined($opt_w)){
 if (!defined($opt_tsize)){
    $opt_tsize=50;                  # per Default 50 lines in one transaction
 }
+if (!defined($opt_A)){
+   $opt_A=90;
+}
 if (!defined($opt_archivemode)){
    $opt_archivemode=0;
 }
@@ -76,6 +81,10 @@ else{
 }
 if ($opt_k<0 || $opt_k>100){
    msg(ERROR,"invalid key column '$opt_k'");
+   exit(1);
+}
+if ($opt_A<14 || $opt_A>10000){
+   msg(ERROR,"invalid PurgeArchive range '$opt_A'");
    exit(1);
 }
 
@@ -526,7 +535,7 @@ sub ProcessTempfile
 
    my $clr_sth=$dbi->prepare(
       "delete from \"$DSTTAB\" where \"W5_isdel\"='1' ".
-      "and \"W5_mdate\"<current_date-90  "
+      "and \"W5_mdate\"<current_date-$opt_A  "
    );
 
 
@@ -656,8 +665,10 @@ sub ProcessTempfile
          my $foundAltOp;
          for(my $c=0;$c<=$#{main::buffer};$c++){
             if ($main::buffer[$c]->{key} eq $chkkey){
-               $foundAltOp=$c;
-               last;
+               if ($op->{op} ne $main::buffer[$c]->{op}){
+                  $foundAltOp=$c;
+                  last;
+               }
             }
          }
          if (defined($foundAltOp)){
@@ -834,11 +845,13 @@ sub Help
    printf($form,"--archive    process in archive mode", "[0]");
    printf($form,"             In archive mode, all records will be stay ","");
    printf($form,"             in db and only be marked as delete.","");
-   printf($form,"             After a period of 90 days, the recoreds","");
+   printf($form,"             After a period of 90 days (-A), the recoreds","");
    printf($form,"             will be hard deleted.","");
    printf($form,"             It is not a good idea, to cyclically switch","");
    printf($form,"             archive and non archive mode, on the same","");
    printf($form,"             target table.","");
+   printf($form,"","");
+   printf($form,"-purgearch   cleanup archive after specified days", "[90]");
    printf($form,"","");
    printf($form,"--transactsz Specify, how many rows get a db transcaction.",
           "[50]");
