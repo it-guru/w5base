@@ -1,0 +1,6 @@
+'secscan::finding'=>{de=>'SecurityScan: Finding',en=>'SecurityScan: Finding'},
+'marked as deleted'=>{de=>'gelöscht markiert'},
+'fullqualified DNS'=>{de=>'vollqualifizierter DNS'},
+'IP-Address'=>{de=>'IP-Adresse'},
+'fieldgroup.handling'=>{de=>'Behandlung',en=>'handling'},
+'fieldgroup.handlingsource'=>{de=>'Behandlung - Metadaten',en=>'handling - metadata'},
