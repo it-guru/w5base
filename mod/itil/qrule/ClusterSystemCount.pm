@@ -6,7 +6,7 @@ package itil::qrule::ClusterSystemCount;
 
 =head3 PURPOSE
 
-The quality rule checks if there are at least 2 cluster members
+The quality rule checks if there are at least 1 cluster members
 (logical systems) in status other than "disposed of waste", assigned to
 a cluster in status "installed/active" or "available in project".
 A dataissue is generated if the cluster creation date is at least 8 weeks
@@ -20,13 +20,13 @@ NONE
 
 [en:]
 
-A cluster must have at least two systems related in status other than
+A cluster must have at least one system related in status other than
 "disposed of waste".
 
 [de:]
 
-Einem Cluster müssen mindestens zwei Systeme zugeordnet sein, die nicht
-im Status "veraltet/gelöscht" sind.
+Einem Cluster muß mindestens ein System zugeordnet sein, das nicht
+im Status "veraltet/gelöscht" ist.
 
 
 =cut
@@ -79,7 +79,7 @@ sub qcheckRecord
    my $duration=CalcDateDuration($rec->{cdate},NowStamp('en'));
    return(0,undef) if ($duration->{days}<56);
 
-   if ($#{$rec->{systems}}<1) {
+   if ($#{$rec->{systems}}<0) {
       my $msg='Insufficient systems related';
       return(3,{qmsg=>[$msg],dataissue=>[$msg]});
    }
