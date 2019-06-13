@@ -476,7 +476,7 @@ sub ProcessTempfile
    if (!$found){
       my $sql="create table \"$DSTTAB\" (".
               "\"W5_rawline\" varchar2(3200),".  # 3200 is oracle index limit!
-              "\"W5_id\" varchar2(40),".
+              "\"W5_id\" varchar2(65),".
               "\"W5_key\" varchar2(40),".
               "\"W5_mdate\" date not null,".
               "\"W5_cdate\" date not null,".
@@ -521,7 +521,8 @@ sub ProcessTempfile
       "(\"W5_rawline\",\"W5_key\",\"W5_id\",\"W5_cdate\",\"W5_mdate\"".
       join("",map({",\"".$_."\""} @FIELDS)).
       ") ".
-      " values(?,?,?,current_date,current_date".
+      " values(?,?,replace(standard_hash(?,'SHA256'),' ',''),".
+      "current_date,current_date".
       join("",map({",?"} @FIELDS)).
       ")"
    );
@@ -705,7 +706,7 @@ sub ProcessTempfile
             msg(DEBUG,"f='".join(";",@FIELDS)."'");
             $stat{colcnterr}++;
          }
-         if (!($sqlbk=$ins_sth->execute($op->{rawline},$op->{key},$op->{id},
+         if (!($sqlbk=$ins_sth->execute($op->{rawline},$op->{key},$op->{rawline},
                                      @{$op->{cols}}))){
             msg(WARN,"insert fail for rawline='$op->{rawline}'");
             msg(DEBUG,"insert operation: %s",Dumper($op));
