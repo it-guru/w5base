@@ -93,7 +93,7 @@ sub qcheckRecord
 
    if ($rec->{techdataupdate} ne ""){
       my $d=CalcDateDuration($rec->{techdataupdate},NowStamp("en"));
-      if (defined($d) && $d->{days}>6){
+      if (defined($d)){
          if ($rec->{techrelstring} ne ""){    # check version string
             if ($rec->{techrelstring} ne $rec->{softwareinstversion}){
                my $msg=sprintf(
