@@ -5,3 +5,4 @@
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'last monitoring date'=>{de=>'Letzter Monitoring Zeitpunkt'},
 'Description'=>{de=>'Beschreibung'},
+'Application'=>{de=>'Anwendung'},

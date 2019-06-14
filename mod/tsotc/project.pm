@@ -45,6 +45,13 @@ sub new
                 label         =>'DomainID',
                 dataobjattr   =>"domain_uuid"),
 
+      new kernel::Field::Link(
+                name          =>'applid',
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'ApplID',
+                dataobjattr   =>"darwin_app_w5baseid"),
+
       new kernel::Field::Text(
                 name          =>'name',
                 sqlorder      =>'desc',
@@ -58,6 +65,14 @@ sub new
                 weblinkto     =>\'tsotc::domain',
                 weblinkon     =>['domainid'=>'id'],
                 dataobjattr   =>"tenant"),
+
+      new kernel::Field::Text(
+                name          =>'appl',
+                sqlorder      =>'desc',
+                label         =>'Application',
+                vjointo       =>\'itil::appl',
+                vjoinon       =>['applid'=>'id'],
+                vjoindisp     =>'name'),
 
       new kernel::Field::SubList(
                 name          =>'systems',
@@ -80,7 +95,7 @@ sub new
 #                dataobjattr   =>"tenant_description"),
 
    );
-   $self->setDefaultView(qw(name id ));
+   $self->setDefaultView(qw(name id appl));
    $self->setWorktable("otc4darwin_projects_vw");
    return($self);
 }
