@@ -1041,9 +1041,6 @@ sub msel
 history.forward();
 if (!(top.frames[0])){
    document.location.href='${rootpath}root$fpfine$jsquerystring';
-   document.writeln("</form>");
-   document.writeln("</base>");
-   document.writeln("</html>");
 }
 else{
    if ("$wintitle"!=""){
