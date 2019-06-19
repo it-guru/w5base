@@ -35,6 +35,8 @@ use vars qw($opt_v $opt_h $opt_c
             $opt_A
             $opt_q 
             $opt_w 
+            $opt_fieldsize 
+            $opt_allowdubkey 
             $opt_p 
             $opt_tsize 
             $opt_l 
@@ -47,10 +49,12 @@ my $startProcessPPID=getppid(); # there is need to check ppid at at start
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'keycol=i'=>\$opt_k,
                         'quietmode'=>\$opt_q,
+                        'nukey'=>\$opt_allowdubkey,
                         'archive'=>\$opt_archivemode,    # archive old records
                         'purgearchive=i'=>\$opt_A,
                         'limittime=i'=>\$opt_l,
                         'warnlevel=i'=>\$opt_w,
+                        'fieldsize=i'=>\$opt_fieldsize,
                         'post=s'=>\$opt_p,
                         'transactsz=i'=>\$opt_tsize,
                         'debug'=>\$opt_v,
@@ -73,6 +77,9 @@ if (!defined($opt_tsize)){
 if (!defined($opt_A)){
    $opt_A=90;
 }
+if (!defined($opt_fieldsize)){
+   $opt_fieldsize=40;
+}
 if (!defined($opt_archivemode)){
    $opt_archivemode=0;
 }
@@ -81,6 +88,10 @@ else{
 }
 if ($opt_k<0 || $opt_k>100){
    msg(ERROR,"invalid key column '$opt_k'");
+   exit(1);
+}
+if ($opt_fieldsize<20 || $opt_fieldsize>2048){
+   msg(ERROR,"invalid fieldsize '$opt_fieldsize'");
    exit(1);
 }
 if ($opt_A<14 || $opt_A>10000){
@@ -478,11 +489,11 @@ sub ProcessTempfile
       my $sql="create table \"$DSTTAB\" (".
               "\"W5_rawline\" varchar2(3200),".  # 3200 is oracle index limit!
               "\"W5_id\" varchar2(65),".
-              "\"W5_key\" varchar2(40),".
+              "\"W5_key\" varchar2($opt_fieldsize),".
               "\"W5_mdate\" date not null,".
               "\"W5_cdate\" date not null,".
               "\"W5_isnotdel\" char(1) default '1',";
-      $sql.=join(",",map({"\"$_\" varchar2(40)"} @FIELDS));
+      $sql.=join(",",map({"\"$_\" varchar2($opt_fieldsize)"} @FIELDS));
       $sql.=")";
       my $bk=$dbi->doCmd($sql);
       if ($bk ne "0E0"){
@@ -490,14 +501,16 @@ sub ProcessTempfile
          exit(1);
       }
       my $sql="create unique index \"${DSTTAB}_i0\" ".
-              "on \"$DSTTAB\" (\"W5_id\",\"W5_isnotdel\")";
+              "on \"$DSTTAB\" ((case when \"W5_isnotdel\" is not null ".
+                            "then \"W5_id\" else null end),\"W5_isnotdel\")";
       my $bk=$dbi->doCmd($sql);
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create i0 index for target table table");
          exit(1);
       }
       my $sql="create unique index \"${DSTTAB}_i1\" ".
-              "on \"$DSTTAB\" (\"W5_key\",\"W5_isnotdel\")";
+              "on \"$DSTTAB\" ((case when \"W5_isnotdel\" is not null ".
+                            "then \"W5_key\" else null end),\"W5_isnotdel\")";
       my $bk=$dbi->doCmd($sql);
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create i1 index for target table table");
@@ -646,11 +659,11 @@ sub ProcessTempfile
                else{
                   $newrec->{key}=undef;
                }
-               my $idstr=MIME::Base64::encode($newrec->{key}.";".
-                                              Time::HiRes::time().";".
-                                              substr(0,20,$line));
-               $idstr=join("-",unpack("(A4)*",substr($idstr,0,32))); # Max 32c
-               $newrec->{id}=$idstr;
+               #my $idstr=MIME::Base64::encode($newrec->{key}.";".
+               #                               Time::HiRes::time().";".
+               #                               substr(0,20,$line));
+               #$idstr=join("-",unpack("(A4)*",substr($idstr,0,32))); # Max 32c
+               #$newrec->{id}=$idstr;
                if ($newrec->{line}=~m/^\s/){
                   $newrec->{op}="insert";
                }
@@ -711,14 +724,30 @@ sub ProcessTempfile
             msg(DEBUG,"f='".join(";",@FIELDS)."'");
             $stat{colcnterr}++;
          }
-         if (!($sqlbk=$ins_sth->execute($op->{rawline},$op->{key},$op->{rawline},
-                                     @{$op->{cols}}))){
-            msg(WARN,"insert fail for rawline='$op->{rawline}'");
-            msg(DEBUG,"insert operation: %s",Dumper($op));
-            if ($DBI::errstr ne ""){
-               msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
+         if ($opt_allowdubkey){
+            if (!($sqlbk=$upd_sth->execute($op->{rawline},
+                                           @{$op->{cols}},
+                                           $op->{key}))){
+               msg(WARN,"ins/update fail for rawline='$op->{rawline}'");
+               msg(DEBUG,"ins/update operation: %s",Dumper($op));
+               if ($DBI::errstr ne ""){
+                  msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
+               }
+               $stat{opfailcnt}++;
             }
-            $stat{opfailcnt}++;
+         }
+         if (!$opt_allowdubkey || $sqlbk eq "0E0"){
+            if (!($sqlbk=$ins_sth->execute($op->{rawline},
+                                           $op->{key},
+                                           $op->{rawline},
+                                        @{$op->{cols}}))){
+               msg(WARN,"insert fail for rawline='$op->{rawline}'");
+               msg(DEBUG,"insert operation: %s",Dumper($op));
+               if ($DBI::errstr ne ""){
+                  msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
+               }
+               $stat{opfailcnt}++;
+            }
          }
          
          $stat{ins}++;
@@ -739,7 +768,8 @@ sub ProcessTempfile
       }
       elsif($op->{op} eq "update"){
          if (!($sqlbk=$upd_sth->execute($op->{rawline},
-                                        @{$op->{cols}},$op->{key}))){
+                                        @{$op->{cols}},
+                                        $op->{key}))){
             msg(WARN,"update fail for rawline='$op->{rawline}'");
             msg(DEBUG,"update operation: %s",Dumper($op));
             if ($DBI::errstr ne ""){
@@ -848,6 +878,10 @@ sub Help
    printf($form,"--keycol     specifies the key column in csv line", "[0]");
    printf($form,"             0 means no keycolumn handling is done.","");
    printf($form,"             The first column is need to specify as 1","");
+   printf($form,"--fieldsize  is the default field size, on create", "[40]");
+   printf($form,"             of column fields.","");
+   printf($form,"--nukey      add handling for not unique keys", "");
+   printf($form,"             in input csv file - use last found key.","");
    printf($form,"--archive    process in archive mode", "[0]");
    printf($form,"             In archive mode, all records will be stay ","");
    printf($form,"             in db and only be marked as delete.","");
@@ -857,7 +891,7 @@ sub Help
    printf($form,"             archive and non archive mode, on the same","");
    printf($form,"             target table.","");
    printf($form,"","");
-   printf($form,"-purgearch   cleanup archive after specified days", "[90]");
+   printf($form,"--purgearch  cleanup archive after specified days", "[90]");
    printf($form,"","");
    printf($form,"--transactsz Specify, how many rows get a db transcaction.",
           "[50]");
