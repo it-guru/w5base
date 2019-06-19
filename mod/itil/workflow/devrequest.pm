@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use base::workflow::request;
+use finance::costcenter;
 @ISA=qw(base::workflow::request);
 
 sub new
@@ -141,6 +142,18 @@ sub Validate
       }
       else{
          $newrec->{devreqdetailstateffortclass}="D (>20h)";
+      }
+   }
+   if (effChanged($oldrec,$newrec,"devreqcostcenter")){
+      if (exists($newrec->{devreqcostcenter}) && 
+          $newrec->{devreqcostcenter} ne ""){
+         if (!$self->finance::costcenter::ValidateCONumber(
+             "itil::workflow::devrequest","devreqcostcenter",$oldrec,$newrec)){
+            $self->LastMsg(ERROR,
+                $self->T("invalid number format '\%s' specified",
+                         "finance::costcenter"),$newrec->{devreqcostcenter});
+            return(0);
+         }
       }
    }
 
@@ -379,6 +392,15 @@ sub getDynamicFields
                 },
                 label         =>'Prio calculated',
                 container     =>'headref'),
+
+      new kernel::Field::Text(
+                name          =>'devreqcostcenter',
+                weblinkto     =>'itil::costcenter',
+                weblinkon     =>['devreqcostcenter'=>'name'],
+                group         =>'init',
+                label         =>'clearing costcenter',
+                container     =>'headref'),
+
 
     ),$self->SUPER::getDynamicFields(%param));
 }
@@ -657,6 +679,7 @@ sub addInitialParameters
       if (defined($arec)){
          if ($arec->{conumber} ne ""){
             $h->{involvedcostcenter}=[$arec->{conumber}];
+            $h->{devreqcostcenter}=$arec->{conumber};
          }
          if ($arec->{customer} ne ""){
             $h->{involvedcustomer}=[$arec->{customer}];

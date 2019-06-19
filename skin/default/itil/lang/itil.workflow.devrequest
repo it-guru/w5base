@@ -31,3 +31,4 @@
 'devreqdetailstatprocboss.1'=>{de=>'ja',en=>'yes'},
 'devreqdetailstatprocboss.0'=>{de=>'nein',en=>'no'},
 'devreqdetailstatprocboss.needless'=>{de=>'nicht erforderlich'},
+'clearing costcenter'=>{de=>'Verrechnungs-Kontierungsobjekt'},
