@@ -283,7 +283,7 @@ sub isWriteValid
    if (!grep(/^init$/,@l) && defined($rec)){
       if ($self->isWorkflowManager($rec)){
     #     push(@l,"default");   # wird ab 11/2011 nicht mehr zugelassen!
-         if ($self->isCurrentForward($rec)){
+         if ($rec->{state}<20){
             push(@l,"init");
          }
       }
