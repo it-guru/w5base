@@ -32,27 +32,50 @@ use tsacinv::system;
 
 
 create or replace view "W5I_secscan__findingbase" as
-select  'OpSha-' || "w5secscan_ShareData"."W5_id"             as id,
-        "w5secscan_ShareData"."W5_isdel"                      as isdel,
-        "w5secscan_ShareData"."C01_SecToken"                  as sectoken,
-        "w5secscan_ShareData"."C05_SecItem"                   as secitem,
-        "w5secscan_ShareData"."C04_TreadRules"                as sectreadrules,
-        TO_DATE("w5secscan_ShareData"."C02_ScanDate",
-                'YYYY-MM-DD HH24:MI:SS')                      as fndscandate,
-        "w5secscan_ShareData"."W5_cdate"                      as fndcdate,
-        "w5secscan_ShareData"."W5_mdate"                      as fndmdate,
-        LOWER(REPLACE(REGEXP_SUBSTR(
-              "w5secscan_ShareData"."C03_HostName",
-              '^.*?\.'),'.',''))                              as hostname,
-        "W5FTPGW1"."w5secscan_ShareData"."C03_HostName"       as fqdns,
-        "w5secscan_ComputerIP"."C02_IPAddress"                as ipaddr,
-        'Share=' || "w5secscan_ShareData"."C06_ShareName" || 
-         chr(13) ||
-        'Files=' || "w5secscan_ShareData"."C09_foundFiles" ||
-         chr(13) ||
-        'Items=' || "w5secscan_ShareData"."C08_foundItems"    as detailspec,
-        'w5sharescan'                                         as srcsys,
-        "w5secscan_ShareData"."W5_id"                         as srcid
+   select  'OpSha-' || "w5secscan_ShareData"."W5_id"          as id,
+           "w5secscan_ShareData"."W5_isnotdel"                as isnotdel,
+           "w5secscan_ShareData"."C01_SecToken"               as sectoken,
+           "w5secscan_ShareData"."C05_SecItem"                as secitem,
+           "w5secscan_ShareData"."C04_TreatRules"             as sectreadrules,
+           TO_DATE("w5secscan_ShareData"."C02_ScanDate",
+                   'YYYY-MM-DD HH24:MI:SS')                   as fndscandate,
+           "w5secscan_ShareData"."W5_cdate"                   as fndcdate,
+           "w5secscan_ShareData"."W5_mdate"                   as fndmdate,
+           LOWER(REPLACE(REGEXP_SUBSTR(
+                 "w5secscan_ShareData"."C03_HostName",
+                 '^.*?\.'),'.',''))                           as hostname,
+           "W5FTPGW1"."w5secscan_ShareData"."C03_HostName"    as fqdns,
+           "w5secscan_ComputerIP"."C02_IPAddress"             as ipaddr,
+           'Share=' || "w5secscan_ShareData"."C06_ShareName" || 
+            chr(13) ||
+           'Files=' || "w5secscan_ShareData"."C09_foundFiles" ||
+            chr(13) ||
+           'Items=' || "w5secscan_ShareData"."C08_foundItems" as detailspec,
+           'w5sharescan'                                      as srcsys,
+           "w5secscan_ShareData"."W5_id"                      as srcid
+   from "W5FTPGW1"."w5secscan_ShareData"
+      join "W5FTPGW1"."w5secscan_ComputerIP"
+         on "w5secscan_ComputerIP"."C01_NetComputer"=
+            "w5secscan_ShareData"."C03_HostName"
+union
+   select  'Once-' || "w5secscan_OneShot"."W5_id"             as id,
+           "w5secscan_OneShot"."W5_isnotdel"                  as isnotdel,
+           "w5secscan_OneShot"."C01_SecToken"                 as sectoken,
+           "w5secscan_OneShot"."C05_SecItem"                  as secitem,
+           "w5secscan_OneShot"."C04_TreatRules"               as sectreadrules,
+           TO_DATE("w5secscan_OneShot"."C02_ScanDate",
+                   'YYYY-MM-DD HH24:MI:SS')                   as fndscandate,
+           "w5secscan_OneShot"."W5_cdate"                     as fndcdate,
+           "w5secscan_OneShot"."W5_mdate"                     as fndmdate,
+           NULL                                               as hostname,
+           NULL                                               as fqdns,
+           "w5secscan_OneShot"."C03_IPAddress"                as ipaddr,
+           "w5secscan_OneShot"."C07_SecDetailSpec"            as detailspec,
+           'OneShot'                                          as srcsys,
+           "w5secscan_OneShot"."W5_id"                        as srcid
+   from "W5FTPGW1"."w5secscan_OneShot";
+
+
 from "W5FTPGW1"."w5secscan_ShareData"
    join "W5FTPGW1"."w5secscan_ComputerIP"
       on "w5secscan_ComputerIP"."C01_NetComputer"=
@@ -76,7 +99,7 @@ create or replace synonym W5I.secscan__finding_of for "W5I_secscan__finding_of";
 
 create or replace view "W5I_secscan__finding" as
 select "W5I_secscan__findingbase".id,
-       "W5I_secscan__findingbase".isdel,
+       decode("W5I_secscan__findingbase".isnotdel,1,0,1) isdel,
        "W5I_secscan__findingbase".sectoken,
        "W5I_secscan__findingbase".secitem,
        "W5I_secscan__findingbase".sectreadrules,
@@ -136,7 +159,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Security Token',
-                lowersearch   =>1,
                 size          =>'16',
                 readonly      =>1,
                 dataobjattr   =>'sectoken'),
