@@ -1,0 +1,32 @@
+'secscan::workflow::FindingHndl'=>{
+de=>'Security: Finding-Behandlung',
+en=>'Security: Finding-Handling'
+},
+'fieldgroup.secinternal'=>{
+de=>'Security-Intern',
+en=>'Security-Internals'
+},
+'Description'=>{de=>'Beschreibung'},
+'treating target in days'=>{de=>'Behandlungsziel in Tagen'},
+'ask statement'=>{de=>'Begründung abfragen'},
+'detail spec'=>{de=>'Detail-Spezifikation'},
+'IP-Address reference'=>{de=>'IP-Adress-Bezug'},
+'ask DSGVO compromised'=>{de=>'DSGVO Verletzung abfragen'},
+'ask statement'=>{de=>'Begründung abfragen'},
+'request enforce remove'=>{de=>'Zwingendes Entfernen anfordern'},
+'responsible person'=>{de=>'verantwortliche Person'},
+
+
+'secscan::workflow::FindingHndl::tip'=>{
+              de=>'<br>
+Security-Findings sind kritische Zustände im Netz und müssen
+mit maximaler Prioriät behandelt werden.
+<br>
+',
+              en=>'<br>
+Security findings are critical states in the network and must 
+be treated with maximum priority.
+'
+                  },
+
+
