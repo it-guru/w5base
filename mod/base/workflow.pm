@@ -226,7 +226,7 @@ sub new
                 xlswidth      =>'25',
                 group         =>'state',
                 label         =>'Workflow-Class',
-                size          =>'20',
+                size          =>'30',
                 dataobjattr   =>'wfhead.wfclass'),
 
       new kernel::Field::KeyText(
