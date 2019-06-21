@@ -79,6 +79,15 @@ sub Init
                       "tsotc::lnksystemiaccontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.tsotc.appagile",
+                      "tsotc::appagilecluster",
+                      prio=>10000,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.tsotc.appagile.namespace",
+                      "tsotc::appagilenamespace",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.system.import.OTC",
                       "tsotc::system",
                       func=>'ImportSystem',
