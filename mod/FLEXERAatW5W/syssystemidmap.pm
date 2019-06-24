@@ -194,7 +194,8 @@ sub ValidatedUpdateRecord
    $filter[0]={id=>\$oldrec->{flexerasystemid}};
    $newrec->{id}=$oldrec->{flexerasystemid};  # als Referenz in der Overflow die 
    if (!defined($oldrec->{ofid})){     # SystemID verwenden
-      return($self->SUPER::ValidatedInsertRecord($newrec));
+      my $o=$self->Clone();
+      return($o->SUPER::ValidatedInsertRecord($newrec));
    }
    return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
 }
