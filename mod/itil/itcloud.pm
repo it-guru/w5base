@@ -100,6 +100,11 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'itcloud.databoss'),
 
+      new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'itcloud.description'),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -275,6 +280,11 @@ sub new
          'local'
       ]
    };
+
+   $self->{CI_Handling}={uniquename=>"fullname",
+                         activator=>["admin","w5base.itil.itcloud"],
+                         uniquesize=>40};
+
    $self->setDefaultView(qw(linenumber fullname cistatus mandator mdate));
    $self->setWorktable("itcloud");
    return($self);
@@ -356,6 +366,24 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $wrgroups=shift;
+
+   my $userid=$self->getCurrentUserId();
+   if (defined($oldrec) && $oldrec->{userid}==$userid){
+      delete($newrec->{cistatusid});
+   }
+   else{
+      if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+         return(0);
+      }
+   }
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
+}
 
 sub Validate
 {
@@ -470,18 +498,33 @@ sub ValidateDelete
 
 
 
-
-
-
 sub FinishWrite
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+      return(0);
+   }
    $self->NotifyOnCIStatusChange($oldrec,$newrec);
-   return($bak);
+   return(1);
 }
+
+
+sub FinishDelete
+{
+   my $self=shift;
+   my $oldrec=shift;
+   if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
+      return(0);
+   }
+   return(1);
+}
+
+
+
+
+
 
 sub getRecordImageUrl
 {
@@ -507,12 +550,15 @@ sub isWriteValid
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
 
-   my @databossedit=qw(default areas contacts attachments phonenumbers 
+   my @databossedit=qw(default contacts attachments phonenumbers 
                        inm misc control);
    if (!defined($rec)){
       return(@databossedit);
    }
    else{
+      if ($rec->{cistatusid}==4 || $rec->{cistatusid}==5){
+         push(@databossedit,"areas");
+      }
       if ($rec->{databossid}==$userid){
          return(@databossedit);
       }

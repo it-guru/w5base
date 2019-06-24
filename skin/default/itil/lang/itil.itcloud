@@ -9,3 +9,5 @@
 "invalid cloud name '%s'"=>{de=>"ungültiger Cloud name '%s'"},
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'cloud is not active'=>{de=>'angegebene Cloud ist nicht aktiv'},
+'Description'=>{de=>'Beschreibung'},
+
