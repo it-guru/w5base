@@ -1,3 +1,7 @@
+'secscan::item'=>{
+de=>'SecItem',
+en=>'SecItem'
+},
 'OPENSHARE001'=>{
 de=>'
 Das ist der deutsche Text zum Item OPENSHARE001 und hier

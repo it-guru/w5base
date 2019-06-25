@@ -6,7 +6,8 @@ en=>'Security: Finding-Handling'
 de=>'Security-Intern',
 en=>'Security-Internals'
 },
-'Description'=>{de=>'Beschreibung'},
+'Description of finding'=>{de=>'Beschreibung des Findings'},
+'Reasons for non-removal'=>{de=>'Begründung der Nichtbeseitigung'},
 'treating target in days'=>{de=>'Behandlungsziel in Tagen'},
 'ask statement'=>{de=>'Begründung abfragen'},
 'detail spec'=>{de=>'Detail-Spezifikation'},
@@ -28,5 +29,20 @@ Security findings are critical states in the network and must
 be treated with maximum priority.
 '
                   },
+
+'wfclose'=>{
+ de=>'Finding als "Beseitigt" abschließen',
+ en=>'Close finding als resolved'
+},
+'wfsecsetwrkasdes'=>{
+ de=>'Workflow ohne Beseitigung des beschriebenen Findings abschließen',
+ en=>'Close workflow without resolve of descripted finding'
+},
+'wfrejectresp'=>{
+ de=>'Ablehnen der Verantwortung für das Finding',
+ en=>'Reject responsibility for finding'
+},
+'wfclosed'=>{de=>'Abgeschlossen',en=>'Closed'},
+
 
 

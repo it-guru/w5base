@@ -112,9 +112,23 @@ sub getDynamicFields
    my @l=($self->InitFields(
       new kernel::Field::Select(  name          =>'secfindingitem',
                                   label         =>'Security Finding Item',
-                                  value         =>['SAMPLE01',
-                                                   'OTHER'],
+                                  vjointo       =>'secscan::item',
+                                  htmldetail    =>0,
+                                  vjoinon      =>['secfindingitemname'=>'name'],
+                                  vjoineditbase =>{cistatusid=>'4'},
+                                  vjoindisp     =>'name'),
+
+      new kernel::Field::Link(    name          =>'secfindingitemname',
+                                  label         =>'Security Finding Item Name',
                                   container     =>'headref'),
+
+      new kernel::Field::Textarea(name          =>'secfindingitemrawdesc',
+                                  label         =>'Security Finding Item Desc',
+                                  readonly      =>1,
+                                  htmldetail    =>0,
+                                  vjointo       =>'secscan::item',
+                                  vjoinon      =>['secfindingitemname'=>'name'],
+                                  vjoindisp     =>'description'),
 
       new kernel::Field::Text(    name          =>'secfindingipaddrref',
                                   label         =>'IP-Address reference',
@@ -122,6 +136,10 @@ sub getDynamicFields
 
       new kernel::Field::Interface(name         =>'secfindingreponsibleid',
                                   label         =>'responsible id',
+                                  container     =>'headref'),
+
+      new kernel::Field::Interface(name         =>'secfindingaltreponsibleid',
+                                  label         =>'alternate responsible id',
                                   container     =>'headref'),
 
       new kernel::Field::Contact( name          =>'secfindingreponsible',
@@ -166,24 +184,39 @@ sub getDynamicFields
                                   container     =>'headref'),
 
       new kernel::Field::Textarea(name          =>'secfindingdesc',
-                                  label         =>'Description',
-                                  depend        =>[qw(secfindingitem 
+                                  label         =>'Description of finding',
+                                  depend        =>[qw(secfindingitemname
+                                                      secfindingitemrawdesc
                                                       secfindingdetailspec)],
                                   onRawValue    =>sub{
                                      my $self   =shift;
                                      my $current=shift;
                                      my $i=$self->getParent->getField(
-                                           "secfindingitem");
-                                     my $secfindingitem=$i->RawValue($current);
+                                           "secfindingitemrawdesc");
+                                     my $dsc=$i->RawValue($current);
+                                     my $lang=$self->getParent->Lang();
+                                     $dsc=extractLangEntry($dsc,
+                                                           $lang,65535,65535); 
                                      my $d=$self->getParent->getField(
                                            "secfindingdetailspec");
                                      my $secfindingdetailspec=
                                            $d->RawValue($current);
-
-                                     return($secfindingitem.
-                                            "\n---\n".
+                                     return($dsc.
+                                            "\n".
                                             $secfindingdetailspec);
                                   }),
+
+      new kernel::Field::Textarea(name          =>'secfindingdsgvostatement',
+                                  label         =>'DSGVO Statement',
+                                  readonly      =>1,
+                                  htmldetail    =>'NotEmpty',
+                                  container     =>'headref'),
+
+      new kernel::Field::Textarea(name          =>'secfindingnonremstatement',
+                                  label         =>'Reasons for non-removal',
+                                  readonly      =>1,
+                                  htmldetail    =>'NotEmpty',
+                                  container     =>'headref'),
 
    ),$self->SUPER::getDynamicFields(%param));
    $self->getField("affectedapplication")->{htmldetail}=0;
@@ -212,101 +245,7 @@ sub getMandatoryParamFields
 }
 
 
-sub getCalculatedRiskState
-{
-   my $self=shift;
-   my $current=shift;
-   my $mode=shift;
-   my $name=$self->Name();
 
-   my $id=$current->{id};
-
-   if (!defined($self->getParent->Context->{CalcRiskState}->{$id})){
-      my $st={
-         raw=>{
-            FindingHndlpoints=>'',
-            FindingHndlcalclog=>[],
-            FindingHndlcolor=>''
-         }
-      };
-      $self->getParent->calculateRiskState($current,$mode,$st);
-      $self->getParent->Context->{CalcRiskState}->{$id}=$st;
-   }
-   return($self->getParent->Context->{CalcRiskState}->{$id}->{raw}->{$name});
-}
-
-
-sub RiskEstimation
-{
-   my $self=shift;
-   my $current=shift;
-   my $mode=shift;
-   my $st=shift;
-
-
-
-}
-
-
-sub getRiskEstimation
-{
-   my $self=shift;
-   my $current=shift;
-   my $mode=shift;
-   my $name=$self->Name();
-
-   my $id=$current->{id};
-
-   if (!defined($self->getParent->Context->{RiskEstimation}->{$id})){
-      my $st={
-         raw=>{
-            FindingHndlestimation=>[],
-            FindingHndlcondition=>[]
-         }
-      };
-      $self->getParent->RiskEstimation($current,$mode,$st);
-      $self->getParent->Context->{RiskEstimation}->{$id}=$st;
-   }
-   return($self->getParent->Context->{RiskEstimation}->{$id}->{raw}->{$name});
-}
-
-
-
-
-
-
-sub getPosibleWorkflowDerivations
-{
-   my $self=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   my @l;
-
-   if ($WfRec->{stateid}<17){
-      push(@l,
-         {label=>$self->T('Initiate developer request'),
-          actor=>sub{
-             my $self=shift;
-             my $WfRec=shift;
-
-             return({
-                targeturl=>'New',
-                targetparam=>{
-                  Formated_name=>$WfRec->{name},
-                  Formated_detaildescription=>
-                                 $WfRec->{detaildescription},
-                  Formated_affectedapplication=>$WfRec->{affectedapplication},
-                  WorkflowClass=>'secscan::workflow::devrequest'
-                }
-             });
-          },
-          name=>'initiatedevrequest'
-         },
-         );
-   }
-
-   return(@l);
-}
 
 
 
@@ -378,7 +317,7 @@ sub isOptionalFieldVisible
    my $name=$param{field}->Name();
 
    return(0) if ($name eq "relations");
-   return(1) if ($name eq "prio");
+   return(0) if ($name eq "prio");
    return(1) if ($name eq "name");
    return(1) if ($name eq "shortactionlog");
    return(0);
@@ -504,22 +443,35 @@ sub getPosibleActions
 #         push(@l,"wffine");
 #      }
 #   }
-#   if ($WfRec->{stateid} > 1 && $WfRec->{stateid} ne "17"){
-#      if ($haveSubWf){   # schliesen nur dann, wenn min. eine Maßnahme
-#         if (($iscurrent || $isadmin) && !$openSubWf){
-#            push(@l,"wfclose");
-#         }
-#      }
-#   }
-#   if ($WfRec->{stateid} eq "1"){  
-#      if ($iscurrent || $userid==$creator || $isadmin){
-#         push(@l,"wfbreak");
-#      }
-#   }
-#   if ($iscurrent){
-#      push(@l,"wfaddnote");
-#      push(@l,"iscurrent");
-#   }
+   if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
+      if (($iscurrent)){
+         push(@l,"wfclose");   # als beseitigt abschließen
+      }
+   }
+   if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
+      if (($iscurrent)){
+         push(@l,"wfsecsetwrkasdes");   # als NICHT beseitigt abschließen
+      }
+   }
+   if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
+      if (($iscurrent)){
+         push(@l,"wfrejectresp");   # Verantwortung ablehnen
+      }
+   }
+
+   if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
+      if (($iscurrent)){
+         push(@l,"wfsetnewresp");   # neuen Verantwortlichen setzen
+      }
+   }
+
+
+      push(@l,"wfaddnote");
+
+   if ($iscurrent){
+      push(@l,"wfaddnote");
+      push(@l,"iscurrent");
+   }
 #   if ($WfRec->{stateid}>=20){  # ab beendet ist nichts mehr machbar
 #      @l=();
 #   }
@@ -762,11 +714,24 @@ sub nativProcess
       my @rskmgr;
       my $flt;
       $h->{step}=$self->getNextStep();
-      $h->{name}="SecurityFinding at xxx";
-      $h->{stateid}=1;
-printf STDERR ("try to store %s\n",Dumper($h));
+      $h->{name}="SecurityFinding @ ".$h->{secfindingipaddrref};
+      $h->{stateid}=2;
+      $h->{fwdtargetid}=$h->{secfindingreponsibleid};
+      $h->{fwdtarget}="base::user";
+      my $secfindingaltreponsibleid=$h->{secfindingaltreponsibleid};
+       
       if (my $id=$self->StoreRecord($WfRec,$h)){
          my $aobj=$self->getParent->getParent->Action();
+
+       # if ($#wsref!=-1){
+       #     while(my $target=shift(@wsref)){
+       #        my $targetid=shift(@wsref);
+       #        last if ($targetid eq "" || $target eq "");
+       #        $self->getParent->getParent->AddToWorkspace($id,
+       #                                                    $target,$targetid);
+       #     }
+       # }
+
        #  $aobj->NotifyForward($id,
        #                       "base::user",
        #                       $rskmgr[0],
@@ -853,7 +818,9 @@ sub Process
          my $h=$self->getWriteRequestHash("web");
          return($self->nativProcess("wfbreak",$h,$WfRec,$actions));
       }
-      elsif ($op eq "wfclose"){
+      elsif ($op eq "wfclose" || 
+             $op eq "wfrejectresp" ||
+             $op eq "wfsecsetwrkasdes"){
          my $note=Query->Param("note");
          my $effort=Query->Param("Formated_effort");
          my $h={};
@@ -931,76 +898,17 @@ sub nativProcess
       }
       return(0);
    }
-   elsif($op eq "wfaddopmeasure"){
-      print STDERR Dumper($h);
-      my $newrec={
-         affectedapplicationid=>$WfRec->{affectedapplicationid},
-         affectedapplication=>$WfRec->{affectedapplication},
-         subtyp=>'riskmeasure',
-         mandator=>$WfRec->{mandator},
-         mandatorid=>$WfRec->{mandatorid},
-         name=>$h->{name},
-         stateid=>'2',
-         fwdtargetname=>$h->{fwdtargetname},
-         detaildescription=>$h->{detaildescription},
-         class=>'secscan::workflow::opmeasure',
-         step =>'base::workflow::request::main'
-      };
-      if ($h->{plannedstart} eq "" || $h->{plannedend} eq ""){
-         $self->LastMsg(ERROR,"planned start or end missing");
-         return(0);
-      }
-      my $tstamp=$self->ExpandTimeExpression($h->{plannedstart},"en",
-                               $self->UserTimezone(),"GMT");
-      return(0) if (!defined($tstamp));
-      $newrec->{plannedstart}=$tstamp;
-
-      my $tstamp=$self->ExpandTimeExpression($h->{plannedend},"en",
-                               $self->UserTimezone(),"GMT");
-      return(0) if (!defined($tstamp));
-      $newrec->{plannedend}=$tstamp;
-      print STDERR Dumper($newrec);
-
-
-
-      my $id=$self->getParent->getParent->Store(undef,$newrec);
-      my $myid=$WfRec->{id};
-      if (defined($id)){
-         my $wr=getModuleObject($self->getParent->getParent->Config,
-                                "base::workflowrelation");
-         $wr->ValidatedInsertRecord({
-            name=>"riskmesure",
-            translation=>"secscan::workflow::FindingHndl",
-            srcwfid=>$myid,
-            dstwfid=>$id,
-         });
-         Query->Delete("OP");
-         Query->Delete("Formated_fwdtargetname");
-         return(1);
-      }
-      return(0);
-   }
    elsif($op eq "wfclose"){
       # hier muss noch der Risko-Coordinator berechnet werden!
-      my @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
-                                             ['RSKCoord'],'firstup');
-      if ($#mem==-1){
-         @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
-                                             ['RSKManager'],'firstup');
-      }
-      if ($#mem==-1){
-         $self->LastMsg(ERROR,"missing RSKCoord or RSKManager");
-         return(0);
-      }
-      my $riskchef=$mem[0];
-
 
       if ($self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wfclosed",
-          {translation=>'secscan::workflow::FindingHndl'},$h->{note},$h->{effort})){
-         my $store={stateid=>17,
-                    fwdtargetid=>$riskchef,
-                    fwdtarget=>'base::user',
+          {translation=>'secscan::workflow::FindingHndl'},
+          $h->{note})){
+         my $store={stateid=>21,
+                    step=>'secscan::workflow::FindingHndl::finish',
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
                     eventend=>NowStamp("en"),
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
@@ -1009,11 +917,55 @@ sub nativProcess
          }
          $self->StoreRecord($WfRec,$store);
          $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-         $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
-                            note=>$h->{note},
-                            fwdtarget=>$store->{fwdtarget},
-                            fwdtargetid=>$store->{fwdtargetid},
-                            fwdtargetname=>'RiskCoordinator');
+        # $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
+        #                    note=>$h->{note},
+        #                    fwdtarget=>$store->{fwdtarget},
+        #                    fwdtargetid=>$store->{fwdtargetid},
+        #                    fwdtargetname=>'RiskCoordinator');
+         return(1);
+      }
+   }
+   elsif($op eq "wfrejectresp"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfreject",
+          {translation=>'secscan::workflow::FindingHndl'},
+          $h->{note})){
+         my $store={stateid=>10,
+                    step=>'secscan::workflow::FindingHndl::approve',
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
+                    eventend=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         return(1);
+      }
+   }
+   elsif($op eq "wfsecsetwrkasdes"){
+      # hier muss noch der Risko-Coordinator berechnet werden!
+
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfclosed",
+          {translation=>'secscan::workflow::FindingHndl'},
+          $h->{note})){
+         my $store={stateid=>17,
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
+                    secfindingnonremstatement=>$h->{note},
+                    eventend=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if ($WfRec->{eventend} eq ""){
+            $store->{eventend}=NowStamp("en");
+         }
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+        # $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
+        #                    note=>$h->{note},
+        #                    fwdtarget=>$store->{fwdtarget},
+        #                    fwdtargetid=>$store->{fwdtargetid},
+        #                    fwdtargetname=>'RiskCoordinator');
          return(1);
       }
    }
@@ -1147,9 +1099,33 @@ sub generateWorkspacePages
                 $self->getParent->T("wfclose",$tr).
                 "</option>\n";
       $$divset.="<div id=OPwfclose class=\"$class\">".
-                $self->getDefaultNoteDiv($WfRec,$actions).
+                $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
                 "</div>";
    }
+
+   if (grep(/^wfsecsetwrkasdes$/,@$actions)){
+      $$selopt.="<option value=\"wfsecsetwrkasdes\">".
+                $self->getParent->T("wfsecsetwrkasdes",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfsecsetwrkasdes class=\"$class\">".
+                "Wenn ein Security-Finding nicht beseitig wird, ist ".
+                "eine ausführliche Begründigung notwendig!".
+                $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
+                "</div>";
+   }
+
+   if (grep(/^wfrejectresp$/,@$actions)){
+      $$selopt.="<option value=\"wfrejectresp\">".
+                $self->getParent->T("wfrejectresp",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfrejectresp class=\"$class\">".
+                "Hiermit dokumentiere ich, dass ich für dieses ".
+                "Security-Finding nicht zuständig bin.".
+                $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
+                "</div>";
+   }
+
+
    if (grep(/^wffine$/,@$actions)){
       $$selopt.="<option value=\"wffine\">".
                 $self->getParent->T("wffine",$tr).
@@ -1165,20 +1141,314 @@ sub generateWorkspacePages
          return("wfaddopmeasure");
       }
    }
+   return("wfclose") if (in_array($actions,"wfclose"));
    return("wfaddnote");
 }
 
 
-sub getWorkHeight
+#sub getWorkHeight
+#{
+##   my $self=shift;
+#   my $WfRec=shift;
+#   my $actions=shift;
+#
+#   return(0) if (ref($actions) eq "ARRAY" && $#{$actions}==-1);
+#
+#   return(150);
+#}
+
+
+
+
+
+
+#######################################################################
+package secscan::workflow::FindingHndl::approve;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+@ISA=qw(kernel::WfStep);
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+
+
+   return(1);
+}
+
+
+sub Process
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   my $op=Query->Param("OP");
+
+
+   if ($action eq "SaveStep"){
+      if ($action ne "" && !grep(/^$op$/,@{$actions})){
+         $self->LastMsg(ERROR,"invalid disalloed action requested");
+         return(0);
+      }
+      elsif ($op eq "wfaddopmeasure"){
+         my $h=$self->getWriteRequestHash("web");
+         $h->{plannedstart}=Query->Param("Formated_plannedstart");
+         $h->{plannedend}=Query->Param("Formated_plannedend");
+         my $bk=$self->nativProcess($op,$h,$WfRec,$actions);
+         if ($bk){
+            Query->Delete("Formated_plannedstart");
+            Query->Delete("Formated_plannedend");
+            Query->Delete("Formated_detaildescription");
+            Query->Delete("Formated_name");
+            return($bk);
+         }
+         return(!$bk);
+      }
+      elsif ($op eq "wffine"){
+         my $h=$self->getWriteRequestHash("web");
+         return($self->nativProcess("wffine",$h,$WfRec,$actions));
+      }
+      elsif ($op eq "wfbreak"){
+         my $h=$self->getWriteRequestHash("web");
+         return($self->nativProcess("wfbreak",$h,$WfRec,$actions));
+      }
+      elsif ($op eq "wfclose" || $op eq "wfsecsetwrkasdes"){
+         my $note=Query->Param("note");
+         my $effort=Query->Param("Formated_effort");
+         my $h={};
+         $h->{note}=$note                     if ($note ne "");
+         $h->{effort}=$effort                 if ($effort ne "");
+         return($self->nativProcess($op,$h,$WfRec,$actions));
+      }
+
+   }
+   return($self->SUPER::Process($action,$WfRec,$actions));
+}
+
+sub getPosibleButtons
 {
    my $self=shift;
    my $WfRec=shift;
    my $actions=shift;
-
-   return(0) if (ref($actions) eq "ARRAY" && $#{$actions}==-1);
-
-   return(250);
+   my @WorkflowStep=Query->Param("WorkflowStep");
+   my %b=();
+   my @saveables=grep(!/^wfbreak$/,@$actions);
+   if ($#saveables!=-1){
+      %b=(SaveStep=>$self->T('Save','kernel::WfStep')) if ($#{$actions}!=-1);
+   }
+   if (defined($WfRec->{id})){
+      if (grep(/^wfbreak$/,@$actions)){
+         $b{BreakWorkflow}=$self->T('cancel risk workflow',
+                                    'secscan::workflow::FindingHndl');
+      }
+   }
+   #print STDERR "Buttons:".Dumper(\%b);
+   return(%b);
 }
+
+
+
+sub nativProcess
+{
+   my $self=shift;
+   my $op=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
+   if ($op ne "" && !grep(/^$op$/,@{$actions})){
+      $self->LastMsg(ERROR,"invalid disalloed action requested");
+      msg(ERROR,"invalid requested operation was '$op'");
+      return(0);
+   }
+
+
+   if ($op eq "wfbreak"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfbreak",
+          {translation=>'base::workflow::request'},"",undef)){
+         my $openuserid=$WfRec->{openuser};
+         my $step=$self->getParent->getStepByShortname("break");
+         $self->StoreRecord($WfRec,{stateid=>22,
+                                    step=>$step,
+                                    eventend=>NowStamp("en"),
+                                    closedate=>NowStamp("en"),
+                                    fwddebtargetid=>undef,
+                                    fwddebtarget=>undef,
+                                    fwdtargetid=>undef,
+                                    fwdtarget=>undef,
+                                   });
+         if ($openuserid!=$userid){
+            $self->PostProcess($op,$WfRec,$actions,
+                               "breaked by $ENV{REMOTE_USER}",
+                               fwdtarget=>'base::user',
+                               fwdtargetid=>$openuserid,
+                               fwdtargetname=>"Requestor");
+         }
+         return(1);
+      }
+      return(0);
+   }
+   elsif($op eq "wfclose"){
+      # hier muss noch der Risko-Coordinator berechnet werden!
+
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfclosed",
+          {translation=>'secscan::workflow::FindingHndl'},
+          $h->{note})){
+         my $store={stateid=>21,
+                    step=>'secscan::workflow::FindingHndl::finish',
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
+                    eventend=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if ($WfRec->{eventend} eq ""){
+            $store->{eventend}=NowStamp("en");
+         }
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+        # $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
+        #                    note=>$h->{note},
+        #                    fwdtarget=>$store->{fwdtarget},
+        #                    fwdtargetid=>$store->{fwdtargetid},
+        #                    fwdtargetname=>'RiskCoordinator');
+         return(1);
+      }
+   }
+   elsif($op eq "wfsecsetwrkasdes"){
+      # hier muss noch der Risko-Coordinator berechnet werden!
+
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfclosed",
+          {translation=>'secscan::workflow::FindingHndl'},
+          $h->{note})){
+         my $store={stateid=>17,
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
+                    secfindingnonremstatement=>$h->{note},
+                    eventend=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if ($WfRec->{eventend} eq ""){
+            $store->{eventend}=NowStamp("en");
+         }
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+        # $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
+        #                    note=>$h->{note},
+        #                    fwdtarget=>$store->{fwdtarget},
+        #                    fwdtargetid=>$store->{fwdtargetid},
+        #                    fwdtargetname=>'RiskCoordinator');
+         return(1);
+      }
+   }
+   elsif($op eq "wffine"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wffine",
+          {translation=>'base::workflow::request'},"",undef)){
+         my $nextstep=$self->getParent->getStepByShortname("finish");
+         my $store={stateid=>21,
+                    step=>$nextstep,
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
+                    closedate=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         foreach my $v (qw(ibiprice 
+                           ibipoints 
+                           solutionopt 
+                           itrmcriticality)){  # store base parameters
+            my $curval=$WfRec->{$v};
+            $store->{"stored_".$v}=$curval;
+         }
+         if ($WfRec->{eventend} eq ""){
+            $store->{eventend}=NowStamp("en");
+         }
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         return(1);
+      }
+   }
+   return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
+}
+
+
+sub PostProcess
+{
+   my $self=shift;
+   my $action=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my %param=@_;
+   my $aobj=$self->getParent->getParent->Action();
+   my $workflowname=$self->getParent->getWorkflowMailName();
+
+
+   if ($action eq "SaveStep.wfclose"){
+      if ($param{fwdtargetid} ne ""){
+         $aobj->NotifyForward($WfRec->{id},
+                              $param{fwdtarget},
+                              $param{fwdtargetid},
+                              $param{fwdtargetname},
+                              $param{note},
+                              mode=>'closeRisk:',
+                              workflowname=>$workflowname);
+      }
+   }
+
+   return($self->SUPER::PostProcess($action,$WfRec,$actions,%param));
+}
+
+
+
+
+
+
+sub generateWorkspacePages
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $divset=shift;
+   my $selopt=shift;
+   my $height=shift;
+   my $tr="secscan::workflow::FindingHndl";
+   my $class="display:none;visibility:hidden";
+
+   if (grep(/^wfclose$/,@$actions)){
+      $$selopt.="<option value=\"wfclose\">".
+                $self->getParent->T("wfclose",$tr).
+                "</option>\n";
+      $$divset.="<div id=OPwfclose class=\"$class\">".
+                $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
+                "</div>";
+   }
+
+   $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
+   return("wfaddnote");
+}
+
+
+#sub getWorkHeight
+#{
+##   my $self=shift;
+#   my $WfRec=shift;
+#   my $actions=shift;
+#
+#   return(0) if (ref($actions) eq "ARRAY" && $#{$actions}==-1);
+#
+#   return(150);
+#}
 
 
 

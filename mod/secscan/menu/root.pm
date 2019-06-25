@@ -42,6 +42,15 @@ sub Init
                       "secscan::finding",
                       defaultacl=>['w5base.secscan']);
    
+   $self->RegisterObj("itu.secscan.item",
+                      "secscan::item",
+                      defaultacl=>['w5base.secscan']);
+   
+   $self->RegisterObj("itu.secscan.item.new",
+                      "secscan::item",
+                      func=>'New',
+                      defaultacl=>['w5base.secscan.admin']);
+   
    return($self);
 }
 
