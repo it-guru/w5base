@@ -179,6 +179,7 @@ sub Connect
    $self->{db}->{PrintError}=0;
 
    if (uc($self->DriverName()) eq "ORACLE"){   # needed for primaryreplkey tech.
+      $self->{db}->{InactiveDestroy}=1; # try to fix W5Reporter ORA-03114
       $self->do("alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");
    }
 
