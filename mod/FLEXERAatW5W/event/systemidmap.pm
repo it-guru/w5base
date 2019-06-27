@@ -94,7 +94,7 @@ sub systemidmap
             $rmap->SetFilter({id=>"!".$mrec->{id},systemid=>\$systemid});
             my ($rchkrec,$msg)=$rmap->getOnlyFirst(qw(ALL)); 
             if (defined($rchkrec)){
-               msg(ERROR,"found id move from $rchkrec->{id} ".
+               msg(DEBUG,"found id move from $rchkrec->{id} ".
                          "to $mrec->{id} in systemid $systemid");
                $rmap->BulkDeleteRecord({id=>\$rchkrec->{id}});
             }
