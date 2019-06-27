@@ -104,6 +104,11 @@ sub FormatedDetail
          $vjoinconcat=~s/\n/<br>\n/g;
       }
       if (defined($self->{sortvalue})){
+         {  # make it unique, if it should be sorted
+            my %u=();
+            map({$u{$_}++} @$d);
+            @$d=keys(%u);
+         }
          if (lc($self->{sortvalue}) eq "asc"){
             $d=join($vjoinconcat,sort(@$d));
          }

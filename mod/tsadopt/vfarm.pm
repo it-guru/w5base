@@ -98,6 +98,18 @@ sub new
                    "where view_darwin_virtual_farm.virtual_farm_id=".
                           "view_darwin_abstract_compute.virtual_farm_id)"),
 
+      new kernel::Field::Text(
+                name          =>'vhostassets',
+                label         =>'virtualisation Host Assets',
+                readonly      =>1,
+                group         =>'vhostassets',
+                vjointo       =>'tsadopt::vhost',
+                vjoinon       =>['id'=>'vfarmid'],
+                sortvalue     =>'asc',
+                weblinkto     =>'NONE',
+                vjoindisp     =>'assetid'),
+
+
       new kernel::Field::SubList(
                 name          =>'vhosts',
                 label         =>'virtualisation Hosts',
@@ -160,7 +172,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default",'state',"vhosts",'vsyss');
+   return("header","default",'state',"vhostassets","vhosts",'vsyss');
 }
 
 
