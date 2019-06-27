@@ -195,6 +195,7 @@ sub ValidatedUpdateRecord
    $newrec->{id}=$oldrec->{flexerasystemid};  # als Referenz in der Overflow die 
    if (!defined($oldrec->{ofid})){     # SystemID verwenden
       my $o=$self->Clone();
+      $o->BackendSessionName("WorkSession-$$");
       return($o->SUPER::ValidatedInsertRecord($newrec));
    }
    return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
