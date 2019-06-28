@@ -150,7 +150,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'supervid',
                 label         =>'Supervisor ID',
-                dataobjattr   =>'"supervid"'),
+                dataobjattr   =>'system."supervid"'),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroup',
@@ -158,7 +158,8 @@ sub new
                 label         =>'Assignment Group',
                 vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lassignmentid'=>'lgroupid'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>"cfmassignment.\"name\""),
 
       new kernel::Field::TextDrop(
                 name          =>'assignmentgroupsupervisor',
@@ -181,7 +182,8 @@ sub new
                 label         =>'Incident Assignment Group',
                 vjointo       =>\'tsacinv::group',
                 vjoinon       =>['lincidentagid'=>'lgroupid'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>"inmassignment.\"name\""),
 
       new kernel::Field::Link(
                 name          =>'lassignmentid',
@@ -211,7 +213,34 @@ sub new
                 name          =>'usage',
                 group         =>'form',
                 label         =>'Usage',
-                dataobjattr   =>'system."usage"'),
+                dataobjattr   =>"
+                   (case 
+                     when system.\"usage\" like 'HOUSING' and
+                          system.\"srcsys\" is null and
+                          system.\"srcid\" is null and
+                          system.\"systemola\" like '%-ONLY' and 
+                          system.\"systemname\" like '%_HW' and 
+                          (cfmassignment.\"name\"='MIS' or 
+                           cfmassignment.\"name\" like 'MIS.%') and
+                          (inmassignment.\"name\"='TI' or 
+                           inmassignment.\"name\" like 'TIT.%' or
+                           inmassignment.\"name\"='TIT' or 
+                           inmassignment.\"name\" like 'TIT.%') 
+                          then n'INVOICE_ONLY'
+                     when system.\"usage\" like 'HOUSING' and
+                          system.\"srcsys\" is null and
+                          system.\"srcid\" is null and
+                          system.\"systemola\" like '%-ONLY' and 
+                          (cfmassignment.\"name\"='MIS' or 
+                           cfmassignment.\"name\" like 'MIS.%') and
+                          (inmassignment.\"name\"='TI' or 
+                           inmassignment.\"name\" like 'TIT.%' or
+                           inmassignment.\"name\"='TIT' or 
+                           inmassignment.\"name\" like 'TIT.%') 
+                          then n'INVOICE_ONLY?'
+                     else system.\"usage\"
+                    end)
+                "),
 
       new kernel::Field::Text(
                 name          =>'type',
@@ -795,17 +824,18 @@ sub new
 }
 
 
-#sub getSqlFrom
-#{
-#   my $self=shift;
-#
-#   # Performance Hack
-#   my $from='system join asset on system."lassetid"=asset."lassetid" '.
-#            'left outer join location '.
-#            'on asset."locationid"=location."locationid"';
-#
-#   return($from);
-#}
+sub getSqlFrom
+{
+   my $self=shift;
+
+   # Performance Hack
+   my $from="system ".
+            "join grp inmassignment ".
+            "on system.\"lincidentagid\"=inmassignment.\"lgroupid\" ".
+            "join grp cfmassignment ".
+            "on system.\"lassignmentid\"=cfmassignment.\"lgroupid\" ";
+   return($from);
+}
 
 
 
@@ -1134,7 +1164,7 @@ sub Import
    }
    $self->ResetFilter();
    $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(systemid systemname lassignmentid status
+   my @l=$self->getHashList(qw(systemid systemname lassignmentid status usage
                                assetid));
    if ($#l==-1){
       $self->LastMsg(ERROR,"SystemID not found in AssetManager");
@@ -1180,6 +1210,11 @@ sub Import
       }
    }
    else{
+      # check 0: usage
+      if ($sysrec->{usage}=~m/^INVOICE_ONLY/){
+         $self->LastMsg(ERROR,"invoice systems are not allowed to import");
+         return(undef);
+      }
       # check 1: Assigmenen Group registered
       if ($sysrec->{lassignmentid} eq ""){
          $self->LastMsg(ERROR,"SystemID has no Assignment Group");
