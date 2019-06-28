@@ -371,6 +371,7 @@ sub execute
        }
        $self->{sth}=$self->{'db'}->prepare($statement,$attr);
        if (!($self->{sth})){
+          msg(ERROR,$DBI::errstr); # for Oracle Syntax fehler
           return(undef,$DBI::errstr);
        }
        if ($self->{sth}->execute(@bind_values)){
