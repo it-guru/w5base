@@ -1799,6 +1799,8 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   return(undef) if (!$self->globalOpValidate("Validate",$oldrec,$newrec));
+
    if (effChangedVal($oldrec,$newrec,"cistatusid")==7){
       $newrec->{systemid}=undef;
       return(1);
@@ -1932,6 +1934,18 @@ sub Validate
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);
 }
+
+
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(undef) if (!$self->globalOpValidate("ValidateDelete",$rec));
+
+   return($self->SUPER::ValidateDelete($rec));
+}
+
 
 
 sub getSqlFrom

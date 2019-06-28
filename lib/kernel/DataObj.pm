@@ -1088,6 +1088,36 @@ sub isDeleteValid
    return(@l);
 }
 
+
+sub globalOpValidate
+{
+   my $self=shift;
+   my $op=shift;
+   my @param=@_;
+
+   if (!exists($self->{globalOpValidate})){
+      $self->LoadSubObjs("ext/globalOpValidate","globalOpValidate");
+   }
+   foreach my $k (sort(keys(%{$self->{globalOpValidate}}))){
+      my $so=$self->{globalOpValidate}->{$k};
+      if ($so->can($op)){
+         my $bk;
+         eval("\$bk=\$so->$op(\$self,\@param);");
+         if ($@){
+            msg(ERROR,"Module Error: $@");
+         }
+         else{
+            return(0) if (!$bk);
+         }
+      }
+
+   }
+   return(1);
+}
+
+
+
+
 sub ValidateDelete
 {
    my $self=shift;
