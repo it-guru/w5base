@@ -154,6 +154,24 @@ sub new
                 vjoinbase     =>[{'parentobj'=>\'itil::itcloud'}],
                 subeditmsk    =>'subedit'),
 
+      new kernel::Field::Boolean(
+                name          =>'can_saas',
+                group         =>'servicemodels',
+                label         =>'Software as a Service (SaaS)',
+                dataobjattr   =>'itcloud.can_saas'),
+
+      new kernel::Field::Boolean(
+                name          =>'can_iaas',
+                group         =>'servicemodels',
+                label         =>'Infrastructure as a Service (IaaS)',
+                dataobjattr   =>'itcloud.can_iaas'),
+
+      new kernel::Field::Boolean(
+                name          =>'can_paas',
+                group         =>'servicemodels',
+                label         =>'Platform as a Service (PaaS)',
+                dataobjattr   =>'itcloud.can_paas'),
+
       new kernel::Field::FileList(
                 name          =>'attachments',
                 parentobj     =>'itil::itcloud',
@@ -294,7 +312,8 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default areas systems contacts phonenumbers misc inm control
+   return(qw(header default servicemodels 
+             areas systems contacts phonenumbers misc inm control
              attachments source));
 }
 
@@ -541,6 +560,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    return(qw(header default history source areas contacts 
+             servicemodels
              attachments control phonenumbers inm misc));
 }
 
@@ -551,6 +571,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default contacts attachments phonenumbers 
+                       servicemodels
                        inm misc control);
    if (!defined($rec)){
       return(@databossedit);

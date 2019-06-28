@@ -52,3 +52,6 @@ create table itcloudarea   (
   FOREIGN KEY fk_appl (appl)
           REFERENCES appl (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table itcloud add can_saas   bool default '0';
+alter table itcloud add can_paas   bool default '0';
+alter table itcloud add can_iaas   bool default '0';
