@@ -1,0 +1,4 @@
+'itil::qrule::ITCloudDesc'=>{de=>'Überprüfung der Beschreibung einer Cloud',
+                          en=>'check of Cloud description'},
+'there is no description defined'=>{de=>'es ist keine Cloud-Beschreibung hinterlegt'},
+'description is not detailed enough'=>{de=>'Beschreibung nicht detailliert genug (min. 15 Worte)'},
