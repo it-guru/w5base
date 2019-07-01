@@ -42,7 +42,12 @@ be treated with maximum priority.
  de=>'Ablehnen der Verantwortung für das Finding',
  en=>'Reject responsibility for finding'
 },
+'wfsetnewresp'=>{
+ de=>'neue verantwortliche Person festlegen und Finding zuweisen',
+ en=>'set new responsible person and assign Finding'
+},
 'wfclosed'=>{de=>'Abgeschlossen',en=>'Closed'},
-
+'wfreject'=>{de=>'Abgelehnt',en=>'Rejected'},
+'new responsible person'=>{de=>'neue verantwortliche Person'},
 
 

@@ -126,12 +126,32 @@ sub getDynamicFields
                                   label         =>'Security Finding Item Desc',
                                   readonly      =>1,
                                   htmldetail    =>0,
+                                  uivisible     =>sub{
+                                     my $self=shift;
+                                     my $app=$self->getParent;
+                                     my $mode=shift;
+                                     my %param=@_;
+                                     return(0) if (ref($param{current}) ne
+                                                   "HASH");
+                                     return($app->isAuthorized("view",
+                                            $param{current}));
+                                  },
                                   vjointo       =>'secscan::item',
                                   vjoinon      =>['secfindingitemname'=>'name'],
                                   vjoindisp     =>'description'),
 
       new kernel::Field::Text(    name          =>'secfindingipaddrref',
                                   label         =>'IP-Address reference',
+                                  uivisible     =>sub{
+                                     my $self=shift;
+                                     my $app=$self->getParent;
+                                     my $mode=shift;
+                                     my %param=@_;
+                                     return(0) if (ref($param{current}) ne
+                                                   "HASH");
+                                     return($app->isAuthorized("view",
+                                            $param{current}));
+                                  },
                                   container     =>'headref'),
 
       new kernel::Field::Interface(name         =>'secfindingreponsibleid',
@@ -185,6 +205,16 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(name          =>'secfindingdesc',
                                   label         =>'Description of finding',
+                                  uivisible     =>sub{
+                                     my $self=shift;
+                                     my $app=$self->getParent;
+                                     my $mode=shift;
+                                     my %param=@_;
+                                     return(0) if (ref($param{current}) ne
+                                                   "HASH");
+                                     return($app->isAuthorized("view",
+                                            $param{current}));
+                                  },
                                   depend        =>[qw(secfindingitemname
                                                       secfindingitemrawdesc
                                                       secfindingdetailspec)],
@@ -209,12 +239,32 @@ sub getDynamicFields
       new kernel::Field::Textarea(name          =>'secfindingdsgvostatement',
                                   label         =>'DSGVO Statement',
                                   readonly      =>1,
+                                  uivisible     =>sub{
+                                     my $self=shift;
+                                     my $app=$self->getParent;
+                                     my $mode=shift;
+                                     my %param=@_;
+                                     return(0) if (ref($param{current}) ne
+                                                   "HASH");
+                                     return($app->isAuthorized("view",
+                                            $param{current}));
+                                  },
                                   htmldetail    =>'NotEmpty',
                                   container     =>'headref'),
 
       new kernel::Field::Textarea(name          =>'secfindingnonremstatement',
                                   label         =>'Reasons for non-removal',
                                   readonly      =>1,
+                                  uivisible     =>sub{
+                                     my $self=shift;
+                                     my $app=$self->getParent;
+                                     my $mode=shift;
+                                     my %param=@_;
+                                     return(0) if (ref($param{current}) ne
+                                                   "HASH");
+                                     return($app->isAuthorized("view",
+                                            $param{current}));
+                                  },
                                   htmldetail    =>'NotEmpty',
                                   container     =>'headref'),
 
@@ -454,22 +504,21 @@ sub getPosibleActions
       }
    }
    if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
-      if (($iscurrent)){
-         push(@l,"wfrejectresp");   # Verantwortung ablehnen
+      if ($WfRec->{step} eq "secscan::workflow::FindingHndl::main"){
+         if (($iscurrent)){
+            push(@l,"wfrejectresp");   # Verantwortung ablehnen
+         }
       }
    }
 
-   if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
-      if (($iscurrent)){
-         push(@l,"wfsetnewresp");   # neuen Verantwortlichen setzen
+   if ($WfRec->{step} eq "secscan::workflow::FindingHndl::approve"){
+      if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
+         if (($iscurrent)){
+            push(@l,"wfsetnewresp");   # neuen Verantwortlichen setzen
+         }
       }
    }
-
-
-      push(@l,"wfaddnote");
-
    if ($iscurrent){
-      push(@l,"wfaddnote");
       push(@l,"iscurrent");
    }
 #   if ($WfRec->{stateid}>=20){  # ab beendet ist nichts mehr machbar
@@ -481,26 +530,64 @@ sub getPosibleActions
 }
 
 
+sub isAuthorized
+{
+   my $self=shift;
+   my $mode=shift;
+   my $rec=shift;
+
+   if ($mode eq "modify" || $mode eq "view"){
+      my $userid=$self->getParent->getCurrentUserId();
+      if ($rec->{fwdtarget} eq "base::user" &&
+          $rec->{fwdtargetid} eq $userid){
+         return(1);
+      }
+      if ($rec->{secfindingreponsibleid} eq $userid){
+         return(1);
+      }
+   }
+   return(0);
+}
+
+
+sub camuflageOptionalField
+{
+   my $self=shift;
+   my $fld=shift;
+   my $d=shift;
+   my $current=shift;
+   if ($fld->Name() eq "name"){
+      if (!$self->isAuthorized("view",$current)){
+         if (length($d)>15){
+            $d=substr($d,0,15)."...";
+         }
+      }
+   }
+
+   return($d);
+}
+
+
+
+
 sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
 
-   my @l=("default","header");
+   my @l=("default");
 
-
-   if ($self->IsMemberOf("admin")){
-      push(@l,"secinternal","relations","state",
+   if ($self->isAuthorized("view",$rec)){
+      push(@l,"relations","state",
               "history","flow","affected","source");
    }
-
-#   if ($self->isRiskWfAuthorized("view",$rec)){
-#      push(@l,"riskdesc","riskrating","relations","state",
-#              "history","flow","affected","riskbase");
-#   }
-
+   if ($self->IsMemberOf("admin")){
+      push(@l,"secinternal");
+   }
    return(@l);
 }
+
+
 
 sub isWriteValid
 {
@@ -519,7 +606,7 @@ sub isWriteValid
 
 sub getDetailBlockPriority            # posibility to change the block order
 {
-   return("header","default","secinternal","flow","source","relations");
+   return("header","default","secinternal","flow","state","source","relations");
 }
 
 sub getRecordImageUrl
@@ -716,6 +803,25 @@ sub nativProcess
       $h->{step}=$self->getNextStep();
       $h->{name}="SecurityFinding @ ".$h->{secfindingipaddrref};
       $h->{stateid}=2;
+
+      if ($h->{secfindingreponsibleid} ne ""){
+         my @mandators=$self->getParent->getMandatorsOf(
+                         $h->{secfindingreponsibleid},"direct");
+         if ($#mandators!=-1){
+            my $m=getModuleObject($self->Config,"base::mandator");
+            $m->SetFilter({grpid=>$mandators[0]});
+            my %mnames=();
+            my %mid=();
+            foreach my $mrec ($m->getHashList(qw(name grpid))){
+               $mnames{$mrec->{name}}++;
+               $mid{$mrec->{grpid}}++;
+            }
+            $h->{mandator}=[sort(keys(%mnames))];
+            $h->{mandatorid}=[sort(keys(%mid))];
+         }
+      }
+
+
       $h->{fwdtargetid}=$h->{secfindingreponsibleid};
       $h->{fwdtarget}="base::user";
       my $secfindingaltreponsibleid=$h->{secfindingaltreponsibleid};
@@ -932,9 +1038,7 @@ sub nativProcess
           $h->{note})){
          my $store={stateid=>10,
                     step=>'secscan::workflow::FindingHndl::approve',
-                    fwdtargetid=>undef,
-                    fwdtarget=>undef,
-                    eventend=>NowStamp("en"),
+                    fwdtargetname=>"w5base.secscan.approve",
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
          $self->StoreRecord($WfRec,$store);
@@ -1109,8 +1213,12 @@ sub generateWorkspacePages
                 "</option>\n";
       $$divset.="<div id=OPwfsecsetwrkasdes class=\"$class\">".
                 "Wenn ein Security-Finding nicht beseitig wird, ist ".
-                "eine ausführliche Begründigung notwendig!".
-                $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
+                "eine ausführliche Begründigung notwendig! Sie müssen ".
+                "also sehr genau beschreiben, was gegen eine ".
+                "Beseitigung spricht.".
+                $self->getDefaultNoteDiv($WfRec,$actions,
+                                         height=>80,
+                                         mode=>'simple').
                 "</div>";
    }
 
@@ -1119,8 +1227,10 @@ sub generateWorkspacePages
                 $self->getParent->T("wfrejectresp",$tr).
                 "</option>\n";
       $$divset.="<div id=OPwfrejectresp class=\"$class\">".
-                "Hiermit dokumentiere ich, dass ich für dieses ".
-                "Security-Finding nicht zuständig bin.".
+                "Hiermit dokumentieren Sie, dass Sie für das ".
+                "Security-Finding nicht zuständig sind. Sie sollten ".
+                "in der Begründung möglichst mit angeben, warum es ".
+                "aus Ihrer Sicht zu dieser Fehlzuweisung gekommen ist.".
                 $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
                 "</div>";
    }
@@ -1197,37 +1307,22 @@ sub Process
          $self->LastMsg(ERROR,"invalid disalloed action requested");
          return(0);
       }
-      elsif ($op eq "wfaddopmeasure"){
-         my $h=$self->getWriteRequestHash("web");
-         $h->{plannedstart}=Query->Param("Formated_plannedstart");
-         $h->{plannedend}=Query->Param("Formated_plannedend");
-         my $bk=$self->nativProcess($op,$h,$WfRec,$actions);
-         if ($bk){
-            Query->Delete("Formated_plannedstart");
-            Query->Delete("Formated_plannedend");
-            Query->Delete("Formated_detaildescription");
-            Query->Delete("Formated_name");
-            return($bk);
+      elsif ($op eq "wfsetnewresp"){
+         my $newrec;
+         my $fobj=$self->getParent->getField("secfindingreponsible");
+         my $h=$self->getWriteRequestHash("nativweb");
+         print STDERR Query->Dumper();
+         if ($newrec=$fobj->Validate($WfRec,$h)){
+            my $nativH={
+               note=>$h->{note},
+               secfindingreponsible=>$h->{secfindingreponsible}
+            }; 
+            return($self->nativProcess($op,$nativH,$WfRec,$actions));
          }
-         return(!$bk);
+         else{
+            return(0);
+         }
       }
-      elsif ($op eq "wffine"){
-         my $h=$self->getWriteRequestHash("web");
-         return($self->nativProcess("wffine",$h,$WfRec,$actions));
-      }
-      elsif ($op eq "wfbreak"){
-         my $h=$self->getWriteRequestHash("web");
-         return($self->nativProcess("wfbreak",$h,$WfRec,$actions));
-      }
-      elsif ($op eq "wfclose" || $op eq "wfsecsetwrkasdes"){
-         my $note=Query->Param("note");
-         my $effort=Query->Param("Formated_effort");
-         my $h={};
-         $h->{note}=$note                     if ($note ne "");
-         $h->{effort}=$effort                 if ($effort ne "");
-         return($self->nativProcess($op,$h,$WfRec,$actions));
-      }
-
    }
    return($self->SUPER::Process($action,$WfRec,$actions));
 }
@@ -1297,117 +1392,64 @@ sub nativProcess
       }
       return(0);
    }
-   elsif($op eq "wfclose"){
-      # hier muss noch der Risko-Coordinator berechnet werden!
-
-      if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"wfclosed",
-          {translation=>'secscan::workflow::FindingHndl'},
-          $h->{note})){
-         my $store={stateid=>21,
-                    step=>'secscan::workflow::FindingHndl::finish',
-                    fwdtargetid=>undef,
-                    fwdtarget=>undef,
-                    eventend=>NowStamp("en"),
-                    fwddebtarget=>undef,
-                    fwddebtargetid=>undef};
-         if ($WfRec->{eventend} eq ""){
-            $store->{eventend}=NowStamp("en");
-         }
-         $self->StoreRecord($WfRec,$store);
+   elsif($op eq "wfsetnewresp"){
+      my $newrec;
+      my $fobj=$self->getParent->getField("secfindingreponsible");
+      if ($newrec=$fobj->Validate($WfRec,$h)){
+         $newrec->{fwdtarget}="base::user";
+         $newrec->{fwdtargetid}=$newrec->{secfindingreponsibleid};
+         $newrec->{step}="secscan::workflow::FindingHndl::main";
+         $newrec->{stateid}=2;
          $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-        # $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
-        #                    note=>$h->{note},
-        #                    fwdtarget=>$store->{fwdtarget},
-        #                    fwdtargetid=>$store->{fwdtargetid},
-        #                    fwdtargetname=>'RiskCoordinator');
-         return(1);
+         if ($self->StoreRecord($WfRec,$newrec)){
+            my $fwdtargetname=$newrec->{secfindingreponsible};
+            if ($self->getParent->getParent->Action->StoreRecord(
+                $WfRec->{id},"wfforward",
+                {translation=>'base::workflow::request'},
+                $fwdtargetname."\n".
+                $newrec->{note},undef)){
+               $self->PostProcess("SaveStep.".$op,$WfRec,$actions,
+                                  note=>$newrec->{note},
+                                  fwdtarget=>$newrec->{fwdtarget},
+                                  fwdtargetid=>$newrec->{fwdtargetid},
+                                  fwdtargetname=>$fwdtargetname);
+            }
+         }
+         return(0);
       }
-   }
-   elsif($op eq "wfsecsetwrkasdes"){
-      # hier muss noch der Risko-Coordinator berechnet werden!
-
-      if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"wfclosed",
-          {translation=>'secscan::workflow::FindingHndl'},
-          $h->{note})){
-         my $store={stateid=>17,
-                    fwdtargetid=>undef,
-                    fwdtarget=>undef,
-                    secfindingnonremstatement=>$h->{note},
-                    eventend=>NowStamp("en"),
-                    fwddebtarget=>undef,
-                    fwddebtargetid=>undef};
-         if ($WfRec->{eventend} eq ""){
-            $store->{eventend}=NowStamp("en");
-         }
-         $self->StoreRecord($WfRec,$store);
-         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-        # $self->PostProcess("SaveStep".".".$op,$WfRec,$actions,
-        #                    note=>$h->{note},
-        #                    fwdtarget=>$store->{fwdtarget},
-        #                    fwdtargetid=>$store->{fwdtargetid},
-        #                    fwdtargetname=>'RiskCoordinator');
-         return(1);
-      }
-   }
-   elsif($op eq "wffine"){
-      if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"wffine",
-          {translation=>'base::workflow::request'},"",undef)){
-         my $nextstep=$self->getParent->getStepByShortname("finish");
-         my $store={stateid=>21,
-                    step=>$nextstep,
-                    fwdtargetid=>undef,
-                    fwdtarget=>undef,
-                    closedate=>NowStamp("en"),
-                    fwddebtarget=>undef,
-                    fwddebtargetid=>undef};
-         foreach my $v (qw(ibiprice 
-                           ibipoints 
-                           solutionopt 
-                           itrmcriticality)){  # store base parameters
-            my $curval=$WfRec->{$v};
-            $store->{"stored_".$v}=$curval;
-         }
-         if ($WfRec->{eventend} eq ""){
-            $store->{eventend}=NowStamp("en");
-         }
-         $self->StoreRecord($WfRec,$store);
-         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-         $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
-         return(1);
+      else{
+         return(0);
       }
    }
    return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
 }
 
 
-sub PostProcess
-{
-   my $self=shift;
-   my $action=shift;
-   my $WfRec=shift;
-   my $actions=shift;
-   my %param=@_;
-   my $aobj=$self->getParent->getParent->Action();
-   my $workflowname=$self->getParent->getWorkflowMailName();
-
-
-   if ($action eq "SaveStep.wfclose"){
-      if ($param{fwdtargetid} ne ""){
-         $aobj->NotifyForward($WfRec->{id},
-                              $param{fwdtarget},
-                              $param{fwdtargetid},
-                              $param{fwdtargetname},
-                              $param{note},
-                              mode=>'closeRisk:',
-                              workflowname=>$workflowname);
-      }
-   }
-
-   return($self->SUPER::PostProcess($action,$WfRec,$actions,%param));
-}
+#sub PostProcess
+#{
+#   my $self=shift;
+#   my $action=shift;
+#   my $WfRec=shift;
+#   my $actions=shift;
+#   my %param=@_;
+#   my $aobj=$self->getParent->getParent->Action();
+#   my $workflowname=$self->getParent->getWorkflowMailName();
+#
+#
+#   if ($action eq "SaveStep.wfclose"){
+#      if ($param{fwdtargetid} ne ""){
+#         $aobj->NotifyForward($WfRec->{id},
+#                              $param{fwdtarget},
+#                              $param{fwdtargetid},
+#                              $param{fwdtargetname},
+#                              $param{note},
+#                              mode=>'closeRisk:',
+#                              workflowname=>$workflowname);
+#      }
+#   }
+#
+#   return($self->SUPER::PostProcess($action,$WfRec,$actions,%param));
+#}
 
 
 
@@ -1433,6 +1475,26 @@ sub generateWorkspacePages
                 $self->getDefaultNoteDiv($WfRec,$actions,mode=>'simple').
                 "</div>";
    }
+   if (grep(/^wfsetnewresp$/,@$actions)){
+      $$selopt.="<option value=\"wfsetnewresp\">".
+                $self->getParent->T("wfsetnewresp",$tr).
+                "</option>\n";
+      my $note=Query->Param("note");
+
+      my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
+         "<td colspan=2><textarea name=note ".
+         "style=\"width:100%;resize:none;height:100px\">".
+         quoteHtml($note)."</textarea></td></tr>";
+      $d.="<tr><td width=1% nowrap>".
+          $self->getParent->T("new responsible person",
+                              "secscan::workflow::FindingHndl").
+          ":&nbsp;</td>".
+          "<td>\%secfindingreponsible(detail)\%".
+          "</td>";
+      $d.="</tr></table>";
+      $$divset.="<div id=OPwfsetnewresp class=\"$class\">$d</div>";
+   }
+
 
    $self->SUPER::generateWorkspacePages($WfRec,$actions,$divset,$selopt);
    return("wfaddnote");
@@ -1494,12 +1556,6 @@ sub getWorkHeight
    return(0);
 }
 
-
-#######################################################################
-package secscan::workflow::FindingHndl::break;
-use vars qw(@ISA);
-use kernel;
-@ISA=qw(base::workflow::request::finish);
 
 
 
