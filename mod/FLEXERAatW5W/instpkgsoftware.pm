@@ -95,6 +95,12 @@ sub new
 #                ignorecase    =>1,
 #                dataobjattr   =>'CMTS'),
 
+      new kernel::Field::Text(
+                name          =>'beaconid',
+                group         =>'source',
+                label         =>'BeaconID',
+                dataobjattr   =>'FLEXERA_system.BEACONID'),
+
       new kernel::Field::Date(
                 name          =>'swinstdate',
                 group         =>'source',
