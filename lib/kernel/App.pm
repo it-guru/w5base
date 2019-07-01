@@ -292,7 +292,7 @@ sub getMandatorsOf
          }                                       # "available" mandators
       }
       $m{$grpid}=1 if (grep(/^$grpid$/,@grps));
-      if ($isadmin){
+      if ($isadmin && !($#roles==0 && $roles[0] eq "direct")){
          $m{$grpid}=1;
          next CHK;
       }
@@ -324,8 +324,11 @@ sub getMandatorsOf
          }
       }
    }
-
-   return(keys(%m));
+   if ($#roles==0 && $roles[0] eq "direct"){
+      # order by distance
+      return(sort({$groups{$a}->{distance} <=> $groups{$b}->{distance}} keys(%m)));
+   }
+   return(sort(keys(%m)));
 }
 
 sub isMandatorReadable
