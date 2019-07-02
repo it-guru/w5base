@@ -3,11 +3,12 @@ de=>'Security: Finding-Behandlung',
 en=>'Security: Finding-Handling'
 },
 'fieldgroup.secinternal'=>{
-de=>'Security-Intern',
-en=>'Security-Internals'
+de=>'Debug: Security-Intern',
+en=>'Debug: Security-Internals'
 },
 'Description of finding'=>{de=>'Beschreibung des Findings'},
 'Reasons for non-removal'=>{de=>'Begründung der Nichtbeseitigung'},
+'Reasons for finding'=>{de=>'Begründung zur Entstehung des Findings'},
 'treating target in days'=>{de=>'Behandlungsziel in Tagen'},
 'ask statement'=>{de=>'Begründung abfragen'},
 'detail spec'=>{de=>'Detail-Spezifikation'},
@@ -42,12 +43,30 @@ be treated with maximum priority.
  de=>'Ablehnen der Verantwortung für das Finding',
  en=>'Reject responsibility for finding'
 },
+'wfaskdsgvo'=>{
+ de=>'Aussage zur möglichen DSGVO Verletzungen abgeben',
+ en=>'statement to posible DSGVO violation'
+},
+'wfaskreason'=>{
+ de=>'Aussage zur Entstehung des SecurityFindings abgeben',
+ en=>'statement for reason of SecurityFinding'
+},
 'wfsetnewresp'=>{
  de=>'neue verantwortliche Person festlegen und Finding zuweisen',
  en=>'set new responsible person and assign Finding'
 },
 'wfclosed'=>{de=>'Abgeschlossen',en=>'Closed'},
 'wfreject'=>{de=>'Abgelehnt',en=>'Rejected'},
+'wfadddsgvo'=>{de=>'addDSGVO Aussage',en=>'addDSGVO Statement'},
+'wfadddreason'=>{de=>'Entstehung Aussage',en=>'reason statement'},
 'new responsible person'=>{de=>'neue verantwortliche Person'},
+'wfaskdsgvo.LABEL'=>{
+  de=>'Beschreiben Sie, ob und in welchem Umfang durch das SecurityFinding die DSGVO verletzt wurde.',
+  en=>'Please descripe DSGVO violations.',
+},
+'wfaskreason.LABEL'=>{
+  de=>'Begründung zur Entstehung des SecurityFinding abgeben.',
+  en=>'Please descripe reason of SecurityFinding.',
+}
 
 
