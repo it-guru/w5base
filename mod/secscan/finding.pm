@@ -163,6 +163,20 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'sectoken'),
 
+      new kernel::Field::Number(
+                name          =>'recuperation',
+                label         =>'Security Token Recuperation Count',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"decode(isdel,'0',".
+                                "(select decode(count(*),'0',NULL,count(*)) ".
+                                " from secscan__finding s ".
+                                " where ".
+                                " secscan__finding.sectoken=s.sectoken and ".
+                                " isdel='1')".
+                                ",NULL)" 
+                ),
+
       new kernel::Field::Boolean(
                 name          =>'isdel',
                 group         =>'source',
@@ -261,12 +275,52 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'modifydate'),
 
+      new kernel::Field::SubList(
+                name          =>'recuphist',
+                label         =>'Recuperation History',
+                group         =>'recup',
+                depend        =>['recuperation'],
+                htmldetail    =>sub{
+                                  my $self=shift;
+                                   my $mode=shift;
+                                   my %param=@_;
+                                   if (defined($param{current})){
+                                      my $d=$param{current}->{recuperation};
+                                      return(1) if ($d ne "" && $d>0);
+                                   }
+                                   return(0);
+                                },
+                searchable    =>0,
+                vjointo       =>'secscan::finding',
+                vjoinon       =>['name'=>'name'],
+                vjoinbase     =>{isdel=>'1'},
+                vjoindisp     =>['startdate','enddate'],
+                vjoininhash   =>['id','startdate','enddate']),
+
+
       new kernel::Field::Owner(
                 name          =>'owner',
                 history       =>0,
                 group         =>'handlingsource',
                 label         =>'last Editor',
                 dataobjattr   =>'modifyuser'),
+
+      new kernel::Field::Date(
+                name          =>'startdate',
+                sqlorder      =>'desc',
+                group         =>'source',
+                htmldetail    =>'0',
+                label         =>'Start-Date',
+                dataobjattr   =>'fndcdate'),
+
+      new kernel::Field::Date(
+                name          =>'enddate',
+                group         =>'handlingsource',
+                htmldetail    =>'0',
+                sqlorder      =>'desc',
+                label         =>'End-Date',
+                dataobjattr   =>'fndmdate'),
+
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -311,7 +365,7 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default handling handlingsource source));
+   return( qw(header default recup handling handlingsource source));
 }
 
 
@@ -365,6 +419,10 @@ sub initSearchQuery
      Query->Param("search_isdel"=>"\"".$self->T("no")."\"");
    }
 
+   if (!defined(Query->Param("search_findcdate"))){
+     Query->Param("search_findcdate"=>">now-14d");
+   }
+
 }
 
 
@@ -376,6 +434,7 @@ sub isViewValid
    if ($self->IsMemberOf(["admin",
                           "w5base.secscan.read",
                           "w5base.secscan.write"])){
+      my @l=qw(source handling handlingsource default header recup);
       return(qw(ALL));
    }
    return(undef);
