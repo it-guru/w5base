@@ -723,6 +723,9 @@ sub ProcessTempfile
             msg(DEBUG,"c='".join(";",@{$op->{cols}})."'");
             msg(DEBUG,"f='".join(";",@FIELDS)."'");
             $stat{colcnterr}++;
+            for(my $add=$#{$op->{cols}};$add<$#FIELDS;$add++){
+               push(@{$op->{cols}},undef);  # fillup with NULLs
+            }
          }
          if ($opt_allowdubkey){
             if (!($sqlbk=$upd_sth->execute($op->{rawline},
