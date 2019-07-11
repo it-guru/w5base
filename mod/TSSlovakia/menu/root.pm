@@ -252,6 +252,24 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("TSSlovakia.cloud",
+                      "TSSlovakia::itcloud",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.cloud.new",
+                      "TSSlovakia::itcloud",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.cloud.area",
+                      "TSSlovakia::itcloudarea",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.cloud.area.new",
+                      "TSSlovakia::itcloudarea",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("TSSlovakia.kern",
                       "tmpl/welcome");
    
@@ -307,6 +325,47 @@ sub Init
                       "itil::servicesupport",
                       func=>'New',
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.asset.itfarm",
+                      "TS::itfarm",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.asset.itfarm.new",
+                      "TS::itfarm",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.asset.itfarm.lnkitfarmasset",
+                      "TS::lnkitfarmasset",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.appl.lnkchmapprgrp",
+                      "TS::lnkapplchmapprgrp",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.kern.platform",
+                      "itil::platform",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("TSSlovakia.kern.platform.new",
+                      "itil::platform",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.kern.location",
+                      "base::location",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.kern.location.new",
+                      "base::location",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.kern.interview",
+                      "TS::interview",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
 
    return(1);
 }
