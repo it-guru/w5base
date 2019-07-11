@@ -60,6 +60,12 @@ sub new
                 label         =>'Combound',
                 dataobjattr   =>'itfarm.combound'),
 
+      new kernel::Field::Text(
+                name          =>'shortname',
+                htmlwidth     =>'190px',
+                label         =>'Short-Name',
+                dataobjattr   =>'itfarm.shortname'),
+
      new kernel::Field::Mandator(),
 
       new kernel::Field::Interface(
@@ -341,7 +347,7 @@ sub Validate
    my $newrec=shift;
 
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-       $newrec->{name}=~m/^\s*$/){
+       (($newrec->{name}=~m/^\s*$/) || haveSpecialChar($newrec->{name}))){
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
    }
@@ -351,6 +357,7 @@ sub Validate
 
    my $name=effVal($oldrec,$newrec,"name");
    my $combound=effVal($oldrec,$newrec,"combound");
+   my $shortname=effVal($oldrec,$newrec,"shortname");
 
    my $fullname=$name;
 
@@ -358,6 +365,20 @@ sub Validate
    if ($combound ne ""){
       $fullname.="-".$combound;
    }
+   if ($shortname ne ""){
+      $fullname.="(".$shortname.")";
+   }
+   if ($shortname ne "" &&
+       (length($shortname)<3 || haveSpecialChar($shortname))){
+      $self->LastMsg(ERROR,"invalid short name specified");
+      return(0);
+   }
+   if ($shortname eq ""){
+      if ($oldrec->{shortname} ne ""){
+         $newrec->{shortname}=undef;
+      }
+   }
+
    $fullname=~s/ /_/g;
 
    if (length($fullname)<5){

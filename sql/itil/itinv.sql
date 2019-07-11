@@ -1758,3 +1758,4 @@ alter table wallet add expnotifyleaddays int(22) default '56';
 alter table swinstance add ssl_expnotifyleaddays int(22) default '56';
 alter table swinstance add techdataupd datetime default NULL;
 alter table lnkitclustsvc add lastqcheck datetime default NULL,add key(lastqcheck);
+alter table itfarm add shortname varchar(40);
