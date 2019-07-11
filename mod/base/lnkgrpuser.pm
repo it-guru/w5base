@@ -341,6 +341,13 @@ sub new
                 label         =>'GrpID',
                 dataobjattr   =>'lnkgrpuser.grpid'),
 
+      new kernel::Field::Interface(
+                name          =>'grpcistatusid',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Grp CI-Statusid',
+                dataobjattr   =>'grp.cistatus'),
+
       new kernel::Field::Text(
                 name          =>'userid',
                 readonly      =>1,
@@ -488,7 +495,8 @@ sub getSqlFrom
    my ($worktable,$workdb)=$self->getWorktable();
    my $selfasparent=$self->SelfAsParentObject();
    my $from="$worktable left outer join lnkgrpuserrole ".
-            "on $worktable.lnkgrpuserid=lnkgrpuserrole.lnkgrpuserid ";
+            "on $worktable.lnkgrpuserid=lnkgrpuserrole.lnkgrpuserid ".
+            "left outer join grp on $worktable.grpid=grp.grpid";
 
    return($from);
 }

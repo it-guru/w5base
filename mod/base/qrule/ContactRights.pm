@@ -19,22 +19,23 @@ NONE
 
 Bitte hinterlegen Sie mindestens einen Kontakt mit der Rolle "schreiben", 
 der nicht gleichzeitig Datenverantwortlicher für diesen Datensatz ist. 
+Ist ein Config-Item älter als 4 Wochen, so wird die organisatorische
+Einheit des Datenverantwortlichen automatisch als Kontakt mit der
+Rolle "schreiben" hinzugefügt, falls keine weiteren Kontakte mit
+der Rolle "schreiben" vorhanden sind.
 
-Verantwortlich: Datenverantwortlicher
-
-Bei Fragen wenden Sie sich bitte an den Darwin Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
-
+Wenn nur "Mitarbeiter" Rollen vorhanden sind, wird die Gruppe mit
+der ältesten Zuorndung verwendet. Sind keine "Mitarbeiter" Rollen
+vorhanden, wird die mit den meisten Hierarchie-Stufen verwendet
+und bei Gleichstand dann die, die die älteste Zuordnung hat.
 
 [en:]
 
 Please enter at least one person, other than the current databoss, 
 into the field Contacts with the role application write.
-
-Accountable: Databoss
-
-If you have any questions please contact the Darwin Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+If a config item is older than 4 weeks, the organizational unit 
+of the databoss is automatically added as a contact with the 
+role "write" if there are no further contacts with the role "write".
 
 
 =cut
@@ -85,6 +86,10 @@ sub qcheckRecord
    return(0,undef) if (!exists($rec->{cistatusid}) || $rec->{cistatusid}>5);
    my $fo=$dataobj->getField("contacts");
    return(0,undef) if (!defined($fo));
+   if ($fo->Type() ne "ContactLnk"){
+      msg(ERROR,"invalid qrule for base::qrule::ContactRights in $dataobj"); 
+      return(undef,undef) if (!defined($fo));
+   }
    my $l=$fo->RawValue($rec);
    my $found=0;
    my $databossid=$rec->{databossid};
@@ -103,6 +108,69 @@ sub qcheckRecord
          }
       }
    }
+   my $age=90;
+   if (exists($rec->{cdate}) && $rec->{cdate} ne ""){
+      my $s=$rec->{cdate};
+      my $d=CalcDateDuration($s,NowStamp("en"),"GMT");
+      if (defined($d)){
+         $age=$d->{days};
+      }
+   }
+   if ($age>27 && !$found){
+      # try to add team with role "write"
+      my $lnkobjname=$fo->getNearestVjoinTarget();
+      $lnkobjname=$$lnkobjname if (ref($lnkobjname));
+      my $lnkobj=getModuleObject($dataobj->Config,$lnkobjname);
+      my $vjoinon=$fo->{vjoinon};
+      my $parentobj=$dataobj->SelfAsParentObject();
+      my $lnkgrp=getModuleObject($dataobj->Config,"base::lnkgrpuser");
+      $lnkgrp->SetFilter({userid=>\$databossid,
+                          rawnativroles=>[orgRoles()],
+                          grpcistatusid=>\'4',
+                          alertstate=>'[EMPTY]'});
+      my $grp;
+      my @l=$lnkgrp->getHashList(qw(cdate group roles alertstate grpid));
+      my @e=grep({in_array($_->{roles},['REmployee'])} @l);
+      if ($#e!=-1){  # Wenn REmployee Einträge, dann haben die Vorrang
+         $grp=$e[0];
+      }
+      else{
+         my @l2=sort({
+            my $sa=$a->{group};
+            $sa=~s/[^.]//g;
+            my $la=length($sa)+1;
+            my $sb=$b->{group};
+            $sb=~s/[^.]//g;
+            my $lb=length($sb)+1;
+            my $bk=$lb<=>$la;  # die gruppe mit den meisten Ebenen!
+            if ($lb==$la){     # ansonsten die Gruppe, in der man am längsten
+               $bk=$a->{cdate}<=>$b->{cdate}; # zugeordnet ist
+            }
+            $bk;
+         } @l);
+         $grp=$l2[0];
+      }
+      if (defined($grp)){
+         my $grpid=$grp->{grpid};
+         my $refid=$rec->{$vjoinon->[0]};
+         if ($refid ne ""){
+            my $cid=$lnkobj->ValidatedInsertRecord({
+               $vjoinon->[1]=>$refid,
+               targetid=>$grp->{grpid},
+               target=>"base::grp",
+               roles=>['write'],
+               parentobj=>$parentobj
+            });
+            if ($cid){
+               return(0,{qmsg=>['group automaticly added: '.$grp->{group}]});
+            }
+         }
+         
+         print STDERR "use=".Dumper($grp);
+
+      }
+   }
+   
    if (!$found){
       return(3,{qmsg=>['no additional contacts with role write registered'],
              dataissue=>['no additional contacts with role write registered']});
