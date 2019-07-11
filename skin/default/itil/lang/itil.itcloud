@@ -10,5 +10,5 @@
 'Phonenumbers'=>{de=>'Rufnummernverzeichnis'},
 'cloud is not active'=>{de=>'angegebene Cloud ist nicht aktiv'},
 'Description'=>{de=>'Beschreibung'},
-'fieldgroup.servicemodels'=>{de=>'mögliche Service-Modelle',en=>'posible service models'},
+'fieldgroup.servicemodels'=>{de=>'mögliche Service-Modelle',en=>'Possible service models'},
 
