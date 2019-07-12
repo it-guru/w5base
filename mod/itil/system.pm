@@ -1980,6 +1980,105 @@ sub getSqlFrom
 }
 
 
+sub Import
+{
+   my $self=shift;
+   my ($func,$p)=$self->extractFunctionPath();
+   my $rootpath=Query->Param("RootPath");
+
+   my $title=$self->T("Config-Item Import Handler for logical Systems ...");
+
+   my $startcmd="document.getElementById('MainStartup').style.display='block';";
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','mainwork.css',
+                                   'kernel.App.Web.css','myw5base.css',
+                                   'frames.css'],
+                           title=>$title,
+                           onload=>$startcmd,
+                           prefix=>$rootpath,
+                           js=>['toolbox.js','subModal.js','kernel.App.Web.js'],
+                           body=>1,form=>1);
+   print $self->HtmlSubModalDiv();
+   print("<div id=MainStartup style='display:none'>".
+         "<table id=MainTable ".
+         "style=\"border-collapse:collapse;width:100%;height:100%\" ".
+         "border=0 cellspacing=0 cellpadding=0>");
+   print("<table width=\"100%\" height=\"100%\" border=0 ".
+         "cellspacing=0 cellpadding=0>");
+   my $AppDirectLink=$func;
+   if ($p ne ""){
+      $AppDirectLink=".".$p;
+   }
+   
+   printf("<tr><td height=\"1%%\" valign=top>%s</td></tr>",
+          $self->getAppTitleBar(title=>$title,
+                                AppDirectLink=>$AppDirectLink,
+                                prefix=>$rootpath,
+                                noModuleObjectInfo=>1));
+   print("<tr><td valign=top>");
+   $p=~s/\///g;
+   if ($p eq ""){
+      print("<table border=0 cellpadding=5 cellspacing=5>");
+      foreach my $iobj ($self->getImportHandler()){
+          print("<tr><td>");
+          printf(" ... <a class=sublink href=\"./Import/%s\">%s</a><br>",
+                 $iobj->Self(),
+                 $iobj->getSelector($self,$self->SelfAsParentObject()));
+          print("</td></tr>");
+     
+      }
+      print("</table>");
+   }
+   else{
+      my $iobj=$self->getImportHandler($p);
+      my $path=$iobj->getImportToolPath($self,$self->SelfAsParentObject());
+      my $iframe="<iframe class=result id=result ".
+                 "name=\"Result\" src=\"../../../$path\"></iframe>";
+      printf("<div style=\"margin:10px\"><b>%s:</b></div>$iframe",
+            $iobj->getSelector($self,$self->SelfAsParentObject()));
+   }
+   print("</td></tr>");
+   print("</table>");
+   print("</div>");
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub getImportHandler
+{
+   my $self=shift;
+   my $obj=shift;
+   my @ret;
+
+   if (!exists($self->{ImportHandler})){
+      $self->LoadSubObjs("ext/ImportHandler","ImportHandler");
+   }
+
+   my %p;
+   foreach my $k (sort(keys(%{$self->{ImportHandler}}))){
+     if ($self->{ImportHandler}->{$k}->can("getPriority")){
+        my $q=$self->{ImportHandler}->{$k}->getPriority($self,
+                             $self->SelfAsParentObject());
+        if (defined($q)){
+           $p{$k}=$q;
+        }
+     }
+   }
+   if ($obj ne ""){
+      if (exists($self->{ImportHandler}->{$obj})){
+         return($self->{ImportHandler}->{$obj});
+      }
+      return(undef);
+   }
+
+   @ret=sort({$p{$a}<=>$p{$b}} keys(%p));
+   return(@ret);
+}
+
+
+
+
+
 sub FinishWrite
 {
    my $self=shift;
@@ -2262,6 +2361,7 @@ sub getValidWebFunctions
 
    my @l=$self->SUPER::getValidWebFunctions();
    push(@l,"HtmlAutoDiscManager");
+   push(@l,"Import");
    return(@l);
 }
 

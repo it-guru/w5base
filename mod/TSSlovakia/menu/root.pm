@@ -172,6 +172,12 @@ sub Init
                       "itil::lnksysteminteranswer",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("TSSlovakia.system.Import",
+                      "itil::system",
+                      func=>'Import',
+                      prio=>20000,
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("TSSlovakia.asset",
                       "TS::asset",
                       defaultacl=>['valid_user']);

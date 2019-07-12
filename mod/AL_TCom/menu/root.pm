@@ -339,7 +339,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.system.import",
-                      "tmpl/welcome",
+                      "itil::system",
                       func=>'Import',
                       prio=>20000,
                       defaultacl=>['valid_user']);

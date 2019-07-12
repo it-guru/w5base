@@ -123,3 +123,4 @@
 'APPL'=>{de=>'anwendungsbezogen',en=>'application related'},
 'PERSON'=>{de=>'personenbezogen',en=>'person related'},
 'active Systems on same Hardware'=>{de=>'aktive Systeme auf der gleichen Hardware'},
+'Config-Item Import Handler for logical Systems ...'=>{de=>'Config-Item Importer für logische Systeme ...'},

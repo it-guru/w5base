@@ -392,16 +392,22 @@ sub getAppTitleBar
    $param{title}=$self->T($self->Self,$self->Self) if (!defined($param{title}));
 
    my $titleonclick="";
-   if ($self->can("ModuleObjectInfo")){
-      $titleonclick="onclick=\"ModuleObjectInfo();return(false);\" ".
-                    "id=ModuleObjectInfo";
+   if (!defined($param{noModuleObjectInfo})){
+      if ($self->can("ModuleObjectInfo")){
+         $titleonclick="onclick=\"ModuleObjectInfo();return(false);\" ".
+                       "id=ModuleObjectInfo";
+      }
+   }
+   my $directLink=$param{AppDirectLink};
+   if (!defined($directLink)){
+      $directLink=$self->getAppDirectLink();
    }
    my $titlebar=sprintf("<tr class=TitleBar><td nowrap align=left>".
                  "<div $titleonclick ".
                  "style=\"margin:0;padding:0;padding-left:5px;".
                  "text-overflow:ellipsis;overflow:hidden;width:380px\">".
                  "<a class=TitleBarLink target=_top ".
-                 "href='".$self->getAppDirectLink()."'>".
+                 "href='$directLink'>".
                  "%s</a>&nbsp;</div></td>".
                  "<td align=right nowrap><div $onclick ".
                  "style=\"margin:0;padding:0;padding-right:5px;".
