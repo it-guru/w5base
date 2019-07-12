@@ -48,6 +48,11 @@ sub new
                 dataobjattr   =>"'unknown name'"),
 
       new kernel::Field::Text(
+                name          =>'state',
+                label         =>'system state',
+                dataobjattr   =>"system_state"),
+
+      new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
                 dataobjattr   =>"sger"),
@@ -62,15 +67,30 @@ sub new
                 label         =>'vcores',
                 dataobjattr   =>"vcores"),
 
-      new kernel::Field::Text(
+      new kernel::Field::Number(
                 name          =>'slices',
                 label         =>'slices',
                 dataobjattr   =>"slices"),
+
+      new kernel::Field::Number(
+                name          =>'drslices',
+                label         =>'DR slices',
+                dataobjattr   =>"dr_slices"),
+
+      new kernel::Field::Text(
+                name          =>'os',
+                label         =>'operating system',
+                dataobjattr   =>"operating_system"),
 
       new kernel::Field::Text(
                 name          =>'ostype',
                 label         =>'operating system type',
                 dataobjattr   =>"operating_system_type"),
+
+      new kernel::Field::Text(
+                name          =>'landscape',
+                label         =>'landscape',
+                dataobjattr   =>"landscape"),
 
       new kernel::Field::TextDrop(
                 name          =>'vfarm',
