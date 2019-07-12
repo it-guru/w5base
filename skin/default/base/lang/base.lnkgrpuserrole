@@ -50,3 +50,5 @@
 'fieldgroup.default'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},
 'native role'=>{de=>'interne Rollen Bez.'},
 'Expiration-Date'=>{de=>'Verfallsdatum'},
+'Contact CI-State'=>{de=>'Kontakt CI-Status'},
+'Group CI-State'=>{de=>'Gruppe CI-Status'},

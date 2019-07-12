@@ -29,7 +29,9 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+
    
    $self->AddFields(
       new kernel::Field::Id(
@@ -38,10 +40,11 @@ sub new
                 size          =>'10',
                 dataobjattr   =>'lnkgrpuserrole.lnkgrpuserroleid'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Contact(
                 name          =>'userfullname',
                 label         =>'UserFullname',
                 readonly      =>1,
+                vjoinon       =>'userid',
                 dataobjattr   =>'contact.fullname'),
 
       new kernel::Field::Link(
@@ -49,6 +52,14 @@ sub new
                 label         =>'UserID',
                 readonly      =>1,
                 dataobjattr   =>'contact.userid'),
+
+      new kernel::Field::Select(
+                name          =>'usercistatus',
+                readonly      =>'1',
+                label         =>'Contact CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
 
       new kernel::Field::Link(
                 name          =>'cistatusid',
@@ -67,6 +78,14 @@ sub new
       new kernel::Field::Link(
                 name          =>'grpid',
                 dataobjattr   =>'grp.grpid'),
+
+      new kernel::Field::Select(
+                name          =>'grpcistatus',
+                readonly      =>'1',
+                label         =>'Group CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
 
       new kernel::Field::Link(
                 name          =>'grpcistatusid',
@@ -193,6 +212,23 @@ sub Validate
    }
    return(1);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+
+   if (!defined(Query->Param("search_usercistatus"))){
+     Query->Param("search_usercistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+   if (!defined(Query->Param("search_grpcistatus"))){
+     Query->Param("search_grpcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 
 
