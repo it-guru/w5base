@@ -43,9 +43,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'200px',
-                sqlorder      =>'NONE',
                 label         =>'virtual Hostname',
-                dataobjattr   =>"'unknown name'"),
+                dataobjattr   =>"system_name"),
 
       new kernel::Field::Text(
                 name          =>'state',

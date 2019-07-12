@@ -126,7 +126,7 @@ sub new
                 group         =>'vsyss',
                 vjointo       =>'tsadopt::vsys',
                 vjoinon       =>['id'=>'vfarmid'],
-                vjoindisp     =>['name','ostype','vcores','slices']),
+                vjoindisp     =>['name','systemid','ostype','vcores','slices']),
 
       new kernel::Field::Link(
                 name          =>'teamid',
