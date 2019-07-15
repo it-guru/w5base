@@ -445,6 +445,18 @@ sub getPosibleActions
    my $creator=$WfRec->{openuser};
    my $initiatorid=$WfRec->{initiatorid};
 
+   if (!$iscurrent){
+      if ($self->isCurrentWorkspace($WfRec)){
+         $iscurrent=1;
+      }
+   }
+   if (!$iscurrent){
+      if ($isadmin){
+         $iscurrent=1;
+      }
+   }
+
+
    my @l=$self->SUPER::getPosibleActions($WfRec);
    if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
       if ( (!($WfRec->{secfindingaskdsgvo}) || 
@@ -521,6 +533,12 @@ sub isAuthorized
          return(1);
       }
       if ($rec->{secfindingreponsibleid} eq $userid){
+         return(1);
+      }
+      if ($self->isCurrentWorkspace($rec)){
+         return(1);
+      }
+      if ($self->IsMemberOf("admin")){
          return(1);
       }
    }
@@ -651,6 +669,67 @@ sub Validate
 
 
 
+sub NotifySecurityFindingForward
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $note=shift;
+   my $id=$WfRec->{id};
+   my $aobj=$self->getParent->Action();
+   my $workflowname=$self->getWorkflowMailName();
+
+   my $wf=$self->getParent->Clone();
+   $wf->ResetFilter();
+   $wf->SetFilter({id=>\$WfRec->{id}});
+   my ($WfRec,$msg)=$wf->getOnlyFirst(qw(id 
+                                      fwdtarget fwdtargetid fwdtargetname)); 
+
+
+   my $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+   my $uobj=getModuleObject($self->Config,'base::user');
+   $uobj->SetFilter({userid=>\$WfRec->{fwdtargetid},cistatusid=>4});
+   my ($u,$msg)=$uobj->getOnlyFirst(qw(lastlang));
+
+   if (defined($u->{lastlang})) {
+      $ENV{HTTP_FORCE_LANGUAGE}=$u->{lastlang};
+   }
+
+   if ($note eq ""){
+      $note=$self->T(
+            "The automaticly decteded security-finding has been forwared ".
+            "to you. Please handle the referenced workflow as fast es ".
+            "posible to reduce the security risk for your application.");
+   }
+   my %cc;
+   my $ws=$self->getParent->getPersistentModuleObject("base::workflowws");
+   if (defined($ws)){
+      $ws->SetFilter({wfheadid=>\$id,fwdtarget=>'base::user'});
+      my @l=$ws->getHashList(qw(ALL));
+      foreach my $wsrec (@l){
+         $cc{$wsrec->{fwdtargetid}}++;
+      }
+   }
+
+
+   $aobj->NotifyForward($id,
+                        $WfRec->{fwdtarget},
+                        $WfRec->{fwdtargetid},
+                        $WfRec->{fwdtargetname},
+                        $note,
+                        emailfrom=>"\"T-Security\" <>",
+                        workflowname=>$workflowname,
+                        addcctarget=>[keys(%cc)]);
+
+   if ($lastlang ne ""){
+      $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+   }
+   else{
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+   }
+}
+
+
+
 
 
 
@@ -772,7 +851,6 @@ sub nativProcess
    my $WfRec=shift;
    my $actions=shift;
 
-
    if ($action eq "NextStep"){
       my @rskmgr;
       my $flt;
@@ -781,8 +859,9 @@ sub nativProcess
       $h->{stateid}=2;
 
       if ($h->{secfindingreponsibleid} ne ""){
-         my @mandators=$self->getParent->getMandatorsOf(
-                         $h->{secfindingreponsibleid},"direct");
+      #   my @mandators=$self->getParent->getMandatorsOf(
+      #                   $h->{secfindingreponsibleid},"direct");
+         my @mandators;
          if ($#mandators!=-1){
             my $m=getModuleObject($self->Config,"base::mandator");
             $m->SetFilter({grpid=>$mandators[0]});
@@ -798,32 +877,27 @@ sub nativProcess
       }
 
 
-      $h->{fwdtargetid}=$h->{secfindingreponsibleid};
+      #$h->{fwdtargetid}=$h->{secfindingreponsibleid};
+      #$h->{fwdtarget}="base::user";
+
+      $h->{fwdtargetid}=11634953080001;
       $h->{fwdtarget}="base::user";
+
+
       my $secfindingaltreponsibleid=$h->{secfindingaltreponsibleid};
-       
       if (my $id=$self->StoreRecord($WfRec,$h)){
          my $aobj=$self->getParent->getParent->Action();
 
-       # if ($#wsref!=-1){
-       #     while(my $target=shift(@wsref)){
-       #        my $targetid=shift(@wsref);
-       #        last if ($targetid eq "" || $target eq "");
-       #        $self->getParent->getParent->AddToWorkspace($id,
-       #                                                    $target,$targetid);
-       #     }
-       # }
-
-       #  $aobj->NotifyForward($id,
-       #                       "base::user",
-       #                       $rskmgr[0],
-       #                       "RiskCoordinator",
-       #                       "",
-       #                       mode=>'newRisk:',
-       #                       workflowname=>$WfRec->{name});
-       #  Query->Delete("Formated_detaildescription");
-       #  Query->Delete("Formated_name");
+         if (defined($h->{secfindingaltreponsibleid})){
+            my $wsref=$h->{secfindingaltreponsibleid};
+            $wsref=[$wsref] if (ref($wsref) ne "ARRAY");
+            foreach my $a (@{$wsref}){
+               $self->getParent->getParent->AddToWorkspace($id,"base::user",$a);
+            }
+         }
+         $self->getParent->NotifySecurityFindingForward({id=>$id});
          $self->PostProcess($action,$h,$actions);
+         return($id);
       }
       else{
          return(0);
@@ -832,7 +906,6 @@ sub nativProcess
 
    return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
 }
-
 
 
 
@@ -1330,7 +1403,7 @@ sub Process
          my $newrec;
          my $fobj=$self->getParent->getField("secfindingreponsible");
          my $h=$self->getWriteRequestHash("nativweb");
-         print STDERR Query->Dumper();
+         #print STDERR Query->Dumper();
          if ($newrec=$fobj->Validate($WfRec,$h)){
             my $nativH={
                note=>$h->{note},
@@ -1473,19 +1546,10 @@ sub PostProcess
    my $WfRec=shift;
    my $actions=shift;
    my %param=@_;
-   my $aobj=$self->getParent->getParent->Action();
-   my $workflowname=$self->getParent->getWorkflowMailName();
 
 
    if ($action eq "SaveStep.wfsetnewresp"){
-      if ($param{fwdtargetid} ne ""){
-         $aobj->NotifyForward($WfRec->{id},
-                              $param{fwdtarget},
-                              $param{fwdtargetid},
-                              $param{fwdtargetname},
-                              $param{note},
-                              workflowname=>$workflowname);
-      }
+      $self->getParent->NotifySecurityFindingForward($WfRec,$param{note});
    }
 
    return($self->SUPER::PostProcess($action,$WfRec,$actions,%param));

@@ -47,9 +47,9 @@ create or replace view "W5I_secscan__findingbase" as
            "W5FTPGW1"."w5secscan_ShareData"."C03_HostName"    as fqdns,
            "w5secscan_ComputerIP"."C02_IPAddress"             as ipaddr,
            'Share=' || "w5secscan_ShareData"."C06_ShareName" || 
-            chr(13) ||
+            chr(10) ||
            'Files=' || "w5secscan_ShareData"."C09_foundFiles" ||
-            chr(13) ||
+            chr(10) ||
            'Items=' || "w5secscan_ShareData"."C08_foundItems" as detailspec,
            'w5sharescan'                                      as srcsys,
            "w5secscan_ShareData"."W5_id"                      as srcid
@@ -267,6 +267,26 @@ sub new
                 group         =>'handling',
                 label         =>'Comments',
                 dataobjattr   =>'comments'),
+
+      new kernel::Field::Boolean(
+                name          =>'wfhandeled',
+                group         =>'handling',
+                readonly      =>1,
+                label         =>'Workflow in process',
+                dataobjattr   =>'wfhandeled'),
+                #
+                # wfhandeled gibt an, ob das finding mit einem Workflow in
+                # Darwin "gekoppelt" ist. Wenn ein finding gelöscht markiert
+                # wurde, kann es bis zu 14 Tage dauern, bis es "entkoppelt"
+                # wird. Die wfref bleibt beim Entkoppeln aber vorhanden.
+                #
+
+      new kernel::Field::TextURL(
+                name          =>'wfref',
+                group         =>'handling',
+                htmldetail    =>'NotEmpty',
+                label         =>'Workflow',
+                dataobjattr   =>'wfref'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',

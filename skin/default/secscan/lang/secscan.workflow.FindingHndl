@@ -67,6 +67,7 @@ be treated with maximum priority.
 'wfaskreason.LABEL'=>{
   de=>'Begründung zur Entstehung des SecurityFinding abgeben.',
   en=>'Please descripe reason of SecurityFinding.',
-}
+},
+'The automaticly decteded security-finding has been forwared to you. Please handle the referenced workflow as fast es posible to reduce the security risk for your application.'=>{de=>'Das automatisch erkannte Security-Finding wurde an Sie weitergeleitet. Bitte behandlen Sie den Workflow so schnell es möglich ist, um die Sicherheits-Risiken für Ihre Anwendung zu minimieren.'},
 
 
