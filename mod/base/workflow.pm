@@ -619,6 +619,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-System',
                 dataobjattr   =>'wfhead.srcsys'),
                                   
@@ -626,6 +627,7 @@ sub new
                 name          =>'srcid',
                 selectfix     =>1,
                 weblinkto     =>\&addSRCLinkToFacility,
+                htmldetail    =>'NotEmpty',
                 xlswidth      =>'18',
                 sqlorder      =>'desc',
                 group         =>'source',
@@ -635,6 +637,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'srcload',
                 sqlorder      =>'desc',
+                htmldetail    =>'NotEmpty',
                 group         =>'source',
                 label         =>'Source-Load',
                 dataobjattr   =>'wfhead.srcload'),
@@ -3141,8 +3144,10 @@ sub nativProcess
       $self->LastMsg(ERROR,"no class specified");
       return(undef);
    }
-   if (!defined(defined($self->{SubDataObj}->{$class}))){
+   if (!defined($self->{SubDataObj}->{$class})){
       $self->LastMsg(ERROR,"unknown class specified");
+printf "class=$class\n"; 
+printf "%s\n",join(",",keys(%{$self->{SubDataObj}}));
       return(undef);
    }
    my $classobj=$self->{SubDataObj}->{$class};
