@@ -284,6 +284,7 @@ sub new
       new kernel::Field::TextURL(
                 name          =>'wfref',
                 group         =>'handling',
+                readonly      =>1,
                 htmldetail    =>'NotEmpty',
                 label         =>'Workflow',
                 dataobjattr   =>'wfref'),
@@ -439,9 +440,9 @@ sub initSearchQuery
      Query->Param("search_isdel"=>"\"".$self->T("no")."\"");
    }
 
-   if (!defined(Query->Param("search_findcdate"))){
-     Query->Param("search_findcdate"=>">now-14d");
-   }
+#   if (!defined(Query->Param("search_findcdate"))){
+#     Query->Param("search_findcdate"=>">now-14d");
+#   }
 
 }
 

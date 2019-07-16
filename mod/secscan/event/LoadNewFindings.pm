@@ -282,23 +282,25 @@ sub analyseRecord
          };
          my $sectreadrules=trim($rec->{sectreadrules});
          my @sectreadrules=split(/\s*[,;]\s*/,$sectreadrules);
-         if (in_array(\@sectreadrules,"EnforceRemove")){
-            $newrec->{secfindingenforceremove}=1;
-         }
-         if (in_array(\@sectreadrules,"GetStatement")){
-            $newrec->{secfindingaskstatement}=1;
-         }
+         if (!in_array(\@sectreadrules,"IgnoreFinding")){
+            if (in_array(\@sectreadrules,"EnforceRemove")){
+               $newrec->{secfindingenforceremove}=1;
+            }
+            if (in_array(\@sectreadrules,"GetStatement")){
+               $newrec->{secfindingaskstatement}=1;
+            }
 
-         if (keys(%altreponsibleid)){
-            $newrec->{secfindingaltreponsibleid}=[sort(keys(%altreponsibleid))];
-         }
-         # sectreadrules handling!
+            if (keys(%altreponsibleid)){
+               $newrec->{secfindingaltreponsibleid}=[sort(keys(%altreponsibleid))];
+            }
+            # sectreadrules handling!
 
-         my $id=$self->{wf}->nativProcess("NextStep",$newrec);
-         if ($id ne ""){
-            $self->{wf}->ResetFilter();
-            $self->{wf}->SetFilter({id=>\$id});
-            ($WfRec,$msg)=$self->{wf}->getOnlyFirst(qw(ALL));
+            my $id=$self->{wf}->nativProcess("NextStep",$newrec);
+            if ($id ne ""){
+               $self->{wf}->ResetFilter();
+               $self->{wf}->SetFilter({id=>\$id});
+               ($WfRec,$msg)=$self->{wf}->getOnlyFirst(qw(ALL));
+            }
          }
       }
       if (defined($WfRec)){
