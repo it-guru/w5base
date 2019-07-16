@@ -51,6 +51,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['w5base.secscan.admin']);
    
+   $self->RegisterObj("itu.secscan.networknode",
+                      "secscan::NetworkNode",
+                      defaultacl=>['w5base.secscan']);
+   
    return($self);
 }
 
