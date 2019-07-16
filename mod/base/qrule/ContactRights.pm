@@ -85,7 +85,7 @@ sub qcheckRecord
 
    return(0,undef) if (!exists($rec->{cistatusid}) || $rec->{cistatusid}>5);
    my $fo=$dataobj->getField("contacts");
-   return(0,undef) if (!defined($fo));
+   return(undef,undef) if (!defined($fo));
    if ($fo->Type() ne "ContactLnk"){
       msg(ERROR,"invalid qrule for base::qrule::ContactRights in $dataobj"); 
       return(undef,undef) if (!defined($fo));
@@ -93,6 +93,9 @@ sub qcheckRecord
    my $l=$fo->RawValue($rec);
    my $found=0;
    my $databossid=$rec->{databossid};
+   my $databossfo=$dataobj->getField("databossid");
+   return(undef,undef) if (!defined($databossfo));
+
    if (ref($l) eq "ARRAY"){
       foreach my $crec (@$l){
          my $r=$crec->{roles};
