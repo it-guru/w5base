@@ -1,4 +1,4 @@
-Ihre Zuordnung zur Gruppe "<b>%group%</b>" mit den aktuell eingetragenen Rollen "<b>%roles(formated)%</b>" ist nicht mehr gültig. Die Gruppe wurde durch die Administration auf "veraltet/gelöscht" gesetzt, d.h. die Rechte die Sie durch die Zuorndungen zu dieser Gruppe erhalten haben, kommen nun nicht mehr zum Tragen.
+Ihre Zuordnung zur Gruppe "<b>%group%</b>" mit den aktuell eingetragenen Rollen "<b>%roles(formated)%</b>" ist nicht mehr gültig. Die Gruppe wurde durch die Administration auf "veraltet/gelöscht" gesetzt, d.h. die Rechte die Sie durch die Zuordnungen zu dieser Gruppe erhalten haben, kommen nun nicht mehr zum Tragen.
 Gruppen werden durch Admins dann auf "veraltet/gelöscht" gesetzt, wenn es z.B. Umorganisationen gab und die betreffenden Bereiche nicht neu zugeordnet werden konnten.
 
 Sollten sie genannte Gruppenzugehörigkeit noch benötigen, so kontaktieren Sie dringend die Admins und stellen die notwendigen Informationen bereit, in welchen Bereich die Gruppe z.B. verschoben werden muss.

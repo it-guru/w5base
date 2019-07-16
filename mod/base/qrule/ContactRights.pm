@@ -25,7 +25,7 @@ Rolle "schreiben" hinzugefügt, falls keine weiteren Kontakte mit
 der Rolle "schreiben" vorhanden sind.
 
 Wenn nur "Mitarbeiter" Rollen vorhanden sind, wird die Gruppe mit
-der ältesten Zuorndung verwendet. Sind keine "Mitarbeiter" Rollen
+der ältesten Zuordnung verwendet. Sind keine "Mitarbeiter" Rollen
 vorhanden, wird die mit den meisten Hierarchie-Stufen verwendet
 und bei Gleichstand dann die, die die älteste Zuordnung hat.
 

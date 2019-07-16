@@ -15,7 +15,7 @@ body{margin:20px}
 
 <p>Wird bei <b>"Schnittstellenbetrachtung"="exzessiv"</b> gewählt und ist bei "betroffene Anwendung" eine oder mehrere Anwendungen angeben, so werden <u>alle</u> das Zeitfenster tangierenden Changes/Maßnahmen aufgelistet und es erfolgt nur eine ensprechede Bewertung in der "Übereinstimmg". In diesem Modus wird quasi JEDE Anwendung als Schnittstelle angesehen. Bei derartigen Abfragen darf das Zeitfenster nicht länger als 24h sein.</p>
 
-<p>In der Ergebnisliste wird eine "Übereinstimmung" in Prozent errechnet. Hier wird eine Zuorndung errechnet, inwieweit die Changes/Maßnahmen den Abfragekriterien entsprechen. Dabei gilt:</p>
+<p>In der Ergebnisliste wird eine "Übereinstimmung" in Prozent errechnet. Hier wird eine Zuordnung errechnet, inwieweit die Changes/Maßnahmen den Abfragekriterien entsprechen. Dabei gilt:</p>
 <ul>
 <li>... es erfolgt eine Aufwertung, wenn der gefundene Workflow möglichst gleichzeitig mit dem abgefragen Zeitfenster beginnt.</li>
 <li>... wurden Stichworte angegben, erfolgt eine Aufwertung wenn diese mehrfach in einem Workflow vorkommen.</li>
