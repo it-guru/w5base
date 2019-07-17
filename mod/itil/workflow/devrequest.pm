@@ -282,6 +282,7 @@ sub getDynamicFields
                                   },
                                   vjointo    =>'itil::appl',
                                   vjoinon    =>['affectedapplicationid'=>'id'],
+                                  vjoineditbase =>{'cistatusid'=>[2,3,4,5]},
                                   vjoindisp  =>'name',
                                   keyhandler =>'kh',
                                   container  =>'headref',
