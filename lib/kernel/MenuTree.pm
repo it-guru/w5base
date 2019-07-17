@@ -84,7 +84,11 @@ sub _TreeLine
       $d.="<div id=MenuTree>";
    }
    else{
-      $d.="<div style=\"border-style:none;border-width:1px;".
+      my $markActive="";
+      if ($ment->{active}){
+         $markActive="id=\"activeMenuTree\" ";
+      }
+      $d.="<div ${markActive}style=\"border-style:none;border-width:1px;".
             "padding:0;margin:0;vertical-align:middle\">";
       $d.="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
       $d.="<tr><td valign=center width=1% nowrap>";

@@ -882,8 +882,24 @@ sub menuframe
    print $self->HtmlHeader(target=>'msel',
                               js=>['toolbox.js','wz_tooltip.js'],
                              base=>'',
-                            prefix=>$rootpath,
+                           prefix=>$rootpath,
+                           onload=>'scrollToActive();',
                            style=>['default.css','menu.css']);
+   print("<script language=\"JavaScript\">");
+   print("function scrollToActive(){");
+   print("var e=document.getElementById('activeMenuTree');");
+   print("if (e){");
+   print("var rect = e.getBoundingClientRect();");
+   print("if (rect){");
+   print("document.body.scrollTop=rect.top;");
+   print("}");
+   print("}");
+   print("}");
+   print("</script>");
+
+
+
+
    my $m=$self->MenuTab($rootpath,$fp,
                         'JavaScript:SwitchMenuVisible() target=_self');
    my $menuframe=$self->getParsedTemplate("tmpl/menutmpl",{
