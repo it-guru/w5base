@@ -6,4 +6,3 @@
 'itu.EWU2.asset'=>{de=>'Hardware',en=>'Hardware'},
 'itu.EWU2.kernel'=>{de=>'Stammdaten',en=>'Basedata'},
 'itu.EWU2.kernel.contact'=>{de=>'Kontakt',en=>'Contact'},
-'AL_TCom.system.import.EWU2'=>{de=>'EWU2-DevLab',en=>'EWU2-DevLab'},

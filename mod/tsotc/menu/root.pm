@@ -88,11 +88,6 @@ sub Init
                       "tsotc::appagilenamespace",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("AL_TCom.system.import.OTC",
-                      "tsotc::system",
-                      func=>'ImportSystem',
-                      prio=>30000,
-                      defaultacl=>['valid_user']);
    return($self);
 }
 
