@@ -185,7 +185,7 @@ sub qcheckRecord
       if (keys(%$forcedupd)){
          if ($parrec->{usage}=~m/^INVOICE_ONLY/){
             $parrec=undef;
-            push(@qmsg,"invoice only systems are not allowed to import");
+            push(@qmsg,"Invoice only systems are not allowed to import");
             $forcedupd={};
          }
       }

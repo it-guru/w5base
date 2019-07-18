@@ -47,9 +47,10 @@ sub checkAgainstAM
          if ($#{$amrec->{services}}!=-1 ||
              $#{$amrec->{orderedservices}} !=-1){
             $dataobj->LastMsg(ERROR,
-              "operation not valid, if there are ".
-              "active services in AssetManager on current system ");
-            msg(ERROR,"invalid operation trieed on SystemID $systemid");
+              "The chosen operation is invalid in case ".
+              "there are active services in AssetManager on the ".
+              "current system");
+            msg(ERROR,"invalid operation tried on SystemID $systemid");
             return(0);
          }
       }
