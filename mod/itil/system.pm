@@ -2022,7 +2022,11 @@ sub Import
       print("<table border=0 cellpadding=5 cellspacing=5>");
       foreach my $iobj ($self->getImportHandler()){
           print("<tr><td>");
-          printf(" ... <a class=sublink href=\"./Import/%s\">%s</a><br>",
+          printf("<input type=button class=button ".
+                 "style=\"width:250px;padding:5px;margin:10px;".
+                 "background:silver;\" ".
+                 "onclick=\"document.location.href='./Import/%s';\" ".
+                 "value=\"%s\">",
                  $iobj->Self(),
                  $iobj->getSelector($self,$self->SelfAsParentObject()));
           print("</td></tr>");
