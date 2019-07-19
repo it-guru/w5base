@@ -310,6 +310,20 @@ sub initSearchQuery
 }
 
 
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+   }
+   return($self->SetFilter(@flt));
+}
+
+
+
 
 
 
