@@ -2188,8 +2188,12 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
    if (defined($idfield)){
       my $id=$idfield->RawValue($oldrec);
       if ($id ne ""){
-         $notifyparam{dataobj}=$self->Self;
-         $notifyparam{dataobjid}=$id;
+         if (!exists($notifyparam{dataobj})){
+            $notifyparam{dataobj}=$self->Self;
+         }
+         if (!exists($notifyparam{dataobjid})){
+            $notifyparam{dataobjid}=$id;
+         }
       }
    }
 
