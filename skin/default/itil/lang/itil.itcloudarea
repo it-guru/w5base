@@ -12,3 +12,30 @@
 'Cloud Area description'=>{de=>'Cloud Area Beschreibung'},
 'cloud is not active'=>{de=>'Cloud ist nicht aktiv'},
 'invalid cloud area name'=>{de=>'ungültiger Cloud Area name'},
+'user deaktivation of Cloud-Area'=>{de=>'User Dekativierung der CloudArea'},
+'New Cloud-Area'=>{de=>'Neue CloudArea'},
+'CMSG001'=>{
+de=>'eine neue CloudArea <b>%s</b> wurde für die 
+Anwendung <b>%s</b> konfiguriert. 
+Diese CloudArea muß durch Sie aktiviert werden um automatisierte Import-Prozeduren zu ermöglichen.
+
+Falls Sie nicht der Meinung sind, dass die CloudArea korrekt ihrer Anwendung zugeordnet sein sollte, kontaktieren Sie bitte den Datenverantwortlichen der betreffenden Cloud um die Angelegenheit zu klären.
+',
+en=>'a new cloudarea <b>%s</b> has been
+configured for your application <b>%s</b> .
+This area needs to be activated by you, to make it useable in automatic import
+procedures.
+If you do not think, the cloudarea is correct related to your application, please contact the the databoss of the related cloud to clarify the situation.
+'
+},
+'CMSG002'=>{
+de=>'die  CloudArea <b>%s</b> wurde auf "zeitweise inaktiv" gesetzt.
+
+Bitte klären Sie mit der Anwendung <b>%s</b> ob dies als Rückbau-Anforderung für die betreffende CloudArea interpretiert werden soll.
+',
+en=>'
+the cloudarea <b>%s</b> has been
+set to inactive/stored.
+Please clarify with the application %s, if this should be interpreted as run-down request for the cloud area.
+'
+}

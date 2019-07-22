@@ -167,17 +167,20 @@ sub new
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
+                htmldetail    =>'NotEmpty',
                 dataobjattr   =>'qitcloudarea.srcsys'),
                                                    
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-Id',
                 dataobjattr   =>'qitcloudarea.srcid'),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Last-Load',
                 dataobjattr   =>'qitcloudarea.srcload'),
 
@@ -251,6 +254,19 @@ sub new
                 dataobjattr   =>'qitcloudarea.itcloud'),
 
    );
+   $self->{history}={
+      insert=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ],
+      delete=>[
+         {dataobj=>'itil::itcloud', id=>'cloudid',
+          field=>'name',as=>'cloudareas'}
+      ]
+   };
+
    $self->setDefaultView(qw(fullname appl conumber  cdate));
    $self->setWorktable("itcloudarea");
    return($self);
@@ -389,6 +405,7 @@ sub Validate
          }
       }
    }
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
 
    
 
@@ -418,12 +435,108 @@ sub isWriteValid
 
    my $itcloudid=$oldrec->{"cloudid"};
    my $applid=$oldrec->{"applid"};
-   if ($self->isWriteOnITCloudValid($itcloudid,"default") ||
-       $self->isWriteOnApplValid($applid,"default")){
+   if ($self->isWriteOnITCloudValid($itcloudid,"default")){
       return("default");
+   }
+   if (defined($oldrec)){
+      if ($oldrec->{cistatusid}>=3 &&
+          $oldrec->{cistatusid}<=5){
+         if ($self->isWriteOnApplValid($applid,"default")){
+            return("default");
+         }
+      }
    }
    return(undef);
 }
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $doNotify=0;
+   if (!defined($oldrec)){
+      if (exists($newrec->{cistatusid}) &&
+          $newrec->{cistatusid}==3){
+         $doNotify=1;
+      }
+   }
+   else{
+      if ($oldrec->{cistatusid}<4){
+         if (defined($newrec) &&
+             exists($newrec->{cistatusid}) &&
+             $newrec->{cistatusid}==3){
+            $doNotify=1;
+         }
+      }
+      if ($oldrec->{cistatusid}==4){
+         if (defined($newrec) &&
+             exists($newrec->{cistatusid}) &&
+             $newrec->{cistatusid}==5){
+            $doNotify=2;
+         }
+      }
+   }
+   if ($doNotify){
+      # send a mail to system/cluster databoss with cc on current user
+      my $caid=effVal($oldrec,$newrec,"id");
+      my $itca=$self->Clone();
+      $itca->SetFilter({id=>\$caid});
+      my ($carec,$msg)=$itca->getOnlyFirst(qw(name fullname applid cloudid
+                                              urlofcurrentrec id));
+      if (defined($carec)){
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         $appl->SetFilter({id=>\$carec->{applid}});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(ALL));
+         if ($doNotify==1){
+            $appl->NotifyWriteAuthorizedContacts($arec,{},{
+                     dataobj=>$self->Self,
+                     dataobjid=>$carec->{id}
+                  },{},sub{
+               my ($subject,$ntext);
+               my $subject=$self->T("New Cloud-Area",'itil::itcloudarea');
+               $subject.=" ";
+               $subject.=$carec->{fullname};
+               my $ntext=$self->T("Dear databoss",'kernel::QRule');
+               $ntext.=",\n\n";                             
+               $ntext.=sprintf($self->T("CMSG001"),
+                               $carec->{name},$arec->{name});
+               $ntext.="\n";
+               return($subject,$ntext);
+            });
+         }
+         if ($doNotify==2){
+            my $itcloud=getModuleObject($self->Config,"itil::itcloud");
+            $itcloud->SetFilter({id=>\$carec->{cloudid}});
+            my ($crec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
+
+            $itcloud->NotifyWriteAuthorizedContacts($crec,{},{
+                     dataobj=>$self->Self,
+                     dataobjid=>$carec->{id}
+                  },{},sub{
+               my ($subject,$ntext);
+               my $subject=$self->T("user deaktivation of Cloud-Area",
+                                    'itil::itcloudarea');
+               $subject.=" ";
+               $subject.=$carec->{fullname};
+               my $ntext=$self->T("Dear databoss",'kernel::QRule');
+               $ntext.=",\n\n";                             
+               $ntext.=sprintf(
+                       $self->T("CMSG002"),
+                                $carec->{name},$arec->{name});
+               $ntext.="\n";
+               return($subject,$ntext);
+            });
+         }
+      }
+   }
+   return($self->SUPER::FinishWrite($oldrec,$newrec));
+}
+
+
+
 
 
 sub getDetailBlockPriority

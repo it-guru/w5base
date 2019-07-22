@@ -53,10 +53,16 @@ sub new
                 dataobjattr   =>"darwin_app_w5baseid"),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                sqlorder      =>'desc',
+                label         =>'OTC-Projectname',
+                dataobjattr   =>"project_name"),
+
+      new kernel::Field::Text(
                 name          =>'name',
                 sqlorder      =>'desc',
                 label         =>'Name',
-                dataobjattr   =>"project_name"),
+                dataobjattr   =>"regexp_replace(project_name,'^.*?_','')"),
 
       new kernel::Field::Text(
                 name          =>'domain',
