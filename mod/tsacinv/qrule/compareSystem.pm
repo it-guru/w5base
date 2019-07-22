@@ -183,7 +183,9 @@ sub qcheckRecord
          $forcedupd->{srcload}=NowStamp("en");
       }
       if (keys(%$forcedupd)){
-         if ($parrec->{usage}=~m/^INVOICE_ONLY/){
+         if ($rec->{systemid} eq "" &&
+             exists($forcedupd->{systemid}) &&
+             ($parrec->{usage}=~m/^INVOICE_ONLY/)){
             $parrec=undef;
             push(@qmsg,"Invoice only systems are not allowed to import");
             $forcedupd={};
