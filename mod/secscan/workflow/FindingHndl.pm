@@ -880,7 +880,7 @@ sub nativProcess
       #$h->{fwdtargetid}=$h->{secfindingreponsibleid};
       #$h->{fwdtarget}="base::user";
 
-      $h->{fwdtargetid}=11634953080001;
+      $h->{fwdtargetid}=15632883160001; # security_issue test contact
       $h->{fwdtarget}="base::user";
 
 
