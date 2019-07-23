@@ -17,6 +17,19 @@ office_costcenter office_accarea office_facsimile givenname surname
 On contacts of typ function and service, there will be givenname
 and surname excluded.
 
+=head3 HINTS
+
+[en:]
+
+The quality rule checks whether correct data are stored in Darwin in comparison with CIAM. If this is not the case, a data issue is generated. 
+
+In order to clean the data issue, correct data contained in CIAM must be entered manually or the field "Allow automated updates through interfaces" has to be set to "Yes" whereby the data will be automatically transferred from CIAM.
+
+[de:]
+
+Die Quality Regel prüft ob korrekte Daten im Vergleich mit CIAM in Darwin gespeichert sind. Trifft dies nicht zu, wird ein Dataissue generiert.
+
+Um das Dataissue zu bereinigen müssen korrekte Daten die in CIAM enthalten sind manuell eingetragen werden oder man setzt das Feld "automatisierte Updates durch Schnittstellen zulassen" auf "Ja" wodurch die Daten automatisch aus CIAM gezogen werden.
 
 
 =cut
