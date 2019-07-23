@@ -74,6 +74,19 @@ sub getDynamicFields
 }
 
 
+sub PostponeMaxDays   # postpone max days after WfStart
+{
+   my $self=shift;
+   my $WfRec=shift;
+   if ($WfRec->{subtyp} eq "riskmeasure"){
+      return((365*3)+5);
+   }
+   return(365*1);
+}
+
+
+
+
 
 sub Validate
 {
@@ -157,6 +170,8 @@ sub Validate
 
    return(1);
 }
+
+
 
 
 

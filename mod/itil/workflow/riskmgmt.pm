@@ -67,7 +67,7 @@ sub PostponeMaxDays   # postpone max days after WfStart
    my $self=shift;
    my $WfRec=shift;
 
-   return(365*3);
+   return((365*3)+5);
 }
 
 
@@ -719,11 +719,15 @@ sub getPosibleActions
 
    my $openSubWf=0;
    my $haveSubWf=0;
+   my $notDeferedWf=0;
 
    foreach my $relrec (@{$WfRec->{relations}}){
       $haveSubWf++;
       if ($relrec->{dststate}<20){
          $openSubWf=1;
+         if ($relrec->{dststate}!=5){
+            $notDeferedWf++;
+         }
       }
    }
 
@@ -744,7 +748,11 @@ sub getPosibleActions
        $WfRec->{stateid}==4){
       if ($iscurrent){
          push(@l,"wfaddopmeasure");
-         push(@l,"wfdefer");
+         if ($haveSubWf){ # Zurückstellen erst möglich, wenn Maßnahmen existsi.
+            if ($notDeferedWf==0){
+               push(@l,"wfdefer");
+            }
+         }
       }
    }
    if ($WfRec->{stateid}<17){  # noch nicht geschlossen

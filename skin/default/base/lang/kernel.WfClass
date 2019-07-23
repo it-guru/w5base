@@ -9,3 +9,6 @@
 'DetailMarkDelete'=>{de=>'gelöscht markieren',en=>'mark as delete'},
 'DetailCopy'=>{de=>'kopieren',en=>'copy'},
 'DetailUnMarkDelete'=>{de=>'Löschmarkierung entfernen',en=>'unmark deleted'},
+'target date must be behind now'=>{de=>'Zieldatum muß in der Zukunft liegen'},
+'defer not allowed! - Target date is more then %d days after start of workflow'=>{de=>'Zurückstellen nicht erlaubt! - Zieldatum ist mehr als %d Tage nach Workflow-Beginn'},
+
