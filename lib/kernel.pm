@@ -1121,14 +1121,27 @@ sub _FancyMailLinks
    return($res);
 }
 
+sub _FancySmbShares
+{
+   my $host=shift;
+   my $share=shift;
+
+   my $res="<a href=\"file:////$host/$share/\" target=_blank>".
+           "\\\\$host\\$share</a>";
+   return($res);
+}
+
 sub FancyLinks
 {
    my $data=shift;
    my $newline=chomp($data);
 
-   $data=~s#([\s";<>]{0,1})(http|https|telnet|news)(://\S+?)(\?\S+?){0,1}([\s";<>]|&quot;|&lt;|&gt;|$)#$1._FancyLinks("$2$3$4",$5)#ge;
+   $data=~s#([\s";<>]{0,1})(http|https|telnet|news)
+            (://\S+?)(\?\S+?){0,1}
+            ([\s";<>]|&quot;|&lt;|&gt;|$)#$1._FancyLinks("$2$3$4",$5)#gex;
    $data.="\n" if($newline);
    $data=~s#(mailto)(:\S+?)(\@)(\S+)#_FancyMailLinks("$1$2$3$4")#ge;
+   $data=~s#\\\\([^\\]+)\\(\S+)#_FancySmbShares($1,$2)#ge;
 
    return($data);
 }
