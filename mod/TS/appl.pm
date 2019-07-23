@@ -757,6 +757,9 @@ sub calcWorkflowStart
                                           name=>'Formated_appl'
                                        };
    }
+   foreach my $wftype (grep(/^.*::workflow::riskmgmt$/,@l)){
+      $r->{$wftype}={ name=>'Formated_affectedapplication' };
+   }
    if (grep(/^itil::workflow::devrequest$/,@l)){
       $r->{'itil::workflow::devrequest'}={
                                           name=>'Formated_affectedapplication'
