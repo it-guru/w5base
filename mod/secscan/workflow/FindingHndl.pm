@@ -882,6 +882,7 @@ sub nativProcess
 
       $h->{fwdtargetid}=15632883160001; # security_issue test contact
       $h->{fwdtarget}="base::user";
+      delete($h->{secfindingaltreponsibleid});  # no tsms
 
 
       my $secfindingaltreponsibleid=$h->{secfindingaltreponsibleid};
