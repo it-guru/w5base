@@ -2,17 +2,3 @@
 de=>'SecItem',
 en=>'SecItem'
 },
-'OPENSHARE001'=>{
-de=>'
-Das ist der deutsche Text zum Item OPENSHARE001 und hier
-sollte auch eine Erklärung erscheinen, was Mann/Frau damit
-machen sollte.
-Speziell für dieses Finding wurde das erkannt:
-',
-en=>'
-This is the englisch text for Item OPENSHARE001 and at
-this position there is an explaination needed for mans
-and womands.
-Specialy for this finding this is founded:
-'},
-

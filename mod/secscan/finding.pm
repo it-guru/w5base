@@ -33,7 +33,7 @@ use tsacinv::system;
 
 create or replace view "W5I_secscan__findingbase" as
    select  'OpSha-' || "w5secscan_ShareData"."W5_id"          as id,
-           "w5secscan_ShareData"."W5_isnotdel"                as isnotdel,
+           "w5secscan_ShareData"."W5_isdel"                   as isdel,
            "w5secscan_ShareData"."C01_SecToken"               as sectoken,
            "w5secscan_ShareData"."C05_SecItem"                as secitem,
            "w5secscan_ShareData"."C04_TreatRules"             as sectreadrules,
@@ -59,7 +59,7 @@ create or replace view "W5I_secscan__findingbase" as
             "w5secscan_ShareData"."C03_HostName"
 union
    select  'Once-' || "w5secscan_OneShot"."W5_id"             as id,
-           "w5secscan_OneShot"."W5_isnotdel"                  as isnotdel,
+           "w5secscan_OneShot"."W5_isdel"                     as isdel,
            "w5secscan_OneShot"."C01_SecToken"                 as sectoken,
            "w5secscan_OneShot"."C05_SecItem"                  as secitem,
            "w5secscan_OneShot"."C04_TreatRules"               as sectreadrules,
@@ -74,12 +74,6 @@ union
            'OneShot'                                          as srcsys,
            "w5secscan_OneShot"."W5_id"                        as srcid
    from "W5FTPGW1"."w5secscan_OneShot";
-
-
-from "W5FTPGW1"."w5secscan_ShareData"
-   join "W5FTPGW1"."w5secscan_ComputerIP"
-      on "w5secscan_ComputerIP"."C01_NetComputer"=
-         "w5secscan_ShareData"."C03_HostName";
 
 
 create table "W5I_secscan__finding_of" (
@@ -99,7 +93,7 @@ create or replace synonym W5I.secscan__finding_of for "W5I_secscan__finding_of";
 
 create or replace view "W5I_secscan__finding" as
 select "W5I_secscan__findingbase".id,
-       decode("W5I_secscan__findingbase".isnotdel,1,0,1) isdel,
+       "W5I_secscan__findingbase".isdel,
        "W5I_secscan__findingbase".sectoken,
        "W5I_secscan__findingbase".secitem,
        "W5I_secscan__findingbase".sectreadrules,
@@ -167,6 +161,7 @@ sub new
                 name          =>'recuperation',
                 label         =>'Security Token Recuperation Count',
                 readonly      =>1,
+                sqlorder      =>'NONE',
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"decode(isdel,'0',".
                                 "(select decode(count(*),'0',NULL,count(*)) ".
@@ -227,19 +222,40 @@ sub new
                 label         =>'IP-Address',
                 dataobjattr   =>'ipaddr'),
 
+
+      new kernel::Field::Textarea(
+                name          =>'itemrawdesc',
+                label         =>'Security Finding Item Desc',
+                readonly      =>1,
+                uivisible     =>0,
+                vjointo       =>\'secscan::item',
+                vjoinon      =>['secitem'=>'name'],
+                vjoindisp     =>'description'),
+
+
       new kernel::Field::Textarea(
                 name          =>'spec',
                 readonly      =>1,
                 label         =>'Specification',
                 searchable    =>0,
+                depend        =>[qw(itemrawdesc secitem detailspec)],
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
                    my $app=$self->getParent;
-                   my $d=trim($app->T($current->{secitem},"secscan::item"));
-                   $d.="\n";
-                   $d.=$current->{detailspec};
-                   return($d);
+                   my $i=$self->getParent->getField(
+                         "itemrawdesc");
+                   my $dsc=$i->RawValue($current);
+                   my $lang=$self->getParent->Lang();
+                   $dsc=extractLangEntry($dsc,
+                                         $lang,65535,65535);
+                   my $d=$self->getParent->getField(
+                         "detailspec");
+                   my $detaildescription=
+                         $d->RawValue($current);
+                   return($dsc.
+                          "\n".
+                          $detaildescription);
                 }),
 
       new kernel::Field::Textarea(

@@ -498,6 +498,11 @@ sub getPosibleActions
          }
       }
    }
+   if ($W5V2::OperationContext eq "W5Server"){
+      if ($WfRec->{step} ne "secscan::workflow::FindingHndl::finish"){
+         push(@l,"wfforceobsolete");
+      }
+   }
    if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
       if ($WfRec->{step} eq "secscan::workflow::FindingHndl::main"){
          if (($iscurrent)){
@@ -729,6 +734,39 @@ sub NotifySecurityFindingForward
 }
 
 
+sub nativProcess
+{
+   my $classobj=shift;
+   my $self=shift;
+   my $action=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+
+   if ($action eq "wfforceobsolete"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wffine",
+          {translation=>'base::workflow::request'},"",undef)){
+         my $nextstep=$self->getParent->getStepByShortname("finish");
+         my $store={stateid=>25,
+                    step=>$nextstep,
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
+                    closedate=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if ($WfRec->{eventend} eq ""){
+            $store->{eventend}=NowStamp("en");
+         }
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         return(1);
+      }
+
+      return(1);
+   }
+   return(0);
+}
 
 
 
@@ -903,6 +941,9 @@ sub nativProcess
       else{
          return(0);
       }
+   }
+   if ($action eq "wfforceobsolete"){
+      return($self->getParent->nativProcess($self,$action,$h,$WfRec,$actions));
    }
 
    return($self->SUPER::nativProcess($action,$h,$WfRec,$actions));
@@ -1108,8 +1149,9 @@ sub nativProcess
           {translation=>'secscan::workflow::FindingHndl'},
           $h->{note})){
          Query->Delete("note");
+         my $nextstep=$self->getParent->getStepByShortname("approve");
          my $store={stateid=>10,
-                    step=>'secscan::workflow::FindingHndl::approve',
+                    step=>$nextstep,
                     fwdtargetname=>"w5base.secscan.approve",
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
@@ -1155,13 +1197,6 @@ sub nativProcess
                     closedate=>NowStamp("en"),
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
-         foreach my $v (qw(ibiprice 
-                           ibipoints 
-                           solutionopt 
-                           itrmcriticality)){  # store base parameters
-            my $curval=$WfRec->{$v};
-            $store->{"stored_".$v}=$curval;
-         }
          if ($WfRec->{eventend} eq ""){
             $store->{eventend}=NowStamp("en");
          }
@@ -1170,6 +1205,9 @@ sub nativProcess
          $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
          return(1);
       }
+   }
+   elsif ($op eq "wfforceobsolete"){
+      return($self->getParent->nativProcess($self,$op,$h,$WfRec,$actions));
    }
    return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
 }
@@ -1535,6 +1573,9 @@ sub nativProcess
       else{
          return(0);
       }
+   }
+   elsif ($op eq "wfforceobsolete"){
+      return($self->getParent->nativProcess($self,$op,$h,$WfRec,$actions));
    }
    return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
 }

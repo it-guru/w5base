@@ -98,7 +98,7 @@ sub LoadNewFindings
       $datastream->SetFilter(\%flt);
       $datastream->SetCurrentView(qw(id name secitem ipaddr 
                                      spec findcdate hostname
-                                     wfhandeled wfref));
+                                     wfhandeled wfref recuphist));
       $datastream->SetCurrentOrder("+findcdate","+id");
       $datastream->Limit(100);
       my ($rec,$msg)=$datastream->getFirst();
@@ -152,6 +152,7 @@ sub LoadNewFindings
          }until(!defined($rec) || $recno>10);
       }
    }
+   my $dataop=$datastream->Clone();
    $datastream->ResetFilter();
    $datastream->SetFilter({
       wfhandeled=>\'1',
@@ -162,8 +163,26 @@ sub LoadNewFindings
 
    if (defined($rec)){
       do{
-         msg(WARN,"need to clean ".Dumper($rec));
+         msg(INFO,"cleanup finding id=$rec->{id}");
+         my $srcsys="secscan::finding";
+         my $srcid=$rec->{id};
+         my $srckey=$srcsys."::".$srcid;  # because length of srcid :-[
 
+         my $wfop=$self->{wf}->Clone(); 
+         $self->{wf}->ResetFilter();
+         $self->{wf}->SetFilter({
+            srcsys=>\$srckey,
+            step=>"!secscan::workflow::FindingHndl::finish"
+         });
+         foreach my $wfrec ($self->{wf}->getHashList(qw(id))){
+            msg(INFO,"cleanup workflow id=$wfrec->{id}");
+            if ($wfop->nativProcess('wfforceobsolete',{},$wfrec->{id})){
+               $dataop->ValidatedUpdateRecord($rec,{
+                  wfhandeled=>'0'
+               },{id=>\$rec->{id}});
+            }
+         }
+         
 
 
 
@@ -259,17 +278,28 @@ sub analyseRecord
    #  Now we have a reponsibleid and we can start a workflow
    # 
    if (defined($reponsibleid)){
+      my @srckey;
       my $srcsys="secscan::finding";
       my $srcid=$rec->{id};
       my $srckey=$srcsys."::".$srcid;  # because length of srcid :-[
+      push(@srckey,$srckey);
+      foreach my $recuprec (@{$rec->{recuphist}}){
+         my $srcid=$recuprec->{id};
+         my $srckey=$srcsys."::".$srcid;  # because length of srcid :-[
+         push(@srckey,$srckey);
+      }
       
       # check if workflow already exists
       $self->{wf}->ResetFilter();
-      $self->{wf}->SetFilter([{srcsys=>\$srckey},
-                               {srcsys=>\$srcsys,srcid=>\$srcid}]);
-      my ($WfRec,$msg)=$self->{wf}->getOnlyFirst(qw(ALL));
-      if (defined($WfRec)){
+      $self->{wf}->SetFilter({srcsys=>\@srckey});
+      my @WfRec=$self->{wf}->getHashList(qw(ALL));
+      my ($WfRec,$msg);
+      if ($#WfRec!=-1){
          msg(INFO,"  already exists with WorkflowID=$WfRec->{id}");
+         printf STDERR ("found existing workflows %s\n",join(", ",map({$_->{id}} @WfRec)));
+         $WfRec=$WfRec[0];
+         sleep(5);  
+         msg(ERROR,"dieses Handling muﬂ noch angepasst werden");
       }
       else{
          my $newrec={
