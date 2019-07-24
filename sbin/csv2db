@@ -492,7 +492,7 @@ sub ProcessTempfile
               "\"W5_key\" varchar2($opt_fieldsize),".
               "\"W5_mdate\" date not null,".
               "\"W5_cdate\" date not null,".
-              "\"W5_isnotdel\" char(1) default '1',";
+              "\"W5_isdel\" char(1) default '0',";
       $sql.=join(",",map({"\"$_\" varchar2($opt_fieldsize)"} @FIELDS));
       $sql.=")";
       my $bk=$dbi->doCmd($sql);
@@ -501,16 +501,16 @@ sub ProcessTempfile
          exit(1);
       }
       my $sql="create unique index \"${DSTTAB}_i0\" ".
-              "on \"$DSTTAB\" ((case when \"W5_isnotdel\" is not null ".
-                            "then \"W5_id\" else null end),\"W5_isnotdel\")";
+              "on \"$DSTTAB\" ((case when \"W5_isdel\"='0' ".
+                            "then \"W5_id\" else null end),\"W5_isdel\")";
       my $bk=$dbi->doCmd($sql);
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create i0 index for target table table");
          exit(1);
       }
       my $sql="create unique index \"${DSTTAB}_i1\" ".
-              "on \"$DSTTAB\" ((case when \"W5_isnotdel\" is not null ".
-                            "then \"W5_key\" else null end),\"W5_isnotdel\")";
+              "on \"$DSTTAB\" ((case when \"W5_isdel\"='0' ".
+                            "then \"W5_key\" else null end),\"W5_isdel\")";
       my $bk=$dbi->doCmd($sql);
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create i1 index for target table table");
@@ -547,11 +547,11 @@ sub ProcessTempfile
       "update \"$DSTTAB\" set ".
       "\"W5_rawline\"=?,\"W5_mdate\"=current_date".
       join("",map({",\"".$_."\"=?"} @FIELDS)).
-      " where \"W5_key\"=? and \"W5_isnotdel\"='1'"
+      " where \"W5_key\"=? and \"W5_isdel\"='0'"
    );
 
    my $clr_sth=$dbi->prepare(
-      "delete from \"$DSTTAB\" where \"W5_isnotdel\" is null ".
+      "delete from \"$DSTTAB\" where \"W5_isdel\"='1' ".
       "and \"W5_mdate\"<current_date-$opt_A  "
    );
 
@@ -561,14 +561,14 @@ sub ProcessTempfile
    if ($opt_archivemode){
       $del_sth=$dbi->prepare(
          "update \"$DSTTAB\" set ".
-         "\"W5_isnotdel\"=NULL,\"W5_mdate\"=current_date ".
-         "where \"W5_rawline\"=? and \"W5_isnotdel\"='1'"
+         "\"W5_isdel\"='1',\"W5_mdate\"=current_date ".
+         "where \"W5_rawline\"=? and \"W5_isdel\"='0'"
       );
    }
    else{
       $del_sth=$dbi->prepare(
          "delete from \"$DSTTAB\" ".
-         "where \"W5_rawline\"=? and \"W5_isnotdel\"='1'"
+         "where \"W5_rawline\"=? and \"W5_isdel\"='0'"
       );
    }
 
@@ -577,7 +577,7 @@ sub ProcessTempfile
    #
    if (open(F,">$TMP/sqlcurrent.csv")){
       my $cmd="select \"W5_rawline\" from \"$DSTTAB\" ".
-              "where \"W5_isnotdel\"='1'";
+              "where \"W5_isdel\"='0'";
       if ($opt_archivemode){  # only lines with W5_key are usesable
          $cmd.=" and \"W5_key\" is not null";
       }
