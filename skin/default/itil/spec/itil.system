@@ -47,7 +47,7 @@ in the detail view of the related
 applications.
 '},
 'isinfrastruct'=>{de=>'
-Systeme die zum Betrieb von anderen Serversystemen
+Systeme, die zum Betrieb von anderen Serversystemen
 notwendig sind (VIOs, Kontrolstations, 
 Hardware Überwachungsrechner)
 sind als Infrastruktursystem zu kennzeichnen.
@@ -58,7 +58,7 @@ or hardware monitoring servers are need
 to be marked als infrastructur systems.
 '},
 'isembedded'=>{de=>'
-Embedded Systeme sind "geschlossene" Systeme die für bestimmte, sehr
+Embedded Systeme sind "geschlossene" Systeme, die für bestimmte, sehr
 genau definierte Aufgaben verwendet werden. Ein Eingriff auf die
 darauf laufende Software ist i.d.R. nicht möglich, da die Firmware auf
 Flash-Speichern als Image installiert ist. Auch ist meist die genaue 
