@@ -126,7 +126,7 @@ sub w5statsend
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*.ST.DB"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.TSI.Prod.CS.SAPS.EG.TelCo2.CF"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.GHQ.VTS.TSI.TI.E-TSO.AO"});
-   $grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.GHQ.VTI.DTIT.E-DTO.E-DTOPT.E-DTOPT02"});
+   #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.GHQ.VTI.DTIT.E-DTO.E-DTOPT.E-DTOPT02"});
    $grp->SetCurrentView(qw(grpid fullname description));
    my ($rec,$msg)=$grp->getFirst(unbuffered=>1);
    if (defined($rec)){
