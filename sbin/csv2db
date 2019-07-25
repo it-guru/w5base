@@ -501,8 +501,7 @@ sub ProcessTempfile
          exit(1);
       }
       my $sql="create unique index \"${DSTTAB}_i0\" ".
-              "on \"$DSTTAB\" ((case when \"W5_isdel\"='0' ".
-                            "then \"W5_id\" else null end),\"W5_isdel\")";
+              "on \"$DSTTAB\" (\"W5_id\")";
       my $bk=$dbi->doCmd($sql);
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create i0 index for target table table");
@@ -510,7 +509,7 @@ sub ProcessTempfile
       }
       my $sql="create unique index \"${DSTTAB}_i1\" ".
               "on \"$DSTTAB\" ((case when \"W5_isdel\"='0' ".
-                            "then \"W5_key\" else null end),\"W5_isdel\")";
+                            "then \"W5_key\" else null end))";
       my $bk=$dbi->doCmd($sql);
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create i1 index for target table table");
