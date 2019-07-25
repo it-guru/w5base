@@ -126,7 +126,8 @@ sub w5statsend
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*.ST.DB"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.TSI.Prod.CS.SAPS.EG.TelCo2.CF"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.GHQ.VTS.TSI.TI.E-TSO.AO"});
-   $grp->SetCurrentView(qw(grpid fullname));
+   $grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.GHQ.VTI.DTIT.E-DTO.E-DTOPT.E-DTOPT02"});
+   $grp->SetCurrentView(qw(grpid fullname description));
    my ($rec,$msg)=$grp->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
@@ -226,12 +227,30 @@ sub w5statsend
                                     $needsend=1;last;
                                  }
                               }
-                              msg(INFO,"target=$emailto lang=$lang ".
-                                       "needsend=$needsend");
+                              my $extdesc=$rec->{description};
+                              if (($extdesc=~m/http[s]{0,1}:/i)){
+                                 $extdesc=undef;
+                              }
+                              if ($extdesc ne ""){
+                                 $extdesc=~s/&/&amp;/g;
+                                 $extdesc=~s/>/&gt;/g;
+                                 $extdesc=~s/</&lt;/g;
+                                 $extdesc="<b>\"".$extdesc."\"</b><br>\n";
+                              }
+                              #msg(INFO,"target=$emailto lang=$lang ".
+                              #         "needsend=$needsend");
+                              #msg(INFO,"extdesc=$extdesc");
                               if ($needsend && 1){
                                  $send++;
-                                 $self->sendOverviewData($emailto,$lang,
-                                                     $primrec,$hist,$d,$ovdata);
+                                 $self->sendOverviewData(
+                                    $emailto,
+                                    $lang,
+                                    $primrec,
+                                    $hist,
+                                    $d,
+                                    $ovdata,
+                                    $extdesc
+                                 );
                               }
                               else{
                                  $notneeded++;
@@ -264,6 +283,7 @@ sub sendOverviewData
    my $hist=shift;
    my $d=shift;
    my $ovdata=shift;
+   my $extdesc=shift;
 
    my $wf=getModuleObject($self->Config,"base::workflow");
    my $sitename=$wf->Config->Param("SITENAME");
@@ -296,7 +316,8 @@ sub sendOverviewData
              htmldata=>$d,month=>$month, 
              directlink=>$joburl."/auth/base/menu/msel/Reporting?search_id=".
                          $primrec->{id},
-             fullname=>$primrec->{fullname}
+             fullname=>$primrec->{fullname},
+             extdesc=>$extdesc
           },
          })){
       my $r=$wf->Store($id,step=>'base::workflow::mailsend::waitforspool');

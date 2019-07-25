@@ -110,7 +110,9 @@ p.header {
 <div style="margin-left:10px;margin-top:15px;width:575px">
 Ladies and Gentlemen,<br>
 <br>
-below you will receive the latest Quality-Report %month% for "%fullname%".<br>
+below you will receive the latest Quality-Report %month% for ...<br>
+&nbsp;&nbsp;&nbsp; <b>"%fullname%"</b><br>
+&nbsp;&nbsp;&nbsp; %extdesc%<br>
 An exact definition of the color coding of the KPIs is not displayed because every KPI has its own evaluation logic. These definitions are shown and described in the detail pages by following the link below.<br>
 <br>
 </div>

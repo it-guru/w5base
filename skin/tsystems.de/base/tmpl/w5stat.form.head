@@ -110,7 +110,10 @@ p.header {
 <div style="margin-left:10px;margin-top:15px;width:575px">
 Sehr geehrte Damen und Herren,<br>
 <br>
-im folgenden erhalten Sie den aktuellen Quality-Report %month% für "%fullname%". Eine detaillierte Analyse/Beschreibung der Kennzahlen erhalten Sie über den folgenden Link.<br>
+im folgenden erhalten Sie den aktuellen Quality-Report %month% für ...<br>
+&nbsp;&nbsp;&nbsp; <b>"%fullname%"</b><br>
+&nbsp;&nbsp;&nbsp; %extdesc%<br>
+Eine detaillierte Analyse/Beschreibung der Kennzahlen erhalten Sie über den folgenden Link.<br>
 <br>
 </div>
 <div style="margin-left:10px;margin-top:25px;margin-bottom:25px;">

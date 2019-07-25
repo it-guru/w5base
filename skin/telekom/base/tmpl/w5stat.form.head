@@ -110,7 +110,10 @@ p.header {
 <div style="margin-left:15px;margin-top:15px;width:600px">
 Ladies and Gentlemen,<br>
 <br>
-below you will receive the latest Quality-Report %month% for "%fullname%". A detailed analysis / description of the figures is available via the following link.<br>
+below you will receive the latest Quality-Report %month% for ...<br>
+&nbsp;&nbsp;&nbsp; <b>"%fullname%"</b><br>
+&nbsp;&nbsp;&nbsp; %extdesc%<br>
+A detailed analysis / description of the figures is available via the following link.<br>
 <br>
 </div>
 <div style="margin-left:25px;margin-top:25px;margin-bottom:25px;width:600px">
