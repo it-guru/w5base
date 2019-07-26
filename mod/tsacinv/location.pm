@@ -98,6 +98,11 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'"name"'),
 
+      new kernel::Field::Boolean(
+                name          =>'isdatacenter',
+                label         =>'is TSI DataCenter',
+                dataobjattr   =>'"isdatacenter"'),
+
       new kernel::Field::OSMap(
                 name          =>'osmap',
                 uploadable    =>0,
