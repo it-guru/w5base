@@ -471,7 +471,8 @@ sub FinishWrite
             $doNotify=1;
          }
       }
-      if ($oldrec->{cistatusid}==4){
+      if ($oldrec->{cistatusid}==4 ||
+          $oldrec->{cistatusid}==3){
          if (defined($newrec) &&
              exists($newrec->{cistatusid}) &&
              $newrec->{cistatusid}==5){
