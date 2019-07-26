@@ -159,21 +159,22 @@ sub overviewDataIssue
    push(@l,[$app->T('unprocessed DataIssue Workflows'),
             $dataissues,$color,$delta]);
 
-   my $keyname='base.DataIssue.sleep56';
+   my $keyname1='base.DataIssue.sleep56';
    my $dataissues=0;
-   if (defined($primrec->{stats}->{$keyname})){
-      $dataissues=$primrec->{stats}->{$keyname}->[0];
+   if (defined($primrec->{stats}->{$keyname1})){
+      $dataissues=$primrec->{stats}->{$keyname1}->[0];
    }
-   my $keyname='base.DataIssue.dead';
-   if (defined($primrec->{stats}->{$keyname})){
-      $dataissues+=$primrec->{stats}->{$keyname}->[0];
+   my $keyname2='base.DataIssue.dead';
+   if (defined($primrec->{stats}->{$keyname2})){
+      $dataissues+=$primrec->{stats}->{$keyname2}->[0];
    }
+
   
    my $color="goldenrod";
    if ($dataissues==0){
       $color="black";
    }
-   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+   my $delta=$app->calcPOffset($primrec,$hist,[$keyname1,$keyname2]);
    if ($dataissues>($users*0.4) && $dataissues>5){
       $color="red";
    }
@@ -188,19 +189,28 @@ sub overviewDataIssue
 
    my @wf;
 
-   my $keyname='base.Workflow.sleep56';
+   my $keyname1='base.Workflow.sleep56';
    my $wfcount=0;
-   if (defined($primrec->{stats}->{$keyname})){
-      $wfcount=$primrec->{stats}->{$keyname}->[0];
+   if (defined($primrec->{stats}->{$keyname1})){
+      $wfcount=$primrec->{stats}->{$keyname1}->[0];
    }
-   my $keyname='base.Workflow.dead';
-   if (defined($primrec->{stats}->{$keyname})){
-      $wfcount+=$primrec->{stats}->{$keyname}->[0];
+   my $keyname2='base.Workflow.dead';
+   if (defined($primrec->{stats}->{$keyname2})){
+      $wfcount+=$primrec->{stats}->{$keyname2}->[0];
+   }
+
+   my $color="goldenrod";
+   if ($wfcount==0){
+      $color="black";
+   }
+   my $delta=$app->calcPOffset($primrec,$hist,[$keyname1,$keyname2]);
+   if ($wfcount>($users*0.4) && $wfcount>5){
+      $color="red";
    }
 
    if ($wfcount>0 && $wfcount!=$dataissues){
       push(@wf,[$app->T('workflows untreaded longer then 8 weeks'),
-               $wfcount,"red",undef]);
+               $wfcount,$color,$delta]);
    }
 
    my $keyname='base.Workflow.dead';
@@ -208,9 +218,15 @@ sub overviewDataIssue
    if (defined($primrec->{stats}->{$keyname})){
       $wfcount=$primrec->{stats}->{$keyname}->[0];
    }
+
+   my $color="red";
+   if ($wfcount==0){
+      $color="black";
+   }
+   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
    if ($wfcount>0){
       push(@wf,[$app->T('count of consequent ignored workflow'),
-               $wfcount,"red",undef]);
+               $wfcount,$color,$delta]);
    }
 
    if ($#wf!=-1){

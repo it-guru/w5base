@@ -696,7 +696,6 @@ sub LoadStatSet
             }
          }
       }
-
       return($primrec,$hist);
 
    }
@@ -1241,21 +1240,32 @@ sub calcPOffset
    my ($primrec,$hist,$name)=@_;
    my $delta;
 
-   if (defined($hist->{lastdstrange}) && 
-       $hist->{lastdstrange}->{stats}->{$name}->[0]>0){
-      my $cur=$primrec->{stats}->{$name}->[0];
-      my $lst=$hist->{lastdstrange}->{stats}->{$name}->[0];
-      $delta=floor(($cur-$lst)*100.0/$lst);
-      if ($delta!=0){
-         if ($delta<0){
-            $delta="$delta".'%'; 
+   if (defined($hist->{lastdstrange})){
+      $name=[$name] if (ref($name) ne "ARRAY");
+      my $lst;
+      my $cur;
+      foreach my $keyname (@$name){
+         if ($primrec->{stats}->{$keyname}->[0]>0){
+            $cur+=$primrec->{stats}->{$keyname}->[0];
          }
-         else{
-            $delta="+$delta".'%';
+
+         if ($hist->{lastdstrange}->{stats}->{$keyname}->[0]>0){
+            $lst+=$hist->{lastdstrange}->{stats}->{$keyname}->[0];
          }
       }
-      else{
-         $delta=undef;
+      if (defined($lst) && defined($cur)){
+         $delta=floor(($cur-$lst)*100.0/$lst);
+         if ($delta!=0){
+            if ($delta<0){
+               $delta="$delta".'%'; 
+            }
+            else{
+               $delta="+$delta".'%';
+            }
+         }
+         else{
+            $delta=undef;
+         }
       }
    }
    return($delta);
