@@ -830,9 +830,9 @@ sub getSqlFrom
 
    # Performance Hack
    my $from="system ".
-            "join grp inmassignment ".
+            "left outer join grp inmassignment ".
             "on system.\"lincidentagid\"=inmassignment.\"lgroupid\" ".
-            "join grp cfmassignment ".
+            "left outer join grp cfmassignment ".
             "on system.\"lassignmentid\"=cfmassignment.\"lgroupid\" ";
    return($from);
 }
