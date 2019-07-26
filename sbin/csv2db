@@ -536,7 +536,8 @@ sub ProcessTempfile
       "(\"W5_rawline\",\"W5_key\",\"W5_id\",\"W5_cdate\",\"W5_mdate\"".
       join("",map({",\"".$_."\""} @FIELDS)).
       ") ".
-      " values(?,?,replace(standard_hash(?,'SHA256'),' ',''),".
+      " values(?,?,".
+      "replace(standard_hash(concat(?,current_date),'SHA256'),' ',''),".
       "current_date,current_date".
       join("",map({",?"} @FIELDS)).
       ")"
