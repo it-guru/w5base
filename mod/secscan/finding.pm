@@ -73,7 +73,24 @@ union
            "w5secscan_OneShot"."C07_SecDetailSpec"            as detailspec,
            'OneShot'                                          as srcsys,
            "w5secscan_OneShot"."W5_id"                        as srcid
-   from "W5FTPGW1"."w5secscan_OneShot";
+   from "W5FTPGW1"."w5secscan_OneShot"
+union
+   select  'Once-' || "w5secscan_BlueKeepRDP"."W5_id"         as id,
+           "w5secscan_BlueKeepRDP"."W5_isdel"                 as isdel,
+           "w5secscan_BlueKeepRDP"."C01_SecToken"             as sectoken,
+           "w5secscan_BlueKeepRDP"."C05_SecItem"              as secitem,
+           "w5secscan_BlueKeepRDP"."C04_TreatRules"           as sectreadrules,
+           TO_DATE("w5secscan_BlueKeepRDP"."C02_ScanDate",
+                   'YYYY-MM-DD HH24:MI:SS')                   as fndscandate,
+           "w5secscan_BlueKeepRDP"."W5_cdate"                 as fndcdate,
+           "w5secscan_BlueKeepRDP"."W5_mdate"                 as fndmdate,
+           NULL                                               as hostname,
+           NULL                                               as fqdns,
+           "w5secscan_BlueKeepRDP"."C03_IPAddress"            as ipaddr,
+           "w5secscan_BlueKeepRDP"."C07_SecDetailSpec"        as detailspec,
+           'BlueKeepRDP'                                      as srcsys,
+           "w5secscan_BlueKeepRDP"."W5_id"                    as srcid
+   from "W5FTPGW1"."w5secscan_BlueKeepRDP";
 
 
 create table "W5I_secscan__finding_of" (
