@@ -801,7 +801,6 @@ sub ShowForm()
    my $e=Dumper(\%ENV);
    $e=~s/^\$VAR1/ENV/;
    $e="";
-
    print $q->header().
    $q->start_html('W5ProbeIP').
 
@@ -809,6 +808,9 @@ sub ShowForm()
    h1({
       -style=>'Color: blue;'
    },'W5ProbeIP').
+   h3({
+      -style=>'Color: black;'
+   },'ClientIP:'.$ENV{REMOTE_ADDR}).
 
    $q->start_form(
       -method=>'POST',
