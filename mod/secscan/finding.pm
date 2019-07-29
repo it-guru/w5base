@@ -75,7 +75,7 @@ union
            "w5secscan_OneShot"."W5_id"                        as srcid
    from "W5FTPGW1"."w5secscan_OneShot"
 union
-   select  'Once-' || "w5secscan_BlueKeepRDP"."W5_id"         as id,
+   select  'BK-' || "w5secscan_BlueKeepRDP"."W5_id"           as id,
            "w5secscan_BlueKeepRDP"."W5_isdel"                 as isdel,
            "w5secscan_BlueKeepRDP"."C01_SecToken"             as sectoken,
            "w5secscan_BlueKeepRDP"."C05_SecItem"              as secitem,
@@ -150,6 +150,7 @@ sub new
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{useMenuFullnameAsACL}=$self->Self();
+   $self->{use_distinct}=0;
 
    
    $self->AddFields(
@@ -219,8 +220,8 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'findcdate',
-                sqlorder      =>'desc',
                 group         =>'source',
+                sqlorder      =>'desc',
                 label         =>'Create-Date',
                 dataobjattr   =>'fndcdate'),
 
@@ -400,7 +401,7 @@ sub new
    };
 
    $self->setWorktable("secscan__finding_of");
-   $self->setDefaultView(qw(name secitem comments));
+   $self->setDefaultView(qw(findcdate name secitem comments));
    return($self);
 }
 
