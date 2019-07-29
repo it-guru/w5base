@@ -433,10 +433,7 @@ sub getBackendName
             if (defined($self->{sqlorder})){
                $sqlorder=$self->{sqlorder};
             }
-            if ($sqlorder eq "desc"){
-               $sqlorder="";
-            }
-            else{
+            if ($sqlorder eq ""){
                $sqlorder="desc";
             }
             if ($sqlorder ne "none" && ($ordername=~m/^-/)){  # absteigend
@@ -448,6 +445,7 @@ sub getBackendName
 
             if ($self->getParent->{use_distinct}){
                return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS') ".
+                      "$sqlorder ".
                       "NULLS FIRST"); # needed for QualityChecks
             }
             # ordering on nativ fields gets better performance then ordering
