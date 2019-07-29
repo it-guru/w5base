@@ -90,7 +90,27 @@ union
            "w5secscan_BlueKeepRDP"."C07_SecDetailSpec"        as detailspec,
            'BlueKeepRDP'                                      as srcsys,
            "w5secscan_BlueKeepRDP"."W5_id"                    as srcid
-   from "W5FTPGW1"."w5secscan_BlueKeepRDP";
+   from "W5FTPGW1"."w5secscan_BlueKeepRDP"
+union
+   select  'BK-' || "w5secscan_OpenProxy"."W5_id"           as id,
+           "w5secscan_OpenProxy"."W5_isdel"                 as isdel,
+           "w5secscan_OpenProxy"."C01_SecToken"             as sectoken,
+           "w5secscan_OpenProxy"."C05_SecItem"              as secitem,
+           "w5secscan_OpenProxy"."C04_TreatRules"           as sectreadrules,
+           TO_DATE("w5secscan_OpenProxy"."C02_ScanDate",
+                   'YYYY-MM-DD HH24:MI:SS')                 as fndscandate,
+           "w5secscan_OpenProxy"."W5_cdate"                 as fndcdate,
+           "w5secscan_OpenProxy"."W5_mdate"                 as fndmdate,
+           NULL                                             as hostname,
+           NULL                                             as fqdns,
+           "w5secscan_OpenProxy"."C03_IPAddress"            as ipaddr,
+           'Port='||"w5secscan_OpenProxy"."C07_ProxyPort"||
+           chr(10) ||
+           'GatewayIP='||
+           "w5secscan_OpenProxy"."C08_GatewayIP"            as detailspec,
+           'OpenProxy'                                      as srcsys,
+           "w5secscan_OpenProxy"."W5_id"                    as srcid
+   from "W5FTPGW1"."w5secscan_OpenProxy";
 
 
 create table "W5I_secscan__finding_of" (
