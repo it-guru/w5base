@@ -740,7 +740,8 @@ sub ProcessTempfile
             }
          }
          if (!$opt_allowdubkey || $sqlbk eq "0E0"){
-            my $shakeybase=trim($op->{rawline});
+            my $shakeybase=$op->{rawline};
+            $shakeybase=trim($shakeybase);
             if (!($sqlbk=$ins_sth->execute($op->{rawline},
                                            $op->{key},
                                            $shakeybase,
