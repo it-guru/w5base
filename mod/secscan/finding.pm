@@ -92,7 +92,7 @@ union
            "w5secscan_BlueKeepRDP"."W5_id"                    as srcid
    from "W5FTPGW1"."w5secscan_BlueKeepRDP"
 union
-   select  'BK-' || "w5secscan_OpenProxy"."W5_id"           as id,
+   select  'OP-' || "w5secscan_OpenProxy"."W5_id"           as id,
            "w5secscan_OpenProxy"."W5_isdel"                 as isdel,
            "w5secscan_OpenProxy"."C01_SecToken"             as sectoken,
            "w5secscan_OpenProxy"."C05_SecItem"              as secitem,
