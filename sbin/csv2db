@@ -740,9 +740,10 @@ sub ProcessTempfile
             }
          }
          if (!$opt_allowdubkey || $sqlbk eq "0E0"){
+            my $shakeybase=trim($op->{rawline});
             if (!($sqlbk=$ins_sth->execute($op->{rawline},
                                            $op->{key},
-                                           $op->{rawline},
+                                           $shakeybase,
                                         @{$op->{cols}}))){
                msg(WARN,"insert fail for rawline='$op->{rawline}'");
                msg(DEBUG,"insert operation: %s",Dumper($op));
