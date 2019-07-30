@@ -4332,11 +4332,7 @@ sub DataObj_findtemplvar
          return($fieldobj->Label($mode));
       }
       elsif ($param[0] eq "searchlabel"){
-         my $l=$fieldobj->Label($mode);
-         if (length($l)>35){
-            $l=substr($l,0,23)."...".substr($l,length($l)-8,8);
-         }
-         return($l);
+         return(TextShorter($fieldobj->Label($mode),35,"INDICATED"));
       }
       elsif ($param[0] eq "detailunit"){
          if ($opt->{WindowMode} ne "HtmlDetailEdit"){
