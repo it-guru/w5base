@@ -87,10 +87,10 @@ sub displayOverview
    }
    my $P={@Presenter};
    $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist);
+   my $grp=getModuleObject($app->Config,"base::grp");
    if (defined($primrec->{nameid}) && $primrec->{nameid} ne "" 
        && $primrec->{sgroup} eq "Group"){
       my $month=$primrec->{dstrange};
-      my $grp=getModuleObject($app->Config,"base::grp");
       $grp->SetFilter({parentid=>\$primrec->{nameid}});
       my @l=$grp->getHashList(qw(fullname grpid));
       if ($#l!=-1){
@@ -140,8 +140,33 @@ sub displayOverview
             $class="subunitdata";
          }
          $d.="\n<tr height=1%>";
+         my $extfullname=$text;
+         my $extdesc;
+         $grp->ResetFilter();
+         $grp->SetFilter({fullname=>\$text,cistatusid=>"<6"});
+         my ($grprec,$msg)=$grp->getOnlyFirst(qw(description));
+         if (defined($grprec)){
+            $extdesc=$grprec->{description};
+            if (($extdesc=~m/http[s]{0,1}:/i)){
+               $extdesc=undef;
+            }
+         }
+         if ((length($extfullname)+
+              length($extdesc))>65){
+            if (length($extfullname)>35){
+               $extfullname=TextShorter($extfullname,35,"DOTHIER");
+            }
+            if ((length($extfullname)+
+                 length($extdesc))>55){
+               $extdesc=TextShorter($extdesc,32,"INDICATED");
+            }
+         }
+         if ($extdesc ne ""){
+            $extdesc="($extdesc)";
+         }
+  
          $d.="<td colspan=3><div class=subunit>".$app->T("Subunit").": ".
-              $text."</div></td>";
+              $extfullname." ".$extdesc."</div></td>";
          $d.="</tr>";
       }
    }

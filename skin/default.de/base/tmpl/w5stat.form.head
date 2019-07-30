@@ -111,8 +111,9 @@ p.header {
 Sehr geehrte Damen und Herren,<br>
 <br>
 im folgenden erhalten Sie den aktuellen Quality-Report %month% für ...<br>
-&nbsp;&nbsp;&nbsp; <b>"%fullname%"</b><br>
-&nbsp;&nbsp;&nbsp; %extdesc%<br>
+<br>
+<b>%extfullname% %extdesc%</b><br>
+<br>
 Eine konkrete Definition, wann sich eine Kennzahl farblich verändert, wird in der Übersicht nicht dargestellt, da jede Kennzahl eine eigene Bewertungslogik hat. Diese wird in den Reporting Detail-Seiten im folgenden Link dargestellt und beschrieben.<br>
 </div>
 <div style="margin-left:10px;margin-top:25px;margin-bottom:25px">

@@ -228,6 +228,7 @@ sub w5statsend
                                  }
                               }
                               my $extdesc=$rec->{description};
+                              my $extfullname=$primrec->{fullname};
                               if (($extdesc=~m/http[s]{0,1}:/i)){
                                  $extdesc=undef;
                               }
@@ -235,7 +236,17 @@ sub w5statsend
                                  $extdesc=~s/&/&amp;/g;
                                  $extdesc=~s/>/&gt;/g;
                                  $extdesc=~s/</&lt;/g;
-                                 $extdesc="<b>\"".$extdesc."\"</b><br>\n";
+                                 if ((length($extfullname)+
+                                      length($extdesc))>75){
+                                    if (length($extfullname)>45){
+                                       $extfullname=TextShorter($extfullname,45,"DOTHIER");
+                                    }
+                                    if ((length($extfullname)+
+                                         length($extdesc))>75){
+                                       $extdesc=TextShorter($extdesc,30,"INDICATED");
+                                    }
+                                 }
+                                 $extdesc="($extdesc)";
                               }
                               #msg(INFO,"target=$emailto lang=$lang ".
                               #         "needsend=$needsend");
@@ -249,6 +260,7 @@ sub w5statsend
                                     $hist,
                                     $d,
                                     $ovdata,
+                                    $extfullname,
                                     $extdesc
                                  );
                               }
@@ -283,6 +295,7 @@ sub sendOverviewData
    my $hist=shift;
    my $d=shift;
    my $ovdata=shift;
+   my $extfullname=shift;
    my $extdesc=shift;
 
    my $wf=getModuleObject($self->Config,"base::workflow");
@@ -317,6 +330,7 @@ sub sendOverviewData
              directlink=>$joburl."/auth/base/menu/msel/Reporting?search_id=".
                          $primrec->{id},
              fullname=>$primrec->{fullname},
+             extfullname=>$extfullname,
              extdesc=>$extdesc
           },
          })){
