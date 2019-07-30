@@ -95,6 +95,7 @@ use charnames ':full';
              &isDataInputFromUserFrontend &orgRoles &extractLangEntry
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16
              &utf8_to_latin1
+             &TextShorter
              &getClientAddrIdString
              &is_POSIXmktime_Clean
              &Stacktrace);
@@ -1080,6 +1081,52 @@ sub getModuleObject
    return($o);
 }
 
+sub TextShorter
+{
+   my $text=shift;
+   my $limit=shift;
+   my @mode=@_;
+   if ($#mode==0 && ref($mode[0]) eq "ARRAY"){
+      @mode=@{$mode[0]};
+   }
+   if (in_array(\@mode,["LINK","URL"])){
+      my $ll=index($text,"//");
+      $ll=index($text,"/",$ll+2);
+      my $start=$ll+11;
+      $start=$limit-1 if ($start<10 || $start>$limit);
+      $text=substr($text,0,$start)."...".substr($text,length($text)-16,16);
+   }
+   if (in_array(\@mode,["INDICATED","INDI"])){
+      if (length($text)>$limit){
+         $text=substr($text,0,$limit-3)."...";
+      }
+   }
+   if (in_array(\@mode,["DOTHIER"])){
+      if (length($text)>$limit){
+         my @text=split(/\./,$text);
+         my @n=(".");
+         my $pretext;
+         my @pref;
+         my @post;
+         while(my $ts=shift(@text)){
+            my $te=pop(@text);
+            push(@pref,$ts);
+            push(@post,$te) if (defined($te));
+            $pretext=join(".",@pref,@n,@post);
+            if (length($text)<=$limit &&
+                length($pretext)>$limit){
+               last;
+            }
+            $text=$pretext;
+         }
+      }
+   }
+   if (length($text)>$limit){
+      $text=substr($text,0,$limit);
+   }
+   return($text);
+}
+
 sub _isWriteValid {return undef};
 
 sub _FancyLinks
@@ -1093,14 +1140,17 @@ sub _FancyLinks
    }
    else{
       if (length($link)>55){
-         my $start;
-         my $ll=index($link,"//");
-         $ll=index($link,"/",$ll+2);
-         $start=$ll+15;
-         $start=55 if ($start<10 || $start>55);
-         my $slink=substr($link,0,$start)."...".
-                   substr($link,length($link)-16,16);
+         #my $start;
+         #my $ll=index($link,"//");
+         #$ll=index($link,"/",$ll+2);
+         #$start=$ll+15;
+         #$start=55 if ($start<10 || $start>55);
+         #my $slink=substr($link,0,$start)."...".
+         #          substr($link,length($link)-16,16);
+         #my $title=$link;
+         #$title=~s/^.*?://g;
          my $title=$link;
+         my $slink=TextShorter($link,55,"URL");
          $title=~s/^.*?://g;
          $res="<a href=\"$link\" target=_blank title=\"$title\">".
               "$slink</a>".$prefix;
