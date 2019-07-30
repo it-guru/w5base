@@ -83,6 +83,7 @@ sub new
                    my $current=shift;
                    my $comments=$current->{comments};
                    $comments=~s/\n/ /g;
+                   $comments=TextShorter($comments,47,"INDICATED");
                    if (length($comments)>47){
                       $comments=substr($comments,0,45)."...";
                    }
