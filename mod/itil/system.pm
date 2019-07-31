@@ -63,6 +63,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
+                size          =>63,
                 dataobjattr   =>'system.name'),
 
       new kernel::Field::Interface(
@@ -1479,6 +1480,9 @@ sub new
    # new kernel::Field::DatacareAssistant()
 
    );
+   $self->{CI_Handling}={uniquename=>"name",
+                         uniquesize=>68};
+
    $self->{workflowlink}={ workflowkey=>[id=>'affectedsystemid'] };
    $self->{history}={
       delete=>[
@@ -1810,7 +1814,7 @@ sub Validate
    my $name=trim(effVal($oldrec,$newrec,"name"));
    my $purename=$name;
    $purename=~s/\[[0-9]+\]\s*$//;
-   if (length($name)<3 ||length($purename)>40 || haveSpecialChar($name) ||
+   if (length($name)<3 ||length($purename)>63 || haveSpecialChar($name) ||
        ($name=~m/^\d+$/)){  # only a number as system name ist not ok
       $self->LastMsg(ERROR,"invalid system name '%s' specified",$name);
       return(0);

@@ -59,7 +59,7 @@ create table lnkapplcustcontract (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table system (
   id         bigint(20) NOT NULL,
-  name       varchar(45) NOT NULL,
+  name       varchar(68) NOT NULL,
     adm            bigint(20)  default NULL,itcloudarea bigint(20) default NULL,
     adm2           bigint(20)  default NULL,admteam   bigint(20)  default NULL,
     relperson      bigint(20)  default NULL,relperson2 bigint(20)  default NULL,
