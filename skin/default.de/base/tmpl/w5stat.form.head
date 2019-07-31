@@ -84,6 +84,14 @@ p.header {
    font-weight: bold;
    color: darkblue;
    margin-top:4px;
+   margin-bottom:0px;
+}
+.unitdesc{
+   font-size:11px;
+   font-weight: bold;
+   color: black;
+   margin-top:0px;
+   margin-bottom:2px;
 }
 .overview{
    margin-top:5px;
@@ -116,8 +124,9 @@ im folgenden erhalten Sie den aktuellen Quality-Report %month% für ...<br>
 <br>
 Eine konkrete Definition, wann sich eine Kennzahl farblich verändert, wird in der Übersicht nicht dargestellt, da jede Kennzahl eine eigene Bewertungslogik hat. Diese wird in den Reporting Detail-Seiten im folgenden Link dargestellt und beschrieben.<br>
 </div>
-<div style="margin-left:10px;margin-top:25px;margin-bottom:25px">
+<div style="margin-left:10px;margin-top:25px;margin-bottom:0px">
 <a class=detaillink title="click here, to see the detail report online" href="%directlink%"><b>Quality-Report %fullname%</b></a><br>
+<div class=unitdesc>%desc%</div>
 %htmldata%
 </div>
 </td></tr></table>

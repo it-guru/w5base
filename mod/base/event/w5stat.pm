@@ -126,7 +126,7 @@ sub w5statsend
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"*.ST.DB"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.TSI.Prod.CS.SAPS.EG.TelCo2.CF"});
    #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.GHQ.VTS.TSI.TI.E-TSO.AO"});
-   #$grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.GHQ.VTI.DTIT.E-DTO.E-DTOPT.E-DTOPT02"});
+   $grp->SetFilter({cistatusid=>[3,4],fullname=>"DTAG.GHQ.VTI.DTIT.E-DTO.E-DTOPT.E-DTOPT02"});
    $grp->SetCurrentView(qw(grpid fullname description));
    my ($rec,$msg)=$grp->getFirst(unbuffered=>1);
    if (defined($rec)){
@@ -229,9 +229,11 @@ sub w5statsend
                               }
                               my $extdesc=$rec->{description};
                               my $extfullname=$primrec->{fullname};
+                              my $fullname=$primrec->{fullname};
                               if (($extdesc=~m/http[s]{0,1}:/i)){
                                  $extdesc=undef;
                               }
+                              my $desc=$extdesc;
                               if ($extdesc ne ""){
                                  $extdesc=~s/&/&amp;/g;
                                  $extdesc=~s/>/&gt;/g;
@@ -260,7 +262,9 @@ sub w5statsend
                                     $hist,
                                     $d,
                                     $ovdata,
+                                    $fullname,
                                     $extfullname,
+                                    $desc,
                                     $extdesc
                                  );
                               }
@@ -295,7 +299,9 @@ sub sendOverviewData
    my $hist=shift;
    my $d=shift;
    my $ovdata=shift;
+   my $fullname=shift;
    my $extfullname=shift;
+   my $desc=shift;
    my $extdesc=shift;
 
    my $wf=getModuleObject($self->Config,"base::workflow");
@@ -331,6 +337,7 @@ sub sendOverviewData
                          $primrec->{id},
              fullname=>$primrec->{fullname},
              extfullname=>$extfullname,
+             desc=>$desc,
              extdesc=>$extdesc
           },
          })){

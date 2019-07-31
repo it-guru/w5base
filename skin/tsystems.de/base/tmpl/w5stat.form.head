@@ -92,6 +92,14 @@ p.header {
 .subunitdata{
    margin-left:10px;
 }
+.unitdesc{
+   font-size:11px;
+   font-weight: bold;
+   color: black;
+   margin-top:0px;
+   margin-bottom:2px;
+}
+
 
 
 -->
@@ -117,8 +125,9 @@ im folgenden erhalten Sie den aktuellen Quality-Report %month% für ...<br>
 Eine detaillierte Analyse/Beschreibung der Kennzahlen erhalten Sie über den folgenden Link.<br>
 <br>
 </div>
-<div style="margin-left:10px;margin-top:25px;margin-bottom:25px;">
+<div style="margin-left:10px;margin-top:25px;margin-bottom:0px;">
 <a class=detaillink title="click here, to see the detail report online" href="%directlink%"><b>Quality-Report %fullname%</b></a><br>
+<div class=unitdesc>%desc%</div>
 %htmldata%
 </div>
 </td></tr></table>

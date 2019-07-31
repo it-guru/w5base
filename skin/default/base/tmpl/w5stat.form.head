@@ -92,6 +92,14 @@ p.header {
 .subunitdata{
    margin-left:10px;
 }
+.unitdesc{
+   font-size:11px;
+   font-weight: bold;
+   color: black;
+   margin-top:0px;
+   margin-bottom:2px;
+}
+
 
 
 -->
@@ -117,8 +125,9 @@ below you will receive the latest Quality-Report %month% for ...<br>
 An exact definition of the color coding of the KPIs is not displayed because every KPI has its own evaluation logic. These definitions are shown and described in the detail pages by following the link below.<br>
 <br>
 </div>
-<div style="margin-left:10px;margin-top:25px;margin-bottom:25px;">
+<div style="margin-left:10px;margin-top:25px;margin-bottom:0px;">
 <a class=detaillink title="click here, to see the detail report online" href="%directlink%"><b>Quality-Report %fullname%</b></a><br>
+<div class=unitdesc>%desc%</div>
 %htmldata%
 </div>
 </td></tr></table>

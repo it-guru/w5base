@@ -112,6 +112,40 @@ sub displayOverview
    foreach my $rec (@ovdata){
       $subloopcnt++;
       my $text=$rec->[0];
+
+      my $extfullname;
+      my $extdesc;
+      my $fullname;
+      my $desc;
+      if ($primrec->{sgroup} eq "Group"){
+         $grp->ResetFilter();
+         $grp->SetFilter({fullname=>\$text,cistatusid=>"<6"});
+         my ($grprec,$msg)=$grp->getOnlyFirst(qw(description));
+         $fullname=$text;
+         $extfullname=$text;
+         if (defined($grprec)){
+            $extdesc=$grprec->{description};
+            if (($extdesc=~m/http[s]{0,1}:/i)){
+               $extdesc=undef;
+            }
+         }
+         $desc=$extdesc;
+         if ((length($extfullname)+
+              length($extdesc))>65){
+            if (length($extfullname)>35){
+               $extfullname=TextShorter($extfullname,35,"DOTHIER");
+            }
+            if ((length($extfullname)+
+                 length($extdesc))>55){
+               $extdesc=TextShorter($extdesc,32,"INDICATED");
+            }
+         }
+         if ($extdesc ne ""){
+            $extdesc="($extdesc)";
+         }
+     }
+
+
       if ($#{$rec}!=0){
          my $color="black";
          if (!defined($rec->[1])){
@@ -127,7 +161,11 @@ sub displayOverview
             $color=$rec->[2];
          }
          $d.="\n<tr height=1%>";
-         $d.="<td><div class=\"$class\">".$text."</div></td>";
+         $d.="<td><div class=\"$class\">".$text."</div>";
+         if ($desc ne ""){
+            $d.="<div class=unitdesc>".$desc."</div>";
+         }
+         $d.="</td>";
          $d.="<td align=right width=50><font color=\"$color\"><b>".
              $rec->[1]."</b></font></td>";
          $d.="<td align=right width=50>".$rec->[3]."</td>";
@@ -140,33 +178,13 @@ sub displayOverview
             $class="subunitdata";
          }
          $d.="\n<tr height=1%>";
-         my $extfullname=$text;
-         my $extdesc;
-         $grp->ResetFilter();
-         $grp->SetFilter({fullname=>\$text,cistatusid=>"<6"});
-         my ($grprec,$msg)=$grp->getOnlyFirst(qw(description));
-         if (defined($grprec)){
-            $extdesc=$grprec->{description};
-            if (($extdesc=~m/http[s]{0,1}:/i)){
-               $extdesc=undef;
-            }
-         }
-         if ((length($extfullname)+
-              length($extdesc))>65){
-            if (length($extfullname)>35){
-               $extfullname=TextShorter($extfullname,35,"DOTHIER");
-            }
-            if ((length($extfullname)+
-                 length($extdesc))>55){
-               $extdesc=TextShorter($extdesc,32,"INDICATED");
-            }
-         }
-         if ($extdesc ne ""){
-            $extdesc="($extdesc)";
-         }
   
          $d.="<td colspan=3><div class=subunit>".$app->T("Subunit").": ".
-              $extfullname." ".$extdesc."</div></td>";
+              $fullname."</div>\n";
+         if ($desc ne ""){
+            $d.="<div class=unitdesc>".$desc."</div>";
+         }
+         $d.="</td>";
          $d.="</tr>";
       }
    }
