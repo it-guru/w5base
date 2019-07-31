@@ -43,14 +43,29 @@ sub ScanNewSystems
    my $self=shift;
    my $queryparam=shift;
 
+
+   my $StreamDataobj="tsotc::system";
+   my $datastream=getModuleObject($self->Config,$StreamDataobj);
+   my @datastreamview=qw(name cdate id contactemail 
+                         availability_zone);
+   if ($queryparam ne ""){
+      msg(INFO,"try to import name='$queryparam'");
+      $datastream->SetFilter({name=>$queryparam});
+      my ($rec,$msg)=$datastream->getOnlyFirst(@datastreamview);
+      if ($self->analyseRecord($datastream,$rec)){
+         return({exitcode=>0,exitmsg=>'ok'});
+      }
+      else{
+         msg(ERROR,"no import done");
+      }
+      return({exitcode=>1,exitmsg=>'fail'});
+   }
    my $firstDayRange=1000;
    my $maxDeltaDayRange="15";
 
-   my $StreamDataobj="tsotc::system";
 
 
    my $joblog=getModuleObject($self->Config,"base::joblog");
-   my $datastream=getModuleObject($self->Config,$StreamDataobj);
    my $user=getModuleObject($self->Config,"base::user");
 
 
@@ -106,7 +121,7 @@ sub ScanNewSystems
       my $skiplevel=0;
       my $recno=0;
       $datastream->SetFilter(\%flt);
-      $datastream->SetCurrentView(qw(name cdate id contactemail availability_zone));
+      $datastream->SetCurrentView(@datastreamview);
       $datastream->SetCurrentOrder("+cdate","+id");
       $datastream->Limit(1000);
       my ($rec,$msg)=$datastream->getFirst();
@@ -192,14 +207,9 @@ sub analyseRecord
    my $res=shift;
 
    msg(INFO,"PROCESS: $rec->{id} $rec->{cdate} name='$rec->{name}'");
-   msg(INFO,"         contact='$rec->{contactemail}'");
 
-   if (!($rec->{name}=~m/^[a-z0-9_-]{2,35}$/)){
+   if (!($rec->{name}=~m/^[a-z0-9_-]{2,63}$/)){
       msg(ERROR,"skip OTC Systemname $rec->{name} - invalid systemname");
-      return();
-   }
-   if ($rec->{contactemail} eq ""){
-      msg(ERROR,"skip OTC Systemname $rec->{name} - no contactemail");
       return();
    }
 
@@ -207,18 +217,18 @@ sub analyseRecord
    my $w5sys=$self->getPersistentModuleObject("W5BaseSys","itil::system");
    my $wfa=$self->getPersistentModuleObject("W5BaseWa","base::workflowaction");
    my $user=$self->getPersistentModuleObject("W5BaseUser","base::user");
-
    my $w5baseid=$sys->Import({importname=>$rec->{name}});
 
    if (defined($w5baseid)){   # create Notification
       $w5sys->SetFilter({id=>\$w5baseid});
-      my ($srec)=$w5sys->getOnlyFirst(qw(id databossid urlofcurrentrec name));
+      my ($srec)=$w5sys->getOnlyFirst(qw(ALL));
       if (!defined($srec)){
-         msg(ERROR,"something went wron while import of OTC Systemname $srec->{name}");
+         msg(ERROR,
+            "something went wron while import of OTC Systemname $srec->{name}");
          return();
       }
       msg(INFO,"start doNotify $srec->{name}");
-      $self->doNotify($sys,$wfa,$user,$srec);
+      $self->doNotify($w5sys,$sys,$wfa,$user,$srec);
       return(1);
    }
    return(0);
@@ -229,6 +239,7 @@ sub analyseRecord
 sub doNotify
 {
    my $self=shift;
+   my $w5sys=shift;
    my $datastream=shift;
    my $wfa=shift;
    my $user=shift;
@@ -236,68 +247,24 @@ sub doNotify
    my $debug="";
 
 
-   my %uid;
-
-   $uid{to}->{$rec->{databossid}}++;
-   my @targetuids=grep(!/^$/,keys(%{$uid{to}}),keys(%{$uid{cc}}));
-
-
-   my %nrec;
-   $user->ResetFilter(); 
-   $user->SetFilter({userid=>\@targetuids});
-   foreach my $urec ($user->getHashList(qw(fullname userid lastlang lang))){
-      my $lang=$urec->{lastlang};
-      $lang=$urec->{lang} if ($lang eq "");
-      $lang="en" if ($lang eq "");
-      $nrec{$lang}->{$urec->{userid}}++;
-   }
-   my $lastlang;
-   if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
-      $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
-   }
-   foreach my $lang (keys(%nrec)){
-      $ENV{HTTP_FORCE_LANGUAGE}=$lang;
-      my @emailto;
-      my @emailcc;
-      foreach my $userid (keys(%{$nrec{$lang}})){
-         if (exists($uid{to}->{$userid})){
-            push(@emailto,$userid);
-         }
-         if (exists($uid{cc}->{$userid})){
-            push(@emailcc,$userid);
-         }
-      }
+   $w5sys->NotifyWriteAuthorizedContacts($rec,{},{
+             emailbcc=>[
+               11634953080001, # HV
+            ]
+         },{},sub{
+      my ($subject,$ntext);
       my $subject=$datastream->T("automatic system import from OTC",
-                                 'tsotc::event::ScanNewSystems')." : ".$rec->{name};
-
-#      my @scans;
-#      foreach my $url (sort(keys(%$rec))){
-#         push(@scans,sprintf("<b>%s</b>\n%s\n",$rec->{$url}->{name},$url));
-#      }
-
-
-
+                                 'tsotc::event::ScanNewSystems')." : ".
+                                 $rec->{name};
       my $tmpl=$datastream->getParsedTemplate("tmpl/ScanNewSystems_MailNotify",{
          static=>{
             URL=>$rec->{urlofcurrentrec},
             SYSTEMNAME=>$rec->{name}
          }
       });
+      return($subject,$tmpl);
+   });
 
-      $wfa->Notify("INFO",$subject,$tmpl, 
-         emailto=>\@emailto, 
-         emailcc=>\@emailcc, 
-         emailbcc=>[
-            11634953080001, # HV
-         ]
-      );
-   }
-   if ($lastlang ne ""){
-      $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
-   }
-   else{
-      delete($ENV{HTTP_FORCE_LANGUAGE});
-   }
 }
 
 

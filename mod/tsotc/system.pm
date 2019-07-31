@@ -298,11 +298,16 @@ sub Import
       }
    }
    else{
+      msg(ERROR,"no importname specified while ".$self->Self." Import call");
       return(undef);
    }
+   my $appl=getModuleObject($self->Config,"TS::appl");
+   my $cloudarea=getModuleObject($self->Config,"itil::itcloudarea");
+
    $self->ResetFilter();
    $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(name cdate id contactemail availability_zone));
+   my @l=$self->getHashList(qw(name cdate id contactemail availability_zone
+                               projectid));
    if ($#l==-1){
       $self->LastMsg(ERROR,"Systemname not found in OTC");
       return(undef);
@@ -312,49 +317,72 @@ sub Import
       return(undef);
    }
    my $sysrec=$l[0];
+   my $w5applrec;
 
-   #if ($sysrec->{status} eq "out of operation"){
-   #   $self->LastMsg(ERROR,"SystemID is out of operation");
-   #   return(undef);
-   #}
+   if ($sysrec->{projectid} ne ""){
+      msg(INFO,"try to add cloudarea to system ".$sysrec->{name});
+      $cloudarea->SetFilter({srcsys=>\'tsotc::project',
+                             srcid=>\$sysrec->{projectid}
+      });
+      my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+      if (defined($w5cloudarearec) &&
+          $w5cloudarearec->{cistatusid} eq "4" &&
+          $w5cloudarearec->{applid} ne ""){
+         msg(INFO,"try to add appl ".$w5cloudarearec->{applid}.
+                  " to system ".$sysrec->{name});
+         $appl->SetFilter({id=>\$w5cloudarearec->{applid}});
+         my ($apprec,$msg)=$appl->getOnlyFirst(qw(ALL));
+         if (defined($apprec) && 
+             in_array([qw(2 3 4)],$apprec->{cistatusid})){
+            $w5applrec=$apprec;
+         }
+      }
+   }
+   my $sys=getModuleObject($self->Config,"TS::system");
 
-
-
-
-
-   my $sys=getModuleObject($self->Config,"itil::system");
-   $sys->SetFilter($flt);
+   $sys->SetFilter({srcsys=>\'OTC',srcid=>\$sysrec->{id}});
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   if (!defined($w5sysrec)){
+      $sys->ResetFilter();
+      $sys->SetFilter($flt);
+      ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+   }
    my $identifyby;
    if (defined($w5sysrec)){
       if (uc($w5sysrec->{srcsys}) eq "OTC"){
-         my $msg=sprintf(
-                    $self->T("Systemname '%s' already imported in W5Base"),
-                    $w5sysrec->{name});
-         if ($w5sysrec->{srcid} ne "" &&
-             $sysrec->{id} ne "" &&
-             $w5sysrec->{srcid} ne $sysrec->{id}){
-            my $qc=getModuleObject($self->Config,"base::qrule");
-            $qc->setParent($sys);
-            $qc->nativQualityCheck($sys->getQualityCheckCompat($w5sysrec),
-                                   $w5sysrec);
-            $sys->ResetFilter();
-            $sys->SetFilter($flt);
-            my ($w5sysrec2)=$sys->getOnlyFirst(qw(ALL));
-            if (defined($w5sysrec2)){
-               $msg=sprintf(
-                       $self->T("Systemname '%s' already imported with ".
-                                "different ids '%s' - '%s'"),
-                       $w5sysrec->{name},$w5sysrec->{srcid},$sysrec->{id});
+         if ($w5sysrec->{cistatusid} ne "4" &&
+             $w5sysrec->{srcid} eq $sysrec->{id}){ # das Teil war schon mal da
+            # das bekommen wir später geregelt     # und scheint nur im
+         }                                         # falschen Status
+         else{
+            my $msg=sprintf(
+                       $self->T("Systemname '%s' already imported in W5Base"),
+                       $w5sysrec->{name});
+            if ($w5sysrec->{srcid} ne "" &&
+                $sysrec->{id} ne "" &&
+                $w5sysrec->{srcid} ne $sysrec->{id}){
+               my $qc=getModuleObject($self->Config,"base::qrule");
+               $qc->setParent($sys);
+               $qc->nativQualityCheck($sys->getQualityCheckCompat($w5sysrec),
+                                      $w5sysrec);
+               $sys->ResetFilter();
+               $sys->SetFilter($flt);
+               my ($w5sysrec2)=$sys->getOnlyFirst(qw(ALL));
+               if (defined($w5sysrec2)){
+                  $msg=sprintf(
+                          $self->T("Systemname '%s' already imported with ".
+                                   "different ids '%s' - '%s'"),
+                          $w5sysrec->{name},$w5sysrec->{srcid},$sysrec->{id});
+               }
+               else{
+                  $msg=undef;
+                  $w5sysrec=undef;
+               }
             }
-            else{
-               $msg=undef;
-               $w5sysrec=undef;
+            if (defined($msg)){
+               $self->LastMsg(ERROR,$msg);
+               return(undef);
             }
-         }
-         if (defined($msg)){
-            $self->LastMsg(ERROR,$msg);
-            return(undef);
          }
       }
    }
@@ -367,7 +395,9 @@ sub Import
          return(undef);
       }
    }
+   my $curdataboss;
    if (defined($w5sysrec)){
+      $curdataboss=$w5sysrec->{databossid};
       my %newrec=();
       my $userid;
 
@@ -399,13 +429,50 @@ sub Import
       if ($w5sysrec->{systemtype} ne "standard"){
          $newrec{systemtype}="standard";
       }
-
+      if ($w5sysrec->{osrelease} eq ""){
+         $newrec{osrelease}="other";
+      }
+      if (defined($w5applrec) &&
+          !$w5sysrec->{isprod} &&
+          !$w5sysrec->{istest} &&
+          !$w5sysrec->{isdevel} &&
+          !$w5sysrec->{iseducation} &&
+          !$w5sysrec->{isapprovtest} &&
+          !$w5sysrec->{isreference} &&
+          !$w5sysrec->{iscbreakdown}) { # alter Datensatz - aber kein opmode
+         if ($w5applrec->{opmode} eq "prod"){   # dann nehmen wir halt die
+            $newrec{isprod}=1;                  # Anwendungsdaten
+         }
+         elsif ($w5applrec->{opmode} eq "test"){
+            $newrec{istest}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "devel"){
+            $newrec{isdevel}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "education"){
+            $newrec{iseducation}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "approvtest"){
+            $newrec{isapprovtest}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "reference"){
+            $newrec{isreference}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "cbreakdown"){
+            $newrec{iscbreakdown}=1;
+         }
+     }
+      if (defined($w5applrec) && $w5applrec->{conumber} ne "" &&
+          $w5applrec->{conumber} ne $sysrec->{conumber}){
+         $newrec{conumber}=$w5applrec->{conumber};
+      }
       if ($sys->ValidatedUpdateRecord($w5sysrec,\%newrec,
                                       {id=>\$w5sysrec->{id}})) {
          $identifyby=$w5sysrec->{id};
       }
    }
    else{
+      msg(INFO,"try to import new with databoss $curdataboss ...");
       # check 1: Assigmenen Group registered
       #if ($sysrec->{lassignmentid} eq ""){
       #   $self->LastMsg(ERROR,"SystemID has no Assignment Group");
@@ -430,25 +497,44 @@ sub Import
       my $newrec={name=>$sysrec->{name},
                   srcid=>$sysrec->{id},
                   srcsys=>'OTC',
+                  osrelease=>'other',
                   allowifupdate=>1,
                   cistatusid=>4};
 
       my $user=getModuleObject($self->Config,"base::user");
       if ($self->isDataInputFromUserFrontend()){
          $newrec->{databossid}=$self->getCurrentUserId();
+         $curdataboss=$newrec->{databossid};
       }
       else{
          my $importname=$sysrec->{contactemail};
-         $user->SetFilter({cistatusid=>[4], emails=>$importname});
-         my @l=$user->getHashList(qw(ALL));
+         my @l;
+         if ($importname ne ""){
+            $user->SetFilter({cistatusid=>[4], emails=>$importname});
+            @l=$user->getHashList(qw(ALL));
+         }
          if ($#l==0){
             $newrec->{databossid}=$l[0]->{userid};
+            $curdataboss=$newrec->{databossid};
          }
          else{
             if ($self->isDataInputFromUserFrontend()){
                $self->LastMsg(ERROR,"can not find databoss contact record");
             }
-            return();
+            else{
+               msg(WARN,"invalid databoss contact rec for ".
+                         $sysrec->{contactemail});
+               if (defined($w5applrec) && $w5applrec->{databossid} ne ""){
+                  msg(INFO,"using databoss from application ".
+                           $w5applrec->{name});
+                  $newrec->{databossid}=$w5applrec->{databossid};
+                  $curdataboss=$newrec->{databossid};
+               }
+            }
+            if (!defined($curdataboss)){
+               msg(ERROR,"unable to import without databoss");
+               return();
+            }
          }
       }
       if (!exists($newrec->{mandatorid})){
@@ -458,30 +544,127 @@ sub Import
             # no writeable mandator for new databoss
             if ($self->isDataInputFromUserFrontend()){
                $self->LastMsg(ERROR,"can not find a writeable mandator");
+               return();
             }
-            return();
          }
          $newrec->{mandatorid}=$m[0];
+      }
+      if (!exists($newrec->{mandatorid})){
+         if (defined($w5applrec) && $w5applrec->{mandatorid} ne ""){
+            $newrec->{mandatorid}=$w5applrec->{mandatorid};
+         }
       }
 
 
       if ($newrec->{mandatorid} eq ""){
-         $self->LastMsg(ERROR,
-                        "can't get mandator for ".
+         $self->LastMsg(ERROR,"can't get mandator for import of ".
                         "OTC System $sysrec->{name}");
          return();
       }
-
+      if (defined($w5applrec)){
+         if ($w5applrec->{conumber} ne ""){
+            $newrec->{conumber}=$w5applrec->{conumber};
+         }
+         if ($w5applrec->{acinmassignmentgroupid} ne ""){
+            $newrec->{acinmassignmentgroupid}=
+                $w5applrec->{acinmassignmentgroupid};
+         }
+         $newrec->{isapplserver}=1;  # per Default, all is an applicationserver
+         if ($w5applrec->{opmode} eq "prod"){
+            $newrec->{isprod}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "test"){
+            $newrec->{istest}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "devel"){
+            $newrec->{isdevel}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "education"){
+            $newrec->{iseducation}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "approvtest"){
+            $newrec->{isapprovtest}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "reference"){
+            $newrec->{isreference}=1;
+         }
+         elsif ($w5applrec->{opmode} eq "cbreakdown"){
+            $newrec->{iscbreakdown}=1;
+         }
+      }
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){
-      $sys->ResetFilter();
-      $sys->SetFilter({'id'=>\$identifyby});
-      my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
-      if (defined($rec)){
-         my $qc=getModuleObject($self->Config,"base::qrule");
-         $qc->setParent($sys);
-         $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
+      if (defined($w5applrec)){
+         { # create application relation
+            my $lnkapplsys=getModuleObject($self->Config,"itil::lnkapplsystem");
+            $lnkapplsys->SetFilter({
+               systemid=>\$identifyby,
+               applid=>\$w5applrec->{id}
+            });
+            my ($lnkrec)=$lnkapplsys->getOnlyFirst(qw(ALL));
+            if (!defined($lnkrec)){
+               $lnkapplsys->ValidatedInsertRecord({
+                  systemid=>$identifyby,
+                  applid=>$w5applrec->{id}
+               });
+            }
+         }
+         { # add addition write contacts
+           my %addwr=();
+           foreach my $fld (qw(tsmid tsm2id opmid opm2id applmgrid databossid)){
+              if ($w5applrec->{$fld} ne "" && 
+                  $w5applrec->{$fld} ne $curdataboss){
+                 $addwr{$w5applrec->{$fld}}++;
+              }
+           }
+           my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
+           $lnkcontact->SetFilter({
+              refid=>\$identifyby,
+              parentobj=>[$sys->SelfAsParentObject()],
+           });
+           my @cur=$lnkcontact->getHashList(qw(ALL));
+           $lnkcontact->ResetFilter();
+           foreach my $userid (keys(%addwr)){
+              my @old=grep({
+                 $_->{target} eq 'base::user' &&
+                 $_->{targetid} eq $userid
+              } @cur);
+              if ($#old==-1){
+                 $lnkcontact->ValidatedInsertRecord({
+                    target=>'base::user',
+                    targetid=>$userid,
+                    roles=>['write'],
+                    refid=>$identifyby,
+                    comments=>"inherited by application",
+                    parentobj=>$sys->SelfAsParentObject()
+                 });   
+              }
+              else{
+                 my @curroles=$old[0]->{roles};
+                 if (ref($curroles[0]) eq "ARRAY"){
+                    @curroles=@{$curroles[0]};
+                 }
+                 if (!in_array(\@curroles,"write")){
+                    $lnkcontact->ValidatedUpdateRecord($old[0],{
+                       roles=>[@curroles,'write'],
+                    },{id=>\$old[0]->{id}});   
+                 }
+              }
+           }
+         }
+      }
+      if ($self->LastMsg()==0){  # do qulity checks only if all is ok
+         $sys->ResetFilter();
+         $sys->SetFilter({'id'=>\$identifyby});
+         my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
+         if (defined($rec)){
+            my $qc=getModuleObject($self->Config,"base::qrule");
+            $qc->setParent($sys);
+            $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
+            # make a second check to ensure get Update for OTC qrule
+            $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
+         }
       }
    }
    return($identifyby);
