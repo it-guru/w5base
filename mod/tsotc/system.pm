@@ -401,11 +401,12 @@ sub Import
       my %newrec=();
       my $userid;
 
+
       if (!$self->isDataInputFromUserFrontend() ||  # only admins (and databoss)
                                                     # can force
           !$self->IsMemberOf("admin")) {            # reimport over webrontend
          $userid=$self->getCurrentUserId();         # if record already exists
-         if ($w5sysrec->{cistatusid}<6){
+         if ($w5sysrec->{cistatusid}<6 && $w5sysrec->{cistatusid}>2){
             if ($userid ne $w5sysrec->{databossid}){
                $self->LastMsg(ERROR,
                               "reimport only posible by current databoss");
@@ -433,13 +434,13 @@ sub Import
          $newrec{osrelease}="other";
       }
       if (defined($w5applrec) &&
-          !$w5sysrec->{isprod} &&
-          !$w5sysrec->{istest} &&
-          !$w5sysrec->{isdevel} &&
-          !$w5sysrec->{iseducation} &&
-          !$w5sysrec->{isapprovtest} &&
-          !$w5sysrec->{isreference} &&
-          !$w5sysrec->{iscbreakdown}) { # alter Datensatz - aber kein opmode
+          ($w5sysrec->{isprod}==0) &&
+          ($w5sysrec->{istest}==0) &&
+          ($w5sysrec->{isdevel}==0) &&
+          ($w5sysrec->{iseducation}==0) &&
+          ($w5sysrec->{isapprovtest}==0) &&
+          ($w5sysrec->{isreference}==0) &&
+          ($w5sysrec->{iscbreakdown}==0)) { # alter Datensatz - aber kein opmode
          if ($w5applrec->{opmode} eq "prod"){   # dann nehmen wir halt die
             $newrec{isprod}=1;                  # Anwendungsdaten
          }
