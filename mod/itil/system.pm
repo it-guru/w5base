@@ -1057,7 +1057,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'isworkstation',
-                group         =>['systemclass'],
+                group         =>'systemclass',
                 htmlhalfwidth =>1,
                 label         =>'Workstation',
                 dataobjattr   =>'system.is_workstation'),

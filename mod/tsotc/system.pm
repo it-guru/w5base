@@ -55,12 +55,7 @@ sub new
       new kernel::Field::Email(
                 name          =>'contactemail',
                 label         =>'Contact email',
-                dataobjattr   =>"lower(".
-                                "case when ".
-                                "otc4darwin_ias_srv_metadata_vw.asp is null ".
-                                "then otc4darwin_iac_srv_metadata_vw.asp ".
-                                "else otc4darwin_ias_srv_metadata_vw.asp ".
-                                "end)"),
+                dataobjattr   =>"lower(metadata.asp)"),
 
       new kernel::Field::Text(
                 name          =>'projectname',
@@ -95,7 +90,7 @@ sub new
                 unit          =>'MB',
                 dataobjattr   =>'ram'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'projectid',
                 label         =>'OTC-ProjectID',
                 dataobjattr   =>'otc4darwin_server_vw.project_uuid'),
@@ -144,13 +139,7 @@ sub new
                 name          =>'appw5baseid',
                 group         =>'source',
                 label         =>'Application W5BaseID',
-                dataobjattr   =>
-                  "lower(".
-                  "case when ".
-                  "otc4darwin_ias_srv_metadata_vw.darwin_app_w5baseid is null ".
-                  "then otc4darwin_iac_srv_metadata_vw.darwin_app_w5baseid ".
-                  "else otc4darwin_ias_srv_metadata_vw.darwin_app_w5baseid ".
-                  "end)"),
+                dataobjattr   =>'metadata.darwin_app_w5baseid'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
@@ -181,14 +170,28 @@ sub getSqlFrom
    my @flt=@_;
    my ($worktable,$workdb)=$self->getWorktable();
    my $selfasparent=$self->SelfAsParentObject();
-   my $from="$worktable ".
-       "join otc4darwin_projects_vw ".
-       "on $worktable.project_uuid=otc4darwin_projects_vw.project_uuid ".
-       "left outer join otc4darwin_ias_srv_metadata_vw ".
-       "on $worktable.server_uuid=otc4darwin_ias_srv_metadata_vw.server_uuid ".
-       "left outer join otc4darwin_iac_srv_metadata_vw ".
-       "on $worktable.server_uuid=otc4darwin_iac_srv_metadata_vw.server_uuid";
-
+   my $from="$worktable 
+left outer join (
+  select distinct ON(server_uuid) server_uuid,asp,darwin_app_w5baseid,w from (
+    select * from (
+      select distinct server_uuid,asp,darwin_app_w5baseid,
+         (case when asp is not null then 1 else 0 end) +
+         (case when darwin_app_w5baseid is not null then 1 else 0 end) as w
+         from otc4darwin_ias_srv_metadata_vw
+      union
+         select distinct server_uuid,asp,darwin_app_w5baseid,
+         (case when asp is not null then 1 else 0 end) +
+         (case when darwin_app_w5baseid is not null then 1 else 0 end) as w
+         from otc4darwin_iac_srv_metadata_vw 
+     ) as prepremeta order by server_uuid,w desc --to get row with most notnulls
+   ) as premetadata
+) as metadata 
+on otc4darwin_server_vw.server_uuid=metadata.server_uuid
+join (  -- project_uuids scheinen auch nicht mehr eindeutig
+  select distinct project_uuid,project_name
+  from otc4darwin_projects_vw
+) as otc4darwin_projects_vw 
+on otc4darwin_server_vw.project_uuid=otc4darwin_projects_vw.project_uuid";
    return($from);
 }
 
