@@ -546,9 +546,8 @@ EOF
       <td class=detailtopline>
 <table border=0 cellspacing=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
 <td class=detailtopline align=left>
-<div style="display:none;visibility:hidden" id=detailtoplinecliptext>
-<font face="Courier;Courier New">
-<font color="black">$headerval</font><br>$urlofcurrentrec</font></div>
+<div style="display:none;visibility:hidden" id=detailtoplinecliptext><font face="Courier;Courier New"><font color="black">$headerval</font><br>
+$urlofcurrentrec</font></div>
 <div style="cursor:pointer" onclick="copyToClipboard('detailtoplinecliptext');">
 ${H}
 </div>
