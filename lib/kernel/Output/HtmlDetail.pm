@@ -383,6 +383,15 @@ EOF
    }
    else{
       my $headerval;
+      my $urlofcurrentrec;
+      if ($self->getParent->getParent->can("getField")){
+         if (my $o=$self->getParent->getParent->getField("urlofcurrentrec")){
+            $urlofcurrentrec=$o->RawValue($rec);
+            if ($urlofcurrentrec ne ""){
+               $urlofcurrentrec.="<br>";
+            }
+         }
+      }
       if ($self->getParent->getParent->can("getRecordHeader")){
          $headerval=$self->getParent->getParent->getRecordHeader($rec);
       }
@@ -536,7 +545,14 @@ EOF
 <td rowspan=2 width=1%>$ByIdLinkStart$recordimg$ByIdLinkEnd</a></td>
       <td class=detailtopline>
 <table border=0 cellspacing=0 width="100%" style="table-layout:fixed;overflow:hidden"><tr>
-<td class=detailtopline align=left>${H}</td>
+<td class=detailtopline align=left>
+<div style="display:none;visibility:hidden" id=detailtoplinecliptext>
+<font face="Courier;Courier New">
+<font color="black">$headerval</font><br>$urlofcurrentrec</font></div>
+<div style="cursor:pointer" onclick="copyToClipboard('detailtoplinecliptext');">
+${H}
+</div>
+</td>
 </tr>
 <tr><td>${PlugCode}</td></tr>
 </table>
