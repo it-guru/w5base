@@ -137,6 +137,8 @@ sub new
                                  'RLIManager',                 # ITIL role
                                  'RLIManager2',                # ITIL role
                                  'RLIOperator',                # ITIL role
+                                 'RSKPManager',                # ITIL role
+                                 'RSKPManager2',               # ITIL role
                                  'RSKManager',                 # ITIL role
                                  'RSKCoord',                   # ITIL role
                                  'RITDemandMgr',               # IT role

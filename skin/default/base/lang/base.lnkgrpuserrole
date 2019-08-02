@@ -44,6 +44,8 @@
 'RTimeManager'=>{ de=>'Zeit-Manager', en=>'Time-Manager'},
 'RITDemandMgr'=>{ de=>'IT Tool Demand Manager', 
                   en=>'IT Tool Demand Manager'},
+'RSKPManager'=>{de=>'Risikoprozessmanager',en=>'Risk-Processmanager'},
+'RSKPManager2'=>{de=>'Risikoprozessmanager Vertreter',en=>'Risk-Processmanager deputy'},
 'RSKManager'=>{de=>'Risiko-Manager',en=>'Risk-Manager'},
 'RSKCoord'=>{de=>'Risiko-Koordinator',en=>'Risk-Coordinator'},
 'base::lnkgrpuserrole'=>{ de=>'Rollenzuordnung',en=>'Rolerelation'},

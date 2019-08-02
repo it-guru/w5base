@@ -159,7 +159,8 @@ sub isRiskWfAuthorized
       push(@mandatorid,@{$rec->{mandatorid}});
    }
 
-   if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager)],"down")){
+   if ($self->IsMemberOf(\@mandatorid,[qw(RSKCoord RSKManager 
+                                          RSKPManager RSKPManager2)],"down")){
       return(1);
    }
    if ($mode eq "view"){
@@ -208,7 +209,9 @@ sub getResponsibleRiskRole
                                           ['RSKCoord'],'firstup');
    if ($#rskmgr==-1){
       @rskmgr=$self->getParent->getMembersOf($cachedArec->{mandatorid},
-                                          ['RSKManager'],'firstup');
+                                          [qw(RSKManager 
+                                              RSKPManager 
+                                              RSKPManager2)],'firstup');
    }
    return(@rskmgr);
 }
@@ -309,7 +312,8 @@ sub getDynamicFields
                                      my @mandatorid=@{$current->{mandatorid}}; 
                                      if ($self->getParent->IsMemberOf(
                                          \@mandatorid,
-                                         [qw(RSKCoord RSKManager)],"up")){
+                                         [qw(RSKCoord RSKManager
+                                             RSKPManager RSKPManager2)],"up")){
                                         return(1);
                                      }
                                      return(0);
@@ -332,7 +336,8 @@ sub getDynamicFields
                                      my @mandatorid=@{$current->{mandatorid}}; 
                                      if ($self->getParent->IsMemberOf(
                                          \@mandatorid,
-                                         [qw(RSKCoord RSKManager)],"up")){
+                                         [qw(RSKCoord RSKManager
+                                             RSKPManager RSKPManager2)],"up")){
                                         return(1);
                                      }
                                      return(0);
@@ -1612,7 +1617,9 @@ sub nativProcess
                                              ['RSKCoord'],'firstup');
       if ($#mem==-1){
          @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
-                                             ['RSKManager'],'firstup');
+                                             [qw(RSKManager
+                                                 RSKPManager 
+                                                 RSKPManager2)],'firstup');
       }
       if ($#mem==-1){
          $self->LastMsg(ERROR,"missing RSKCoord or RSKManager");

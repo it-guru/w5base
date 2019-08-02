@@ -271,7 +271,9 @@ sub isWriteValid
    }
 
    if ($rec->{mandatorid}!=0 &&
-      $self->IsMemberOf($rec->{mandatorid},["RSKManager"],"down")){
+      $self->IsMemberOf($rec->{mandatorid},[qw(RSKManager 
+                                               RSKPManager 
+                                               RSKPManager2)],"down")){
       push(@l,@databossedit);
    }
 

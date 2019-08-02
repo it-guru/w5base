@@ -87,6 +87,7 @@ sub isSelectable
                           [qw(
                               RSKManager 
                               RSKCoord 
+                              RSKPManager RSKPManager2
                               )],
                           @{$grprec->{roles}}));
          }
