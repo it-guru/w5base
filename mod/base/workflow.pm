@@ -3146,8 +3146,6 @@ sub nativProcess
    }
    if (!defined($self->{SubDataObj}->{$class})){
       $self->LastMsg(ERROR,"unknown class specified");
-printf "class=$class\n"; 
-printf "%s\n",join(",",keys(%{$self->{SubDataObj}}));
       return(undef);
    }
    my $classobj=$self->{SubDataObj}->{$class};
