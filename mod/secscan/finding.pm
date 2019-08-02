@@ -60,8 +60,8 @@ create or replace view "W5I_secscan__findingbase" as
             "w5secscan_ShareData"."C03_HostName"
 union
    select  'Once-' || "w5secscan_OneShot"."W5_id"             as id,
-           "w5secscan_OneShot"."W5_keyid"                     as keyid,
            "w5secscan_OneShot"."W5_isdel"                     as isdel,
+           "w5secscan_OneShot"."W5_keyid"                     as keyid,
            "w5secscan_OneShot"."C01_SecToken"                 as sectoken,
            "w5secscan_OneShot"."C05_SecItem"                  as secitem,
            "w5secscan_OneShot"."C04_TreatRules"               as sectreadrules,
@@ -78,8 +78,8 @@ union
    from "W5FTPGW1"."w5secscan_OneShot"
 union
    select  'BK-' || "w5secscan_BlueKeepRDP"."W5_id"           as id,
-           "w5secscan_BlueKeepRDP"."W5_keyid"                 as keyid,
            "w5secscan_BlueKeepRDP"."W5_isdel"                 as isdel,
+           "w5secscan_BlueKeepRDP"."W5_keyid"                 as keyid,
            "w5secscan_BlueKeepRDP"."C01_SecToken"             as sectoken,
            "w5secscan_BlueKeepRDP"."C05_SecItem"              as secitem,
            "w5secscan_BlueKeepRDP"."C04_TreatRules"           as sectreadrules,
@@ -97,8 +97,8 @@ union
    from "W5FTPGW1"."w5secscan_BlueKeepRDP"
 union
    select  'OP-' || "w5secscan_OpenProxy"."W5_id"           as id,
-           "w5secscan_OpenProxy"."W5_keyid"                 as keyid,
            "w5secscan_OpenProxy"."W5_isdel"                 as isdel,
+           "w5secscan_OpenProxy"."W5_keyid"                 as keyid,
            "w5secscan_OpenProxy"."C01_SecToken"             as sectoken,
            "w5secscan_OpenProxy"."C05_SecItem"              as secitem,
            "w5secscan_OpenProxy"."C04_TreatRules"           as sectreadrules,
