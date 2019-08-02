@@ -91,7 +91,7 @@ p.header {
    font-weight: bold;
    color: black;
    margin-top:0px;
-   margin-bottom:2px;
+   margin-bottom:10px;
 }
 .overview{
    margin-top:5px;

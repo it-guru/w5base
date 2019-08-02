@@ -151,7 +151,7 @@ sub displayOverview
          if (!defined($rec->[1])){
             $text="<u>".$text."</u>";
             if ($subloopcnt>1){
-               $text="<br>".$text;
+               #$text="<div style='width:1px;height:2px'></div>".$text;
             }
          }
          else{
@@ -174,7 +174,7 @@ sub displayOverview
       else{
          $subloopcnt=0;
          if ($class eq "unitdata"){
-            $d.="\n<tr height=1%><td colspan=3>&nbsp;</td></tr>";
+            $d.="\n<tr style='height:5px'><td colspan=3></td></tr>";
             $class="subunitdata";
          }
          $d.="\n<tr height=1%>";

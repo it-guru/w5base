@@ -83,7 +83,7 @@ p.header {
    font-size:14px;
    font-weight: bold;
    color: darkblue;
-   margin-top:4px;
+   margin-top:12px;
 }
 .overview{
    margin-top:5px;
@@ -97,7 +97,7 @@ p.header {
    font-weight: bold;
    color: black;
    margin-top:0px;
-   margin-bottom:2px;
+   margin-bottom:15px;
 }
 
 
