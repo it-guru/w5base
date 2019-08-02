@@ -490,6 +490,9 @@ sub ProcessTempfile
               "\"W5_rawline\" varchar2(3200),".  # 3200 is oracle index limit!
               "\"W5_id\" varchar2(65),".
               "\"W5_key\" varchar2($opt_fieldsize),".
+              "\"W5_keyid\" varchar2(65) ".
+              "generated always as ".
+              "(replace(standard_hash(\"W5_key\",'SHA256'),' ','')),".
               "\"W5_mdate\" date not null,".
               "\"W5_cdate\" date not null,".
               "\"W5_isdel\" char(1) default '0',";
@@ -525,6 +528,13 @@ sub ProcessTempfile
       my $bk=$dbi->doCmd($sql);
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create i3 index for target table table");
+         exit(1);
+      }
+      my $sql="create index \"${DSTTAB}_i4\" ".
+              "on \"$DSTTAB\" (\"W5_keyid\")";
+      my $bk=$dbi->doCmd($sql);
+      if ($bk ne "0E0"){
+         msg(ERROR,"fail to create i4 index for target table table");
          exit(1);
       }
    }
