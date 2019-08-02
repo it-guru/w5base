@@ -267,11 +267,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'hostname',
                 label         =>'Systemname',
+                htmldetail    =>'NotEmpty',
                 dataobjattr   =>'hostname'),
 
       new kernel::Field::Text(
                 name          =>'fqdns',
                 label         =>'fullqualified DNS',
+                htmldetail    =>'NotEmpty',
                 dataobjattr   =>'fqdns'),
 
       new kernel::Field::Text(
