@@ -38,6 +38,8 @@ sub new
                 label         =>'ID',
                 dataobjattr   =>"ipaddress.ip_id"),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'ifname',
                 label         =>'Interface Name',
