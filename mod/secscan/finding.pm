@@ -34,6 +34,7 @@ use tsacinv::system;
 create or replace view "W5I_secscan__findingbase" as
    select  'OpSha-' || "w5secscan_ShareData"."W5_id"          as id,
            "w5secscan_ShareData"."W5_isdel"                   as isdel,
+           "w5secscan_ShareData"."W5_keyid"                   as keyid,
            "w5secscan_ShareData"."C01_SecToken"               as sectoken,
            "w5secscan_ShareData"."C05_SecItem"                as secitem,
            "w5secscan_ShareData"."C04_TreatRules"             as sectreadrules,
@@ -59,6 +60,7 @@ create or replace view "W5I_secscan__findingbase" as
             "w5secscan_ShareData"."C03_HostName"
 union
    select  'Once-' || "w5secscan_OneShot"."W5_id"             as id,
+           "w5secscan_OneShot"."W5_keyid"                     as keyid,
            "w5secscan_OneShot"."W5_isdel"                     as isdel,
            "w5secscan_OneShot"."C01_SecToken"                 as sectoken,
            "w5secscan_OneShot"."C05_SecItem"                  as secitem,
@@ -76,6 +78,7 @@ union
    from "W5FTPGW1"."w5secscan_OneShot"
 union
    select  'BK-' || "w5secscan_BlueKeepRDP"."W5_id"           as id,
+           "w5secscan_BlueKeepRDP"."W5_keyid"                 as keyid,
            "w5secscan_BlueKeepRDP"."W5_isdel"                 as isdel,
            "w5secscan_BlueKeepRDP"."C01_SecToken"             as sectoken,
            "w5secscan_BlueKeepRDP"."C05_SecItem"              as secitem,
@@ -87,12 +90,14 @@ union
            NULL                                               as hostname,
            NULL                                               as fqdns,
            "w5secscan_BlueKeepRDP"."C03_IPAddress"            as ipaddr,
-           "w5secscan_BlueKeepRDP"."C07_SecDetailSpec"        as detailspec,
+           'found on '||"w5secscan_BlueKeepRDP"."C03_IPAddress"
+                                                              as detailspec,
            'BlueKeepRDP'                                      as srcsys,
            "w5secscan_BlueKeepRDP"."W5_id"                    as srcid
    from "W5FTPGW1"."w5secscan_BlueKeepRDP"
 union
    select  'OP-' || "w5secscan_OpenProxy"."W5_id"           as id,
+           "w5secscan_OpenProxy"."W5_keyid"                 as keyid,
            "w5secscan_OpenProxy"."W5_isdel"                 as isdel,
            "w5secscan_OpenProxy"."C01_SecToken"             as sectoken,
            "w5secscan_OpenProxy"."C05_SecItem"              as secitem,
@@ -118,6 +123,8 @@ create table "W5I_secscan__finding_of" (
    comments            varchar2(4000),
    wfhandeled          number(*,0) default '0',
    wfref               varchar2(256),
+   wfheadid            varchar2(20),
+   hstate              varchar2(20) default 'AUTOANALYSED',
    respemail           varchar2(128),
    modifyuser          number(*,0),
    modifydate          date,
@@ -130,6 +137,7 @@ create or replace synonym W5I.secscan__finding_of for "W5I_secscan__finding_of";
 
 create or replace view "W5I_secscan__finding" as
 select "W5I_secscan__findingbase".id,
+       "W5I_secscan__findingbase".keyid,
        "W5I_secscan__findingbase".isdel,
        "W5I_secscan__findingbase".sectoken,
        "W5I_secscan__findingbase".secitem,
@@ -148,12 +156,14 @@ select "W5I_secscan__findingbase".id,
        decode("W5I_secscan__finding_of".wfhandeled,
               NULL,'0',"W5I_secscan__finding_of".wfhandeled) wfhandeled,
        "W5I_secscan__finding_of".wfref,
+       "W5I_secscan__finding_of".hstate,
+       "W5I_secscan__finding_of".wfheadid,
        "W5I_secscan__finding_of".respemail,
        "W5I_secscan__finding_of".modifyuser,
        "W5I_secscan__finding_of".modifydate
 from "W5I_secscan__findingbase"
      left outer join "W5I_secscan__finding_of"
-        on "W5I_secscan__findingbase".id=
+        on "W5I_secscan__findingbase".keyid=
            "W5I_secscan__finding_of".refid;
 
 
@@ -194,6 +204,15 @@ sub new
                 size          =>'16',
                 readonly      =>1,
                 dataobjattr   =>'sectoken'),
+
+      new kernel::Field::Text(
+                name          =>'hstate',
+                label         =>'handling state',
+                default       =>'Waiting for analyse...',
+                nowrap        =>1,
+                readonly      =>1,
+                selectfix     =>1,
+                dataobjattr   =>'hstate'),
 
       new kernel::Field::Number(
                 name          =>'recuperation',
@@ -316,6 +335,22 @@ sub new
                 label         =>'Overflow ID',
                 dataobjattr   =>'of_id'),
 
+      new kernel::Field::Select(
+                name          =>'mhstate',
+                group         =>'handling',
+                label         =>'handling state',
+                searchable    =>0,
+                value         =>[qw(NOTAUTOHANDLED 
+                                    MANUELRESPCONT
+                                    GOTMANUELOK)],
+                dataobjattr   =>'hstate'),
+
+      new kernel::Field::Email(
+                name          =>'respemail',
+                group         =>'handling',
+                label         =>'desired E-Mail responsible',
+                dataobjattr   =>'respemail'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'handling',
@@ -324,7 +359,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'wfhandeled',
-                group         =>'handling',
+                group         =>'wfhandling',
                 readonly      =>1,
                 label         =>'Workflow in process',
                 dataobjattr   =>'wfhandeled'),
@@ -337,11 +372,51 @@ sub new
 
       new kernel::Field::TextURL(
                 name          =>'wfref',
-                group         =>'handling',
+                group         =>'wfhandling',
                 readonly      =>1,
                 htmldetail    =>'NotEmpty',
                 label         =>'Workflow',
                 dataobjattr   =>'wfref'),
+
+      new kernel::Field::Text(
+                name          =>'wfheadid',
+                group         =>'wfhandling',
+                readonly      =>1,
+                htmldetail    =>'0',
+                selectfix     =>1,
+                label         =>'WfHeadID',
+                dataobjattr   =>'wfheadid'),
+
+      new kernel::Field::Import($self,
+                vjointo       =>\'base::workflow',
+                vjoinon       =>['wfheadid'=>'id'],
+                group         =>"wfhandling",
+                htmldetail    =>'NotEmpty',
+                weblinkto     =>"NONE",
+                fields        =>[qw(name state)]),
+
+
+#      new kernel::Field::Text(
+#                name          =>'wfname',
+#                group         =>'wfhandling',
+#                vjointo       =>'base::workflow',
+#                vjoinon       =>['wfheadid'=>'id'],
+#                vjoindisp     =>'name',
+#                weblinkto     =>"NONE",
+#                readonly      =>1,
+#                htmldetail    =>'NotEmpty',
+#                label         =>'Workflow Name'),
+#
+#      new kernel::Field::Text(
+#                name          =>'wfstate',
+#                group         =>'wfhandling',
+#                vjointo       =>'base::workflow',
+#                vjoinon       =>['wfheadid'=>'id'],
+#                vjoindisp     =>'state',
+#                weblinkto     =>"NONE",
+#                readonly      =>1,
+#                htmldetail    =>'NotEmpty',
+#                label         =>'Workflow State'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
@@ -398,6 +473,14 @@ sub new
 
 
       new kernel::Field::Text(
+                name          =>'sectokenid',
+                label         =>'Security Token ID',
+                size          =>'16',
+                group         =>'source',
+                readonly      =>1,
+                dataobjattr   =>'keyid'),
+
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 selectfix     =>1,
                 group         =>'source',
@@ -421,7 +504,7 @@ sub new
    };
 
    $self->setWorktable("secscan__finding_of");
-   $self->setDefaultView(qw(findcdate name secitem comments));
+   $self->setDefaultView(qw(findcdate name hstate secitem comments));
    return($self);
 }
 
@@ -440,7 +523,7 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default recup handling handlingsource source));
+   return( qw(header default recup wfhandling handling handlingsource source));
 }
 
 
@@ -451,9 +534,19 @@ sub ValidatedUpdateRecord
    my $newrec=shift;
    my @filter=@_;
 
-   $filter[0]={id=>\$oldrec->{id}};
+   if ($newrec->{mhstate} eq "NOTAUTOHANDLED" &&
+       $newrec->{respemail} ne ""){
+      $newrec->{mhstate}="MANUELRESPCONT";
+   }
+
+
+   $filter[0]={id=>\$oldrec->{sectokenid}};
    if (!defined($oldrec->{ofid})){ 
-      $newrec->{id}=$oldrec->{id}; 
+      $newrec->{id}=$oldrec->{sectokenid}; 
+      if ($newrec->{hstate} ne "AUTOANALYSED" &&
+          $newrec->{hstate} ne "NOTAUTOHANDLED"){
+         $newrec->{hstate}="TOUCHED";
+      }
       return($self->SUPER::ValidatedInsertRecord($newrec));
    }
    return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
@@ -509,8 +602,17 @@ sub isViewValid
    if ($self->IsMemberOf(["admin",
                           "w5base.secscan.read",
                           "w5base.secscan.write"])){
-      my @l=qw(source handling handlingsource default header recup);
-      return(qw(ALL));
+      my @l=qw(source handlingsource default header recup);
+      if ($rec->{wfheadid} ne ""){
+         push(@l,"wfhandling");
+      }
+      else{
+         if ($rec->{hstate} ne ""){
+            push(@l,"handling");
+         }
+      }
+      
+      return(@l);
    }
    return(undef);
 }

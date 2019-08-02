@@ -31,7 +31,7 @@ sub LoadNewFindings
    my $queryparam=shift;
 
 
-   my $firstDayRange=14;
+   my $firstDayRange=100;
    my $maxDeltaDayRange="15";
 
    my $StreamDataobj="secscan::finding";
@@ -98,9 +98,11 @@ sub LoadNewFindings
       $datastream->SetFilter(\%flt);
       $datastream->SetCurrentView(qw(id name secitem ipaddr 
                                      spec findcdate hostname
-                                     wfhandeled wfref recuphist));
+                                     wfhandeled wfref recuphist
+                                     sectokenid hstate wfheadid
+                                     comments));
       $datastream->SetCurrentOrder("+findcdate","+id");
-      $datastream->Limit(100);
+      #$datastream->Limit(1000);
       my ($rec,$msg)=$datastream->getFirst();
 
       if (defined($rec)){
@@ -149,7 +151,7 @@ sub LoadNewFindings
                msg(ERROR,"db record problem: %s",$msg);
                return({exitcode=>1,msg=>$msg});
             }
-         }until(!defined($rec) || $recno>10);
+         }until(!defined($rec) || $recno>20);
       }
    }
    my $dataop=$datastream->Clone();
@@ -178,7 +180,8 @@ sub LoadNewFindings
             msg(INFO,"cleanup workflow id=$wfrec->{id}");
             if ($wfop->nativProcess('wfforceobsolete',{},$wfrec->{id})){
                $dataop->ValidatedUpdateRecord($rec,{
-                  wfhandeled=>'0'
+                  wfhandeled=>'0',
+                  hstate=>"OBSOLETE"
                },{id=>\$rec->{id}});
             }
          }
@@ -218,8 +221,10 @@ sub analyseRecord
    my $res=shift;
 
    msg(INFO,"F:$rec->{id}");
-   msg(INFO,"  Host  :$rec->{hostname}");
-   msg(INFO,"  IpAddr:$rec->{ipaddr}");
+   msg(INFO,"  SecToken  :$rec->{name}");
+   msg(INFO,"  Host      :$rec->{hostname}");
+   msg(INFO,"  IpAddr    :$rec->{ipaddr}");
+   msg(INFO,"  SecTokenID: $rec->{sectokenid}");
 
    my $ipaddr=$rec->{ipaddr};
 
@@ -277,29 +282,31 @@ sub analyseRecord
    # 
    #  Now we have a reponsibleid and we can start a workflow
    # 
+   my ($WfRec,$msg);
    if (defined($reponsibleid)){
       my @srckey;
       my $srcsys="secscan::finding";
-      my $srcid=$rec->{id};
+      my $srcid=$rec->{sectokenid};
       my $srckey=$srcsys."::".$srcid;  # because length of srcid :-[
-      push(@srckey,$srckey);
-      foreach my $recuprec (@{$rec->{recuphist}}){
-         my $srcid=$recuprec->{id};
-         my $srckey=$srcsys."::".$srcid;  # because length of srcid :-[
-         push(@srckey,$srckey);
-      }
       
       # check if workflow already exists
       $self->{wf}->ResetFilter();
-      $self->{wf}->SetFilter({srcsys=>\@srckey});
+      $self->{wf}->SetFilter({srcsys=>\$srckey});
       my @WfRec=$self->{wf}->getHashList(qw(ALL));
-      my ($WfRec,$msg);
       if ($#WfRec!=-1){
-         msg(INFO,"  already exists with WorkflowID=$WfRec->{id}");
-         printf STDERR ("found existing workflows %s\n",join(", ",map({$_->{id}} @WfRec)));
+         msg(INFO,"  already exists with WorkflowID=$WfRec[0]->{id}");
          $WfRec=$WfRec[0];
-         sleep(5);  
-         msg(ERROR,"dieses Handling muß noch angepasst werden");
+         if ($WfRec->{stateid}>15){
+            msg(INFO,"need to reactivate $WfRec->{id}");
+            my $wfop=$self->{wf}->Clone(); 
+            if ($wfop->nativProcess('wfreactivate',{
+                  secfindingreponsibleid=>$reponsibleid,
+                  detaildescription=>$rec->{detailspec} },$WfRec->{id})){
+               msg(INFO,"ok - it was reactivated $WfRec->{id}");
+            }
+         }
+      #   $self->{wf}->Action->StoreRecord($WfRec->{id},"note",
+      #                              {additional=>{}},"recreation detected");
       }
       else{
          my $newrec={
@@ -333,20 +340,50 @@ sub analyseRecord
             }
          }
       }
-      if (defined($WfRec)){
-         my $upd={};
-         if (!$rec->{wfhandeled}){
-            $upd->{wfhandeled}=1;
-         }
-         if ($rec->{wfref} ne $WfRec->{urlofcurrentrec}){
-            $upd->{wfref}=$WfRec->{urlofcurrentrec};
-         }
-         if (keys(%$upd)){
-            my $d=$dataobj->Clone();
-            $d->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}});
+   }
+   my $dataop=$dataobj->Clone();
+   $dataop->BackendSessionName("cloned$$"); # needed because oracle gets problems with getNext
+   my $upd={};
+   if (defined($WfRec)){
+      if (!$rec->{wfhandeled}){
+         $upd->{wfhandeled}=1;
+      }
+      if (!$rec->{hstate}){
+         $upd->{hstate}="AUTOANALYSED";
+      }
+      if ($rec->{wfref} ne $WfRec->{urlofcurrentrec}){
+         $upd->{wfref}=$WfRec->{urlofcurrentrec};
+      }
+      if ($rec->{wfheadid} ne $WfRec->{id}){
+         $upd->{wfheadid}=$WfRec->{id};
+      }
+   }
+   else{
+      if (!$rec->{hstate}){
+         $upd->{hstate}="NOTAUTOHANDLED";
+      }
+      if ($rec->{comments} eq ""){
+         my $ipflt=$rec->{ipaddr};
+         $ipflt=~s/\*//g;
+         $ipflt=~s/\?//g;
+         msg(INFO,"try to query NOAH on ip $ipflt");
+         if ($ipflt ne ""){
+            my $noa=getModuleObject($dataobj->Config,"tsnoah::ipaddress");
+            $noa->SetFilter({name=>$ipflt});
+            my @l=$noa->getHashList(qw(name systemname urlofcurrentrec));
+            if ($#l!=-1){
+               $upd->{comments}=join("\n\n",map({
+                  $_->{systemname}."\n".$_->{urlofcurrentrec};
+               } @l));
+            }
          }
       }
    }
+   if (keys(%$upd)){
+      $dataop->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}});
+   }
+
+
 }
 
 

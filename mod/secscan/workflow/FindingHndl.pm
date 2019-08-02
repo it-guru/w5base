@@ -502,6 +502,9 @@ sub getPosibleActions
       if ($WfRec->{step} ne "secscan::workflow::FindingHndl::finish"){
          push(@l,"wfforceobsolete");
       }
+      if ($WfRec->{stateid}>15){
+         push(@l,"wfreactivate");
+      }
    }
    if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
       if ($WfRec->{step} eq "secscan::workflow::FindingHndl::main"){
@@ -582,9 +585,9 @@ sub isViewValid
       push(@l,"relations","state",
               "history","flow","affected","source");
    }
-   if ($self->IsMemberOf("admin")){
-      push(@l,"secinternal");
-   }
+   #if ($self->IsMemberOf("admin")){
+   #   push(@l,"secinternal");
+   #}
    return(@l);
 }
 
@@ -763,6 +766,24 @@ sub nativProcess
          return(1);
       }
 
+      return(1);
+   }
+   if ($action eq "wfreactivate"){
+      $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wfreactivate",
+          {translation=>'secscan::workflow::FindingHndl'},"",undef)){
+         my $nextstep=$self->getParent->getStepByShortname("main");
+         my $store={stateid=>2,
+                    step=>$nextstep,
+                    fwdtargetid=>15632883160001,
+                    fwdtarget=>'base::user',
+                    closedate=>undef,
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         $self->StoreRecord($WfRec,$store);
+         return(1);
+      }
       return(1);
    }
    return(0);
@@ -1049,7 +1070,6 @@ sub getPosibleButtons
                                     'secscan::workflow::FindingHndl');
       }
    }
-   #print STDERR "Buttons:".Dumper(\%b);
    return(%b);
 }
 
@@ -1442,7 +1462,6 @@ sub Process
          my $newrec;
          my $fobj=$self->getParent->getField("secfindingreponsible");
          my $h=$self->getWriteRequestHash("nativweb");
-         #print STDERR Query->Dumper();
          if ($newrec=$fobj->Validate($WfRec,$h)){
             my $nativH={
                note=>$h->{note},
@@ -1475,7 +1494,6 @@ sub getPosibleButtons
                                     'secscan::workflow::FindingHndl');
       }
    }
-   #print STDERR "Buttons:".Dumper(\%b);
    return(%b);
 }
 
@@ -1690,6 +1708,28 @@ sub getPosibleButtons
    my %p=$self->SUPER::getPosibleButtons($WfRec);
    delete($p{BreakWorkflow});
    return(%p);
+}
+
+sub nativProcess
+{
+   my $self=shift;
+   my $op=shift;
+   my $h=shift;
+   my $WfRec=shift;
+   my $actions=shift;
+   my $userid=$self->getParent->getParent->getCurrentUserId();
+
+   if ($op ne "" && !grep(/^$op$/,@{$actions})){
+      $self->LastMsg(ERROR,"invalid disalloed action requested");
+      msg(ERROR,"invalid requested operation was '$op'");
+      return(0);
+   }
+
+
+   if ($op eq "wfreactivate"){
+      return($self->getParent->nativProcess($self,$op,$h,$WfRec,$actions));
+   }
+   return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
 }
 
 
