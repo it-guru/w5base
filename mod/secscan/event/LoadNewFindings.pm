@@ -107,6 +107,9 @@ sub LoadNewFindings
 
       if (defined($rec)){
          READLOOP: do{
+            msg(DEBUG,"start datastream loop");
+            msg(DEBUG,"...handling with laststamp='$laststamp'");
+            msg(DEBUG,"...handling with lastid='$lastid'");
             if ($skiplevel==2){
                if ($rec->{id} ne $lastid){
                   $skiplevel=3;
@@ -130,7 +133,7 @@ sub LoadNewFindings
                }
             }
             if ($skiplevel==1){
-               if ($lastid eq $rec->{id}){
+               if (!defined($lastid) || $lastid eq $rec->{id}){
                   msg(INFO,"got ladid point $lastid");
                   $skiplevel=2;
                }
@@ -151,7 +154,10 @@ sub LoadNewFindings
                msg(ERROR,"db record problem: %s",$msg);
                return({exitcode=>1,msg=>$msg});
             }
-         }until(!defined($rec) || $recno>20);
+            if ($recno>50){  # limit record-handing in one pass
+               last;
+            } 
+         }until(!defined($rec));
       }
    }
    my $dataop=$datastream->Clone();
