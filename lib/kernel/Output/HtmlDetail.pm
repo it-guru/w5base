@@ -535,6 +535,16 @@ EOF
                    "<script language=\"JavaScript\">".$PlugCode."</script>";
       }
       #######################################################################
+      my $copyToClipboardStart="";
+      my $copyToClipboardEnd="";
+      if ($urlofcurrentrec ne ""){ # allow one click to clipboard only on
+                                   # records with urlofcurrentrec field
+         $copyToClipboardStart="<div style=\"cursor:pointer\" ".
+                               "onclick=\"".
+                               "copyToClipboard('detailtoplinecliptext');".
+                               "\">";
+         $copyToClipboardEnd="</div>";
+      }
 
       $template{"header"}=<<EOF;
 <a name="index"></a>
@@ -548,9 +558,9 @@ EOF
 <td class=detailtopline align=left>
 <div style="display:none;visibility:hidden" id=detailtoplinecliptext><font face="Courier;Courier New"><font color="black">$headerval</font><br>
 $urlofcurrentrec</font></div>
-<div style="cursor:pointer" onclick="copyToClipboard('detailtoplinecliptext');">
+$copyToClipboardStart
 ${H}
-</div>
+$copyToClipboardEnd
 </td>
 </tr>
 <tr><td>${PlugCode}</td></tr>
