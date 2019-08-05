@@ -731,10 +731,15 @@ sub NotifySecurityFindingForward
    my $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
    my $uobj=getModuleObject($self->Config,'base::user');
    $uobj->SetFilter({userid=>\$WfRec->{fwdtargetid},cistatusid=>4});
-   my ($u,$msg)=$uobj->getOnlyFirst(qw(lastlang));
+   my ($u,$msg)=$uobj->getOnlyFirst(qw(lastlang lang));
 
    if (defined($u->{lastlang})) {
       $ENV{HTTP_FORCE_LANGUAGE}=$u->{lastlang};
+   }
+   else{
+      if (defined($u->{lang})){
+         $ENV{HTTP_FORCE_LANGUAGE}=$u->{lang};
+      }
    }
 
    if ($note eq ""){
