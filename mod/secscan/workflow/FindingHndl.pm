@@ -279,6 +279,17 @@ sub getDynamicFields
                                   htmldetail    =>'NotEmpty',
                                   container     =>'headref'),
 
+      new kernel::Field::Select(  name          =>'secfindingstate',
+                                  label         =>'state of Secuirty Finding',
+                                  group         =>'state',
+                                  readonly      =>1,
+                                  default       =>'INANALYSE',
+                                  value         =>['INANALYSE',
+                                                   'CLOSEDRESOLVED',
+                                                   'CLOSEDCNTEXIST'
+                                                  ],
+                                  container     =>'headref'),
+
    ),$self->SUPER::getDynamicFields(%param));
    $self->getField("affectedapplication")->{htmldetail}=0;
    $self->getField("affectedcontract")->{htmldetail}=0;
@@ -818,6 +829,7 @@ sub nativProcess
                     step=>$nextstep,
                     fwdtargetid=>15632883160001,
                     fwdtarget=>'base::user',
+                    secfindingstate=>'INANALYSE',
                     closedate=>undef,
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
@@ -984,6 +996,7 @@ sub nativProcess
       delete($h->{secfindingaltreponsibleid});  # no tsms
 
 
+      $h->{secfindingstate}="INANALYSE";
       my $secfindingaltreponsibleid=$h->{secfindingaltreponsibleid};
       if (my $id=$self->StoreRecord($WfRec,$h)){
          my $aobj=$self->getParent->getParent->Action();
@@ -1192,6 +1205,7 @@ sub nativProcess
                     step=>'secscan::workflow::FindingHndl::finish',
                     fwdtargetid=>undef,
                     fwdtarget=>undef,
+                    secfindingstate=>'CLOSEDRESOLVED',
                     eventend=>NowStamp("en"),
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
@@ -1225,10 +1239,15 @@ sub nativProcess
           $WfRec->{id},"wfclosed",
           {translation=>'secscan::workflow::FindingHndl'},
           $h->{note})){
-         my $store={stateid=>17,
+         #
+         # Hier müsste u.U. noch eine Prüfung durch die Approve Abteilung
+         # rein
+         #
+         my $store={stateid=>21,
                     fwdtargetid=>undef,
                     fwdtarget=>undef,
                     secfindingnonremstatement=>$h->{note},
+                    secfindingstate=>'CLOSEDCNTEXIST',
                     eventend=>NowStamp("en"),
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};

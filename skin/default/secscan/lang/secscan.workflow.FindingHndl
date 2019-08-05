@@ -57,6 +57,7 @@ be treated with maximum priority.
 },
 'wfclosed'=>{de=>'Abgeschlossen',en=>'Closed'},
 'wfreject'=>{de=>'Abgelehnt',en=>'Rejected'},
+'wfaddreason'=>{de=>'Begründung hinzugefügt',en=>'add reason'},
 'wfadddsgvo'=>{de=>'addDSGVO Aussage',en=>'addDSGVO Statement'},
 'wfadddreason'=>{de=>'Entstehung Aussage',en=>'reason statement'},
 'new responsible person'=>{de=>'neue verantwortliche Person'},
@@ -70,4 +71,8 @@ be treated with maximum priority.
 },
 'The automaticly decteded security-finding has been forwared to you. Please handle the referenced workflow as fast es posible to reduce the security risk for your application.'=>{de=>'Das automatisch erkannte Security-Finding wurde an Sie weitergeleitet. Bitte behandlen Sie den Workflow so schnell es möglich ist, um die Sicherheits-Risiken für Ihre Anwendung zu minimieren.'},
 
+'state of Secuirty Finding'=>{de=>'gesamt Status der Finding-Behandlung'},
+'INANALYSE'=>{de=>'in analyse',en=>'in analyse'},
+'CLOSEDRESOLVED'=>{de=>'geschlossen und beseitigt',en=>'closed and resolved'},
+'CLOSEDCNTEXIST'=>{de=>'geschlossen und fortbestehend',en=>'closed and existend'},
 
