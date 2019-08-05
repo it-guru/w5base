@@ -115,7 +115,8 @@ sub LoadNewFindings
                   $skiplevel=3;
                }
             }
-            if ($skiplevel==2){
+            if ($skiplevel==1){  # laststamp was arived, but not lastid seen
+               # this can happend, if lastid id-record is deleted
                if ($rec->{findcdate} ne $laststamp){
                   msg(WARN,"record with id '$lastid' missing in datastream");
                   msg(WARN,"this can result in skiped records!");
