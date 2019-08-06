@@ -95,6 +95,11 @@ sub qcheckRecord
    my $databossid=$rec->{databossid};
    my $databossfo=$dataobj->getField("databossid");
    return(undef,undef) if (!defined($databossfo));
+   if ($databossid eq ""){
+      return(3,{qmsg=>['no databoss registered'],
+             dataissue=>['no databoss registered']});
+
+   }
 
    if (ref($l) eq "ARRAY"){
       foreach my $crec (@$l){
