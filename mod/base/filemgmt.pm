@@ -758,6 +758,9 @@ sub sendFile
          print join("",<F>);
          return();
       }
+      else{
+         msg(ERROR,"base::filemgmt error - can not open $realfile");
+      }
    }
    if ($thumbnail){
       print $self->HttpHeader("image/gif");
