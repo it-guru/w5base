@@ -467,6 +467,20 @@ sub Import
           $w5applrec->{conumber} ne $sysrec->{conumber}){
          $newrec{conumber}=$w5applrec->{conumber};
       }
+
+      my $foundsystemclass=0;
+      foreach my $v (qw(isapplserver isworkstation isinfrastruct 
+                        isprinter isbackupsrv isdatabasesrv 
+                        iswebserver ismailserver isrouter 
+                        isnetswitch isterminalsrv isnas
+                        isclusternode)){
+         if ($w5sysrec->{$v}==1){
+            $foundsystemclass++;
+         }
+      }
+      if (!$foundsystemclass){
+         $newrec{isapplserver}="1"; 
+      }
       if ($sys->ValidatedUpdateRecord($w5sysrec,\%newrec,
                                       {id=>\$w5sysrec->{id}})) {
          $identifyby=$w5sysrec->{id};
