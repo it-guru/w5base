@@ -402,7 +402,7 @@ sub Import
       my $userid;
 
 
-      if ($self->isDataInputFromUserFrontend() ||   # only admins (and databoss)
+      if ($self->isDataInputFromUserFrontend() &&   # only admins (and databoss)
                                                     # can force
           !$self->IsMemberOf("admin")) {            # reimport over webrontend
          $userid=$self->getCurrentUserId();         # if record already exists
