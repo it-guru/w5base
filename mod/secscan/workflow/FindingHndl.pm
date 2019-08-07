@@ -744,11 +744,11 @@ sub NotifySecurityFindingForward
    $uobj->SetFilter({userid=>\$WfRec->{fwdtargetid},cistatusid=>4});
    my ($u,$msg)=$uobj->getOnlyFirst(qw(lastlang lang));
 
-   if (defined($u->{lastlang})) {
+   if (defined($u->{lastlang}) && $u->{lastlang} ne "") {
       $ENV{HTTP_FORCE_LANGUAGE}=$u->{lastlang};
    }
    else{
-      if (defined($u->{lang})){
+      if (defined($u->{lang}) && $u->{lang} ne ""){
          $ENV{HTTP_FORCE_LANGUAGE}=$u->{lang};
       }
    }
