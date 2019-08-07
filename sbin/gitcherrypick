@@ -61,6 +61,37 @@ my @commitlst=$repo->command("log","--cherry-pick",
                              "--reverse",
                              $branch."...".$masterbranch);
 
+#
+# With ...
+#
+# git cherry-pick --keep-redundant-commits -X ours -x xxxxxxx
+#
+# ... commits can be "marked" as cherry-picked - if missequenced cherry-picks
+# are killed corred patch-id handling. The following git-log-grep sequence
+# filter them out
+#
+
+if ($#commitlst!=-1){
+   if ($opt_d){
+      printf STDERR ("DEBUG: filter commit list, against already empty cerry-pickeds\n");
+   }
+   for(my $c=0;$c<=$#commitlst;$c++){
+      if ($opt_d){
+         printf STDERR ("DEBUG: check $c commit %s\n",$commitlst[$c]);
+      }
+      my @g=$repo->command("log",$branch,
+                           "--grep","(cherry picked from commit ".$commitlst[$c].")");
+      if ($#g!=-1){ # the commit seems to be cherry-picked as empty patch 
+         if ($opt_v){
+            printf("INFO: commit %s removed due empty cherry-picked\n",$commitlst[$c]);
+         }
+         $commitlst[$c]=undef;
+      }
+   }
+   @commitlst=grep({defined($_)} @commitlst);
+}
+
+
 if ($opt_v){
    printf STDERR ("git found %d missing commit-picks in current branch egainst '%s'\n",
       $#commitlst+1,$masterbranch);
