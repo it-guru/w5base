@@ -1244,6 +1244,7 @@ sub nativProcess
          # rein
          #
          my $store={stateid=>21,
+                    step=>'secscan::workflow::FindingHndl::finish',
                     fwdtargetid=>undef,
                     fwdtarget=>undef,
                     secfindingnonremstatement=>$h->{note},
