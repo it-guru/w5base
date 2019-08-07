@@ -107,7 +107,7 @@ sub SecScanMon
                   $skiplevel=3;
                }
             }
-            if ($skiplevel==2){
+            if ($skiplevel==1){
                if ($rec->{sdate} ne $laststamp){
                   msg(WARN,"record with id '$lastid' missing in datastream");
                   msg(WARN,"this can result in skiped records!");
