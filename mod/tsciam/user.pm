@@ -197,6 +197,11 @@ sub new
                                    label      =>'Room',
                                    dataobjattr=>'roomNumber'),
 
+      new kernel::Field::Text(     name       =>'office_organisation',
+                                   group      =>'office',
+                                   label      =>'Organisation',
+                                   dataobjattr=>'toLD'),
+
       new kernel::Field::Text(     name       =>'office_street',
                                    group      =>'office',
                                    label      =>'Street',
@@ -226,21 +231,6 @@ sub new
                                    group      =>'status',
                                    label      =>'Country',
                                    dataobjattr=>'C'),
-
-      #new kernel::Field::Text(     name       =>'office_address',
-      #                             group      =>'status',
-      #                             label      =>'postalAddress',
-      #                             dataobjattr=>'postalAddress'),
-
-      #new kernel::Field::Text(     name       =>'office_organisation',
-      #                             group      =>'status',
-      #                             label      =>'Organisation',
-      #                             dataobjattr=>'o'),
-
-      #new kernel::Field::Text(     name       =>'office_orgunit',
-      #                             group      =>'status',
-      #                             label      =>'Orgunit',
-      #                             dataobjattr=>'ou'),
 
       new kernel::Field::Text(     name       =>'sex',
                                    group      =>'status',
