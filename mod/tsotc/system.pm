@@ -537,8 +537,8 @@ sub Import
                $self->LastMsg(ERROR,"can not find databoss contact record");
             }
             else{
-               msg(WARN,"invalid databoss contact rec for ".
-                         $sysrec->{contactemail});
+               #msg(WARN,"invalid databoss contact rec for ".
+               #          $sysrec->{contactemail});
                if (defined($w5applrec) && $w5applrec->{databossid} ne ""){
                   msg(INFO,"using databoss from application ".
                            $w5applrec->{name});
@@ -547,7 +547,8 @@ sub Import
                }
             }
             if (!defined($curdataboss)){
-               msg(ERROR,"unable to import without databoss");
+               msg(ERROR,"unable to import system '$sysrec->{name}' ".
+                         "without databoss");
                return();
             }
          }
