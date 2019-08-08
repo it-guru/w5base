@@ -387,7 +387,12 @@ sub analyseRecord
       }
    }
    if (keys(%$upd)){
-      $dataop->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}});
+      my $upddump=Dumper($upd);
+      my $recdump=Dumper($rec);
+      if (!$dataop->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}})){
+         msg(ERROR,"ValidatedUpdateRecord failed on upd ".$upddump);
+         msg(ERROR,"rec ".$recdump);
+      }
    }
 
 

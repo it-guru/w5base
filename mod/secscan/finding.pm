@@ -546,6 +546,7 @@ sub ValidatedUpdateRecord
    if (!defined($oldrec->{ofid})){ 
       $newrec->{id}=$oldrec->{sectokenid}; 
       if ($newrec->{hstate} ne "AUTOANALYSED" &&
+          $newrec->{hstate} ne "MANUELRESPCONT" &&
           $newrec->{hstate} ne "NOTAUTOHANDLED"){
          $newrec->{hstate}="TOUCHED";
       }
