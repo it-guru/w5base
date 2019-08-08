@@ -104,6 +104,16 @@ sub new
                 dataobjattr   =>"DARWIN_JOIN_L4_ASSETS_STO_MD_S.".
                                 "sv_mail"),
 
+      new kernel::Field::Text(
+                name          =>'inmassignmentgroup',
+                label         =>'Incident-Assignmentgroup',
+                dataobjattr   =>"ASSET_SM9_INCIDENTGROUP_Z_B___"),
+
+      new kernel::Field::Text(
+                name          =>'chmassignmentgroup',
+                label         =>'Change-Assignmentgroup',
+                dataobjattr   =>"ASSET_SM9_CHANGEGROUP_Z_B___TI"),
+
       new kernel::Field::Number(
                 name          =>'cpucount',
                 group         =>'asset',
