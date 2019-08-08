@@ -38,8 +38,8 @@ create or replace view "W5I_secscan__NetworkNode" as
           "C02_DNSName"  dns,
           "C03_Ports"    ports,
           TO_DATE("w5secscan_NetworkNode"."C04_ScanDate",
-                  'YYYY-MM-DD HH24:MI:SS')                    dscandate,
-          decode("w5secscan_NetworkNode"."W5_isnotdel",1,0,1) isdel
+                  'YYYY-MM-DD HH24:MI:SS')                  dscandate,
+          "w5secscan_NetworkNode"."W5_isdel"                isdel
    from "W5FTPGW1"."w5secscan_NetworkNode";
 
 grant select on "W5I_secscan__NetworkNode" to W5I;
