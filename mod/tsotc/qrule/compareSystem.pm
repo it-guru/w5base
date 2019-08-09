@@ -501,6 +501,8 @@ sub qcheckRecord
          my @fld=grep(!/^srcload$/,keys(%$forcedupd));
          if ($#fld!=-1){
             push(@qmsg,"all desired fields has been updated: ".join(", ",@fld));
+            $checksession->{EssentialsChangedCnt}++;
+            map({$checksession->{EssentialsChanged}->{$_}++} @fld);
          }
       }
       else{
