@@ -646,7 +646,7 @@ sub ProcessTempfile
    sub getDiffOperation
    {
       my $s=shift;
-      my $bufsz=5;
+      my $bufsz=7;
 
       if (!$main::streameof){
          do{
@@ -695,8 +695,16 @@ sub ProcessTempfile
          for(my $c=0;$c<=$#{main::buffer};$c++){
             if ($main::buffer[$c]->{key} eq $chkkey){
                if ($op->{op} ne $main::buffer[$c]->{op}){
-                  $foundAltOp=$c;
-                  last;
+                  if (defined($foundAltOp)){
+                     msg(ERROR,"found muliple (more then 2) alternate ".
+                               "operations on the ".
+                               "same key '$chkkey'");
+                     msg(ERROR,"buffer=".Dumper(\@main::buffer));
+                     last;
+                  }
+                  else{
+                     $foundAltOp=$c;
+                  }
                }
             }
          }
