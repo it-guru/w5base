@@ -97,8 +97,8 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
-
-   my $autocorrect=0;
+   my $checksession=shift;
+   my $autocorrect=$checksession->{autocorrect};
 
    my $wfrequest={};
    my $forcedupd={};
