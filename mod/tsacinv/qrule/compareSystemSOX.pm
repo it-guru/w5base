@@ -92,7 +92,7 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(undef,undef) if (lc($rec->{srcsys}) eq "w5base");
+   return(undef,undef) if (lc($rec->{srcsys}) ne "assetmanager");
    return(0,undef) if ($rec->{cistatusid}<=1 || $rec->{cistatusid}>=6);
    if ($rec->{systemid} ne ""){
       my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
