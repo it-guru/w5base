@@ -481,6 +481,10 @@ sub nativQualityCheck
    my %dataupdate;
    my $checkStart=NowStamp("en");
 
+   if (ref($param[0]) ne "HASH"){
+      $param[0]={}; # this is the checksession!
+   }
+
    $param[0]->{autocorrect}=0 if (!exists($param[0]->{autocorrect}));;
    $param[0]->{ruleno}=0 if (!exists($param[0]->{ruleno}));;
 
@@ -523,57 +527,72 @@ sub nativQualityCheck
    #  }
    #  $param[0]->{ruleno}=0;
 
-   foreach my $qrulename (@$finalQruleList){
-      my $sseconds=Time::HiRes::time();
-      if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-         msg(INFO,"start rule $qrulename ...");
-      }
-      my $qrule=$self->{qrule}->{$qrulename};
-      my $oldcontext=$W5V2::OperationContext;
-      $W5V2::OperationContext="QualityCheck";
-      my $acorrect=0;  # vorgesehen für auto correct modeA
-      $param[0]->{ruleno}++;
-      if ($qrule->can("qcheckRecord")){
-         my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,@param);
-         $W5V2::OperationContext=$oldcontext;
-         if (defined($control) && defined($control->{dataissue})){
-            my $dataissuemsg=$control->{dataissue};
-            $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
-            if ($#{$dataissuemsg}!=-1){
-               my $qrulename=$qrule->Self();
-               if (!defined($alldataissuemsg{$qrulename})){
-                  $alldataissuemsg{$qrulename}=[];
+   CIRCQC: for(my $circQC=0;$circQC<3;$circQC++){
+      %alldataissuemsg=(); # a new circulaer pass resets the old messages
+      $param[0]->{EssentialsChangedCnt}=0;
+      $param[0]->{EssentialsChanged}={};
+      foreach my $qrulename (@$finalQruleList){
+         my $sseconds=Time::HiRes::time();
+         if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+            msg(INFO,"start rule $qrulename ...");
+         }
+         my $qrule=$self->{qrule}->{$qrulename};
+         my $oldcontext=$W5V2::OperationContext;
+         $W5V2::OperationContext="QualityCheck";
+         my $acorrect=0;  # vorgesehen für auto correct modeA
+         $param[0]->{ruleno}++;
+         if ($qrule->can("qcheckRecord")){
+            my $oldHistComments=$W5V2::HistoryComments;
+            $W5V2::HistoryComments="QualityRule=$qrulename";
+            my ($qresult,$control)=$qrule->qcheckRecord($parent,$rec,@param);
+            $W5V2::OperationContext=$oldcontext;
+            $W5V2::HistoryComments=$oldHistComments; 
+            if (defined($control) && defined($control->{dataissue})){
+               my $dataissuemsg=$control->{dataissue};
+               $dataissuemsg=[$dataissuemsg] if (ref($dataissuemsg) ne "ARRAY");
+               if ($#{$dataissuemsg}!=-1){
+                  my $qrulename=$qrule->Self();
+                  if (!defined($alldataissuemsg{$qrulename})){
+                     $alldataissuemsg{$qrulename}=[];
+                  }
+                  push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
                }
-               push(@{$alldataissuemsg{$qrulename}},@{$dataissuemsg});
             }
+            if (defined($control) && defined($control->{dataupdate})){
+            }
+            my $resulttext="OK";
+            $resulttext="fail"      if (defined($qresult) && $qresult!=0);
+            $resulttext="messy"     if ($qresult==1);
+            $resulttext="warn"      if ($qresult==2);
+            $resulttext="disabled" if (!defined($qresult));
+            my $qrulelongname=$qrule->getName();
+            my $hints=$qrule->getHints();
+            my $havehints=$hints eq "" ? 0 : 1;
+            my $res={ 
+               rulelabel=>"$qrulelongname",
+               ruleid=>$qrule->Self,
+               havehints=>$havehints,
+               result=>$self->T($resulttext),
+               exitcode=>$qresult
+            };
+            if ($circQC>0){
+               $res->{rulelabel}="(Pass:".($circQC+1).") ".$res->{rulelabel};
+            }
+            if (defined($control->{qmsg})){
+               $self->translate_qmsg($control,$res,$qrulename);
+            }
+            push(@{$result->{rule}},$res);
          }
-         if (defined($control) && defined($control->{dataupdate})){
+         $W5V2::OperationContext=$oldcontext;
+         if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+            my $eseconds=Time::HiRes::time();
+            my $t=sprintf("%.3lf",$eseconds-$sseconds); 
+            msg(INFO,"... end rule $qrulename (duration=$t sec)");
+            msg(INFO,"-------------------------------------------------\n");
          }
-         my $resulttext="OK";
-         $resulttext="fail"      if (defined($qresult) && $qresult!=0);
-         $resulttext="messy"     if ($qresult==1);
-         $resulttext="warn"      if ($qresult==2);
-         $resulttext="disabled" if (!defined($qresult));
-         my $qrulelongname=$qrule->getName();
-         my $hints=$qrule->getHints();
-         my $havehints=$hints eq "" ? 0 : 1;
-         my $res={ 
-            rulelabel=>"$qrulelongname",
-            ruleid=>$qrule->Self,
-            havehints=>$havehints,
-            result=>$self->T($resulttext),
-            exitcode=>$qresult
-         };
-         if (defined($control->{qmsg})){
-            $self->translate_qmsg($control,$res,$qrulename);
-         }
-         push(@{$result->{rule}},$res);
       }
-      if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-         my $eseconds=Time::HiRes::time();
-         my $t=sprintf("%.3lf",$eseconds-$sseconds); 
-         msg(INFO,"... end rule $qrulename (duration=$t sec)");
-         msg(INFO,"-------------------------------------------------\n");
+      if ($param[0]->{EssentialsChangedCnt}==0){ 
+         last CIRCQC;
       }
    }
    if ($parent->Self() ne "base::workflow"){ # only DataIssues for nonworkflows!

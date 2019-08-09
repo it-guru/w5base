@@ -515,6 +515,8 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
                           join(", ",keys(%$forcedupd)));
                foreach my $k (keys(%$forcedupd)){
                   $rec->{$k}=$forcedupd->{$k};
+                  $checksession->{EssentialsChangedCnt}++;
+                  $checksession->{EssentialsChanged}->{$k}++
                }
             }
             else{
