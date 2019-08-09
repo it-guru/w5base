@@ -54,6 +54,8 @@ sub new
                                    sortvalue  =>'asc',
                                    dataobjattr=>'tWrID'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(     name       =>'uid',
                                    label      =>'UserID (uid)',
                                    size       =>'10',

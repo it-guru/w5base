@@ -46,6 +46,8 @@ sub new
                 align         =>'left',
                 dataobjattr   =>'generic_appl."applid"'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'full CI-Name',

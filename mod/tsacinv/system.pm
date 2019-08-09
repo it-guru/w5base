@@ -64,6 +64,8 @@ sub new
                 align         =>'left',
                 dataobjattr   =>'system."systemid"'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'itfarm',
                 vjointo       =>\'tsacinv::itfarm',

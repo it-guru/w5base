@@ -42,6 +42,8 @@ sub new
                                    align      =>'left',
                                    dataobjattr=>'wiwid'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(     name       =>'uid',
                                    label      =>'UserID',
                                    size       =>'10',

@@ -46,6 +46,7 @@ sub new
                 align         =>'left',
                 dataobjattr   =>'"assetid"'),
 
+      new kernel::Field::RecordUrl(),
 
       new kernel::Field::Text(
                 name          =>'itfarm',

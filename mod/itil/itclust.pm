@@ -44,6 +44,8 @@ sub new
                 group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'itclust.id'),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'fullname',

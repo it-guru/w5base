@@ -38,6 +38,8 @@ sub new
                 group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'costcenter.id'),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'name',

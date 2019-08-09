@@ -42,7 +42,9 @@ sub new
                 searchable    =>0,
                 group         =>'source',
                 dataobjattr   =>'qitcloudarea.id'),
-                                                 
+
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'full qualified cloud area',
