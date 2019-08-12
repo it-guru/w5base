@@ -38,6 +38,8 @@ sub new
                 label         =>'ID',
                 dataobjattr   =>"ipnet.subnetz_id"),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Subnet label',

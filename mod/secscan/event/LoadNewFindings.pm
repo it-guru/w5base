@@ -44,6 +44,16 @@ sub LoadNewFindings
    $self->{wf}=getModuleObject($self->Config,"base::workflow");
    my $user=getModuleObject($self->Config,"base::user");
 
+   my @datastreamview=qw(ALL);
+
+   if ($queryparam ne ""){
+      $datastream->SetFilter({id=>\$queryparam});
+      foreach my $rec ($datastream->getHashList(@datastreamview)){
+          my $res={};
+          $self->analyseRecord($datastream,$rec,$res);
+      }
+      return({exitcode=>0,exitmsg=>'DEBUG: ok'});
+   }
 
    my $eventlabel='IncStreamAnalyse::'.$datastream->Self;
    my $method=(caller(0))[3];
@@ -96,11 +106,7 @@ sub LoadNewFindings
       my $skiplevel=0;
       my $recno=0;
       $datastream->SetFilter(\%flt);
-      $datastream->SetCurrentView(qw(id name secitem ipaddr 
-                                     spec findcdate hostname
-                                     wfhandeled wfref recuphist
-                                     sectokenid hstate wfheadid
-                                     comments));
+      $datastream->SetCurrentView(@datastreamview);
       $datastream->SetCurrentOrder("+findcdate","+id");
       #$datastream->Limit(1000);
       my ($rec,$msg)=$datastream->getFirst();
@@ -291,6 +297,7 @@ sub analyseRecord
    # 
    my ($WfRec,$msg);
    if (defined($reponsibleid)){
+      msg(INFO,"start handling for reponsibleid $reponsibleid");
       my @srckey;
       my $srcsys="secscan::finding";
       my $srcid=$rec->{sectokenid};
@@ -352,6 +359,7 @@ sub analyseRecord
    $dataop->BackendSessionName("cloned$$"); # needed because oracle gets problems with getNext
    my $upd={};
    if (defined($WfRec)){
+      msg(INFO,"start handling for existing workflow");
       if (!$rec->{wfhandeled}){
          $upd->{wfhandeled}=1;
       }
@@ -366,10 +374,13 @@ sub analyseRecord
       }
    }
    else{
+      msg(INFO,"start handling unknown ip adresses");
       if (!$rec->{hstate}){
          $upd->{hstate}="NOTAUTOHANDLED";
       }
-      if ($rec->{comments} eq ""){
+      #if ($rec->{comments} eq ""){
+      if (1){
+         my $newcomments="";
          my $ipflt=$rec->{ipaddr};
          $ipflt=~s/\*//g;
          $ipflt=~s/\?//g;
@@ -379,19 +390,62 @@ sub analyseRecord
             $noa->SetFilter({name=>$ipflt});
             my @l=$noa->getHashList(qw(name systemname urlofcurrentrec));
             if ($#l!=-1){
-               $upd->{comments}=join("\n\n",map({
+               $newcomments.="NOAH IP-Informations:\n".join("\n\n",map({
                   $_->{systemname}."\n".$_->{urlofcurrentrec};
                } @l));
             }
+            if (1){
+               # now we try to find the correct networks
+               my @netmask=qw(0 0 0 0);
+               my @network=qw(0 0 0 0);
+               my @flt;
+               foreach my $ipaddr (split(/[\s;]+/,$rec->{ipaddr})){
+                   my @okt=split(/\./,$ipaddr);
+                   for(my $o=0;$o<=3;$o++){
+                      my $bitmask=128;
+                      for(my $bit=0;$bit<8;$bit++){
+                         $bitmask=(128>>$bit)|$bitmask;
+                         $netmask[$o]=$bitmask;
+                         my $netmask=join(".",@netmask);
+                         for(my $n=0;$n<4;$n++){
+                            $network[$n]=$okt[$n]&$netmask[$n];
+                         }
+                         my $network=join(".",@network);
+                         push(@flt,{
+                            name=>\$network,
+                            subnetmask=>\$netmask 
+                         });
+                      }
+                   }
+               }
+               if ($#flt!=-1){
+                  my $noa=getModuleObject($dataobj->Config,"tsnoah::ipnet");
+                  $noa->SetFilter(\@flt);
+                  my @l=$noa->getHashList(qw(fullname name subnetmask
+                                             urlofcurrentrec));
+                  if ($#l!=-1){
+                     if ($newcomments ne ""){
+                        $newcomments.="\n\n";
+                     }
+                     $newcomments.="NOAH IP-Networks:\n".join("\n\n",map({
+                        $_->{fullname}."\n".$_->{name}." ".
+                        "(".$_->{subnetmask}.")\n".
+                        $_->{urlofcurrentrec};
+                     } @l));
+                  }
+               }
+            }
+         }
+         if (trim($rec->{comments}) ne trim($newcomments)){
+            $upd->{comments}=$newcomments;
          }
       }
    }
    if (keys(%$upd)){
-      my $upddump=Dumper($upd);
-      my $recdump=Dumper($rec);
       if (!$dataop->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}})){
-         msg(ERROR,"ValidatedUpdateRecord failed on upd ".$upddump);
-         msg(ERROR,"rec ".$recdump);
+         msg(ERROR,"ValidatedUpdateRecord failed on upd");
+         msg(ERROR,"rec=".Dumper($rec));
+         msg(ERROR,"upd=".Dumper($upd));
       }
    }
 
