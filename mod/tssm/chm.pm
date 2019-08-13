@@ -482,7 +482,8 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tssm::lnkticket',
                 vjoinon       =>['changenumber'=>'src'],
-                vjoindisp     =>[qw(dstname)]),
+                vjoindisp     =>[qw(dstname)],
+                vjoininhash   =>[qw(dstsmid dstsmobj dstname)]),
 
       new kernel::Field::Text(
                 name          =>'editor',
