@@ -251,7 +251,8 @@ sub SetFilter
 
    #######################################################################
    my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-             [qw(RSKManager RSKCoord)], "down");
+             [qw(RSKManager RSKCoord
+                 RSKPManager RSKPManager2)], "down");
    my @grpids=keys(%grp);
    @grpids=(qw(-1)) if ($#grpids==-1);
    $flt->{mandatorid}=\@grpids;
