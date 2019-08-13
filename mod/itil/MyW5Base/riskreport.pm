@@ -286,6 +286,7 @@ sub SetFilter
       $flt->{class}=[grep(/^.*::riskmgmt$/,
                           keys(%{$dataobj->{SubDataObj}}))];
       my %subflt=%{$flt};
+      delete($subflt{state});
       my $o=$dataobj->Clone();
       $o->SetFilter(\%subflt);
       my @l=$o->getHashList(qw(id relations));
@@ -304,10 +305,10 @@ sub SetFilter
                           keys(%{$dataobj->{SubDataObj}}))];
    }
    elsif ($flt->{wfclass} eq "both"){
-      delete($flt->{wfclass});
       $flt->{class}=[grep(/^.*::riskmgmt$/,
                           keys(%{$dataobj->{SubDataObj}}))];
       my %subflt=%{$flt};
+      delete($subflt{state});
       my $o=$dataobj->Clone();
       $o->SetFilter(\%subflt);
       my @l=$o->getHashList(qw(id relations));
