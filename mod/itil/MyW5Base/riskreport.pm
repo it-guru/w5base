@@ -287,6 +287,7 @@ sub SetFilter
                           keys(%{$dataobj->{SubDataObj}}))];
       my %subflt=%{$flt};
       delete($subflt{state});
+      delete($subflt{wfclass});
       my $o=$dataobj->Clone();
       $o->SetFilter(\%subflt);
       my @l=$o->getHashList(qw(id relations));
@@ -309,6 +310,7 @@ sub SetFilter
                           keys(%{$dataobj->{SubDataObj}}))];
       my %subflt=%{$flt};
       delete($subflt{state});
+      delete($subflt{wfclass});
       my $o=$dataobj->Clone();
       $o->SetFilter(\%subflt);
       my @l=$o->getHashList(qw(id relations));
