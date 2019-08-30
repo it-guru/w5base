@@ -221,8 +221,17 @@ sub CloudAreaSync
                 $currec->{srcid} ne $a->{srcid}){
                $updrec->{srcid}=$a->{srcid};
             }
+            if ($currec->{applid} ne $a->{applid}){
+               if ($a->{appl} ne ""){
+                  $updrec->{appl}=$a->{appl};
+                  if ($currec->{cistatusid} eq "4"){
+                     if ($d->{days}<3){
+                        $updrec->{cistatusid}=3;
+                     }
+                  }
+               }
+            }
             if (keys(%$updrec)){
-#print STDERR Dumper($updrec);
                $itcloudareaobj->ValidatedUpdateRecord(
                   $currec,$updrec,{
                      id=>$currec->{id}

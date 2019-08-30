@@ -505,6 +505,11 @@ sub FinishWrite
             $doNotify=2;
          }
       }
+      if ($oldrec->{cistatusid}==3 &&
+          exists($newrec->{applid}) &&
+          $oldrec->{applid} ne $newrec->{applid}){
+         $doNotify=1;
+      }
    }
    if ($doNotify){
       # send a mail to system/cluster databoss with cc on current user
