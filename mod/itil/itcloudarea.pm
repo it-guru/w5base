@@ -294,6 +294,12 @@ sub initSearchQuery
 }
 
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::itcloudarea");
+}
+
+
 
          
 
@@ -394,16 +400,22 @@ sub Validate
    }
    if (effChanged($oldrec,$newrec,"cistatusid")){
       if ($newrec->{cistatusid}==6){
-         if (!$self->isWriteOnITCloudValid($itcloudid,"default")){
-            $self->LastMsg(ERROR,"mark as wasted only allowed ".
-                                 "for cloud writeables");
-            return(0);
+         if ($self->isDataInputFromUserFrontend() && 
+             !$self->IsMemberOf("admin")){
+            if (!$self->isWriteOnITCloudValid($itcloudid,"default")){
+               $self->LastMsg(ERROR,"mark as wasted only allowed ".
+                                    "for cloud writeables");
+               return(0);
+            }
          }
       }
       if ($newrec->{cistatusid}<3){
-         if (!$self->isWriteOnITCloudValid($itcloudid,"default")){
-            $self->LastMsg(ERROR,"CI-Status not allowed to set");
-            return(0);
+         if ($self->isDataInputFromUserFrontend() && 
+             !$self->IsMemberOf("admin")){
+            if (!$self->isWriteOnITCloudValid($itcloudid,"default")){
+               $self->LastMsg(ERROR,"CI-Status not allowed to set");
+               return(0);
+            }
          }
       }
    }
