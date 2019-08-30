@@ -62,7 +62,8 @@ sub CloudAreaSync
       name=>'![EMPTY]'
    });
    foreach my $appansrec ($appans->getHashList(qw(
-                           name fullname cluster id applid appl))){
+                           name fullname cluster id applid appl
+                           lastmondate))){
        $itcloud{$appansrec->{cluster}}++;
        my $fullname=$appansrec->{cluster}.".".$appansrec->{name};
        my %carec=(
@@ -72,7 +73,8 @@ sub CloudAreaSync
           srcid=>undef,
           srcsys=>$appans->Self(),
           applid=>$appansrec->{applid},
-          appl=>$appansrec->{appl}
+          appl=>$appansrec->{appl},
+          lastmondate=>$appansrec->{lastmondate}
        );
        push(@a,\%carec);
    }
@@ -84,7 +86,9 @@ sub CloudAreaSync
       my %otcpname;
       my $itcloud="OTC";
       foreach my $otcprorec ($otcpro->getHashList(qw(
-                              name cluster id applid appl domain fullname))){
+                              name cluster id applid appl 
+                              domain fullname
+                              lastmondate))){
           my $fullname=$itcloud.".".$otcprorec->{name};
           $itcloud{$itcloud}++;
           $otcpname{$otcprorec->{name}}++;
@@ -99,7 +103,8 @@ sub CloudAreaSync
              srcid=>$otcprorec->{id},
              srcsys=>$otcpro->Self(),
              applid=>$otcprorec->{applid},
-             appl=>$otcprorec->{appl}
+             appl=>$otcprorec->{appl},
+             lastmondate=>$otcprorec->{lastmondate}
           );
           push(@a,\%carec);
       }
@@ -118,8 +123,7 @@ sub CloudAreaSync
 
    # load all relevant itcloud records
    $itcloudobj->SetFilter({
-      name=>[keys(%itcloud)],
-      cistatusid=>[3,4]
+      name=>[keys(%itcloud)]
    });
    $itcloudobj->SetCurrentView(qw(name id databossid cistatusid));
    my $itcloud=$itcloudobj->getHashIndexed("id","name");
@@ -136,16 +140,12 @@ sub CloudAreaSync
    $itcloudareaobj->SetFilter({
       cloud=>[keys(%itcloud)],
    });
-   $itcloudareaobj->SetCurrentView(qw(name fullname id itcloudid srcsys srcid));
+   $itcloudareaobj->SetCurrentView(qw(ALL));
    my $itcloudarea=$itcloudareaobj->getHashIndexed("id","fullname","name");
-
-
 
    #print Dumper(\%itcloud);
    #print Dumper($itcloud);
    #print Dumper($itcloudarea);
-
-
 
    foreach my $a (@a){
       last if ($inscnt>9);
@@ -154,9 +154,16 @@ sub CloudAreaSync
       if (exists($itcloudarea->{fullname}->{$fullname})){
          $currec=$itcloudarea->{fullname}->{$fullname};
       }
-      #{
-      #   # try to find currec by srcid/srcsys
-      #}
+      if (defined($a->{srcid}) && defined($a->{srcsys}) &&
+          !defined($currec)){
+         foreach my $carec (values(%{$itcloudarea->{id}})){
+            if ($a->{srcsys} eq $carec->{srcsys} &&
+                $a->{srcid} eq $carec->{srcid}){
+               $currec=$carec;
+               last;
+            }
+         }
+      }
       if (!defined($currec)){
          if (exists($itcloud->{name}->{$a->{itcloud}})){
             if ($a->{appl} ne ""){
@@ -189,19 +196,42 @@ sub CloudAreaSync
       else{
          # check, if updates needs to be done
          my $updrec;
-         if ($currec->{srcsys} ne $a->{srcsys}){
-            $updrec->{srcsys}=$a->{srcsys};
+         my $d=CalcDateDuration($a->{lastmondate},NowStamp("en"));
+         if (defined($d)){
+            if ($d->{days}>6){
+               if ($currec->{cistatusid}!=6){
+                  $updrec->{cistatusid}=6;   # auf veraltet settzen
+               }
+            }
+            else{
+               if ($currec->{cistatusid}>5){ # reaktivieren einer bereits
+                  $updrec->{cistatusid}=3;   # als veraltet markieren CloudArea
+               }                             # (mit Nachfrage beim AG DV)
+            }
+
+            if ($currec->{srcsys} ne $a->{srcsys}){
+               $updrec->{srcsys}=$a->{srcsys};
+            }
+            my $curbasename=$currec->{name};
+            $curbasename=~s/\[[0-9]+\]$//;
+            if ($curbasename ne $a->{name}){
+               $updrec->{name}=$a->{name};
+            }
+            if (exists($a->{srcid}) && $a->{srcid} ne "" &&
+                $currec->{srcid} ne $a->{srcid}){
+               $updrec->{srcid}=$a->{srcid};
+            }
+            if (keys(%$updrec)){
+#print STDERR Dumper($updrec);
+               $itcloudareaobj->ValidatedUpdateRecord(
+                  $currec,$updrec,{
+                     id=>$currec->{id}
+                  }
+               );
+            }
          }
-         if ($currec->{name} ne $a->{name}){
-            $updrec->{name}=$a->{name};
-         }
-         if (exists($a->{srcid}) && $a->{srcid} ne "" &&
-             $currec->{srcid} ne $a->{srcid}){
-            $updrec->{srcid}=$a->{srcid};
-         }
-         if (keys(%$updrec)){
-            $itcloudareaobj->ValidatedUpdateRecord($currec,$updrec,
-                                                   {id=>$currec->{id}});
+         else{
+            msg(ERROR,"invalid lastmondate in ".Dumper($a));
          }
       }
    }
