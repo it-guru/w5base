@@ -349,6 +349,18 @@ sub SecureValidate
 
 
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $itcloudid=$rec->{"cloudid"};
+   if ($self->isWriteOnITCloudValid($itcloudid,"default")){
+      return(1);
+   }
+   return(0);
+}
+
 
 sub Validate
 {
