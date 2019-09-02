@@ -137,15 +137,51 @@ sub new
                 name          =>'days_not_patched',
                 label         =>'Missing Patch released x days ago',
                 htmldetail    =>'NotEmpty',
+                background    =>\&getTCCbackground,
+                group         =>'auditserver',
                 searchable    =>0,
                 dataobjattr   =>'DAYS_NOT_PATCHED'),
+
+      new kernel::Field::Text(
+                name          =>'days_not_patched_color',
+                label         =>'Missing Patch: Color',
+                htmldetail    =>'0',
+                group         =>'auditserver',
+                sqlorder      =>'NONE',
+                dataobjattr   =>"CASE  ".
+                                "WHEN lower(OPERATIONCATEGORY)='downtime optimized' THEN ".
+                                      "(case ".
+                                      "when DAYS_NOT_PATCHED=0 THEN NULL ".
+                                      "when DAYS_NOT_PATCHED is null THEN NULL ".
+                                      "when DAYS_NOT_PATCHED<180 THEN 'green' ".
+                                      "when DAYS_NOT_PATCHED>365 THEN 'red' ".
+                                      "else 'yellow' end) ".
+                                "WHEN lower(OPERATIONCATEGORY)='up to date' THEN ".
+                                      "(case ".
+                                      "when DAYS_NOT_PATCHED=0 THEN NULL ".
+                                      "when DAYS_NOT_PATCHED is null THEN NULL ".
+                                      "when DAYS_NOT_PATCHED<90 THEN 'green' ".
+                                      "when DAYS_NOT_PATCHED>120 THEN 'red' ".
+                                      "else 'yellow' end) ".
+                                "ELSE NULL ".
+                                "END"),
 
       new kernel::Field::Text(
                 name          =>'red_alert',
                 label         =>'Red Alert',
                 htmldetail    =>'NotEmpty',
-                searchable    =>0,
+                background    =>\&getTCCbackground,
+                group         =>'auditserver',
+                searchable    =>1,
+                ignorecase    =>1,
                 dataobjattr   =>'RED_ALERT'),
+
+      new kernel::Field::Text(
+                name          =>'red_alert_color',
+                label         =>'Red Alert: Color',
+                htmldetail    =>'0',
+                group         =>'auditserver',
+                dataobjattr   =>"decode(RED_ALERT,NULL,'','red')"),
 
       new kernel::Field::Date(
                 name          =>'opcatchangedate',
@@ -1011,7 +1047,7 @@ sub Validate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default roadmap upd patch dsk ha  hw mon other w5basedata source));
+   return(qw(header default auditserver roadmap upd patch dsk ha  hw mon other w5basedata source));
 }
 
 

@@ -9,6 +9,7 @@
 'fieldgroup.os'=>{de=>'Betriebssystem',en=>'Operationsystem'},
 'fieldgroup.hw'=>{de=>'Hardware',en=>'Hardware'},
 'fieldgroup.other'=>{de=>'Sonstige Base-Setups',en=>'Other Base-Setups'},
+'fieldgroup.auditserver'=>{de=>'Auditserver',en=>'Auditserver'},
 'fieldgroup.roadmap'=>{de=>'Roadmap Compliance',en=>'Roadmap Compliance'},
 'fieldgroup.patch'=>{de=>'Release-/Patchmanagement Compliancy',en=>'Release-/Patchmanagement Compliancy'},
 'fieldgroup.dsk'=>{de=>'Storage Connectivity Compliancy',en=>'Storage Connectivity Compliancy'},
