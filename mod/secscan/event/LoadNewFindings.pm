@@ -322,7 +322,7 @@ sub analyseRecord
       #   $self->{wf}->Action->StoreRecord($WfRec->{id},"note",
       #                              {additional=>{}},"recreation detected");
       }
-      else{
+      if (!defined($WfRec)){
          my $newrec={
             srcsys=>$srckey,
             class=>'secscan::workflow::FindingHndl',

@@ -998,7 +998,7 @@ sub nativProcess
       $h->{fwdtarget}="base::user";
 
       if (!in_array($self->getParent->{tester},
-                    $WfRec->{fwdtargetid})){
+                    $h->{fwdtargetid})){
          $h->{fwdtargetid}=15632883160001; # security_issue test contact
          $h->{fwdtarget}="base::user";
          delete($h->{secfindingaltreponsibleid});  # no tsms
