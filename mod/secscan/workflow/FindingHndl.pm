@@ -30,6 +30,8 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->{history}=[qw(insert modify delete)];
+   $self->{tester}=[qw(11634961950007 11634966030005 11817228080001 
+                       12260596620002 13643853890000 13790292430004)];
    return($self);
 }
 
@@ -827,12 +829,16 @@ sub nativProcess
          my $nextstep=$self->getParent->getStepByShortname("main");
          my $store={stateid=>2,
                     step=>$nextstep,
-                    fwdtargetid=>15632883160001,
-                    fwdtarget=>'base::user',
                     secfindingstate=>'INANALYSE',
                     closedate=>undef,
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
+         msg(WARN,"reactivate SecFinding $WfRec->{id}");
+         if (!in_array($self->getParent->{tester},
+                       $WfRec->{fwdtargetid})){
+            $store->{fwdtargetid}=15632883160001;
+            $store->{fwdtarget}="base::user";
+         }
          $self->StoreRecord($WfRec,$store);
          return(1);
       }
@@ -988,13 +994,15 @@ sub nativProcess
       }
 
 
-      #$h->{fwdtargetid}=$h->{secfindingreponsibleid};
-      #$h->{fwdtarget}="base::user";
-
-      $h->{fwdtargetid}=15632883160001; # security_issue test contact
+      $h->{fwdtargetid}=$h->{secfindingreponsibleid};
       $h->{fwdtarget}="base::user";
-      delete($h->{secfindingaltreponsibleid});  # no tsms
 
+      if (!in_array($self->getParent->{tester},
+                    $WfRec->{fwdtargetid})){
+         $h->{fwdtargetid}=15632883160001; # security_issue test contact
+         $h->{fwdtarget}="base::user";
+         delete($h->{secfindingaltreponsibleid});  # no tsms
+      }
 
       $h->{secfindingstate}="INANALYSE";
       my $secfindingaltreponsibleid=$h->{secfindingaltreponsibleid};
