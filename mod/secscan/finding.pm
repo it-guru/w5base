@@ -131,7 +131,7 @@ create table "W5I_secscan__finding_of" (
    constraint "W5I_secscan_finding_of_pk" primary key (refid)
 );
 
-grant select,update,insert on "W5I_secscan__finding_of" to W5I;
+grant select,update,insert,delete on "W5I_secscan__finding_of" to W5I;
 create or replace synonym W5I.secscan__finding_of for "W5I_secscan__finding_of";
 
 
@@ -638,8 +638,34 @@ sub isDeleteValid
    my $self=shift;
    my $rec=shift;
 
+   if ($self->IsMemberOf("admin")){
+      return(1);
+   }
    return(0);
 }
+
+
+sub getDeleteRecordFilter
+{
+   my $self=shift;
+   my $oldrec=shift;
+
+   my $idname=$self->IdField->Name();
+   my $dropid=$oldrec->{$idname};
+   if (!defined($dropid)){
+      $self->LastMsg(ERROR,"can't delete record without unique id in $idname");
+      return;
+   }
+   my $sectokenid=$oldrec->{sectokenid};
+   if (!defined($sectokenid)){
+      $self->LastMsg(ERROR,"can't delete record without sectokenid in $idname");
+      return;
+   }
+
+   my @flt=({$self->IdField->Name()=>$sectokenid});
+   return(@flt);
+}
+
 
 
 sub isQualityCheckValid
