@@ -2784,7 +2784,20 @@ sub SendRemoteEvent
 }
 
 
+sub getDeleteRecordFilter
+{
+   my $self=shift;
+   my $oldrec=shift;
 
+   my $idname=$self->IdField->Name();
+   my $dropid=$oldrec->{$idname};
+   if (!defined($dropid)){
+      $self->LastMsg(ERROR,"can't delete record without unique id in $idname");
+      return;
+   }
+   my @flt=({$self->IdField->Name()=>$dropid});
+   return(@flt);
+}
 
 
 

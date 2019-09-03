@@ -669,14 +669,13 @@ sub DeleteRecord
 {
    my $self=shift;
    my $oldrec=shift;
-   my $idname=$self->IdField->Name();
    $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
-   my $dropid=$oldrec->{$idname};
-   if (!defined($dropid)){
-      $self->LastMsg(ERROR,"can't delete record without unique id in $idname");
-      return(undef);
+
+   my @flt;
+   if (!(@flt=$self->getDeleteRecordFilter($oldrec))){
+      $self->LastMsg(ERROR,"can't create delete filter in $self");
+      return;
    }
-   my @flt=({$self->IdField->Name()=>$dropid});
    my $where=$self->getSqlWhere("delete",@flt);
 
    my ($worktable,$workdb)=$self->getWorktable();
