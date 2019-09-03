@@ -243,7 +243,6 @@ sub ProcessLine
    my @cellobj=();
    foreach my $fo (@{$recordview}){
       next if ($fo->Type() eq "Link");
-      next if ($fo->Type() eq "Interface");
       next if ($fo->Type() eq "Container");
       my $name=$fo->Name();
       if (!defined($self->{xlscollindex}->{$name})){
@@ -326,7 +325,6 @@ sub ProcessHead
 
    for(my $cellno=0;$cellno<=$#view;$cellno++){
       #next if (!($view[$cellno]->UiVisible()));   # ist nicht mehr notwendig
-      next if ($view[$cellno]->Type() eq "Interface");
       next if ($view[$cellno]->Type() eq "Container");
       my $xlscellno=$self->{xlscollindex}->{$view[$cellno]->Name()};
       my $label=$view[$cellno]->Label();

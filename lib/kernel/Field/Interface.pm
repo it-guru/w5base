@@ -33,6 +33,7 @@ sub new
    my $self={@_};
    $self->{searchable}=0 if (!defined($self->{searchable}));
    $self->{htmldetail}=0 if (!defined($self->{htmldetail}));
+   $self->{xlsnumformat}='@' if (!defined($self->{xlsnumformat}));
    $self->{uivisible}=sub {
       my $self=shift;
       if ($self->getParent->can("IsMemberOf")){
