@@ -424,15 +424,18 @@ sub Sendmail
             if (ref($emailbottom) eq "ARRAY"){
                $emailbottom=join("",@{$emailbottom});
             }
+            my $mailsignature="";
+            if (defined($emailsig) && $emailsig->{htmlsig} ne ""){
+               $mailsignature=$emailsig->{htmlsig};
+            }
+ 
             $maildata=$app->getParsedTemplate($formname,{
                                            static=>{
                                               %additional,
                                               langcontrol =>$langcontrol,
-                                              emailbottom =>$emailbottom
+                                              emailbottom =>$emailbottom,
+                                              MAILSIGNATURE=>$mailsignature
                                            }});
-         }
-         if (defined($emailsig) && $emailsig->{htmlsig} ne ""){
-            $maildata.=$emailsig->{htmlsig};
          }
          $mail.=$maildata;
 
