@@ -171,8 +171,23 @@ sub new
                 onRawValue    =>\&parseSSL),
 
       new kernel::Field::Date(
+                name          =>'sslparsedvalidfrom',
+                label         =>'SSL parsed Valid From',
+                group         =>'sslcert',
+                depend        =>'results',
+                onRawValue    =>\&parseSSL),
+
+      new kernel::Field::Date(
                 name          =>'sslparsedvalidtill',
                 label         =>'SSL parsed Valid Till',
+                group         =>'sslcert',
+                depend        =>'results',
+                onRawValue    =>\&parseSSL),
+
+      new kernel::Field::Number(
+                name          =>'sslparsedvalidity',
+                label         =>'SSL parsed validity period',
+                unit          =>'days',
                 group         =>'sslcert',
                 depend        =>'results',
                 onRawValue    =>\&parseSSL),
@@ -433,6 +448,9 @@ sub parseSSL
             if (my ($s)=$line=~m/^\(0\)Valid Till\s*(.*)\s*$/){
                $l{sslparsedvalidtill}=Localtime("GMT",str2time($s));
             }
+            if (my ($s)=$line=~m/^\(0\)Valid From\s*(.*)\s*$/){
+               $l{sslparsedvalidfrom}=Localtime("GMT",str2time($s));
+            }
             if (my ($s)=$line=~m/^\(0\)ISSUER NAME\s*$/){
                $inissuer=1;
             }
@@ -449,6 +467,14 @@ sub parseSSL
          }
          $l{sslparsedissuer}=$i;
       } 
+      $l{sslparsedvalidity}=undef;
+      if ($l{sslparsedvalidfrom} ne "" &&
+          $l{sslparsedvalidtill} ne ""){
+         my $d=CalcDateDuration($l{sslparsedvalidfrom},$l{sslparsedvalidtill});
+         if (defined($d)){
+            $l{sslparsedvalidity}=$d->{days};
+         }
+      }
       $c->{$cacheKey}->{$id}=\%l;
    }
    return($c->{$cacheKey}->{$id}->{$self->Name});
