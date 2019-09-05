@@ -35,7 +35,8 @@ sub SSLcertMon
    my $maxDeltaDayRange="15";
 
    my $StreamDataobj="tssiem::secent";
-
+   my $jobid;
+   my $exitmsg="done";
 
    my $joblog=getModuleObject($self->Config,"base::joblog");
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
@@ -43,113 +44,125 @@ sub SSLcertMon
    my $wfa=getModuleObject($self->Config,"base::workflowaction");
    my $user=getModuleObject($self->Config,"base::user");
 
-
-   my $eventlabel='IncStreamAnalyse::'.$datastream->Self;
-   my $method=(caller(0))[3];
-
-   $joblog->SetFilter({name=>\$method,
-                       exitcode=>\'0',
-                       exitmsg=>'last:*',
-                       cdate=>">now-${maxDeltaDayRange}d", 
-                       event=>\$eventlabel});
-   $joblog->SetCurrentOrder('-cdate');
-
-   $joblog->Limit(1);
-   my ($firstrec,$msg)=$joblog->getOnlyFirst(qw(ALL));
-
-   my %jobrec=(
-      name=>$method,
-      event=>$eventlabel,
-      pid=>$$
-   );
-   my $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
-   msg(DEBUG,"jobid=$jobid");
-
+   my @datastreamview=qw(ictono ipaddress port protocol
+                                 os
+                                 sslparsedw5baseref
+                                 sslparsedvalidfrom
+                                 sslparsedvalidtill
+                                 sslparsedvalidity
+                                 sdate srcid);
    my $res={};
-
-   my $lastSuccessRun;
-   my $startstamp="now-${firstDayRange}d";        # intial scan over 14 days
-   my $exitmsg="done";
-   my $laststamp;
-   my $lastid;
-   my %flt;
-   {    #analyse lastSuccessRun
-      %flt=( 
-         sdate=>">$startstamp",
-         qid=>\"86002"
-      );
-      if (defined($firstrec)){
-         my $lastmsg=$firstrec->{exitmsg};
-         if (($laststamp,$lastid)=
-             $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\d+)$/){
-            $exitmsg=$lastmsg;
-            %flt=( 
-               sdate=>">=\"$laststamp GMT\"",
-               qid=>\"86002"
-            );
-         }
+   if ($queryparam ne ""){
+      msg(INFO,"try to process srcid='$queryparam'");
+      $datastream->SetFilter({srcid=>$queryparam});
+      my ($rec,$msg)=$datastream->getOnlyFirst(@datastreamview);
+      if (defined($rec)){
+         $self->analyseRecord($datastream,$rec,$res);
       }
    }
+   else{
+      my $eventlabel='IncStreamAnalyse::'.$datastream->Self;
+      my $method=(caller(0))[3];
 
-   { # process new records
-      my $skiplevel=0;
-      my $recno=0;
-      $datastream->SetFilter(\%flt);
-      $datastream->SetCurrentView(qw(ictono ipaddress port protocol  
-                                 os
-                                 sslparsedw5baseref sslparsedvalidtill
-                                 sdate srcid));
-      $datastream->SetCurrentOrder("+sdate","+srcid");
-      $datastream->Limit(5000);
-      my ($rec,$msg)=$datastream->getFirst();
+      $joblog->SetFilter({name=>\$method,
+                          exitcode=>\'0',
+                          exitmsg=>'last:*',
+                          cdate=>">now-${maxDeltaDayRange}d", 
+                          event=>\$eventlabel});
+      $joblog->SetCurrentOrder('-cdate');
 
-      if (defined($rec)){
-         READLOOP: do{
-            if ($skiplevel==2){
-               if ($rec->{srcid} ne $lastid){
-                  $skiplevel=3;
-               }
+      $joblog->Limit(1);
+      my ($firstrec,$msg)=$joblog->getOnlyFirst(qw(ALL));
+
+      my %jobrec=(
+         name=>$method,
+         event=>$eventlabel,
+         pid=>$$
+      );
+      $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
+      msg(DEBUG,"jobid=$jobid");
+
+
+      my $lastSuccessRun;
+      my $startstamp="now-${firstDayRange}d";        # intial scan over 14 days
+      my $laststamp;
+      my $lastid;
+      my %flt;
+      {    #analyse lastSuccessRun
+         %flt=( 
+            sdate=>">$startstamp",
+            qid=>\"86002"
+         );
+         if (defined($firstrec)){
+            my $lastmsg=$firstrec->{exitmsg};
+            if (($laststamp,$lastid)=
+                $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\d+)$/){
+               $exitmsg=$lastmsg;
+               %flt=( 
+                  sdate=>">=\"$laststamp GMT\"",
+                  qid=>\"86002"
+               );
             }
-            if ($skiplevel==1){
-               if ($rec->{sdate} ne $laststamp){
-                  msg(WARN,"record with id '$lastid' missing in datastream");
-                  msg(WARN,"this can result in skiped records!");
-                  $skiplevel=3;
-               }
-            }
-            if ($skiplevel==0){
-               if (defined($laststamp) && defined($lastid)){
-                  if ($laststamp eq $rec->{sdate}){
-                     $skiplevel=1;
+         }
+      }
+
+      { # process new records
+         my $skiplevel=0;
+         my $recno=0;
+         $datastream->SetFilter(\%flt);
+         $datastream->SetCurrentView(@datastreamview);
+         $datastream->SetCurrentOrder("+sdate","+srcid");
+         $datastream->Limit(5000);
+         my ($rec,$msg)=$datastream->getFirst();
+
+         if (defined($rec)){
+            READLOOP: do{
+               if ($skiplevel==2){
+                  if ($rec->{srcid} ne $lastid){
+                     $skiplevel=3;
                   }
                }
+               if ($skiplevel==1){
+                  if ($rec->{sdate} ne $laststamp){
+                     msg(WARN,"record with id '$lastid' missing in datastream");
+                     msg(WARN,"this can result in skiped records!");
+                     $skiplevel=3;
+                  }
+               }
+               if ($skiplevel==0){
+                  if (defined($laststamp) && defined($lastid)){
+                     if ($laststamp eq $rec->{sdate}){
+                        $skiplevel=1;
+                     }
+                  }
+                  else{
+                     $skiplevel=3;
+                  }
+               }
+               if ($skiplevel==1){
+                  if ($lastid eq $rec->{srcid}){
+                     msg(INFO,"got ladid point $lastid");
+                     $skiplevel=2;
+                  }
+               }
+               if ($skiplevel==0 ||  # = no records to skip
+                   $skiplevel==3){   # = all skips are done
+                  $self->analyseRecord($datastream,$rec,$res);
+                  $recno++;
+                  $exitmsg="last:".$rec->{sdate}.";".$rec->{srcid};
+               }
                else{
-                  $skiplevel=3;
+                  msg(INFO,"skip rec $rec->{sdate} - ".
+                           "srcid=$rec->{srcid} ".
+                           "skiplevel=$skiplevel recon=$recno");
                }
-            }
-            if ($skiplevel==1){
-               if ($lastid eq $rec->{srcid}){
-                  msg(INFO,"got ladid point $lastid");
-                  $skiplevel=2;
+               ($rec,$msg)=$datastream->getNext();
+               if (defined($msg)){
+                  msg(ERROR,"db record problem: %s",$msg);
+                  return({exitcode=>1,msg=>$msg});
                }
-            }
-            if ($skiplevel==0 ||  # = no records to skip
-                $skiplevel==3){   # = all skips are done
-               $self->analyseRecord($datastream,$rec,$res);
-               $recno++;
-               $exitmsg="last:".$rec->{sdate}.";".$rec->{srcid};
-            }
-            else{
-               msg(INFO,"skip rec $rec->{sdate} - ".
-                        "srcid=$rec->{srcid} ".
-                        "skiplevel=$skiplevel recon=$recno");
-            }
-            ($rec,$msg)=$datastream->getNext();
-            if (defined($msg)){
-               msg(ERROR,"db record problem: %s",$msg);
-               return({exitcode=>1,msg=>$msg});
-            }
-         }until(!defined($rec) || $recno>2000);
+            }until(!defined($rec) || $recno>2000);
+         }
       }
    }
 
@@ -167,11 +180,13 @@ sub SSLcertMon
 
       }
    }
-   $joblog->ValidatedUpdateRecord({id=>$jobid},
-                                 {exitcode=>"0",
-                                  exitmsg=>$exitmsg,
-                                  exitstate=>"ok - $ncnt messages"},
-                                 {id=>\$jobid});
+   if ($queryparam eq ""){
+      $joblog->ValidatedUpdateRecord({id=>$jobid},
+                                    {exitcode=>"0",
+                                     exitmsg=>$exitmsg,
+                                     exitstate=>"ok - $ncnt messages"},
+                                    {id=>\$jobid});
+   }
    return({exitcode=>0,exitmsg=>'ok'});
 }
 
@@ -203,7 +218,14 @@ sub analyseRecord
       return();
    }
 
-   if ($d->{days}<8*7 && $d->{days}>3){   # 8 weeks
+   my $notifyDayLimit=8*7;
+
+   if (defined($rec->{sslparsedvalidity}) && $rec->{sslparsedvalidity}<=180){
+      #msg(WARN,"using short period for $rec->{ipaddress}");
+      $notifyDayLimit=2*7;
+   }
+
+   if ($d->{days}<$notifyDayLimit && $d->{days}>3){   # 8 weeks
       if (defined($rec->{sslparsedw5baseref})){
          msg(WARN,"ok - found sslparsedw5baseref for ".
                   "$rec->{ipaddress}:$rec->{port}");
