@@ -14,7 +14,7 @@
 'fieldgroup.patch'=>{de=>'Release-/Patchmanagement Compliancy',en=>'Release-/Patchmanagement Compliancy'},
 'fieldgroup.dsk'=>{de=>'Storage Connectivity Compliancy',en=>'Storage Connectivity Compliancy'},
 'fieldgroup.mon'=>{de=>'Monitoring',en=>'Monitoring'},
-'Productline'=>{de=>'Produktlinie'},
+'Productline of TSI'=>{de=>'Produktlinie der TSI'},
 'TCC total state'=>{de=>'TCC Gesamtstatus'},
 'Report-Date'=>{de=>'Report-Datum'},
 'comments to Update/Refresh posibilities'=>{de=>'Bemerkungen zu den Update/Refresh Möglichkeiten'},

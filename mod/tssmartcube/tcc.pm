@@ -79,7 +79,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'productline',
-                label         =>'Productline',
+                label         =>'Productline of TSI',
                 htmllabelwidth=>'150',
                 ignorecase    =>1,
                 dataobjattr   =>'PRODUCTLINE'),
