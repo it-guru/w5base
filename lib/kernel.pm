@@ -1146,15 +1146,6 @@ sub _FancyLinks
    }
    else{
       if (length($link)>55){
-         #my $start;
-         #my $ll=index($link,"//");
-         #$ll=index($link,"/",$ll+2);
-         #$start=$ll+15;
-         #$start=55 if ($start<10 || $start>55);
-         #my $slink=substr($link,0,$start)."...".
-         #          substr($link,length($link)-16,16);
-         #my $title=$link;
-         #$title=~s/^.*?://g;
          my $title=$link;
          my $slink=TextShorter($link,55,"URL");
          $title=~s/^.*?://g;
@@ -1192,9 +1183,9 @@ sub FancyLinks
    my $data=shift;
    my $newline=chomp($data);
 
-   $data=~s#([\s";<>]{0,1})(http|https|telnet|news)
+   $data=~s#([\s"<>]{0,1})(http|https|telnet|news)
             (://\S+?)(\?\S+?){0,1}
-            ([\s";<>]|&quot;|&lt;|&gt;|$)#$1._FancyLinks("$2$3$4",$5)#gex;
+            ([\s"<>]+|&quot;|&lt;|&gt;|$)#$1._FancyLinks("$2$3$4",$5)#gex;
    $data.="\n" if($newline);
    $data=~s#(mailto)(:\S+?)(\@)(\S+)#_FancyMailLinks("$1$2$3$4")#ge;
    $data=~s#\\\\([^\\]+)\\(\S+)#_FancySmbShares($1,$2)#ge;
