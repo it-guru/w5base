@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
    $self->{use_distinct}=0;
 
@@ -60,6 +61,12 @@ sub new
                 label         =>'SystemID',
                 ignorecase    =>1,
                 dataobjattr   =>'systemid'),
+
+      new kernel::Field::Text(
+                name          =>'systemdevicestatus',
+                label         =>'System Device Status',
+                uppersearch   =>1,
+                dataobjattr   =>'devicestatus'),
 
       new kernel::Field::Text(
                 name          =>'osrelease',
@@ -181,7 +188,7 @@ sub new
 
    );
    $self->setWorktable("FLEXERA_system");
-   $self->setDefaultView(qw(systemname systemid osrelease hwmodel 
+   $self->setDefaultView(qw(systemname systemid systemdevicestatus osrelease hwmodel 
                             beaconid scandate));
    return($self);
 }
@@ -198,17 +205,13 @@ sub Initialize
 }
 
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_status"))){
-#     Query->Param("search_status"=>"\"!out of operation\"");
-#   }
-#   if (!defined(Query->Param("search_tenant"))){
-#     Query->Param("search_tenant"=>"CS");
-#   }
-#
-#}
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_systemdevicestatus"))){
+     Query->Param("search_systemdevicestatus"=>"!IGNORED");
+   }
+}
 
 
 

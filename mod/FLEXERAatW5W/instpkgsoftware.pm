@@ -28,6 +28,8 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4;
+
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->{use_dirtyread}=1;
@@ -89,11 +91,12 @@ sub new
                 vjoinon       =>['flexerasystemid'=>'id'],
                 dataobjattr   =>'systemname'),
 
-#      new kernel::Field::Textarea(
-#                name          =>'comments',
-#                label         =>'Comments',
-#                ignorecase    =>1,
-#                dataobjattr   =>'CMTS'),
+      new kernel::Field::Text(
+                name          =>'systemdevicestatus',
+                label         =>'System Device Status',
+                uppersearch   =>1,
+                htmldetail    =>0,
+                dataobjattr   =>'devicestatus'),
 
       new kernel::Field::Text(
                 name          =>'beaconid',
@@ -154,6 +157,18 @@ sub getSqlFrom
 
    return($from);
 }
+
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_systemdevicestatus"))){
+     Query->Param("search_systemdevicestatus"=>"!IGNORED");
+   }
+}
+
+
 
 
 

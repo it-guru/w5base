@@ -7,6 +7,7 @@ create materialized view "mview_FLEXERA_system"
 select 
    FLEXERADEVICEID,
    FLEXERADEVICEID flexerasystemid,
+   upper(DEVICESTATUS) DEVICESTATUS,
    UUID,
    TENANTID,
    SYSTEMNAME,
