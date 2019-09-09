@@ -111,6 +111,12 @@ sub qcheckRecord
    #      $forcedupd->{srcload}=undef;
    #   }
    #}
+   if ($rec->{cistatusid}==6 && defined($parrec)){
+      # das kann auftreten, wenn die OTC Datenbank temporär Rotz-Daten 
+      # hatte (d.h. es fehlten einfach Systeme, die in Wirklichkeit noch
+      # da waren.
+      $forcedupd->{cistatusid}=4;
+   }
    if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
        $rec->{cistatusid}==5){
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "OTC"){

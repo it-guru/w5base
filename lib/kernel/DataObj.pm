@@ -115,10 +115,9 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
    }
 
    if (my $cistatusid=$self->getField("cistatusid")){
-     # $flt[0]->{cistatusid}=[3,4,5];  # muss wieder geändert werden!!!
       $flt[0]->{cistatusid}=[1,2,3,4,5];
       if (my $mdate=$self->getField("mdate")){
-         $flt[1]->{cistatusid}=[1,2,6];
+         $flt[1]->{cistatusid}=[6];
          $flt[1]->{mdate}=">now-28d";
       }
    }
