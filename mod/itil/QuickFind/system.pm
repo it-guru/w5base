@@ -40,13 +40,16 @@ sub CISearchResult
    my %param=@_;
 
    my @l;
-   if (grep(/^ci$/,@$stag) &&
+   if (in_array("ci",$stag) &&
        (!defined($tag) || grep(/^$tag$/,qw(system sys server)))){
       my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
                {applications=>"$searchtext",cistatusid=>"<=5"},
                {systemid=>"$searchtext"}];
       if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
          push(@$flt,{ipaddresses=>"$searchtext"});
+      }
+      elsif ($searchtext=~m/^[a-f,0-9]{2}(:[a-f,0-9]{2}){5}$/){
+         push(@$flt,{macadresses=>"$searchtext"});
       }
       else{
          if ($searchtext=~m/\./){

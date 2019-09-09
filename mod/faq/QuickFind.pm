@@ -67,8 +67,10 @@ EOF
    if ($s ne ""){
       my $tag=undef;
       if (my ($stag,$stxt)=$s=~m/^\s*(\S+)\s*:\s*(\S+.*)\S*$/){
-         $tag=lc($stag);
-         $s=$stxt;
+         if (!($stxt=~m/:/)){  # MAC Search
+            $tag=lc($stag);
+            $s=$stxt;
+         }
       }
       my $searchtext=trim($s);
       my @s;
@@ -278,7 +280,7 @@ sub doSearch
       return();
    }
    my $tag=undef;
-   if (my ($stag,$stxt)=$searchtext=~m/^\s*([^:'"]+)\s*:\s*(\S+.*)\S*$/){
+   if (my ($stag,$stxt)=$searchtext=~m/^\s*([^:'"]{3,20})\s*:\s*(\S+.*)\S*$/){
       $tag=lc($stag);
       $searchtext=$stxt;
    }
