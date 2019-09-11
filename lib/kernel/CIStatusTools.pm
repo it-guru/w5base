@@ -175,7 +175,7 @@ sub HandleCIStatusModification
          $newrec->{$altname}=$altval; 
       }
    }
-   if ($cistatusid!=6){
+   if ($cistatusid<6){  # namecheck is needed, if cistatusid=6 or 7
       foreach my $primarykey (@primarykey){
          my $primkeyval=effVal($oldrec,$newrec,$primarykey);
          if ($primkeyval=~m/\[.*\]\s*$/){

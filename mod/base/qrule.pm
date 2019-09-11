@@ -591,6 +591,17 @@ sub nativQualityCheck
             msg(INFO,"-------------------------------------------------\n");
          }
       }
+      {
+         # reload is needed, to enscure to get correct current values
+         # from database - this is needed for a posible pass2 or for
+         # for write accesss to record to get correct oldrec
+         my $reloadedRec=$self->reloadRec($parent,$rec);
+         if (!defined($reloadedRec)){
+            msg(ERROR,"reloadRec error after QualtiyCheck Pass");
+            return();
+         }
+         $rec=$reloadedRec;
+      }
       if ($param[0]->{EssentialsChangedCnt}==0){ 
          last CIRCQC;
       }
