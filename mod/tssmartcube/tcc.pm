@@ -78,6 +78,16 @@ sub new
                 dataobjattr   =>'ASSET_ID'),
 
       new kernel::Field::Text(
+                name          =>'w5applications',
+                label         =>'W5Base/Application',
+                group         =>'w5basedata',
+                vjointo       =>\'itil::lnkapplsystem',
+                vjoinslimit   =>'1000',
+                vjoinon       =>['w5systemid'=>'systemid'],
+                weblinkto     =>'none',
+                vjoindisp     =>'appl'),
+
+      new kernel::Field::Text(
                 name          =>'productline',
                 label         =>'Productline of TSI',
                 htmllabelwidth=>'150',
@@ -133,56 +143,6 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'VIRTUALIZATION'),
 
-      new kernel::Field::Text(
-                name          =>'days_not_patched',
-                label         =>'Missing Patch released x days ago',
-                htmldetail    =>'NotEmpty',
-                background    =>\&getTCCbackground,
-                group         =>'auditserver',
-                searchable    =>0,
-                dataobjattr   =>'DAYS_NOT_PATCHED'),
-
-      new kernel::Field::Text(
-                name          =>'days_not_patched_color',
-                label         =>'Missing Patch: Color',
-                htmldetail    =>'0',
-                group         =>'auditserver',
-                sqlorder      =>'NONE',
-                dataobjattr   =>"CASE  ".
-                                "WHEN lower(OPERATIONCATEGORY)='downtime optimized' THEN ".
-                                      "(case ".
-                                      "when DAYS_NOT_PATCHED=0 THEN NULL ".
-                                      "when DAYS_NOT_PATCHED is null THEN NULL ".
-                                      "when DAYS_NOT_PATCHED<180 THEN 'green' ".
-                                      "when DAYS_NOT_PATCHED>365 THEN 'red' ".
-                                      "else 'yellow' end) ".
-                                "WHEN lower(OPERATIONCATEGORY)='up to date' THEN ".
-                                      "(case ".
-                                      "when DAYS_NOT_PATCHED=0 THEN NULL ".
-                                      "when DAYS_NOT_PATCHED is null THEN NULL ".
-                                      "when DAYS_NOT_PATCHED<90 THEN 'green' ".
-                                      "when DAYS_NOT_PATCHED>120 THEN 'red' ".
-                                      "else 'yellow' end) ".
-                                "ELSE NULL ".
-                                "END"),
-
-      new kernel::Field::Text(
-                name          =>'red_alert',
-                label         =>'Red Alert',
-                htmldetail    =>'NotEmpty',
-                background    =>\&getTCCbackground,
-                group         =>'auditserver',
-                searchable    =>1,
-                ignorecase    =>1,
-                dataobjattr   =>'RED_ALERT'),
-
-      new kernel::Field::Text(
-                name          =>'red_alert_color',
-                label         =>'Red Alert: Color',
-                htmldetail    =>'0',
-                group         =>'auditserver',
-                dataobjattr   =>"decode(RED_ALERT,NULL,'','red')"),
-
       new kernel::Field::Date(
                 name          =>'opcatchangedate',
                 label         =>'Operation Category Change Date',
@@ -211,6 +171,23 @@ sub new
                 background    =>\&getTCCbackground,
                 label         =>'TCC total state',
                 dataobjattr   =>getTCCColorSQL('CHECK_STATUS')),
+
+
+      #######################################################################
+
+      new kernel::Field::Text(
+                name          =>'os_base_setup',
+                label         =>'OS Base-Setup',
+                htmllabelwidth=>'250',
+                group         =>['patch'],
+                depend        =>['os_base_setup_color'],
+                background    =>\&getTCCbackground,
+                ignorecase    =>1,
+                sqlorder      =>'NONE',
+                dataobjattr   =>"(case ".
+                    "when lower(OS_NAME) like '%windows%' then OS_NAME ".
+                    "else OS_BASE_SETUP ".
+                    "end)"),
 
 
       #######################################################################
@@ -347,22 +324,59 @@ sub new
                    return($st.$failpost);
                 }),
 
-      #######################################################################
-      # Release-/Patchmanagement Compliancy #################################
+      new kernel::Field::Text(
+                name          =>'days_not_patched',
+                label         =>'Missing Patch released x days ago',
+                htmldetail    =>'NotEmpty',
+                background    =>\&getTCCbackground,
+                group         =>'auditserver',
+                searchable    =>0,
+                dataobjattr   =>'DAYS_NOT_PATCHED'),
 
       new kernel::Field::Text(
-                name          =>'os_base_setup',
-                label         =>'OS Base-Setup',
-                htmllabelwidth=>'250',
-                group         =>['patch'],
-                depend        =>['os_base_setup_color'],
-                background    =>\&getTCCbackground,
-                ignorecase    =>1,
+                name          =>'days_not_patched_color',
+                label         =>'Missing Patch: Color',
+                htmldetail    =>'0',
+                group         =>'auditserver',
                 sqlorder      =>'NONE',
-                dataobjattr   =>"(case ".
-                    "when lower(OS_NAME) like '%windows%' then OS_NAME ".
-                    "else OS_BASE_SETUP ".
-                    "end)"),
+                dataobjattr   =>"CASE  ".
+                                "WHEN lower(OPERATIONCATEGORY)='downtime optimized' THEN ".
+                                      "(case ".
+                                      "when DAYS_NOT_PATCHED=0 THEN NULL ".
+                                      "when DAYS_NOT_PATCHED is null THEN NULL ".
+                                      "when DAYS_NOT_PATCHED<180 THEN 'green' ".
+                                      "when DAYS_NOT_PATCHED>365 THEN 'red' ".
+                                      "else 'yellow' end) ".
+                                "WHEN lower(OPERATIONCATEGORY)='up to date' THEN ".
+                                      "(case ".
+                                      "when DAYS_NOT_PATCHED=0 THEN NULL ".
+                                      "when DAYS_NOT_PATCHED is null THEN NULL ".
+                                      "when DAYS_NOT_PATCHED<90 THEN 'green' ".
+                                      "when DAYS_NOT_PATCHED>120 THEN 'red' ".
+                                      "else 'yellow' end) ".
+                                "ELSE NULL ".
+                                "END"),
+
+      new kernel::Field::Text(
+                name          =>'red_alert',
+                label         =>'Red Alert',
+                htmldetail    =>'NotEmpty',
+                background    =>\&getTCCbackground,
+                group         =>'auditserver',
+                searchable    =>1,
+                ignorecase    =>1,
+                dataobjattr   =>'RED_ALERT'),
+
+      new kernel::Field::Text(
+                name          =>'red_alert_color',
+                label         =>'Red Alert: Color',
+                htmldetail    =>'0',
+                searchable    =>0,
+                group         =>'auditserver',
+                dataobjattr   =>"decode(RED_ALERT,NULL,'','red')"),
+
+      #######################################################################
+      # Release-/Patchmanagement Compliancy #################################
 
       new kernel::Field::Text(
                 name          =>'os_base_setup_check',
@@ -783,16 +797,6 @@ sub new
                 vjointo       =>\'AL_TCom::system',
                 vjoinon       =>['w5systemid'=>'id'],
                 vjoindisp     =>'name'),
-
-      new kernel::Field::Text(
-                name          =>'w5applications',
-                label         =>'W5Base/Application',
-                group         =>'w5basedata',
-                vjointo       =>\'itil::lnkapplsystem',
-                vjoinslimit   =>'1000',
-                vjoinon       =>['w5systemid'=>'systemid'],
-                weblinkto     =>'none',
-                vjoindisp     =>'appl'),
 
       new kernel::Field::DataMaintContacts(
                 vjointo       =>'itil::system',
