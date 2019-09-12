@@ -562,7 +562,7 @@ sub nativQualityCheck
             }
             my $resulttext="OK";
             $resulttext="fail"      if (defined($qresult) && $qresult!=0);
-            $resulttext="messy"     if ($qresult==1);
+            $resulttext="note"      if ($qresult==1);
             $resulttext="warn"      if ($qresult==2);
             $resulttext="disabled" if (!defined($qresult));
             my $qrulelongname=$qrule->getName();
