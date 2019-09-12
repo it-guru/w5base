@@ -94,6 +94,9 @@ sub qcheckRecord
    my @qmsg;
    my @dataissue;
 
+   if ($dataobj->Self=~m/::appl$/){
+      return($errorlevel,undef) if ($rec->{businessteam} eq "Extern");
+   }
    if ($rec->{srcsys} eq "w5base" &&
        exists($rec->{cistatusid}) && in_array([$rec->{cistatusid}],[3,4,5])){
       if ($dataobj->Self=~m/::system$/){
@@ -105,7 +108,8 @@ sub qcheckRecord
       # TS::system  -> acinmassignmentgroupid
       # TS::asset   -> acinmassignmentgroupid
       my $isnotneeded=0;
-      if ($rec->{acinmassignmentgroupid} eq ""){
+      my $acinmassingmentgroup=$rec->{acinmassingmentgroup};
+      if ($acinmassingmentgroup=~m/^\s*$/){
          my $msg="missing valid incident assignmentgroup";
          push(@qmsg,$msg);
          if ($dataobj->Self=~m/::appl$/){
@@ -131,6 +135,20 @@ sub qcheckRecord
          else{
             push(@dataissue,$msg);
             $errorlevel=3 if ($errorlevel<3);
+         }
+      }
+      else{
+         my $o=getModuleObject($self->getParent->Config,"tsacinv::group");
+         my $flt={fullname=>\$acinmassingmentgroup};
+         $o->SetFilter($flt);
+         my ($grec)=$o->getOnlyFirst(qw(id deleted));
+         if ($o->Ping()){
+            if (!defined($grec) || $grec->{deleted}){
+               my $m="refered incident assignmentgroup is deleted";
+               push(@qmsg,$m);
+               push(@dataissue,$m);
+               $errorlevel=3 if ($errorlevel<3);
+            }
          }
       }
       return($self->HandleWfRequest($dataobj,$rec,

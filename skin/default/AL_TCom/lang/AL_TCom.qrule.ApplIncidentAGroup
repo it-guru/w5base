@@ -1,2 +1,0 @@
-'AL_TCom::qrule::ApplIncidentAGroup'=>{de=>'Prüfung ob AC Incident Assignmentgroup eingetragen (alt)',en=>'check if there is an incident assignmentgroup defined(old)'},
-'there is no incident assignmentgroup defined'=>{de=>'es wurde keine Incident-Assignmentgroup eingetragen'},

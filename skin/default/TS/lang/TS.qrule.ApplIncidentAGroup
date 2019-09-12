@@ -1,3 +1,0 @@
-'TS::qrule::ApplIncidentAGroup'=>{de=>'Prüfung ob AssetManager Incident Assignmentgroup eingetragen',en=>'check if there is an AssetManager incident assignmentgroup defined'},
-'there is no incident assignmentgroup defined'=>{de=>'es wurde keine Incident-Assignmentgroup eingetragen'},
-'refered incident assignmentgroup is deleted'=>{de=>'die angegebene Incident-Assignmentgroup ist gelöscht oder als gelöscht markiert'},
