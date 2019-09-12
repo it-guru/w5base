@@ -190,6 +190,21 @@ sub getDynamicFields
   );
 }
 
+
+sub isOptionalFieldVisible
+{
+   my $self=shift;
+   my $mode=shift;
+   my %param=@_;
+   my $name=$param{field}->Name();
+
+   return(1) if ($name eq "shortactionlog");
+   return(1) if ($name eq "relations");
+   return($self->SUPER::isOptionalFieldVisible($mode,@_));
+}
+
+
+
 sub IsModuleSelectable
 {
    my $self=shift;
@@ -233,8 +248,15 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","state","mailsend","header");
+   return("default","state","flow","mailsend","header","relations");
 }
+
+sub getDetailBlockPriority            # posibility to change the block order
+{
+   return("default","state","mailsend","flow","relations");
+}
+
+
 
 sub isWriteValid
 {
@@ -663,7 +685,7 @@ sub generateWorkspace
 {
    my $self=shift;
    my $WfRec=shift;
-   my $msg=$self->T("Mail send.");
+   my $msg=$self->T("Mail handling finished.");
    my $templ=<<EOF;
 <br><div class=Question><table border=0><tr><td>$msg</td></tr></table></div>
 EOF

@@ -155,14 +155,19 @@ sub TestMail2
 {
    my $self=shift;
 
+   my @emailto=qw(hartmut.vogler@com);
+   for(my $c=0;$c<1640;$c++){
+      push(@emailto,"a.abcdefg$c\@de");
+   }
+
    my $wf=getModuleObject($self->Config,"base::workflow");
    if (my $id=$wf->Store(undef,{
           class    =>'base::workflow::mailsend',
           step     =>'base::workflow::mailsend::dataload',
-          name     =>'eine Mail vom Testevent1 mit äöüß',
-          emailto  =>'vogler.hartmut@xxxxxxxxxxxxxm',
+          name     =>'Largeeine Mail vom Testevent1 mit äöüß',
+          emailto  =>\@emailto,
           emailfrom=>'"Vogler, Hartmut" <>',
-          emailtext=>["Dies ist der\n 1. Text",'dies der 2.','und der d 100 Zeichen: 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890ritte'],
+          emailtext=>["Dies ist der\n 1. Text",'dies der 2.','und der d 100 Zeichen: 12345xljkchvjkyxchvkjyxhcvkljyxchvkljyxhcvkjlyxhcvkljhyxckjvhyxkjcvhyxk1234567890ritte'],
           emailhead=>['Head1','Head2 mal ein gaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaanz langer Text1234567345624354357246357832','Head3'],
           emailtstamp=>['01.01.2000 14:14:00',undef,'02.02.2000 01:01:01'],
           emailprefix=>['sued/xxxxxx.hartmut',undef,'nobody'],

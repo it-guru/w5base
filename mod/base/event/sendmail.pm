@@ -241,377 +241,399 @@ sub Sendmail
          $mail.="Message-ID: <".$rec->{id}.'@'.$rec->{initialconfig}.'@'.
                 $rec->{initialsite}.'@'."W5Base>\n";
          $mail.="Mime-Version: 1.0\n";
-         $mail.="Content-Type: multipart/mixed; boundary=\"$mixbound\"\n";
-         $mail.="--$mixbound";
-         $mail.="\n";
-         $mail.="Content-Type: multipart/alternative; boundary=\"$bound\"\n";
-         $mail.="--$bound";
-         $mail.="\n";
-         $mail.="Content-Type: text/plain; charset=\"iso-8859-1\"\n\n";
-         #printf STDERR ("%s\n",$mail);       
-         {
-            my $plaintext;
-            for(my $blk=0;$blk<=$blkcount;$blk++){
-               $plaintext.=$rec->{emailprefix}->[$blk];
-               $plaintext.="\n"; 
-               my $emailtext=$rec->{emailtext}->[$blk];
-               $emailtext=~s#<[a-z/].*?>##g;
-               $emailtext=~s#&nbsp;# #g;
-               $emailtext=~s#^\.\s*$# .\n#mg;  # prevent . finish of mail
-               $plaintext.=$emailtext;
-               $plaintext.="\n-\n"; 
-            }
-            if ($plaintext ne ""){
-               $mail.=$plaintext;
-               $smstext=$plaintext;
-            }
+         msg(DEBUG,"SMTP Message Header Size: ".length($mail));
+         if (length($mail)>25000){
+            msg(DEBUG,"======================");
+            msg(DEBUG,"SMTP to:".length($to));
+            msg(DEBUG,"SMTP cc:".length($cc));
+            msg(DEBUG,"SMTP bcc:".length($bcc));
+            msg(DEBUG,"SMTP Header LIMIT !!!!");
+            msg(DEBUG,"======================");
+            my $wfop=$wf->Clone();
+            my $finerec={state=>22,
+                         eventend=>NowStamp("en"),
+                         closedate=>NowStamp("en"),
+                         step=>'base::workflow::mailsend::finish'};
+            $wfop->Action->StoreRecord( $rec->{id},"note",
+                 {translation=>'base::workflow::sendmail'},
+                 "message header size exceeds limit"
+            );
+            $wfop->Store($rec,$finerec);
          }
+         else{
+            $mail.="Content-Type: multipart/mixed; boundary=\"$mixbound\"\n";
+            $mail.="--$mixbound";
+            $mail.="\n";
+            $mail.="Content-Type: multipart/alternative; boundary=\"$bound\"\n";
+            $mail.="--$bound";
+            $mail.="\n";
+            $mail.="Content-Type: text/plain; charset=\"iso-8859-1\"\n\n";
+            #printf STDERR ("%s\n",$mail);       
+            {
+               my $plaintext;
+               for(my $blk=0;$blk<=$blkcount;$blk++){
+                  $plaintext.=$rec->{emailprefix}->[$blk];
+                  $plaintext.="\n"; 
+                  my $emailtext=$rec->{emailtext}->[$blk];
+                  $emailtext=~s#<[a-z/].*?>##g;
+                  $emailtext=~s#&nbsp;# #g;
+                  $emailtext=~s#^\.\s*$# .\n#mg;  # prevent . finish of mail
+                  $plaintext.=$emailtext;
+                  $plaintext.="\n-\n"; 
+               }
+               if ($plaintext ne ""){
+                  $mail.=$plaintext;
+                  $smstext=$plaintext;
+               }
+            }
 
 
-         $mail.="\n--$bound";
-         $mail.="\n";
-         my $relbound="Rel.$bound";
-         $mail.="Content-Type: multipart/related; boundary=\"$relbound\"\n\n";
-         $mail.="--$relbound";
-         $mail.="\n";
-         $mail.="Content-Type: text/html; charset=\"iso-8859-1\"\n\n";
-         my $additional=$rec->{additional};
-         my %additional=();
-         foreach my $k (keys(%$additional)){
-            if (ref($additional->{$k}) eq "ARRAY"){
-               $additional{$k}=join(", ",@{$additional->{$k}});
+            $mail.="\n--$bound";
+            $mail.="\n";
+            my $relbound="Rel.$bound";
+            $mail.="Content-Type: multipart/related; boundary=\"$relbound\"\n\n";
+            $mail.="--$relbound";
+            $mail.="\n";
+            $mail.="Content-Type: text/html; charset=\"iso-8859-1\"\n\n";
+            my $additional=$rec->{additional};
+            my %additional=();
+            foreach my $k (keys(%$additional)){
+               if (ref($additional->{$k}) eq "ARRAY"){
+                  $additional{$k}=join(", ",@{$additional->{$k}});
+               }
+               else{
+                  $additional{$k}=$additional->{$k};
+               }
             }
-            else{
-               $additional{$k}=$additional->{$k};
+            #msg(DEBUG,"add=%s",Dumper(\%additional));
+            my $currentlang=shift(@emaillang);
+            my $formname="tmpl/$template.form.head";
+            my $maildata="ERROR: critical application problem - ".
+                         "mail template not found";
+            #msg(DEBUG,"loading and parsing mail template");
+            $app->setSkinBase($skinbase);
+            my $sep=0;
+            my %useadditional=%additional;
+            foreach my $k (keys(%useadditional)){
+               if ($k=~m/PAGE$sep$/){
+                  my $knew=$k;
+                  $knew=~s/PAGE\d+$//;
+                  $useadditional{$knew}=$additional{$k};
+               }
             }
-         }
-         #msg(DEBUG,"add=%s",Dumper(\%additional));
-         my $currentlang=shift(@emaillang);
-         my $formname="tmpl/$template.form.head";
-         my $maildata="ERROR: critical application problem - ".
-                      "mail template not found";
-         #msg(DEBUG,"loading and parsing mail template");
-         $app->setSkinBase($skinbase);
-         my $sep=0;
-         my %useadditional=%additional;
-         foreach my $k (keys(%useadditional)){
-            if ($k=~m/PAGE$sep$/){
-               my $knew=$k;
-               $knew=~s/PAGE\d+$//;
-               $useadditional{$knew}=$additional{$k};
-            }
-         }
 
 
-         if ($app->getSkinFile($app->SkinBase()."/".$formname)){
-            $maildata=$app->getParsedTemplate($formname,
-                                     {static=>{
-                                        %useadditional,
-                                        currentlang =>$currentlang,
-                                        langcontrol =>$langcontrol,
-                                      }
-                                     });
-         }
-         $mail.=$maildata;
-         #msg(DEBUG,"adding $blkcount datablocks to mail body");
-         $mail.="<a name=\"separation.$sep\"></a>";
-         $mail.="<div class=\"separation\" id=\"separation.$sep\">";
-         $mail.="<div class=\"separationbackground\">";
-         for(my $blk=0;$blk<=$blkcount;$blk++){
-            my $formname="tmpl/$template.form.line";
-            my $maildata="ERROR: Mail template not found";
-            if (my $skinfile=$app->getSkinFile($app->SkinBase()."/".$formname)){
-#               my $emailtext="<!-- skinfile=$skinfile -->\n".
-               my $emailtext=$rec->{emailtext}->[$blk];
-               if (!(($emailtext=~m/<a/) ||
-                     ($emailtext=~m/<b>/) ||
-                     ($emailtext=~m/<center>/) ||
-                     ($emailtext=~m/<\/b>/) ||
-                     ($emailtext=~m/<\/ul>/) ||
-                     ($emailtext=~m/<i>/) ||
-                     ($emailtext=~m/<div/))){
-                  $emailtext=~s/</&lt;/g;
-                  $emailtext=~s/>/&gt;/g;
-               }
-               $emailtext=FancyLinks($emailtext);
-               $emailtext=mkMailInlineAttachment($baseurl,$emailtext);
-               my $emailbottom=$rec->{emailbottom};
-               if (ref($rec->{emailbottom}) eq "ARRAY"){
-                  $emailbottom=$rec->{emailbottom}->[$blk];
-               }
-               if (defined($emailbottom) && $emailbottom eq ""){
-                  $emailbottom="<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>";
-               }
-               #msg(DEBUG,"try add blk $blk");
-               if ($rec->{emailsubheader}->[$blk] ne "" &&
-                   $rec->{emailsubheader}->[$blk] ne "0"){
-                  my $sh=$rec->{emailsubheader}->[$blk];
-                  if ($sh eq "1"){
-                     $sh="";
-                  }
-                  if ($sh eq " "){
-                     $sh="&nbsp;";
-                  }
-                  $sh=~s/\n/<br>\n/g;
-                  $mail.="<div class=subheader>".$sh."</div>";
-               }
-               my $prepemailpostfix=$rec->{emailpostfix}->[$blk];
-               if ($prepemailpostfix=~m/^\s*$/){
-                  $prepemailpostfix="<font size=1>&nbsp;</font>";
-               }
-               $maildata=$app->getParsedTemplate($formname,{
-                                  static=>{
-                                     %useadditional,
-                                     emailtext   =>$emailtext,
-                                     emailhead   =>$rec->{emailhead}->[$blk],
-                                     emailbottom =>$emailbottom,
-                                     emailtstamp =>$rec->{emailtstamp}->[$blk],
-                                     emailprefix =>$rec->{emailprefix}->[$blk],
-                                     emailsubtitle =>$rec->{emailsubtitle}->[$blk],
-                                     emailpostfix=>$prepemailpostfix,
-                                     currentlang =>$currentlang,
-                                     langcontrol =>$langcontrol,
-                                                          }
-                                   });
-               $maildata=~s#^\.\s*$# .\n#mg;  # prevent . finish of mail
-               if ($rec->{emailsep}->[$blk] ne "" &&
-                   $rec->{emailsep}->[$blk] ne "0"){
-                  $currentlang=shift(@emaillang);
-                  my $septext=$rec->{emailsep}->[$blk];
-                  if ($septext eq "1"){
-                     $septext="";
-                  }
-                  $mail.="</div>";
-                  $mail.="</div>";
-                  $sep++;
-                  %useadditional=%additional;
-                  foreach my $k (keys(%useadditional)){
-                     if ($k=~m/PAGE$sep$/){
-                        my $knew=$k;
-                        $knew=~s/PAGE\d+$//;
-                        $useadditional{$knew}=$additional{$k};
-                     }
-                  }
-                  my $formname="tmpl/$template.form.sep";
-                  my $maildata="ERROR: Mail template not found";
-                  if ($app->getSkinFile($app->SkinBase()."/".$formname)){
-                     my $sep=$app->getParsedTemplate($formname,{
-                                        static=>{
+            if ($app->getSkinFile($app->SkinBase()."/".$formname)){
+               $maildata=$app->getParsedTemplate($formname,
+                                        {static=>{
                                            %useadditional,
-                                           currentlang=>$currentlang,
-                                           separation=>$sep,
-                                           septext=>$septext,
+                                           currentlang =>$currentlang,
                                            langcontrol =>$langcontrol,
-                                         }});
-                     $mail.=$sep;
-                
-                  }
-                  $mail.="<a name=\"separation.$sep\"></a>";
-                  $mail.="<div class=\"separation\" id=\"separation.$sep\">";
-                  $mail.="<div class=\"separationbackground\">";
-               }
-               #msg(DEBUG,"add blk $blk ok");
+                                         }
+                                        });
             }
             $mail.=$maildata;
-         }
-         $mail.="</div>";
-         $mail.="</div>";
-         #msg(DEBUG,"adding mail bottom");
-         my $formname="tmpl/$template.form.bottom";
-         my $maildata="ERROR: Mail template not found";
-         if ($app->getSkinFile($app->SkinBase()."/".$formname)){
-            my $emailbottom=$rec->{emailbottom};
-            if (ref($emailbottom) eq "ARRAY"){
-               $emailbottom=join("",@{$emailbottom});
-            }
-            my $mailsignature="";
-            if (defined($emailsig) && $emailsig->{htmlsig} ne ""){
-               $mailsignature=$emailsig->{htmlsig};
-            }
- 
-            $maildata=$app->getParsedTemplate($formname,{
+            #msg(DEBUG,"adding $blkcount datablocks to mail body");
+            $mail.="<a name=\"separation.$sep\"></a>";
+            $mail.="<div class=\"separation\" id=\"separation.$sep\">";
+            $mail.="<div class=\"separationbackground\">";
+            for(my $blk=0;$blk<=$blkcount;$blk++){
+               my $formname="tmpl/$template.form.line";
+               my $maildata="ERROR: Mail template not found";
+               if (my $skinfile=$app->getSkinFile($app->SkinBase()."/".$formname)){
+   #               my $emailtext="<!-- skinfile=$skinfile -->\n".
+                  my $emailtext=$rec->{emailtext}->[$blk];
+                  if (!(($emailtext=~m/<a/) ||
+                        ($emailtext=~m/<b>/) ||
+                        ($emailtext=~m/<center>/) ||
+                        ($emailtext=~m/<\/b>/) ||
+                        ($emailtext=~m/<\/ul>/) ||
+                        ($emailtext=~m/<i>/) ||
+                        ($emailtext=~m/<div/))){
+                     $emailtext=~s/</&lt;/g;
+                     $emailtext=~s/>/&gt;/g;
+                  }
+                  $emailtext=FancyLinks($emailtext);
+                  $emailtext=mkMailInlineAttachment($baseurl,$emailtext);
+                  my $emailbottom=$rec->{emailbottom};
+                  if (ref($rec->{emailbottom}) eq "ARRAY"){
+                     $emailbottom=$rec->{emailbottom}->[$blk];
+                  }
+                  if (defined($emailbottom) && $emailbottom eq ""){
+                     $emailbottom="<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>";
+                  }
+                  #msg(DEBUG,"try add blk $blk");
+                  if ($rec->{emailsubheader}->[$blk] ne "" &&
+                      $rec->{emailsubheader}->[$blk] ne "0"){
+                     my $sh=$rec->{emailsubheader}->[$blk];
+                     if ($sh eq "1"){
+                        $sh="";
+                     }
+                     if ($sh eq " "){
+                        $sh="&nbsp;";
+                     }
+                     $sh=~s/\n/<br>\n/g;
+                     $mail.="<div class=subheader>".$sh."</div>";
+                  }
+                  my $prepemailpostfix=$rec->{emailpostfix}->[$blk];
+                  if ($prepemailpostfix=~m/^\s*$/){
+                     $prepemailpostfix="<font size=1>&nbsp;</font>";
+                  }
+                  $maildata=$app->getParsedTemplate($formname,{
+                                     static=>{
+                                        %useadditional,
+                                        emailtext   =>$emailtext,
+                                        emailhead   =>$rec->{emailhead}->[$blk],
+                                        emailbottom =>$emailbottom,
+                                        emailtstamp =>$rec->{emailtstamp}->[$blk],
+                                        emailprefix =>$rec->{emailprefix}->[$blk],
+                                        emailsubtitle =>$rec->{emailsubtitle}->[$blk],
+                                        emailpostfix=>$prepemailpostfix,
+                                        currentlang =>$currentlang,
+                                        langcontrol =>$langcontrol,
+                                                             }
+                                      });
+                  $maildata=~s#^\.\s*$# .\n#mg;  # prevent . finish of mail
+                  if ($rec->{emailsep}->[$blk] ne "" &&
+                      $rec->{emailsep}->[$blk] ne "0"){
+                     $currentlang=shift(@emaillang);
+                     my $septext=$rec->{emailsep}->[$blk];
+                     if ($septext eq "1"){
+                        $septext="";
+                     }
+                     $mail.="</div>";
+                     $mail.="</div>";
+                     $sep++;
+                     %useadditional=%additional;
+                     foreach my $k (keys(%useadditional)){
+                        if ($k=~m/PAGE$sep$/){
+                           my $knew=$k;
+                           $knew=~s/PAGE\d+$//;
+                           $useadditional{$knew}=$additional{$k};
+                        }
+                     }
+                     my $formname="tmpl/$template.form.sep";
+                     my $maildata="ERROR: Mail template not found";
+                     if ($app->getSkinFile($app->SkinBase()."/".$formname)){
+                        my $sep=$app->getParsedTemplate($formname,{
                                            static=>{
-                                              %additional,
+                                              %useadditional,
+                                              currentlang=>$currentlang,
+                                              separation=>$sep,
+                                              septext=>$septext,
                                               langcontrol =>$langcontrol,
-                                              emailbottom =>$emailbottom,
-                                              MAILSIGNATURE=>$mailsignature
-                                           }});
-         }
-         $mail.=$maildata;
+                                            }});
+                        $mail.=$sep;
+                   
+                     }
+                     $mail.="<a name=\"separation.$sep\"></a>";
+                     $mail.="<div class=\"separation\" id=\"separation.$sep\">";
+                     $mail.="<div class=\"separationbackground\">";
+                  }
+                  #msg(DEBUG,"add blk $blk ok");
+               }
+               $mail.=$maildata;
+            }
+            $mail.="</div>";
+            $mail.="</div>";
+            #msg(DEBUG,"adding mail bottom");
+            my $formname="tmpl/$template.form.bottom";
+            my $maildata="ERROR: Mail template not found";
+            if ($app->getSkinFile($app->SkinBase()."/".$formname)){
+               my $emailbottom=$rec->{emailbottom};
+               if (ref($emailbottom) eq "ARRAY"){
+                  $emailbottom=join("",@{$emailbottom});
+               }
+               my $mailsignature="";
+               if (defined($emailsig) && $emailsig->{htmlsig} ne ""){
+                  $mailsignature=$emailsig->{htmlsig};
+               }
+    
+               $maildata=$app->getParsedTemplate($formname,{
+                                              static=>{
+                                                 %additional,
+                                                 langcontrol =>$langcontrol,
+                                                 emailbottom =>$emailbottom,
+                                                 MAILSIGNATURE=>$mailsignature
+                                              }});
+            }
+            $mail.=$maildata;
 
-         $mail.="\n--$relbound";
-         #msg(DEBUG,"adding pictures to mail body as multiplart content");
-         for(my $c=1;$c<=9;$c++){
-            my $imgname="$template.bild$c.jpg";
-            my $qimgname=quotemeta($imgname);
-            if (grep(/cid:$qimgname/,$mail)){
-               if (my $pic=$app->getSkinFile($app->SkinBase()."/img/".
-                                             $imgname)){
-                  if (open(IMG,"<$pic")){
-                     my $imgbin=join("",<IMG>);
-                     close(IMG);
-                     $mail.="\nContent-ID: <$imgname>\n";
-                     $mail.="Content-Type: image/jpg\n";
-                     $mail.="Content-Name: $imgname\n";
-                     $mail.="Content-Transfer-Encoding: base64\n\n";
-                     $mail.=encode_base64($imgbin);
-                     $mail.="\n--$relbound";
+            $mail.="\n--$relbound";
+            #msg(DEBUG,"adding pictures to mail body as multiplart content");
+            for(my $c=1;$c<=9;$c++){
+               my $imgname="$template.bild$c.jpg";
+               my $qimgname=quotemeta($imgname);
+               if (grep(/cid:$qimgname/,$mail)){
+                  if (my $pic=$app->getSkinFile($app->SkinBase()."/img/".
+                                                $imgname)){
+                     if (open(IMG,"<$pic")){
+                        my $imgbin=join("",<IMG>);
+                        close(IMG);
+                        $mail.="\nContent-ID: <$imgname>\n";
+                        $mail.="Content-Type: image/jpg\n";
+                        $mail.="Content-Name: $imgname\n";
+                        $mail.="Content-Transfer-Encoding: base64\n\n";
+                        $mail.=encode_base64($imgbin);
+                        $mail.="\n--$relbound";
+                     }
                   }
                }
             }
-         }
-         $mail.="--\n";
-         my $tstart=$rec->{terminstart};
-         my $tend=$rec->{terminend};
-         if ($tend ne "" && $tstart ne ""){
-            $mail.="\n--$bound\n";
-            $mail.="Content-Type: text/calendar\n";
-            $mail.="\n";
-            $mail.="BEGIN:VCALENDAR\n";
-            $mail.="METHOD:PUBLISH\n";
-            $mail.="PRODID:http://$rec->{initialsite}\n";
-            $mail.="VERSION:2.0\n";
+            $mail.="--\n";
+            my $tstart=$rec->{terminstart};
+            my $tend=$rec->{terminend};
+            if ($tend ne "" && $tstart ne ""){
+               $mail.="\n--$bound\n";
+               $mail.="Content-Type: text/calendar\n";
+               $mail.="\n";
+               $mail.="BEGIN:VCALENDAR\n";
+               $mail.="METHOD:PUBLISH\n";
+               $mail.="PRODID:http://$rec->{initialsite}\n";
+               $mail.="VERSION:2.0\n";
 
-            $mail.="BEGIN:VTIMEZONE\n";
-            $mail.="TZID:GMT\n";
-            $mail.="BEGIN:STANDARD\n";
-            $mail.="TZOFFSETTO:+0000\n";
-            $mail.="END:STANDARD\n";
-            $mail.="END:VTIMEZONE\n";
+               $mail.="BEGIN:VTIMEZONE\n";
+               $mail.="TZID:GMT\n";
+               $mail.="BEGIN:STANDARD\n";
+               $mail.="TZOFFSETTO:+0000\n";
+               $mail.="END:STANDARD\n";
+               $mail.="END:VTIMEZONE\n";
 
-            $mail.="BEGIN:VEVENT\n";
-            $mail.="SUMMARY:$rec->{name}\n";
-            # aus absender
-            $mail.="ORGANIZER;".$terminfrom."\n";
-            # aus to
-            foreach my $e (@emailto){
-               if ($e ne ""){
-                  $mail.="ATTENDEE;ROLE=REQ-PARTICIPANT;".
-                         "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
-                         "MAILTO:$e\n";
+               $mail.="BEGIN:VEVENT\n";
+               $mail.="SUMMARY:$rec->{name}\n";
+               # aus absender
+               $mail.="ORGANIZER;".$terminfrom."\n";
+               # aus to
+               foreach my $e (@emailto){
+                  if ($e ne ""){
+                     $mail.="ATTENDEE;ROLE=REQ-PARTICIPANT;".
+                            "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
+                            "MAILTO:$e\n";
+                  }
+               }
+               # aus cc
+               foreach my $e (@emailcc){
+                  if ($e ne ""){
+                     $mail.="ATTENDEE;ROLE=OPT-PARTICIPANT;".
+                            "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
+                            "MAILTO:$e\n";
+                  }
+               }
+               
+               $mail.="DTSTART;TZID=GMT:".
+                      $app->ExpandTimeExpression($tstart,"ICS")."\n";
+               $mail.="DTEND;TZID=GMT:".
+                      $app->ExpandTimeExpression($tend,"ICS")."\n";
+               my $uid;
+               if ($rec->{directlnkid} ne ""){
+                  $uid=$rec->{directlnkid};
+                  $uid.='@'.$rec->{directlnkmode}.'@'.$rec->{directlnktype};
+               }
+               else{
+                  $uid=$rec->{id};
+               }
+               $mail.="UID:$uid\@$rec->{initialsite}\n";  
+               $mail.="CLASS:PUBLIC\n";
+               $mail.="DTSTAMP:".
+                      $app->ExpandTimeExpression($rec->{createdate},"ICS")."\n";
+               $mail.="STATUS:REQUEST\n";
+               if ($rec->{terminlocation} ne ""){
+                  $mail.="LOCATION:".$rec->{terminlocation}."\n";
+               }
+               $mail."PRIORITY:".$rec->{prio}."\n";
+               if ($rec->{terminnotify}>0){
+                  $mail.="BEGIN:VALARM\n";
+                  $mail.="ACTION:DISPLAY\n";
+                  $mail.="DESCRIPTION:REMINDER\n";
+                  $mail.="TRIGGER;RELATED=START:-PT".$rec->{terminnotify}."M\n";
+                  $mail.="END:VALARM\n";
+               }
+
+               $mail.="END:VEVENT\n";
+               $mail.="END:VCALENDAR\n";
+            }
+
+            $mail.="\n--$bound--\n";
+            {
+               my $wfa=getModuleObject($self->Config,"base::wfattach");
+               $wfa->SetFilter({wfheadid=>\$rec->{id}});
+               my ($attrec,$msg)=$wfa->getOnlyFirst(qw(ALL));
+               $wfa->SetCurrentView(qw(contenttype name data));
+               my ($attrec,$msg)=$wfa->getFirst(unbuffered=>1);
+               if (defined($attrec)){
+                  do{
+                     $mail.="\n--$mixbound\n";
+                     $mail.="Content-Type: $attrec->{contenttype}\n";
+                     $mail.="Content-Name: $attrec->{name}\n";
+                     $mail.="Content-Disposition: attachment; ".
+                            "filename=$attrec->{name}\n";
+                     $mail.="Content-Transfer-Encoding: base64\n\n";
+                     $mail.=encode_base64($attrec->{data});
+                     ($attrec,$msg)=$wfa->getNext();
+                  }until(!defined($attrec));
                }
             }
-            # aus cc
-            foreach my $e (@emailcc){
-               if ($e ne ""){
-                  $mail.="ATTENDEE;ROLE=OPT-PARTICIPANT;".
-                         "PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=:".
-                         "MAILTO:$e\n";
+            $mail.="\n--$mixbound--\n";
+            ####################################################################
+            # SMS Handling
+            if ($rec->{allowsms}==1 &&
+                $self->Config->Param("SMSInterfaceScript") ne ""){
+               my $smsscript=$self->Config->Param("SMSInterfaceScript");
+               #msg(DEBUG,"prepare to call $smsscript");
+               my $user=getModuleObject($self->Config,"base::user");
+               $user->SetFilter({email=>\@emailto});
+               my @smsrec=$user->getHashList(qw(fullname sms 
+                                                office_mobile private_mobile));
+               $smstext=$rec->{smstext} if ($rec->{smstext} ne "");
+               my @numlist;
+               foreach my $smsrec (@smsrec){
+                  my $number;
+                  if ($smsrec->{sms} eq "officealways"){
+                     $number=$smsrec->{office_mobile};
+                  }
+                  if ($smsrec->{sms} eq "homealways"){
+                     $number=$smsrec->{private_mobile};
+                  }
+                  if (defined($number)){
+                     $number=~s/[\s-\/\(\)]//g;
+                     #msg(DEBUG,"sending sms to $smsrec->{fullname}");
+                     push(@numlist,$number);
+                     if (open(F,"|".$smsscript." \"-s\" -- \"$number\"")){
+                        print F $smstext;
+                        close(F);
+                     }
+                     else{
+                        msg(ERROR,"cant initiate sms to $smsrec->{fullname}");
+                     }
+                  }
                }
-            }
-            
-            $mail.="DTSTART;TZID=GMT:".
-                   $app->ExpandTimeExpression($tstart,"ICS")."\n";
-            $mail.="DTEND;TZID=GMT:".
-                   $app->ExpandTimeExpression($tend,"ICS")."\n";
-            my $uid;
-            if ($rec->{directlnkid} ne ""){
-               $uid=$rec->{directlnkid};
-               $uid.='@'.$rec->{directlnkmode}.'@'.$rec->{directlnktype};
-            }
-            else{
-               $uid=$rec->{id};
-            }
-            $mail.="UID:$uid\@$rec->{initialsite}\n";  
-            $mail.="CLASS:PUBLIC\n";
-            $mail.="DTSTAMP:".
-                   $app->ExpandTimeExpression($rec->{createdate},"ICS")."\n";
-            $mail.="STATUS:REQUEST\n";
-            if ($rec->{terminlocation} ne ""){
-               $mail.="LOCATION:".$rec->{terminlocation}."\n";
-            }
-            $mail."PRIORITY:".$rec->{prio}."\n";
-            if ($rec->{terminnotify}>0){
-               $mail.="BEGIN:VALARM\n";
-               $mail.="ACTION:DISPLAY\n";
-               $mail.="DESCRIPTION:REMINDER\n";
-               $mail.="TRIGGER;RELATED=START:-PT".$rec->{terminnotify}."M\n";
-               $mail.="END:VALARM\n";
-            }
-
-            $mail.="END:VEVENT\n";
-            $mail.="END:VCALENDAR\n";
-         }
-
-         $mail.="\n--$bound--\n";
-         {
-            my $wfa=getModuleObject($self->Config,"base::wfattach");
-            $wfa->SetFilter({wfheadid=>\$rec->{id}});
-            my ($attrec,$msg)=$wfa->getOnlyFirst(qw(ALL));
-            $wfa->SetCurrentView(qw(contenttype name data));
-            my ($attrec,$msg)=$wfa->getFirst(unbuffered=>1);
-            if (defined($attrec)){
-               do{
-                  $mail.="\n--$mixbound\n";
-                  $mail.="Content-Type: $attrec->{contenttype}\n";
-                  $mail.="Content-Name: $attrec->{name}\n";
-                  $mail.="Content-Disposition: attachment; ".
-                         "filename=$attrec->{name}\n";
-                  $mail.="Content-Transfer-Encoding: base64\n\n";
-                  $mail.=encode_base64($attrec->{data});
-                  ($attrec,$msg)=$wfa->getNext();
-               }until(!defined($attrec));
-            }
-         }
-         $mail.="\n--$mixbound--\n";
-         ####################################################################
-         # SMS Handling
-         if ($rec->{allowsms}==1 &&
-             $self->Config->Param("SMSInterfaceScript") ne ""){
-            my $smsscript=$self->Config->Param("SMSInterfaceScript");
-            #msg(DEBUG,"prepare to call $smsscript");
-            my $user=getModuleObject($self->Config,"base::user");
-            $user->SetFilter({email=>\@emailto});
-            my @smsrec=$user->getHashList(qw(fullname sms 
-                                             office_mobile private_mobile));
-            $smstext=$rec->{smstext} if ($rec->{smstext} ne "");
-            my @numlist;
-            foreach my $smsrec (@smsrec){
-               my $number;
-               if ($smsrec->{sms} eq "officealways"){
-                  $number=$smsrec->{office_mobile};
-               }
-               if ($smsrec->{sms} eq "homealways"){
-                  $number=$smsrec->{private_mobile};
-               }
-               if (defined($number)){
-                  $number=~s/[\s-\/\(\)]//g;
-                  #msg(DEBUG,"sending sms to $smsrec->{fullname}");
-                  push(@numlist,$number);
-                  if (open(F,"|".$smsscript." \"-s\" -- \"$number\"")){
+               if ($#numlist!=-1){
+                  if (open(F,"|".$smsscript." \"-m\" -- ".
+                             join(" ",map({'"'.$_.'"'} @numlist)))){
                      print F $smstext;
                      close(F);
                   }
-                  else{
-                     msg(ERROR,"cant initiate sms to $smsrec->{fullname}");
-                  }
                }
             }
-            if ($#numlist!=-1){
-               if (open(F,"|".$smsscript." \"-m\" -- ".
-                          join(" ",map({'"'.$_.'"'} @numlist)))){
-                  print F $smstext;
-                  close(F);
+            ####################################################################
+            #msg(DEBUG,"deliver maildata to $sendmail");
+            my $bouncehandler=$self->Config->Param("MAILBOUNCEHANDLER");
+            $bouncehandler='bounce@w5base.net' if ($bouncehandler eq "");
+            if (open(F,"|".$sendmail." -f $bouncehandler -t")){
+               print F $mail;
+               close(F);
+               push(@processed,$rec->{id});
+               if (open(D,">/tmp/mail.dump.tmp")){
+                  my $wfop=$wf->Clone();
+                  my $finerec={state=>21,
+                               eventend=>NowStamp("en"),
+                               closedate=>NowStamp("en"),
+                               step=>'base::workflow::mailsend::finish'};
+                  print D $mail;
+                  #print D "\n----\n".Dumper($finerec);
+                  $wfop->Store($rec,$finerec);
+                  close(D);
                }
-            }
-         }
-         ####################################################################
-         #msg(DEBUG,"deliver maildata to $sendmail");
-         my $bouncehandler=$self->Config->Param("MAILBOUNCEHANDLER");
-         $bouncehandler='bounce@w5base.net' if ($bouncehandler eq "");
-         if (open(F,"|".$sendmail." -f $bouncehandler -t")){
-            print F $mail;
-            close(F);
-            push(@processed,$rec->{id});
-            if (open(D,">/tmp/mail.dump.tmp")){
-               my $finerec={state=>21,
-                            eventend=>NowStamp("en"),
-                            closedate=>NowStamp("en"),
-                            step=>'base::workflow::mailsend::finish'};
-               print D $mail;
-               #print D "\n----\n".Dumper($finerec);
-               $wf->Store($rec,$finerec);
-               close(D);
             }
          }
          #msg(DEBUG,"try to load next record");
