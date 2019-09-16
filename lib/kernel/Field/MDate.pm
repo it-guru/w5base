@@ -51,8 +51,11 @@ sub Validate
    $val=NowStamp("en") if (!defined($val));
 
    if (defined($oldrec)){
-      return({}) if ($W5V2::OperationContext eq "QualityCheck" &&
-                     !exists($newrec->{$self->Name()}));
+      if ($W5V2::OperationContext eq "QualityCheck"){
+         if (exists($newrec->{$self->Name()})){
+            return({$self->Name()=>$newrec->{$self->Name()}});
+         }
+      }
    }
    if ($W5V2::OperationContext eq "Kernel"){
       if (defined($newrec->{$self->Name()})){

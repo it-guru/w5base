@@ -123,7 +123,6 @@ sub qcheckRecord
          if (!defined($parrec)){
             return(undef,undef) if (!$par->Ping());
             $forcedupd->{cistatusid}=6;
-            $forcedupd->{mdate}=NowStamp("en");
             push(@qmsg,
                'set system CI-Status to disposed of waste due missing on OTC');
          }
