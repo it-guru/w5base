@@ -92,7 +92,7 @@ sub QualityCheck
                              uivisible     =>0,
                              noselect      =>1,
                              dataobjattr   =>'('.$lastqcheck->{dataobjattr}.
-                                             '>'.$mdate->{dataobjattr}.')')
+                                             '>='.$mdate->{dataobjattr}.')')
                )
             }
          }
@@ -178,7 +178,7 @@ sub doQualityCheck
       $loopmax=2;
       $qualitycheckduration=5;
    }
-   do{
+   MAINLOOP: do{
       $dataobj->ResetFilter();
       if (defined($basefilter)){
          $dataobj->SetNamedFilter("MANDATORID",$basefilter);
@@ -190,7 +190,7 @@ sub doQualityCheck
       my ($rec,$msg)=$dataobj->getFirst(unbuffered=>1);
       $c=0;
       if (defined($rec)){
-         do{
+         BLOCKLOOP: do{
             msg(DEBUG,"check record start");
             my $curid=$idfieldobj->RawValue($rec);
             if ($stateparam->{checkProcess} eq "idBased"){
@@ -238,7 +238,6 @@ sub doQualityCheck
                          "QualityCheckDuration=$qualitycheckduration");
                return({exitcode=>0,
                        msg=>'ok '.$total.' records checked = partial'});
-               last;
             }
             if (!defined($stateparam->{firstid})){
                $stateparam->{firstid}=$curid;
