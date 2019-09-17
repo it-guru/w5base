@@ -696,10 +696,10 @@ sub ProcessTempfile
             if ($main::buffer[$c]->{key} eq $chkkey){
                if ($op->{op} ne $main::buffer[$c]->{op}){
                   if (defined($foundAltOp)){
-                     msg(ERROR,"found muliple (more then 2) alternate ".
-                               "operations on the ".
-                               "same key '$chkkey'");
-                     msg(ERROR,"buffer=".Dumper(\@main::buffer));
+                     #msg(ERROR,"found muliple (more then 2) alternate ".
+                     #          "operations on the ".
+                     #          "same key '$chkkey'");
+                     #msg(ERROR,"buffer=".Dumper(\@main::buffer));
                      last;
                   }
                   else{
@@ -714,6 +714,18 @@ sub ProcessTempfile
                splice(@main::buffer,$foundAltOp,1);
                #msg(INFO,"insert befor delete on key $chkkey");
                $op->{op}="update";
+            }
+            elsif ($op->{op} eq "insert" &&
+                $main::buffer[$foundAltOp]->{op} eq "insert"){
+               # multiple insert operations found on the same key
+               msg(ERROR,"found muliple inserts on '$chkkey'");
+               $main::buffer[$foundAltOp]->{op}="update";
+            }
+            elsif ($op->{op} eq "update" &&
+                $main::buffer[$foundAltOp]->{op} eq "insert"){
+               # multiple insert operations found on the same key
+               msg(ERROR,"found insert after update on '$chkkey'");
+               $main::buffer[$foundAltOp]->{op}="update";
             }
             elsif ($op->{op} eq "delete" &&
                    $main::buffer[$foundAltOp]->{op} eq "insert"){
