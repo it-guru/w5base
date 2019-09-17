@@ -112,6 +112,9 @@ $html=new HTML::Parser();
             push(@msg,"setting new performance url for DINA");
             $newrec->{"perf${perfgate}url"}=$newUrl;
          }
+         else{
+            $newrec->{mdate}=$rec->{mdate};  # dont change mdate if url is not
+         }                                   # changed
          my $swop=$dataobj->Clone();
          $swop->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}});
       }
