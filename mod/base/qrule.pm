@@ -244,6 +244,7 @@ sub calcParentAndObjlist
                         if (!defined($reloadedRec)){
                            msg(ERROR,"parent transformation error ".
                                      "while reread rec");
+                           msg(ERROR,"rec=".Dumper($rec));
                            return();
                         }
                         ${$calledRec}=$reloadedRec; # return new rec to caller
