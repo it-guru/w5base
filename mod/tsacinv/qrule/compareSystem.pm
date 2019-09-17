@@ -792,6 +792,10 @@ sub qcheckRecord
 
    if (keys(%$forcedupd)){
       #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
+      if (keys(%$forcedupd)==1 && 
+          exists($forcedupd->{srcload})){   # don't change mdate if only srcload
+         $forcedupd->{mdate}=$rec->{mdate}; # is updated
+      }
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
          my @fld=grep(!/^srcload$/,keys(%$forcedupd));
          if ($#fld!=-1){
