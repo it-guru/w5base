@@ -80,17 +80,23 @@ sub EditArea    # for module defined edit areas (f.e. javascript areas)
    my $d=shift;
    my $name=$self->Name();
    my $style1="";
-   my $style2="";
+   my $style2="resize:none";
    if ($self->{htmlheight} ne ""){
-      $style1=" style='height:".($self->{htmlheight}+4)."px'";
-      $style2=" style='height:".($self->{htmlheight}-4)."px'";
+      if ($self->{htmlheight} eq "auto"){
+         $style1=" style='height:208px'";
+         $style2.=";height:200px";
+      }
+      else{
+         $style1=" style='height:".($self->{htmlheight}+4)."px'";
+         $style2.=";height:".($self->{htmlheight}-4)."px";
+      }
    }
    $d="<div class=multilinetext$style1>".
-      "<textarea id=$name style='resize:none' ".
+      "<textarea id=$name style='$style2' ".
       "onkeydown=\"if (window.textareaKeyHandler){".
       "textareaKeyHandler(this,event);}\" ".
       "cols=$self->{cols} name=Formated_$name ".
-      "class=multilinetext$style2>".quoteHtml($d)."</textarea></div>";
+      "class=multilinetext>".quoteHtml($d)."</textarea></div>";
    $d.="<script language=JavaScript>";
    $d.=" var element_$name=document.forms[0].elements['Formated_$name'];";
    $d.=" function DragCancel_$name(e){";
@@ -140,8 +146,14 @@ sub ViewArea    # for module defined view areas (f.e. javascript areas)
    my $style1="";
    my $style2="";
    if ($self->{htmlheight} ne ""){
-      $style1=" style='height:".($self->{htmlheight}+4)."px'";
-      $style2=" style='height:".($self->{htmlheight}-4)."px'";
+      if ($self->{htmlheight} eq "auto"){
+         $style1=" style='min-height:200px;height:".($self->{htmlheight})."'";
+         $style2=" style='min-height:200px;height:".($self->{htmlheight})."'";
+      }
+      else{
+         $style1=" style='height:".($self->{htmlheight}+4)."px'";
+         $style2=" style='height:".($self->{htmlheight}-4)."px'";
+      }
    }
    
    my $expandcode="var p=this.parentNode;p.style.height='auto';".
@@ -161,6 +173,9 @@ sub ViewArea    # for module defined view areas (f.e. javascript areas)
       if ($#l<5 && length($d)<250){
          $multilinetextexpand="";
       }
+   }
+   if ($self->{htmlheight} eq "auto"){
+      $multilinetextexpand="";
    }
 
    $d="<table cellspacing=0 cellpadding=0 border=0 ".

@@ -22,7 +22,6 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::Dumper;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -62,6 +61,7 @@ sub new
                 vjoinon       =>['wfheadid'=>'id'],
                 vjoindisp     =>'name',
                 sqlorder      =>'none',
+                group         =>['default','actiondata'],
                 searchable    =>'0',
                 label         =>'Workflow Name'),
 
@@ -161,6 +161,7 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'comments',
+                htmlheight    =>'auto',
                 sqlorder      =>'none',
                 group         =>'actiondata',
                 label         =>'Comments',
@@ -286,6 +287,12 @@ sub getSqlFrom
 
 
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
 
 
 
