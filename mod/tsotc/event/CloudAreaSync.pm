@@ -85,6 +85,7 @@ sub CloudAreaSync
    {
       my %otcpname;
       my $itcloud="OTC";
+      $otcpro->SetFilter({lastmondate=>"<now-14d"});
       foreach my $otcprorec ($otcpro->getHashList(qw(
                               name cluster id applid appl 
                               domain fullname
