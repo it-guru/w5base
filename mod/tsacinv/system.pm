@@ -217,7 +217,8 @@ sub new
                 label         =>'Usage',
                 dataobjattr   =>"
                    (case 
-                     when system.\"usage\" like 'HOUSING' and
+                     when (system.\"usage\" like 'HOUSING' or 
+                           system.\"usage\" like 'OSY-I: HOUSING' ) and
                           system.\"srcsys\" is null and
                           system.\"srcid\" is null and
                           system.\"systemola\" like '%-ONLY' and 
@@ -229,7 +230,8 @@ sub new
                            inmassignment.\"name\"='TIT' or 
                            inmassignment.\"name\" like 'TIT.%') 
                           then n'INVOICE_ONLY'
-                     when system.\"usage\" like 'HOUSING' and
+                     when (system.\"usage\" like 'HOUSING' or
+                           system.\"usage\" like 'OSY-I: HOUSING' ) and
                           system.\"srcsys\" is null and
                           system.\"srcid\" is null and
                           system.\"systemola\" like '%-ONLY' and 
