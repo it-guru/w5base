@@ -44,8 +44,7 @@ sub checkAgainstAM
          my ($amrec)=$asys->getOnlyFirst(qw(systemid services
                                             orderedservices));
          #print STDERR "amrec".Dumper($amrec);
-         if ($#{$amrec->{services}}!=-1 ||
-             $#{$amrec->{orderedservices}} !=-1){
+         if ($#{$amrec->{orderedservices}} !=-1){
             $dataobj->LastMsg(ERROR,
               "The chosen operation is invalid in case ".
               "there are active services in AssetManager on the ".
