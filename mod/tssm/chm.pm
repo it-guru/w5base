@@ -472,6 +472,8 @@ sub new
                 forwardSearch =>1,
                 vjointo       =>'tssm::chm_device',
                 vjoinon       =>['changenumber'=>'src'],
+                vjoininhash   =>[qw(descname dstmodel dstcriticality
+                                    civalid dststatus dstid)],
                 vjoindisp     =>[qw(descname dstmodel dstcriticality
                                     civalid dststatus)]),
 
