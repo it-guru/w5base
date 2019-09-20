@@ -266,7 +266,7 @@ sub calcParentAndObjlist
          $cache->{$cache_identifier}={parent=>$parent->Self,objlist=>$objlist};
       }
       else{
-         if ($parent ne $cache->{$cache_identifier}->{parent}){
+         if ($parent->Self() ne $cache->{$cache_identifier}->{parent}){
             my $do=getModuleObject($self->Config,
                                     $cache->{$cache_identifier}->{parent});
             my $reloadedRec=$self->reloadRec($do,$rec);
@@ -304,9 +304,7 @@ sub reloadRec
       $do->SetFilter({$idname=>\$rec->{$idname}});
       ($rec)=$do->getOnlyFirst(qw(ALL)); 
       if (!defined($rec)){
-         msg(ERROR,"parent transformation error ".
-                   "while reread rec");
-         return();
+         return(undef);
       }
       else{
          return($rec);
@@ -425,19 +423,23 @@ sub nativDatacareAssistant
                   my $idobj=$do->IdField();
                   if (defined($idobj)){
                      my $idname=$do->IdField()->Name();
-                     $do->SetFilter({$idname=>\$rec->{$idname}});
+                     my $idval=$rec->{$idname};
+                     $do->SetFilter({$idname=>\$idval});
                      ($rec)=$do->getOnlyFirst(qw(ALL)); 
                      if (!defined($rec)){
-                        msg(ERROR,"parent transformation error while reread rec");
+                        msg(ERROR,"parent transformation error ".
+                                  "while reread rec on refid='".$idval."'");
                         return;
                      }
-                     $objlist=$do->getQualityCheckCompat($rec); # recreate compat list
+                      # recreate compat list
+                     $objlist=$do->getQualityCheckCompat($rec); 
                      msg(INFO,"qrule parent transformation from %s to %s done",
                               $parent->Self(),$do->Self());
                      $parent=$do;
                   }
                   else{
-                     msg(ERROR,"qrule.pm can not detect idfield in ".$do->Self());
+                     msg(ERROR,"qrule.pm can not detect idfield in ".
+                         $do->Self());
                   }
                }
                else{
@@ -598,7 +600,9 @@ sub nativQualityCheck
          # for write accesss to record to get correct oldrec
          my $reloadedRec=$self->reloadRec($parent,$rec);
          if (!defined($reloadedRec)){
-            msg(ERROR,"reloadRec error after QualtiyCheck Pass");
+            # record does not exists after QualityCheck. This only can meen,
+            # any qrule in check has delete the check-record (f.e. for 
+            # cleanup
             return();
          }
          $rec=$reloadedRec;
