@@ -402,12 +402,16 @@ sub StoreRecord
    my $data=shift;
    my $comments=shift;
    my $effort=shift;
+   my $additional=shift;
 
    my %rec=%{$data};
    $rec{wfheadid}=$wfheadid;
    $rec{name}=$name;
    $rec{comments}=$comments;
    $rec{effort}=$effort if (defined($effort) && $effort!=0);
+   $rec{additional}=$additional if (defined($additional) && 
+                                  ref($additional) eq "HASH" &&
+                                  keys(%$additional));
 
    if (!($rec{wfheadid}=~/^\d{3,20}$/)){
       $self->LastMsg(ERROR,"invalid wfheadid StoreRecord in StoreRecord");
