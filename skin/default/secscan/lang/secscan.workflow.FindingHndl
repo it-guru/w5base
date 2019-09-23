@@ -56,6 +56,8 @@ be treated with maximum priority.
  en=>'set new responsible person and assign Finding'
 },
 'wfclosed'=>{de=>'Abgeschlossen',en=>'Closed'},
+'wfreactivate'=>{de=>'Reaktivierung',en=>'Reactivation'},
+'wfreseen'=>{de=>'Wiedergesehen',en=>'seen again'},
 'wfreject'=>{de=>'Abgelehnt',en=>'Rejected'},
 'wfaddreason'=>{de=>'Begründung hinzugefügt',en=>'add reason'},
 'wfadddsgvo'=>{de=>'addDSGVO Aussage',en=>'addDSGVO Statement'},

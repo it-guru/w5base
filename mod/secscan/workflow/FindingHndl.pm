@@ -824,24 +824,65 @@ sub nativProcess
    }
    if ($action eq "wfreactivate"){
       $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-      if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"wfreactivate",
-          {translation=>'secscan::workflow::FindingHndl'},"",undef)){
-         my $nextstep=$self->getParent->getStepByShortname("main");
-         my $store={stateid=>2,
-                    step=>$nextstep,
-                    secfindingstate=>'INANALYSE',
-                    closedate=>undef,
-                    fwddebtarget=>undef,
-                    fwddebtargetid=>undef};
-         msg(WARN,"reactivate SecFinding $WfRec->{id}");
-         if (!in_array($self->getParent->{tester},
-                       $WfRec->{fwdtargetid})){
-            $store->{fwdtargetid}=15632883160001;
-            $store->{fwdtarget}="base::user";
+      my $reseen=0;
+      foreach my $arec (@{$WfRec->{shortactionlog}}){
+         if ($arec->{name} eq "wfreseen"){
+            $reseen++;
          }
-         $self->StoreRecord($WfRec,$store);
-         return(1);
+      }
+      if ($WfRec->{secfindingstate} eq "INANALYSE"){
+         msg(ERROR,"seltsame reactivate Operation auf ".
+                   "sec Workflow $WfRec->{id}");
+      }
+      elsif ($WfRec->{secfindingstate} eq "CLOSEDRESOLVED"){
+         if ($self->getParent->getParent->Action->StoreRecord(
+             $WfRec->{id},"wfreactivate",
+             {translation=>'secscan::workflow::FindingHndl'},"",undef)){
+            my $nextstep=$self->getParent->getStepByShortname("main");
+            my $store={stateid=>2,
+                       step=>$nextstep,
+                       secfindingstate=>'INANALYSE',
+                       closedate=>undef,
+                       fwddebtarget=>undef,
+                       fwddebtargetid=>undef};
+            msg(WARN,"reactivate SecFinding $WfRec->{id}");
+            if (!in_array($self->getParent->{tester},
+                          $h->{secfindingreponsibleid})){
+               $store->{fwdtargetid}=15632883160001;
+               $store->{fwdtarget}="base::user";
+            }
+            else{
+               $store->{fwdtargetid}=$h->{secfindingreponsibleid};
+               $store->{fwdtarget}="base::user";
+            }
+            if (defined($h->{secfindingaltreponsibleid})){
+               $store->{secfindingaltreponsibleid}=$h->{secfindingreponsibleid};
+            }
+            if ($self->StoreRecord($WfRec,$store)){
+               my $id=$WfRec->{id};
+               my $aobj=$self->getParent->getParent->Action();
+        
+               if (defined($h->{secfindingaltreponsibleid})){
+                  my $wsref=$h->{secfindingaltreponsibleid};
+                  $wsref=[$wsref] if (ref($wsref) ne "ARRAY");
+                  foreach my $a (@{$wsref}){
+                     $self->getParent->getParent->AddToWorkspace(
+                            $id,"base::user",$a);
+                  }
+               }
+               $classobj->NotifySecurityFindingForward({id=>$id});
+               $self->PostProcess($action,$h,$actions);
+            }
+         }
+      }
+      else{
+         # we add a note only in workflow 
+         $classobj->getParent->Action->StoreRecord($WfRec->{id},"wfreseen",
+             {translation=>'secscan::workflow::FindingHndl'},
+             "",undef,
+             {request=>'reactivate',
+              reseen=>$reseen,
+              lastsecfindingstate=>$WfRec->{secfindingstate}});
       }
       return(1);
    }

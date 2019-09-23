@@ -8,3 +8,4 @@
 'fieldgroup.handling'=>{de=>'Manuelle Behandlung',en=>'manuell handling'},
 'fieldgroup.recup'=>{de=>'Wiedererscheinungs-Verlauf',en=>'recuperation history'},
 'fieldgroup.handlingsource'=>{de=>'Behandlung - Metadaten',en=>'handling - metadata'},
+'current Workflow result'=>{de=>'aktuelles Workflow Ergebnis'},

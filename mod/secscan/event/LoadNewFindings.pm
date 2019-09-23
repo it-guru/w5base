@@ -313,9 +313,15 @@ sub analyseRecord
          if ($WfRec->{stateid}>15){
             msg(INFO,"need to reactivate $WfRec->{id}");
             my $wfop=$self->{wf}->Clone(); 
-            if ($wfop->nativProcess('wfreactivate',{
+            my $newrec={
                   secfindingreponsibleid=>$reponsibleid,
-                  detaildescription=>$rec->{detailspec} },$WfRec->{id})){
+                  detaildescription=>$rec->{detailspec} 
+            };
+            if (keys(%altreponsibleid)){
+               $newrec->{secfindingaltreponsibleid}=
+                  [sort(keys(%altreponsibleid))];
+            }
+            if ($wfop->nativProcess('wfreactivate',$newrec,$WfRec->{id})){
                msg(INFO,"ok - it was reactivated $WfRec->{id}");
             }
          }

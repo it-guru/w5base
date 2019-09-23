@@ -194,7 +194,6 @@ sub new
                 group         =>'source',
                 align         =>'left',
                 history       =>0,
-                htmldetail    =>0,
                 dataobjattr   =>"id",
                 wrdataobjattr =>"refid"),
 
@@ -397,6 +396,12 @@ sub new
                 weblinkto     =>"NONE",
                 fields        =>[qw(name state)]),
 
+      new kernel::Field::Text(
+                name          =>'findingstatus',
+                group         =>'wfhandling',
+                readonly      =>1,
+                label         =>'current Workflow result',
+                onRawValue    =>\&getFindingState),
 
 #      new kernel::Field::Text(
 #                name          =>'wfname',
@@ -508,6 +513,28 @@ sub new
    $self->setWorktable("secscan__finding_of");
    $self->setDefaultView(qw(findcdate name hstate secitem comments));
    return($self);
+}
+
+
+sub getFindingState
+{
+   my $self=shift;
+   my $current=shift;
+   my $app=$self->getParent();
+   if (defined($current) &&
+       $current->{wfheadid} ne ""){
+      my $wf=$app->getPersistentModuleObject("wf","base::workflow");
+      $wf->SetFilter({id=>\$current->{wfheadid}});
+      my ($WfRec)=$wf->getOnlyFirst(qw(ALL));
+      if (defined($WfRec)){
+         my $fld=$wf->getField("wffields.secfindingstate",$WfRec);
+         if (defined($fld)){
+            my $d=$fld->FormatedResult($WfRec,"HtmlV01");
+            return($d);
+         }
+      }
+   }
+   return(undef);
 }
 
 
