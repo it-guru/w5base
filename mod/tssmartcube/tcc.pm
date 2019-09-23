@@ -371,7 +371,7 @@ sub new
                 name          =>'red_alert_color',
                 label         =>'Red Alert: Color',
                 htmldetail    =>'0',
-                searchable    =>0,
+                searchable    =>1,
                 group         =>'auditserver',
                 dataobjattr   =>"decode(RED_ALERT,NULL,'','red')"),
 
