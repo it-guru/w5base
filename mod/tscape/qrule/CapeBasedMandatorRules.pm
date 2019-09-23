@@ -136,16 +136,21 @@ sub qcheckRecord
          my $i=getModuleObject($dataobj->Config,"tscape::archappl");
          return(undef,undef) if ($i->isSuspended());
          $i->SetFilter({archapplid=>\$icto});
-         my ($ictor)=$i->getOnlyFirst(qw(organisation archapplid orgareaid));
+         my ($ictor)=$i->getOnlyFirst(qw(organisation archapplid orgareaid
+                                         orgarea));
          if (defined($ictor) && $ictor->{organisation} ne ""){
             $grp=$ictor->{orgareaid};
          }
          if ($grp ne ""){
             my $m=getModuleObject($dataobj->Config,"base::mandator");
-            $m->SetFilter({grpid=>\$grp,cistatusid=>['3','4']});
+            $m->SetFilter({grpid=>\$grp,cistatusid=>['3','4','5']});
             my ($mrec)=$m->getOnlyFirst(qw(name grpid));
             if (!defined($mrec)){ 
-               msg(ERROR,"can not identify mandator for group '$grp'");
+               msg(ERROR,"no usable mandator for ".
+                         "organisation '$ictor->{organisation}' ".
+                         "(grp=$ictor->{orgarea}) ".
+                         "as requested ".
+                         "from Cape in '$icto' - id=$rec->{id}");
                return(0,undef);
             }
             if ($curmandator ne $mrec->{name}){
