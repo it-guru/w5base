@@ -124,8 +124,12 @@ sub qcheckRecord
                  # printf STDERR ("w5clust=%s\n",Dumper($w5clust));
                }
                else{
-                  push(@qmsg,"ClusterID: '".$amclust->{clusterid}.
-                       "' not found in W5Base/Darwin");
+                  push(@qmsg,"ClusterID not found in ".
+                             "W5Base/Darwin IT-Inventory: ".
+                       $amclust->{clusterid});
+                  push(@dataissue,"ClusterID not found in ".
+                                  "W5Base/Darwin IT-Inventory: ".
+                       $amclust->{clusterid});
                   $errorlevel=3 if ($errorlevel<3);
                }
             }

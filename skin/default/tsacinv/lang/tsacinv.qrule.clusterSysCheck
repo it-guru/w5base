@@ -2,3 +2,4 @@
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
 'different values stored in AssetManager'=>{de=>'in AssetManager sind andere Inhalte gespeichert'},
 'can not create needed cluster relation'=>{de=>'notwendige Cluster Zuordnung kann nicht erstellt werden'},
+'ClusterID not found in W5Base/Darwin IT-Inventory'=>{de=>'ClusterID konnte in W5Base/Darwin IT-Inventar nicht gefunden werden'},
