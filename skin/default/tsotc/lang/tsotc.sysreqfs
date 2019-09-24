@@ -1,4 +1,0 @@
-'tsotc::sysreqfs'=>{de=>'OTC: Systemrequest filesytem',en=>'OTC: Systemrequest filesytem'},
-'invalid fs entry for WIN systems'=>{de=>'ungültiger Filesystem Entry für WIN Systeme'},
-'invalid fs entry for UX systems'=>{de=>'ungültiger Filesystem Entry für UX Systeme'},
-'missing root filesystem'=>{de=>'fehlendes root/c: Filesystem'},

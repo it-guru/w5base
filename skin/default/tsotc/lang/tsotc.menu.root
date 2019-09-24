@@ -4,8 +4,6 @@
 'itu.tsotc.project.lnksystem'=>{de=>'Verkn. System',en=>'Link System'},
 'itu.tsotc.system'=>{de=>'System',en=>'System'},
 'itu.tsotc.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Address'},
-'itu.tsotc.system.request'=>{de=>'Anforderung',en=>'Request'},
-'itu.tsotc.system.request.new'=>{de=>'Neueingabe',en=>'New'},
 'itu.tsotc.system.lnkiaascontact'=>{de=>'Verkn. IaaS Kontakt',en=>'Link IaaS Contact'},
 'itu.tsotc.system.lnkiaccontact'=>{de=>'Verkn. IaC Kontakt',en=>'Link IaC Contact'},
 'itu.tsotc.appagile'=>{de=>'AppAgile',en=>'AppAgile'},
