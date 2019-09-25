@@ -30,6 +30,7 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->{MsgBuffer}={};
+   $self->{MsgArray}=[];
 
    return($self);
 }
@@ -65,12 +66,12 @@ sub openExcel
          $ws->write($xlsexp->{xls}->{line},0,
                     "ToDoTag",
                     $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(0,0,17);
+         $ws->set_column(0,0,24);
 
          $ws->write($xlsexp->{xls}->{line},1,
                     "AM ID Ref",
                     $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(1,1,20);
+         $ws->set_column(1,1,15);
 
          $ws->write($xlsexp->{xls}->{line},2,
                     "Standort",
@@ -85,7 +86,7 @@ sub openExcel
          $ws->write($xlsexp->{xls}->{line},4,
                     "Bemerkungen",
                     $xlsexp->{xls}->{format}->{header});
-         $ws->set_column(4,4,190);
+         $ws->set_column(4,4,220);
 
          $xlsexp->{xls}->{line}++;
       }
@@ -96,10 +97,14 @@ sub addMessage
 {
    my $self=shift;
    my @col=@_;
+   my @locationpath=split(/\//,$col[2]);
+   $col[2]=$locationpath[1];
 
    my $key=$col[0].":".$col[1];
-
-   $self->{MsgBuffer}->{$key}=\@col;
+   if (!exists($self->{MsgBuffer}->{$key})){
+      push(@{$self->{MsgArray}},\@col);
+      $self->{MsgBuffer}->{$key}=\@col;
+   }
 }
 
 sub addLine
@@ -140,20 +145,52 @@ sub closeExcel
 }
 
 
+sub getRebuildW5BaseSysSQLcmd
+{
+    my $self=shift;
+    my $w5sysrec=shift;
+    my $iassigrp=shift;
+
+    my $cmd=<<EOF;
+-- Umbau $w5sysrec->{name} as srcsys=W5Base
+update system set srcsys='w5base',srcid=NULL,systemid=NULL,
+acinmassignmentgroupid=(select id from metagrpmgmt where fullname='$iassigrp')
+where id='$w5sysrec->{id}';
+EOF
+
+    return($cmd);
+}
+
+
 sub HousingAnalyse
 {
    my $self=shift;
    my $app=$self->getParent;
    my @idlist=@_;
+   my $nomail=0;
+
+   my $DarwinDev="TIT.TSI.DE.W5BASE";
+
+   if (grep(/^(-){0,1}nomail$/i,@idlist)){
+      $nomail=1;
+      @idlist=grep(!/^(-){0,1}nomail$/i,@idlist);
+   }
+
+
+
+
    my $defaultStartOfNewHousingHandling=">01.08.2019";
 
    my @msg;
 
    my $w5sys=getModuleObject($self->Config,"itil::system");
+   my $w5ass=getModuleObject($self->Config,"itil::asset");
    my $w5tsgrp=getModuleObject($self->Config,"tsgrpmgmt::grp");
    my $amsys=getModuleObject($self->Config,"tsacinv::system");
    my $amsys2=getModuleObject($self->Config,"tsacinv::system");
    my $amass=getModuleObject($self->Config,"tsacinv::asset");
+   my $tssmgrp=getModuleObject($self->Config,"tssm::group");
+   my $wf=getModuleObject($self->Config,"base::workflow");
 
    $amsys2->BackendSessionName("xxo$$");
 
@@ -170,16 +207,67 @@ sub HousingAnalyse
    my %assetid;
    my %amivosys;
    my %smap;
-   
 
 
-   if (1){  # Fall1: Systeme sehen aus wie INVOICE_ONLY - haben aber 
-            # nicht den passenden namen.
+   my %amasset;
+   my %amassetid;
+   my %w5asset;
+   my %w5assetid;
+   my %amsystem;
+   my %amsystemid;
+   my %w5system;
+   my %w5systemid;
+
+
+   sub getMostHousingIVOlookingSystemID{
+      my $assetid=shift;
+      my $systemids=shift;
+      my %IVOweight;
+      my $c=1;
+      # alle SystemIDs am Asset sehen gleichberechtigt aus und kommen
+      # alle aus W5Base. Nun muss ich versuchen, eines raus zu picken,
+      # das dann das INVOICE_ONLY werden soll.
+      # Das machen wir dann nach einem Gewichtungssystem ...
+      foreach my $systemid (sort(@$systemids)){
+         #print Dumper($amsystem{$systemid});
+         my $partofasset=$amsystem{$systemid}->{partofasset};
+         $partofasset=~s/,/./;
+         $partofasset=~s/^\./0./;
+         $IVOweight{$systemid}=$c++;
+         if ($partofasset==1.0){
+            $IVOweight{$systemid}*=100000;
+         }
+         else{
+            $IVOweight{$systemid}*=(1.0+$partofasset);
+         }
+         if ($#{$amsystem{$systemid}->{applications}}==-1){
+            $IVOweight{$systemid}*=100;
+         }
+         if ($#{$amsystem{$systemid}->{orderedservices}}>0){
+            $IVOweight{$systemid}*=
+               (10*($#{$amsystem{$systemid}->{orderedservices}}+1));
+         }
+      }
+      my @weightSystemID=sort({$IVOweight{$a}<=>$IVOweight{$b}}
+                              keys(%IVOweight));
+      #print STDERR "w=".Dumper(\%IVOweight);
+      return($weightSystemID[0]);
+
+   }
+
+
+
+
+
+
+
+   if (1){  
+
+      ####################################################################### 
+      # load 1st stage of Systemdate from AssetManager
       $amsys->ResetFilter();
       my $flt={
-         usage=>\'INVOICE_ONLY?',
          deleted=>\'0',
-         customerlink=>'DTAG DTAG.*',
          status=>'"!out of operation"'
       };
       if ($#idlist==-1){
@@ -190,52 +278,40 @@ sub HousingAnalyse
       }
       $amsys->SetFilter($flt);
       foreach my $amsysrec ($amsys->getHashList(
-                            qw(systemname systemid
-                               assetassetid
-                               assignmentgroup
-                               iassignmentgroup
-                               tsacinv_locationfullname
-                               orderedservices
-                               services))){
-         $amivosys{$amsysrec->{systemid}}++;
-         my @l=split(/\//,$amsysrec->{tsacinv_locationfullname});
-         #next if (in_array(\@notsirz,$l[1]));
-
-         $loc{$l[1]}++;
-
-         $assetid{$amsysrec->{assetassetid}}++;  # an den Assets, muß dann ein 
-                                                 # INVOICE_ONLY System vorhanden
-                                                 # sein.
-         if (1){
-            $w5sys->ResetFilter();
-            $w5sys->SetFilter({systemid=>\$amsysrec->{systemid}});
-            my ($w5sysrec,$msg)=$w5sys->getOnlyFirst(qw(id));
-            msg(INFO,"check SystemID $amsysrec->{systemid}");
-            if (defined($w5sysrec)){
-               # das wie INVOICE_ONLY ausschauende system ist bereits in 
-               # darwin importiert. Das wird nun zu einem tech. Systemdatensatz
-               # "umgebaut" (bekommt neue SystemID - Name bleibt gleich):
-               
-               msg(INFO,"umbau SystemID $amsysrec->{systemid}");
-               $w5tsgrp->ResetFilter();
-               $w5tsgrp->SetFilter({fullname=>\$amsysrec->{iassignmentgroup}});
-               my ($w5tsgrprec,$msg)=$w5tsgrp->getOnlyFirst(qw(ALL));
-
-               $self->addMessage("DelInvoiceOnlyW5Sys",$amsysrec->{systemid},
-                         $l[1],"Darwin-Dev",
-                         "update system set srcsys='w5base',".
-                         "srcid=NULL,systemid=NULL,".
-                         "acinmassignmentgroupid='$w5tsgrprec->{id}' ".
-                         "where systemid='$amsysrec->{systemid}';");
-            }
-         }
+                           qw(systemname systemid assetassetid))){
+         my $rec=ObjectRecordCodeResolver($amsysrec);
+         msg(INFO,"load AssetManager system $rec->{systemid}");
+         $amassetid{$rec->{assetassetid}}++;
       }
-   }
+      ####################################################################### 
+
+
+      ####################################################################### 
+      # load Asset data from W5Base
+      $w5ass->ResetFilter();
+      my $flt={
+         name=>'A*',
+         cistatusid=>'2 3 4 5',
+         srcsys=>'W5Base',
+         cdate=>$defaultStartOfNewHousingHandling
+      };
+      if ($#idlist==-1){
+         $w5ass->SetFilter($flt);
+      }
+      else{
+         $w5ass->SetFilter({name=>\@idlist,
+                            cistatusid=>'2 3 4 5'});
+      }
+      foreach my $w5assrec ($w5ass->getHashList(qw(name))){
+         msg(INFO,"load W5Base Asset $w5assrec->{name}");
+         $amassetid{$w5assrec->{name}}++;
+      }
 
 
 
-   if (1){ # Fall2: Assets sind von W5Base Darwin erzeugt, stehen aber in
-           # einem RZ von T-Systems
+
+      ####################################################################### 
+      # load Asset data from AssetManager
       $amass->ResetFilter();
       my $flt={
          status=>'"!wasted"',
@@ -248,118 +324,409 @@ sub HousingAnalyse
       else{
          $flt->{assetid}=\@idlist;
       }
-      $amass->SetFilter($flt);
-      foreach my $amassrec ($amass->getHashList(
-                            qw(assetid tsacinv_locationfullname))){
-         my @l=split(/\//,$amassrec->{tsacinv_locationfullname});
-         next if (in_array(\@notsirz,$l[1]));
-         $assetid{$amassrec->{assetid}}++;
-         $self->addMessage("TransfAssetAuthD2A",$amassrec->{assetid},
-                   $l[1],"AssetManager-Admins",
-                   "Das Asset $amassrec->{assetid} muss von ".
-                   "ExternalSystem=W5Base".
-                   "auf ExternalSystem=NULL umgestellt werden, da es in einem ".
-                   "TSI RZ steht. Unklar, wer die Assignmentgroup in ".
-                   "AM bekommen ".
-                   "soll.");
+      if (keys(%amassetid)){
+         $amass->SetFilter([$flt,{assetid=>[keys(%amassetid)]}]);
       }
-      if (0){  # Analyse der System-Datensätze an Assets, die von Darwin erzeugt
-               # wurden
-         $amass->ResetFilter();
-         $amass->SetFilter({
-            status=>'"!wasted"',
-            deleted=>\'0',
-            assetid=>[keys(%assetid)]  #load assetids from posible INVOICE_ONLY?
-         });
-         foreach my $amassrec ($amass->getHashList(
-                               qw(assetid tsacinv_locationfullname))){
-            my @l=split(/\//,$amassrec->{tsacinv_locationfullname});
-          #  next if (in_array(\@notsirz,$l[1]));
-          #  printf F ($form,"TransfAssetAuthD2A",$amassrec->{assetid},$l[1],
-          #            "Das Asset $amassrec->{assetid} muss von ExternalSystem=W5Base".
-          #            "auf ExternalSystem=NULL umgestellt werden, da es in einem ".
-          #            "TSI RZ steht. Unklar, wer die Assignmentgroup in AM bekommen ".
-          #            "soll.");
-            #print Dumper($amassrec);
-         }
+      else{
+         $amass->SetFilter($flt);
+      }
+      foreach my $amassrec ($amass->getHashList(
+                            qw(assetid 
+                              assignmentgroup
+                              iassignmentgroup
+                               tsacinv_locationfullname srcsys))){
+         my $rec=ObjectRecordCodeResolver($amassrec);
+         msg(INFO,"load AssetManager asset $rec->{assetid}");
+         $amassetid{$rec->{assetid}}++;
+         $amasset{$rec->{assetid}}=$rec;
+      }
+      ####################################################################### 
+
+
+      ####################################################################### 
+      # load 2st stage of Systemdate from AssetManager
+      $amsys->ResetFilter();
+      my $flt={
+         assetassetid=>[keys(%amassetid)],
+         deleted=>\'0',
+         status=>'"!out of operation"'
+      };
+      $amsys->SetFilter($flt);
+      foreach my $amsysrec ($amsys->getHashList(
+                           qw(systemname systemid
+                              assetassetid
+                              assignmentgroup
+                              iassignmentgroup
+                              customerlink usage
+                              applications orderedservices
+                              srcsys usage partofasset
+                              tsacinv_locationfullname))){
+         my $rec=ObjectRecordCodeResolver($amsysrec);
+         msg(INFO,"2nd load AssetManager system $rec->{systemid}");
+         $amsystem{$rec->{systemid}}=$rec;
+      }
+
+      ####################################################################### 
+      # load Asset data from W5Base
+      $w5ass->ResetFilter();
+      my $flt={
+         name=>[keys(%amassetid)],
+      };
+      $w5ass->SetFilter($flt);
+      foreach my $w5assrec ($w5ass->getHashList(qw(name class 
+                                                   cistatusid systems))){
+         my $rec=ObjectRecordCodeResolver($w5assrec);
+         msg(INFO,"load W5Base asset $rec->{name}");
+         $w5assetid{$rec->{name}}=$rec;
+         $w5asset{$rec->{id}}=$rec;
+      }
+
+      ####################################################################### 
+      # load System data from W5Base
+      $w5sys->ResetFilter();
+      my $flt={
+      };
+      $w5sys->SetFilter([{
+         asset=>[keys(%amassetid)],
+         cistatusid=>'2 3 4 5'
+      },{
+         systemid=>[keys(%amsystemid)],
+         cistatusid=>'2 3 4 5'
+      }]);
+      foreach my $w5sysrec ($w5sys->getHashList(qw(name cistatusid systemid id
+                                                   asset))){
+         my $rec=ObjectRecordCodeResolver($w5sysrec);
+         msg(INFO,"load W5Base system $rec->{name}");
+         $w5systemid{$rec->{systemid}}=$rec;
+         $w5system{$rec->{id}}=$rec;
       }
    }
 
-   foreach my $assetid (sort(keys(%assetid))){
-         # prüfen, ob "echtes" INVOICE_ONLY System bereits vorhanden
-         msg(INFO,"check AssetID $assetid");
-         $amsys2->ResetFilter();
-         $amsys2->SetFilter({assetassetid=>\$assetid,
-                             usage=>'INVOICE_ONLY*',
-                             deleted=>\'0',
-                             status=>'"!out of operation"'});
-         my @amivosys=$amsys2->getHashList(qw(systemid name usage assetid
-                                              assignmentgroup
-                                              applications));
+   # Analyse Phase
+   msg(INFO,"--------------------------------------------");
 
-         if ($#amivosys>0){
-            my @noappsid;
-            for(my $c=0;$c<=$#amivosys;$c++){
-               if ($#{$amivosys[$c]->{applications}}==-1){
-                  push(@noappsid,$c);
+
+   # Try to detect correct INVOICE_ONLY System
+
+   foreach my $assetid (keys(%amassetid)){
+      msg(INFO,"analyse INVOICE_ONLY for asset $assetid");
+      my $allowedAsHousingOnTSIlocation=0;
+      my @tsisystemid;
+      my @ivosystemid;
+      my @housingsystemid;
+      if ($#ivosystemid==-1){
+         msg(INFO,"check for INVOICE_ONLY* our HOUSING on $assetid");
+         foreach my $sysrec (values(%amsystem)){
+            if ($sysrec->{assetassetid} eq $assetid){
+               if ($sysrec->{usage} eq "INVOICE_ONLY" ||
+                   $sysrec->{usage} eq "INVOICE_ONLY?"){
+                  push(@ivosystemid,$sysrec->{systemid});
+               }
+               elsif ($sysrec->{usage}=~/housing/i){
+          #        if (lc($sysrec->{srcsys}) eq "w5base"){
+                  push(@housingsystemid,$sysrec->{systemid});
+               }
+               else{
+                  if ($sysrec->{usage} ne ""){  # manchmal ist die usage leer!
+                     push(@tsisystemid,$sysrec->{systemid});
+                  }
                }
             }
-            if ($#noappsid==0){   # Wenn nur ein System keine Anwendungen hat,
-               @amivosys=($amivosys[$noappsid[0]]); # dann sollte dass das
-            }                     # korrekte Verrechnungssystem sein.
          }
-         if ($#amivosys>0){
-            print Dumper(\@amivosys);
-            my $systemid=join(", ",map({$_->{systemid}} @amivosys));
-            $self->addMessage("UnUniqueIVOSysInAM",$assetid,
-                       "ToDo","INMAssignmentgroup des Assets",
-                      "Das INVOICE_ONLY System ".
-                      "in AssetManager des Assets $amivosys[0]->{assetassetid} ".
-                      "kann nicht eindeutig ermittelt werden. ".
-                      "Es käment $systemid in Frage.");
-         }
-         elsif($#amivosys==-1){
-            $self->addMessage("CreateIVOSysInAM",$assetid,
-                       "ToDo","INMAssignmentgroup des Assets",
-                      "Für die AssetID $amivosys[0]->{assetassetid} ".
-                      "muss ein INVOICE_ONLY System erzeugt werden. ".
-                      "TSI RZ steht. Unklar, wer die Assignmentgroup in ".
-                      "AM bekommen soll.");
-         }
-         else{
-            if ($amivosys[0]->{usage} eq "INVOICE_ONLY?"){
-               $self->addMessage("RenameIVOSysInAM",$amivosys[0]->{systemid},
-                          "ToDo","ToDo",
-                         "Das System mit der SystemID ".
-                         $amivosys[0]->{systemid}." muss von ".
-                         $amivosys[0]->{name}." auf ".
-                         $amivosys[0]->{systemid}."_HW umbeannt werden.");
-            }
-            $w5sys->ResetFilter();
-            $w5sys->SetFilter({cistatusid=>"<6",
-                               assetid=>$assetid});
-            my @w5techsys=$w5sys->getHashList(qw(id systemid));
-            @w5techsys=grep({!in_array([keys(%amivosys)],$_->{systemid})}
-                            @w5techsys);
-            if ($#w5techsys==-1){
-               $self->addMessage("CreateTechW5Sys",$assetid,
-                         "??","??",
-                         "Für die AssetID $assetid ".
-                         "muss mindestens ein technisches/echtes/reales ".
-                         "Sytem in W5Base/Darwin erzeugt werden (Neueingabe)");
-            }
-         }
+         msg(INFO,"found ".($#ivosystemid+1)." INVOICE_ONLY* Systems");
+      }
+      # alle INVOICE_ONLY Systeme haben wir nun. 
+      # Check ob der Standort eine TSI Standort ist.
+
+       my @locationpath=split(/\//,
+                              $amasset{$assetid}->{tsacinv_locationfullname});
+       my $isTsiRzAsset=0;
+       if (!in_array(\@notsirz,$locationpath[1])){ # check auf TSI Standort
+          $isTsiRzAsset=1;
+       }
+
+       if (lc($amasset{$assetid}->{srcsys}) eq "w5base" &&
+           $isTsiRzAsset==1){
+          if (exists($w5assetid{$assetid}) && 
+              $w5assetid{$assetid}->{class} eq "BUNDLE"){
+             msg(INFO,"AssetID $assetid is a BUNDLE and allowed");
+             $allowedAsHousingOnTSIlocation=1;
+          }
+          else{
+             msg(INFO,"AssetID $assetid needs to be ".
+                      "transfered to srcsys=AssetManager");
+             $self->addMessage("TransfAssetAuthD2A",
+                $assetid,
+                $amasset{$assetid}->{tsacinv_locationfullname},
+                "AssetManager-Admins",
+                "Das Asset $assetid muss von ".
+                "ExternalSystem=W5Base ".
+                "auf ExternalSystem=NULL umgestellt werden, da ".
+                "es in einem ".
+                "TSI RZ steht. Unklar, wer die Assignmentgroup in ".
+                "AM bekommen ".
+                "soll."
+             );
+          }
+       }
+
+
+      
+       if ($#ivosystemid>-1 || 
+           ($isTsiRzAsset==1 && $#housingsystemid>-1 && 
+            $allowedAsHousingOnTSIlocation==0)){
+          msg(INFO,"AssetID $assetid needs INVOICE_ONLY handling");
+          if ($#ivosystemid>0){
+             msg(INFO,"multiple INVOICE_ONLY* systems - try to find the right");
+             my @correctnamed;
+             foreach my $systemid (@ivosystemid){
+                if ($amsystem{$systemid}->{usage} eq "INVOICE_ONLY"){
+                   push(@correctnamed,$systemid);
+                }
+             }
+             if ($#correctnamed==0){
+                msg(INFO,"SystemID $correctnamed[0] is correct named");
+                @ivosystemid=@correctnamed;
+             }
+             elsif ($#correctnamed>0){
+                msg(INFO,"multiple correct INVOICE_ONLY SystemIDs on $assetid");
+                die("no further processing posible");
+             }
+          }
+          if ($#ivosystemid>0){
+             msg(INFO,"unable to detect correct INVOICE_ONLY on $assetid");
+
+
+          }
+          if ($#ivosystemid==0){
+             msg(INFO,"processing asset $assetid with INVOICE_ONLY=".
+                      $ivosystemid[0]);
+             if ($amsystem{$ivosystemid[0]}->{usage} eq "INVOICE_ONLY?"){
+                msg(INFO,"AssetManager: rename of $ivosystemid[0] needed");
+               $self->addMessage(
+                  "RenameIVOSysInAM",
+                  $ivosystemid[0],
+                  $amasset{$assetid}->{tsacinv_locationfullname},
+                  $amsystem{$ivosystemid[0]}->{assignmentgroup},
+                  "Das System mit der SystemID ".
+                  $ivosystemid[0]." muss in AssetManager von ".
+                  $amsystem{$ivosystemid[0]}->{systemname}." auf ".
+                  $amsystem{$ivosystemid[0]}->{systemid}.
+                  "_HW umbeannt werden."
+               );
+             }
+             if (exists($w5systemid{$ivosystemid[0]})){ 
+                msg(INFO,"W5Base: INVOICE_ONLY? SystemID $ivosystemid[0] ".
+                         "needs covert to a tech system"); 
+                if ($w5systemid{$ivosystemid[0]}->{name}
+                    =~m/^S[0-9]{6,10}(_HW){0,1}$/i){
+                   # scheint sich ohnehin um kein "richtiges" System zu handeln
+                   $self->addMessage(
+                      "DelInvoiceOnlyW5Sys",
+                      $ivosystemid[0],
+                      $amasset{$assetid}->{tsacinv_locationfullname},
+                      $DarwinDev,
+                      "-- hartes Entfernen des Systems ".
+                      "   $w5systemid{$ivosystemid[0]}->{name} \n".
+                      "delete from system where ".
+                      "id='$w5systemid{$ivosystemid[0]}->{id}';\n".
+                      "delete from ipaddress where ".
+                      "system='$w5systemid{$ivosystemid[0]}->{id}';\n".
+                      "delete from lnkapplsystem where ".
+                      "system='$w5systemid{$ivosystemid[0]}->{id}';\n"
+                   );
+                }
+                else{
+                   $self->addMessage(
+                      "ModIvoW5Sys2techSys",
+                      $ivosystemid[0],
+                      $amasset{$assetid}->{tsacinv_locationfullname},
+                      $DarwinDev,
+                      $self->getRebuildW5BaseSysSQLcmd(
+                          $w5systemid{$ivosystemid[0]},
+                          $amsystem{$ivosystemid[0]}->{iassignmentgroup},
+                      )
+                   );
+                }
+             }
+             else{
+                # check, if other HOUSING Systems are already on $assetid. If
+                # no, request a new create of min. 1 system in Darwin.
+                my @others=grep(!/^$ivosystemid[0]$/,@housingsystemid);
+                if ($#others==-1){
+                   my $iassi="???";
+                   if (exists($amsystem{$ivosystemid[0]}) &&
+                       $amsystem{$ivosystemid[0]}->{iassignmentgroup} ne ""){
+                      $iassi=$amsystem{$ivosystemid[0]}->{iassignmentgroup};
+                   }
+                   $self->addMessage(
+                      "CreateTecSysW5",
+                      $assetid,
+                      $amasset{$assetid}->{tsacinv_locationfullname},
+                      $iassi,
+                      "Für das Asset $assetid muss ein technisches ".
+                      "System in W5Base/Darwin per Neueingabe erzeugt werden.\n"
+                   );
+                }
+             }
+          }
+          if ($#ivosystemid==-1 &&
+              ($isTsiRzAsset==1 && $#housingsystemid>-1)){
+             msg(INFO,"AssetManager: need to create a INVOICE_ONLY System");
+             my $housingivosystemid;
+             if ($#housingsystemid==0){
+                $housingivosystemid=$housingsystemid[0];
+             }
+             else{
+                msg(INFO,"multiple HOUSING Systems on TSI RZ Location ".
+                         "for $assetid");
+                my $sid=getMostHousingIVOlookingSystemID(
+                   $assetid,
+                   \@housingsystemid
+                );
+
+                msg(INFO,"using weighted $sid as INVOCIE_ONLY for $assetid");
+                $housingivosystemid=$sid;
+             }
+             if (defined($housingivosystemid)){
+                if (lc($amsystem{$housingivosystemid}->{srcsys}) eq "w5base"){
+                   msg(INFO,"AssetManager: $housingivosystemid needs to be ".
+                            "transfert to srcsys=AssetManager");
+                   if ($#tsisystemid!=-1){
+                      msg(INFO,"Housing Mix detected on assetid $assetid");
+                      # HOUSING und TSI Systeme können nicht gemeinsam auf
+                      # EINEM Asset existieren!
+                      $self->addMessage(
+                         "RemoveW5SysMix",
+                         $housingivosystemid,
+                         $amasset{$assetid}->{tsacinv_locationfullname},
+                         $amsystem{$housingivosystemid}->{iassignmentgroup},
+                         "Das System $amsystem{$ivosystemid[0]}->{systemname} ".
+                         "muss aus W5Base/Darwin entfernt werden, da es ".
+                         "mit TSI Systemen gemeinsam auf einem Asset ".
+                         "existiert."
+                      );
+                   }
+                   else{
+                      $self->addMessage("TrSysAutD2AwithIVOmod",
+                         $housingivosystemid,
+                         $amasset{$assetid}->{tsacinv_locationfullname},
+                         "AssetManager-Admins",
+                         "Das System ".
+                         "$amsystem{$housingivosystemid}->{systemname} ".
+                         "($housingivosystemid) muss von ".
+                         "ExternalSystem=W5Base ".
+                         "auf ExternalSystem=NULL umgestellt werden, da ".
+                         "es in einem TSI RZ steht.\n".
+                         "Der Systemname muss auf ${housingivosystemid}_HW ".
+                         "geändert werden.\n".
+                         "Die neue Assignmentgroup wird ".
+                         "vom Asset $assetid übernommen auf ".
+                         "$amasset{$assetid}->{assignmentgroup} ."
+                      );
+                      if (exists($w5systemid{$housingivosystemid})){
+                         msg(INFO,"W5Base: $housingivosystemid needs to be ".
+                                  "rebuild as NEW technical sys ".
+                                  "(new systemid)");
+                         $self->addMessage(
+                            "RebuildHousTW5Sys",
+                            $housingivosystemid,
+                            $amasset{$assetid}->{tsacinv_locationfullname},
+                            $DarwinDev,
+                            $self->getRebuildW5BaseSysSQLcmd(
+                             $w5systemid{$housingivosystemid},
+                             $amsystem{$housingivosystemid}->{iassignmentgroup},
+                            )
+                         );
+                      }
+                   }
+                }
+             }
+             else{
+                msg(ERROR,"am $assetid blick ichs nicht");
+                $self->addMessage(
+                   "UnknownProblem",
+                   $assetid,
+                   $amasset{$assetid}->{tsacinv_locationfullname},
+                   $DarwinDev,"kein Housing ermittelbar"
+                );
+             }
+          }
+       }
+       else{
+          msg(INFO,"ignoring AssetID $assetid - no HOUSING indicator");
+       }
+       msg(INFO,"--------------------------------------------");
    }
 
-
-
-
-   foreach my $k (sort(keys(%{$self->{MsgBuffer}}))){
-      $self->addLine(@{$self->{MsgBuffer}->{$k}});
+   foreach my $l (@{$self->{MsgArray}}){
+      $self->addLine(@{$l});
    }
-
-
    $self->closeExcel();
+
+   if (!$nomail){
+      msg(INFO,"start Mailing ....");
+      my %target;
+      my %tag;
+      foreach my $l (@{$self->{MsgArray}}){
+         $target{$l->[3]}++;
+         $tag{$l->[0]}++;
+      }
+      print Dumper(\%target);
+
+      foreach my $target (sort(keys(%target))){
+         my %targetemail=();
+#         next if ($target ne "TIT.TSI.DE.W5BASE");
+
+         if ($target eq "TIT.TSI.DE.W5BASE"){
+            $targetemail{'hartmut.vogler@t-systems.com'}++;
+         }
+
+         if (!keys(%targetemail)){
+            $tssmgrp->ResetFilter();
+            $tssmgrp->SetFilter({fullname=>\$target}); 
+            my @l=$tssmgrp->getHashList(qw(fullname memberemails));
+            foreach my $rec (@l){
+               foreach my $urec (@{$rec->{memberemails}}){
+                  if ($urec->{useremail} ne ""){
+                     $targetemail{lc($urec->{useremail})}++;
+                  }
+               }
+            }
+         }
+
+         my $subject="Housing SACM Issues for $target";
+         my $mailtxt="";
+
+         $mailtxt.="To: ".join("; ",sort(keys(%targetemail)))."\n\n";
+         foreach my $t (sort(keys(%tag))){
+            foreach my $l (@{$self->{MsgArray}}){
+               if ($l->[0] eq $t){
+                  if ($target eq $l->[3]){
+                     $mailtxt.=$l->[1].":\n";
+                     $mailtxt.=$l->[4]."\n";
+                     $mailtxt.="--\n\n";
+                  }
+               }
+            }
+         }
+
+         my %notify=(
+                     class        =>'base::workflow::mailsend',
+                     step         =>'base::workflow::mailsend::dataload',
+                     name         =>$subject,
+                     emailfrom    =>'"AssetManager HOUSING Check" <>',
+                     emailto      =>[sort(keys(%targetemail))],
+                     emailbcc     =>'hartmut.vogler@t-systems.com',
+                     emailtext    =>$mailtxt,
+                    );
+         my $r=undef;
+         if (my $id=$wf->Store(undef,\%notify)) {
+            my %d=(step=>'base::workflow::mailsend::waitforspool');
+            $r=$wf->Store($id,%d);
+         }
+      }
+   }
 
 
 
