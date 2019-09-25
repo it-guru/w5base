@@ -67,7 +67,7 @@ sub new
                                    searchable =>0,
                                    htmldetail =>0,
                                    vjointo    =>'tssm::useraccount',
-                                   vjoinon    =>['contactkey'=>'lcontactkey'],
+                                   vjoinon    =>['contactkey'=>'contactkey'],
                                    vjoindisp  =>'email'),
 
       new kernel::Field::Text(     name       =>'luser',
