@@ -129,7 +129,7 @@ sub ValidatedUpdateRecord
          msg(INFO,"data changed in field '".$v."'");
       }
       else{
-         msg(INFO,"no data change found in field '".$v."'");
+         #msg(INFO,"no data change found in field '".$v."'");
       }
    }
    if (!$subchanges){
