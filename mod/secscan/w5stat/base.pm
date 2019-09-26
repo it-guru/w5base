@@ -36,10 +36,13 @@ sub new
 sub processRecord
 {
    my $self=shift;
+   my $statstream=shift;
    my $module=shift;
    my $month=shift;
    my $rec=shift;
    my %param=@_;
+
+   return() if ($statstream ne "default");
 
 
 

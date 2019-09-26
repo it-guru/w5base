@@ -38,9 +38,12 @@ sub new
 sub processDataInit
 {
    my $self=shift;
+   my $statstream=shift;
    my $dstrange=shift;
    my %param=@_;
    my $count;
+
+   return() if ($statstream ne "default");
 
    msg(INFO,"processDataInit in $self");
    my $wfrepjob=getModuleObject(
@@ -64,9 +67,12 @@ sub processDataInit
 sub processData
 {
    my $self=shift;
+   my $statstream=shift;
    my $dstrange=shift;
    my %param=@_;
    my $count;
+
+   return() if ($statstream ne "default");
 
    #######################################################################
    if ($param{currentmonth} eq $dstrange){
@@ -87,7 +93,7 @@ sub processData
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-            $self->getParent->processRecord('base::workflow::stat',
+            $self->getParent->processRecord($statstream,'base::workflow::stat',
                                             $dstrange,$rec,%param);
             $count++;
             ($rec,$msg)=$wf->getNext();
@@ -100,10 +106,13 @@ sub processData
 sub processRecord
 {
    my $self=shift;
+   my $statstream=shift;
    my $module=shift;
    my $month=shift;
    my $rec=shift;
    my %param=@_;
+
+   return() if ($statstream ne "default");
 
    if ($module eq "base::workflow::stat"){
       return(undef) if (!exists($self->{SSTORE}));
@@ -336,9 +345,12 @@ sub Format
 sub processDataFinish
 {
    my $self=shift;
+   my $statstream=shift;
    my $dstrange=shift;
    my %param=@_;
    my $count;
+
+   return() if ($statstream ne "default");
 
    my $ss=$self->{SSTORE};
    return(undef) if (!defined($self->{SSTORE}));

@@ -504,9 +504,12 @@ sub displayOrg
 sub processData
 {
    my $self=shift;
+   my $statstream=shift;
    my $dstrange=shift;
    my %param=@_;
    my $count;
+
+   return() if ($statstream ne "default");
 
      
    foreach my $objname (qw(base::workflow
@@ -518,7 +521,7 @@ sub processData
       my $o=getModuleObject($self->getParent->Config,$objname);
       my $n=$o->CountRecords();
       msg(INFO,"result of $objname is $n");
-      $self->getParent->processRecord('objectcount',$dstrange,
+      $self->getParent->processRecord($statstream,'objectcount',$dstrange,
                                       {objectname=>$objname,count=>$n});
    }
 
@@ -530,7 +533,7 @@ sub processData
    my ($rec,$msg)=$grp->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('base::grp',$dstrange,$rec);
+         $self->getParent->processRecord($statstream,'base::grp',$dstrange,$rec);
          $count++;
          ($rec,$msg)=$grp->getNext();
       } until(!defined($rec));
@@ -545,7 +548,7 @@ sub processData
    my ($rec,$msg)=$user->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('base::user',$dstrange,$rec,%param);
+         $self->getParent->processRecord($statstream,'base::user',$dstrange,$rec,%param);
          $count++;
          ($rec,$msg)=$user->getNext();
       } until(!defined($rec));
@@ -574,7 +577,7 @@ sub processData
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-            $self->getParent->processRecord('base::workflow::active',
+            $self->getParent->processRecord($statstream,'base::workflow::active',
                                             $dstrange,$rec,%param);
             $count++;
             $c++;
@@ -595,7 +598,7 @@ sub processData
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-            $self->getParent->processRecord('base::workflow::active',
+            $self->getParent->processRecord($statstream,'base::workflow::active',
                                             $dstrange,$rec,%param);
             $count++;
             $c++;
@@ -616,7 +619,7 @@ sub processData
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-            $self->getParent->processRecord('base::workflow::notfinished',
+            $self->getParent->processRecord($statstream,'base::workflow::notfinished',
                                             $dstrange,$rec,%param);
             $c++;
             $count++;
@@ -630,11 +633,13 @@ sub processData
 sub processRecord
 {
    my $self=shift;
+   my $statstream=shift;
    my $module=shift;
    my $month=shift;
    my $rec=shift;
    my %param=@_;
 
+   return() if ($statstream ne "default");
 
 
    if ($module eq "objectcount"){

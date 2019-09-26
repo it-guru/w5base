@@ -97,10 +97,13 @@ sub displayCustContract
 sub processData
 {
    my $self=shift;
+   my $statstream=shift;
    my $dstrange=shift;
    my %param=@_;
    my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/;
    my $count;
+
+   return() if ($statstream ne "default");
 
 
    my $appl=getModuleObject($self->getParent->Config,"finance::custcontract");
@@ -111,7 +114,7 @@ sub processData
    my ($rec,$msg)=$appl->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('finance::custcontract',
+         $self->getParent->processRecord($statstream,'finance::custcontract',
                                          $dstrange,$rec,%param);
          ($rec,$msg)=$appl->getNext();
          $count++;
@@ -125,11 +128,14 @@ sub processData
 sub processRecord
 {
    my $self=shift;
+   my $statstream=shift;
    my $module=shift;
    my $monthstamp=shift;
    my $rec=shift;
    my %param=@_;
    my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
+
+   return() if ($statstream ne "default");
 
    if ($module eq "finance::custcontract"){
       my $name=$rec->{name};

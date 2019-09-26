@@ -38,9 +38,12 @@ sub new
 sub processData
 {
    my $self=shift;
+   my $statstream=shift;
    my $dstrange=shift;
    my %param=@_;
    my $count;
+
+   return() if ($statstream ne "default");
 
    my $wf=getModuleObject($self->getParent->Config,"base::workflow");
    $wf->SetCurrentView(qw(ALL));
@@ -57,7 +60,7 @@ sub processData
    my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
-         $self->getParent->processRecord('itil::workflow::eventinfo',
+         $self->getParent->processRecord($statstream,'itil::workflow::eventinfo',
                                          $dstrange,$rec,%param);
          ($rec,$msg)=$wf->getNext();
          $count++;
@@ -70,11 +73,14 @@ sub processData
 sub processRecord
 {
    my $self=shift;
+   my $statstream=shift;
    my $module=shift;
    my $monthstamp=shift;
    my $rec=shift;
    my %param=@_;
    my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
+
+   return() if ($statstream ne "default");
 
    if ($module eq "itil::workflow::eventinfo"){
       my $eventstart=$rec->{eventstart};

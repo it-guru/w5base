@@ -38,17 +38,22 @@ sub Init
 
 
    $self->RegisterEvent("w5stat","w5stat",timeout=>7200);
+   $self->RegisterEvent("w5statrecreate","w5statrecreate",timeout=>7200);
    $self->RegisterEvent("w5statsend","w5statsend");
    return(1);
 }
 
-sub w5stat
+sub w5statrecreate
 {
    my $self=shift;
+   my $statstream=shift;
    my $module=shift;
    my $dstrange=shift;
    my @dstrange;
 
+   if ($statstream eq "*" || $statstream eq "w5stat"){
+      $statstream="default";
+   } 
    $module="*" if (!defined($module));
    if (!defined($dstrange)){
       my ($year,$mon,$day, $hour,$min,$sec) = Today_and_Now("GMT");
@@ -75,11 +80,20 @@ sub w5stat
 
 
    foreach my $dstrange (@dstrange){
-      $stat->recreateStats("w5stat",$module,$dstrange);
+      $stat->recreateStats($statstream,"w5stat",$module,$dstrange);
    }
    $stat->loadLateModifies(\@dstrange);
 
    return({exitcode=>0});
+}
+
+sub w5stat
+{
+   my $self=shift;
+   my $module=shift;
+   my $dstrange=shift;
+
+   return($self->w5statrecreate("default",$module,$dstrange));
 }
 
 

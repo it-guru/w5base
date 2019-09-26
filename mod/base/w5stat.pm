@@ -51,7 +51,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'sgroup',
                 label         =>'Statistic Group',
-                value         =>['Mandator','Group',
+                value         =>['Mandator','Group','RMOGroup',
                                  'Application','Location','User',
                                  'Contract','Costcenter'],
                 dataobjattr   =>'w5stat.statgroup'),
@@ -230,6 +230,7 @@ sub loadLateModifies
 sub recreateStats
 {
    my $self=shift;
+   my $statstream=shift;
    my $mode=shift;
    my $module=shift;
    my $dstrangestamp=shift;
@@ -290,6 +291,10 @@ sub recreateStats
       }
    }
 
+   msg(INFO,"w5stat statstream: $statstream");
+   msg(INFO,"w5stat mode: $mode");
+   msg(INFO,"registered w5stat Modules: ".
+            join(", ",sort(keys(%{$self->{$mode}}))));
 
 
    foreach my $obj (values(%{$self->{$mode}})){
@@ -297,7 +302,7 @@ sub recreateStats
          my %param;
          if ($obj->Self eq $module || $module eq "*" || !defined($module)){
             if (!$obj->{InitIsDone}){
-               $obj->processDataInit($dstrangestamp,%param);
+               $obj->processDataInit($statstream,$dstrangestamp,%param);
             }
             $obj->{InitIsDone}++;
          }
@@ -311,7 +316,7 @@ sub recreateStats
          $param{basespan}=$basespan if (defined($basespan));
          $param{baseduration}=$baseduration if (defined($baseduration));
          if ($obj->Self eq $module || $module eq "*" || !defined($module)){
-            $obj->processData($dstrangestamp,%param);
+            $obj->processData($statstream,$dstrangestamp,%param);
          }
       }
    }
@@ -320,7 +325,7 @@ sub recreateStats
          my %param;
          if ($obj->Self eq $module || $module eq "*" || !defined($module)){
             if ($obj->{InitIsDone}){
-               $obj->processDataFinish($dstrangestamp,%param);
+               $obj->processDataFinish($statstream,$dstrangestamp,%param);
             }
          }
       }
@@ -430,6 +435,7 @@ sub _storeStats
 sub processRecord
 {
    my $self=shift;
+   my $statstream=shift;
    my $module=shift;
    my $month=shift;
    my $rec=shift;
@@ -437,7 +443,7 @@ sub processRecord
 
    foreach my $obj (values(%{$self->{w5stat}})){
       if ($obj->can("processRecord")){
-         $obj->processRecord($module,$month,$rec,%param); 
+         $obj->processRecord($statstream,$module,$month,$rec,%param); 
       }
    }
 }

@@ -38,11 +38,14 @@ sub new
 sub processRecord
 {
    my $self=shift;
+   my $statstream=shift;
    my $module=shift;
    my $monthstamp=shift;
    my $rec=shift;
    my %param=@_;
    my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
+
+   return() if ($statstream ne "default");
 
    if ($module eq "itil::workflow::eventinfo"){
       my $eventstart=$rec->{eventstart};
