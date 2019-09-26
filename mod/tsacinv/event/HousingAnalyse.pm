@@ -171,9 +171,9 @@ sub HousingAnalyse
 
    my $DarwinDev="TIT.TSI.DE.W5BASE";
 
-   if (grep(/^(-){0,1}nomail$/i,@idlist)){
+   if (grep(/^(-){0,2}nomail$/i,@idlist)){
       $nomail=1;
-      @idlist=grep(!/^(-){0,1}nomail$/i,@idlist);
+      @idlist=grep(!/^(-){0,2}nomail$/i,@idlist);
    }
 
 
@@ -503,8 +503,7 @@ sub HousingAnalyse
                       $ivosystemid[0]);
              if ($amsystem{$ivosystemid[0]}->{usage} eq "INVOICE_ONLY?"){
                 msg(INFO,"AssetManager: rename of $ivosystemid[0] needed");
-               $self->addMessage(
-                  "RenameIVOSysInAM",
+               $self->addMessage("RenameIVOSysInAM",
                   $ivosystemid[0],
                   $amasset{$assetid}->{tsacinv_locationfullname},
                   $amsystem{$ivosystemid[0]}->{assignmentgroup},
@@ -521,8 +520,7 @@ sub HousingAnalyse
                 if ($w5systemid{$ivosystemid[0]}->{name}
                     =~m/^S[0-9]{6,10}(_HW){0,1}$/i){
                    # scheint sich ohnehin um kein "richtiges" System zu handeln
-                   $self->addMessage(
-                      "DelInvoiceOnlyW5Sys",
+                   $self->addMessage("DelInvoiceOnlyW5Sys",
                       $ivosystemid[0],
                       $amasset{$assetid}->{tsacinv_locationfullname},
                       $DarwinDev,
@@ -537,8 +535,7 @@ sub HousingAnalyse
                    );
                 }
                 else{
-                   $self->addMessage(
-                      "ModIvoW5Sys2techSys",
+                   $self->addMessage("ModIvoW5Sys2techSys",
                       $ivosystemid[0],
                       $amasset{$assetid}->{tsacinv_locationfullname},
                       $DarwinDev,
@@ -559,8 +556,7 @@ sub HousingAnalyse
                        $amsystem{$ivosystemid[0]}->{iassignmentgroup} ne ""){
                       $iassi=$amsystem{$ivosystemid[0]}->{iassignmentgroup};
                    }
-                   $self->addMessage(
-                      "CreateTecSysW5",
+                   $self->addMessage("CreateTecSysW5",
                       $assetid,
                       $amasset{$assetid}->{tsacinv_locationfullname},
                       $iassi,
@@ -596,8 +592,7 @@ sub HousingAnalyse
                       msg(INFO,"Housing Mix detected on assetid $assetid");
                       # HOUSING und TSI Systeme können nicht gemeinsam auf
                       # EINEM Asset existieren!
-                      $self->addMessage(
-                         "RemoveW5SysMix",
+                      $self->addMessage("RemoveW5SysMix",
                          $housingivosystemid,
                          $amasset{$assetid}->{tsacinv_locationfullname},
                          $amsystem{$housingivosystemid}->{iassignmentgroup},
@@ -628,8 +623,7 @@ sub HousingAnalyse
                          msg(INFO,"W5Base: $housingivosystemid needs to be ".
                                   "rebuild as NEW technical sys ".
                                   "(new systemid)");
-                         $self->addMessage(
-                            "RebuildHousTW5Sys",
+                         $self->addMessage("RebuildHousTW5Sys",
                             $housingivosystemid,
                             $amasset{$assetid}->{tsacinv_locationfullname},
                             $DarwinDev,
@@ -644,8 +638,7 @@ sub HousingAnalyse
              }
              else{
                 msg(ERROR,"am $assetid blick ichs nicht");
-                $self->addMessage(
-                   "UnknownProblem",
+                $self->addMessage("UnknownProblem",
                    $assetid,
                    $amasset{$assetid}->{tsacinv_locationfullname},
                    $DarwinDev,"kein Housing ermittelbar"
