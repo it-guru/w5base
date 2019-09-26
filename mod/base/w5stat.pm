@@ -667,27 +667,68 @@ sub LoadStatSet
       }
       my $dstrange=$primrec->{dstrange};
       my $lastrange=undef;
+      my @histrange=();
 
       if (my ($Y,$M)=$dstrange=~m/^(\d{4})(\d{2})$/){
+         my ($week,$year)=Week_of_Year($Y,$M,1);
+         my ($Y1,$M1)=($Y,$M);
+         for(my $c=0;$c<=6;$c++){
+            $M1++;
+            if ($M1>12){
+               $Y1++;
+               $M1=1;
+            }
+            push(@histrange,sprintf("%04d%02d",$Y1,$M1));
+         }
+         my $minweek=$week-8;
+         my $maxweek=$week+8;
+         $minweek=1 if ($minweek<1);
+         $maxweek=56 if ($maxweek>56);
+         for(my $kw=$minweek;$kw<=$maxweek;$kw++){
+            push(@histrange,sprintf("%04dKW%02d",$Y,$kw));
+         }
          $M--;
          if ($M<=0){
             $M=12;
             $Y--;
          }
          $lastrange=sprintf("%04d%02d",$Y,$M);
+         push(@histrange,$lastrange);
+         for(my $l=0;$l<6;$l++){
+            $M--;
+            if ($M<=0){
+               $M=12;
+               $Y--;
+            }
+            push(@histrange,sprintf("%04d%02d",$Y,$M));
+         }
       }
+      push(@histrange,$dstrange);
 
       my @fltlist=({fullname=>\$primrec->{'fullname'},
-                    sgroup=>\$primrec->{'sgroup'}},
-                   {nameid=>\$primrec->{'nameid'},
-                    sgroup=>\$primrec->{'sgroup'}});
+                    sgroup=>\$primrec->{'sgroup'},
+                    dstrange=>\@histrange});
+
+      if (defined($primrec->{'nameid'})){
+         push(@fltlist,{
+            nameid=>\$primrec->{'nameid'},
+            sgroup=>\$primrec->{'sgroup'},
+            dstrange=>\@histrange
+         });
+      }
+
+      my $r=ObjectRecordCodeResolver(\@fltlist);
+      #print STDERR Dumper($r);
+
       my %srec;
       my $hist={area=>[]};
+      my $cntrec=0;
       foreach my $flt (@fltlist){
          $self->ResetFilter();
          $self->SecureSetFilter($flt);
          $self->SetCurrentOrder("NONE");
          foreach my $srec ($self->getHashList(qw(ALL))){
+            $cntrec++;
             if (!exists($srec{$srec->{id}})){
                if (ref($srec->{stats}) ne "HASH"){
                   $srec->{stats}={Datafield2Hash($srec->{stats})};
@@ -702,6 +743,7 @@ sub LoadStatSet
             }
          }
       }
+      msg(INFO,"loaded $cntrec records for $id");
       return($primrec,$hist);
 
    }
@@ -973,10 +1015,10 @@ EOF
       if (defined($histid->{$k})){
          $ms=sprintf("<td align=center style=\"$style\">".
                  "<a class=sublink href=javascript:refreshTag($histid->{$k})>".
-                 "%02d<br>%4d</a></td>",$M1,$Y1);
+                 "%02d/%4d</a></td>",$M1,$Y1);
       }
       else{
-         $ms=sprintf("<td align=center>%02d<br>%4d</td>",$M1,$Y1);
+         $ms=sprintf("<td align=center>%02d/%4d</td>",$M1,$Y1);
       }
       return($ms,$cw);
       
@@ -995,7 +1037,7 @@ EOF
       $Y=$yy;
    }
    my ($Y1,$M1)=($Y,$M);
-   for(my $c=0;$c<=2;$c++){
+   for(my $c=0;$c<=6;$c++){
       my ($ms,$cw)=getLabelString(\%histid,$M1,$Y1,$M,$Y,$KWyear,$KWweek);
       $mstr.=$ms;
       $cstr.=$cw;
@@ -1006,7 +1048,7 @@ EOF
       }
    }
    my ($Y1,$M1)=($Y,$M);
-   for(my $c=0;$c<12;$c++){
+   for(my $c=0;$c<6;$c++){
       $M1--;
       if ($M1<1){
          $Y1--;

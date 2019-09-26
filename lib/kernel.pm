@@ -203,6 +203,11 @@ sub ObjectRecordCodeResolver
             $back->{$k}=ObjectRecordCodeResolver($_[0]->{$k},$deep);
          }
       }
+      elsif (ref($_[0]) eq "SCALAR"){
+         $back={};
+         my $var=${$_[0]};
+         $back=\$var;
+      }
       elsif (ref($_[0])){
          $back=msg(ERROR,$_[0]." not resolvable in ObjectRecordCodeResolver");
       }
