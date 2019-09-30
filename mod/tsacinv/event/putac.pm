@@ -166,10 +166,11 @@ sub mkAcFtpRecIP
 
    if (ref($rec->{ipaddresses}) eq "ARRAY"){
       my @ip;
+      my $desc="DESC:".$iprec->{comments};
       foreach my $iprec (@{$rec->{ipaddresses}}){
           push(@ip,{
              EventID=>"IP:".$rec->{systemid}.":".$iprec->{id},
-             Description=>$iprec->{comments},
+             Description=>$desc,
              Comp_ExternalID=>$rec->{id},
              Comp_ExternalSystem=>"W5Base",
              Computer=>$rec->{systemid},
