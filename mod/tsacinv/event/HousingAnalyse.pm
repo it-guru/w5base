@@ -235,30 +235,25 @@ sub HousingAnalyse
          $partofasset=~s/^\./0./;
          $IVOweight{$systemid}=$c++;
          if ($partofasset==1.0){
-            $IVOweight{$systemid}*=100000;
+            $IVOweight{$systemid}*=100000.0;
          }
          else{
             $IVOweight{$systemid}*=(1.0+$partofasset);
          }
          if ($#{$amsystem{$systemid}->{applications}}==-1){
-            $IVOweight{$systemid}*=100;
+            $IVOweight{$systemid}*=100.0;
          }
          if ($#{$amsystem{$systemid}->{orderedservices}}>0){
             $IVOweight{$systemid}*=
-               (10*($#{$amsystem{$systemid}->{orderedservices}}+1));
+               (10.0*($#{$amsystem{$systemid}->{orderedservices}}+1));
          }
       }
-      my @weightSystemID=sort({$IVOweight{$a}<=>$IVOweight{$b}}
-                              keys(%IVOweight));
-      #print STDERR "w=".Dumper(\%IVOweight);
+      my @weightSystemID=sort({
+            $IVOweight{$b}<=>$IVOweight{$a};
+         } keys(%IVOweight));
       return($weightSystemID[0]);
 
    }
-
-
-
-
-
 
 
    if (1){  
