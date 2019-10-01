@@ -60,12 +60,6 @@ sub new
                 weblinkon     =>['clusterid','id'],
                 dataobjattr   =>"appagile_cluster"),
 
-     new kernel::Field::Interface(
-                name          =>'applid',
-                group         =>'source',
-                label         =>'ApplID',
-                dataobjattr   =>"darwin_w5baseid"),
-
       new kernel::Field::Text(
                 name          =>'appl',
                 sqlorder      =>'desc',
@@ -74,6 +68,12 @@ sub new
                 vjointo       =>\'itil::appl',
                 vjoinon       =>['applid'=>'id'],
                 vjoindisp     =>'name'),
+
+     new kernel::Field::Text(
+                name          =>'applid',
+                group         =>'source',
+                label         =>'Application W5BaseID',
+                dataobjattr   =>"darwin_w5baseid"),
 
       new kernel::Field::Date(
                 name          =>'firstmondate',

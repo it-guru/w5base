@@ -45,13 +45,6 @@ sub new
                 label         =>'DomainID',
                 dataobjattr   =>"domain_uuid"),
 
-      new kernel::Field::Link(
-                name          =>'applid',
-                sqlorder      =>'desc',
-                group         =>'source',
-                label         =>'ApplID',
-                dataobjattr   =>"darwin_app_w5baseid"),
-
       new kernel::Field::Text(
                 name          =>'fullname',
                 sqlorder      =>'desc',
@@ -87,6 +80,13 @@ sub new
                 vjointo       =>\'tsotc::lnkprojectsystem',
                 vjoinon       =>['id'=>'projectid'],
                 vjoindisp     =>['systemname','state']),
+
+      new kernel::Field::Text(
+                name          =>'applid',
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'Application W5BaseID',
+                dataobjattr   =>"darwin_app_w5baseid"),
 
       new kernel::Field::Date(
                 name          =>'lastmondate',
