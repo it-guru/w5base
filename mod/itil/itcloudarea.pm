@@ -119,6 +119,7 @@ sub new
                    return(0);
                 },
                 vjointo       =>'itil::appl',
+                SoftValidate  =>1,
                 vjoineditbase =>{'cistatusid'=>[2,3,4]},
                 vjoinon       =>['applid'=>'id'],
                 vjoindisp     =>'name'),
