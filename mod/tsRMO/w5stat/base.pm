@@ -251,6 +251,7 @@ sub displayRMO
    my @a;
    my %a;
    my @i;
+   my @swinst;
    my %DIid;
    if ($rmostat->{sgroup} eq "Application"){
       if ($applcnt){
@@ -307,6 +308,20 @@ sub displayRMO
             $rec;
          } @{$rmostat->{stats}->{'RMO.Instance'}});
       }
+      if (exists($rmostat->{stats}->{'RMO.SoftwareInst'})){
+         @swinst=map({
+            my @fld=split(/;/,$_);
+            my $pos=0; 
+            my $rec={id=>$fld[$pos++]};
+            $rec->{dataobj}=$fld[$pos++];
+            $rec->{fullname}=$fld[$pos++];
+            $rec->{dataissue}=$fld[$pos++];
+            $rec->{instrating}=$fld[$pos++];
+            $rec->{ratingmsg}=$fld[$pos++];
+            $rec;
+         } @{$rmostat->{stats}->{'RMO.SoftwareInst'}});
+          
+      }
 
       { # Systems rowspan calculation in Asset columns
          for(my $i=0;$i<=$#s;$i++){
@@ -361,10 +376,17 @@ sub displayRMO
          $DIid{$DIid}++ if ($DIid ne "");
          $appkpi->{'RMO.DataIssue.'.$DIcol}++;
       }
+      foreach my $rec (@swinst){
+         my $color=$rec->{instrating};
+         $appkpi->{'RMO.SoftwareInst.Rating.'.$color}++;
+      }
    }
    if ($rmostat->{sgroup} eq "Group"){
       foreach my $color (keys(%colors)){
-         foreach my $prefix (qw(RMO.System.TCC.os RMO.Asset.age RMO.DataIssue)){
+         foreach my $prefix (qw(RMO.System.TCC.os 
+                                RMO.SoftwareInst.Rating
+                                RMO.Asset.age 
+                                RMO.DataIssue)){
             if (exists($rmostat->{stats}->{$prefix.".".$color})){
                $appkpi->{$prefix.".".$color}=
                   $rmostat->{stats}->{$prefix.".".$color}->[0];
@@ -373,7 +395,10 @@ sub displayRMO
       }
    }
    foreach my $color (keys(%colors)){
-      foreach my $prefix (qw(RMO.System.TCC.os RMO.Asset.age RMO.DataIssue)){
+      foreach my $prefix (qw(RMO.System.TCC.os 
+                             RMO.SoftwareInst.Rating
+                             RMO.Asset.age 
+                             RMO.DataIssue)){
          if ($appkpi->{$prefix.".".$color}==0){
             delete($appkpi->{$prefix.".".$color});
          }
@@ -402,6 +427,12 @@ sub displayRMO
          $d.=sprintf("<tr><td nowrap>Instanzen an RMO relevanten ".
                      "Anwendungen:</td><td>%d</td></tr>",
                      $rmostat->{stats}->{'RMO.Instance.Count'}->[0]);
+      }
+      if (exists($rmostat->{stats}->{'RMO.SoftwareInst.Count'})){
+         $d.=sprintf("<tr><td nowrap>Software-Installationen die ".
+                     "von RMO relevanten ".
+                     "Anwendungen genutzt werden:</td><td>%d</td></tr>",
+                     $rmostat->{stats}->{'RMO.SoftwareInst.Count'}->[0]);
       }
       $d.="</table>";
       $d.="Die Kennzahlen werden immer bezogen auf eine Anwendung ermittelt ".
@@ -432,6 +463,14 @@ sub displayRMO
                           "RMO.System.TCC.os"));
       $d.="<hr>";
    }
+   if (grep(/^RMO.SoftwareInst.Rating/,keys(%{$appkpi}))){
+      $d.="<h3>Software-Installationen (TelekomIT Roadmap bewertet):</h3>";
+      $d.="Die Software-Installationen, auf die eine Anwendung zugriff hat, ";
+      $d.="werden mit der TelekomIT RoadMap abgeglichen und bewertet.";
+      $d.=$self->mkSegBar("swinstrating",$self->mkSegBarDSet($appkpi,
+                          "RMO.SoftwareInst.Rating"));
+      $d.="<hr>";
+   }
    if (grep(/^RMO.DataIssue/,keys(%{$appkpi}))){
       $d.="<h3>DataIssues:</h3>";
       $d.="Bewertet wird das vorhanden sein von DataIssues an den in direkter ";
@@ -449,9 +488,11 @@ sub displayRMO
       
    if ($rmostat->{sgroup} eq "Application"){
       my $sById;
+      my $swinstById;
       my $aById;
       my $tccById;
       my $DIById;
+      $d.="<br><br>";
       if ($#s!=-1){
          my $o=$app->getPersistentModuleObject("itil::system");
          $o->SetFilter({id=>[map({$_->{id}} @s)]});
@@ -468,6 +509,11 @@ sub displayRMO
          $o->SetFilter({id=>[map({$_->{id}} @a)]});
          $aById=$o->getHashIndexed(qw(id));
       }
+      if ($#swinst!=-1){
+         my $o=$app->getPersistentModuleObject("itil::lnksoftware");
+         $o->SetFilter({id=>[map({$_->{id}} @swinst)]});
+         $swinstById=$o->getHashIndexed(qw(id));
+      }
       if (keys(%DIid)){
          my $o=$app->getPersistentModuleObject("base::workflow");
          $o->SetFilter({id=>[keys(%DIid)]});
@@ -478,13 +524,14 @@ sub displayRMO
          for(my $i=0;$i<=$#s;$i++){
             if ($i==0){
                $d.="<table class=statTab>";
-               $d.="<thead><tr><th width=1%>System</th><th>SystemID</th>".
-                       "<th width=20>Productline</th>".
-                       "<th width=20>OS</th><th>DI</th>".
+               $d.="<thead><tr><th width=1%>System</th>".
+                       "<th width=20%>SystemID</th>".
+                       "<th width=20%>Productline</th>".
+                       "<th width=20>OS</th><th width=10>Data Issue</th>".
                        "<th>Asset</th>".
                        "<th width=20>Hardware Alter</th>".
                        "<th width=20>HW</th>".
-                       "<th width=20>DI</th>".
+                       "<th width=10>Data Issue</th>".
                        "</tr></thead>";
             }
             $d.="<tr>";
@@ -579,7 +626,7 @@ sub displayRMO
          for(my $i=0;$i<=$#i;$i++){
             if ($i==0){
                $d.="<table class=statTab>";
-               $d.="<thead><tr><th>Instancename</th><th width=10>DI</th>".
+               $d.="<thead><tr><th>Software-Instanz Name</th><th width=10>Data Issue</th>".
                        "</tr></thead>";
             }
             $d.="<tr>";
@@ -603,6 +650,54 @@ sub displayRMO
          }
          $d.="</table>" if ($#i!=-1);
       }
+      { # Software Installations
+         @swinst=sort({$a->{fullname} cmp $b->{fullname}} @swinst);
+         for(my $i=0;$i<=$#swinst;$i++){
+            if ($i==0){
+               $d.="<table class=statTab>";
+               $d.="<thead><tr><th>Software-Installation</th>".
+                   "<th width=10>Patch/Release Rating</th>".
+                   "<th width=1%></th>".
+                   "</tr></thead>";
+            }
+            $d.="<tr>";
+            $d.="<td valign=top>";
+            if (exists($swinstById->{id}->{$swinst[$i]->{id}})){
+               $d.=$app->OpenByIdWindow($swinst[$i]->{dataobj},
+                                        $swinst[$i]->{id},
+                                        $swinst[$i]->{fullname});
+            }
+            else{
+               $d.=$swinst[$i]->{fullname};
+            }
+            $d.="</td>";
+            $d.="<td align=center valign=top>".
+                SignImg($swinst[$i]->{instrating}).
+                "</td>";
+            my $ratingmsg=$swinst[$i]->{ratingmsg};
+            if ($swinst[$i]->{instrating} eq "blue"){
+               $ratingmsg="";
+            }
+            $d.="<td width=2%>".$ratingmsg."</td>";
+            #{
+            #   my $DItext="";
+            #   if ($swinst[$i]->{dataissue} ne ""){
+            #      my ($DIid,$DIcol)=DIsplit($swinst[$i]->{dataissue});
+            #      if ($DIid ne "" && exists($DIById->{id}->{$DIid})){
+            #         $DItext=$app->OpenByIdWindow("base::workflow",
+            #                                   $DIid,
+            #                                   $DItext=SignImg($DIcol));
+            #      }
+            #      else{
+            #         $DItext=SignImg($DIcol);
+            #      }
+            #   }
+            #   $d.="<td align=center width=10>".$DItext."</td>";
+            #}
+            $d.="</tr>";
+         }
+         $d.="</table>" if ($#i!=-1);
+      }
    }
 
 
@@ -616,16 +711,25 @@ sub displayRMO
       $d.="<hr>";
    }
 
-   $d.="Debug-Data:<br>";
-   
-   $d.="w5stat w5baseid=".
-       $app->OpenByIdWindow("base::w5stat",$primrec->{id},$primrec->{id}).
-       "<br>";
-   $d.="w5stat RMO w5baseid=".
-       $app->OpenByIdWindow("base::w5stat",$rmostat->{id},$rmostat->{id}).
-       "<br>";
-   $d.="w5stat RMO Stand=$rmostat->{mdate}<br>";
-   $d.="<hr>";
+
+   my $condition=$app->T("condition",'base::w5stat');
+   my $load=$app->findtemplvar({current=>$rmostat,
+                              mode=>"HtmlV01"},"mdate","formated");
+   $d.=sprintf("<div class=condition>RMO $condition: $load</div>");
+
+
+   if ($app->IsMemberOf("admin")){
+      $d.="<br><br><br>Debug-Data:<br>";
+      
+      $d.="w5stat w5baseid=".
+          $app->OpenByIdWindow("base::w5stat",$primrec->{id},$primrec->{id}).
+          "<br>";
+      $d.="w5stat RMO w5baseid=".
+          $app->OpenByIdWindow("base::w5stat",$rmostat->{id},$rmostat->{id}).
+          "<br>";
+      $d.="w5stat RMO Stand=$rmostat->{mdate}<br>";
+      $d.="<hr>";
+   }
    return($d);
 }
 
@@ -654,9 +758,13 @@ sub processData
    $appl->SetCurrentView(qw(name cistatusid mandatorid systems swinstances
                             businessteam responseteam id dataissuestate
                             mgmtitemgroup));
-   #$appl->SetFilter({cistatusid=>'<=4',name=>'W5* NGSS* Dina*'});
-   #$appl->SetFilter({cistatusid=>'<=4',name=>'W5* Dina* TSG_VIRTUELLE_T-SERVER*'});
-   $appl->SetFilter({cistatusid=>'4'});
+   if ($appl->Config->Param("W5BaseOperationMode") eq "dev"){
+      $appl->SetFilter({cistatusid=>'<=4',
+                        name=>'W5* Dina* TSG_VIRTUELLE_T-SERVER* NGSS*Perfo*'});
+   }
+   else{
+      $appl->SetFilter({cistatusid=>'4'});
+   }
    $appl->SetCurrentOrder("NONE");
    msg(INFO,"starting collect of RMO Applications");
    my ($rec,$msg)=$appl->getFirst();
@@ -737,9 +845,30 @@ sub processRecord
          $tcc->SetFilter({systemid=>[keys(%systemsystemid)]});
          foreach my $tccrec ($tcc->getHashList(qw(systemid 
                                                   systemname
-                                                  check_release_color))){
+                                                  check_release_color
+                                                  osroadmapstate))){
             my $tcc_color=$tccrec->{check_release_color};
             $tcc_color="green" if ($tcc_color eq "");
+            if ($tccrec->{osroadmapstate} ne ""){
+               if ($tccrec->{osroadmapstate}=~m/^FAIL/){
+                  $tcc_color="red";
+               }
+               if ($tccrec->{osroadmapstate}=~m/^FAIL but OK/){
+                  $tcc_color="blue";
+               }
+               if ($tccrec->{osroadmapstate}=~m/^WARN but OK/){
+                  $tcc_color="blue";
+               }
+               if ($tccrec->{osroadmapstate}=~m/^WARN but not OK/){
+                  $tcc_color="yellow";
+               }
+               if ($tccrec->{osroadmapstate}=~m/^OK/){
+                  $tcc_color="green";
+               }
+               if ($tccrec->{osroadmapstate}=~m/^OK unrestricted/){
+                  $tcc_color="blue";
+               }
+            }
             $systemsystemid{$tccrec->{systemid}}->{roadmap_color}=$tcc_color;
          }
       }
@@ -855,26 +984,71 @@ sub processRecord
             }
          }
       }
-      if (keys(%systemid)){
-         my $o=$app->getPersistentModuleObject("itil::lnksoftware");
-         $o->SetFilter({systemid=>[keys(%systemid)],
-                        softwareset=>'TEL-IT Patchmanagement 2019-10'});
-         foreach my $swirec ($o->getHashList(qw(id fullname 
-                                                softwareinstrelstate))){
-            #print Dumper($swirec);
-            $swinst{$swirec->{id}}={
-                fullname=>$swirec->{fullname}
-            };
+
+      if ($#{$self->{Roadmap}}>=0){
+         foreach my $swinstdataobj (qw( itil::lnksoftwaresystem 
+                                        itil::lnksoftwareitclustsvc)){
+            my $o=$app->getPersistentModuleObject($swinstdataobj);
+            if ($swinstdataobj eq "itil::lnksoftwaresystem"){
+               if (keys(%systemid)){
+                  $o->SetFilter({systemid =>[keys(%systemid)],
+                                 softwareset=>$self->{Roadmap}->[0]->{name}});
+               }
+               else{
+                  next;
+               }
+            }
+            else{
+               $o->SetFilter({applications    =>\$rec->{name},
+                              softwareset=>$self->{Roadmap}->[0]->{name}});
+            }
+            foreach my $swirec ($o->getHashList(qw(id fullname 
+                                                   softwareinstrelstate
+                                                   softwareinstrelmsg))){
+               #print Dumper($swirec);
+               my $instrating="green";
+               if ($swirec->{softwareinstrelstate}=~m/^FAIL/){
+                  $instrating="red";
+               }
+               if ($swirec->{softwareinstrelstate}=~m/^FAIL but OK/){
+                  $instrating="blue";
+               }
+               if ($swirec->{softwareinstrelstate}=~m/^WARN but OK/){
+                  $instrating="blue";
+               }
+               if ($swirec->{softwareinstrelstate}=~m/^WARN but not OK/){
+                  $instrating="yellow";
+               }
+               if ($swirec->{softwareinstrelstate}=~m/^OK/){
+                  $instrating="green";
+               }
+               if ($swirec->{softwareinstrelstate}=~m/^OK unrestricted/){
+                  $instrating="blue";
+               }
+print Dumper($swirec);
+               my $softwareinstrelmsg=$swirec->{softwareinstrelmsg};
+               $softwareinstrelmsg=~s/;/ /g;
+               $softwareinstrelmsg=~s/\n/ /g;
+               $swinst{$swirec->{id}}={
+                   id=>$swirec->{id},
+                   dataobj=>$swinstdataobj,
+                   instrating=>$instrating,
+                   fullname=>$swirec->{fullname},
+                   ratingmsg=>$softwareinstrelmsg
+               };
+            }
          }
       }
-      #print Dumper(\%swinst);
+      print Dumper(\%swinst);
 
 
 
 
       my %colors=@{$self->{Colors}};
       foreach my $color (keys(%colors)){
-         foreach my $prefix (qw(RMO.System.TCC.os RMO.Asset.age)){
+         foreach my $prefix (qw(RMO.System.TCC.os 
+                                RMO.SoftwareInst.Rating
+                                RMO.Asset.age)){
             $appkpi->{$prefix.".".$color}=0;
          }
       }
@@ -920,6 +1094,32 @@ sub processRecord
                                          method=>'add'},
                                         "RMO.Instance",$l);
       }
+      foreach my $swiid (sort(keys(%swinst))){
+         $appkpi->{'RMO.SoftwareInst.Count'}++;
+         my $l="";
+         $l.=$swinst{$swiid}->{id}.";";
+         $l.=$swinst{$swiid}->{dataobj}.";";
+         $l.=$swinst{$swiid}->{fullname}.";";
+         $l.=$swinst{$swiid}->{dataissue}.";";
+         my $ratingcolor=$swinst{$swiid}->{instrating};
+         if ($ratingcolor eq ""){
+            $ratingcolor="green";
+         }
+         $l.=$ratingcolor.";";
+         if (in_array([keys(%colors)],$ratingcolor)){
+            $appkpi->{'RMO.SoftwareInst.Rating.'.$ratingcolor}++;
+         }
+         $l.=$swinst{$swiid}->{ratingmsg}.";";
+         $self->getParent->storeStatVar("Application",
+                                        [$rec->{name}],
+                                        {nosplit=>1,
+                                         nameid=>$rec->{id},
+                                         method=>'add'},
+                                        "RMO.SoftwareInst",$l);
+      }
+
+
+
       foreach my $aid (sort(keys(%assetid))){
          $appkpi->{'RMO.Asset.Count'}++;
          my $l="";
@@ -941,9 +1141,19 @@ sub processRecord
                                          method=>'add'},
                                         "RMO.Asset",$l);
       }
+      my $isRMOrelevant=0;
       my $mgmtitemgroup=$rec->{mgmtitemgroup};
       $mgmtitemgroup=[$mgmtitemgroup] if (ref($mgmtitemgroup) ne "ARRAY");
       if (grep(/^TOP.*Telekom.*$/i,@$mgmtitemgroup)){
+         $isRMOrelevant=1;
+      }
+      if ($app->Config->Param("W5BaseOperationMode") eq "dev"){
+         if (($rec->{name}=~m/\(P\)$/) || ($rec->{name}=~m/^W5B/)){
+            $isRMOrelevant=1;
+         }
+      }
+
+      if ($isRMOrelevant){
          $self->getParent->storeStatVar("Group",\@repOrg,{},"RMO.Appl.Count",1);
          $self->getParent->storeStatVar("Application",[$rec->{name}],{
                                            nosplit=>1,nameid=>$rec->{id}

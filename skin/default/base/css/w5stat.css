@@ -100,6 +100,8 @@ table.statTab {
   width: 100%;
   text-align: left;
   border-collapse: collapse;
+  margin-top:10px;
+  margin-bottom:20px;
 }
 table.statTab td, table.statTab th {
   border: 1px solid #000000;

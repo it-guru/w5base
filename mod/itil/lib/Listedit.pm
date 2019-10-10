@@ -965,6 +965,7 @@ sub calcSoftwareState
          if ($swi->{is_dbs}){
             $resdstate->{group}->{DB}->{count}++;
          }
+         
          RULESET: foreach my $swrec (@ruleset){
             if ($swrec->{softwareid} eq  $swi->{softwareid}){
                $FilterSet->{Analyse}->{relevantSoftwareInst}++;
@@ -1211,11 +1212,19 @@ sub calcSoftwareState
       return("<div style='width:500px'>".
              join("<br>",@{$FilterSet->{Analyse}->{todo}})."</div>");
    }
-   if ($self->Name eq "softwareinstrelstate" ||
-       $self->Name eq "softwarerelstate" ||
+   if ($self->Name eq "softwareinstrelstate"){
+      my $totalstate=$FilterSet->{Analyse}->{totalstate};
+      if ($totalstate eq "OK" && 
+          $FilterSet->{Analyse}->{relevantSoftwareInst}==0){
+         $totalstate.=" unrestricted";
+      }
+      return($totalstate);
+   }
+   if ($self->Name eq "softwarerelstate" ||
        $self->Name eq "osanalysestate"){
       return($FilterSet->{Analyse}->{totalstate});
    }
+
    if ($self->Name eq "softwareinstrelmsg" ||
        $self->Name eq "softwarerelmsg"){
       return(join("\n",@{$FilterSet->{Analyse}->{totalmsg}}));
