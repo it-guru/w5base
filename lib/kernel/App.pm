@@ -344,6 +344,67 @@ sub isMandatorReadable
 }
 
 
+sub OpenByIdWindow
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $id=shift;
+   my $innerText=shift;
+   my $auth=shift;
+   my $method="ById";
+
+   if (!defined($auth)){
+      $auth="auth";
+   }
+
+   my $baseurl=$self->Config->Param("EventJobBaseUrl");
+
+   my $dest=$baseurl;
+
+   $dest.="/" if (!($dest=~m/\/$/));
+
+   if ($dataobj eq "base::workflow"){
+      $method="ById";
+   }
+   $dataobj=~s/::/\//g;
+   $dest.=$auth."/".$dataobj."/".$method."/".$id;
+
+   my $onclick="";
+
+   my $detailx=$self->DetailX();
+   my $detaily=$self->DetailY();
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   }
+   my $winsize="normal";
+   if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+      $winsize=$UserCache->{winsize};
+   }
+   my $winname="_blank";
+   if (defined($UserCache->{winhandling}) &&
+       $UserCache->{winhandling} eq "winonlyone"){
+      $winname="W5BaseDataWindow";
+   }
+   if (defined($UserCache->{winhandling})
+       && $UserCache->{winhandling} eq "winminimal"){
+      $winname="W5B_".$self->Self."_".$id;
+      $winname=~s/[^a-z0-9]/_/gi;
+   }
+   if ($dest ne ""){
+      $onclick="custopenwin(\"$dest\",\"$winsize\",".
+                   "$detailx,$detaily,\"$winname\");return(false);";
+   }
+   my $a="<a onclick='$onclick' href=\"$dest\">";
+
+
+
+
+   return($a.$innerText."</a>");
+}
+
+
+
 sub getMembersOf
 {
    my $self=shift;
