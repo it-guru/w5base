@@ -48,17 +48,28 @@ sub new
                 label         =>'W5BaseID',
                 dataobjattr   =>'w5stat.id'),
                                                   
-      new kernel::Field::Select(
+      new kernel::Field::Text(
                 name          =>'sgroup',
                 label         =>'Statistic Group',
-                value         =>['Mandator','Group','RMOGroup',
-                                 'Application','Location','User',
-                                 'Contract','Costcenter'],
+                selectfix     =>1,
+               # value         =>['Mandator','Group',
+               #                  'Application','Location','User',
+               #                  'Contract','Costcenter'],
                 dataobjattr   =>'w5stat.statgroup'),
+
+      new kernel::Field::Text(
+                name          =>'statstream',
+                label         =>'Statistic Stream',
+                selectfix     =>1,
+               # value         =>['Mandator','Group',
+               #                  'Application','Location','User',
+               #                  'Contract','Costcenter'],
+                dataobjattr   =>'w5stat.statstream'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Statistic Name',
+                selectfix     =>1,
                 dataobjattr   =>'w5stat.name'),
 
       new kernel::Field::Link(
@@ -69,6 +80,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'dstrange',
                 label         =>'Month',
+                selectfix     =>1,
                 dataobjattr   =>'w5stat.monthkwday'),
 
       new kernel::Field::Link(
@@ -86,6 +98,35 @@ sub new
                 selectfix     =>1,
                 label         =>'Statistic Data',
                 dataobjattr   =>'w5stat.stats'),
+
+
+      new kernel::Field::SubList(
+                name          =>'statstreams',
+                label         =>'StatStreams',
+                readonly      =>1,
+                group         =>'statstreams',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'base::w5stat',
+                vjoinon       =>['fullname'=>'fullname'],
+                vjoinonfinish =>sub{
+                   my $self=shift;
+                   my $flt=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   my $sgroup=$current->{sgroup};
+                   my $dstrange=$current->{dstrange};
+                   my $fullname=$current->{fullname};
+                   $flt->{sgroup}=\$sgroup;
+                   $flt->{dstrange}=\$dstrange;
+                   $flt->{fullname}=\$fullname;
+                   $flt->{statstream}="!default";
+
+                   return($flt);
+                },
+                vjoindisp     =>['statstream','stats'],
+                vjoininhash   =>['statstream','stats','sgroup','mdate']),
+
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -133,7 +174,8 @@ sub new
 
    );
    $self->LoadSubObjs("w5stat","w5stat");
-   $self->setDefaultView(qw(linenumber dstrange sgroup fullname mdate));
+   $self->setDefaultView(qw(statstream 
+                            dstrange sgroup fullname mdate));
    $self->setWorktable("w5stat");
    return($self);
 }
@@ -153,7 +195,11 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+
+   if ($rec->{statstream} eq "default"){
+      return("header","default","stats","statstreams","source");
+   }
+   return("header","default","stats","source")
 }
 
 sub isWriteValid
@@ -169,13 +215,14 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","stats","source");
+   return("header","default","stats","statstreams","source");
 }
 
 
 sub loadLateModifies
 {
    my $self=shift;
+   my $statstream=shift;
    my $excldst=shift;
 
    msg(INFO,"==== load late master overwrite data ====");
@@ -221,7 +268,7 @@ sub loadLateModifies
    }
    if (defined($self->{stats})){
       #printf STDERR ("stats=%s\n",Dumper($self->{stats}));
-      $self->_storeStats($olddstrange);
+      $self->_storeStats($statstream,$olddstrange);
       delete($self->{stats});
    }
 }
@@ -350,7 +397,7 @@ sub recreateStats
       } until(!defined($rec));
    }
    msg(INFO,"====================================");
-   $self->_storeStats($dstrangestamp,$baseduration,$basespan);
+   $self->_storeStats($statstream,$dstrangestamp,$baseduration,$basespan);
 
    
 
@@ -362,6 +409,7 @@ sub recreateStats
 sub _storeStats
 {
    my $self=shift;
+   my $statstream=shift;
    my $dstrangestamp=shift;
    my $baseduration=shift;
    my $basespan=shift;
@@ -370,7 +418,10 @@ sub _storeStats
       foreach my $name (keys(%{$self->{stats}->{$group}})){
          if (defined($baseduration) && defined($basespan)){
             foreach my $v (keys(%{$self->{stats}->{$group}->{$name}})){
-               if (ref($self->{stats}->{$group}->{$name}->{$v})){
+               if (ref($self->{stats}->{$group}->{$name}->{$v}) eq "ARRAY"){
+                  # fifi
+               }
+               elsif (ref($self->{stats}->{$group}->{$name}->{$v})){
                   my $spanobj=$self->{stats}->{$group}->{$name}->{$v};
                   if (!defined($spanobj) || !ref($spanobj)){
                      #printf STDERR ("spanobj=$spanobj\n");
@@ -412,11 +463,13 @@ sub _storeStats
          }
          my $statrec={stats=>$self->{stats}->{$group}->{$name},
                       sgroup=>$group,
+                      statstream=>$statstream,
                       dstrange=>$dstrangestamp,
                       nameid=>$nameid,
                       fullname=>$name};
          my $flt={sgroup=>\$statrec->{sgroup},
                   dstrange=>\$dstrangestamp,
+                  statstream=>\$statstream,
                   fullname=>\$statrec->{fullname}};
          $self->SetFilter($flt);
          my ($oldrec,$msg)=$self->getOnlyFirst(qw(ALL));
@@ -492,6 +545,17 @@ sub storeStatVar
                   }
                   $self->{stats}->{$group}->{$key}->{$var}.=$val[0];
                }
+               if (lc($method) eq "add"){
+                  if (!defined($self->{stats}->{$group}->{$key}->{$var})){
+                     $self->{stats}->{$group}->{$key}->{$var}=[];
+                  }
+                  if (ref($self->{stats}->{$group}->{$key}->{$var}) ne 
+                      "ARRAY"){
+                     $self->{stats}->{$group}->{$key}->{$var}=[
+                        $self->{stats}->{$group}->{$key}->{$var}];
+                  }
+                  push(@{$self->{stats}->{$group}->{$key}->{$var}},$val[0]);
+               }
                elsif (lc($method) eq "tspan.union"){
 
                   if ((my ($Y1,$M1,$D1,$h1,$m1,$s1)=$val[0]=~
@@ -563,7 +627,8 @@ sub ShowEntry
    $MinReportUserGroupCount=int($MinReportUserGroupCount);
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','w5stat.css'],
-                           js=>['toolbox.js','subModal.js'],
+                           js=>['toolbox.js','subModal.js',
+                                'jquery.js','jquery.segbar.js','Chart.min.js'],
                            body=>1,form=>1,
                            title=>$title);
 
@@ -585,30 +650,24 @@ sub ShowEntry
       print(<<EOF);
 <input type=hidden name=id value="$requestid">
 <input type=hidden name=tag value="$requesttag">
-<div style="margin:10px;padding:15px;width:600px;background:#ffffff;
-            border-color:black;border-style:solid;border-width:1px;">
-<div class=chartlabel>
-Quality Report $label - $primrec->{fullname}
-</div>
-<div class=chartsublabel>
-$subtitle
-</div>
-<script type="text/javascript" 
-        src="../load/Chart.min.js"></script>
 EOF
       my $ucnt;
       $ucnt=$primrec->{stats}->{User} if (ref($primrec) eq "HASH" &&
                                     ref($primrec->{stats}) eq "HASH");
       $ucnt=$ucnt->[0] if (ref($ucnt) eq "ARRAY");
+
+      my $htmlReport="";
+
+
       if (defined($ucnt) && $ucnt<$MinReportUserGroupCount &&
           $primrec->{nameid}>=2 &&
           !$self->IsMemberOf("admin")){
-         printf("<br><hr><b>");
-         printf($self->T("Access to this report is not granted, ".
+         $htmlReport.=sprintf("<br><hr><b>");
+         $htmlReport.=sprintf($self->T("Access to this report is not granted, ".
                          "because the minimum count of analysed ".
                          "users of %d is not reached."),
                 $MinReportUserGroupCount);
-         printf("</b><hr>");
+         $htmlReport.=sprintf("</b><hr>");
       }
       else{
          if ($requesttag ne ""){
@@ -630,17 +689,39 @@ EOF
                    ($rtag eq $p || $requesttag eq "ALL")){
                   my ($d,$ovdata)=
                          &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
-                  print($d);
+                  if ($requesttag eq "ALL"){
+                      my $requesttag=$P{$p}->{module}."::".$p;
+                      if ($requesttag ne "base::w5stat::overview::overview" &&
+                          $d ne ""){
+                         my ($rmod,$rtag)=$requesttag=~m/^(.*)::([^:]+)$/;
+                         my $subtitle=$self->T($requesttag,$P{$p}->{module});
+                         $htmlReport.="<hr style=\"width:50%;margin-top:40px;".
+                                      "margin-bottom:20px\">".
+                                      "<div class=chartsublabel ".
+                                      "style=\"margin-bottom:20px\">".
+                                      $subtitle."</div>";
+                      }
+                  }
+                  $htmlReport.=$d;
                }
             }
          }
       }
-     
-      print(<<EOF);
-<div class=condition>$condition: $load</div>
-</div>
-
-EOF
+      if ($htmlReport ne ""){
+         print("<div id=reportFrame>".
+               "<div class=chartlabel>".
+               "Quality Report $label - $primrec->{fullname}".
+               "</div>".
+               "<div class=chartsublabel>".
+               "$subtitle".
+               "</div>");
+         print $htmlReport;
+         if ($requesttag eq "base::w5stat::overview::overview" ||
+             $requesttag eq "ALL"){
+            print("<div class=condition>$condition: $load</div>");
+         }
+         print("</div>");
+      }
    }
    print $self->HtmlBottom(body=>1,form=>1);
 }
@@ -658,7 +739,12 @@ sub LoadStatSet
       $self->SecureSetFilter({id=>\$id});
    }
    if ($type eq "grpid"){
-      $self->SecureSetFilter({sgroup=>\'Group',nameid=>\$id,dstrange=>\$month});
+      $self->SecureSetFilter({
+         sgroup=>\'Group',
+         nameid=>\$id,
+         statstream=>\'default',
+         dstrange=>\$month
+      });
    }
    my ($primrec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (defined($primrec)){
@@ -666,6 +752,11 @@ sub LoadStatSet
          $primrec->{stats}={Datafield2Hash($primrec->{stats})};
       }
       my $dstrange=$primrec->{dstrange};
+
+
+
+
+
       my $lastrange=undef;
       my @histrange=();
 
@@ -789,14 +880,15 @@ sub Presenter
          $statname='"'.$statname.'"';
       }
       $self->SetFilter({fullname=>$statname,sgroup=>$statgrp,
-                        dstrange=>"!*KW*"});
-      my ($srec,$msg)=$self->getOnlyFirst(qw(descmonth sgroup id));
-      if (defined($srec)){
-         $requestid=$srec->{id};
+                        dstrange=>"!*KW*",statstream=>\'default'});
+      $self->Limit(10);
+      my @l=$self->getHashList(qw(-dstrange sgroup id));
+      if ($#l!=-1){
+         $requestid=$l[0]->{id};
       }
    }
-   if (Query->Param("search_id") ne ""){
-      my $id=Query->Param("search_id");
+   if (Query->Param("id") ne ""){
+      my $id=Query->Param("id");
       $self->ResetFilter();
       $self->SetFilter({id=>\$id});
       my ($srec,$msg)=$self->getOnlyFirst(qw(id sgroup fullname));
@@ -857,96 +949,32 @@ EOF
       $dstrange=sprintf("%04d%02d",$year,$mon);
       $altdstrange=sprintf("%04d%02d",$altyear,$altmon);
    }
-   my $lnkrole=getModuleObject($self->Config,"base::lnkgrpuserrole");
-   my $userid=$self->getCurrentUserId();
-
-   $lnkrole->SetFilter({userid=>\$userid,
-                        nativrole=>['REmployee','RBoss','RBoss2',
-                                    'RReportReceive','RQManager']});
-   my %grpids;
-   map({$grpids{$_->{grpid}}++} $lnkrole->getHashList("grpid"));
-   my $grp=getModuleObject($self->Config,"base::grp");
-   $grp->SetFilter([{grpid=>[keys(%grpids)]},
-                    {parentid=>[keys(%grpids)]}]);
-   map({$grpids{$_->{grpid}}++;
-        $grpids{$_->{parentid}}++;} $grp->getHashList("grpid","parentid"));
-   my @grpids=grep(!/^\s*$/,keys(%grpids));
-   $grp->ResetFilter();
-   $grp->SetFilter({grpid=>\@grpids});
-   my @grps=$grp->getHashList("fullname","grpid");
-                    
-
-   my @grpnames;
-   my @grpids;
-   foreach my $r (@grps){
-      push(@grpids,$r->{grpid});
-      push(@grpnames,$r->{fullname});
-   }
-
-   $self->ResetFilter();
-   $self->SecureSetFilter([
-                           {dstrange=>\$dstrange,sgroup=>\'Group',
-                            fullname=>\@grpnames},
-                           {dstrange=>\$dstrange,sgroup=>\'Group',
-                            nameid=>\@grpids},
-                          ]);
-   my @statnamelst=$self->getHashList(qw(fullname id));
-
-   if ($#statnamelst==-1){   # seems to be the first day in month
-      $self->ResetFilter();
-      $self->SecureSetFilter([
-                              {dstrange=>\$altdstrange,sgroup=>\'Group',
-                               fullname=>\@grpnames},
-                              {dstrange=>\$altdstrange,sgroup=>\'Group',
-                               nameid=>\@grpids},
-                             ]);
-      @statnamelst=$self->getHashList(qw(fullname id));
-   }
-
-   foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
-      push(@ol,$r->{id},$r->{fullname});
-   }
-
-   my %grp=$self->getGroupsOf($ENV{REMOTE_USER},
-           ['RCFManager','RCFManager2'],"down");
-   if (keys(%grp)){
-      my $m=getModuleObject($self->Config,"base::mandator");
-      $m->SetFilter({grpid=>[keys(%grp)],
-                     cistatusid=>"<6"});
 
 
-      my @idl=();
-      foreach my $mrec ($m->getHashList(qw(name grpid))){
-         push(@idl,$mrec->{grpid});
+   my %StatSelBox;
+
+
+   foreach my $obj (values(%{$self->{w5stat}})){
+      if ($obj->can("getStatSelectionBox")){
+         $obj->getStatSelectionBox(\%StatSelBox,$dstrange,$altdstrange);
       }
-      my @statnamelst;
-      if ($#idl!=-1){
-         $self->ResetFilter();
-         $self->SecureSetFilter([
-                                 {dstrange=>\$dstrange,sgroup=>\'Mandator',
-                                  nameid=>\@idl},
-                                ]);
-         @statnamelst=$self->getHashList(qw(fullname id));
-         if ($#statnamelst==-1){   # seems to be the first day in month
-            $self->ResetFilter();
-            $self->SecureSetFilter([
-                                    {dstrange=>\$altdstrange,sgroup=>\'Group',
-                                     nameid=>\@idl},
-                                   ]);
-            @statnamelst=$self->getHashList(qw(fullname id));
-         }
-         foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
-            push(@ol,$r->{id},$r->{fullname});
-         }
+   }
+   foreach my $k (keys(%StatSelBox)){
+      if ( (!exists($StatSelBox{$k}->{prio})) ||
+           (!exists($StatSelBox{$k}->{fullname})) ||
+           (!exists($StatSelBox{$k}->{id}))){
+         delete($StatSelBox{$k});
       }
    }
 
-   if (!defined($primrec) && $#ol!=-1){
-      $requestid=$ol[0];
+   my @StatSelBox=sort({
+      $StatSelBox{$a}->{prio}<=>$StatSelBox{$b}->{prio}
+   } keys(%StatSelBox));
+
+   if (!defined($primrec) && $#StatSelBox!=-1){
+      $requestid=$StatSelBox{$StatSelBox[0]}->{id};
       ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
    }
-
-
 
    print("<tr height=1%><td>");
    print("<table border=0 width=\"100%\" border=0><tr>\n");
@@ -967,9 +995,15 @@ EOF
       print("<td width=1%>");
       print("<select name=selid onchange=\"changeid(this);\" ".
             "style=\"width:320px\">");
-      while(my $k=shift(@ol)){
-         my $label=shift(@ol);
-         printf("<option value=\"%s\">%s</option>",$k,$label);
+      foreach my $k (@StatSelBox){
+         my $label=$k;
+         $label=~s/^Group://;
+         my $sel="";
+         if ($requestid eq $StatSelBox{$k}->{id}){
+            $sel=" selected";
+         }
+         printf("<option value=\"%s\"%s>%s</option>",
+                $StatSelBox{$k}->{id},$sel,$label);
       }
       print("</select>");
    }
@@ -1164,34 +1198,6 @@ EOF
                      rootlink =>"javascript:setTag($requestid,\"ALL\")");
       
 
-
-#      print("<ul>");
-#      foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
-#         if (defined($P{$p}->{opcode})){
-#            my $prec=$P{$p};
-#            my $opcode=$P{$p}->{opcode};
-#            my $show=&{$opcode}($self->{w5stat}->{$prec->{module}},$primrec);
-#            if ($show){
-#               my $tag=$prec->{module}."::".$p;
-#               my $label=$self->T($tag,$prec->{module});
-#               my $link="javascript:setTag($requestid,\"$tag\")";
-#               print "<li><a class=sublink href=$link>".$label."</a></li>";
-#               if ($p eq "overview"){
-#                  print "</ul><br><u>".$self->T("Details").":</u><ul>";
-#               }
-#            }
-#         }
-#      }
-#      if (keys(%P)>1){
-#         my $link="javascript:setTag($requestid,\"ALL\")";
-#         print "<br><br><li>".
-#               "<a class=sublink href=$link>".
-#               $self->T("complete list")."</a></li>";
-#      }
-#      printf("</ul>");
-
-
-
    }
 
    printf("</td>");
@@ -1222,7 +1228,8 @@ function refreshTag(id)
          document.forms[0].elements['search_name'].value="";
       }
       document.forms[0].elements['id'].value=id;
-      document.forms[0].action=id;
+      //document.forms[0].action=id;
+      document.forms[0].action="Presenter";
    }
    else{
       document.forms[0].elements['id'].value="";

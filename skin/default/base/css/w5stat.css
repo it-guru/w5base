@@ -1,3 +1,33 @@
+#reportFrame{
+   margin:10px;
+   padding:15px;
+   min-width:400px;
+   max-width:800px;
+   width:auto;
+   background:#ffffff;
+   border-color:black;
+   border-style:solid;
+   border-width:1px;
+}
+.segbar{
+   border-color:black;
+   border-style:solid;
+   border-width:1px;
+}
+
+@media print {
+   #reportFrame{
+      margin:0px;
+      padding:15px;
+      background:#ffffff;
+      border-style:none;
+   }
+   .segbar > * {
+      -webkit-print-color-adjust: exact; 
+   }
+}
+
+
 .chartlabel{
    font-size:16px;
    font-weight: bold;
@@ -19,6 +49,7 @@
    margin-bottom:25px;
 }
 .chartsublabel{
+   font-size:14px;
    color: darkblue;
 }
 .unitdata{
@@ -53,4 +84,55 @@ a:link.exlink, a:visited.exlink, a:active.exlink  {
             text-decoration:none;
             color:#16305e;
           }
+
+
+#reportFrame  a:link, #reportFrame  a:visited, #reportFrame  a:active {
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:#16305e;
+          }
+
+
+
+table.statTab {
+  border: 1px solid #B90B64;
+  background-color: #EEEEEE;
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+table.statTab td, table.statTab th {
+  border: 1px solid #000000;
+  padding: 3px 2px;
+}
+table.statTab tr:nth-child(even) {
+  background: #DDDDDD;
+}
+table.statTab thead {
+  background: #B90B64;
+  background: -moz-linear-gradient(top, #ca488b 0%, #c02373 66%, #B90B64 100%);
+  background: -webkit-linear-gradient(top, #ca488b 0%, #c02373 66%, #B90B64 100%);
+  background: linear-gradient(to bottom, #ca488b 0%, #c02373 66%, #B90B64 100%);
+  border-bottom: 1px solid #444444;
+}
+table.statTab thead th {
+  color: #FFFFFF;
+  text-align: center;
+  border-left: 1px solid #9B9B9B;
+}
+table.statTab thead th:first-child {
+  border-left: none;
+}
+
+
+h2{
+  font-size: 14px;
+  color: #165e4f;
+}
+h3{
+  font-size: 12px;
+  color: #165e4f;
+}
+
+
 

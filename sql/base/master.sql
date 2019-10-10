@@ -113,7 +113,7 @@ create table w5stat (
   id         bigint(20)   NOT NULL,
   statgroup  varchar(40)  NOT NULL,
   name       varchar(128) NOT NULL, nameid bigint(20),
-  month      char(6)      NOT NULL,
+  monthkwday char(8)      NOT NULL, statstream varchar(20) default 'default',
   stats      mediumblob,comments blob,
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
@@ -121,7 +121,7 @@ create table w5stat (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload),
-  UNIQUE userid(month,name,statgroup),key name (statgroup,name),key (nameid)
+  UNIQUE userid(month,name,statgroup,statstream),key name (statgroup,name),key (nameid),key nameonly(name)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table mailsignatur (
   id         bigint(20)   NOT NULL,
@@ -161,7 +161,7 @@ alter table location add response bigint(20) default NULL;
 alter table location add response2 bigint(20) default NULL;
 alter table mailsignatur add fromaddress varchar(128) default NULL;
 alter table userbookmark add comments blob;
-alter table w5stat change month monthkwday varchar(8) not NULL;
+#alter table w5stat change month monthkwday varchar(8) not NULL;
 create table w5statmaster (
   id         bigint(20)   NOT NULL,
   statgroup  varchar(40)  NOT NULL,

@@ -80,9 +80,11 @@ sub w5statrecreate
 
 
    foreach my $dstrange (@dstrange){
+      msg(INFO,"call recreateStats for Module '$module' in ".
+               "dstrange '$dstrange'");
       $stat->recreateStats($statstream,"w5stat",$module,$dstrange);
    }
-   $stat->loadLateModifies(\@dstrange);
+   $stat->loadLateModifies($statstream,\@dstrange);
 
    return({exitcode=>0});
 }

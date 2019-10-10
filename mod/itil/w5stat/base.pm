@@ -120,7 +120,7 @@ sub displayW5Base
       my $v="Chart".$k;
       $v=~s/\./_/g;
       my $chart=$app->buildChart($v,$data,
-                      width=>500,height=>200,
+                      width=>450,height=>200,
                       label=>$app->T($label));
       $d.=$chart;
 
@@ -128,6 +128,102 @@ sub displayW5Base
    return($d);
 }
 
+
+sub getStatSelectionBox
+{
+   my $self=shift;
+   my $selbox=shift;
+   my $dstrange=shift;
+   my $altdstrange=shift;
+   my $app=$self->getParent();
+
+
+
+   my $userid=$app->getCurrentUserId();
+   my %groups=$app->getGroupsOf($userid,['REmployee','RBoss'],'direct');
+
+   my @grpids=keys(%groups);
+
+
+
+
+   if ($#grpids==-1){
+      @grpids=(-99);
+   }
+
+   my $appl=getModuleObject($app->Config,"itil::appl");
+
+   my @flt=(
+      {
+         cistatusid=>'3 4 5',
+         databossid=>\$userid
+      },
+      {
+         cistatusid=>'3 4 5',
+         applmgrid=>\$userid
+      },
+      {
+         cistatusid=>'3 4 5',
+         tsmid=>\$userid
+      },
+      {
+         cistatusid=>'3 4 5',
+         opmid=>\$userid
+      },
+      {
+         cistatusid=>'3 4 5',
+         tsm2id=>\$userid
+      },
+      {
+         cistatusid=>'3 4 5',
+         opm2id=>\$userid
+      }
+   );
+
+
+   $appl->SetFilter(\@flt);
+   my @l=$appl->getHashList(qw(id name));
+   my @applname;
+   my @applid;
+   foreach my $r (@l){
+      push(@applid,$r->{id});
+      push(@applname,$r->{name});
+      if (!exists($selbox->{'Application:'.$r->{name}})){
+         $selbox->{'Application:'.$r->{name}}={
+            prio=>'9000'
+         };   
+      }
+   }
+
+   $app->ResetFilter();
+   $app->SetFilter([
+                           {dstrange=>\$dstrange,sgroup=>\'Application',
+                            fullname=>\@applname,statstream=>\'default'},
+                           {dstrange=>\$dstrange,sgroup=>\'Application',
+                            nameid=>\@applid,statstream=>\'default'},
+                          ]);
+   my @statnamelst=$app->getHashList(qw(fullname id));
+
+   if ($#statnamelst==-1){   # seems to be the first day in month
+      $app->ResetFilter();
+      $app->SecureSetFilter([
+                              {dstrange=>\$altdstrange,sgroup=>\'Application',
+                               fullname=>\@applname},
+                              {dstrange=>\$altdstrange,sgroup=>\'Application',
+                               nameid=>\@applid},
+                             ]);
+      @statnamelst=$app->getHashList(qw(fullname id));
+   }
+   my $c=0;
+   foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
+      $c++;
+      if (exists($selbox->{'Application:'.$r->{fullname}})){
+         $selbox->{'Application:'.$r->{fullname}}->{fullname}=$r->{fullname};
+         $selbox->{'Application:'.$r->{fullname}}->{id}=$r->{id};
+         $selbox->{'Application:'.$r->{fullname}}->{prio}+=$c;
+      }
+   }
+}
 
 
 

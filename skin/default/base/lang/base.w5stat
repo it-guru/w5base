@@ -2,6 +2,7 @@
 'Statistic Group'=>{de=>'Statistik Gruppe'},
 'Statistic Name'=>{de=>'Statistik Name'},
 'fieldgroup.default'=>{de=>'Statistik Kopf',en=>'Statistic Header'},
+'fieldgroup.statstreams'=>{de=>'Statistik Streams',en=>'Statistic Streams'},
 'fieldgroup.stats'=>{de=>'Statistik Daten',en=>'Statistic Data'},
 'Month'=>{de=>'Monat/KW/Tag',en=>'Month/CW/Day'},
 'averange'=>{de=>'Bereichs Mittelwert'},

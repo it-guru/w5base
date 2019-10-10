@@ -63,6 +63,134 @@ sub getPresenter
 }
 
 
+sub getStatSelectionBox
+{
+   my $self=shift;
+   my $selbox=shift;
+   my $dstrange=shift;
+   my $altdstrange=shift;
+   my $app=$self->getParent();
+
+
+
+   my $userid=$app->getCurrentUserId();
+   my %groups=$app->getGroupsOf($userid,['REmployee','RBoss'],'direct');
+   foreach my $grpid (keys(%groups)){
+      if (!exists($selbox->{'Group:'.$groups{$grpid}->{fullname}})){
+         $selbox->{'Group:'.$groups{$grpid}->{fullname}}={
+            prio=>'1000'
+         };   
+      }
+   }
+
+   my $lnkrole=getModuleObject($app->Config,"base::lnkgrpuserrole");
+
+
+   $lnkrole->SetFilter({userid=>\$userid,
+                        nativrole=>['REmployee','RBoss','RBoss2',
+                                    'RReportReceive','RQManager']});
+   my %grpids;
+   map({$grpids{$_->{grpid}}++} $lnkrole->getHashList("grpid"));
+   my $grp=getModuleObject($app->Config,"base::grp");
+   $grp->SetFilter([{grpid=>[keys(%grpids)]},
+                    {parentid=>[keys(%grpids)]}]);
+   map({$grpids{$_->{grpid}}++;
+        $grpids{$_->{parentid}}++;} $grp->getHashList("grpid","parentid"));
+   my @grpids=grep(!/^\s*$/,keys(%grpids));
+   $grp->ResetFilter();
+   $grp->SetFilter({grpid=>\@grpids});
+   my @grps=$grp->getHashList("fullname","grpid");
+                    
+
+   my @grpnames;
+   my @grpids;
+   foreach my $r (@grps){
+      push(@grpids,$r->{grpid});
+      push(@grpnames,$r->{fullname});
+      if (!exists($selbox->{'Group:'.$r->{fullname}})){
+         $selbox->{'Group:'.$r->{fullname}}={
+            prio=>'2000'
+         };   
+      }
+   }
+
+   $app->ResetFilter();
+   $app->SecureSetFilter([
+                           {dstrange=>\$dstrange,sgroup=>\'Group',
+                            fullname=>\@grpnames,statstream=>\'default'},
+                           {dstrange=>\$dstrange,sgroup=>\'Group',
+                            nameid=>\@grpids,statstream=>\'default'},
+                          ]);
+   my @statnamelst=$app->getHashList(qw(fullname id));
+
+   if ($#statnamelst==-1){   # seems to be the first day in month
+      $app->ResetFilter();
+      $app->SecureSetFilter([
+                              {dstrange=>\$altdstrange,sgroup=>\'Group',
+                               fullname=>\@grpnames},
+                              {dstrange=>\$altdstrange,sgroup=>\'Group',
+                               nameid=>\@grpids},
+                             ]);
+      @statnamelst=$app->getHashList(qw(fullname id));
+   }
+   my $c=0;
+   foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
+      $c++;
+      if (exists($selbox->{'Group:'.$r->{fullname}})){
+         $selbox->{'Group:'.$r->{fullname}}->{fullname}=$r->{fullname};
+         $selbox->{'Group:'.$r->{fullname}}->{id}=$r->{id};
+         $selbox->{'Group:'.$r->{fullname}}->{prio}+=$c;
+      }
+   }
+
+   my %grp=$app->getGroupsOf($ENV{REMOTE_USER},
+           ['RCFManager','RCFManager2'],"down");
+   if (keys(%grp)){
+      my $m=getModuleObject($app->Config,"base::mandator");
+      $m->SetFilter({grpid=>[keys(%grp)],
+                     cistatusid=>"<6"});
+
+
+      my @idl=();
+      foreach my $mrec ($m->getHashList(qw(name grpid))){
+         push(@idl,$mrec->{grpid});
+      }
+      my @statnamelst;
+      if ($#idl!=-1){
+         $app->ResetFilter();
+         $app->SecureSetFilter([
+                                 {dstrange=>\$dstrange,sgroup=>\'Mandator',
+                                  nameid=>\@idl},
+                                ]);
+         @statnamelst=$app->getHashList(qw(fullname id));
+         if ($#statnamelst==-1){   # seems to be the first day in month
+            $app->ResetFilter();
+            $app->SecureSetFilter([
+                                    {dstrange=>\$altdstrange,sgroup=>\'Group',
+                                     nameid=>\@idl},
+                                   ]);
+            @statnamelst=$self->getHashList(qw(fullname id));
+         }
+         foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
+             if (!exists($selbox->{'Group:'.$r->{fullname}})){
+                $selbox->{'Mandator:'.$r->{fullname}}={
+                   id=>$r->{id},
+                   fullname=>$r->{fullname},
+                   prio=>'3000'
+                };   
+             }
+         }
+      }
+   }
+
+
+
+
+
+
+}
+
+
 sub overviewW5Base
 {
    my $self=shift;
@@ -124,7 +252,7 @@ sub displayW5Base
       my $v="Chart".$k;
       $v=~s/\./_/g;
       my $chart=$app->buildChart($v,$data,
-                      width=>500,height=>200, label=>$app->T($label));
+                      width=>450,height=>200, label=>$app->T($label));
       $d.=$chart;
 
    }   
