@@ -943,7 +943,7 @@ sub processRecord
       }
       my $mgmtitemgroup=$rec->{mgmtitemgroup};
       $mgmtitemgroup=[$mgmtitemgroup] if (ref($mgmtitemgroup) ne "ARRAY");
-      if (grep(/top/,@$mgmtitemgroup)){
+      if (grep(/^TOP.*Telekom.*$/i,@$mgmtitemgroup)){
          $self->getParent->storeStatVar("Group",\@repOrg,{},"RMO.Appl.Count",1);
          $self->getParent->storeStatVar("Application",[$rec->{name}],{
                                            nosplit=>1,nameid=>$rec->{id}
