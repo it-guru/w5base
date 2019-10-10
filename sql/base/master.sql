@@ -121,7 +121,7 @@ create table w5stat (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `srcsys` (srcsys,srcid),key srcload(srcload),
-  UNIQUE userid(month,name,statgroup,statstream),key name (statgroup,name),key (nameid),key nameonly(name)
+  UNIQUE userid(monthkwday,name,statgroup,statstream),key name (statgroup,name),key (nameid),key nameonly(name)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table mailsignatur (
   id         bigint(20)   NOT NULL,
