@@ -379,7 +379,21 @@ sub RawValue
          }
          $self->vjoinobj->SetNamedFilter("BASE",@{$base});
       }
-      $self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
+
+
+
+      my %flt=($self->{vjoinon}->[1]=>$srcval);
+      my @fltlst=(\%flt);
+      if (ref($self->{vjoinonfinish}) eq "CODE"){  # this allows dynamic joins
+         @fltlst=&{$self->{vjoinonfinish}}($self,\%flt,$current);
+      }
+
+      $self->vjoinobj->SetFilter(@fltlst);
+
+
+
+
+      #$self->vjoinobj->SetFilter({$self->{vjoinon}->[1]=>$srcval});
 
 
       my @view=($self->{vjoindisp});
