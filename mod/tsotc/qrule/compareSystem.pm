@@ -212,68 +212,94 @@ sub qcheckRecord
                   my @opList;
 
                   #
-                  # %cleanAmIPlist is neassasary, because multiple IP-Addresses
+                  # %cleanOTCIPlist is neassasary, because multiple IP-Addresses
                   # can be in one networkcard record
                   #
-                  my %cleanAmIPlist;
-                  my %cleanAmIflist;
+                  my %cleanOTCIPlist;
+                  my %cleanOTCIflist;
 
 
                   # dynamic assign Interface names - if none given
                   my %ifnum;
                   my $ifnum=0;
-                     # 1st try to find already assinged ifnames on MACs
+                  my $ifnamepattern='eth%d';
+
+                  # 1st get all already assigend ifnames to macs
                   foreach my $ifrec (@{$rec->{sysiface}}){
-                     foreach my $otciprec (@{$parrec->{ipaddresses}}){
-                        if ($ifrec->{mac} eq $otciprec->{hwaddr}){
-                           $otciprec->{ifname}=$ifrec->{name};
-                           $ifnum{$otciprec->{ifname}}++;
-                        }
-                     } 
+                     $ifnum{$ifrec->{name}}=$ifrec->{mac};
                   }
-                    # 2nd check if IPs have already ifnames 
+                  # 2nd remove invalid ifnames from current ip-List in w5base
                   foreach my $iprec (@{$rec->{ipaddresses}}){
-                     foreach my $otciprec (@{$parrec->{ipaddresses}}){
-                        if ($otciprec->{name} eq $iprec->{name} &&
-                            $otciprec->{ifname} eq ""){
-                           if ($iprec->{ifname} ne ""){
-                              $otciprec->{ifname}=$iprec->{ifname};
-                              $ifnum{$otciprec->{ifname}}++;
-                           }
+                     if ($iprec->{ifname} ne "" && 
+                         !exists($ifnum{$iprec->{ifname}})){
+                        $iprec->{ifname}="";
+                     }
+                  }
+                  # 3d load ifnames to otcipaddresses for already assigned
+                  #    macs to ifnames
+                  foreach my $otciprec (@{$parrec->{ipaddresses}}){
+                     foreach my $ifname (keys(%ifnum)){
+                        if ($otciprec->{hwaddr} eq $ifnum{$ifname}){
+                           $otciprec->{ifname}=$ifname; 
                         }
                      }
                   }
-                    # 3rd fillup missing ifnames with unused names
+                  # 4th fillup missing ifnames with unused (new) names
                   foreach my $iprec (@{$rec->{ipaddresses}}){
                      foreach my $otciprec (@{$parrec->{ipaddresses}}){
                         if ($otciprec->{name} eq $iprec->{name}){
-                           if ($iprec->{ifname} eq ""){
+                           if ($otciprec->{ifname} eq "" &&
+                               $otciprec->{hwaddr} ne ""){
                               my $ifname;
                               do{
-                                 $ifname=sprintf("eth%d",$ifnum);
+                                 $ifname=sprintf($ifnamepattern,$ifnum);
                                  $ifnum++;
                               }while(exists($ifnum{$ifname}));
+                              $ifnum{$ifname}++;
                               $otciprec->{ifname}=$ifname; 
-                              $ifnum{$otciprec->{ifname}}++;
                            }
                         }
                      }
                   }
-
-
+                  # create ifnames on OTC records, if nothing is already
+                  # assigned
+                  for(my $i=0;$i<=$#{$parrec->{ipaddresses}};$i++){
+                     my $otciprec=$parrec->{ipaddresses}->[$i];
+                     if ($otciprec->{ifname} eq ""){
+                        my $ifname;
+                        for(my $ii=0;$ii<=$#{$parrec->{ipaddresses}};$ii++){
+                           if ($parrec->{ipaddresses}->[$ii]->{hwaddr} ne "" &&
+                               $otciprec->{hwaddr} eq 
+                               $parrec->{ipaddresses}->[$ii]->{hwaddr}){
+                              $ifname=$parrec->{ipaddresses}->[$ii]->{ifname};
+                              last;
+                           }
+                        }
+ 
+                        if ($ifname eq ""){
+                           do{
+                              $ifname=sprintf($ifnamepattern,$ifnum);
+                              $ifnum++;
+                           }while(exists($ifnum{$ifname}));
+                           $ifnum{$ifname}++;
+                        }
+                        $otciprec->{ifname}=$ifname; 
+                     }
+                  }
+                  
                   foreach my $otciprec (@{$parrec->{ipaddresses}}){
                      my $mappedCIStatus=4;
                      if ($otciprec->{name} ne ""){
                         if ($otciprec->{name}=~
                             m/^\d{1,3}(\.\d{1,3}){3,3}$/){
-                           $cleanAmIPlist{$otciprec->{name}}={
+                           $cleanOTCIPlist{$otciprec->{name}}={
                               cistatusid=>$mappedCIStatus,
                               ipaddress=>$otciprec->{name},
                               ifname=>$otciprec->{ifname},
                               comments=>trim($otciprec->{comments})
                            };
                            if ($otciprec->{hwaddr} ne ""){
-                              $cleanAmIflist{$otciprec->{ifname}}={
+                              $cleanOTCIflist{$otciprec->{ifname}}={
                                  name=>$otciprec->{ifname},
                                  mac=>$otciprec->{hwaddr}
                               };
@@ -286,7 +312,7 @@ sub qcheckRecord
                         }
                      }
                   }
-                  my @cleanAmIPlist=values(%cleanAmIPlist);
+                  my @cleanOTCIPlist=values(%cleanOTCIPlist);
 
                   my $res=OpAnalyse(
                              sub{  # comperator 
@@ -363,14 +389,14 @@ sub qcheckRecord
                                 }
                                 return(undef);
                              },
-                             $rec->{ipaddresses},\@cleanAmIPlist,\@opList,
+                             $rec->{ipaddresses},\@cleanOTCIPlist,\@opList,
                              refid=>$rec->{id},netarea=>$netarea);
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
                   }
 
 
-                  my @cleanAmIflist=values(%cleanAmIflist);
+                  my @cleanOTCIflist=values(%cleanOTCIflist);
                   @opList=();
                   my $res=OpAnalyse(
                              sub{  # comperator 
@@ -420,7 +446,7 @@ sub qcheckRecord
                                 }
                                 return(undef);
                              },
-                             $rec->{sysiface},\@cleanAmIflist,\@opList,
+                             $rec->{sysiface},\@cleanOTCIflist,\@opList,
                              refid=>$rec->{id});
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
