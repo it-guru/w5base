@@ -539,6 +539,16 @@ sub storeStatVar
                if (lc($method) eq "count"){
                   $self->{stats}->{$group}->{$key}->{$var}+=$val[0];
                }
+               if (lc($method) eq "avg"){
+                  $self->{stats}->{$group}->{$key}->{$var}+=$val[0];
+                  if ($self->{stats}->{$group}->{$key}->{$var}>0){
+                     $self->{stats}->{$group}->{$key}->{$var}=
+                        ($self->{stats}->{$group}->{$key}->{$var}+$val[0])/2;
+                  }
+                  else{
+                     $self->{stats}->{$group}->{$key}->{$var}=$val[0];
+                  }
+               }
                if (lc($method) eq "concat"){
                   if ($self->{stats}->{$group}->{$key}->{$var} ne ""){
                      $self->{stats}->{$group}->{$key}->{$var}.=", ";

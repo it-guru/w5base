@@ -249,10 +249,21 @@ sub displayRMO
 
    my @s;
    my @a;
+   my @appl;
    my %a;
    my @i;
    my @swinst;
    my %DIid;
+   if (exists($rmostat->{stats}->{'RMO.Appl.List'})){
+      @appl=map({
+         my @fld=split(/;/,$_);
+         my $pos=0; 
+         my $rec={id=>$fld[$pos++]};
+         $rec->{name}=$fld[$pos++];
+         $rec->{index}=$fld[$pos++];
+         $rec;
+      } @{$rmostat->{stats}->{'RMO.Appl.List'}});
+   }
    if ($rmostat->{sgroup} eq "Application"){
       if ($applcnt){
          $d.=sprintf($app->T("APPISRELEVANT"),$primrec->{fullname});
@@ -408,6 +419,16 @@ sub displayRMO
       }
    }
 
+   if (exists($rmostat->{stats}->{'RMO.Appl.Index'})){
+      $d.="<h2>RMO-Index:</h2>";
+      my $red=int($rmostat->{stats}->{'RMO.Appl.Index'}->[0]);
+      my $green=100-$red;
+      $d.=$self->mkSegBar("RMOindex",[
+         { value=>$red, color=>'red' },
+         { value=>$green, color=>'green' }
+      ]);
+   }
+
 
    if ($rmostat->{sgroup} eq "Group"){
       $d.="<table class=statTab style=\"width:70%\">";
@@ -484,6 +505,12 @@ sub displayRMO
       $d.="<hr>";
    }
 
+   my $applById;
+   if ($#appl!=-1){
+      my $o=$app->getPersistentModuleObject("itil::appl");
+      $o->SetFilter({id=>[map({$_->{id}} @appl)]});
+      $applById=$o->getHashIndexed(qw(id));
+   }
 
       
    if ($rmostat->{sgroup} eq "Application"){
@@ -698,6 +725,40 @@ sub displayRMO
          }
          $d.="</table>" if ($#i!=-1);
       }
+   }
+   if ($#appl!=-1){ # RMO-Index direkt zugeordneter Anwendungen
+      @appl=sort({$a->{index}<=>$b->{index}} @appl);
+      for(my $i=0;$i<=$#appl;$i++){
+         if ($i==0){
+            $d.="<br><br>";
+            $d.="<h3>RMO-Index direkt zugeordneter Anwendungen</h3>";
+            $d.="<table class=statTab>";
+            $d.="<thead><tr><th width=10%>Application</th>".
+                "<th></th>".
+                "</tr></thead>";
+         }
+         $d.="<tr>";
+         $d.="<td valign=top>";
+         if (exists($applById->{id}->{$appl[$i]->{id}})){
+            $d.=$app->OpenByIdWindow("itil::appl",
+                                     $appl[$i]->{id},
+                                     $appl[$i]->{name});
+         }
+         else{
+            $d.=$appl[$i]->{name};
+         }
+         $d.="</td>";
+         my $red=int($appl[$i]->{index});
+         my $green=100-$red;
+         $d.="<td valign=top>";
+         $d.=$self->mkSegBar("RMOindexA".$appl[$i]->{id},[
+            { value=>$red, color=>'red' },
+            { value=>$green, color=>'green' }
+         ]);
+         $d.="</td>";
+         $d.="</tr>";
+      }
+      $d.="</table>";
    }
 
 
@@ -1025,7 +1086,6 @@ sub processRecord
                if ($swirec->{softwareinstrelstate}=~m/^OK unrestricted/){
                   $instrating="blue";
                }
-print Dumper($swirec);
                my $softwareinstrelmsg=$swirec->{softwareinstrelmsg};
                $softwareinstrelmsg=~s/;/ /g;
                $softwareinstrelmsg=~s/\n/ /g;
@@ -1039,7 +1099,7 @@ print Dumper($swirec);
             }
          }
       }
-      print Dumper(\%swinst);
+      #print Dumper(\%swinst);
 
 
 
@@ -1153,7 +1213,47 @@ print Dumper($swirec);
          }
       }
 
+
+      my %colors=@{$self->{Colors}};
+      my $totalItems=0;
+      my $redCount=0;
+      foreach my $color (keys(%colors)){
+         foreach my $prefix (qw(RMO.System.TCC.os 
+                                RMO.SoftwareInst.Rating
+                                RMO.Asset.age
+                                RMO.DataIssue)){
+            if (exists($appkpi->{$prefix.".".$color})){
+               if ($color eq "red"){
+                  $redCount+=$appkpi->{$prefix.".".$color};
+               } elsif ($color eq "yellow"){
+                  $redCount+=($appkpi->{$prefix.".".$color}/2);
+               } elsif ($color ne "gray"){
+                  $totalItems+=$appkpi->{$prefix.".".$color};
+               }
+            }
+         }
+      }
+      my $redPercent=0;
+      if ($totalItems>9){
+         $redPercent=int($redCount*100.0/$totalItems);
+      }
+
+
+      my $ApplIndexLine="$rec->{id};$rec->{name};$redPercent";
+      $self->getParent->storeStatVar("Application",
+                                     [$rec->{name}],
+                                     {nosplit=>1,
+                                      nameid=>$rec->{id},
+                                      method=>'add'},
+                                     "RMO.Appl.Index",$redPercent);
+
       if ($isRMOrelevant){
+         $self->getParent->storeStatVar("Group",\@repOrg,{
+             nosplit=>1,method=>'add'},
+             "RMO.Appl.List",$ApplIndexLine);
+         $self->getParent->storeStatVar("Group",\@repOrg,{
+             method=>'avg'},
+             "RMO.Appl.Index",$redPercent);
          $self->getParent->storeStatVar("Group",\@repOrg,{},"RMO.Appl.Count",1);
          $self->getParent->storeStatVar("Application",[$rec->{name}],{
                                            nosplit=>1,nameid=>$rec->{id}
