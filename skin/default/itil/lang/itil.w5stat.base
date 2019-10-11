@@ -8,6 +8,8 @@
 'Count of System Config-Items'=>{de=>'Anzahl System Config-Items'},
 'Count of Instance Config-Items'=>{de=>'Anzahl Sofware-Instanz Config-Items'},
 'Count of Asset Config-Items'=>{de=>'Anzahl Asset Config-Items'},
+'finished Changes'=>{de=>'beendete Changes'},
+'finished Incidents'=>{de=>'beendete Incidents'},
 'Applications'=>{de=>'Anwendungen'},
 'swinstance'=>{de=>'Software-Instanzen',en=>'software-instances'},
 'count of applications'=>{de=>'Anzahl Anwendungen'},

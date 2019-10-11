@@ -284,8 +284,10 @@ sub overviewDataIssue
    if ($dataissues>($users*0.4) && $dataissues>5){
       $color="red";
    }
-   push(@l,[$app->T('unprocessed DataIssue Workflows'),
-            $dataissues,$color,$delta]);
+   if ($primrec->{sgroup} eq "Group"){
+      push(@l,[$app->T('unprocessed DataIssue Workflows'),
+               $dataissues,$color,$delta]);
+   }
 
    my $keyname1='base.DataIssue.sleep56';
    my $dataissues=0;

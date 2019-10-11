@@ -235,7 +235,29 @@ sub overviewAppl
    my $app=$self->getParent();
    my @l;
 
-   my $keyname='ITIL.Application.Count';
+   if ($primrec->{sgroup} eq "Application"){
+      my $keyname='ITIL.Change.Finish.Count';
+      my $n=0;
+      if (defined($primrec->{stats}->{$keyname})){
+         $n=$primrec->{stats}->{$keyname}->[0];
+      }
+      my $color="black";
+      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+      push(@l,[$app->T('finished Changes'),
+                  $n,$color,$delta]);
+   }
+   if ($primrec->{sgroup} eq "Application"){
+      my $keyname='ITIL.Incident.Finish.Count';
+      my $n=0;
+      if (defined($primrec->{stats}->{$keyname})){
+         $n=$primrec->{stats}->{$keyname}->[0];
+      }
+      my $color="black";
+      my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+      push(@l,[$app->T('finished Incidents'),
+                  $n,$color,$delta]);
+   }
+
    #if (defined($primrec->{stats}->{$keyname})){
    #   my $color="black";
    #   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
@@ -279,13 +301,15 @@ sub overviewSystem
    my $app=$self->getParent();
    my @l;
 
-   my $keyname='ITIL.System.Count';
-   #if (defined($primrec->{stats}->{$keyname})){
-   #   my $color="black";
-   #   my $delta=$app->calcPOffset($primrec,$hist,$keyname);
-   #   push(@l,[$app->T('Count of System Config-Items'),
-   #            $primrec->{stats}->{$keyname}->[0],$color,$delta]);
-   #}
+   if ($primrec->{sgroup} eq "Application"){
+      my $keyname='ITIL.System.Count';
+      if (defined($primrec->{stats}->{$keyname})){
+         my $color="black";
+         my $delta=$app->calcPOffset($primrec,$hist,$keyname);
+         push(@l,[$app->T('Count of System Config-Items'),
+                  $primrec->{stats}->{$keyname}->[0],$color,$delta]);
+      }
+   }
    return(@l);
 }
 
@@ -533,7 +557,11 @@ sub processRecord
       if ($rec->{cistatusid}<=5){
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "ITIL.Total.Application.Count",1);
-
+         my $systemcount=$#{$rec->{systems}}+1;
+         $self->getParent->storeStatVar("Application",[$rec->{name}],
+                                        {nameid=>$rec->{id},
+                                         nosplit=>1},
+                                        "ITIL.System.Count",$systemcount);
       }
    }
    if ($module eq "itil::system"){
