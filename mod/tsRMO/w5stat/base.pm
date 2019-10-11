@@ -727,7 +727,7 @@ sub displayRMO
       }
    }
    if ($#appl!=-1){ # RMO-Index direkt zugeordneter Anwendungen
-      @appl=sort({$a->{index}<=>$b->{index}} @appl);
+      @appl=sort({$b->{index}<=>$a->{index}} @appl);
       for(my $i=0;$i<=$#appl;$i++){
          if ($i==0){
             $d.="<br><br>";
