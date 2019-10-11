@@ -264,12 +264,33 @@ sub displayRMO
          $rec;
       } @{$rmostat->{stats}->{'RMO.Appl.List'}});
    }
+
+   my $applById;
+   if (1){
+      my $o=$app->getPersistentModuleObject("itil::appl");
+      my @ids=map({$_->{id}} @appl);
+      if ($primrec->{sgroup} eq "Application" &&
+          $primrec->{nameid} ne ""){
+         push(@ids,$primrec->{nameid});
+      }
+      $o->SetFilter({id=>\@ids});
+      $applById=$o->getHashIndexed(qw(id));
+   }
+
+
+
    if ($rmostat->{sgroup} eq "Application"){
+      my $applname=$primrec->{fullname};
+      if ($primrec->{nameid} ne "" &&
+          exists($applById->{id}->{$primrec->{nameid}})){
+         $applname=$app->OpenByIdWindow("itil::appl",
+                                        $primrec->{nameid},$applname);
+      }
       if ($applcnt){
-         $d.=sprintf($app->T("APPISRELEVANT"),$primrec->{fullname});
+         $d.=sprintf($app->T("APPISRELEVANT"),$applname);
       }
       else{
-         $d.=sprintf($app->T("APPISNOTRELEVANT"),$primrec->{fullname});
+         $d.=sprintf($app->T("APPISNOTRELEVANT"),$applname);
       }
       if (exists($rmostat->{stats}->{'RMO.System'})){
          @s=map({
@@ -505,14 +526,6 @@ sub displayRMO
       $d.="<hr>";
    }
 
-   my $applById;
-   if ($#appl!=-1){
-      my $o=$app->getPersistentModuleObject("itil::appl");
-      $o->SetFilter({id=>[map({$_->{id}} @appl)]});
-      $applById=$o->getHashIndexed(qw(id));
-   }
-
-      
    if ($rmostat->{sgroup} eq "Application"){
       my $sById;
       my $swinstById;
@@ -818,7 +831,7 @@ sub processData
    my $appl=getModuleObject($self->getParent->Config,"TS::appl");
    $appl->SetCurrentView(qw(name cistatusid mandatorid systems swinstances
                             businessteam responseteam id dataissuestate
-                            mgmtitemgroup));
+                            mgmtitemgroup dataissuestate));
    if ($appl->Config->Param("W5BaseOperationMode") eq "dev"){
       $appl->SetFilter({cistatusid=>'<=4',
                         name=>'W5* Dina* TSG_VIRTUELLE_T-SERVER* NGSS*Perfo*'});
@@ -874,6 +887,20 @@ sub processRecord
          }
       }
 
+      if (exists($rec->{dataissuestate}->{id})){
+         my $dicolor="red";
+         my $eventstart=$rec->{dataissuestate}->{eventstart};
+         if ($eventstart ne ""){
+            my $d=CalcDateDuration($eventstart,NowStamp('en'));
+            if (defined($d) && $d->{days}<8*7){
+               $dicolor="yellow";
+            }
+         }
+         $appkpi->{'RMO.DataIssue.'.$dicolor}++;
+      }
+      else{
+         $appkpi->{'RMO.DataIssue.green'}++;
+      }
 
       #######################################################################
       # Analyse of systems
