@@ -196,10 +196,15 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
 
-   if ($rec->{statstream} eq "default"){
-      return("header","default","stats","statstreams","source");
+   my @groups=("header","default","source");
+
+   if ($self->IsMemberOf("admin")){
+      push(@groups,"stats");
    }
-   return("header","default","stats","source")
+   if ($rec->{statstream} eq "default"){
+      push(@groups,"statstreams");
+   }
+   return(@groups)
 }
 
 sub isWriteValid
@@ -844,7 +849,9 @@ sub LoadStatSet
             }
          }
       }
-      msg(INFO,"loaded $cntrec records for $id");
+      if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+         msg(INFO,"loaded $cntrec records for $id");
+      }
       return($primrec,$hist);
 
    }
@@ -901,15 +908,27 @@ sub Presenter
       my $id=Query->Param("id");
       $self->ResetFilter();
       $self->SetFilter({id=>\$id});
-      my ($srec,$msg)=$self->getOnlyFirst(qw(id sgroup fullname));
+      my ($srec,$msg)=$self->getOnlyFirst(qw(id sgroup dstrange statstream
+                                             fullname));
       if (defined($srec)){
-         $requestid=$srec->{id};
+         if ($srec->{statstream} ne "default"){
+            $self->ResetFilter();
+            $self->SetFilter({dstrange=>\$srec->{dstrange},
+                              fullname=>\$srec->{fullname},
+                              statstream=>\'default'});
+            ($srec,$msg)=$self->getOnlyFirst(qw(id sgroup dstrange statstream
+                                                fullname));
+         }
+         if (defined($srec)){
+            $requestid=$srec->{id};
+         }
       }
    }
    if ($requestid ne ""){
       $self->ResetFilter();
       $self->SetFilter({id=>\$requestid});
-      my ($srec,$msg)=$self->getOnlyFirst(qw(id sgroup fullname));
+      my ($srec,$msg)=$self->getOnlyFirst(qw(id sgroup dstrange 
+                                             statstream fullname));
       if (defined($srec)){
          Query->Param("search_name"=>$srec->{sgroup}.":".$srec->{fullname});
       }
