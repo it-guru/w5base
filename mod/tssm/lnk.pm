@@ -211,6 +211,7 @@ sub getSMIDfromDesc   # Link ID innerhalb von ServiceManager
    return("decode(depend_filename,'cm3r',depend,".
                                  "'cm3t',depend,".
                                  "'problem',depend,".
+                                 "'rootcause',depend,".
                  "substr(dbms_lob.substr(dh_desc),1,".
                  "instr(dbms_lob.substr(dh_desc),chr(10),1,1)-1))");
 }
@@ -225,6 +226,7 @@ sub getSrcDecode
 {
    my $varname=shift;
    return("decode($varname,'cm3r','tssm::chm',".
+                          "'rootcause','tssm::prm',".
                           "'problem','tssm::prm',".
                           "'incidents','tssm::inm'".
           ")");
@@ -236,6 +238,7 @@ sub getSMObjDecode
    return(
        "decode(depend_filename,'cm3r','tssm::chm',".
                               "'problem','tssm::inm',".
+                              "'rootcause','tssm::prm',".
                               "'cm3t','tssm::chmtask',".
           "decode(substr($varname,0,1),'S','tsacinv::system',".
                                       "'T','tssm::chmtask',".
