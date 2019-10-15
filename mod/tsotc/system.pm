@@ -675,11 +675,12 @@ sub Import
          $sys->SetFilter({'id'=>\$identifyby});
          my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
          if (defined($rec)){
+            my %checksession;
             my $qc=getModuleObject($self->Config,"base::qrule");
             $qc->setParent($sys);
-            $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
-            # make a second check to ensure get Update for OTC qrule
-            $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec);
+            $checksession{autocorrect}=$rec->{allowifupdate};
+            $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec,
+                                   \%checksession);
          }
       }
    }
