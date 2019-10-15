@@ -244,23 +244,6 @@ sub qcheckRecord
                         }
                      }
                   }
-                  # 4th fillup missing ifnames with unused (new) names
-                  foreach my $iprec (@{$rec->{ipaddresses}}){
-                     foreach my $otciprec (@{$parrec->{ipaddresses}}){
-                        if ($otciprec->{name} eq $iprec->{name}){
-                           if ($otciprec->{ifname} eq "" &&
-                               $otciprec->{hwaddr} ne ""){
-                              my $ifname;
-                              do{
-                                 $ifname=sprintf($ifnamepattern,$ifnum);
-                                 $ifnum++;
-                              }while(exists($ifnum{$ifname}));
-                              $ifnum{$ifname}++;
-                              $otciprec->{ifname}=$ifname; 
-                           }
-                        }
-                     }
-                  }
                   # create ifnames on OTC records, if nothing is already
                   # assigned
                   for(my $i=0;$i<=$#{$parrec->{ipaddresses}};$i++){
