@@ -1,8 +1,43 @@
-Your relation to group "<b>%group%</b>" with your current role(s) "<b>%roles(formated)%</b>" has been expired.  If you do not contact the admin, this relation will be deleted in 4 weeks. It may happen, that the removal of this relationship will result in limited functionality or visibility of data. The removal of this relation will not terminate your access to this system! It is possible, that there are already new relations defined, which ensure access to all functionalities for you or your organisational unit. 
+Dear User, 
 
-If you have changed your organisational relation, ensure that all relevant entries in the configuration management are adjusted.
+this email informs you that your relation to the group "<b>%group%</b>" with the currently entered roles "<b>%roles(formated)%</b>" has expired. The entry in W5Base System will be removed in 4 weeks. 
+Please note that the org. group relations are predefined in the HR administration system. This can be a result of a reorganization or a change of the team, etc..
 
-Before you contact the admins, check the plausibility of your current group relations in "MyW5Base-&gt;Userpreferences". If you discover discrepansies please start an admin-requst in "MyW5Base:start new workflow".
+It can happen that:
 
-This is the one and only notification. No further notifications about this situation will be sent.
+   * you are already assigned to a new group with the same role
+
+   * you can no longer use certain functions or that 
+     data records are no longer visible to you.
+
+It cannot happen that:
+
+   * your access to the system will be deleted.
+
+What should you do:
+
+   * Please check your group relations for plausibility 
+     under MyW5Base-&gt;User Settings (Block Group Memberships) 
+     or use the link at the bottom of this email marked 
+     with "Show current group relations:".
+
+   * If the relation is correct, there is no further to-do for you.
+
+   * If the relation is not correct:
+      - and you have the role "employee, member" for the group, 
+        please contact your team leader, your 
+        local HR bussiness partner to maintain this in 
+        the HR administration system.
+
+      - For groups with other roles, contact 1st level support.
+
+   * If you can no longer use certain functions after 
+     the group is removed, contact 1st level support.
+
+   * If your organizational relation has been changed, please 
+     make sure that all necessary entries in Config Management 
+     have been update by the Databoss.
+
+
+This is the only notification sent to you. No further messages will be generated for you regarding this case.
 

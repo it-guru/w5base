@@ -1,11 +1,49 @@
-Ihre Zuordnung zur Gruppe "<b>%group%</b>" mit den aktuell eingetragenen Rollen "<b>%roles(formated)%</b>" ist verfallen. Wenn Sie nicht die Admins kontaktieren (z.B. via Admin-Request) wird diese Zuordnung in 4 Wochen endgültig gelöscht. 
-Das Entfernen dieser Zuordnung kann dazu führen, dass Sie danach bestimmte Funktionalitäten nicht mehr nutzen können bzw. dass für Sie Datensätze nicht mehr sichtbar sind. Es bedeutet NICHT, dass Sie ohne diese Zuordnung keinen Zugang zum System mehr erhalten. Es ist möglich, dass bereits neue Gruppenzuordnungen in Ihren Benutzereinstellungen eingetragen wurden, die alle notwendigen Funktionalitäten für Sie bzw. für Ihren Bereich weiterhin sicherstellen.
+Sehr geehrte/r Benutzer/in,
 
-Falls Ihre organisatorische Zugehörigkeit geändert wurde, so stellen Sie bitte sicher, dass alle notwendigen Einträge im Config-Management durch die betreffenden Datenverantwortlichen angepasst werden.
-Diese Mail kann auch durch Umorganisationen in Ihrem Bereich ausgelöst worden sein. In diesem Fall klären Sie über Ihre(n) Vorgesetzten, dass Ihrem Bereich auch in der neuen Organisationsstrutkur die notwendigen Berechtigungen zugewiesen wurden bzw. werden.
+diese Email informiert Sie darüber, dass Ihre Zuordnung zu der Gruppe "<b>%group%</b>" mit den aktuell eingetragenen Rollen "<b>%roles(formated)%</b>" verfallen ist. Der Eintrag im W5Base System wird in 4 Wochen entferrnt. 
 
-Bevor Sie die Admins kontaktieren, prüfen Sie bitte ob Ihre Gruppenzuordnung unter "MyW5Base-&gt;Benutzereinstellungen" nicht doch plausibel ist. Erst wenn Ihnen die aktuell vorhandenen Zuordnungen nicht plausibel erscheinen, macht es Sinn die Admins zu kontaktieren.
-Beachten Sie, dass die Admins nur tätig werden können, wenn Sie Ihre Anfrage über "MyW5Base:neuen Workflow starten" als <b>"W5Base Admin oder Support Anforderung/Admin Anfrage"</b> stellen!
+Bitte beachten Sie, dass die org. Gruppenzuordnungen aus dem Personalwerwaltungssystem vorgegeben wird. Dies kann eine Auswirkung einer Umorganisation oder eines Wechsels des Team, etc.
+
+Es kann passieren, dass:
+
+   * Sie schon einer neuen Gruppe mit der selben Rolle 
+     zugeordnet sind
+
+   * Sie bestimmte Funktionalitäten nicht mehr nutzen 
+     können bzw. dass für Sie Datensätze nicht 
+     mehr sichtbar sind.
+
+Es kann nicht passieren, dass:
+
+   * Ihr Zugang zum System gelöscht wird.
+
+Was sollten Sie tun: 
+
+   * Bitte prüfen Sie Ihre Gruppenzuordnung auf Plausibilität unter 
+     MyW5Base-&gt;Benutzereinstellungen (Block Gruppenmitgliedschaften) 
+     oder den Link unten in dieser Email markiert mit 
+     "Aktuelle Gruppenzuordnungen anzeigen:" benutzen. 
+
+   * Falls die Zuordnung korrekt ist, gibt es für Sie kein 
+     weiteres To-Do.
+
+   * Falls die Zuordnung nicht korrekt ist:
+
+      - und Sie bei der Gruppe die Rolle "Mitarbeiter, Mitglied" 
+        haben, wenden Sie sich bitte an Ihren Team Leiter, ihren 
+        lokalen HR-Anschprechspartner um dies im 
+        Personalwerwaltungssystem zu pflegen.
+
+      - bei Gruppen mit anderen Rollen wenden Sie sich an 
+        den 1st Level Support.
+
+   * Falls Sie nach der Entfernung der Gruppe bestimmte 
+     Funktionalitäten nicht mehr nutzen können, wenden Sie 
+     sich an den 1st Level Support.
+
+   * Falls Ihre organisatorische Zugehörigkeit geändert wurde, so
+     stellen Sie bitte sicher, dass alle notwendigen Einträge im 
+     Config-Management durch die betreffenden Datenverantwortlichen 
+     angepasst werden.
 
 Dies ist die einzige Benachrichtigung, die an Sie gesandt wird. Es werden über diesen Sachverhalt keine weiteren Nachrichten an Sie erzeugt.
-
