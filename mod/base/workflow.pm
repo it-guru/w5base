@@ -34,7 +34,7 @@ sub new
    
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
    $self->setWorktable("wfhead");
-   return(@result) if (defined($result[0]) eq "InitERROR");
+   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
    $self->{Action}=getModuleObject($self->Config,"base::workflowaction");
    return(undef) if (!defined($self->{Action}));
    $self->{use_distinct}=1;

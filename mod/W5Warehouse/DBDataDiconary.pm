@@ -39,7 +39,7 @@ sub Initialize
    my $self=shift;
 
    my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5repo"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
+   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
    $self->{use_distinct}=1;
 
    return(1) if (defined($self->{DB}));

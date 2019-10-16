@@ -31,7 +31,7 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    
    my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"tswiw"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
+   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
 
    $self->setBase("o=CostCenter,o=WiW");
    $self->AddFields(

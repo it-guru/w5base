@@ -189,7 +189,7 @@ sub Initialize
    my $self=shift;
 
    my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"tsadsEMEA1"));
-   return(@result) if (defined($result[0]) eq "InitERROR");
+   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
 
    return(1) if (defined($self->{tsadsEMEA1}));
    return(0);

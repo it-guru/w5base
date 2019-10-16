@@ -108,7 +108,7 @@ sub new
 #   my $self=shift;
 #
 #   my @result=$self->AddDatabase(DB=>new kernel::database($self,"sigfilestore"));
-#   return(@result) if (defined($result[0]) eq "InitERROR");
+#   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
 #   return(1) if (defined($self->{DB}));
 #   return(0);
 #}
