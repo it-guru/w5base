@@ -3385,6 +3385,9 @@ sub Result
       my @view=$self->GetCurrentView();
       $self->Log(INFO,"viewreq","$ENV{REMOTE_USER} ".
                                 $self->Self." ".join(",",@view)); 
+      if ($format eq "MONI"){
+         $self->doInitialize(1); # Init with errors to LastMsg
+      }
       $output->WriteToStdout(HttpHeader=>1);
    }
    else{

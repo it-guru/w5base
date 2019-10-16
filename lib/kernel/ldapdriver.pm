@@ -100,9 +100,11 @@ sub Connect
 
    foreach my $v (qw(ldapuser ldappass ldapserv)){
       if ((ref($p{$v}) ne "HASH" || !defined($p{$v}->{$ldapname}))){
-         return(undef,
-                msg(ERROR,"Connect(%s): essential information '%s' missing",
-                    $ldapname,$v));
+         my $msg=sprintf(
+                   "Connect(%s): essential information '%s' missing",
+                    $ldapname,$v);
+         msg(ERROR,$msg);
+         return(undef,$msg);
       }
       if (defined($p{$v}->{$ldapname}) && $p{$v}->{$ldapname} ne ""){
          $self->{$v}=$p{$v}->{$ldapname};
@@ -111,15 +113,18 @@ sub Connect
    if (!($self->{ldap}=Net::LDAP->new($self->{ldapserv},
                                       timeout=>100,
                                       version=>'3',async=>0))){
-      return(undef,msg(ERROR,"ldapbind '%s' while connect '%s'",
-             $@,$self->{ldapserv}));
+      my $msg=sprintf("ldapbind '%s' while connect '%s'",$@,$self->{ldapserv});
+      msg(ERROR,$msg);
+      return(undef,$msg);
    }
    $self->{ldap}->bind($self->{ldapuser},password =>$self->{ldappass});
 
 
    if (!$self->{'ldap'}){
-      return(undef,msg(ERROR,"Connect(%s): LDAP '%s'",$ldapname,
-                       "can't connect"));
+      my $msg=sprintf("Connect(%s): LDAP '%s'",$ldapname,
+                       "can't connect");
+      msg(ERROR,$msg);
+      return(undef,$msg);
    }
    else{
       $self->{isConnected}=1;

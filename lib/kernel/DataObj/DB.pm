@@ -932,14 +932,12 @@ sub getFirst
 
    if (!defined($self->{DB})){
       $self->{isInitalized}=0;
+      my $msg=$self->T("no database connection or invalid database handle");
       if ($self->isSuspended()){
-         return(undef,
-                msg(ERROR,
-                $self->T("database connection temporary suspended")));
+         $msg=$self->T("database connection temporary suspended");
       }
-      return(undef,
-             msg(ERROR,
-             $self->T("no database connection or invalid database handle")));
+      $self->LastMsg(ERROR,$msg);
+      return(undef,msg(ERROR,$msg));
    }
    $self->{DB}->finish();
    my @sqlcmd=($self->getSqlSelect());

@@ -466,10 +466,17 @@ sub getFirst
    my @fieldlist=$self->getFieldList();
    my @attr=();
 
-   if (!defined($self->{LDAP})){
-      return(undef,msg(ERROR,"no LDAP connection"));
+
+  if (!defined($self->{LDAP})){
+      $self->{isInitalized}=0;
+      my $msg=$self->T("no LDAP connection or invalid LDAP handle");
+      if ($self->isSuspended()){
+         $msg=$self->T("LDAP connection temporary suspended");
+      }
+      $self->LastMsg(ERROR,$msg);
+      return(undef,msg(ERROR,$msg));
    }
-#   my @sqlcmd=($self->getLdapFilter());
+
    my $baselimit=$self->Limit();
    $self->Context->{CurrentLimit}=$baselimit if ($baselimit>0);
    my $t0=[gettimeofday()];

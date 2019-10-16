@@ -1,0 +1,2 @@
+'no LDAP connection or invalid LDAP handle'=>{de=>'keine LDAP Verbindung oder kein gültiger LDAP Handle'},
+'LDAP connection temporary suspended'=>{de=>'LDAP Verbindung zeitweise nicht verfübar'},

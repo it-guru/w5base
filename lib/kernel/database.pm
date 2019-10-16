@@ -72,9 +72,10 @@ sub Connect
    foreach my $v (qw(dbconnect dbuser dbpass dbschema)){
       if ((ref($p{$v}) ne "HASH" || !defined($p{$v}->{$dbname})) && 
           $v ne "dbschema"){
-         return(undef,
-                msg(ERROR,"Connect(%s): essential information '%s' missing",
-                    $dbname,$v));
+         my $msg=sprintf("Connect(%s): essential information '%s' missing",
+                    $dbname,$v);
+         msg(ERROR,$msg);
+         return(undef,$msg);
       }
       if (defined($p{$v}->{$dbname}) && $p{$v}->{$dbname} ne ""){
          $self->{$v}=$p{$v}->{$dbname};
@@ -165,8 +166,9 @@ sub Connect
             msg(ERROR,"env NLS_LANG='$ENV{NLS_LANG}'");
          }
       }
-      return(undef,msg(ERROR,"Connect(%s): DBI '%s'",$dbname,
-                       $self->getErrorMsg()));
+      my $msg=sprintf("Connect(%s): DBI '%s'",$dbname, $self->getErrorMsg());
+      msg(ERROR,$msg);
+      return(undef,$msg);
    }
    else{
       $self->{isConnected}=1;
@@ -188,10 +190,10 @@ sub Connect
       if (($self->{dbconnect}=~m/^dbi:pg:/i)){
          my $schemacmd="set schema '$self->{dbschema}'";
          if (!($self->do($schemacmd))){
-            return(undef,
-                   msg(ERROR,"Connect(%s): can't set current_schema to '%s'",
-                       $dbname,$self->{dbschema}));
-            return(undef);
+            my $msg=sprintf("Connect(%s): can't set current_schema to '%s'",
+                       $dbname,$self->{dbschema});
+            msg(ERROR,$msg);
+            return(undef,$msg);
          }
          else{
             my $parent=$self->getParent->Self();
@@ -203,10 +205,10 @@ sub Connect
          $self->do("alter session set sort_area_size=524288000");
          my $schemacmd="alter session set current_schema=$self->{dbschema}";
          if (!($self->do($schemacmd))){
-            return(undef,
-                   msg(ERROR,"Connect(%s): can't set current_schema to '%s'",
-                       $dbname,$self->{dbschema}));
-            return(undef);
+            my $msg=sprintf("Connect(%s): can't set current_schema to '%s'",
+                       $dbname,$self->{dbschema});
+            msg(ERROR,$msg);
+            return(undef,$msg);
          }
          else{
             my $parent=$self->getParent->Self();

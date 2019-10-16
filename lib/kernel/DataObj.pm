@@ -389,7 +389,7 @@ sub Initialize
    my $self=shift;
    if ($self->can("AddDatabase")){
       my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-      return(@result) if (defined($result[0]) eq "InitERROR");
+      return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
       return(1) if (defined($self->{DB}));
    }
    return(0);
@@ -542,12 +542,26 @@ sub getDefaultHtmlDetailPage
 sub doInitialize
 {
    my $self=shift;
+   my $raiseErrors=shift;
 
    if (!($self->Self=~m/^base::/) && $self->isSuspended()){
       $self->{isInitalized}=0;
       return(undef);
    }
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   if (!$self->{isInitalized}){
+      my @result=$self->Initialize();
+      if (defined($result[0]) && $result[0] eq "InitERROR"){
+         $self->{isInitalized}=0;
+         if ($raiseErrors){
+            shift(@result);
+            foreach my $msg (@result){
+               $self->LastMsg(ERROR,$msg);
+            }
+         }
+         return(undef,@result);
+      }
+      $self->{isInitalized}=1;
+   }
    return($self->{isInitalized});
 }
 
