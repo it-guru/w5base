@@ -60,11 +60,21 @@ sub getDownloadFilename
 }
 
 
+sub prepareParent
+{
+   my $self=shift;
+   my $app=shift;
+
+   $self->{HttpStatusCode}="900 backend error";
+}
+
+
 sub getHttpHeader
 {  
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
+   $d.="Status: ".$self->{HttpStatusCode}."\n";
    $d.="Content-type:".$self->MimeType().";charset=ISO-8895-1\n\n";
 
    return($d);
@@ -76,16 +86,16 @@ sub getErrorDocument
    my $self=shift;
    my (%param)=@_;
 
-   my $d="";
-   if ($param{HttpHeader}){
-      $d.=$self->getHttpHeader();
-   }
-
    my @msg;
    if ($param{msg}){
       push(@msg,$param{msg});
    }
    push(@msg,$self->getParent->getParent->LastMsg());
+
+   my $d="";
+   if ($param{HttpHeader}){
+      $d.=$self->getHttpHeader();
+   }
 
    $d.="FAIL\n";
    if ($#msg!=-1){
@@ -109,9 +119,10 @@ sub ProcessBottom
    my @maxlist=();
    my $headlines=1;
 
-
+   $self->{HttpStatusCode}="200 OK";
    if ($#{$self->{recordlist}}!=0){
       $self->getParent->getParent->LastMsg(ERROR,"unexpected record count");
+      $self->{HttpStatusCode}="901 unexpected record count";
       return($self->getErrorDocument());
    }
 
@@ -128,6 +139,7 @@ sub ProcessBottom
    if (keys(%search)!=keys(%searchCol)){
       $self->getParent->getParent->LastMsg(ERROR,
                                            "unexpected column count in result");
+      $self->{HttpStatusCode}="902 unexpected column count in result";
       return($self->getErrorDocument());
    }
 
@@ -149,6 +161,7 @@ sub ProcessBottom
    if (!$allMatch){
       $self->getParent->getParent->LastMsg(ERROR,
                                            "unexpected field value in result");
+      $self->{HttpStatusCode}="903 unexpected field value in result";
       return($self->getErrorDocument());
    }
    $d="OK\n";
