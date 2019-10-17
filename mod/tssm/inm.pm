@@ -291,6 +291,13 @@ sub new
                 dataobjattr   =>SELpref.'probsummarym1.contact_name'),
 
       new kernel::Field::Text(
+                name          =>'assigneename',
+                ignorecase    =>1,
+                group         =>'contact',
+                label         =>'Assignee Name',
+                dataobjattr   =>SELpref.'probsummarym1.assignee_name'),
+
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
