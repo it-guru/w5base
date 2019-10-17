@@ -1103,5 +1103,29 @@ sub findtemplvar
 }
 
 
+sub getErrorDocument
+{
+   my $self=shift;
+   my (%param)=@_;
+   my $d="";
+
+   if ($param{HttpHeader}){
+      $d.=$self->getHttpHeader();
+   }
+   if ($self->getParent->getParent->can("getParsedTemplate")){
+      $d.=$self->getParent->getParent->getParsedTemplate("tmpl/DataObjOffline",
+          {skinbase=>"base"});
+   }
+   else{
+      my $LastMsg=join("\n",map({rmNonLatin1($_)}
+                  $self->getParent->getParent->LastMsg()));
+      $d.=join("\n",map({rmNonLatin1($_)}
+                        $self->getParent->getParent->LastMsg()));
+   }
+   return($d);
+}
+
+
+
 
 1;
