@@ -124,6 +124,20 @@ sub Header
    return($self->{'cgi'}->header(@_));
 }
 
+sub HttpHeader
+{
+   my $self=shift;
+   my %h=@_;
+
+   if (!keys(%h)){
+      my $q=$self->{'cgi'};
+      my %headers=map({$_=>$q->http($_)} $q->http());
+      return(\%headers);
+   }
+
+   return(undef);
+}
+
 sub Delete
 {
    my $self=shift;

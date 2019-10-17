@@ -70,6 +70,19 @@ EOF
          $val=~s/\n/\\n/g;
          printf("%-25s='%s'\n",$v,$val);
       }
+      my $httpHeaders=Query->HttpHeader();
+      if (keys(%$httpHeaders)){
+         print("\n\n");
+    
+         print("Request-Header:\n");
+         print("===============\n");
+         foreach my $v (sort(keys(%$httpHeaders))){
+            my $val=$httpHeaders->{$v};
+            $val=~s/\n/\\n/g;
+            printf("%-25s='%s'\n",$v,$val);
+         }
+      }
+
       
      
       print("</xmp>");
