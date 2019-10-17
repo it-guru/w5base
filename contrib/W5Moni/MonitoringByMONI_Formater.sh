@@ -24,11 +24,44 @@ MONQUERY="search_name=qde8hv&CurrentView=(name)"
 # anderen Zustände erzeugen einen HTTP-Code ungleich 200.
 # 
 
-MONQUERY="${MONQUERY}&FormatAs=MONI"
-while true; do
-  HTTPCODE=`curl -n -s -o /dev/null -w "%{http_code}\n"  \
-     "https://${W5HOST}/${W5CONF}/auth/${DATAOBJ//::/\\/}/Result?${MONQUERY}"`
-  echo "$(TZ=UTC date +'%Y%d%m %H:%M:%S') ${DATAOBJ} = $HTTPCODE"
-  sleep 10
-done
+doCheck(){
+   INTERF="$1"
+   DATAOBJ="$2"
+   MONQUERY="$3"
+   TSTAMP=$(TZ=UTC date +'%Y%d%m %H:%M:%S')
+   Q="https://${W5HOST}/${W5CONF}/auth/${DATAOBJ//::/\\/}/Result?${MONQUERY}"
+   HCODE=`curl -n -s -o /dev/null -w "%{http_code}\n" $Q ` 
+
+   WARN=""
+   if [ "$HCODE" != "200" ]; then
+      WARN="!!!"
+      echo -ne '\007'
+   fi
+
+   printf "%-18s  -  %-12s %-20s = %s%s\n" \
+          "$TSTAMP UTC" ${INTERF} ${DATAOBJ} $HCODE $WARN
+}
+
+
+declare -a TESTLIST
+if [ "$1" != "" ]; then
+   echo "Reading $1"
+   readarray TESTLIST < $1
+
+   while true; do 
+      for index in "${!TESTLIST[@]}"; do 
+         set -- ${TESTLIST[$index]}
+         I="$1" D="$2" Q="$3"
+         doCheck "$I" "$D" "$Q"
+         sleep 1
+      done
+      sleep 10
+   done
+else
+  doCheck "Test" "$DATAOBJ" "$MONQUERY"
+fi
+
+
+
+exit 0
 
