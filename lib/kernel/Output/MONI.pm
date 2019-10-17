@@ -91,6 +91,7 @@ sub getErrorDocument
    if ($#msg!=-1){
       @msg=map({$_.="\n" if (!($_=~m/\n$/s)); $_} @msg);
       $d.=join("",@msg);
+      $d.="\n";
    }
 
    return($d);
@@ -150,7 +151,7 @@ sub ProcessBottom
                                            "unexpected field value in result");
       return($self->getErrorDocument());
    }
-   $d="OK";
+   $d="OK\n";
    return($d);
 }
 
