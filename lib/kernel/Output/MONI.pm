@@ -81,6 +81,19 @@ sub getHttpHeader
 }
 
 
+sub getEmpty
+{
+   my $self=shift;
+   my %param=@_;
+   $self->getParent->getParent->LastMsg(ERROR,"unexpected record count");
+   $self->{HttpStatusCode}="901 unexpected record count";
+   my $d=$self->getErrorDocument(%param);
+   return($d);
+}
+
+
+
+
 sub getErrorDocument
 {
    my $self=shift;
