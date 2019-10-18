@@ -249,6 +249,9 @@ sub getNotifyDestinations
                   ($aarec->{contype}==4 ||
                    $aarec->{contype}==5 ||
                    $aarec->{contype}==3));   # uncritical  communications
+         # if mode=all, no filter on contype 3,4,5 is done, which
+         # meens ALL interface applications of the direct affected
+         # applications are used as "relevant applications".
          if (!in_array($applid,$aarec->{toapplid})){
             push(@ifid,$aarec->{toapplid});
          }
