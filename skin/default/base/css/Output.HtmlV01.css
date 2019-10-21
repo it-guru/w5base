@@ -18,6 +18,7 @@ table.maintable{
    padding:0px;
    margin:0px;
 }
+
 td.mainblock{
    border-collapse:collapse;
    width:100%;
@@ -121,6 +122,18 @@ table.datatable{
    border-top-style:none;
    empty-cells:show;
 }
+
+table.datatable thead tr th{
+   position: -webkit-sticky;
+   position: -moz-sticky;
+   position: -ms-sticky;
+   position: -o-sticky;
+   position: sticky;
+   top: 0;
+   z-index: 5;
+}
+
+
 a.viewselect{
    cursor:pointer;
 }
@@ -143,11 +156,11 @@ td.datafield{
 th.headfield{
    padding-left:5px;
    -padding-right:5px;
-   background:#dadada;
    background:#CfCfCf;
    text-align:left;
    border-bottom-width:1px;
    border-bottom-style:solid;
+   border-bottom-color:black;
 }
 tr.linehighlight{
    background:#b0c5ec;
