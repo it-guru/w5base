@@ -103,10 +103,21 @@ sub new
                 name          =>'contacts',
                 label         =>'Contacts',
                 group         =>'contacts',
-                vjointo       =>'ewu2::lnksystemcontact',
+                htmldetail    =>'NotEmpty',
                 searchable    =>0,
+                vjointo       =>'ewu2::lnksystemcontact',
                 vjoinon       =>['id'=>'devlabsystemid'],
                 vjoindisp     =>[qw(contactfullname comments)]),
+
+      new kernel::Field::SubList(
+                name          =>'contractowners',
+                label         =>'contract owners',
+                group         =>'contacts',
+                searchable    =>0,
+                vjointo       =>'ewu2::lnksystemcontrowner',
+                htmldetail    =>'NotEmpty',
+                vjoinon       =>['id'=>'devlabsystemid'],
+                vjoindisp     =>[qw(contractowner)]),
 
       new kernel::Field::SubList(
                 name          =>'contracts',
