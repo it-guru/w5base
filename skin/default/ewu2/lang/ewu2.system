@@ -19,4 +19,4 @@
 'full systemname'=>{de=>'vollständiger Systemname'},
 'marked as delete'=>{de=>'gelöscht markiert'},
 'virtualisation Host'=>{de=>'Virtualisierungs Host'},
-
+'contract owners'=>{de=>'Vertrags-Eigentümer'},
