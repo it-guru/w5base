@@ -1274,13 +1274,15 @@ sub nativProcess
       }
       if (my $id=$self->StoreRecord($WfRec,$h)){
          my $aobj=$self->getParent->getParent->Action();
-         $aobj->NotifyForward($id,
-                              "base::user",
-                              $rskmgr[0],
-                              "RiskCoordinator",
-                              "",
-                              mode=>'newRisk:',
-                              workflowname=>$WfRec->{name});
+         my $tRskM=shift(@rskmgr);
+         my %nP=(
+            mode=>'newRisk:',
+            workflowname=>$WfRec->{name}
+         );
+         if ($#rskmgr!=-1){
+            $nP{addcctarget}=\@rskmgr;
+         }
+         $aobj->NotifyForward($id,"base::user",$tRskM,"RiskCoordinator","",%nP);
          Query->Delete("Formated_detaildescription");
          Query->Delete("Formated_name");
          $self->PostProcess($action,$h,$actions);
