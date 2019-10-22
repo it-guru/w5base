@@ -1615,19 +1615,20 @@ sub nativProcess
    }
    elsif($op eq "wfclose"){
       # hier muss noch der Risko-Coordinator berechnet werden!
-      my @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
-                                             ['RSKCoord'],'firstup');
-      if ($#mem==-1){
-         @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
-                                             [qw(RSKManager
-                                                 RSKPManager 
-                                                 RSKPManager2)],'firstup');
-      }
-      if ($#mem==-1){
+      my @rskmgr=$self->getParent->getResponsibleRiskRole($WfRec);
+    #  my @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
+    #                                         ['RSKCoord'],'firstup');
+    #  if ($#mem==-1){
+    #     @mem=$self->getParent->getMembersOf($WfRec->{mandatorid},
+    #                                         [qw(RSKManager
+    #                                             RSKPManager 
+    #                                             RSKPManager2)],'firstup');
+    #  }
+      if ($#rskmgr==-1){
          $self->LastMsg(ERROR,"missing RSKCoord or RSKManager");
          return(0);
       }
-      my $riskchef=$mem[0];
+      my $riskchef=shift(@rskmgr);
 
 
       if ($self->getParent->getParent->Action->StoreRecord(
@@ -1648,7 +1649,8 @@ sub nativProcess
                             note=>$h->{note},
                             fwdtarget=>$store->{fwdtarget},
                             fwdtargetid=>$store->{fwdtargetid},
-                            fwdtargetname=>'RiskCoordinator');
+                            fwdtargetname=>'RiskCoordinator',
+                            addcctarget=>\@rskmgr);
          return(1);
       }
    }
@@ -1697,13 +1699,20 @@ sub PostProcess
 
    if ($action eq "SaveStep.wfclose"){
       if ($param{fwdtargetid} ne ""){
+         my %nP=(
+            mode=>'closeRisk:',
+            workflowname=>$workflowname
+         );
+         if (defined($param{addcctarget}) && 
+             ref($param{addcctarget}) eq "ARRAY" &&
+             $#{$param{addcctarget}}!=-1){
+            $nP{addcctarget}=$param{addcctarget};
+         }
          $aobj->NotifyForward($WfRec->{id},
                               $param{fwdtarget},
                               $param{fwdtargetid},
                               $param{fwdtargetname},
-                              $param{note},
-                              mode=>'closeRisk:',
-                              workflowname=>$workflowname);
+                              $param{note},%nP);
       }
    }
 
