@@ -771,12 +771,25 @@ sub LoadStatSet
 
 
 
-
       my $lastrange=undef;
       my @histrange=();
 
-      if (my ($Y,$M)=$dstrange=~m/^(\d{4})(\d{2})$/){
-         my ($week,$year)=Week_of_Year($Y,$M,1);
+
+      my ($Y,$M,$D,$year,$week,$baseRange);
+
+      if (($Y,$M)=$dstrange=~m/^(\d{4})(\d{2})$/){
+         ($week,$year)=Week_of_Year($Y,$M,1);
+         $week++;
+         $baseRange="M";
+      }
+      else{
+         if (($year,$week)=$dstrange=~m/^(\d{4})KW(\d{2})$/){
+            $week--;
+            ($Y,$M,$D)=Monday_of_Week($week,$year);
+            $baseRange="W";
+         }
+      }
+      if (defined($baseRange)){
          my ($Y1,$M1)=($Y,$M);
          for(my $c=0;$c<=6;$c++){
             $M1++;
@@ -793,7 +806,9 @@ sub LoadStatSet
          for(my $kw=$minweek;$kw<=$maxweek;$kw++){
             push(@histrange,sprintf("%04dKW%02d",$Y,$kw));
          }
-         $M--;
+         if ($baseRange eq "M"){
+            $M--;
+         }
          if ($M<=0){
             $M=12;
             $Y--;
@@ -813,12 +828,14 @@ sub LoadStatSet
 
       my @fltlist=({fullname=>\$primrec->{'fullname'},
                     sgroup=>\$primrec->{'sgroup'},
+                    statstream=>\'default',
                     dstrange=>\@histrange});
 
       if (defined($primrec->{'nameid'})){
          push(@fltlist,{
             nameid=>\$primrec->{'nameid'},
             sgroup=>\$primrec->{'sgroup'},
+            statstream=>\'default',
             dstrange=>\@histrange
          });
       }
@@ -896,8 +913,12 @@ sub Presenter
       if ($statname=~m/\s/){
          $statname='"'.$statname.'"';
       }
-      $self->SetFilter({fullname=>$statname,sgroup=>$statgrp,
-                        dstrange=>"!*KW*",statstream=>\'default'});
+      $self->SetFilter({
+         fullname=>$statname,
+         sgroup=>$statgrp,
+         dstrange=>"!*KW*",
+         statstream=>\'default'
+      });
       $self->Limit(10);
       my @l=$self->getHashList(qw(-dstrange sgroup id));
       if ($#l!=-1){
@@ -933,7 +954,6 @@ sub Presenter
          Query->Param("search_name"=>$srec->{sgroup}.":".$srec->{fullname});
       }
    }
-
    my ($primrec,$hist)=$self->LoadStatSet(id=>$requestid);
 
 
@@ -1052,6 +1072,7 @@ EOF
       my $k=sprintf("%04d%02d",$Y1,$M1);
       my $style="";
       my $cw;
+
       if ($M1==$curM && $Y1==$curY){
          $style="border-color:black;border-width:1px;border-style:solid";
          my ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$curY,$curM,1,0,0,-30);
@@ -1070,7 +1091,7 @@ EOF
                     "href=javascript:refreshTag($histid->{$tag})>$frond</a>";
             }
             else{
-               $cw.="$frond";
+               $cw.="<font color=silver>$frond</font>";
             }
          }
       }
@@ -1081,7 +1102,8 @@ EOF
                  "%02d/%4d</a></td>",$M1,$Y1);
       }
       else{
-         $ms=sprintf("<td align=center>%02d/%4d</td>",$M1,$Y1);
+         $ms=sprintf("<td align=center><font color=silver>%02d/%4d</font></td>",
+                     $M1,$Y1);
       }
       return($ms,$cw);
       
@@ -1139,7 +1161,7 @@ EOF
           "<span class=sublink>".
           "<img border=0 style=\"margin-bottom:2px\" onclick=doPrint() ".
           "src=\"../../../../public/base/load/miniprint.gif\"></span>".
-          "</td><td align=right>$cstr</td>");
+          "</td><td align=right>$cstr&nbsp;</td>");
    print("</tr></table>");
 
    printf("</td>");
@@ -1257,12 +1279,10 @@ function refreshTag(id)
          document.forms[0].elements['search_name'].value="";
       }
       document.forms[0].elements['id'].value=id;
-      //document.forms[0].action=id;
       document.forms[0].action="Presenter";
    }
    else{
       document.forms[0].elements['id'].value="";
-      document.forms[0].action="Main";
    }
    document.forms[0].target="_self";
    document.forms[0].submit();
