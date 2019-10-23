@@ -757,6 +757,12 @@ sub new
                 dataobjattr   =>'system.dsid'),
 
       new kernel::Field::Text(
+                name          =>'fsystemalias',
+                group         =>'misc',
+                label         =>'functional Alias',
+                dataobjattr   =>"system.fsystemalias"),
+
+      new kernel::Field::Text(
                 name          =>'kwords',
                 group         =>'misc',
                 label         =>'Keywords',
@@ -1896,6 +1902,25 @@ sub Validate
       if (exists($newrec->{itclustid})){
          delete($newrec->{itclust}); # ensure, not itclust is specified
          $newrec->{itclustid}=undef;
+      }
+   }
+
+   if (exists($newrec->{fsystemalias})){
+      if ($newrec->{fsystemalias} eq ""){
+         $newrec->{fsystemalias}=undef;
+      }
+      else{
+         if ($newrec->{fsystemalias}=~m/[^a-z0-9_.-]/i){
+            $self->LastMsg(ERROR,"invalid characters in functional alias");
+            return(0);
+         }
+         if (!($newrec->{fsystemalias}=~m/[^.]+\.[^.]+/)){
+            $self->LastMsg(ERROR,"functional alias must be a FQDN");
+            return(0);
+         }
+         if ($newrec->{fsystemalias} ne lc($newrec->{fsystemalias})){
+            $newrec->{fsystemalias}=lc($newrec->{fsystemalias});
+         }
       }
    }
 
