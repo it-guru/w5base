@@ -82,6 +82,13 @@ sub SecScanMon
          if (($laststamp,$lastid)=
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
             $exitmsg=$lastmsg;
+            $datastream->ResetFilter();
+            $datastream->SetFilter({id=>\$lastid,sdate=>\$laststamp});
+            my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
+            if (!defined($lastrec)){
+               msg(WARN,"record with id '$lastid' has been deleted or changed - using date only");
+               $lastid=undef;
+            }
             %flt=( 
                sdate=>">=\"$laststamp GMT\""
             );
@@ -92,6 +99,7 @@ sub SecScanMon
    { # process new records
       my $skiplevel=0;
       my $recno=0;
+      $datastream->ResetFilter();
       $datastream->SetFilter(\%flt);
       $datastream->SetCurrentView(qw(ictono urlofcurrentrec
                                      name

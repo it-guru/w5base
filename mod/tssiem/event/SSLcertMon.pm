@@ -98,6 +98,13 @@ sub SSLcertMon
             if (($laststamp,$lastid)=
                 $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\d+)$/){
                $exitmsg=$lastmsg;
+               $datastream->ResetFilter();
+               $datastream->SetFilter({srcid=>\$lastid,sdate=>\$laststamp});
+               my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
+               if (!defined($lastrec)){
+                  msg(WARN,"record with id '$lastid' has been deleted or changed - using date only");
+                  $lastid=undef;
+               }
                %flt=( 
                   sdate=>">=\"$laststamp GMT\"",
                   qid=>\"86002"
@@ -227,7 +234,7 @@ sub analyseRecord
 
    if ($d->{days}<$notifyDayLimit && $d->{days}>3){   # 8 weeks
       if (defined($rec->{sslparsedw5baseref})){
-         msg(WARN,"ok - found sslparsedw5baseref for ".
+         msg(INFO,"ok - found sslparsedw5baseref for ".
                   "$rec->{ipaddress}:$rec->{port}");
       }
       else{  # store in result structure 
