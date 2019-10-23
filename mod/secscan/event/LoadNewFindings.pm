@@ -94,6 +94,13 @@ sub LoadNewFindings
          if (($laststamp,$lastid)=
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
             $exitmsg=$lastmsg;
+            $datastream->ResetFilter();
+            $datastream->SetFilter({id=>\$lastid,findcdate=>\$laststamp});
+            my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
+            if (!defined($lastrec)){
+               msg(WARN,"record with id '$lastid' has been deleted or changed - using date only");
+               $lastid=undef;
+            }
             %flt=( 
                findcdate=>">=\"$laststamp GMT\"",
                isdel=>\'0'
@@ -105,6 +112,7 @@ sub LoadNewFindings
    { # process new records
       my $skiplevel=0;
       my $recno=0;
+      $datastream->ResetFilter();
       $datastream->SetFilter(\%flt);
       $datastream->SetCurrentView(@datastreamview);
       $datastream->SetCurrentOrder("+findcdate","+id");
