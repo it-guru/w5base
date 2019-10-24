@@ -895,7 +895,6 @@ sub Presenter
    my $requestid=$p;
    $requestid=~s/[^\d]//g;
    my $search_name=Query->Param("search_name");
-printf STDERR ("fifi 01 search_name=$search_name\n");
    if ($search_name ne ""){
       my $name=$search_name;
       my $statname;
@@ -922,7 +921,6 @@ printf STDERR ("fifi 01 search_name=$search_name\n");
       });
       $self->Limit(10);
       my @l=$self->getHashList(qw(-dstrange sgroup id));
-printf STDERR ("fifi d=%s\n",Dumper(\@l));
       if ($#l!=-1){
          $requestid=$l[0]->{id};
       }
