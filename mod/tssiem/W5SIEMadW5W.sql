@@ -122,3 +122,71 @@ create or replace synonym W5SIEM.secscanruntime for "W5SIEM_secscanruntime";
 create or replace synonym W5I.W5SIEM_secscanruntime for "W5SIEM_secscanruntime";
 
 
+-- detect latest secscan on ICTO-ID
+create or replace view "W5SIEM_latestsecscan" as
+with scanbase as (
+  select ref,launch_datetime,ictoid,title,importdate
+  from "W5SIEM_secscan"  
+  where launch_datetime>SYSDATE-90
+)
+select scanbase.ref,
+       scanbase.ictoid,
+       scanbase.title,
+       scanbase.launch_datetime,
+       scanbase.importdate
+from scanbase join (
+   select distinct ref,
+          max(launch_datetime) over (partition by ictoid) as maxdate 
+   from scanbase where title like '%_vFWI_%'
+   union
+   select distinct ref,
+          max(launch_datetime) over (partition by ictoid) as maxdate 
+   from scanbase where title not like '%_vFWI_%'
+   ) cur on cur.ref=scanbase.ref
+order by scanbase.launch_datetime;
+grant select on "W5SIEM_latestsecscan" to W5I;
+grant select on "W5SIEM_latestsecscan" to W5SIEM;
+create or replace synonym W5SIEM.latestsecscan for "W5SIEM_latestsecscan";
+create or replace synonym W5I.W5SIEM_latestsecscan for "W5SIEM_latestsecscan";
+
+-- drop materialized view "mview_W5SIEM_finding";
+create materialized view "mview_W5SIEM_finding"
+   refresh complete start with TRUNC(SYSDATE+1)+((1/24)*6)
+   next SYSDATE+(1/24)
+   as
+with secentcatbase as (
+   select
+      replace(standard_hash(
+         "W5SIEM_secscan".ref||"W5SIEM_secent".ipaddress||'-'||"W5SIEM_secent".category,'SHA256'),' ','') id,
+      replace(standard_hash("W5SIEM_secent".ipaddress||'-'||"W5SIEM_secent".category,'SHA256'),' ','') sectoken,
+      "W5SIEM_secent".ipaddress,
+      "W5SIEM_secent".category,
+      "W5SIEM_secent".title||
+      case when "W5SIEM_secent".port is not null then ' at Port:'|| "W5SIEM_secent".port end ||
+      chr(10) ||
+      case when length("W5SIEM_secent".results)>200 then 
+                substr( "W5SIEM_secent".results, 0, 200 ) || '...' 
+           else "W5SIEM_secent".results 
+       end || chr(10) ||
+      'https://darwin.telekom.de/darwin/auth/tssiem/secent/ById/'||"W5SIEM_secent".id dsc ,
+      "W5SIEM_secent".ref
+   from "W5SIEM_secent"
+   join "W5SIEM_secscan"
+      on "W5SIEM_secent".ref="W5SIEM_secscan".ref
+   where "W5SIEM_secent".severity in (4,5) and "W5SIEM_secent".pci_vuln='yes')
+select id,decode("W5SIEM_latestsecscan".ref,NULL,1,0) isdel,sectoken,ipaddress,category, 
+replace(replace(
+                XmlAgg(
+                  XmlElement("a", dsc)
+                  order by
+                  id desc nulls last)
+                  .getClobVal(),
+              '<a>', ''),
+            '</a>',chr(10)||chr(10)) as detaildesc
+from secentcatbase 
+left outer join "W5SIEM_latestsecscan"
+  on "W5SIEM_latestsecscan".ref=secentcatbase.ref
+group by id,sectoken,ipaddress,category,decode("W5SIEM_latestsecscan".ref,NULL,1,0);
+
+
+
