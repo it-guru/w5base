@@ -895,6 +895,7 @@ sub Presenter
    my $requestid=$p;
    $requestid=~s/[^\d]//g;
    my $search_name=Query->Param("search_name");
+printf STDERR ("fifi 01 search_name=$search_name\n");
    if ($search_name ne ""){
       my $name=$search_name;
       my $statname;
@@ -921,6 +922,7 @@ sub Presenter
       });
       $self->Limit(10);
       my @l=$self->getHashList(qw(-dstrange sgroup id));
+printf STDERR ("fifi d=%s\n",Dumper(\@l));
       if ($#l!=-1){
          $requestid=$l[0]->{id};
       }
@@ -1283,6 +1285,7 @@ function refreshTag(id)
    }
    else{
       document.forms[0].elements['id'].value="";
+      document.forms[0].action="Main"
    }
    document.forms[0].target="_self";
    document.forms[0].submit();
