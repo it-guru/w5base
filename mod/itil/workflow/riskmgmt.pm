@@ -165,7 +165,12 @@ sub isRiskWfAuthorized
    }
    if ($mode eq "view"){
       return(1) if ($self->IsMemberOf("admin"));
+      if ($self->IsMemberOf(\@mandatorid,[qw(RPRManager RPRManager2
+                                             RPROperator)],"down")){
+         return(1);
+      }
    }
+
    return(0);
 }
 

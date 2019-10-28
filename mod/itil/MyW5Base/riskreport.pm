@@ -88,6 +88,7 @@ sub isSelectable
                               RSKManager 
                               RSKCoord 
                               RSKPManager RSKPManager2
+                              RPRManager RPRManager2 RPROperator
                               )],
                           @{$grprec->{roles}}));
          }
@@ -252,6 +253,7 @@ sub SetFilter
    #######################################################################
    my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
              [qw(RSKManager RSKCoord
+                 RPRManager RPRManager2 RPROperator
                  RSKPManager RSKPManager2)], "down");
    my @grpids=keys(%grp);
    @grpids=(qw(-1)) if ($#grpids==-1);
