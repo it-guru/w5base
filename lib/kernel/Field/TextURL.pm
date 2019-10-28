@@ -107,7 +107,8 @@ sub URLValidate
    }
 
    my @nonStdSchema=qw(oracle net8 mssql mysql informix scp 
-                       ssh pesit sftp
+                       ssh pesit sftp 
+                       smtp
                        tcp udp);
 
    my @sok=(qw(http ldap ldaps https file mailto ftp rlogin),@nonStdSchema);
@@ -137,6 +138,7 @@ sub URLValidate
          $uri{port}=22 if ($uri{scheme} eq 'ssh');
          $uri{port}=22 if ($uri{scheme} eq 'sftp');
          $uri{port}=22 if ($uri{scheme} eq 'scp');
+         $uri{port}=25 if ($uri{scheme} eq 'smtp');
       }
    }
 
