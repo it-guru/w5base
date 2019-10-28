@@ -539,7 +539,7 @@ sub FinishDelete
    if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
       return(0);
    }
-   return(1);
+   return($self->SUPER::FinishDelete($oldrec));
 }
 
 
