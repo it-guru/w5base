@@ -51,6 +51,11 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'AL_TCom::itcloud',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'AL_TCom::businessservice',
              target    =>'fullname',
              targetid  =>'id'
