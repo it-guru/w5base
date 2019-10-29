@@ -749,10 +749,14 @@ sub processData
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-            $self->getParent->processRecord($statstream,'base::workflow::notfinished',
-                                            $dstrange,$rec,%param);
-            $c++;
-            $count++;
+            if ($rec->{fwdtargetid} ne "15632883160001"){ # temp Hack for 
+                                                          # secfinding wf test
+               $self->getParent->processRecord($statstream,
+                                               'base::workflow::notfinished',
+                                               $dstrange,$rec,%param);
+               $c++;
+               $count++;
+            }
             ($rec,$msg)=$wf->getNext();
          } until(!defined($rec));
       }
