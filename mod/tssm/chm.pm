@@ -135,7 +135,8 @@ sub new
                 vjoinon       =>['changenumber'=>'changenumber'],
                 vjoininhash   =>['plannedstart','plannedend',
                                  'tasknumber','name','cidown',
-                                 'status','relations','implementer'],
+                                 'status','relations','implementer',
+                                 'assignedto'],
                 vjoindisp     =>[qw(plannedstart plannedend tasknumber status
                                     cidown name implementer)]),
 
