@@ -5,7 +5,7 @@ use strict;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 @EXPORT = qw(
-             &trim &rtrim &ltrim &limitlen &in_array 
+             &trim &rtrim &ltrim &limitlen &in_array &first_index
              &extractLanguageBlock
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
              );
@@ -197,6 +197,7 @@ sub UTF8toLatin1
 sub in_array
 {
    my ($arr,$search_for) = @_;
+
    $arr=[$arr] if (ref($arr) ne "ARRAY");
    my %items;
    map({$items{$_}++} @$arr); # create a hash out of the array values
@@ -207,6 +208,23 @@ sub in_array
       return(0);
    }
    return(exists($items{$search_for})?1:0);
+}
+
+sub first_index
+{
+    my $f = shift;
+
+    foreach my $i (0 .. $#_)
+    {
+        local *_ = \$_[$i];
+        if (ref($f)){
+           return($i) if $f->();
+        }
+        else{
+           return($i) if ($_ eq $f);
+        }
+    }
+    return(-1);
 }
 
 
