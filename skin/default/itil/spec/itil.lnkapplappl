@@ -128,4 +128,20 @@ Optional you can specify the
 project name, which implements
 this interface.
 EOF
+'ifrel'=>{de=><<EOF,
+Bei Schnitstellen-Beziehung=indirekt
+muss die Gateway-Anwendung angegeben
+werden, über die der Datenaustausch
+erfolgt.
+Die Schnittstellenvereinbarung ist auch
+in diesem Fall mit der "nach Anwendung"
+zu erstellen.
+EOF
+en=><<EOF},
+If Interface-Relation=indirect
+the Gateway-Application needs to
+be specified.
+The Interface-Agreement must be create
+with the "to application".
+EOF
 

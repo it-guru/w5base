@@ -941,9 +941,10 @@ sub new
                 vjointo       =>'itil::lnkapplappl',
                 vjoinbase     =>[{toapplcistatus=>"<=5",cistatusid=>"<=5"}],
                 vjoinon       =>['id'=>'fromapplid'],
-                vjoindisp     =>['toappl','contype','conproto','conmode'],
+                vjoindisp     =>['toappl','ifrelcontype','conproto','conmode'],
                 vjoininhash   =>['toappl','contype','conproto','conmode',
                                  'toapplid', 'comments','id','cistatusid',
+                                 'gwapplid','fullname',
                                  'ifagreementdocsz','ifagreementneeded']),
 
       new kernel::Field::Number(

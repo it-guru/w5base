@@ -27,7 +27,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
+   $param{MainSearchFieldLines}=5 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
    
 
@@ -35,25 +35,54 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'LinkID',
+                group         =>'source',
                 dataobjattr   =>'lnkapplappl.id'),
 
       new kernel::Field::RecordUrl(),
+
+      new kernel::Field::Select(
+                name          =>'ifrel',
+                label         =>'Interface Relation',
+                value         =>[qw(DIRECT INDIRECT)],
+                default       =>'DIRECT',
+                jsonchanged   =>\&getifrelHandlingScript,
+                jsoninit      =>\&getifrelHandlingScript,
+                dataobjattr   =>'lnkapplappl.ifrelation'),
+
+      new kernel::Field::TextDrop(
+                name          =>'gwappl',
+                htmlwidth     =>'250px',
+                label         =>'Gateway Application',
+                htmldetail    =>'NotEmptyOrEdit',
+                vjoineditbase =>{cistatusid=>[2,3,4,5]},
+                SoftValidate  =>1,
+                vjointo       =>'itil::appl',
+                vjoinon       =>['gwapplid'=>'id'],
+                vjoindisp     =>'name',
+                dataobjattr   =>'gwappl.name'),
 
       new kernel::Field::TextDrop(
                 name          =>'fromappl',
                 htmlwidth     =>'250px',
                 label         =>'from Application',
                 vjointo       =>'itil::appl',
+                vjoineditbase =>{cistatusid=>[2,3,4,5]},
+                SoftValidate  =>1,
                 vjoinon       =>['fromapplid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>'fromappl.name'),
 
       new kernel::Field::TextDrop(
                 name          =>'toappl',
                 htmlwidth     =>'150px',
                 label         =>'to Application',
                 vjointo       =>'itil::appl',
+                vjoineditbase =>{cistatusid=>[2,3,4,5]},
+                SoftValidate  =>1,
                 vjoinon       =>['toapplid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>'toappl.name'),
+
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -70,6 +99,9 @@ sub new
                 label         =>'Interface fullname',
                 selectfix     =>1,
                 dataobjattr   =>"concat(fromappl.name,':',".
+                                "if (gwappl.id is not null,".
+                                "concat('-',gwappl.name,'-:'),".
+                                "''),".
                                 "toappl.name,':',lnkapplappl.conprotocol)"),
 
       new kernel::Field::Link(
@@ -86,6 +118,19 @@ sub new
                 default       =>'0',
                 htmleditwidth =>'350px',
                 dataobjattr   =>'lnkapplappl.contype'),
+
+      new kernel::Field::Select(
+                name          =>'ifrelcontype',
+                label         =>'Interfacetype with relation',
+                htmlwidth     =>'250px',
+                htmldetail    =>0,
+                searchable    =>0,
+                readonly      =>0,
+                transprefix   =>'contype.',
+                dataobjattr   =>"concat(".
+                                "if (lnkapplappl.ifrelation=".
+                                "'INDIRECT','I',''),".
+                                "lnkapplappl.contype)"),
 
       new kernel::Field::Interface(
                 name          =>'rawcontype',
@@ -509,6 +554,11 @@ sub new
                 dataobjattr   =>'lnkapplappl.fromappl'),
 
       new kernel::Field::Interface(
+                name          =>'gwapplid',
+                label         =>'gateway ApplID',
+                dataobjattr   =>'lnkapplappl.gwappl'),
+
+      new kernel::Field::Interface(
                name          =>'fromapplopmode',
                label         =>'from Appl primary operation mode',
                dataobjattr   =>'fromappl.opmode'),
@@ -633,7 +683,7 @@ sub new
    };
 
 
-   $self->setDefaultView(qw(fromappl toappl cistatus cdate editor));
+   $self->setDefaultView(qw(fromappl ifrel toappl cistatus cdate editor));
    $self->setWorktable("lnkapplappl");
    return($self);
 }
@@ -656,6 +706,23 @@ sub initSearchQuery
 }
 
 
+sub orderSearchMaskFields
+{
+   my $self=shift;
+   my $searchfields=shift;
+   my @searchfields=$self->SUPER::orderSearchMaskFields($searchfields);
+
+   foreach my $fname (qw(gwappl ifrel)){
+      if (in_array(\@searchfields,$fname)){
+         @searchfields=grep({$_ ne $fname} @searchfields);
+         splice(@searchfields,
+                first_index("toapplicationcistatus",@searchfields)+1,0,$fname);
+      }
+   }
+   return(@searchfields); 
+}
+
+
 sub getSqlFrom
 {
    my $self=shift;
@@ -664,6 +731,8 @@ sub getSqlFrom
             "on lnkapplappl.toappl=toappl.id ".
             "left outer join appl as fromappl ".
             "on lnkapplappl.fromappl=fromappl.id ".
+            "left outer join appl as gwappl ".
+            "on lnkapplappl.gwappl=gwappl.id ".
 
             "left outer join lnkcontact toappllnkcontact ".
             "on toappllnkcontact.parentobj='itil::appl' ".
@@ -685,6 +754,37 @@ sub getRecordImageUrl
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/lnkapplappl.jpg?".$cgi->query_string());
+}
+
+
+sub getifrelHandlingScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var d=document.forms[0].elements['Formated_ifrel'];
+var c=document.forms[0].elements['Formated_gwappl'];
+
+if (d){
+   var v=d.options[d.selectedIndex].value;
+   if (v!="" && v!="DIRECT"){
+      if (c){
+         c.disabled=false;
+         //addClass(c,"disabledClass");
+      }
+   }
+   else{
+      if (c){
+         c.disabled=true;
+         //removeClass(c,"disabledClass");
+      }
+   }
+}
+
+EOF
+   return($d);
 }
 
 
@@ -904,6 +1004,22 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $origrec=shift;
+
+   my $ifrel=effVal($oldrec,$newrec,"ifrel");
+   $ifrel="DIRECT" if ($ifrel eq "");
+
+   my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
+   if ($ifrel eq "DIRECT"){
+      if ($gwapplid ne ""){
+         $newrec->{gwapplid}=undef;
+      }
+   }
+   else{
+      if ($gwapplid eq ""){
+         $self->LastMsg(ERROR,"no valid gateway application specified");
+         return(0);
+      }
+   }
 
    my $fromapplid=effVal($oldrec,$newrec,"fromapplid");
    if ($fromapplid==0){
