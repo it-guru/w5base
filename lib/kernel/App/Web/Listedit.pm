@@ -920,33 +920,10 @@ EOF
       # identify searchable fields and bring them in correct order
       #
 
-      my $idshifted=0;
-      my @tmpsearchfieldorder;
-
-      while(my $fieldname=shift(@searchfields)){
-         my $fo=$self->getField($fieldname); 
-         my $type=$fo->Type();
-         next if (!$fo->UiVisible("SearchMask"));
-         if (!$fo->searchable()){
-            if ($type eq "Id"){
-               if ($#searchfields!=-1){
-                  push(@searchfields,$fieldname) if (!$idshifted);
-                  $idshifted++;
-                  next;
-               }
-            }
-            else{
-               next;
-            }
-         }
-         push(@tmpsearchfieldorder,$fieldname);
-      }
 
       # now we have a temporary order of all searchable fields
       # in @tmpsearchfieldorder
-
-
-      # at this place, a user customizable order can be implemented
+      my @tmpsearchfieldorder=$self->orderSearchMaskFields(\@searchfields);
 
 
       while(my $fieldname=shift(@tmpsearchfieldorder)){
@@ -995,6 +972,38 @@ EOF
    }
    return($d);
 }
+
+sub orderSearchMaskFields
+{
+   my $self=shift;
+   my $searchfields=shift;
+   my @searchfields=@{$searchfields};
+
+   my $idshifted=0;
+   my @tmpsearchfieldorder;
+
+   while(my $fieldname=shift(@searchfields)){
+      my $fo=$self->getField($fieldname); 
+      my $type=$fo->Type();
+      next if (!$fo->UiVisible("SearchMask"));
+      if (!$fo->searchable()){
+         if ($type eq "Id"){
+            if ($#searchfields!=-1){
+               push(@searchfields,$fieldname) if (!$idshifted);
+               $idshifted++;
+               next;
+            }
+         }
+         else{
+            next;
+         }
+      }
+      push(@tmpsearchfieldorder,$fieldname);
+   }
+   return(@tmpsearchfieldorder);
+}
+
+
 
 sub arrangeSearchData
 {
