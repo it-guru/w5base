@@ -754,7 +754,7 @@ sub translate_qmsg
    $res->{qmsg}=$control->{qmsg};
    if (ref($res->{qmsg}) eq "ARRAY"){
       for(my $c=0;$c<=$#{$res->{qmsg}};$c++){
-         if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*)\s*:\s*(.*)$/){
+         if (my ($pr,$po)=$res->{qmsg}->[$c]=~m/^(.*?)\s*:\s*(.*)$/){
             $res->{qmsg}->[$c]=$self->T($pr,
                                          $qrulename).": ".$po;
          }
