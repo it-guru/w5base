@@ -68,13 +68,32 @@ sub qcheckRecord
          return(3,{qmsg=>['no interfaces defined'],
                    dataissue=>['no interfaces defined']});
       }
-      foreach my $ifrec (@{$rec->{interfaces}}){
-         if ($ifrec->{'comments'}=~m/(^|\s)DataLoopInOutTechSpec(\s|$)/) {
-            next;
+      if ($#{$rec->{interfaces}}!=-1){
+         my $appl=$dataobj->Clone();
+         my @msg;
+         foreach my $ifrec (@{$rec->{interfaces}}){
+            if ($ifrec->{'comments'}=~m/(^|\s)DataLoopInOutTechSpec(\s|$)/) {
+               next;
+            }
+            if ($ifrec->{toapplid} eq $rec->{id}){
+               my @msg=("loop interfaces to the current ".
+                        "application are not allowed");
+               return(3,{qmsg=>\@msg,dataissue=>\@msg});
+            }
+            my @acheck=();
+            push(@acheck,$ifrec->{toapplid}) if ($ifrec->{toapplid} ne "");
+            push(@acheck,$ifrec->{gwapplid}) if ($ifrec->{gwapplid} ne "");
+            foreach my $applid (@acheck){
+               $appl->ResetFilter();
+               $appl->SetFilter({id=>\$applid,cistatusid=>"2 3 4 5"});
+               my ($arec,$msg)=$appl->getOnlyFirst(qw(id));
+               if (!defined($arec)){
+                  push(@msg,"invalid application in interface: ".
+                           $ifrec->{fullname});
+               }
+            }
          }
-         if ($ifrec->{toapplid} eq $rec->{id}){
-            my @msg=("loop interfaces to the current ".
-                     "application are not allowed");
+         if ($#msg!=-1){
             return(3,{qmsg=>\@msg,dataissue=>\@msg});
          }
       }
