@@ -4,6 +4,7 @@
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'Full Cloud Name'=>{de=>'vollständiger Cloud-Name'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
+'Support Contact'=>{de=>'Support Kontakt'},
 'delete only posible, if there are no cloud areas'=>{de=>'löschen nur ohne Cloud Areas zulässig'},
 'there are existing cloud areas'=>{de=>'es existieren Cloud Areas'},
 "invalid cloud name '%s'"=>{de=>"ungültiger Cloud name '%s'"},

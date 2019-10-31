@@ -55,3 +55,4 @@ create table itcloudarea   (
 alter table itcloud add can_saas   bool default '0';
 alter table itcloud add can_paas   bool default '0';
 alter table itcloud add can_iaas   bool default '0';
+alter table itcloud add support    bigint(20);

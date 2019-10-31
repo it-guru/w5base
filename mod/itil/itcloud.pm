@@ -102,6 +102,16 @@ sub new
                 name          =>'databossid',
                 dataobjattr   =>'itcloud.databoss'),
 
+      new kernel::Field::Contact(
+                name          =>'support',
+                AllowEmpty    =>1,
+                label         =>'Support Contact',
+                vjoinon       =>['supportid'=>'userid']),
+
+      new kernel::Field::Link(
+                name          =>'supportid',
+                dataobjattr   =>'itcloud.support'),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
@@ -126,7 +136,8 @@ sub new
                 vjointo       =>'itil::itcloudarea',
                 vjoinon       =>['id'=>'cloudid'],
                 vjoindisp     =>['fullname','cistatus','appl'],
-                vjoininhash   =>['fullname','cistatusid','applid','name','id']),
+                vjoininhash   =>['fullname','cistatusid','applid',
+                                 'name','id','mdate','srcid','srcsys']),
 
 #      new kernel::Field::Boolean(
 #                name          =>'allowifupdate',
