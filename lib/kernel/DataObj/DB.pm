@@ -972,6 +972,7 @@ sub getFirst
       }
       my ($temprec,$error)=$self->{DB}->fetchrow();
       if ($error){
+         $self->LastMsg(ERROR,$self->{DB}->getErrorMsg());
          return(undef,$self->{DB}->getErrorMsg());
       }
       if ($temprec){
@@ -979,6 +980,7 @@ sub getFirst
       }
       return($temprec);
    }
+   $self->LastMsg(ERROR,$self->{DB}->getErrorMsg());
    return(undef,$self->{DB}->getErrorMsg());
 }
 
