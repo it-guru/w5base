@@ -28,15 +28,21 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3 if (!exists($param{MainSearchFieldLines}));
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
+     # new kernel::Field::Id(
+     #           name          =>'id',
+     #           label         =>'CheckID',
+     #           searchable    =>0,
+     #           dataobjattr   =>"ROWID"),
+
       new kernel::Field::Text(
                 name          =>'bupid',
                 label         =>'BUP',
                 uppersearch   =>1,
-                dataobjattr   =>'BUP'),
+                dataobjattr   =>'POSCHECK_BUPID'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
@@ -50,6 +56,12 @@ sub new
                 uppersearch   =>1,
                 dataobjattr   =>'HOSTNAME'),
 
+      new kernel::Field::Boolean(
+                name          =>'latestbackup',
+                label         =>'is latest',
+                sqlorder      =>'none',
+                dataobjattr   =>'decode(O,1,1,0)'),
+
       new kernel::Field::Date(
                 name          =>'checkdate',
                 label         =>'Check Date',
@@ -59,24 +71,35 @@ sub new
       new kernel::Field::Number(
                 name          =>'checkexitcode',
                 label         =>'Check Exitcode',
-                dataobjattr   =>'POSCHECK_RESULT'),
+                dataobjattr   =>'POSCHECK_RESULTID'),
 
       new kernel::Field::Text(
                 name          =>'exitstate',
                 label         =>'Exit State',
-                dataobjattr   =>"decode(POSCHECK_RESULT,0,'ok','failed')"),
+                dataobjattr   =>"decode(POSCHECK_RESULTID,0,'ok','failed')"),
 
       new kernel::Field::Text(
-                name          =>'exittext',
-                label         =>'Exit Text',
-                dataobjattr   =>"RESULT_DESCRIPTION"),
+                name          =>'w5applications',
+                label         =>'W5Base/Application',
+                group         =>'w5basedata',
+                vjointo       =>\'itil::lnkapplsystem',
+                vjoinslimit   =>'1000',
+                vjoinon       =>['systemid'=>'systemsystemid'],
+                weblinkto     =>'none',
+                vjoindisp     =>'appl'),
+
+
+#      new kernel::Field::Text(
+#                name          =>'exittext',
+#                label         =>'Exit Text',
+#                dataobjattr   =>"RESULT_DESCRIPTION"),
 
    );
    $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(bupid systemid systemname checkdate 
+   $self->setDefaultView(qw(systemname systemid bupid checkdate 
                             exitstate exittext));
-   $self->setWorktable("v_bupdetails_31d");
+   $self->setWorktable("BUPSTAT");
    return($self);
 }
 
@@ -90,6 +113,40 @@ sub Initialize
    return(1) if (defined($self->{DB}));
    return(0);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my $from="";
+
+   $from.="(select ".
+          "v_bupdetails_31d.*,".
+          "rank() over (partition by POSCHECK_BUPID ".
+          "order by POSCHECK_DATE desc) O ".
+          "from v_bupdetails_31d".
+          ") BUPSTAT";
+
+   return($from);
+}
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+
+   if (!defined(Query->Param("search_latestbackup"))){
+     Query->Param("search_latestbackup"=>$self->T("yes"));
+   }
+}
+
+
+
+
+
+
+
 
 sub initSqlWhere
 {
@@ -159,15 +216,6 @@ sub initSqlWhere
    }
 
    return($where);
-}
-
-
-sub initSearchQuery
-{
-   my $self=shift;
-   if (!defined(Query->Param("search_checkdate"))){
-     Query->Param("search_checkdate"=>">now-3d");
-   }
 }
 
 
