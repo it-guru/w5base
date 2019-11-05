@@ -463,7 +463,7 @@ sub isWriteValid
    my @l=$self->SUPER::isWriteValid(@_);
    my $WfRec=shift;
 
-   push(@l,"extopmeadesc") if (!defined($_[0]));
+   push(@l,"extopmeadesc") if (!defined($WfRec));
    if (grep(/^default$/,@l)){
       push(@l,"customerdata");
       push(@l,"extopmeadesc");
