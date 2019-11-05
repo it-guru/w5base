@@ -332,6 +332,7 @@ sub ViewProcessor
       my $d="";
       my $content;
       my $filename;
+      my $forbitten=1;
       if (defined($idfield)){
          $obj->ResetFilter();
          $obj->SecureSetFilter({$idfield->Name()=>\$refid});
@@ -344,47 +345,59 @@ sub ViewProcessor
                    in_array(\@l,$self->{group})){ 
                   my $fo=$obj->getField($self->Name(),$rec);
                   $d=$fo->RawValue($rec);
-                 if (exists($self->{mimetype})){
-                    my $fo=$obj->getField($self->{mimetype},$rec);   
-                    $content=$fo->RawValue($rec);
-                 }
-                 if (exists($self->{filename})){
-                    my $fo=$obj->getField($self->{filename},$rec);   
-                    $filename=$fo->RawValue($rec);
-                 }
+                  $forbitten=0;
+                  if (exists($self->{mimetype})){
+                     my $fo=$obj->getField($self->{mimetype},$rec);   
+                     $content=$fo->RawValue($rec);
+                  }
+                  if (exists($self->{filename})){
+                     my $fo=$obj->getField($self->{filename},$rec);   
+                     $filename=$fo->RawValue($rec);
+                  }
                }
                else{
                   msg(ERROR,"ileagal file attachment access $obj $refid");
                }
             }
          }
-      }
-      my $ext=".bin";
-      if (!defined($content)){
-         $content=$self->{content};
-      }
-      if (my ($f1,$f2)=$content=~m/^(.*)\/(.*)$/){
-         if ($f1 eq "image"){
-            $ext=".$f2";
-         }
-         if ($f2 eq "pdf"){
-            $ext=".pdf";
-         }
-         if ($f2 eq "excel" || $f2 eq "vnd.ms-excel"){
-            $ext=".xls";
-         }
-         if ($f2 eq "msword"){
-            $ext=".doc";
+         else{
+            msg(ERROR,"ileagal record access for attachment $obj $refid");
          }
       }
-      if (!defined($filename)){
-         $filename=$self->{name}.$ext;
+      if ($forbitten){
+         printf("Status: 405 Forbidden\n");
+         printf("Content-type:text/html;charset=ISO-8895-1\n\n");
+         printf("<html><body><h1>405 Forbidden</h1></body></html>");
+         return;
       }
+      else{
+         my $ext=".bin";
+         if (!defined($content)){
+            $content=$self->{content};
+         }
+         if (my ($f1,$f2)=$content=~m/^(.*)\/(.*)$/){
+            if ($f1 eq "image"){
+               $ext=".$f2";
+            }
+            if ($f2 eq "pdf"){
+               $ext=".pdf";
+            }
+            if ($f2 eq "excel" || $f2 eq "vnd.ms-excel"){
+               $ext=".xls";
+            }
+            if ($f2 eq "msword"){
+               $ext=".doc";
+            }
+         }
+         if (!defined($filename)){
+            $filename=$self->{name}.$ext;
+         }
 
-      print $self->getParent->HttpHeader($content,
-              filename=>$filename);
-      print $d;
-      return;
+         print $self->getParent->HttpHeader($content,
+                 filename=>$filename);
+         print $d;
+         return;
+      }
    }
    return;
 }
