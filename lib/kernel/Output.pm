@@ -341,6 +341,12 @@ sub WriteToScalar    # ToDo: viewgroups implementation
                my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
                             \@recordview,$fieldbase,
                             $app->Context->{Linenumber},$msg); 
+               if (!exists($self->Format->{charset}) ||
+                   lc($self->Format->{charset}) ne "utf-8"){
+                  if (utf8::is_utf8($d)){
+                     $d=UTF8toLatin1($d);
+                  }
+               }
                syswrite(TMP,$d) if (defined($d));
             }
          }
