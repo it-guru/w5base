@@ -1,3 +1,4 @@
 "no matching value '\%s' in field '\%s'"=>{de=>"kein gültiger Inhalt '\%s' für das Feld '\%s'"},
 "invalid native value '\%s' in \%s"=>{de=>"unzulässiger Inhalt '\%s' für das Feld \%s"},
-"none"=>{de=>"nicht definiert"}
+"none"=>{de=>"nicht definiert"},
+"- other -"=>{de=>"- andere -"},

@@ -33,6 +33,7 @@ sub new
    $self->{_permitted}->{jsonchanged}=1;      # On Changed Handling
    $self->{_permitted}->{jsoninit}=1;      # On Init Handling
    $self->{allownative}=undef if (!exists($self->{allownative}));
+   $self->{allowfree}=undef   if (!exists($self->{allowfree}));
    $self->{useNullEmpty}=0    if (!exists($self->{allownative}));
    return($self);
 }
@@ -211,11 +212,26 @@ sub FormatedDetail
          $s.=" multiple";
          $s.=" size=\"$self->{multisize}\"";
       }
+      my $onchange="";
+      if ($self->{allowfree} eq "1"){
+         $onchange.=";" if ($onchange ne "");
+         $onchange.="select_allow_free_$name(this);";
+      }
       if (defined($self->{jsonchanged})){
-         $s.=" onchange=\"jsonchanged_$name('onchange');\"";
+         $onchange.=";" if ($onchange ne "");
+         $onchange.="jsonchanged_$name('onchange');";
+      }
+      if ($onchange ne ""){
+         $s.=" onchange=\"$onchange\"";
       }
       $s.=" class=\"finput\" style=\"width:$width\">";
       my @options=$self->getPostibleValues($current,undef,"edit");
+      if ($self->{allowfree} eq "1"){
+         push(@options,"");
+         push(@options,
+              $self->getParent->T("- other -","kernel::Field::Select"));
+      }
+
       while($#options!=-1){
          my $key=shift(@options);
          my $val=shift(@options);
@@ -232,6 +248,20 @@ sub FormatedDetail
          $s.="<script language=\"JavaScript\">".
              "function jsonchanged_$name(mode){".
              $self->jsonchanged."}".  
+             "</script>";
+      }
+      if ($self->{allowfree} eq "1"){
+         $s.="<script language=\"JavaScript\">".
+             "function select_allow_free_$name(e){".
+             "if (e.options[e.selectedIndex].value==''){".
+             "var newObject = document.createElement('input');".
+             "newObject.type='text';".
+             "newObject.name=e.name;".
+             "newObject.style=e.style;".
+             "newObject.id=e.id;".
+             "e.parentNode.replaceChild(newObject,e);".
+             "}".  
+             "}".  
              "</script>";
       }
       return($s);
@@ -409,7 +439,7 @@ sub Validate
                last;
             }
          }
-         if ($self->{allownative} eq "1"){
+         if ($self->{allownative} eq "1" || $self->{allowfree} eq "1"){
             $failfound=0;
          }
          if (!$failfound){
