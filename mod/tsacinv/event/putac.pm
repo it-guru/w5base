@@ -255,6 +255,10 @@ sub mkAcFtpRecSystem
    if (defined($arec) && $arec->{srcsys} eq "W5Base"){
       $acrec->{LogSys}->{pSystemPartOfAsset}=$TXTpSystemPartOfAsset;
    }
+   else{
+      # Nach dem neuen (seit 01.08.2019) Housing Konzept
+      $acrec->{LogSys}->{pSystemPartOfAsset}="0.00";
+   }
 
    if ($rec->{mandator}=~m/^TelekomIT.*/){
       $acrec->{LogSys}->{SC_Location_ID}="4787.0000.0000";
