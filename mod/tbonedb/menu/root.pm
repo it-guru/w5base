@@ -42,6 +42,10 @@ sub Init
                       "tbonedb::bupstat",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.tbone.bupjob",
+                      "tbonedb::bupjob",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

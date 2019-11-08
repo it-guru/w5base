@@ -19,10 +19,10 @@ package tbonedb::bupstat;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::App::Web;
-use kernel::DataObj::DB;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use tbonedb::lib::Listedit;
+@ISA=qw(tbonedb::lib::Listedit);
+
 
 sub new
 {
@@ -104,16 +104,6 @@ sub new
 }
 
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"tbone"));
-   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
-   return(1) if (defined($self->{DB}));
-   return(0);
-}
-
 sub getSqlFrom
 {
    my $self=shift;
@@ -146,77 +136,6 @@ sub initSearchQuery
 
 
 
-
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="";
-
-   my $userid=$self->getCurrentUserId();
-   $userid=-1 if (!defined($userid) || $userid==0);
-
-   if ($self->isDataInputFromUserFrontend()){
-      if (!$self->IsMemberOf([qw(admin 
-                                 w5base.tbone.bupstat.read
-                              )],
-          "RMember")){
-         my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
-         my @grpid=grep(/^[0-9]+/,keys(%grp));
-         @grpid=qw(-99) if ($#grpid==-1);
-        
-         my $appl=$self->getPersistentModuleObject("w5appl","itil::appl");
-         my $sys=$self->getPersistentModuleObject("w5sys","itil::system");
-         my $lappsys=$self->getPersistentModuleObject("w5lappsys",
-            "itil::lnkapplsystem");
-        
-         my @flt=();
-         push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],applmgrid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],tsmid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],tsm2id=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],opmid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],opm2id=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],businessteamid=>\@grpid});
-        
-         $appl->SetFilter(\@flt);
-         $appl->SetCurrentView(qw(id));
-         my $i=$appl->getHashIndexed("id");
-        
-         my @appid=keys(%{$i->{id}});
-         @appid=qw(-1) if ($#appid==-1);
-        
-         $lappsys->SetFilter({applid=>\@appid});
-         $lappsys->SetCurrentView(qw(systemsystemid));
-         my $s=$lappsys->getHashIndexed("systemsystemid");
-
-         my @flt=();
-         push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],admid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],adm2id=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],adminteamid=>\@grpid});
-         $sys->SetFilter(\@flt);
-         $sys->SetCurrentView(qw(systemid));
-         my $ss=$sys->getHashIndexed("systemid");
-         foreach my $k (keys(%{$ss->{systemid}})){
-            $s->{systemsystemid}->{$k}="1";
-         }
-
-
-        
-         my @systemid=grep(/^S[0-9]+$/,keys(%{$s->{systemsystemid}}));
-        
-         my @secsystemid;
-         while (my @sid=splice(@systemid,0,500)){ #needed to fix ora "in" limits
-            push(@secsystemid,"SYSTEMID in (".
-                              join(",",map({"'".$_."'"} @sid)).")");
-         }
-         $where="(".join(" OR ",@secsystemid).")";
-      }
-   }
-
-   return($where);
-}
 
 
 
