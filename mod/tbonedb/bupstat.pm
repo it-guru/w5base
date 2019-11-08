@@ -89,10 +89,10 @@ sub new
                 vjoindisp     =>'appl'),
 
 
-#      new kernel::Field::Text(
-#                name          =>'exittext',
-#                label         =>'Exit Text',
-#                dataobjattr   =>"RESULT_DESCRIPTION"),
+      new kernel::Field::Text(
+                name          =>'exittext',
+                label         =>'Exit Text',
+                dataobjattr   =>"RESULT_DESCRIPTION"),
 
    );
    $self->{use_distinct}=0;
