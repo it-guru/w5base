@@ -467,6 +467,11 @@ sub Import
           $w5applrec->{conumber} ne $sysrec->{conumber}){
          $newrec{conumber}=$w5applrec->{conumber};
       }
+      if (defined($w5applrec) && $w5applrec->{acinmassignmentgroupid} ne "" &&
+          $w5sysrec->{acinmassignmentgroupid} eq ""){
+         $newrec{acinmassignmentgroupid}=
+             $w5applrec->{acinmassignmentgroupid};
+      }
 
       my $foundsystemclass=0;
       foreach my $v (qw(isapplserver isworkstation isinfrastruct 
