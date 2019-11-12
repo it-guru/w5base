@@ -57,6 +57,10 @@ sub openExcel
          $xlsexp->{xls}->{format}->{default}=$xlsexp->{xls}->{workbook}->
                                              addformat(text_wrap=>1,
                                                        align=>'top');
+         $xlsexp->{xls}->{format}->{text}=$xlsexp->{xls}->{workbook}->
+                                             addformat(text_wrap=>1,
+                                                       num_format=>'#',
+                                                       align=>'top');
          $xlsexp->{xls}->{format}->{header}=$xlsexp->{xls}->{workbook}->
                                              addformat(text_wrap=>1,
                                                        align=>'top',
@@ -89,6 +93,30 @@ sub openExcel
          $ws->set_column(4,4,220);
 
          $xlsexp->{xls}->{line}++;
+
+         $xlsexp->{xls}->{amws}=$xlsexp->{xls}->{workbook}->
+                                     addworksheet("AssetManagerUpd");
+         $xlsexp->{xls}->{amline}=1;
+         my $amupd=$xlsexp->{xls}->{amws};
+         $amupd->write(0,0,"SystemID",$xlsexp->{xls}->{format}->{header});
+         $amupd->set_column(0,0,20);
+         $amupd->write(0,1,"AssetID",$xlsexp->{xls}->{format}->{header});
+         $amupd->set_column(0,1,20);
+         $amupd->write(0,2,"Systemname",
+                           $xlsexp->{xls}->{format}->{header});
+         $amupd->set_column(0,2,24);
+         $amupd->write(0,3,"Assignmentgroup",
+                           $xlsexp->{xls}->{format}->{header});
+         $amupd->set_column(0,3,28);
+         $amupd->write(0,4,"ExternalSystem",
+                           $xlsexp->{xls}->{format}->{header});
+         $amupd->set_column(0,4,24);
+         $amupd->write(0,5,"ExternalId",
+                           $xlsexp->{xls}->{format}->{header});
+         $amupd->set_column(0,5,20);
+         $amupd->write(0,6,"SystemPartOfAsset",
+                           $xlsexp->{xls}->{format}->{header});
+         $amupd->set_column(0,6,20);
       }
    }
 }
@@ -123,21 +151,39 @@ sub addLine
    $xlsexp->{xls}->{line}++;
 }
 
+sub addAmUpdLine
+{
+   my $self=shift;
+   my @col=@_;
+
+   my $xlsexp=$self->{XLS};
+   my $ws=$xlsexp->{xls}->{amws};
+   for(my $c=0;$c<=$#col;$c++){
+      $ws->write($xlsexp->{xls}->{amline},$c,
+                 $col[$c],
+                 $xlsexp->{xls}->{format}->{text});
+
+   }
+   $xlsexp->{xls}->{amline}++;
+}
+
 sub closeExcel
 {
    my $self=shift;
+   my $names=shift;
    my $xlsexp=$self->{XLS};
       
    $xlsexp->{xls}->{workbook}->close(); 
    my $file=getModuleObject($self->Config,"base::filemgmt");
    if (open(F,"<".$xlsexp->{xls}->{filename})){
       my $dir="Reports/AMHousing";
-      my $filename="Report.xls";
-      $file->ValidatedInsertOrUpdateRecord({name=>$filename,
-                                            parent=>$dir,
-                                            file=>\*F},
-                                           {name=>\$filename,
-                                            parent=>\$dir});
+      foreach my $filename (@$names){
+         $file->ValidatedInsertOrUpdateRecord({name=>$filename,
+                                               parent=>$dir,
+                                               file=>\*F},
+                                              {name=>\$filename,
+                                               parent=>\$dir});
+      }
    }
    else{
       msg(ERROR,"can't open $xlsexp->{xls}->{filename}");
@@ -167,14 +213,26 @@ sub HousingAnalyse
    my $self=shift;
    my $app=$self->getParent;
    my @idlist=@_;
-   my $nomail=0;
+   my $nomail=1;
+   my @reportNames;
 
    my $DarwinDev="TIT.TSI.DE.W5BASE";
 
-   if (grep(/^(-){0,2}nomail$/i,@idlist)){
-      $nomail=1;
-      @idlist=grep(!/^(-){0,2}nomail$/i,@idlist);
+   if (grep(/^(-){0,2}mail$/i,@idlist)){
+      $nomail=0;
+      @idlist=grep(!/^(-){0,2}mail$/i,@idlist);
    }
+
+   if ($#idlist==-1){
+      my $stamp=NowStamp();
+      push(@reportNames,"Report.$stamp.xls");
+      push(@reportNames,"Report.xls");
+   }
+   else{
+      my $stamp=NowStamp();
+      push(@reportNames,"IndividualReport.$stamp.xls");
+   }
+
 
 
 
@@ -385,7 +443,7 @@ sub HousingAnalyse
          asset=>[keys(%amassetid)],
          cistatusid=>'2 3 4 5'
       },{
-         systemid=>[keys(%amsystemid)],
+         systemid=>[keys(%amsystem)],
          cistatusid=>'2 3 4 5'
       }]);
       foreach my $w5sysrec ($w5sys->getHashList(qw(name cistatusid systemid id
@@ -464,17 +522,36 @@ sub HousingAnalyse
              );
           }
        }
-
-
       
        if ($#ivosystemid>-1 || 
            ($isTsiRzAsset==1 && $#housingsystemid>-1 && 
             $allowedAsHousingOnTSIlocation==0)){
           msg(INFO,"AssetID $assetid needs INVOICE_ONLY handling");
+          my @ivosystemidNotInW5B;
+          my @ivosystemidWithServices;
+          my @ivosystemidShortesName;
+          my $ivosystemidShortesNameLen;
           if ($#ivosystemid>0){
              msg(INFO,"multiple INVOICE_ONLY* systems - try to find the right");
              my @correctnamed;
              foreach my $systemid (@ivosystemid){
+                if (length($amsystem{$systemid}->{systemname})==
+                     $ivosystemidShortesNameLen){
+                   push(@ivosystemidShortesName,$systemid);
+                }
+                if (!defined($ivosystemidShortesNameLen) ||
+                    length($amsystem{$systemid}->{systemname})<
+                       $ivosystemidShortesNameLen){
+                   $ivosystemidShortesNameLen=
+                                   length($amsystem{$systemid}->{systemname});
+                   @ivosystemidShortesName=($systemid);
+                }
+                if (!exists($w5systemid{$systemid})){
+                   push(@ivosystemidNotInW5B,$systemid);
+                }
+                if ($#{$amsystem{$systemid}->{orderedservices}}!=-1){
+                   push(@ivosystemidWithServices,$systemid);
+                }
                 if ($amsystem{$systemid}->{usage} eq "INVOICE_ONLY"){
                    push(@correctnamed,$systemid);
                 }
@@ -488,10 +565,63 @@ sub HousingAnalyse
                 die("no further processing posible");
              }
           }
+
+
+
+
+
           if ($#ivosystemid>0){
-             msg(INFO,"unable to detect correct INVOICE_ONLY on $assetid");
-
-
+             my $ivosystemidSelected;
+             if ($#ivosystemidNotInW5B==0){
+                msg(INFO,"select from multiple INVOICE_ONLY by NotInW5B");
+                $ivosystemidSelected=$ivosystemidNotInW5B[0];
+             }
+             elsif ($#ivosystemidWithServices==0){
+                msg(INFO,"select from multiple INVOICE_ONLY by WithService");
+                $ivosystemidSelected=$ivosystemidWithServices[0];
+             }
+             elsif($#ivosystemidShortesName==0){
+                msg(INFO,"select from multiple INVOICE_ONLY by ShortestName");
+                $ivosystemidSelected=$ivosystemidShortesName[0];
+             }
+             else{
+                my @l=sort(@ivosystemid);
+                $ivosystemidSelected=@l[0];
+                msg(INFO,"select from multiple INVOICE_ONLY by FirstSystemID");
+             }
+             msg(INFO,"using $ivosystemidSelected as INVOICE_ONLY");
+             # Alle anderen IVO SystemIDs muessen noch gecheckt werden
+             foreach my $systemid (@ivosystemid){
+                next if ($systemid eq $ivosystemidSelected);
+                if (exists($w5systemid{$systemid})){
+                   $self->addMessage("TransfSystemAuthA2D",
+                      $systemid,
+                      $amasset{$assetid}->{tsacinv_locationfullname},
+                      "AssetManager-Admins",
+                      "Die SystemID $systemid muss von W5Base/Darwin ".
+                      "aus gepflegt werden. Es muss ".
+                      "ExternalSystem=W5Base ".
+                      "und ExternalId=$w5systemid{$systemid}->{id} ".
+                      "gesetzt werden. Assignmentgroup muss auf TIT ".
+                      "geändert werden."
+                   );
+                   if (!in_array(\@housingsystemid,$systemid)){
+                      # eigentlich ist das dann ein "normales" HOUSING Sys
+                      push(@housingsystemid,$systemid);
+                   }
+                   $self->addAmUpdLine(
+                      $systemid,
+                      $assetid,
+                      $amsystem{$systemid}->{systemname},
+                      "TIT",
+                      "W5Base",
+                      $w5systemid{$systemid}->{id},
+                      "0,0"
+                   );
+                }
+             }
+             #
+             @ivosystemid=($ivosystemidSelected);
           }
           if ($#ivosystemid==0){
              msg(INFO,"processing asset $assetid with INVOICE_ONLY=".
@@ -508,7 +638,18 @@ sub HousingAnalyse
                   $amsystem{$ivosystemid[0]}->{systemid}.
                   "_HW umbeannt werden."
                );
+               $self->addAmUpdLine(
+                  $amsystem{$ivosystemid[0]}->{systemid},
+                  $assetid,
+                  $amsystem{$ivosystemid[0]}->{systemid}."_HW",
+                  $amsystem{$ivosystemid[0]}->{assignmentgroup},
+                  "[NULL]",
+                  "[NULL]",
+                  "1,0"
+               );
              }
+
+
              if (exists($w5systemid{$ivosystemid[0]})){ 
                 msg(INFO,"W5Base: INVOICE_ONLY? SystemID $ivosystemid[0] ".
                          "needs covert to a tech system"); 
@@ -614,6 +755,15 @@ sub HousingAnalyse
                          "vom Asset $assetid übernommen auf ".
                          "$amasset{$assetid}->{assignmentgroup} ."
                       );
+                      $self->addAmUpdLine(
+                         $housingivosystemid,
+                         $assetid,
+                         ${housingivosystemid}."_HW",
+                         $amasset{$assetid}->{assignmentgroup},
+                         "[NULL]",
+                         "[NULL]",
+                         "1,0"
+                      );
                       if (exists($w5systemid{$housingivosystemid})){
                          msg(INFO,"W5Base: $housingivosystemid needs to be ".
                                   "rebuild as NEW technical sys ".
@@ -650,7 +800,44 @@ sub HousingAnalyse
    foreach my $l (@{$self->{MsgArray}}){
       $self->addLine(@{$l});
    }
-   $self->closeExcel();
+
+   $self->closeExcel(\@reportNames);
+
+
+   printf("Current Asset-Map:\n\n");
+   foreach my $assetid (keys(%amassetid)){
+      printf("%s:",$assetid);
+      my $c=0;
+      my $s=0;
+      foreach my $sysrec (values(%amsystem)){
+         if ($sysrec->{assetassetid} eq $assetid){
+            $s++;
+            if ($c==0){
+               printf("\n   ");
+            }
+            my $usage=$sysrec->{usage};
+            if (length($usage)>20){
+               $usage=TextShorter($usage,18,"INDI");
+            }
+            printf("%-10s: %-25s",$sysrec->{systemid},$usage);
+            $c++;
+            if ($c==2){
+               $c=0;
+            }
+         }
+      }
+      printf("\n") if ($s>0);
+      printf("\n");
+   }
+
+
+
+
+   printf("\n\n");
+
+
+
+
 
    if (!$nomail){
       msg(INFO,"start Mailing ....");
@@ -660,7 +847,6 @@ sub HousingAnalyse
          $target{$l->[3]}++;
          $tag{$l->[0]}++;
       }
-      print Dumper(\%target);
 
       foreach my $target (sort(keys(%target))){
          my %targetemail=();
