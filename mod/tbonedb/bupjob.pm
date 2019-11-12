@@ -46,10 +46,32 @@ sub new
                 dataobjattr   =>'SYSTEMID'),
 
       new kernel::Field::Text(
+                name          =>'systemname',
+                uppersearch   =>1,
+                label         =>'Systemname',
+                dataobjattr   =>'(select HOSTNAME from v_bupdetails_31d '.
+                                'where ROWNUM<2 AND '.
+                                'v_bupdetails_31d.POSCHECK_BUPID=BUP)'),
+
+      new kernel::Field::Text(
                 name          =>'service',
                 label         =>'Service',
                 caseignore    =>1,
                 dataobjattr   =>'SERVICE'),
+
+      new kernel::Field::Text(
+                name          =>'retention',
+                label         =>'Retention',
+                caseignore    =>1,
+                dataobjattr   =>'RETENTION'),
+
+      new kernel::Field::Number(
+                name          =>'quantity',
+                label         =>'Quantity',
+                caseignore    =>1,
+                unit          =>'GB',
+                dataobjattr   =>'QUANTITY'),
+
 
       new kernel::Field::Boolean(
                 name          =>'isactive',
@@ -76,6 +98,16 @@ sub new
                 label         =>'DB-Type',
                 dataobjattr   =>'DBTYPE'),
 
+      new kernel::Field::SubList(
+                name          =>'lastjobs',
+                label         =>'Last-Jobs',
+                group         =>'lastjobs',
+                htmllimit     =>15,
+                vjointo       =>\'tbonedb::bupstat',
+                vjoinon       =>['bupid'=>'bupid'],
+                vjoindisp     =>['bupid','checkdate','exitstate','exittext']),
+
+
       new kernel::Field::Text(
                 name          =>'w5applications',
                 label         =>'W5Base/Application',
@@ -88,7 +120,8 @@ sub new
    );
    $self->{use_distinct}=0;
    $self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(bupid systemid service isactive));
+   $self->setDefaultView(qw(bupid systemid systemname service 
+                            retention quantity isactive));
    $self->setWorktable("BUPJOB");
    return($self);
 }
@@ -126,7 +159,7 @@ sub getSqlFrom
    my $self=shift;
    my $mode=shift;
    my @flt=@_;
-   my $from="V_IBR_AM_BACKUPS BUPJOB";
+   my $from="V_IBR_AM_BACKUPS BUPJOB " ;
 
 
    return($from);

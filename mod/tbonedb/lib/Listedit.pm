@@ -56,6 +56,7 @@ sub initSqlWhere
                                  w5base.tbone.bupstat.read
                               )],
           "RMember")){
+         my @systemid;
          my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
          my @grpid=grep(/^[0-9]+/,keys(%grp));
          @grpid=qw(-99) if ($#grpid==-1);
@@ -80,7 +81,26 @@ sub initSqlWhere
         
          my @appid=keys(%{$i->{id}});
          @appid=qw(-1) if ($#appid==-1);
-        
+
+         if (keys(%{$i->{id}})){
+            my $svcappl=$self->getPersistentModuleObject("w5svcall",
+                                                   "itil::lnkitclustsvcappl");
+            $svcappl->SetFilter({applid=>\@appid});
+            $svcappl->SetCurrentView(qw(id itclustid));
+            my $s=$svcappl->getHashIndexed("itclustid");
+            my @itclustid=keys(%{$s->{itclustid}}); 
+            if ($#itclustid!=-1){
+               my $itc=$self->getPersistentModuleObject("w5itc",
+                                                   "itil::itclust");
+               $itc->SetFilter({clusterid=>'!""',id=>\@itclustid});
+               $itc->SetCurrentView(qw(id clusterid));
+               my $s=$itc->getHashIndexed("clusterid");
+               my @clusterid=keys(%{$s->{clusterid}});
+               if ($#clusterid!=-1){
+                  push(@systemid,@clusterid);
+               }
+            }
+         }
          $lappsys->SetFilter({applid=>\@appid});
          $lappsys->SetCurrentView(qw(systemsystemid));
          my $s=$lappsys->getHashIndexed("systemsystemid");
@@ -99,18 +119,36 @@ sub initSqlWhere
 
 
         
-         my @systemid=grep(/^S[0-9]+$/,keys(%{$s->{systemsystemid}}));
+         push(@systemid,grep(/^S[0-9]+$/,keys(%{$s->{systemsystemid}})));
         
          my @secsystemid;
          while (my @sid=splice(@systemid,0,500)){ #needed to fix ora "in" limits
             push(@secsystemid,"SYSTEMID in (".
                               join(",",map({"'".$_."'"} @sid)).")");
          }
-         $where="(".join(" OR ",@secsystemid).")";
+         if ($#secsystemid!=-1){
+            $where="(".join(" OR ",@secsystemid).")";
+         }
+         else{
+            $where="(1=0)";
+         }
       }
    }
 
    return($where);
 }
+
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
+
 
 

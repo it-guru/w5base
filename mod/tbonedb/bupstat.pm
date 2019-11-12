@@ -32,15 +32,17 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-     # new kernel::Field::Id(
-     #           name          =>'id',
-     #           label         =>'CheckID',
-     #           searchable    =>0,
-     #           dataobjattr   =>"ROWID"),
+      new kernel::Field::Id(
+                name          =>'id',
+                label         =>'CheckID',
+                searchable    =>0,
+                dataobjattr   =>"POSCHECK_RESDETAILID"),
 
       new kernel::Field::Text(
                 name          =>'bupid',
                 label         =>'BUP',
+                weblinkto     =>\'tbonedb::bupjob',
+                weblinkon     =>['bupid'=>'bupid'],
                 uppersearch   =>1,
                 dataobjattr   =>'POSCHECK_BUPID'),
 
@@ -60,11 +62,13 @@ sub new
                 name          =>'latestbackup',
                 label         =>'is latest',
                 sqlorder      =>'none',
+                htmldetail    =>0,
                 dataobjattr   =>'decode(O,1,1,0)'),
 
       new kernel::Field::Date(
                 name          =>'checkdate',
                 label         =>'Check Date',
+                sqlorder      =>'DESC',
                 timezone      =>'CET',
                 dataobjattr   =>'POSCHECK_DATE'),
 
