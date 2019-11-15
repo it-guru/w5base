@@ -243,10 +243,17 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
-                label         =>'Mandator ID of Cluster',
+                label         =>'Mandator ID of Cloud',
                 readonly      =>1,
                 group         =>'cloudinfo',
                 dataobjattr   =>'itcloud.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'supportid',
+                label         =>'Contact SupportID of Cloud',
+                readonly      =>1,
+                group         =>'cloudinfo',
+                dataobjattr   =>'itcloud.support'),
 
       new kernel::Field::Interface(
                 name          =>'cloudid',
@@ -511,6 +518,13 @@ sub FinishWrite
           $oldrec->{applid} ne $newrec->{applid}){
          $doNotify=1;
       }
+      if ($oldrec->{cistatusid}!=4){
+         if (defined($newrec) &&
+             exists($newrec->{cistatusid}) &&
+             $newrec->{cistatusid}==4){
+            $doNotify=3;
+         }
+      }
    }
    if ($doNotify){
       # send a mail to system/cluster databoss with cc on current user
@@ -540,25 +554,45 @@ sub FinishWrite
                return($subject,$ntext);
             });
          }
-         if ($doNotify==2){
+         if ($doNotify==2 || $doNotify==3){
             my $itcloud=getModuleObject($self->Config,"itil::itcloud");
             $itcloud->SetFilter({id=>\$carec->{cloudid}});
             my ($crec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
+            my %notifyParam=(
+                dataobj=>$self->Self,
+                dataobjid=>$carec->{id},
+                emailbcc=>11634953080001
+            );
+            if ($crec->{supportid} ne ""){
+               $notifyParam{emailcc}=$crec->{supportid};
+            }
 
-            $itcloud->NotifyWriteAuthorizedContacts($crec,{},{
-                     dataobj=>$self->Self,
-                     dataobjid=>$carec->{id}
-                  },{},sub{
+            $itcloud->NotifyWriteAuthorizedContacts($crec,{},\%notifyParam,
+                  {},sub{
                my ($subject,$ntext);
-               my $subject=$self->T("user deaktivation of Cloud-Area",
+               my $subject="??";
+               if ($doNotify==2){
+                  $subject=$self->T("user deactivation of Cloud-Area",
                                     'itil::itcloudarea');
+               }
+               if ($doNotify==3){
+                  $subject=$self->T("user activation of Cloud-Area",
+                                    'itil::itcloudarea');
+               }
                $subject.=" ";
                $subject.=$carec->{fullname};
                my $ntext=$self->T("Dear databoss",'kernel::QRule');
                $ntext.=",\n\n";                             
-               $ntext.=sprintf(
-                       $self->T("CMSG002"),
-                                $carec->{name},$arec->{name});
+               if ($doNotify==2){
+                  $ntext.=sprintf(
+                          $self->T("CMSG002"),
+                                   $carec->{name},$arec->{name});
+               }
+               if ($doNotify==3){
+                  $ntext.=sprintf(
+                          $self->T("CMSG003"),
+                                   $carec->{name},$arec->{name});
+               }
                $ntext.="\n";
                return($subject,$ntext);
             });
