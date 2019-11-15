@@ -2303,14 +2303,15 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
       $ntext.="\n";
       $text=$ntext;
    }
-
+   my $mode=$notifycontrol->{mode};
+   $mode="INFO" if ($mode eq "");
 
    if (defined($subject) && defined($text)){
       if (!defined($notifycontrol->{wfact})){
          $notifycontrol->{wfact}=getModuleObject($self->Config,
                                                  "base::workflowaction");
       }
-      $notifycontrol->{wfact}->Notify("INFO",$subject,$text,%notifyparam);
+      $notifycontrol->{wfact}->Notify($mode,$subject,$text,%notifyparam);
    }
    if (defined($lastlang)){
       $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
