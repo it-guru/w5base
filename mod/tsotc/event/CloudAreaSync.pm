@@ -62,7 +62,7 @@ sub CloudAreaSync
       name=>'![EMPTY]'
    });
    foreach my $appansrec ($appans->getHashList(qw(
-                           name fullname cluster id applid appl
+                           name fullname cluster id applid appl supportid
                            lastmondate))){
        $itcloud{$appansrec->{cluster}}++;
        my $fullname=$appansrec->{cluster}.".".$appansrec->{name};
@@ -72,6 +72,7 @@ sub CloudAreaSync
           name=>$appansrec->{name},
           srcid=>undef,
           srcsys=>$appans->Self(),
+          supportid=>$appans->{supportid},
           applid=>$appansrec->{applid},
           appl=>$appansrec->{appl},
           lastmondate=>$appansrec->{lastmondate}
@@ -85,9 +86,9 @@ sub CloudAreaSync
    {
       my %otcpname;
       my $itcloud="OTC";
-      $otcpro->SetFilter({lastmondate=>"<now-14d"});
+      $otcpro->SetFilter({lastmondate=>">now-14d"});
       foreach my $otcprorec ($otcpro->getHashList(qw(
-                              name cluster id applid appl 
+                              name cluster id applid appl supportid
                               domain fullname
                               lastmondate))){
           my $fullname=$itcloud.".".$otcprorec->{name};
@@ -102,6 +103,7 @@ sub CloudAreaSync
              altfullname=>$altfullname,
              name=>$otcprorec->{name},
              srcid=>$otcprorec->{id},
+             supportid=>$otcprorec->{supportid},
              srcsys=>$otcpro->Self(),
              applid=>$otcprorec->{applid},
              appl=>$otcprorec->{appl},

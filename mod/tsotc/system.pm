@@ -303,6 +303,20 @@ sub Import
    }
    my $appl=getModuleObject($self->Config,"TS::appl");
    my $cloudarea=getModuleObject($self->Config,"itil::itcloudarea");
+   my $itcloud=getModuleObject($self->Config,"itil::itcloud");
+   my $cloudrec;
+   {
+      $itcloud->ResetFilter();
+      $itcloud->SetFilter({name=>'OTC',cistatusid=>'4'});
+      my ($crec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
+      if (defined($crec)){
+         $cloudrec=$crec;
+      }
+      else{
+         $self->LastMsg(ERROR,"no active OTC Cloud in inventory");
+         return(undef);
+      }
+   }
 
    $self->ResetFilter();
    $self->SetFilter($flt);
@@ -313,11 +327,35 @@ sub Import
       return(undef);
    }
    if ($#l>0){
-      $self->LastMsg(ERROR,"Systemname not unique in OTC");
+      {
+         my %notifyParam=(
+             mode=>'ERROR',
+             emailbcc=>11634953080001 # hartmut
+         );
+         if ($cloudrec->{supportid} ne ""){
+            $notifyParam{emailcc}=$cloudrec->{supportid};
+         }
+
+         $itcloud->NotifyWriteAuthorizedContacts($cloudrec,
+               {},\%notifyParam,
+               {mode=>'ERROR'},sub{
+            my ($subject,$ntext);
+            my $subject="OTC cloud systemname configuration error";
+            my $ntext="the systemname '".$param->{importname}."' is ".
+                      "not unique in OTC";
+            $ntext.="\n";
+            return($subject,$ntext);
+         });
+      }
+      if ($self->isDataInputFromUserFrontend()){
+         $self->LastMsg(ERROR,"Systemname '%s' not unique in OTC",
+                              $param->{importname});
+      }
       return(undef);
    }
    my $sysrec=$l[0];
    my $w5applrec;
+   my $w5carec;
 
    if ($sysrec->{projectid} ne ""){
       msg(INFO,"try to add cloudarea to system ".$sysrec->{name});
@@ -325,16 +363,18 @@ sub Import
                              srcid=>\$sysrec->{projectid}
       });
       my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
-      if (defined($w5cloudarearec) &&
-          $w5cloudarearec->{cistatusid} eq "4" &&
-          $w5cloudarearec->{applid} ne ""){
-         msg(INFO,"try to add appl ".$w5cloudarearec->{applid}.
-                  " to system ".$sysrec->{name});
-         $appl->SetFilter({id=>\$w5cloudarearec->{applid}});
-         my ($apprec,$msg)=$appl->getOnlyFirst(qw(ALL));
-         if (defined($apprec) && 
-             in_array([qw(2 3 4)],$apprec->{cistatusid})){
-            $w5applrec=$apprec;
+      if (defined($w5cloudarearec)){
+         $w5carec=$w5cloudarearec;
+         if ($w5cloudarearec->{cistatusid} eq "4" &&
+             $w5cloudarearec->{applid} ne ""){
+            msg(INFO,"try to add appl ".$w5cloudarearec->{applid}.
+                     " to system ".$sysrec->{name});
+            $appl->SetFilter({id=>\$w5cloudarearec->{applid}});
+            my ($apprec,$msg)=$appl->getOnlyFirst(qw(ALL));
+            if (defined($apprec) && 
+                in_array([qw(2 3 4)],$apprec->{cistatusid})){
+               $w5applrec=$apprec;
+            }
          }
       }
    }
@@ -552,8 +592,30 @@ sub Import
                }
             }
             if (!defined($curdataboss)){
-               msg(ERROR,"unable to import system '$sysrec->{name}' ".
-                         "without databoss");
+               if ($self->isDataInputFromUserFrontend()){
+                  msg(ERROR,"unable to import system '$sysrec->{name}' ".
+                            "without databoss");
+               }
+               else{
+                  my %notifyParam=(
+                      mode=>'ERROR',
+                      emailbcc=>11634953080001 # hartmut
+                  );
+                  if ($cloudrec->{supportid} ne ""){
+                     $notifyParam{emailcc}=$cloudrec->{supportid};
+                  }
+                 
+                  $itcloud->NotifyWriteAuthorizedContacts($cloudrec,
+                        {},\%notifyParam,
+                        {mode=>'ERROR'},sub{
+                     my ($subject,$ntext);
+                     my $subject="OTC system import error";
+                     my $ntext="unable to import '".$sysrec->{name}."' in ".
+                               "it inventory - no databoss can be detected";
+                     $ntext.="\n";
+                     return($subject,$ntext);
+                  });
+               }
                return();
             }
          }
