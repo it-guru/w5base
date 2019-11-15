@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -81,6 +82,16 @@ sub new
                 vjoinon       =>['id'=>'projectid'],
                 vjoindisp     =>['systemname','state']),
 
+      new kernel::Field::Number(
+                name          =>'systemcount',
+                label         =>'System count',
+                group         =>'systems',
+                htmldetail    =>0,
+                dataobjattr   =>"(select count(*) from  ".
+                                "otc4darwin_server_vw ".
+                                "where otc4darwin_server_vw.project_uuid=".
+                                      "otc4darwin_projects_vw.project_uuid)"),
+
       new kernel::Field::Text(
                 name          =>'applid',
                 sqlorder      =>'desc',
@@ -131,14 +142,13 @@ sub getRecordImageUrl
    return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
 }
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_cistatus"))){
-#     Query->Param("search_cistatus"=>
-#                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
-#   }
-#}
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_lastmondate"))){
+     Query->Param("search_lastmondate"=>">now-14d");
+   }
+}
 
 sub isViewValid
 {

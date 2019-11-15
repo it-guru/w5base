@@ -6,3 +6,5 @@
 'last monitoring date'=>{de=>'Letzter Monitoring Zeitpunkt'},
 'Description'=>{de=>'Beschreibung'},
 'Application'=>{de=>'Anwendung'},
+'Systems'=>{de=>'Systeme'},
+'System count'=>{de=>'System-Anzahl'},
