@@ -22,6 +22,7 @@
 'Interface-Agreement-Document Name'=>{de=>'Schnittstellenvereinbarungs-Dateiname'},
 'Interface-Agreement-Document Name'=>{de=>'Schnittstellenvereinbarungs-Dateiname'},
 'Interface-Agreement-Document Size'=>{de=>'Schnittstellenvereinbarungs-Dateigröße'},
+'Interface-Agreement-Document Date'=>{de=>'Schnittstellenvereinbarungs-Datum'},
 'from Application'=>{de=>'von Anwendung'},
 'reason on not needed interface agreement'=>{de=>'Begründung zur nicht-Notwendigkeit der Vereinbarung'},
 'to Application'=>{de=>'nach Anwendung'},
