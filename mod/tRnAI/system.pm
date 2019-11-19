@@ -55,7 +55,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'ipaddress',
                 label         =>'IP-Address',
-                translation   =>'itil::ipaddress',
                 dataobjattr   =>'tRnAI_system.ipaddress'),
 
       new kernel::Field::Text(
@@ -113,6 +112,7 @@ sub new
       new kernel::Field::SubList(
                 name          =>'useraccounts',
                 label         =>'AD-Accounts',
+                forwardSearch =>1,
                 group         =>'useraccounts',
                 subeditmsk    =>'subedit.useraccounts',
                 vjointo       =>\'tRnAI::useraccount',

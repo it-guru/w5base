@@ -92,11 +92,13 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'admuser',
+                group         =>'admindata',
                 label         =>'Admin-Useraccount',
                 dataobjattr   =>'tRnAI_usbsrv.admuser'),
 
       new kernel::Field::Text(
                 name          =>'admpass',
+                group         =>'admindata',
                 label         =>'Admin-Password',
                 dataobjattr   =>'tRnAI_usbsrv.admpass'),
 
@@ -183,7 +185,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default usbports
+          qw(header default admindata usbports
              source));
 }
 
@@ -208,7 +210,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default usbports);
+   my @wrgrp=qw(default usbports admindata);
 
    return(@wrgrp) if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
    return(undef);
@@ -220,7 +222,8 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default") if (!defined($rec));
-   return("ALL") if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"],undef,"up"));
+   return("ALL") if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
+   return("header","default","source") if ($self->IsMemberOf(["w5base.RnAI.inventory.read"],undef,"direct"));
    return(undef);
 }
 

@@ -1,2 +1,4 @@
 'tRnAI::useraccount'=>{de=>'User-Account',en=>'User-Account'},
 'SC Expireing Date'=>{de=>'SC Verfallsdatum'},
+'date of birth'=>{de=>'Geburtsdatum'},
+'SAP personal number'=>{de=>'SAP-Personalnummer'},

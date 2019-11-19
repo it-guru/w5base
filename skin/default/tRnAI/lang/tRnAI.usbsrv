@@ -1,5 +1,6 @@
 'tRnAI::usbsrv'=>{de=>'USB-Server',en=>'USB-Server'},
 'fieldgroup.usbports'=>{de=>'USB-Ports',en=>'USB-Ports'},
+'fieldgroup.admindata'=>{de=>'Admin-Daten',en=>'Admin-Data'},
 'Port-Count'=>{de=>'Port-Anzahl'},
 'Contact'=>{de=>'Ansprechpartner'},
 'deputy Contact'=>{de=>'Ansprechp. Vertreter'},

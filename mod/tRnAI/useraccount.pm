@@ -51,6 +51,7 @@ sub new
                 name          =>'domain',
                 label         =>'AD-Domain',
                 htmldetail    =>0,
+                readonly      =>1,
                 htmlwidth     =>'120px',
                 dataobjattr   =>'tRnAI_useraccount.domain'),
 
@@ -63,6 +64,17 @@ sub new
                 name          =>'expdate',
                 label         =>'SC Expireing Date',
                 dataobjattr   =>'tRnAI_useraccount.expdate'),
+
+      new kernel::Field::Date(
+                name          =>'birthdate',
+                label         =>'date of birth',
+                dayonly       =>1, 
+                dataobjattr   =>'tRnAI_useraccount.bdate'),
+
+      new kernel::Field::Text(
+                name          =>'sappersno',
+                label         =>'SAP personal number',
+                dataobjattr   =>'tRnAI_useraccount.sappersno'),
 
       new kernel::Field::Text(
                 name          =>'comments',

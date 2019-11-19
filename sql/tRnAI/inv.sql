@@ -82,3 +82,4 @@ create table tRnAI_usbsrvport(
   FOREIGN KEY (system) REFERENCES tRnAI_system (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
+alter table tRnAI_useraccount add sappersno varchar(20),add bdate datetime;
