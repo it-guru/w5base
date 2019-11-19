@@ -177,6 +177,9 @@ EOF
                   foreach my $k (keys(%{$vjoinbase})){
                       my $v=$vjoinbase->{$k};
                       $v=$$v if (ref($v) eq "SCALAR");
+                      if (ref($v) eq "ARRAY"){
+                         $v=join(" ",map({'"'.$_.'"'} @$v));
+                      }
                       $target.="&search_$k=".quoteQueryString($v);
                   }
                   $vjoinbaseok=1;
