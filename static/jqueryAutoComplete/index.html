@@ -16,12 +16,18 @@ body{
 <script>
 $(document).ready(function(){
    var checkStore=new Array();
+   function getStoredRecord(v){
+      for (i in checkStore){
+         if (checkStore[i].shortname.toLowerCase()==v.toLowerCase()){
+             return(checkStore[i]);
+         }
+      }
+      return(undefined);
+   }
    function checkValidValue(v){
       var isValid=false;
-      for (i in checkStore){
-         if (checkStore[i].name.toLowerCase()==v.toLowerCase()){
-             isValid=true;
-         }
+      if (getStoredRecord(v)){
+         isValid=true;
       }
       if (v!="" && isValid){
          $("#save").removeAttr("disabled");
@@ -38,18 +44,16 @@ $(document).ready(function(){
                dataType: "jsonp",
                data: {
                    callback : "p",
-                   search_name: "*"+request.term+"*",
-                   search_cistatusid: "3 4",
-                   FormatAs: "JSONP",
-                   UseLimit: "20",
-                   CurrentView: "(name,id)"
+                   stags : "ci",
+                   searchtext: "appl:"+request.term.trim(),
+                   FormatAs: "JSONP"
                },
                success: function( data ) {
                    checkStore=data;
                    response( $.map( data, function( item ) {
                        return {
-                           label: item.name,
-                           value: item.name
+                           label: item.shortname,
+                           value: item.shortname
                        }
                    }));
                }
@@ -65,24 +69,25 @@ $(document).ready(function(){
             checkValidValue(ui.item.value); 
          }
       },
-      minLength: 1
+      minLength: 2
    }).keyup(function() {
       checkValidValue(this.value);
    })
    $("#save").click(function (e){
-      alert("you use '"+$("#appname").val()+"'");
+      var rec=getStoredRecord($("#appname").val());
+      alert("you use '"+rec.shortname+"' with id="+rec.id);
    });
 });
 </script>
 <body><div id=apphead>
-<h1 align=center>jquery AutoComplete on W5Base JSONP REST Data</h1>
+<h1 align=center>jquery AutoComplete on W5Base JSONP REST Data<br>by QuickFinder Interface</h1>
 </div>
 <center>
 <div style="width:550px;height:100px;padding:10px;
             text-align:left;border:1px solid black">
 <table width=100%>
 <tr><td>AutoComplete from:</td><td><div style="font-size:12px" id=useurl>???</div></td></tr>
-<tr><td>Application:</td><td><input id=appname></td></tr>
+<tr><td>Application:</td><td><input style="width:250px" id=appname></td></tr>
 </table>
 <br>
 <div style="text-align:center">

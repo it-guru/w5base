@@ -2815,6 +2815,9 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    my @l=qw(mandator applmgr 
            sem sem2 delmgr delmgr2 tsm tsm2 databoss 
            businessteam systemnames);
+   if ($ENV{REMOTE_USER} eq "anonymous"){
+      @l=qw(mandator applmgr);
+   }
    foreach my $v (@l){
       if ($v eq "systemnames"){
          my $name=$self->getField($v)->Label();
@@ -2836,19 +2839,23 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
       }
    }
 
-   if (my $pn=$self->getField("phonenumbers")){
-      $htmlresult.=$pn->FormatForHtmlPublicDetail($rec,["phoneRB"]);
+   if ($ENV{REMOTE_USER} ne "anonymous"){
+      if (my $pn=$self->getField("phonenumbers")){
+         $htmlresult.=$pn->FormatForHtmlPublicDetail($rec,["phoneRB"]);
+      }
    }
    $htmlresult.="</table>\n";
-   if ($rec->{description} ne ""){
-      my $desclabel=$self->getField("description")->Label();
-      my $desc=$rec->{description};
-      $desc=~s/\n/<br>\n/g;
+   if ($ENV{REMOTE_USER} ne "anonymous"){
+      if ($rec->{description} ne ""){
+         my $desclabel=$self->getField("description")->Label();
+         my $desc=$rec->{description};
+         $desc=~s/\n/<br>\n/g;
 
-      $htmlresult.="<table><tr><td>".
-                   "<div style=\"height:60px;overflow:auto;color:gray\">".
-                   "\n<font color=black>$desclabel:</font><div>\n$desc".
-                   "</div></div>\n</td></tr></table>";
+         $htmlresult.="<table><tr><td>".
+                      "<div style=\"height:60px;overflow:auto;color:gray\">".
+                      "\n<font color=black>$desclabel:</font><div>\n$desc".
+                      "</div></div>\n</td></tr></table>";
+      }
    }
    return($htmlresult);
 

@@ -41,10 +41,10 @@ sub CISearchResult
 
    my @l;
    if (in_array("ci",$stag) &&
-       (!defined($tag) || grep(/^$tag$/,qw(system sys server)))){
+       (!defined($tag) || in_array($tag,[qw(system sys server)]))){
       my $flt=[{name=>"$searchtext",cistatusid=>"<=5"},
-               {applications=>"$searchtext",cistatusid=>"<=5"},
                {systemid=>"$searchtext"}];
+      push(@$flt,{applications=>"$searchtext",cistatusid=>"<=5"});
       if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
          push(@$flt,{ipaddresses=>"$searchtext"});
       }
@@ -52,11 +52,13 @@ sub CISearchResult
          push(@$flt,{macadresses=>"$searchtext"});
       }
       else{
-         if ($searchtext=~m/\./){
-            push(@$flt,{dnsnamelist=>\"$searchtext"});
-         }
-         else{
-            push(@$flt,{dnsnamelist=>"$searchtext.*"});
+         if (!in_array($tag,[qw(system sys server)])){
+            if ($searchtext=~m/\./){
+               push(@$flt,{dnsnamelist=>\"$searchtext"});
+            }
+            else{
+               push(@$flt,{dnsnamelist=>"$searchtext.*"});
+            }
          }
       }
       if ($searchtext=~m/^\d{3,20}$/){
@@ -65,12 +67,17 @@ sub CISearchResult
       }
       my $dataobj=getModuleObject($self->getParent->Config,"itil::system");
       $dataobj->SetFilter($flt);
-      foreach my $rec ($dataobj->getHashList(qw(name))){
+      if ($tag eq "system"){
+         $dataobj->Limit(29);
+      }
+      foreach my $rec ($dataobj->getHashList(qw(name cistatusid))){
          my $dispname=$rec->{name};
          push(@l,{group=>$self->getParent->T("itil::system","itil::system"),
                   id=>$rec->{id},
                   parent=>$self->Self,
-                  name=>$dispname});
+                  name=>$dispname,
+                  cistatusid=>$rec->{cistatusid},
+                  shortname=>$dispname});
       }
    }
    return(@l);

@@ -81,7 +81,6 @@ EOF
          if (defined($acl)){
             next if (!grep(/^read$/,@$acl));
          }
-         msg(INFO,"mod=%s acl=%s",$sobj->Self(),Dumper($acl));
          if ($sobj->can("CISearchResult")){
             push(@s,$sobj->CISearchResult($tag,$searchtext));
          }
@@ -96,7 +95,6 @@ EOF
             $d.="<p>".quoteWap($srec->{name})."</p>";
          }
       }
-      printf STDERR ("s=%s\n",Dumper(\@s));
    }
    printf STDERR ("d=%s\n",$d);
    print $self->HttpHeader("text/vnd.wap.wml");
@@ -260,6 +258,7 @@ sub doSearch
    my $self=shift;
    my $label=shift;
    my $searchtext=shift;
+   my $FormatAs; 
 
    my @stags=();
    if (Query->Param("forum") ne ""){
@@ -274,10 +273,16 @@ sub doSearch
    if (Query->Param("stags") ne ""){
       @stags=Query->Param("stags");
    }
-   if ($searchtext ne "" && length($searchtext)<3){
-      print treeViewHeader("<font color=red>".$self->T("search text to short").
-                           "</font>",1);
-      return();
+   if (Query->Param("FormatAs") ne ""){
+      $FormatAs=Query->Param("FormatAs");
+   }
+   if (!defined($FormatAs)){
+      if ($searchtext ne "" && length($searchtext)<3){
+         print treeViewHeader("<font color=red>".
+                              $self->T("search text to short").
+                              "</font>",1);
+         return();
+      }
    }
    my $tag=undef;
    if (my ($stag,$stxt)=$searchtext=~m/^\s*([^:'"]{3,20})\s*:\s*(\S+.*)\S*$/){
@@ -303,12 +308,13 @@ sub doSearch
             push(@s,$sobj->CISearchResult(\@stags,$tag,$searchtext));
          }
       }
-      my $group=undef;
-      foreach my $res (sort({$a->{group} cmp 
-                             $b->{group}} @s)){
-         if (!$found){
-            print treeViewHeader($label,1);
-            print <<EOF;
+      if (!defined($FormatAs)){
+         my $group=undef;
+         foreach my $res (sort({$a->{group} cmp 
+                                $b->{group}} @s)){
+            if (!$found){
+               print treeViewHeader($label,1);
+               print <<EOF;
 function switchTag(id)
 {
    var e=document.getElementById(id);
@@ -343,39 +349,110 @@ function switchTag(id)
    }
 }
 EOF
-          }
-          $found++;
-          if ($group ne $res->{group}){
-             $tree="foldersTree";
-             my $gtag=$res->{group};
-             $gtag=~s/[^a-z0-9]/_/gi;
-             print insFld($tree,$gtag,$res->{group});
-             $tree=$gtag;
-             $group=$res->{group};
-          }
-          my $divid="$res->{parent}::$res->{id}";
-          my $html="<div class=QuickFindDetail id=\"$divid\" ".
-                   "style=\"visibility:hidden;display:none\">XXX</div>";
-          my $link="javascript:switchTag('$divid')";
-          $link=undef if (!defined($res->{id}) || !defined($res->{parent}));
+             }
+             $found++;
+             if ($group ne $res->{group}){
+                $tree="foldersTree";
+                my $gtag=$res->{group};
+                $gtag=~s/[^a-z0-9]/_/gi;
+                print insFld($tree,$gtag,$res->{group});
+                $tree=$gtag;
+                $group=$res->{group};
+             }
+             my $divid="$res->{parent}::$res->{id}";
+             my $html="<div class=QuickFindDetail id=\"$divid\" ".
+                      "style=\"visibility:hidden;display:none\">XXX</div>";
+             my $link="javascript:switchTag('$divid')";
+             $link=undef if (!defined($res->{id}) || !defined($res->{parent}));
 
-          print insDoc($tree,$res->{name},$link,appendHTML=>$html); 
+             print insDoc($tree,$res->{name},$link,appendHTML=>$html); 
+         }
+      }
+      elsif($FormatAs eq "nativeJSON" || $FormatAs eq "JSONP"){
+         if ($FormatAs eq "JSONP"){
+            my $JSONP=Query->Param("callback");
+            $JSONP="_JSONP" if ($JSONP eq "");
+            print("$JSONP(");
+         }
+         print $self->{JSON}->encode(\@s);
+         if ($FormatAs eq "JSONP"){
+            print(");");
+         }
       }
    }
+   if (!defined($FormatAs)){
+      if (grep(/^article$/,@stags) && 
+          (!defined($tag) || grep(/^$tag$/,qw(faq)))){
+         my $tree="foldersTree";
+         my $faq=getModuleObject($self->Config,"faq::article");
+         my @kwords=split(/\s*\|\s*/,$searchtext);
+         foreach my $kwords (@kwords){
+            $faq->ResetFilter();
+            $faq->SecureSetFilter({kwords=>$kwords,
+                                   lang=>[$self->Lang(),"multilang"]});
+            my @l=$faq->getHashList(qw(uservotelevel mdate name faqid));
+            my $loop=0;
+            foreach my $rec (@l){
+               my $pref=""; 
+               my $post=""; 
+               if ($rec->{uservotelevel}<-600){
+                  $pref="<font color='gray'>"; 
+                  $post="</font>"; 
+               }
+               elsif ($rec->{uservotelevel}<-100){
+                  $pref="<font color='dimgray'>"; 
+                  $post="</font>"; 
+               }
+               if (!$found){
+                  print treeViewHeader($label,1);
+                  $found++;
+               }
+               if ($loop==0 && $#stags>0){
+                  print insFld($tree,"article","FAQ-Artikel");
+                  $tree="article";
+                  $loop++;
+               }
+               print insDoc($tree,$pref.$rec->{name}.$post,
+                            "../../faq/article/ById/".
+                            "$rec->{faqid}");
+            }
+            last if ($found);
+         }
+      }
+      if (grep(/^forum$/,@stags) && 
+          (!defined($tag) || grep(/^$tag$/,qw(forum)))){
+         my $tree="foldersTree";
+         my %id;
 
-   if (grep(/^article$/,@stags) && (!defined($tag) || grep(/^$tag$/,qw(faq)))){
-      my $tree="foldersTree";
-      my $faq=getModuleObject($self->Config,"faq::article");
-      my @kwords=split(/\s*\|\s*/,$searchtext);
-      foreach my $kwords (@kwords){
-         $faq->ResetFilter();
-         $faq->SecureSetFilter({kwords=>$kwords,
-                                lang=>[$self->Lang(),"multilang"]});
-         my @l=$faq->getHashList(qw(uservotelevel mdate name faqid));
+         my $fo=getModuleObject($self->Config,"faq::forumentry");
+         $fo->SecureSetFilter({ftext=>$searchtext});
+         my @l=$fo->getHashList(qw(uservotelevel forumtopic));
+         foreach my $rec (@l){
+            $id{$rec->{forumtopic}}++;
+         }
+         my $fo=getModuleObject($self->Config,"faq::forumtopic");
+         $fo->SecureSetFilter({ftext=>$searchtext});
+         my @l=$fo->getHashList(qw(id));
+         foreach my $rec (@l){
+            $id{$rec->{id}}++;
+         }
+         $fo->ResetFilter();
+         $fo->SecureSetFilter({id=>[keys(%id)]});
+         my @l=$fo->getHashList(qw(uservotelevel id name));
+
          my $loop=0;
          foreach my $rec (@l){
             my $pref=""; 
             my $post=""; 
+            if (!$found){
+               print treeViewHeader($label,1);
+               $found++;
+            }
+            if ($loop==0 && $#stags>0){
+               print insFld($tree,"forum","Forum");
+               $tree="forum";
+               $loop++;
+            }
             if ($rec->{uservotelevel}<-600){
                $pref="<font color='gray'>"; 
                $post="</font>"; 
@@ -384,71 +461,17 @@ EOF
                $pref="<font color='dimgray'>"; 
                $post="</font>"; 
             }
-            if (!$found){
-               print treeViewHeader($label,1);
-               $found++;
-            }
-            if ($loop==0 && $#stags>0){
-               print insFld($tree,"article","FAQ-Artikel");
-               $tree="article";
-               $loop++;
-            }
             print insDoc($tree,$pref.$rec->{name}.$post,
-                         "../../faq/article/ById/".
-                         "$rec->{faqid}");
+                         "../../faq/forum/Topic/".
+                         "$rec->{id}");
          }
-         last if ($found);
       }
    }
-   if (grep(/^forum$/,@stags) && (!defined($tag) || grep(/^$tag$/,qw(forum)))){
-      my $tree="foldersTree";
-      my %id;
-
-      my $fo=getModuleObject($self->Config,"faq::forumentry");
-      $fo->SecureSetFilter({ftext=>$searchtext});
-      my @l=$fo->getHashList(qw(uservotelevel forumtopic));
-      foreach my $rec (@l){
-         $id{$rec->{forumtopic}}++;
+   if (!defined($FormatAs)){
+      if (!$found){
+         print treeViewHeader("<font color=red>".$self->T("nothing found").
+                              "</font>",1);
       }
-      my $fo=getModuleObject($self->Config,"faq::forumtopic");
-      $fo->SecureSetFilter({ftext=>$searchtext});
-      my @l=$fo->getHashList(qw(id));
-      foreach my $rec (@l){
-         $id{$rec->{id}}++;
-      }
-      $fo->ResetFilter();
-      $fo->SecureSetFilter({id=>[keys(%id)]});
-      my @l=$fo->getHashList(qw(uservotelevel id name));
-
-      my $loop=0;
-      foreach my $rec (@l){
-         my $pref=""; 
-         my $post=""; 
-         if (!$found){
-            print treeViewHeader($label,1);
-            $found++;
-         }
-         if ($loop==0 && $#stags>0){
-            print insFld($tree,"forum","Forum");
-            $tree="forum";
-            $loop++;
-         }
-         if ($rec->{uservotelevel}<-600){
-            $pref="<font color='gray'>"; 
-            $post="</font>"; 
-         }
-         elsif ($rec->{uservotelevel}<-100){
-            $pref="<font color='dimgray'>"; 
-            $post="</font>"; 
-         }
-         print insDoc($tree,$pref.$rec->{name}.$post,
-                      "../../faq/forum/Topic/".
-                      "$rec->{id}");
-      }
-   }
-   if (!$found){
-      print treeViewHeader("<font color=red>".$self->T("nothing found").
-                           "</font>",1);
    }
    return(0);
 }
@@ -550,21 +573,36 @@ sub Result
    my $self=shift;
    my $label=shift;
    my $searchtext=Query->Param("searchtext");
+   my $FormatAs=Query->Param("FormatAs");
 
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','mainwork.css',
-                                   'public/faq/load/QuickFind.css'],
-                           title=>"QuickFind Result",
-                           js=>['toolbox.js'],
-                           body=>1,form=>1);
+   if (!defined($FormatAs)){
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(style=>['default.css','mainwork.css',
+                                      'public/faq/load/QuickFind.css'],
+                              title=>"QuickFind Result",
+                              js=>['toolbox.js'],
+                              body=>1,form=>1);
+   }
+   elsif($FormatAs eq "nativeJSON" || $FormatAs eq "JSONP"){
+      print $self->HttpHeader("application/javascript",charset=>'UTF8');
+      eval('use JSON;$self->{JSON}=new JSON;');
+      $self->{JSON}->utf8(1);
+   }
+   else{
+      printf("Status: 405 Forbidden\n");
+      printf("Content-type:text/html;charset=ISO-8895-1\n\n");
+      printf("<html><body><h1>405 Forbidden</h1></body></html>");
+      return;
+
+   }
    if ($searchtext eq ""){
       $self->Welcome($self->T("W5Base Documentation"),$searchtext);
    }
    else{
       $self->doSearch($self->T("Search Result"),$searchtext);
    }
-
-   print(<<EOF);
+   if (!defined($FormatAs)){
+      print(<<EOF);
 </script>
 <style>
 body{overflow:hidden;}
@@ -585,7 +623,8 @@ addEvent(window,"resize",resizeResult);
 </script>
 </div>
 EOF
-   print $self->HtmlBottom(body=>1,form=>1);
+      print $self->HtmlBottom(body=>1,form=>1);
+   }
 }
 
 sub getValidWebFunctions

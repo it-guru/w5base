@@ -41,18 +41,25 @@ sub CISearchResult
 
    my @l;
    if (grep(/^ci$/,@$stag) &&
-       (!defined($tag) || grep(/^$tag$/,qw(ag appl anwendung)))){
+       (!defined($tag) || grep(/^$tag$/,qw(ag appl anwendung application)))){
       my $flt=[{name=>"*$searchtext*", cistatusid=>"<=5"},
-               {id=>\"$searchtext",cistatusid=>"<=5"},
-               {applid=>\"$searchtext",cistatusid=>"<=5"},
-               {systems=>"$searchtext",cistatusid=>"<=5"}];
+               {applid=>\"$searchtext",cistatusid=>"<=5"}];
+      if ($searchtext=~m/^[0-9]{2,20}$/){
+         $flt=[{id=>\"$searchtext",cistatusid=>"<=5"}];
+      }
+      if ($tag ne "application"){
+         push(@$flt,{systems=>"$searchtext",cistatusid=>"<=5"});
+      }
       if ($searchtext=~m/^\d{3,20}$/){
          push(@$flt,{conumber=>\"$searchtext",
                      cistatusid=>"<=5"});
       }
       my $appl=getModuleObject($self->getParent->Config,"itil::appl");
       $appl->SetFilter($flt);
-      foreach my $rec ($appl->getHashList(qw(name customer))){
+      if ($tag eq "application"){
+         $appl->Limit(29);
+      }
+      foreach my $rec ($appl->getHashList(qw(name customer cistatusid))){
          my $dispname=$rec->{name};
          if ($rec->{customer} ne ""){
             $dispname.=' @ '.$rec->{customer};
@@ -60,6 +67,8 @@ sub CISearchResult
          push(@l,{group=>$self->getParent->T("itil::appl","itil::appl"),
                   id=>$rec->{id},
                   parent=>$self->Self,
+                  shortname=>$rec->{name},
+                  cistatusid=>$rec->{cistatusid},
                   name=>$dispname});
       }
    }
@@ -74,13 +83,13 @@ sub QuickFindDetail
 
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
    $appl->SetFilter({id=>\$id});
-   my ($rec,$msg)=$appl->getOnlyFirst(qw(mandator 
-                                         delmgr delmgr2 conumber cistatus 
-                                         applmgr
-                                         sem sem2 tsm tsm2 databoss 
-                                         systemnames
-                                         customerprio phonenumbers
-                                         description businessteam));
+   my @view=qw(mandator delmgr delmgr2 conumber cistatus
+               applmgr
+               sem sem2 tsm tsm2 databoss
+               systemnames
+               customerprio phonenumbers
+               description businessteam);
+   my ($rec,$msg)=$appl->getOnlyFirst(@view);
    $appl->ResetFilter();
    $appl->SecureSetFilter([{id=>\$id}]);
    my ($secrec,$msg)=$appl->getOnlyFirst(qw(id));
