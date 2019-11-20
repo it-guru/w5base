@@ -3,8 +3,8 @@
 # .netrc erzeugen mit ...
 # |
 # | machine w5base-testenv.telekom.de
-# | login service/w5moni
-# | password sgXX_geit193
+# | login service/xxxxxx
+# | password xxxxxxxxxxxx
 # |
 #
 # ... und auf die dann chmod 600 !
