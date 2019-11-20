@@ -36,7 +36,6 @@ use vars qw($opt_v $opt_h $opt_c
             $opt_q 
             $opt_w 
             $opt_fieldsize 
-            $opt_allowdubkey 
             $opt_p 
             $opt_tsize 
             $opt_l 
@@ -49,7 +48,6 @@ my $startProcessPPID=getppid(); # there is need to check ppid at at start
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'keycol=i'=>\$opt_k,
                         'quietmode'=>\$opt_q,
-                        'nukey'=>\$opt_allowdubkey,
                         'archive'=>\$opt_archivemode,    # archive old records
                         'purgearchive=i'=>\$opt_A,
                         'limittime=i'=>\$opt_l,
@@ -249,7 +247,7 @@ sub getOracleDBIConnectionHandle
 #
 # find system commandos sort, comm and diff
 #
-my @SYSCMD=qw(sort comm diff cat sftp uniq dd tr);
+my @SYSCMD=qw(sort comm diff cat sftp uniq dd tr head tail);
 my %SYSCMD;
 foreach my $dir (split(":",$ENV{PATH})){
    $dir.="/" if (!($dir=~m/\/$/));
@@ -424,11 +422,15 @@ sub prepairTempfile
          MSG(ERROR,"fail to open source csv '$sourcefile'");
          exit(1);
       }
-      my $cmd="$SYSCMD{cat} '$TMP/base.csv'|".
+      my $usortsequence="$SYSCMD{sort}|$SYSCMD{uniq}";
+      if ($opt_k>0){
+         $usortsequence="$SYSCMD{sort} -u -k $opt_k,$opt_k -t\\;"
+      }
+
+      my $cmd="$SYSCMD{cat}  '$TMP/base.csv'|".
               "$SYSCMD{tr} -d '\15\32'|".  # remove cr + ctrl+z if it is DOS
-              "$SYSCMD{sort}|".
-              "$SYSCMD{uniq}".
-              ">'$TMP/source.csv'";
+              "$usortsequence".
+              ">>'$TMP/source.csv'";
       msg(DEBUG,"source create cmd: $cmd");
       system($cmd);
       unlink("$TMP/base.csv");
@@ -646,7 +648,7 @@ sub ProcessTempfile
    sub getDiffOperation
    {
       my $s=shift;
-      my $bufsz=7;
+      my $bufsz=3;
 
       if (!$main::streameof){
          do{
@@ -757,32 +759,18 @@ sub ProcessTempfile
                push(@{$op->{cols}},undef);  # fillup with NULLs
             }
          }
-         if ($opt_allowdubkey){
-            if (!($sqlbk=$upd_sth->execute($op->{rawline},
-                                           @{$op->{cols}},
-                                           $op->{key}))){
-               msg(WARN,"ins/update fail for rawline='$op->{rawline}'");
-               msg(DEBUG,"ins/update operation: %s",Dumper($op));
-               if ($DBI::errstr ne ""){
-                  msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
-               }
-               $stat{opfailcnt}++;
+         my $shakeybase=$op->{rawline};
+         $shakeybase=trim($shakeybase);
+         if (!($sqlbk=$ins_sth->execute($op->{rawline},
+                                        $op->{key},
+                                        $shakeybase,
+                                     @{$op->{cols}}))){
+            msg(WARN,"insert fail for rawline='$op->{rawline}'");
+            msg(DEBUG,"insert operation: %s",Dumper($op));
+            if ($DBI::errstr ne ""){
+               msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
             }
-         }
-         if (!$opt_allowdubkey || $sqlbk eq "0E0"){
-            my $shakeybase=$op->{rawline};
-            $shakeybase=trim($shakeybase);
-            if (!($sqlbk=$ins_sth->execute($op->{rawline},
-                                           $op->{key},
-                                           $shakeybase,
-                                        @{$op->{cols}}))){
-               msg(WARN,"insert fail for rawline='$op->{rawline}'");
-               msg(DEBUG,"insert operation: %s",Dumper($op));
-               if ($DBI::errstr ne ""){
-                  msg(ERROR,"DBI::ERROR: ".$DBI::errstr);
-               }
-               $stat{opfailcnt}++;
-            }
+            $stat{opfailcnt}++;
          }
          
          $stat{ins}++;
@@ -915,8 +903,6 @@ sub Help
    printf($form,"             The first column is need to specify as 1","");
    printf($form,"--fieldsize  is the default field size, on create", "[40]");
    printf($form,"             of column fields.","");
-   printf($form,"--nukey      add handling for not unique keys", "");
-   printf($form,"             in input csv file - use last found key.","");
    printf($form,"--archive    process in archive mode", "[0]");
    printf($form,"             In archive mode, all records will be stay ","");
    printf($form,"             in db and only be marked as delete.","");
