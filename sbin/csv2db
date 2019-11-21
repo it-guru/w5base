@@ -424,7 +424,7 @@ sub prepairTempfile
       }
       my $usortsequence="$SYSCMD{sort}|$SYSCMD{uniq}";
       if ($opt_k>0){
-         $usortsequence="$SYSCMD{sort} -u -k $opt_k,$opt_k -t\\;"
+         $usortsequence="$SYSCMD{sort} -u -k $opt_k,$opt_k -t\\;|$SYSCMD{sort}";
       }
 
       my $cmd="$SYSCMD{cat}  '$TMP/base.csv'|".
