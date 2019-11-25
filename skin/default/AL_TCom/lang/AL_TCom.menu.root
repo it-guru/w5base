@@ -137,6 +137,8 @@
 'AL_TCom.proc.softmgmt.analyse'=>{de=>'Analyse',en=>'Analyse'},
 'AL_TCom.proc.softmgmt.software'=>{de=>'Verkn. Software',en=>'Software Rel.'},
 'AL_TCom.proc.riskmgmt'=>{de=>'Risikomanagement',en=>'Riskmanagement'},
+'AL_TCom.proc.vou'=>{de=>'virtuelle Org-Einheit',en=>'virtuel Org-Unit'},
+'AL_TCom.proc.vou.new'=>{de=>'Neueingabe',en=>'New'},
 'Reporting.amore'=>{de=>'@more',en=>'@more'},
 'itservices'=>{de=>'IT-Services Telekom IT',en=>'IT-Services Telekom IT'},
 'itservices.bps'=>{de=>'Geschäftsprozess',en=>'Businessprocess'},

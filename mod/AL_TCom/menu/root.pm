@@ -717,6 +717,15 @@ sub Init
                       "itil::riskmgmtbase",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.proc.vou",
+                      "TS::vou",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.proc.vou.new",
+                      "TS::vou",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itservices",
                       "AL_TCom::itschain",
                       defaultacl=>['valid_user']);  # muß noch admin  werden!

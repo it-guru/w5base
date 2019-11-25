@@ -352,6 +352,15 @@ sub Init
                       "itil::lnksoftwaresoftwareset",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.proc.vou",
+                      "TS::vou",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.proc.vou.new",
+                      "TS::vou",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.kern.projectroom.new",
                       "itil::projectroom",
                       func=>'New',

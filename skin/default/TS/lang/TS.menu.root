@@ -83,6 +83,8 @@
 'itts.proc.softmgmt'=>{de=>'Software Management',en=>'Software Management'},
 'itts.proc.softmgmt.analyse'=>{de=>'Analyse',en=>'Analyse'},
 'itts.proc.softmgmt.software'=>{de=>'Verkn. Software',en=>'Software Rel.'},
+'itts.proc.vou'=>{de=>'virtuelle Org-Einheit',en=>'virtuel Org-Unit'},
+'itts.proc.vou.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.qmgmt.tsinterview'=>{de=>'Deutsche Telekom CI-Interview',
                              en=>'Deutsche Telekom CI-Interview'},
 'sysadm.qmgmt.tsinterview.new'=>{de=>'Neueingabe',
