@@ -1010,8 +1010,14 @@ sub Validate
 
    my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
    if ($ifrel eq "DIRECT"){
-      if ($gwapplid ne ""){
-         $newrec->{gwapplid}=undef;
+      if (exists($newrec->{gwapplid}) && $newrec->{gwapplid} ne "" &&
+          !exists($newrec->{ifrel})){
+         $newrec->{ifrel}="INDIRECT";
+      }
+      else{
+         if ($gwapplid ne ""){
+            $newrec->{gwapplid}=undef;
+         }
       }
    }
    else{
