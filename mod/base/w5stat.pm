@@ -424,7 +424,29 @@ sub _storeStats
          if (defined($baseduration) && defined($basespan)){
             foreach my $v (keys(%{$self->{stats}->{$group}->{$name}})){
                if (ref($self->{stats}->{$group}->{$name}->{$v}) eq "ARRAY"){
-                  # fifi
+                  # use as is
+               }
+               elsif (ref($self->{stats}->{$group}->{$name}->{$v}) eq "HASH"){
+                  if ($self->{stats}->{$group}->{$name}->{$v}->{method} 
+                      eq "avg"){
+                     my @l;
+                     if (ref($self->{stats}->{$group}->{$name}->{$v}->{data}) 
+                         eq "ARRAY"){
+                        @l=@{$self->{stats}->{$group}->{$name}->{$v}->{data}};
+                     }
+                     my $n=$#l+1;
+                     my $s=0;
+                     map({$s+=$_;} @l);
+                     if ($n>0){
+                        $self->{stats}->{$group}->{$name}->{$v}=$s/$n;
+                     }
+                     else{
+                        $self->{stats}->{$group}->{$name}->{$v}=0;
+                     }
+                  }
+                  else{
+                     $self->{stats}->{$group}->{$name}->{$v}="bad data";
+                  }
                }
                elsif (ref($self->{stats}->{$group}->{$name}->{$v})){
                   my $spanobj=$self->{stats}->{$group}->{$name}->{$v};
@@ -544,7 +566,7 @@ sub storeStatVar
                if (lc($method) eq "count"){
                   $self->{stats}->{$group}->{$key}->{$var}+=$val[0];
                }
-               if (lc($method) eq "avg"){
+               if (lc($method) eq "gavg"){
                   $self->{stats}->{$group}->{$key}->{$var}+=$val[0];
                   if ($self->{stats}->{$group}->{$key}->{$var}>0){
                      $self->{stats}->{$group}->{$key}->{$var}=
@@ -553,6 +575,18 @@ sub storeStatVar
                   else{
                      $self->{stats}->{$group}->{$key}->{$var}=$val[0];
                   }
+               }
+               if (lc($method) eq "avg"){
+                  if (ref($self->{stats}->{$group}->{$key}->{$var}) ne "HASH"){
+                     $self->{stats}->{$group}->{$key}->{$var}={};
+                  }
+                  $self->{stats}->{$group}->{$key}->{$var}->{method}="avg";
+                  if (ref($self->{stats}->{$group}->{$key}->{$var}->{data}) ne
+                      "ARRAY"){
+                     $self->{stats}->{$group}->{$key}->{$var}->{data}=[];
+                  }
+                  push(@{$self->{stats}->{$group}->{$key}->{$var}->{data}},
+                       $val[0]);
                }
                if (lc($method) eq "concat"){
                   if ($self->{stats}->{$group}->{$key}->{$var} ne ""){
