@@ -24,7 +24,9 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::Field::DataMaintContacts;
 use itil::lib::Listedit;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+use itil::lib::SecurityRestrictor;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB
+        itil::lib::SecurityRestrictor);
 
 sub new
 {
@@ -848,70 +850,25 @@ sub initSqlWhere
    my $self=shift;
    my $where="";
 
-   my $userid=$self->getCurrentUserId();
-   $userid=-1 if (!defined($userid) || $userid==0);
-
    if ($self->isDataInputFromUserFrontend()){
       if (!$self->IsMemberOf([qw(admin 
                                  w5base.tssmartcube.tcc.read
                                  w5base.tssmartcube.tcc.read.itsem
                               )],
           "RMember")){
-         my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
-         my @grpid=grep(/^[0-9]+/,keys(%grp));
-         @grpid=qw(-99) if ($#grpid==-1);
-        
-         my $appl=$self->getPersistentModuleObject("w5appl","itil::appl");
-         my $sys=$self->getPersistentModuleObject("w5sys","itil::system");
-         my $lappsys=$self->getPersistentModuleObject("w5lappsys",
-            "itil::lnkapplsystem");
-        
-         my @flt=();
-         push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],applmgrid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],semid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],sem2id=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],tsmid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],tsm2id=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],opmid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],opm2id=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],businessteamid=>\@grpid});
-         push(@flt,{cistatusid=>[3,4,5],itsemteamid=>\@grpid});
-         push(@flt,{cistatusid=>[3,4,5],responseteam=>\@grpid});
-        
-         $appl->SetFilter(\@flt);
-         $appl->SetCurrentView(qw(id));
-         my $i=$appl->getHashIndexed("id");
-        
-         my @appid=keys(%{$i->{id}});
-         @appid=qw(-1) if ($#appid==-1);
-        
-         $lappsys->SetFilter({applid=>\@appid});
-         $lappsys->SetCurrentView(qw(systemsystemid));
-         my $s=$lappsys->getHashIndexed("systemsystemid");
-
-         my @flt=();
-         push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],admid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],adm2id=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],adminteamid=>\@grpid});
-         $sys->SetFilter(\@flt);
-         $sys->SetCurrentView(qw(systemid));
-         my $ss=$sys->getHashIndexed("systemid");
-         foreach my $k (keys(%{$ss->{systemid}})){
-            $s->{systemsystemid}->{$k}="1";
+         my @systemid=$self->getSecurityRestrictedAllowedSystemIDs(10);
+         if ($#systemid>-1){
+            my @secsystemid;
+            #needed to fix ora "in" limits
+            while (my @sid=splice(@systemid,0,500)){ 
+               push(@secsystemid,"SYSTEM_ID in (".
+                                 join(",",map({"'".$_."'"} @sid)).")");
+            }
+            $where="(".join(" OR ",@secsystemid).")";
          }
-
-
-        
-         my @systemid=grep(/^S[0-9]+$/,keys(%{$s->{systemsystemid}}));
-        
-         my @secsystemid;
-         while (my @sid=splice(@systemid,0,500)){ #needed to fix ora "in" limits
-            push(@secsystemid,"SYSTEM_ID in (".
-                              join(",",map({"'".$_."'"} @sid)).")");
+         else{
+            $where="(1=0)";
          }
-         $where="(".join(" OR ",@secsystemid).")";
       }
    }
 
