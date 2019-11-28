@@ -1,0 +1,5 @@
+'tsAuditSrv::auditmsg'=>{de=>'Audit Meldung',en=>'Audit message'},
+'first occur'=>{de=>'Erstmeldung'},
+'Message Text'=>{de=>'Meldungstext'},
+'Result Returned shorted'=>{de=>'gekürzte Rückmeldung'},
+'Severity'=>{de=>'Schwere'},

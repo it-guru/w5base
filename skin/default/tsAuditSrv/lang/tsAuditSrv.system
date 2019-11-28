@@ -1,0 +1,13 @@
+'tsAuditSrv::system'=>{
+de=>'AuditServer - logisches System',
+en=>'AuditServer - logical System'
+},
+'fieldgroup.audit'=>{de=>'Audit Zusammenfassung',en=>'Audit Summary'},
+'fieldgroup.auditmsgs'=>{de=>'Audit Meldungen',en=>'Audit Messages'},
+'Auditserver registered'=>{de=>'am AuditServer registriert'},
+'Missing Patch released x days ago'=>{de=>'Fehlender Patch, freigegeben vor x Tagen'},
+'Patch Calculation Date'=>{de=>'Patch Berechnungszeitpunkt'},
+'Reaction Level'=>{de=>'Reaktionsstufe'},
+'Audit messages'=>{de=>'Audit Meldungen'},
+'urgent Audit messages'=>{de=>'dringende Audit Meldungen'},
+
