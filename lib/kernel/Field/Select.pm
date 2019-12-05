@@ -401,6 +401,8 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
    my $name=$self->{name};
+
+
    if (exists($newrec->{$name})){
       my $val=$newrec->{$name};
       if (($val eq "" || (ref($val) eq "ARRAY" && $#{$val}==-1)) 
@@ -630,40 +632,44 @@ sub prepUploadRecord   # prepair one record on upload
          }
       }
       else{
-         while($#o!=-1){   # pass 1 check if value  matches
-            my $key=shift(@o);
-            my $val=shift(@o);
-            if ($val eq $reqval){
-               $newkey=$key;
-               last;
-            }
-         }
-         if (!defined($newkey)){
-            my @o=@options;
-            while($#o!=-1){  # pass 1 check if value (translated) matches
+         if (!$self->{allowfree}){
+            while($#o!=-1){   # pass 1 check if value  matches
                my $key=shift(@o);
                my $val=shift(@o);
-               if ($self->getParent->T($self->{transprefix}.$val,
-                     $self->{translation}) eq $reqval){
+               if ($val eq $reqval){
                   $newkey=$key;
                   last;
                }
             }
             if (!defined($newkey)){
                my @o=@options;
-               while($#o!=-1){  # pass 1 check if key direct matches
+               while($#o!=-1){  # pass 1 check if value (translated) matches
                   my $key=shift(@o);
                   my $val=shift(@o);
-                  if ($key eq $reqval){
+                  if ($self->getParent->T($self->{transprefix}.$val,
+                        $self->{translation}) eq $reqval){
                      $newkey=$key;
                      last;
                   }
                }
+               if (!defined($newkey)){
+                  my @o=@options;
+                  while($#o!=-1){  # pass 1 check if key direct matches
+                     my $key=shift(@o);
+                     my $val=shift(@o);
+                     if ($key eq $reqval){
+                        $newkey=$key;
+                        last;
+                     }
+                  }
+               }
             }
+         }
+         else{
+            $newkey=$reqval;
          }
       }
       if (!defined($newkey)){
- 
          print msg(ERROR,
                  $self->getParent->T("no matching value '\%s' in field '\%s'"),
                $reqval,$name);
