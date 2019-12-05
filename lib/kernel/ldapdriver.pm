@@ -57,6 +57,7 @@ sub unbindHandle
    my $ldaphandle=shift;
    if (defined($ldaphandle) && $ldaphandle->can("unbind")){
       $ldaphandle->unbind();
+      $ldaphandle->disconnect();
    }
    else{
       return(0);
@@ -111,14 +112,15 @@ sub Connect
       }
    }
    if (!($self->{ldap}=Net::LDAP->new($self->{ldapserv},
-                                      timeout=>100,
-                                      version=>'3',async=>0))){
+                                      timeout=>10,
+                                      keepalive=>1,
+                                      version=>'3',
+                                      async=>0))){
       my $msg=sprintf("ldapbind '%s' while connect '%s'",$@,$self->{ldapserv});
       msg(ERROR,$msg);
       return(undef,$msg);
    }
-   $self->{ldap}->bind($self->{ldapuser},password =>$self->{ldappass});
-
+   my $res=$self->{ldap}->bind($self->{ldapuser},password =>$self->{ldappass});
 
    if (!$self->{'ldap'}){
       my $msg=sprintf("Connect(%s): LDAP '%s'",$ldapname,
@@ -158,15 +160,33 @@ sub execute
    my @param=@_;
    my %p=@param;
 
-   if ($self->{ldap}){
-      my $c=$self->getParent->Context;
+   if (defined($self->{SessionCacheKey})){
+      if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
+         my $cacheEntry=
+             $LDAPConnectionPool::Session{$self->{SessionCacheKey}};
+         if (time()-$cacheEntry->{atime}<300){
+            $cacheEntry->{atime}=time();
+         }
+         else{
+            printf STDERR ("fifi reset socket\n");
+            unbindHandle($cacheEntry->{ldap});
+            delete($self->{ldap});
+            delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
+            $self->Connect();
+         }
+      }
+   }
 
+   my $c=$self->getParent->Context;
+   delete($c->{$self->{ldapname}});
+
+   if (defined($self->{ldap})){
       my $ldaporderstring=$self->getParent->getLdapOrder();
       #my $sort = Net::LDAP::Control::Sort->new(order=>$ldaporderstring);
       #push(@param,"control"=>[$sort]);
       # - sort request did not work on whoishwo
       my $sseconds=Time::HiRes::time();
-      $c->{$self->{ldapname}}->{sth}=$self->{'ldap'}->search(@param);
+      $c->{$self->{ldapname}}->{sth}=$self->{ldap}->search(@param);
       my $eseconds=Time::HiRes::time();
       my $slowlimit=20;
       if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
@@ -188,9 +208,22 @@ sub execute
       if ($c->{$self->{ldapname}}->{sth}->code()){
          $c->{$self->{ldapname}}->{sthdata}=[];
          $c->{$self->{ldapname}}->{sthcount}=0;
-         return(undef,msg(ERROR,"ldap-search:%s (%s)",
+         if (defined($self->{SessionCacheKey})){
+            if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
+               my $cacheEntry=
+                   $LDAPConnectionPool::Session{$self->{SessionCacheKey}};
+               printf STDERR ("fifi cleanup bad socket\n");
+               unbindHandle($cacheEntry->{ldap});
+               delete($self->{ldap});
+               delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
+               $self->Connect();
+            }
+         }
+         my $msg=msg(ERROR,"ldap-search:%s (%s)",
                           $c->{$self->{ldapname}}->{sth}->error,
-                          Dumper(\@param)));
+                          Dumper(\@param));
+         delete($c->{$self->{ldapname}});
+         return(undef,$msg);
       }
       my $resultsorted=0;
                      
@@ -306,26 +339,12 @@ sub do
    my $cmd=shift;
 
 
-   if (defined($self->{SessionCacheKey})){
-      if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
-         my $cacheEntry=$LDAPConnectionPool::Session{$self->{SessionCacheKey}};
-         $cacheEntry->{atime}=time();
-      }
-   }
-
-   $cmd.=" /* W5BaseUser: $ENV{REMOTE_USER} */" if ($ENV{REMOTE_USER} ne "");
-   if ($self->{'db'}){
-      if ($self->{'db'}->do($cmd,{},@_)){
-         return($self->{'db'});
-      }
-      else{
-         msg(ERROR,"do('%s')",$cmd);
-      }
-   }
+   msg(ERROR,"do not supported in ldap driver at now ('%s')",$cmd);
    return(undef);
 }
 
 END{
+   msg(WARN,"closing all LDAP Sessions");
    foreach my $SessionCacheKey (keys(%LDAPConnectionPool::Session)){
       my $cacheEntry=$LDAPConnectionPool::Session{$SessionCacheKey};
       unbindHandle($cacheEntry->{ldap});

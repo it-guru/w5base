@@ -466,8 +466,10 @@ sub getFirst
    my @fieldlist=$self->getFieldList();
    my @attr=();
 
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
 
-  if (!defined($self->{LDAP})){
+
+   if (!defined($self->{LDAP})){
       $self->{isInitalized}=0;
       my $msg=$self->T("no LDAP connection or invalid LDAP handle");
       if ($self->isSuspended()){
@@ -549,6 +551,7 @@ sub getFirst
       return($temprec);
    }
    else{
+      $self->LastMsg(ERROR,"LDAP search execute failed");
       return($sth,$mesg);
    }
 }
