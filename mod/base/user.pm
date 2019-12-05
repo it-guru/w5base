@@ -2291,4 +2291,26 @@ sub jsExploreObjectMethods
 }
 
 
+sub SetFilterForQualityCheck    # prepaire dataobject for automatic
+{                               # quality check (nightly)
+   my $self=shift;
+   my $stateparam=shift;
+   my @view=@_;                 # predefinition for request view
+   my @flt;
+
+   # eine alternative wäre es, in einem qualityState objekt die letzte
+   # geprüfte ID (mit Zeitstempel) zu speichern. Die IDs müsten aufsteigend
+   # sortiert werden.
+
+   if (my $cistatusid=$self->getField("cistatusid")){
+      $flt[0]->{cistatusid}=[1,2,3,4,5];
+      $flt[0]->{email}="hartmut.vogler* carina.junghans* d.roesler*";
+   }
+   $self->SetFilter(\@flt);
+   $self->SetCurrentView(@view);
+   return(1);
+}
+
+
+
 1;

@@ -87,7 +87,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'rawcustomer',
-                label         =>'Customer',
+                label         =>'Customer raw',
                 group         =>'customer',
                 dataobjattr   =>'tRnAI_system.customer'),
 
@@ -105,7 +105,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'rawdepartment',
-                label         =>'Department',
+                label         =>'Department raw',
                 group         =>'customer',
                 dataobjattr   =>'tRnAI_system.department'),
 
