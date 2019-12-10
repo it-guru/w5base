@@ -150,6 +150,7 @@ sub new
                 label         =>'Interfaceprotocol',
                 value         =>[qw( unknown 
                      BCV CAPI CIFS Corba DB-Connection DB-Link dce DCOM DSO 
+                     EFB
                      ftp html http https IMAP IMAPS IMAP4 
                      jdbc ldap ldaps LDIF MAPI 
                      MFT MQSeries Netegrity NFS ODBC OSI openFT
