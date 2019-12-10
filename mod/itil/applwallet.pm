@@ -388,9 +388,28 @@ sub Validate
       # SerialNr. (hex format)
       $newrec->{serialno}=$x509->serial();
 
+
       # Name
       my ($cn)=grep({$_->type() eq 'CN'} @$iobjs);
       $newrec->{name}=$cn->value().' - '.$newrec->{serialno};
+
+      # "Alternative Name" analyse
+      my $alternativeNames;
+
+      my $exts=$x509->extensions_by_oid();
+      if (ref($exts) eq "HASH"){
+         foreach my $oid (keys(%$exts)){
+           my $ext=$exts->{$oid};
+           if ($oid eq "2.5.29.17"){
+              my $val=$ext->value(); 
+              # Eigentlich muss hier die ->as_string() methode verwendet
+              # werden - die ist aber bei der 1.807 von Crypt-OpenSSL-X509
+              # noch nicht vorhanden. Da muss AO also erst noch vorarbeiten.
+              $alternativeNames=$val;
+           }
+         }
+      }
+      msg(INFO,"alternativeNames=$alternativeNames");
 
       # check if already expired
       my $duration=CalcDateDuration(NowStamp('en'),$newrec->{enddate});
