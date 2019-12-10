@@ -79,6 +79,16 @@ sub new
                 label         =>'Auditserver registered',
                 dataobjattr   =>"decode(AUDITSERVER_REGISTRATED,'YES',1,0)"),
 
+      new kernel::Field::Text(
+                name          =>'w5applications',
+                label         =>'W5Base/Application',
+                group         =>'w5basedata',
+                vjointo       =>\'itil::lnkapplsystem',
+                vjoinslimit   =>'1000',
+                vjoinon       =>['w5systemid'=>'systemid'],
+                weblinkto     =>'none',
+                vjoindisp     =>'appl'),
+
       new kernel::Field::SubList(
                 name          =>'urgentauditmsgs',
                 label         =>'urgent audit messages',
@@ -161,6 +171,26 @@ sub new
                 htmllabelwidth=>'250',
                 ignorecase    =>1,
                 dataobjattr   =>'DARWIN_TBL_ASSET_DATA.ASSET_ID'),
+
+
+      new kernel::Field::Link(
+                name          =>'w5systemid',
+                label         =>'W5BaseID of relevant System',
+                group         =>'w5basedata',
+                vjointo       =>\'itil::system',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>'id'),
+
+      new kernel::Field::Text(
+                name          =>'w5systemname',
+                label         =>'W5Base/logical System',
+                group         =>'w5basedata',
+                searchable    =>0,
+                vjointo       =>\'AL_TCom::system',
+                vjoinon       =>['w5systemid'=>'id'],
+                vjoindisp     =>'name'),
+
+
 
    );
    $self->setWorktable("DARWIN_TBL_ASSET_DATA");
