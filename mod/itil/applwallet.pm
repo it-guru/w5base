@@ -35,6 +35,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -154,6 +155,14 @@ sub new
                 htmldetail    =>1,
                 readonly      =>1,
                 dataobjattr   =>'wallet.issuerdn'),
+
+      new kernel::Field::Text(
+                name          =>'altname',
+                label         =>'alternate Names',
+                group         =>'detail',
+                htmldetail    =>"notEmpty",
+                readonly      =>1,
+                dataobjattr   =>'wallet.altname'),
 
       new kernel::Field::Text(
                 name          =>'serialno',
@@ -402,11 +411,24 @@ sub Validate
            my $ext=$exts->{$oid};
            if ($oid eq "2.5.29.17"){
               my $val=$ext->value(); 
-              # Eigentlich muss hier die ->as_string() methode verwendet
-              # werden - die ist aber bei der 1.807 von Crypt-OpenSSL-X509
-              # noch nicht vorhanden. Da muss AO also erst noch vorarbeiten.
+              if ($ext->can("to_string")){
+                 $val=$ext->to_string();
+              }
+              elsif ($ext->can("as_string")){
+                 $val=$ext->as_string();
+              }
               $alternativeNames=$val;
            }
+         }
+      }
+      if (defined($alternativeNames)){
+         if (!defined($oldrec)){
+            $newrec->{altname}=$alternativeNames;
+         }
+         else{
+            if ($oldrec->{altname} ne $alternativeNames){
+               $newrec->{altname}=$alternativeNames;
+            }
          }
       }
       msg(INFO,"alternativeNames=$alternativeNames");

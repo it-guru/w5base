@@ -1761,3 +1761,4 @@ alter table lnkitclustsvc add lastqcheck datetime default NULL,add key(lastqchec
 alter table itfarm add shortname varchar(40);
 alter table system add fsystemalias varchar(128) default NULL,add unique(fsystemalias);
 alter table lnkapplappl add gwappl bigint(20) default NULL,add ifrelation varchar(20) default 'DIRECT';
+alter table wallet add altname longtext;

@@ -8,6 +8,7 @@
 'Brief description'=>{de=>'Kurzbeschreibung'},
 'Comments'=>{de=>'Bemerkungen'},
 'Issuer'=>{de=>'Aussteller'},
+'alternate Names'=>{de=>'alternative Namen'},
 'Serial Nr.'=>{de=>'Serien-Nr.'},
 'No certificate file selected'=>{de=>"Keine Zertifikats-Datei ausgewählt"},
 'No brief description specified'=>{de=>"Keine Kurzbeschreibung angegeben"},
