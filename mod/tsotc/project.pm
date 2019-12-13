@@ -97,7 +97,7 @@ sub new
                 sqlorder      =>'desc',
                 group         =>'source',
                 label         =>'Application W5BaseID',
-                dataobjattr   =>"darwin_app_w5baseid"),
+                dataobjattr   =>"cast(darwin_app_w5baseid as bigint)"),
 
       new kernel::Field::Date(
                 name          =>'lastmondate',
