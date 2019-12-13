@@ -214,6 +214,7 @@ sub HousingAnalyse
    my $app=$self->getParent;
    my @idlist=@_;
    my $nomail=1;
+   my $secCnt=3600;
    my @reportNames;
 
    my $DarwinDev="TIT.TSI.DE.W5BASE";
@@ -468,6 +469,18 @@ sub HousingAnalyse
       my @ivosystemid;
       my @housingsystemid;
       if ($#ivosystemid==-1){
+         msg(INFO,"missing Usage-Fixup on $assetid");
+         foreach my $sysrec (values(%amsystem)){
+            if ($sysrec->{usage} eq ""){
+               if (($sysrec->{iassignmentgroup}=~m/^TIT\..*/) &&
+                   ($sysrec->{assignmentgroup}=~m/^MIS\..*/)){
+                  msg(INFO,"tread missing Usage on $sysrec->{systemid} as INVOICE_ONLY?");
+                  $sysrec->{usage}="INVOICE_ONLY?";
+               }
+            }
+         }
+
+
          msg(INFO,"check for INVOICE_ONLY* our HOUSING on $assetid");
          foreach my $sysrec (values(%amsystem)){
             if ($sysrec->{assetassetid} eq $assetid){
@@ -530,6 +543,7 @@ sub HousingAnalyse
           my @ivosystemidNotInW5B;
           my @ivosystemidWithServices;
           my @ivosystemidShortesName;
+          my @ivosystemid100PartOfAsset;
           my $ivosystemidShortesNameLen;
           if ($#ivosystemid>0){
              msg(INFO,"multiple INVOICE_ONLY* systems - try to find the right");
@@ -555,6 +569,9 @@ sub HousingAnalyse
                 if ($amsystem{$systemid}->{usage} eq "INVOICE_ONLY"){
                    push(@correctnamed,$systemid);
                 }
+                if ($amsystem{$systemid}->{partofasset}==1.0){
+                   push(@ivosystemid100PartOfAsset,$systemid);
+                }
              }
              if ($#correctnamed==0){
                 msg(INFO,"SystemID $correctnamed[0] is correct named");
@@ -566,13 +583,13 @@ sub HousingAnalyse
              }
           }
 
-
-
-
-
           if ($#ivosystemid>0){
              my $ivosystemidSelected;
-             if ($#ivosystemidNotInW5B==0){
+             if ($#ivosystemid100PartOfAsset==0){
+                msg(INFO,"select from multiple INVOICE_ONLY by one100PartOfAsset");
+                $ivosystemidSelected=$ivosystemid100PartOfAsset[0];
+             }
+             elsif ($#ivosystemidNotInW5B==0){
                 msg(INFO,"select from multiple INVOICE_ONLY by NotInW5B");
                 $ivosystemidSelected=$ivosystemidNotInW5B[0];
              }
@@ -617,6 +634,16 @@ sub HousingAnalyse
                       "W5Base",
                       $w5systemid{$systemid}->{id},
                       "0,0"
+                   );
+                   $secCnt++;
+                   $self->addMessage("UpdMDateInW5Sys",
+                      $systemid,
+                      $amasset{$assetid}->{tsacinv_locationfullname},
+                      $DarwinDev,
+                      "-- MDate Update des Systems ".
+                      "   $w5systemid{$systemid}->{name} \n".
+                      "update system set modifydate=DATE_ADD(NOW(),INTERVAL -$secCnt SECOND) where ".
+                      "id='$w5systemid{$systemid}->{id}';\n"
                    );
                 }
              }
