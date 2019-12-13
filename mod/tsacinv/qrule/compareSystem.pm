@@ -170,6 +170,16 @@ sub qcheckRecord
             if ($rec->{srcid} ne ""){
                $forcedupd->{srcid}=undef;
             }
+            # transfer Incident-Assignmentgroup from AssetManager to W5Base
+            # System-Record - if no Incident-Assignmentgroup is in W5Base
+            if (exists($rec->{acinmassignmentgroupid}) && 
+                $rec->{acinmassignmentgroupid} eq ""){
+               if ($rec->{acreliassignmentgroup} ne ""){
+                  $forcedupd->{acinmassingmentgroup}=
+                     $rec->{acreliassignmentgroup}; # transfer Incident-AG
+                                                    # from AM to Darwin
+               }
+            }
          }
       }
       else{
@@ -796,6 +806,8 @@ sub qcheckRecord
          my @fld=grep(!/^srcload$/,keys(%$forcedupd));
          if ($#fld!=-1){
             push(@qmsg,"all desired fields has been updated: ".join(", ",@fld));
+            $checksession->{EssentialsChangedCnt}++;
+            map({$checksession->{EssentialsChanged}->{$_}++} @fld);
          }
       }
       else{
