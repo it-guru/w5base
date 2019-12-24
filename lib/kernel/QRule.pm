@@ -264,6 +264,7 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
    }
    elsif ($param{mode} eq "leftouterlinkcreate" ||
           $param{mode} eq "leftouterlinkbaselogged" ||
+          $param{mode} eq "leftouterlinkmissok" ||
           $param{mode} eq "leftouterlink"){  # like servicesupprt links
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&
@@ -337,6 +338,18 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                       $ref.="(".$origrec->{$idfield->Name()}.")";
                    }
                    $obj->Log(ERROR,"basedata",
+                        "Missing key '$comprec->{$compfieldname}' while ".
+                        "try to import '$compfieldname' in '".
+                        $ref."' with module '$callerpackage'".
+                        "\n-");
+               }
+               elsif ($param{mode} eq "leftouterlinkmissok"){
+                   my $ref=$obj->Self;
+                   my $idfield=$obj->IdField();
+                   if (defined($idfield) && $origrec->{$idfield->Name()} ne ""){
+                      $ref.="(".$origrec->{$idfield->Name()}.")";
+                   }
+                   msg(DEBUG,
                         "Missing key '$comprec->{$compfieldname}' while ".
                         "try to import '$compfieldname' in '".
                         $ref."' with module '$callerpackage'".

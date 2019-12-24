@@ -202,7 +202,7 @@ sub qcheckRecord
                              $parrec,"image_name",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlinkbaselogged',
+                             mode=>'leftouterlinkmissok',
                              iomapped=>$par);
                if ($autocorrect){
                   my $net=getModuleObject($self->getParent->Config(),
