@@ -77,8 +77,8 @@ de=>'<b>Achtung:</b> Bitte verwenden Sie die Funktion "Neueingabe" nur dann, wen
 en=>'<b>Attention:</b> Please use the "New" function only in case you really want to create a <u>new</u> Config-Item. If the Config-Item already exists in another Config-Management-System, please use the "Import" function.'
 },
 'issox'=>{
-de=>'Wenn die Applikation in den ICS/SOX Focus gelangt wird dies bei der Applikation dokumentiert. Per Default wird die Applikationsvorgabe automatisch in dieses Feld übernommen.',
-en=>'When the application reaches the ICS/SOX Focus, this is documented in the application. By default, the application default is automatically transferred to this field.'
+de=>'Wenn die Applikation in den ICS/SOX Focus gelangt wird dies bei der Applikation dokumentiert. Per Default wird die Applikationsvorgabe automatisch in dieses Feld übernommen. Wenn dieses Feld auf Ja gesetzt ist, wird über eine Quality-Rule geprüft, ob der System-Betrieb SOX konform erfolgt. Dies wird z.B. mittels dem Feld SAS70= Yes durch den Provider bestätigt.',
+en=>'When the application reaches the ICS/SOX Focus, this is documented in the application. By default, the application default is automatically transferred to this field. If this field is set to "Yes", a quality rule is used to check whether system operation is SOX-compliant. This is confirmed by the provider, for example, using the field SAS70= Yes.'
 },
 'nosoxinherit'=>{
 de=>'Soll die Applikationsvorgabe für einzelne Server nicht übernommen werden, so ist hier ein Nein einzutragen.',
