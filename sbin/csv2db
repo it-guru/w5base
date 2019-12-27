@@ -37,9 +37,11 @@ use vars qw($opt_v $opt_h $opt_c
             $opt_w 
             $opt_fieldsize 
             $opt_p 
+            $opt_chronolog
             $opt_tsize 
             $opt_l 
-            $configname);
+            $configname
+            $log_sth);
 $|=1;
 my $startProcessPPID=getppid(); # there is need to check ppid at at start 
                                 # against current, because IO::Multiplex and
@@ -54,6 +56,7 @@ exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'warnlevel=i'=>\$opt_w,
                         'fieldsize=i'=>\$opt_fieldsize,
                         'post=s'=>\$opt_p,
+                        'storeChronolog'=>\$opt_chronolog,
                         'transactsz=i'=>\$opt_tsize,
                         'debug'=>\$opt_v,
                         'help'=>\$opt_h,
@@ -463,6 +466,12 @@ sub ProcessTempfile
    msg(INFO,"connect to Oracle database Schema");
    my ($dbi,$schema,$partner)=getOracleDBIConnectionHandle();
 
+   $log_sth=$dbi->prepare(
+      "insert into \"CHRONOLOG\" ".
+      "(\"TSTAMP\",\"TARGETTABLE\",\"MSG\")".
+      " values(current_date,?,?)");
+
+
    $FIELDS=~s/\s*$//;
    my $c=1;
    @FIELDS=map({
@@ -481,11 +490,32 @@ sub ProcessTempfile
    # Sicherstellen das Zieltabelle vorhanden
    #
    my $found=0;
+   my $foundChronoLog=0;
    foreach my $tab (getOracleDBIschemaInfo($dbi,$schema)){
       if ($tab->{TABLE_TYPE} eq "TABLE" &&
           $tab->{'TABLE_NAME'} eq $DSTTAB){
          $found++;
       }
+      if ($tab->{TABLE_TYPE} eq "TABLE" &&
+          $tab->{'TABLE_NAME'} eq "CHRONOLOG"){
+         $foundChronoLog++;
+      }
+   }
+   if (!$foundChronoLog && $opt_chronolog){
+      my $sql="create table \"CHRONOLOG\" (".
+              "\"TSTAMP\" date not null,".
+              "\"TARGETTABLE\" varchar2(128),".
+              "\"MSG\" varchar2(4000))";
+      my $bk=$dbi->doCmd($sql);
+      if ($bk ne "0E0"){
+         msg(ERROR,"fail to create CHRONOLOG table");
+         exit(1);
+      }
+      $log_sth->execute($DSTTAB,"CHRONOLOG create");
+      
+   }
+   if ($opt_chronolog){
+      $log_sth->execute($DSTTAB,"start processing");
    }
    if (!$found){
       my $sql="create table \"$DSTTAB\" (".
@@ -504,6 +534,9 @@ sub ProcessTempfile
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create target table");
          exit(1);
+      }
+      if ($opt_chronolog){
+         $log_sth->execute($DSTTAB,"create table");
       }
       my $sql="create unique index \"${DSTTAB}_i0\" ".
               "on \"$DSTTAB\" (\"W5_id\")";
@@ -538,6 +571,9 @@ sub ProcessTempfile
       if ($bk ne "0E0"){
          msg(ERROR,"fail to create i4 index for target table table");
          exit(1);
+      }
+      if ($opt_chronolog){
+         $log_sth->execute($DSTTAB,"create of additional indizies done");
       }
    }
 
@@ -588,6 +624,9 @@ sub ProcessTempfile
    # bereits geladenen CSV Stand erzeugen
    #
    if (open(F,">$TMP/sqlcurrent.csv")){
+      if ($opt_chronolog){
+         $log_sth->execute($DSTTAB,"start download of current table state");
+      }
       my $cmd="select \"W5_rawline\" from \"$DSTTAB\" ".
               "where \"W5_isdel\"='0'";
       if ($opt_archivemode){  # only lines with W5_key are usesable
@@ -608,6 +647,9 @@ sub ProcessTempfile
          }
       }
       close(F);
+      if ($opt_chronolog){
+         $log_sth->execute($DSTTAB,"finish download of current table state");
+      }
    }
 
 
@@ -844,16 +886,28 @@ sub ProcessTempfile
       $stat{clr}=$sqlbk;
    }
 
-   msg(INFO,"start final commit");
    $dbi->commit();
    $stat{commit}++;
-   $dbi->disconnect();
-   msg(INFO,"final commit done");
-
-
    $stat{end}=time();
    $stat{opcnt}=$stat{upd}+$stat{ins}+$stat{del};
    $stat{duration}=$stat{end}-$stat{start};
+
+   msg(INFO,"start final commit");
+   if ($opt_chronolog){
+      $log_sth->execute($DSTTAB,"finish processing");
+      $log_sth->execute($DSTTAB,
+         sprintf("STAT: duration: %d sec  ins:%d upd:%d del:%d",
+                 $stat{duration},
+                 $stat{ins},
+                 $stat{upd},
+                 $stat{del}
+         )
+      );
+      $dbi->commit();
+   }
+   $dbi->disconnect();
+   msg(INFO,"final commit done");
+
 
    my $metric=INFO;
    if (($opt_w & 2) && ($stat{duration}<3)){
@@ -931,6 +985,8 @@ sub Help
           "[none]");
    printf($form,"--limittime  limit t for replication process in sec",
           "[600]");
+   printf($form,"","");
+   printf($form,"--storeChronologic  Stores all operations in a chronolog","");
    printf("\n");
    printf("SRCURI:\n");
    printf("This can be a local file or a sftp://... URI. If a sftp URI\n".
