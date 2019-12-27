@@ -346,7 +346,12 @@ foreach my $SOURCE (@SOURCELIST){
       foreach my $remotefile (split(/[\r\n]+/,$res)){
           $remotefile=~s/\s*$//s;
           msg(INFO,"processing file '$remotefile'");
-          my $cmd="echo 'lcd \"$ftptemp\"\ncd $dir\nget \"$remotefile\"' | ".
+          my $postGet="";
+          if ($opt_p eq "rename" || $opt_p eq "delete"){
+             $postGet="\nrename \"$remotefile\" \"$remotefile.inprog\"";
+          }
+          my $cmd="echo 'lcd \"$ftptemp\"\n".
+                  "cd $dir\nget \"$remotefile\"$postGet' | ".
                   " sftp -b - \"$host\" 2>&1";
           my $res=`$cmd`;
           my $loaderror;
@@ -355,6 +360,10 @@ foreach my $SOURCE (@SOURCELIST){
           }
           prepairTempfile($ftptemp."/".$remotefile);
           ProcessTempfile();
+          if ($opt_p eq "rename" || $opt_p eq "delete"){
+             $remotefile.=".inprog";
+          }
+
           if ($opt_p eq "rename"){
              my $cmd="echo 'cd $dir\n".
                      "rename \"$remotefile\" \"$remotefile.done\"' | ".
