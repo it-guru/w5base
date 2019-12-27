@@ -78,6 +78,25 @@ sub getControlRecord
              target       =>'delmgr2',
              idfield      =>'delmgr2id'
            },
+           itsemteamcostcenter=>{
+             replaceoptype=>'base::grp',
+             dataobj      =>'finance::costcenter',
+             target       =>'itsemteam',
+             idfield      =>'itsemteamid',
+             targetlabel  =>'name'
+           },
+           itsemcostcenter=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'finance::costcenter',
+             target       =>'itsem',
+             idfield      =>'itsemid'
+           },
+           itsem2costcenter=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'finance::costcenter',
+             target       =>'itsem2',
+             idfield      =>'itsem2id'
+           },
          ];
    return($d);
 }
