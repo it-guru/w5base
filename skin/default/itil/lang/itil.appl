@@ -76,7 +76,7 @@
 'Application is mangaged by rules of SOX or ICS'=>{de=>'Nach ICS oder SOX Richtlinien zu betreuen'},
 'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
 'changenotify'=>{de=>'Change-Benachrichtigung',en=>'Changenotification'},
-'STEVapplchanged'=>{de=>'Benachrichtigung bei hinzufügen/entfernen einer Anwendung',en=>'notification on add/remove of application'},
+'STEVapplchanged'=>{de=>'Benachrichtigung bei Hinzufügen/Entfernen/Umbenennen einer Anwendung',en=>'notification on add/remove/rename of application'},
 'STEVchangeinfobyfunction'=>{de=>'Change-Benachrichtigung über Funktion (AM, TSM)',
                              en=>'automatic change notification by function (AM, TSM)'},
 'STEVchangeinfobydepfunc'=>{de=>'Change-Benachrichtigung über Funktion (AM-, TSM-Vertreter)',

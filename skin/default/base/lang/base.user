@@ -92,7 +92,7 @@
 	          en=>'Private-Contact Mobile by day'},
 'SMS.homenight'=>{de=>'Privat-Kontakt Handynummer nachts',
 	            en=>'Private-Contact Mobile by night'},
-'STEVuserchanged'=>{de=>'Benachrichtigung bei hinzufügen/entfernen von Kontakten',en=>'notify on change or add of contacts'},
+'STEVuserchanged'=>{de=>'Benachrichtigung bei Hinzufügen/Entfernen/Umbenennen von Kontakten',en=>'notify on add/remove/rename of contacts'},
 'Modify/View SSH Public Key'=>{de=>'Änderung/Abfrage des SSH Public Key'},
 'key has been stored'=>{de=>'Schlüssel konnte erfolgreich gespeichert werden'},
 'SECSTATE.1'=>{de=>'1 - keinerlei Zugriff auf personenbezogene Daten',

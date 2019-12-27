@@ -628,6 +628,17 @@ sub NotifyAddOrRemoveObject
       $op="insert";
    }
    if (defined($oldrec) && defined($newrec)){
+      if (exists($oldrec->{$labelname}) && exists($newrec->{$labelname})){
+         my $old=$oldrec->{$labelname};
+         my $new=$newrec->{$labelname};
+         $old=~s/\[\d+\]$//;
+         $new=~s/\[\d+\]$//;
+         if ($old ne $new){
+            $op="rename";
+         }
+      }
+
+
       if (exists($newrec->{cistatusid})){
          if ($newrec->{cistatusid}==4 && $oldrec->{cistatusid}!=4){
             $op="activate";
@@ -669,6 +680,11 @@ sub NotifyAddOrRemoveObject
       }
       if ($op eq "deactivate"){
          $msg=$self->T("MSG008");
+         $msg=sprintf($msg,$modulelabel,$name,$mandatorstr,$fullname);
+         $msg.="\n\nDirectLink:\n$url";
+      }
+      if ($op eq "rename"){
+         $msg=$self->T("MSG012");
          $msg=sprintf($msg,$modulelabel,$name,$mandatorstr,$fullname);
          $msg.="\n\nDirectLink:\n$url";
       }

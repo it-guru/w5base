@@ -176,5 +176,17 @@ Die Aktivierung des Config-Item "%s" wurde abgelehnt.
 %s
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
+'MSG012'=>{en=>'%s: RENAME
+
+The Config-Item "%s" %s has been renamed by "%s".
+
+Depending on your user rights, it is possible that the new record is not accessable by you.
+
+',de=>'%s: UMBENENNUNG
+
+Das Config-Item "%s" %s wurde durch den User "%s" umbenannt.
+
+Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
+'},
 'argumentation'=>{de=>'Begründung'},
 
