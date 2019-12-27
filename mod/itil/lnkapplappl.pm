@@ -56,6 +56,7 @@ sub new
                 htmldetail    =>'NotEmptyOrEdit',
                 vjoineditbase =>{cistatusid=>[2,3,4,5]},
                 SoftValidate  =>1,
+                AllowEmpty    =>1,
                 vjointo       =>'itil::appl',
                 vjoinon       =>['gwapplid'=>'id'],
                 vjoindisp     =>'name',
@@ -125,7 +126,7 @@ sub new
                 htmlwidth     =>'250px',
                 htmldetail    =>0,
                 searchable    =>0,
-                readonly      =>0,
+                readonly      =>1,
                 transprefix   =>'contype.',
                 dataobjattr   =>"concat(".
                                 "if (lnkapplappl.ifrelation=".
@@ -135,6 +136,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'rawcontype',
                 label         =>'raw Interfacetype',
+                uploadable    =>0,
                 dataobjattr   =>'lnkapplappl.contype'),
 
       new kernel::Field::Select(
@@ -379,6 +381,7 @@ sub new
                 name          =>'rawmonitor',
                 group         =>'classi',
                 label         =>'raw Interface Monitoring',
+                uploadable    =>0,
                 dataobjattr   =>'lnkapplappl.monitor'),
 
       new kernel::Field::Select(
@@ -402,6 +405,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'rawmonitortool',
                 group         =>'classi',
+                uploadable    =>0,
                 label         =>'raw Interface Monitoring Tool',
                 dataobjattr   =>'lnkapplappl.monitortool'),
 
@@ -1011,20 +1015,29 @@ sub Validate
 
    my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
    if ($ifrel eq "DIRECT"){
-      if (exists($newrec->{gwapplid}) && $newrec->{gwapplid} ne "" &&
-          !exists($newrec->{ifrel})){
-         $newrec->{ifrel}="INDIRECT";
+      if (!exists($newrec->{ifrel})){
+         if (exists($newrec->{gwapplid}) && $newrec->{gwapplid} ne ""){
+            $newrec->{ifrel}="INDIRECT";
+         }
       }
       else{
          if ($gwapplid ne ""){
-            $newrec->{gwapplid}=undef;
+            $self->LastMsg(ERROR,"gateway application not allowed");
+            return(0);
          }
       }
    }
    else{
-      if ($gwapplid eq ""){
-         $self->LastMsg(ERROR,"no valid gateway application specified");
-         return(0);
+      if (!exists($newrec->{ifrel})){
+         if (exists($newrec->{gwapplid}) && $newrec->{gwapplid} eq ""){
+            $newrec->{ifrel}="DIRECT";
+         }
+      }
+      else{
+         if ($gwapplid eq ""){
+            $self->LastMsg(ERROR,"no valid gateway application specified");
+            return(0);
+         }
       }
    }
 

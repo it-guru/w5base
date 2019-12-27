@@ -131,3 +131,4 @@
 'Gateway Application'=>{de=>'Gateway-Anwendung'},
 'Interface Relation'=>{de=>'Schnittstellen-Beziehung'},
 'no valid gateway application specified'=>{de=>'keine gültige Gateway-Anwendung angegeben'},
+'gateway application not allowed'=>{de=>'Gateway-Anwendung nicht erlaubt'},
