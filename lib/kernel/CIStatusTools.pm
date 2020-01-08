@@ -585,6 +585,11 @@ sub NotifyAddOrRemoveObject
    my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
    my $name=effVal($oldrec,$newrec,$labelname);
    my $fullname="???";
+   my $oldname="???";
+
+   if (defined($oldrec) && exists($oldrec->{$labelname})){
+      $oldname=$oldrec->{$labelname};
+   }
 
    my $UserCache=$self->Cache->{User}->{Cache};
    if (defined($UserCache->{$ENV{REMOTE_USER}})){
@@ -685,7 +690,7 @@ sub NotifyAddOrRemoveObject
       }
       if ($op eq "rename"){
          $msg=$self->T("MSG012");
-         $msg=sprintf($msg,$modulelabel,$name,$mandatorstr,$fullname);
+         $msg=sprintf($msg,$modulelabel,$oldname,$mandatorstr,$name,$fullname);
          $msg.="\n\nDirectLink:\n$url";
       }
       my $sitename=$self->Config->Param("SITENAME");
