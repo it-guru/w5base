@@ -75,6 +75,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
+                selectfix     =>1,
                 dataobjattr   =>'costcenter.cistatus'),
 
       new kernel::Field::Text(
