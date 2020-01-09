@@ -137,8 +137,16 @@ sub setReferencesToNull
          if (defined($idfield)){
             my $idname=$idfield->Name();
             if ($ref->{type} ne "ContactLnk"){
-               if ($ref->{type} ne "Databoss"){
-                  if (!defined($contactrec) || $contactrec->{cistatusid}==7){
+               if ($ref->{type} ne "Databoss" ||
+                   (exists($rec->{cistatusid}) &&  # if record is marked as 
+                    $rec->{cistatusid}>5)){        # delete, databoss can
+                                                   # be set to NULL
+                  if (!defined($contactrec) || 
+                      $contactrec->{cistatusid}==7 
+                     # || ($contactrec->{cistatusid}==6 &&  # cleanup if chkrec
+                     #  exists($rec->{cistatusid}) &&       # self is already
+                     #  $rec->{cistatusid}>5)               # marked as delete
+                      ){
                      # nur entsorgte Rollen sollen geNULLt werden
                      # https://darwin.telekom.de/darwin/auth/base/workflow/ById/15053783010001
                      if ($dataobj->UpdateRecord({$ref->{rawfield}=>undef},

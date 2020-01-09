@@ -254,7 +254,7 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(0,undef) if (!exists($rec->{cistatusid}) || $rec->{cistatusid}>5);
+   #return(0,undef) if (!exists($rec->{cistatusid}) || $rec->{cistatusid}>5);
 
    my @chkfieldtypes=qw(ContactLnk Contact Group Databoss);
    my $chkfieldtypes=join("|",@chkfieldtypes);
@@ -393,10 +393,17 @@ sub qcheckRecord
       }
    }
    if ($#failmsg!=-1){
-      return(3,{
-         qmsg=>['There are invalid contact references!',@failmsg],
-         dataissue=>['There are invalid contact references!',@dataissue]
-      });
+      if (exists($rec->{cistatusid}) &&  $rec->{cistatusid}<=5){
+         return(3,{
+            qmsg=>['There are invalid contact references!',@failmsg],
+            dataissue=>['There are invalid contact references!',@dataissue]
+         });
+      }
+      else{
+         return(0,{
+            qmsg=>['There are invalid contact references!',@failmsg]
+         });
+      }
    }
    
    return(0,undef);
