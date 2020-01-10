@@ -1014,16 +1014,21 @@ sub Validate
    $ifrel="DIRECT" if ($ifrel eq "");
 
    my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
-   if ($ifrel eq "DIRECT"){
+   if ($ifrel eq "DIRECT"){    # indirekt auf direkt
       if (!exists($newrec->{ifrel})){
          if (exists($newrec->{gwapplid}) && $newrec->{gwapplid} ne ""){
             $newrec->{ifrel}="INDIRECT";
          }
       }
       else{
-         if ($gwapplid ne ""){
-            $self->LastMsg(ERROR,"gateway application not allowed");
-            return(0);
+         if (!exists($newrec->{gwapplid})){
+            $newrec->{gwapplid}=undef;
+         }
+         else{
+            if ($gwapplid ne ""){
+               $self->LastMsg(ERROR,"gateway application not allowed");
+               return(0);
+            }
          }
       }
    }
