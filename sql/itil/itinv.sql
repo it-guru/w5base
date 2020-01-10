@@ -252,7 +252,7 @@ create table ipaddress (
   id         bigint(20) NOT NULL,
   name       varchar(45) NOT NULL, binnamekey char(128),
   cistatus   int(2)      NOT NULL,
-    dnsname        varchar(40) default NULL,
+    dnsname        varchar(128) default NULL,
     addresstyp     int(10)     default NULL,
     is_foundindns  bool default '0',is_controllpartner  bool default '0',
     system         bigint(20)  default NULL,
