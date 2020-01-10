@@ -83,3 +83,22 @@ create table tRnAI_usbsrvport(
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
 alter table tRnAI_useraccount add sappersno varchar(20),add bdate datetime;
+create table tRnAI_lnkuseraccountsystem(
+  id              bigint(20)   NOT NULL,
+  system          bigint(20)   NOT NULL,
+  useraccount     bigint(20)   NOT NULL,
+  reltyp          varchar(20), uflag varchar(20) default NULL,
+    additional     longtext    default NULL,
+  comments    longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  UNIQUE(system,useraccount),
+  UNIQUE KEY `PrimCheck`(system,uflag),
+  FOREIGN KEY (system) REFERENCES tRnAI_system (id) ON DELETE CASCADE,
+  FOREIGN KEY (useraccount) REFERENCES tRnAI_useraccount (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -1,6 +1,6 @@
-package tRnAI::useraccount;
+package tRnAI::lnkuseraccountsystem;
 #  W5Base Framework
-#  Copyright (C) 2019  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2020  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -39,111 +39,112 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'W5BaseID',
-                dataobjattr   =>'tRnAI_useraccount.id'),
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.id'),
                                                   
-      new kernel::Field::Text(
-                name          =>'name',
-                label         =>'AD-Account',
-                htmlwidth     =>'120px',
-                dataobjattr   =>'tRnAI_useraccount.name'),
+      new kernel::Field::TextDrop(
+                name          =>'useraccount',
+                label         =>'User-Account',
+                vjointo       =>\'tRnAI::useraccount',
+                vjoinon       =>['useraccountid'=>'id'],
+                vjoindisp     =>'name'),
 
-      new kernel::Field::Text(
-                name          =>'domain',
-                label         =>'AD-Domain',
-                htmldetail    =>0,
-                readonly      =>1,
-                htmlwidth     =>'120px',
-                dataobjattr   =>'tRnAI_useraccount.domain'),
+      new kernel::Field::Link(
+                name          =>'useraccountid',
+                label         =>'useraccountid',
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.useraccount'),
 
-      new kernel::Field::Email(
-                name          =>'email',
-                label         =>'E-Mail',
-                dataobjattr   =>'tRnAI_useraccount.email'),
-
-      new kernel::Field::Date(
-                name          =>'expdate',
-                label         =>'SC Expireing Date',
-                dataobjattr   =>'tRnAI_useraccount.expdate'),
-
-      new kernel::Field::Date(
-                name          =>'birthdate',
-                label         =>'date of birth',
-                dayonly       =>1, 
-                dataobjattr   =>'tRnAI_useraccount.bdate'),
-
-      new kernel::Field::Text(
-                name          =>'sappersno',
-                label         =>'SAP personal number',
-                dataobjattr   =>'tRnAI_useraccount.sappersno'),
-
-      new kernel::Field::Text(
-                name          =>'comments',
-                label         =>'Comments',
-                dataobjattr   =>'tRnAI_useraccount.comments'),
+      new kernel::Field::Link(
+                name          =>'uflag',
+                label         =>'uflag',
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.uflag'),
 
       new kernel::Field::TextDrop(
                 name          =>'system',
                 label         =>'VDI-Systemname',
+                htmlwidth     =>'140',
                 vjointo       =>\'tRnAI::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Select(
+                name          =>'reltyp',
+                label         =>'relation type',
+                value         =>['PRIM','SEC'],
+                htmlwidth     =>'110',
+                default       =>'PRIM',
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.reltyp'),
+
+
       new kernel::Field::Link(
                 name          =>'systemid',
                 label         =>'systemid',
-                dataobjattr   =>'tRnAI_useraccount.system'),
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.system'),
 
-      new kernel::Field::SubList(
-                name          =>'systems',
-                label         =>'Systems',
-                group         =>'systems',
-                subeditmsk    =>'subedit.systems',
-                vjointo       =>\'tRnAI::lnkuseraccountsystem',
-                vjoinon       =>['id'=>'useraccountid'],
-                vjoindisp     =>['system','reltyp']),
+      new kernel::Field::TextDrop(
+                name          =>'email',
+                label         =>'E-Mail',
+                group         =>'accountinfo',
+                htmldetail    =>0,
+                vjointo       =>\'tRnAI::useraccount',
+                vjoinon       =>['useraccountid'=>'id'],
+                vjoindisp     =>'email'),
+
+      new kernel::Field::TextDrop(
+                name          =>'comments',
+                label         =>'Comments',
+                htmldetail    =>0,
+                group         =>'accountinfo',
+                vjointo       =>\'tRnAI::useraccount',
+                vjoinon       =>['useraccountid'=>'id'],
+                vjoindisp     =>'comments'),
+
+      #new kernel::Field::Text(
+      #          name          =>'comments',
+      #          label         =>'Comments',
+      #          dataobjattr   =>'tRnAI_lnkuseraccountsystem.comments'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Creation-Date',
-                dataobjattr   =>'tRnAI_useraccount.createdate'),
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.createdate'),
                                                   
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
-                dataobjattr   =>'tRnAI_useraccount.modifydate'),
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.modifydate'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
                 label         =>'Creator',
-                dataobjattr   =>'tRnAI_useraccount.createuser'),
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.createuser'),
 
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
                 label         =>'last Editor',
-                dataobjattr   =>'tRnAI_useraccount.modifyuser'),
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.modifyuser'),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
                 label         =>'Editor Account',
-                dataobjattr   =>'tRnAI_useraccount.editor'),
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 label         =>'real Editor Account',
-                dataobjattr   =>'tRnAI_useraccount.realeditor'),
+                dataobjattr   =>'tRnAI_lnkuseraccountsystem.realeditor'),
    
 
    );
-   $self->setDefaultView(qw(name email system expdate mdate));
-   $self->setWorktable("tRnAI_useraccount");
+   $self->setDefaultView(qw(useraccount system mdate));
+   $self->setWorktable("tRnAI_lnkuseraccountsystem");
    return($self);
 }
 
@@ -152,7 +153,7 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/base/load/useraccount.jpg?".$cgi->query_string());
+   return("../../../public/base/load/gnome-user-group.jpg?".$cgi->query_string());
 }
 
 
@@ -172,27 +173,29 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if ((!defined($oldrec) || defined($newrec->{name})) &&
-       (($newrec->{name}=~m/^\s*$/) || length($newrec->{name})<3)){
-      $self->LastMsg(ERROR,"invalid AD-Account specified");
-      return(0);
+   if (effVal($oldrec,$newrec,"reltyp") eq "PRIM"){
+      if (effVal($oldrec,$newrec,"uflag") ne "PRIM"){
+         $newrec->{uflag}="PRIM";
+      }
    }
-   if (exists($newrec->{name})){
-      my $n=uc($newrec->{name});
-      if (my ($d,$n)=$n=~m/^(\S+)[\/\\](\S+)$/){
-         my $full=$d."/".$n;
-         if ($full ne $newrec->{name}){
-            $newrec->{name}=$full;
-         }
-         $newrec->{domain}=$d;
+   else{
+      if (effVal($oldrec,$newrec,"uflag") ne ""){
+         $newrec->{uflag}=undef;
       }
-      else{
-         $newrec->{domain}=undef;
-      }
+   }
 
-   }
    return(1);
 }
+
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return( qw(header default accountinfo source));
+}
+
+
 
 
 sub isWriteValid
@@ -200,7 +203,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default systems);
+   my @wrgrp=qw(default);
 
    return(@wrgrp) if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
    return(undef);
@@ -224,16 +227,6 @@ sub initSearchQuery
 #                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
 #   }
 }
-
-
-
-sub getDetailBlockPriority
-{
-   my $self=shift;
-   return( qw(header default systems source));
-}
-
-
 
 
 

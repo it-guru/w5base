@@ -1,4 +1,5 @@
 'tRnAI::useraccount'=>{de=>'User-Account',en=>'User-Account'},
+'fieldgroup.systems'=>{de=>'VDI-Systeme',en=>'VDI-Systems'},
 'SC Expireing Date'=>{de=>'SC Verfallsdatum'},
 'date of birth'=>{de=>'Geburtsdatum'},
 'SAP personal number'=>{de=>'SAP-Personalnummer'},

@@ -115,9 +115,9 @@ sub new
                 forwardSearch =>1,
                 group         =>'useraccounts',
                 subeditmsk    =>'subedit.useraccounts',
-                vjointo       =>\'tRnAI::useraccount',
+                vjointo       =>\'tRnAI::lnkuseraccountsystem',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name','email','comments']),
+                vjoindisp     =>['useraccount','reltyp','email','comments']),
 
       new kernel::Field::Text(
                 name          =>'costcenter',

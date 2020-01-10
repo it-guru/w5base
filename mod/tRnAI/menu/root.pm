@@ -47,6 +47,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.RnAI.system.lnkusersys",
+                      "tRnAI::lnkuseraccountsystem",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.RnAI.system.useraccount",
                       "tRnAI::useraccount",
                       defaultacl=>['valid_user']);
