@@ -66,7 +66,12 @@ sub Validate
    if ($self->{'SoftValidate'}){
       if ((!defined($fromquery) || $fromquery eq $oldrec->{$name}) &&
           $newrec->{$name} eq $oldrec->{$name}){  # no change needs no validate
-         return({});                              # (problem EDITBASE!)
+                                                  # (problem EDITBASE!)
+         if (exists($oldrec->{$self->{vjoinon}->[0]})){
+            my $oldid=$oldrec->{$self->{vjoinon}->[0]};
+            return({$self->{vjoinon}->[0]=>$oldid});
+         }
+         return({});
       }
    }
 
