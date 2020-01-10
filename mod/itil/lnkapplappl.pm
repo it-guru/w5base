@@ -55,7 +55,7 @@ sub new
                 label         =>'Gateway Application',
                 htmldetail    =>'NotEmptyOrEdit',
                 vjoineditbase =>{cistatusid=>[2,3,4,5]},
-                SoftValidate  =>1,
+                xSoftValidate  =>1,
                 AllowEmpty    =>1,
                 vjointo       =>'itil::appl',
                 vjoinon       =>['gwapplid'=>'id'],
