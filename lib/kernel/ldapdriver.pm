@@ -344,7 +344,7 @@ sub do
 }
 
 END{
-   msg(WARN,"closing all LDAP Sessions");
+   #msg(WARN,"closing all LDAP Sessions");
    foreach my $SessionCacheKey (keys(%LDAPConnectionPool::Session)){
       my $cacheEntry=$LDAPConnectionPool::Session{$SessionCacheKey};
       unbindHandle($cacheEntry->{ldap});
