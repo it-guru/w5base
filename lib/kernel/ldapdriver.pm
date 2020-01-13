@@ -45,7 +45,8 @@ sub new
 sub DESTROY
 {
    my $self=shift;
-   if (!defined($self->{SessionCacheKey})){
+
+   if ($self->{isConnected}){
       unbindHandle($self->{ldap});
       delete($self->{ldap});
    }
@@ -78,21 +79,21 @@ sub Connect
    my $BackendSessionName=$self->getParent->BackendSessionName();
    $BackendSessionName="default" if (!defined($BackendSessionName));
 
-   if ($BackendSessionName ne "ForceUncached"){
-      $self->{SessionCacheKey}=$BackendSessionName.':'.$ldapname; 
-      if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
-         my $cacheEntry=$LDAPConnectionPool::Session{$self->{SessionCacheKey}};
-         if (time()-$cacheEntry->{atime}<300){
-            $self->{ldap}=$cacheEntry->{ldap};
-            $self->{isConnected}=1;
-            return($self->{'ldap'});
-         }
-         else{
-            unbindHandle($cacheEntry->{ldap});
-            delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
-         }
-      }
-   }
+#   if ($BackendSessionName ne "ForceUncached"){
+#      $self->{SessionCacheKey}=$BackendSessionName.':'.$ldapname; 
+#      if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
+#         my $cacheEntry=$LDAPConnectionPool::Session{$self->{SessionCacheKey}};
+#         if (time()-$cacheEntry->{atime}<300){
+#            $self->{ldap}=$cacheEntry->{ldap};
+#            $self->{isConnected}=1;
+#            return($self->{'ldap'});
+#         }
+#         else{
+#            unbindHandle($cacheEntry->{ldap});
+#            delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
+#         }
+#      }
+#   }
 
 
    $p{ldapuser}=$self->getParent->Config->Param('DATAOBJUSER');
@@ -130,12 +131,12 @@ sub Connect
    }
    else{
       $self->{isConnected}=1;
-      if (defined($self->{SessionCacheKey})){
-         $LDAPConnectionPool::Session{$self->{SessionCacheKey}}={
-            ldap=>$self->{'ldap'},
-            atime=>time()
-         };
-      }
+     # if (defined($self->{SessionCacheKey})){
+     #    $LDAPConnectionPool::Session{$self->{SessionCacheKey}}={
+     #       ldap=>$self->{'ldap'},
+     #       atime=>time()
+     #    };
+     # }
    }
 
    return($self->{'ldap'});
@@ -160,22 +161,22 @@ sub execute
    my @param=@_;
    my %p=@param;
 
-   if (defined($self->{SessionCacheKey})){
-      if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
-         my $cacheEntry=
-             $LDAPConnectionPool::Session{$self->{SessionCacheKey}};
-         if (time()-$cacheEntry->{atime}<300){
-            $cacheEntry->{atime}=time();
-         }
-         else{
-            printf STDERR ("fifi reset socket\n");
-            unbindHandle($cacheEntry->{ldap});
-            delete($self->{ldap});
-            delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
-            $self->Connect();
-         }
-      }
-   }
+#   if (defined($self->{SessionCacheKey})){
+#      if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
+#         my $cacheEntry=
+#             $LDAPConnectionPool::Session{$self->{SessionCacheKey}};
+#         if (time()-$cacheEntry->{atime}<300){
+#            $cacheEntry->{atime}=time();
+#         }
+#         else{
+#            printf STDERR ("fifi reset socket\n");
+#            unbindHandle($cacheEntry->{ldap});
+#            delete($self->{ldap});
+#            delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
+#            $self->Connect();
+#         }
+#      }
+#   }
 
    my $c=$self->getParent->Context;
    delete($c->{$self->{ldapname}});
@@ -208,17 +209,17 @@ sub execute
       if ($c->{$self->{ldapname}}->{sth}->code()){
          $c->{$self->{ldapname}}->{sthdata}=[];
          $c->{$self->{ldapname}}->{sthcount}=0;
-         if (defined($self->{SessionCacheKey})){
-            if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
-               my $cacheEntry=
-                   $LDAPConnectionPool::Session{$self->{SessionCacheKey}};
-               printf STDERR ("fifi cleanup bad socket\n");
-               unbindHandle($cacheEntry->{ldap});
-               delete($self->{ldap});
-               delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
-               $self->Connect();
-            }
-         }
+#         if (defined($self->{SessionCacheKey})){
+#            if (exists($LDAPConnectionPool::Session{$self->{SessionCacheKey}})){
+#               my $cacheEntry=
+#                   $LDAPConnectionPool::Session{$self->{SessionCacheKey}};
+#               printf STDERR ("fifi cleanup bad socket\n");
+#               unbindHandle($cacheEntry->{ldap});
+#               delete($self->{ldap});
+#               delete($LDAPConnectionPool::Session{$self->{SessionCacheKey}});
+#               $self->Connect();
+#            }
+#         }
          my $msg=msg(ERROR,"ldap-search:%s (%s)",
                           $c->{$self->{ldapname}}->{sth}->error,
                           Dumper(\@param));
@@ -343,14 +344,14 @@ sub do
    return(undef);
 }
 
-END{
-   #msg(WARN,"closing all LDAP Sessions");
-   foreach my $SessionCacheKey (keys(%LDAPConnectionPool::Session)){
-      my $cacheEntry=$LDAPConnectionPool::Session{$SessionCacheKey};
-      unbindHandle($cacheEntry->{ldap});
-      delete($LDAPConnectionPool::Session{$SessionCacheKey});
-   }
-}
+#END{
+#   #msg(WARN,"closing all LDAP Sessions");
+#   foreach my $SessionCacheKey (keys(%LDAPConnectionPool::Session)){
+#      my $cacheEntry=$LDAPConnectionPool::Session{$SessionCacheKey};
+#      unbindHandle($cacheEntry->{ldap});
+#      delete($LDAPConnectionPool::Session{$SessionCacheKey});
+#   }
+#}
 
 
 
