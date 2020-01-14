@@ -54,7 +54,7 @@ sub dailywfreport
    my $ac=getModuleObject($self->Config,"base::workflowaction");
 
 
-   $wf->SetFilter({mdate=>">now-$param{hours}h"});
+   $wf->SetFilter({mdate=>">now-$param{hours}h",isdeleted=>\'0'});
    msg(INFO,"collecting data");
    my @wflist=$wf->getHashList(qw(mdate id class affectedapplicationid 
                                   affectedapplication affectedsystem
