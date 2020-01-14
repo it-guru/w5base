@@ -192,16 +192,6 @@ sub qcheckRecord
          if (lc($parrec->{status}) eq lc("Retired")){
 
             my $retiredReached=1;
-            if ($parrec->{planned_retirement_date} ne ""){
-               my $t=CalcDateDuration(NowStamp("en"),
-                                      $parrec->{planned_retirement_date},
-                                      "GMT");
-               if (defined($t)){
-                  if ($t->{totalminutes}>0){
-                     $retiredReached=0;
-                  }
-               }  
-            }
             if ($retiredReached){
                my $msg="the given ICTO-ID is marked as retired in CAPE";
                push(@qmsg,$msg);

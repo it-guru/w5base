@@ -12,5 +12,3 @@
                     en=>'Applicationversions'},
 
 'all reference Costcenters'=>{de=>'alle referenzierten Kontierungsobjekte'},
-'planned Retirement Date'=>{de=>"geplantes Retirement Datum"},
-'Retirement Type'=>{de=>"Retirement Typ"},

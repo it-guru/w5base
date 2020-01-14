@@ -62,30 +62,10 @@ sub new
                 label         =>'Shortname',
                 dataobjattr   =>'Kurzbezeichnung'),
 
-#      new kernel::Field::Text(                      # Das Feld steht zwar
-#                name          =>'retirement_type',  # auf der Interface 
-#                label         =>'Retirement Type',  # Tabelle bereit - ist
-#                dataobjattr   =>'Retirement_Type'), # aber immer leer.
-
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 dataobjattr   =>'Status'),
-
-      new kernel::Field::Date(
-                name          =>'planned_retirement_date',
-                timezone      =>'CET',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my $current={};
-                   my %param=@_;
-                   $current=$param{current} if (exists($param{current}));
-                   return(1) if ($current->{planned_retirement_date} ne "");
-                   return(0);
-                },
-                label         =>'planned Retirement Date',
-                dataobjattr   =>'geplantes_Retirement_Datum'),
 
       new kernel::Field::Text(
                 name          =>'organisation',
