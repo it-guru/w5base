@@ -348,6 +348,11 @@ sub preProcessFilter
                $neg++;
                $chk=~s/^!//;
             }
+            if ($neg && exists($self->{container})){
+               $err=$self->getParent->T("negations not allowed on ".
+                                        "container based fields",$self->Self());
+               last;
+            }
             my $qchk='^'.quotemeta($chk).'$';
             $qchk=~s/\\\*/\.*/g;
             $qchk=~s/\\\?/\./g;
@@ -361,12 +366,12 @@ sub preProcessFilter
             }
             else{
                if ($neg){
-                  if (grep(/^$chk$/i,keys(%tr))){ # check if neg is translated
-                     push(@newsearch,grep(!/^$chk$/i,keys(%tr)));
+                  if (grep(/^$qchk$/i,keys(%tr))){ # check if neg is translated
+                     push(@newsearch,grep(!/^$qchk$/i,keys(%tr)));
                      $changed++;
                   }
-                  elsif (grep(/^$chk$/i,keys(%raw))){ # check if neg is on raw
-                     push(@newsearch,grep(!/^$chk$/i,keys(%raw)));
+                  elsif (grep(/^$qchk$/i,keys(%raw))){ # check if neg is on raw
+                     push(@newsearch,grep(!/^$qchk$/i,keys(%raw)));
                   }
                }
                else{

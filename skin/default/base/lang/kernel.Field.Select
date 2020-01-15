@@ -2,3 +2,4 @@
 "invalid native value '\%s' in \%s"=>{de=>"unzulässiger Inhalt '\%s' für das Feld \%s"},
 "none"=>{de=>"nicht definiert"},
 "- other -"=>{de=>"- andere -"},
+'negations not allowed on container based fields'=>{de=>'Negationen sind nicht erlaubt auf Container basierenden Feldern'},

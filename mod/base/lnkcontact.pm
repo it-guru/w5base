@@ -193,7 +193,7 @@ sub new
                 name          =>'roles',
                 label         =>'Roles',
                 htmleditwidth =>'100%',
-                searchable    =>0,
+                searchable    =>1,
                 depend        =>['parentobj'],
                 multisize     =>5,
                 container     =>'croles',
@@ -417,15 +417,23 @@ sub getPostibleRoleValues
    my @opt;
    my $parentobj;
 
+   if (!defined($current) && !defined($newrec)){
+      if (exists($app->{secparentobj})){
+         $parentobj=$app->{secparentobj}
+      }
+   }
    if (defined($current)){
       $parentobj=$current->{parentobj};
    }
    else{
-      $parentobj=$newrec->{parentobj};
+      if (defined($newrec) && exists($newrec->{parentobj})){
+         $parentobj=$newrec->{parentobj};
+      }
       if ($parentobj eq ""){
          $parentobj=Query->Param("parentobj");  # bei Neueingabe über SubList
       }
    }
+
    foreach my $obj (values(%{$app->{lnkcontact}})){
       push(@opt,$obj->getPosibleRoles($self,$parentobj,$current,$newrec));
    }

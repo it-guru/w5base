@@ -2590,9 +2590,6 @@ sub ForeachFilteredRecord
          else{
             return(undef)   
          }
-       #  if (!&$method$self->SecureValidatedDeleteRecord($rec)){
-       #     printf STDERR ("fifi ERROR in HandleDelete\n");
-       #  }
       }until(!defined($rec));
    }
    return(1);
@@ -4672,13 +4669,16 @@ sub FilterPart2SQLexp
    my $exp="";
 
    my @workfilter=(@$filter);
-#   if (!defined($sqlparam{containermode})){
       my $conjunction=$sqlparam{conjunction};
       if ($sqlparam{allow_sql_in}){  # NULL check not works with "in" statement!
          if ($#workfilter>10 && !in_array(\@workfilter,undef)){
             my @subexp=();
+            my $FinalUseSqlFieldName=$sqlfieldname;
+            if (defined($sqlparam{containermode})){
+               $FinalUseSqlFieldName=$sqlparam{containermode};
+            }
             while(my @subflt=splice(@workfilter,0,999)){
-               push(@subexp,"$sqlfieldname in (".
+               push(@subexp,"$FinalUseSqlFieldName in (".
                  join(",",map({my $qv="'".$_."'";
                                $qv="NULL" if (!defined($_)); 
                                $qv;} @subflt)).")");
@@ -4768,6 +4768,7 @@ sub FilterPart2SQLexp
             $compop=" like ";
             $val=~s/^'/\\'/;
             $val=~s/'$/\\'/;
+            #fifi $val="'".'%'."$sqlfieldname=$val=$sqlfieldname".'%'."'";
             $val="'".'%'."$sqlfieldname=$val=$sqlfieldname".'%'."'";
          }
          my $setescape="";
@@ -4814,11 +4815,12 @@ sub FilterPart2SQLexp
                $val="lower($val)";
             }
          }
+         my $FinalUseSqlFieldName=$sqlfieldname;
          if (defined($sqlparam{containermode})){
-            $sqlfieldname=$sqlparam{containermode};
+            $FinalUseSqlFieldName=$sqlparam{containermode};
          }
          $exp.=" ".$conjunction." " if ($exp ne "");
-         $exp.="(".$sqlfieldname.$compop.$val.$setescape.")"
+         $exp.="(".$FinalUseSqlFieldName.$compop.$val.$setescape.")"
       }
       $exp="($exp)" if ($exp ne "");
 #   }
