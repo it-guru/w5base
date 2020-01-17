@@ -179,6 +179,10 @@ sub new
    $self->{history}={
       update=>[
          'local'
+      ],
+      delete=>[
+         {dataobj=>'itil::system', id=>'systemid',
+          field=>'fullname',as=>'software'}
       ]
    };
    $self->setDefaultView(qw(software version quantity system cdate));
@@ -236,7 +240,8 @@ sub Validate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default instdetail lic useableby options misc link releaseinfos 
+   return(qw(header 
+             default instdetail lic useableby options misc link releaseinfos 
              upd source));
 }
 
