@@ -1279,14 +1279,34 @@ sub checkAlternateInstCreateRights
    return(1);
 }
 
-#sub FinishDelete
-#{
-#   my $self=shift;
-#   my $oldrec=shift;
-#   my $bk=$self->SUPER::FinishDelete($oldrec);
-#
-#   print STDERR "FinishDelete:".Dumper($oldrec);
-#}
+sub FinishDelete
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $bk=$self->SUPER::FinishDelete($oldrec);
+
+   my $lnksoftwareid=$oldrec->{id};
+   # Revert Prozess for AutoDisc based Software-Installations
+   if (defined($oldrec) && $oldrec->{autodischint} ne "" &&
+       $lnksoftwareid ne ""){
+      # check if current record is based on an autodiscovery record
+      my $o=getModuleObject($self->Config,"itil::autodiscrec");
+      $o->SetFilter({lnkto_lnksoftware=>\$lnksoftwareid});
+      my @l=$o->getHashList(qw(ALL));
+      if ($#l!=-1){
+         my $op=$o->Clone();
+         foreach my $autodiscrec (@l){
+            # reset posible existing autodisc records to "unprocessed"
+            $op->ValidatedUpdateRecord(
+                  $autodiscrec,
+                  {state=>1,lnkto_lnksoftware=>undef},
+                  {id=>\$autodiscrec->{id}}
+            );
+         }
+      }
+   }
+   return($bk);
+}
 
 
 
