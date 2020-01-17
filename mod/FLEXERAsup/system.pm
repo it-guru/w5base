@@ -813,7 +813,7 @@ sub initSearchQuery
    if (!defined(Query->Param("search_saphier"))){
      Query->Param("search_saphier"=>
            "\"K001YT5ATS_ES.K001YT5A_DTIT\" \"K001YT5ATS_ES.K001YT5A_DTIT.*\" ".
-           "\"YT5ATS_ES.YT5A_DTIT\" \"YT5ATS_ES.YT5A_DTIT.*\" ".
+           "\"YT5A_DTIT\" \"YT5A_DTIT.*\" ".
            "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
    }
 #   if (!defined(Query->Param("search_inflexera"))){
