@@ -45,8 +45,16 @@ sub new
                 group         =>'source',
                 dataobjattr   =>'swinstancerule.id'),
                                                  
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'fullname',
+                label         =>'Rule full label',
+                htmlwidth     =>'400px',
+                htmldetail    =>0,
+                readonly      =>1,
+                dataobjattr   =>"if (swinstancerule.ruletype='RESLNK',concat(swinstancerule.rulelabel,':',appl.name),swinstancerule.rulelabel)"),
+       
+      new kernel::Field::Text(
+                name          =>'rulelabel',
                 label         =>'Rule label',
                 htmlwidth     =>'400px',
                 htmldetail    =>0,
@@ -72,7 +80,8 @@ sub new
                 },
                 jsonchanged   =>\&getOnChangedScript,
                 label         =>'Rule Type',
-                value         =>['FWAPP','FWSYS','IPCLIACL','CFRULE','FREE'],
+                value         =>['FWAPP','FWSYS','IPCLIACL',
+                                 'CFRULE','RESLNK','FREE'],
                 dataobjattr   =>'swinstancerule.ruletype'),
 
       new kernel::Field::Interface(
@@ -173,6 +182,12 @@ sub new
                 name          =>'varval',
                 group         =>'varval',
                 label         =>'Variable-Value',
+                dataobjattr   =>'swinstancerule.varval'),
+
+      new kernel::Field::Text(
+                name          =>'resname',
+                group         =>'res',
+                label         =>'Resource-Name',
                 dataobjattr   =>'swinstancerule.varval'),
 
       new kernel::Field::Textarea(
@@ -456,9 +471,9 @@ sub Validate
 
    my $userid=$self->getCurrentUserId();
    my $ruletype=effVal($oldrec,$newrec,"ruletype");
-   my $fullname;
+   my $rulelabel;
    if ($ruletype eq "FWAPP"){
-      $fullname=sprintf("FW-A:%s:%s:%s -> %s:%s",
+      $rulelabel=sprintf("FW-A:%s:%s:%s -> %s:%s",
                 effVal($oldrec,$newrec,"policy"),
                 effVal($oldrec,$newrec,"fromaddr"),
                 effVal($oldrec,$newrec,"fromport"),
@@ -469,7 +484,7 @@ sub Validate
       }
    }
    elsif ($ruletype eq "FWSYS"){
-      $fullname=sprintf("FW-S:%s:%s:%s -> %s:%s",
+      $rulelabel=sprintf("FW-S:%s:%s:%s -> %s:%s",
                 effVal($oldrec,$newrec,"policy"),
                 effVal($oldrec,$newrec,"fromaddr"),
                 effVal($oldrec,$newrec,"fromport"),
@@ -480,12 +495,19 @@ sub Validate
       }
    }
    elsif ($ruletype eq "IPCLIACL"){
-      $fullname=sprintf("IPACL:%s:%s",
+      $rulelabel=sprintf("IPACL:%s:%s",
                 effVal($oldrec,$newrec,"clifromaddr"),
                 effVal($oldrec,$newrec,"clitoport"));
    }
+   elsif ($ruletype eq "RESLNK"){
+      $rulelabel=sprintf("RES:%s",
+                effVal($oldrec,$newrec,"resname"));
+      if (effVal($oldrec,$newrec,"parentobj") ne "itil::appl"){
+         $newrec->{parentobj}="itil::appl";
+      }
+   }
    elsif ($ruletype eq "CFRULE"){
-      $fullname=sprintf("VAR:%s=%s",
+      $rulelabel=sprintf("VAR:%s=%s",
                 effVal($oldrec,$newrec,"varname"),
                 effVal($oldrec,$newrec,"varval"));
    }
@@ -493,11 +515,11 @@ sub Validate
       my $s=effVal($oldrec,$newrec,"freetext");
       $s=~s/[^a-z0-9 ]+/ /gi;
       $s=limitlen($s,70,1);
-      $fullname=sprintf("FREE:%s",$s);
+      $rulelabel=sprintf("FREE:%s",$s);
    }
 
-   if ($fullname ne effVal($oldrec,$newrec,"fullname")){
-      $newrec->{fullname}=$fullname;
+   if ($rulelabel ne effVal($oldrec,$newrec,"rulelabel")){
+      $newrec->{rulelabel}=$rulelabel;
    }
 
    my $swinstanceid=effVal($oldrec,$newrec,"swinstanceid");
@@ -663,6 +685,7 @@ sub isViewValid
    push(@l,"appl","ipfw")   if (!defined($rec) && $ruletype eq "FWAPP");
    push(@l,"varval")        if (!defined($rec) && $ruletype eq "CFRULE");
    push(@l,"free")          if (!defined($rec) && $ruletype eq "FREE");
+   push(@l,"appl")          if (!defined($rec) && $ruletype eq "RESLNK");
    push(@l,"ipcliacl")      if (!defined($rec) && $ruletype eq "IPCLIACL");
   
    return(@l) if (!defined($rec));
@@ -674,6 +697,7 @@ sub isViewValid
    push(@l,"varval")             if ($ruletype eq "CFRULE" && defined($rec));
    push(@l,"free")               if ($ruletype eq "FREE"   && defined($rec));
    push(@l,"ipcliacl")           if ($ruletype eq "IPCLIACL" && defined($rec));
+   push(@l,"appl","res")         if ($ruletype eq "RESLNK" && defined($rec));
    push(@l,"source") if (defined($rec));
 
    if (defined($rec)){
@@ -716,7 +740,7 @@ sub isWriteValid
 
    }
 
-   return(qw(default ipfw appl system varval ipcliacl free)) if ($rw);
+   return(qw(default ipfw appl system varval res ipcliacl free)) if ($rw);
    return(undef);
 }
 
@@ -724,7 +748,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default ipfw ipcliacl varval free link system appl source));
+   return(qw(header default ipfw ipcliacl res 
+             varval free link system appl source));
 }
 
 
@@ -768,7 +793,7 @@ sub FinishWrite
    if ((defined($applrefrec) || defined($sysrefrec)) && $swinstanceid ne ""){
       my $o=getModuleObject($self->Config,"itil::swinstance");
       $o->SetFilter({id=>\$swinstanceid});
-      ($swirec)=$o->getOnlyFirst(qw(fullname name admid adm2id databossid));
+      ($swirec)=$o->getOnlyFirst(qw(rulelabel name admid adm2id databossid));
    }
    return(1) if ((!defined($sysrefrec) && !defined($applrefrec)) || 
                   !defined($swirec));
@@ -796,7 +821,7 @@ sub FinishWrite
       $ENV{HTTP_FORCE_LANGUAGE}=$self->getLangFromEmailto($emailto);
       $wfa->Notify("INFO",
             $self->T("software instance rule activation request"),
-            sprintf($self->T("MSG001"),$swirec->{fullname}),
+            sprintf($self->T("MSG001"),$swirec->{rulelabel}),
             emailfrom=>[$userid],
             emailto=>[$swirec->{admid}],
             emailcc=>[$swirec->{adm2id}],
@@ -825,7 +850,7 @@ sub FinishWrite
       $ENV{HTTP_FORCE_LANGUAGE}=$self->getLangFromEmailto($emailto);
       $wfa->Notify("INFO",
             $self->T("activation of software instance rule entry"),
-            sprintf($self->T("MSG002"),effVal($oldrec,$newrec,"fullname")),
+            sprintf($self->T("MSG002"),effVal($oldrec,$newrec,"rulelabel")),
             emailfrom=>[$userid],
             emailto=>$emailto,
             emailcc=>$emailcc,
@@ -884,7 +909,7 @@ sub FinishWrite
       $ENV{HTTP_FORCE_LANGUAGE}=$self->getLangFromEmailto($emailto);
       $wfa->Notify("INFO",
             $self->T("reject of rule request entry"),
-            sprintf($self->T("MSG004"),effVal($oldrec,$newrec,"fullname")),
+            sprintf($self->T("MSG004"),effVal($oldrec,$newrec,"rulelabel")),
             emailfrom=>[$userid],
             emailto=>$emailto,
             emailcc=>$emailcc,

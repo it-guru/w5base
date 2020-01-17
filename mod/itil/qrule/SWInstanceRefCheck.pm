@@ -129,11 +129,13 @@ sub qcheckRecord
                my $c=getModuleObject($self->getParent->Config,
                                      "itil::lnkapplsystem");
                my $applid=$arec->{id};
-               $c->SetFilter({systemid=>\$systemid,applid=>\$applid});
+               $c->SetFilter({systemid=>\$systemid,
+                              applid=>\$applid,
+                              reltyp=>'!instance'});
                my ($chkrec,$msg)=$c->getOnlyFirst(qw(id));
 
                if (!defined($chkrec)){
-                  push(@msg,"application does not match application ".
+                  push(@msg,"application does not match direct application ".
                             "in system");
                }
             }
