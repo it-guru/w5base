@@ -200,10 +200,10 @@ sub new
                 dataobjattr   =>'"CIAM-ID Confirmer"'),
 
       new kernel::Field::Text(
-                name          =>'cnfwiw',
+                name          =>'cnfemail',
                 group         =>'source',
-                label         =>'Confirmer WIW-ID',
-                dataobjattr   =>'"WIW-ID Confirmer"'),
+                label         =>'Confirmer EMail',
+                dataobjattr   =>'"Email_Confirmer"'),
 
       new kernel::Field::Date(
                 name          =>'mdate',
