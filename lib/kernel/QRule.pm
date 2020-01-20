@@ -737,9 +737,24 @@ sub ProcessOpList
                my $idname=$idfield->Name();
                $dataobj->SetFilter({$idname=>\$op->{IDENTIFYBY}});
                my ($oldrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
-               my $id=$dataobj->ValidatedUpdateRecord($oldrec,$op->{DATA},
-                                                 {$idname=>\$op->{IDENTIFYBY}});
-               msg(INFO,"update id ok = $id");
+               my $changed=0;
+               foreach my $k (keys(%{$op->{DATA}})){
+                  if (trim($op->{DATA}->{$k}) ne trim($oldrec->{$k})){
+                     msg(INFO,"update $k=$oldrec->{$k}");
+                     $changed++;
+                  }
+               }
+               if ($changed){
+                  my $id=$dataobj->ValidatedUpdateRecord(
+                     $oldrec,$op->{DATA},
+                     {$idname=>\$op->{IDENTIFYBY}}
+                  );
+                  msg(INFO,"update id ok = $id");
+               }
+               else{
+                  msg(INFO,"skip update for $op->{DATAOBJ} ".
+                           "id $op->{IDENTIFYBY}");
+               }
             }
          }
          elsif ($op->{OP} eq "delete"){

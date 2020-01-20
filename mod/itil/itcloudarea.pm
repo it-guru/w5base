@@ -153,6 +153,31 @@ sub new
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'appl.conumber'),
 
+      new kernel::Field::SubList(
+                name          =>'ipaddresses',
+                label         =>'IP-Adresses',
+                group         =>'ipaddresses',
+                forwardSearch =>1,
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                htmllimit     =>'50',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjointo       =>'itil::ipaddress',
+                vjoinon       =>['id'=>'itcloudareaid'],
+                vjoindisp     =>['name','cistatus','network']),
+
+      new kernel::Field::SubList(
+                name          =>'systems',
+                label         =>'Systems',
+                group         =>'systems',
+                forwardSearch =>1,
+                readonly      =>1,
+                htmllimit     =>'50',
+                htmldetail    =>'NotEmpty',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjointo       =>'itil::system',
+                vjoinon       =>['id'=>'itcloudareaid'],
+                vjoindisp     =>['name','systemid','cistatus']),
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -610,7 +635,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default appl inm 
-             misc control source));
+             systems swinstances ipaddresses misc control source));
 }
 
 sub ValidateDelete

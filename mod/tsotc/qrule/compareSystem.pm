@@ -128,8 +128,6 @@ sub qcheckRecord
          }
          else{
             if ($rec->{srcsys} eq "OTC"){
-               # assetid compare 
-
                if (defined($parrec->{name})){
                   $parrec->{name}=lc($parrec->{name});
                   $parrec->{name}=~s/\..*$//; # remove posible Domain part 
@@ -204,6 +202,29 @@ sub qcheckRecord
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'leftouterlinkmissok',
                              iomapped=>$par);
+               my $w5itcloudarea;
+               if ($parrec->{projectid} ne ""){
+                  msg(INFO,"try to add cloudarea to system ".$rec->{name});
+                  my $cloudarea=getModuleObject($self->getParent->Config,
+                                                "itil::itcloudarea");
+                  $cloudarea->SetFilter({srcsys=>\'tsotc::project',
+                                         srcid=>\$parrec->{projectid}
+                  });
+                  my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+                  if (defined($w5cloudarearec)){
+                     $w5itcloudarea=$w5cloudarearec;
+                     if ($w5cloudarearec->{cistatusid} eq "4" &&
+                         $w5cloudarearec->{applid} ne ""){
+                        if ($rec->{itcloudareaid} ne $w5cloudarearec->{id}){
+                           $forcedupd->{itcloudareaid}= $w5cloudarearec->{id};
+                        }
+                     }
+                  }
+                  else{
+                     msg(ERROR,"found OTC System $rec->{name} ".
+                               "on invalid cloudarea");
+                  }
+               }
                if ($autocorrect){
                   my $net=getModuleObject($self->getParent->Config(),
                           "itil::network");
@@ -218,6 +239,10 @@ sub qcheckRecord
                   my %cleanOTCIPlist;
                   my %cleanOTCIflist;
 
+                  my $cloudareaid;
+                  if (defined($w5itcloudarea)){
+                     $cloudareaid=$w5itcloudarea->{id};
+                  }
 
                   # dynamic assign Interface names - if none given
                   my %ifnum;
@@ -246,6 +271,7 @@ sub qcheckRecord
                   }
                   # create ifnames on OTC records, if nothing is already
                   # assigned
+
                   for(my $i=0;$i<=$#{$parrec->{ipaddresses}};$i++){
                      my $otciprec=$parrec->{ipaddresses}->[$i];
                      if ($otciprec->{ifname} eq ""){
@@ -278,6 +304,7 @@ sub qcheckRecord
                            $cleanOTCIPlist{$otciprec->{name}}={
                               cistatusid=>$mappedCIStatus,
                               ipaddress=>$otciprec->{name},
+                              itcloudareaid=>$cloudareaid,
                               ifname=>$otciprec->{ifname},
                               comments=>trim($otciprec->{comments})
                            };
@@ -303,13 +330,14 @@ sub qcheckRecord
                                 my $eq;
                                 if ($a->{name} eq $b->{ipaddress}){
                                   $eq=0;
-                                   $eq=1 if ($a->{srcsys} eq "OTC" &&
-                                             $a->{cistatusid} eq 
-                                             $b->{cistatusid}       &&
-                                             $a->{ifname} eq 
-                                             $b->{ifname}   &&
-                                             $a->{comments} eq 
-                                             $b->{comments});
+                                  if ($a->{srcsys} eq "OTC" &&
+                                      $a->{cistatusid} eq $b->{cistatusid}  &&
+                                      $a->{ifname} eq $b->{ifname} &&
+                                      $b->{itcloudareaid} eq 
+                                      $a->{itcloudareaid} && 
+                                      $a->{comments} eq $b->{comments}){
+                                     $eq=1;
+                                  }
                                 }
                                 return($eq);
                              },
@@ -340,22 +368,25 @@ sub qcheckRecord
                                    #    "customer"){
                                    #   $type="0"; # Customer Interface is prim
                                    #}
-                                   return({OP=>$mode,
-                                           MSG=>"$mode ip $newrec->{ipaddress} ".
-                                                "in W5Base",
-                                           IDENTIFYBY=>$identifyby,
-                                           DATAOBJ=>'itil::ipaddress',
-                                           DATA=>{
-                                              name      =>$newrec->{ipaddress},
-                                              cistatusid=>$newrec->{cistatusid},
-                                              srcsys    =>'OTC',
-                                              type      =>$type,
-                                              networkid =>$networkid,
-                                              comments  =>$newrec->{comments},
-                                              ifname    =>$newrec->{ifname},
-                                              systemid  =>$p{refid}
-                                              }
-                                           });
+                                   my $oprec={
+                                     OP=>$mode,
+                                     MSG=>"$mode ip $newrec->{ipaddress} ".
+                                          "in W5Base",
+                                     IDENTIFYBY=>$identifyby,
+                                     DATAOBJ=>'itil::ipaddress',
+                                     DATA=>{
+                                      name         =>$newrec->{ipaddress},
+                                      cistatusid   =>$newrec->{cistatusid},
+                                      srcsys       =>'OTC',
+                                      type         =>$type,
+                                      networkid    =>$networkid,
+                                      comments     =>$newrec->{comments},
+                                      itcloudareaid=>$newrec->{itcloudareaid},
+                                      ifname       =>$newrec->{ifname},
+                                      systemid     =>$p{refid}
+                                     }
+                                   };
+                                   return($oprec);
                                 }
                                 elsif ($mode eq "delete"){
                                    my $networkid=$oldrec->{networkid};

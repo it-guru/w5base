@@ -117,7 +117,7 @@ sub new
                 group         =>'ipaddresses',
                 vjointo       =>\'tsotc::ipaddress',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name',"hwaddr"]),
+                vjoindisp     =>['name',"hwaddr","itcloudareaid"]),
 
       new kernel::Field::CDate(
                 name          =>'cdate',

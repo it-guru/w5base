@@ -896,7 +896,7 @@ sub new
                 dataobjattr   =>"$vmifexp,vsystem.asset,system.asset)", 
                 wrdataobjattr =>"system.asset"),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'locationid',
                 vjointo       =>'itil::asset',
                 vjoinon       =>['assetid'=>'id'],
@@ -911,6 +911,21 @@ sub new
                 vjointo       =>'itil::lnkitfarmasset',
                 vjoinon       =>['assetid'=>'assetid'],
                 vjoindisp     =>'itfarm'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itcloudarea',
+                group         =>'physys',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'Cloud Area',
+                vjointo       =>'itil::itcloudarea',
+                vjoinon       =>['itcloudareaid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Interface(
+                name          =>'itcloudareaid',
+                vjointo       =>'itil::itcloudarea',
+                dataobjattr   =>'system.itcloudarea'),
 
       new kernel::Field::TextDrop(
                 name          =>'hwmodel',

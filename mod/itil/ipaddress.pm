@@ -348,6 +348,21 @@ sub new
                 vjoinon       =>['furthersystemid'=>'systemid'],
                 vjoindisp     =>['tsm2email']),
 
+      new kernel::Field::TextDrop(
+                name          =>'itcloudarea',
+                group         =>'further',
+                label         =>'Cloud Area',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'itil::itcloudarea',
+                vjoinon       =>['itcloudareaid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itcloudareaid',
+                label         =>'CloudAreaID',
+                group         =>'further',
+                dataobjattr   =>'ipaddress.itcloudarea'),
+                                                  
       new kernel::Field::Select(
                 name          =>'network',
                 htmleditwidth =>'280px',
