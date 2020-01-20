@@ -685,7 +685,7 @@ sub isViewValid
    push(@l,"appl","ipfw")   if (!defined($rec) && $ruletype eq "FWAPP");
    push(@l,"varval")        if (!defined($rec) && $ruletype eq "CFRULE");
    push(@l,"free")          if (!defined($rec) && $ruletype eq "FREE");
-   push(@l,"appl")          if (!defined($rec) && $ruletype eq "RESLNK");
+   push(@l,"appl","res")    if (!defined($rec) && $ruletype eq "RESLNK");
    push(@l,"ipcliacl")      if (!defined($rec) && $ruletype eq "IPCLIACL");
   
    return(@l) if (!defined($rec));
