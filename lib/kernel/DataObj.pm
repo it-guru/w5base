@@ -4703,12 +4703,22 @@ sub FilterPart2SQLexp
          if (($val eq "[LEER]" || $val eq "[EMPTY]") && 
               ($sqlparam{wildcards} || $sqlparam{datatype} eq "DATE")){
             $exp.=" ".$conjunction." " if ($exp ne "");
-            if (defined($sqlparam{sqldbh}) &&
-                ($sqldriver eq "oracle" || $sqldriver eq "db2")){
-               $exp.="($sqlfieldname is NULL)"; # in oracle is ''=NULL and
-            }                                   # a compare on '' produces a
-            else{                               # wrong result
-               $exp.="($sqlfieldname is NULL or $sqlfieldname='')";
+            if ($sqlparam{containermode}){
+               my $container=$sqlparam{containermode};
+               $exp.="(($container not like '".'%'.
+                       "$sqlfieldname=%=$sqlfieldname".'%'."') or ".
+                      "($container is NULL) or ".
+                      "($container like '".'%'.
+                       "$sqlfieldname=\'\'=$sqlfieldname".'%'."'))";
+            }
+            else{
+               if (defined($sqlparam{sqldbh}) &&
+                   ($sqldriver eq "oracle" || $sqldriver eq "db2")){
+                  $exp.="($sqlfieldname is NULL)"; # in oracle is ''=NULL and
+               }                                   # a compare on '' produces a
+               else{                               # wrong result
+                  $exp.="($sqlfieldname is NULL or $sqlfieldname='')";
+               }
             }
             next;
          }
