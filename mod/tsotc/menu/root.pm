@@ -62,6 +62,10 @@ sub Init
                       "tsotc::ipaddress",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.tsotc.system.inipaddress",
+                      "tsotc::inipaddress",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.tsotc.system.lnkiaascontact",
                       "tsotc::lnksystemiaascontact",
                       defaultacl=>['valid_user']);
