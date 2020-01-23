@@ -112,14 +112,6 @@ sub qcheckRecord
       if ($acinmassingmentgroup=~m/^\s*$/){
          my $msg="missing valid incident assignmentgroup";
          push(@qmsg,$msg);
-         if ($dataobj->Self=~m/::appl$/){
-            if ($rec->{opmode} eq "test"){
-               $isnotneeded=1;
-            } 
-            if ($rec->{opmode} eq "devel"){
-               $isnotneeded=1;
-            } 
-         }
          if ($dataobj->Self=~m/::system$/){
             if (!($rec->{iscbreakdown} || $rec->{iscbreakdown} ||
                   $rec->{iseducation}  || $rec->{isapprovtest} ||
