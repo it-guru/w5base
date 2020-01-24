@@ -669,7 +669,8 @@ sub ProcessTempfile
    system($cmd);
    unlink("$TMP/sqlcurrent.csv");
 
-
+   system("cp $TMP/current.csv /tmp/debug.csv2db.last.current.csv 2>/dev/null");
+   system("cp $TMP/source.csv /tmp/debug.csv2db.last.source.csv 2>/dev/null");
 
 
    my $diffstream;
