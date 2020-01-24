@@ -2,3 +2,6 @@
 'fieldgroup.scan'=>{de=>'Scan',en=>'Scan'},
 'fieldgroup.sslcert'=>{de=>'SSL Cert',en=>'SSL Cert'},
 'first detect'=>{de=>'erstmalig erkannt'},
+'is latest'=>{de=>'ist aktuell'},
+'perspective'=>{de=>'Perspective'},
+'expected PRM title'=>{de=>'erwarteter PRM Titel'},

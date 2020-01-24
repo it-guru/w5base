@@ -58,19 +58,38 @@ sub new
       new kernel::Field::Text(
                 name          =>'ictono',
                 label         =>'ICTO-ID',
-                dataobjattr   =>"ictoid"),
-
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"ictoid"),  # In Zukunft sollte die dann 
+                                            # irgendwann optional sein
+      new kernel::Field::Text(
+                name          =>'itscanobjectid',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                label         =>'IT-ScanObjectID',
+                dataobjattr   =>"ictoid"),  # da kann dann ICTOID oder W5BID 
+                                            # irgendwann mal drin sein.
       new kernel::Field::Text(
                 name          =>'stype',
                 htmlwidth     =>'200px',
                 label         =>'Scan type',
                 dataobjattr   =>"type"),
 
+      new kernel::Field::Boolean(
+                name          =>'islatest',
+                htmldetail    =>0,
+                label         =>'latest scan',
+                dataobjattr   =>"islatest"),
+
+      new kernel::Field::Text(
+                name          =>'perspective',
+                htmldetail    =>0,
+                label         =>'perspective',
+                dataobjattr   =>"scanperspective"),
+
       new kernel::Field::Date(
                 name          =>'sdate',
                 label         =>'Scan date',
                 dataobjattr   =>'launch_datetime'),
-
 
       new kernel::Field::Text(
                 name          =>'sduration',
@@ -98,7 +117,7 @@ sub new
                 htmldetail    =>0,
                 uploadable    =>0,
                 dataobjattr   =>"(select count(*) from W5SIEM_secent ".
-                                "where W5SIEM_secscan.ref=W5SIEM_secent.ref ".
+                                "where secscan.ref=W5SIEM_secent.ref ".
                                 " and W5SIEM_secent.pci_vuln='yes' and ".
                                 "  W5SIEM_secent.severity in (1,2,3))"),
 
@@ -319,7 +338,7 @@ sub new
    );
    $self->{use_distinct}=0;
    $self->setDefaultView(qw(sdate ictono name sduration secentcnt));
-   $self->setWorktable("W5SIEM_secscan");
+   $self->setWorktable("secscan");
    $self->BackendSessionName("W5SIEM_secscan_LongRead");  # try to force dedicated Session
                                                           # because lonReadLen and 
                                                           # cursor_sharing=force
@@ -344,12 +363,44 @@ sub Initialize
    return(0);
 }
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my $from="";
+
+   $from.="(select ".
+          "W5SIEM_secscan.*,".
+          "decode(rank() over (partition by ".
+              "case ".
+                "when title like '%_vFWI_%' ".
+                    "then ictoid||'_vFWI' ".
+                "else ictoid||'_STD' ".
+              "end ".
+          "order by launch_datetime desc),1,1,0) islatest,".
+              "case ".
+                "when title like '%_vFWI_%' ".
+                    "then 'SharedVLAN' ".
+                "else 'CNDTAG' ".
+              "end scanperspective ".
+          "from W5SIEM_secscan ".
+          ") secscan";
+
+   return($from);
+}
+
+
+
 sub initSearchQuery
 {
    my $self=shift;
-   if (!defined(Query->Param("search_sdate"))){
-     Query->Param("search_sdate"=>">now-3M");
+   if (!defined(Query->Param("search_islatest"))){
+     Query->Param("search_islatest"=>$self->T("yes"));
    }
+   #if (!defined(Query->Param("search_sdate"))){
+   #  Query->Param("search_sdate"=>">now-3M");
+   #}
 }
 
 

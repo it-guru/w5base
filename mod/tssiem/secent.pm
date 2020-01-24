@@ -31,20 +31,29 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3 if (!exists($param{MainSearchFieldLines}));
+   $param{MainSearchFieldLines}=5 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
       new kernel::Field::Text(
                 name          =>'ictono',
-                group         =>'scan',
                 label         =>'ICTO-ID',
-                dataobjattr   =>"W5SIEM_secscan.ictoid"),
-
+                group         =>'scan',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"ictoid"),  # In Zukunft sollte die dann
+                                            # irgendwann optional sein
+      new kernel::Field::Text(
+                name          =>'itscanobjectid',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                group         =>'scan',
+                label         =>'IT-ScanObjectID',
+                dataobjattr   =>"ictoid"),  # da kann dann ICTOID oder W5BID
+                                            # irgendwann mal drin sein.
       new kernel::Field::Date(
                 name          =>'sdate',
                 label         =>'Scan date',
-                dataobjattr   =>'W5SIEM_secscan.launch_datetime'),
+                dataobjattr   =>'secscan.launch_datetime'),
 
       new kernel::Field::Text(
                 name          =>'ipaddress',
@@ -87,7 +96,14 @@ sub new
                 name          =>'ipstatus',
                 label         =>'IP Status',
                 sqlorder      =>'NONE',
+                searchable    =>0,
                 dataobjattr   =>"W5SIEM_secent.ipstatus"),
+
+      new kernel::Field::Boolean(
+                name          =>'islatest',
+                htmldetail    =>0,
+                label         =>'is latest',
+                dataobjattr   =>"secscan.islatest"),
 
       new kernel::Field::Text(
                 name          =>'qid',
@@ -239,25 +255,31 @@ sub new
                 dataobjattr   =>"W5SIEM_secent.category"),
 
       new kernel::Field::Text(
+                name          =>'perspective',
+                htmldetail    =>0,
+                label         =>'perspective',
+                dataobjattr   =>"scanperspective"),
+
+      new kernel::Field::Text(
                 name          =>'scanname',
                 label         =>'Scan Title',
                 sqlorder      =>'NONE',
                 weblinkto     =>'tssiem::secscan',
                 weblinkon     =>['scanqref'=>'qref'],
                 group         =>'scan',
-                dataobjattr   =>"W5SIEM_secscan.title"),
+                dataobjattr   =>"secscan.title"),
 
       new kernel::Field::Text(
                 name          =>'scanqref',
-                group         =>'source',
+                group         =>'scan',
                 label         =>'Scan-ID',
-                dataobjattr   =>'W5SIEM_secscan.ref'),
+                dataobjattr   =>'secscan.ref'),
 
       new kernel::Field::Link(
                 name          =>'scanid',
                 label         =>'Scan ID',
                 group         =>'scan',
-                dataobjattr   =>"W5SIEM_secscan.id"),
+                dataobjattr   =>"secscan.id"),
 
       new kernel::Field::Textarea(
                 name          =>'results',
@@ -298,6 +320,25 @@ sub new
                 label         =>'Source-Id',
                 dataobjattr   =>'W5SIEM_secent.id'),
 
+      new kernel::Field::Text(
+                name          =>'msghash',
+                group         =>'source',
+                label         =>'Message-MD5-Hash',
+                dataobjattr   =>"replace(standard_hash(".
+                                "secscan.ictoid||'-'".  # muss irgendwann objid
+                                "||W5SIEM_secent.ipaddress||'-'".
+                                "||W5SIEM_secent.port||'-'".
+                                "||W5SIEM_secent.qid".
+                                ",'MD5'),' ','')"),
+
+      new kernel::Field::Text(
+                name          =>'exptickettitle',
+                group         =>'source',
+                label         =>'expected PRM title',
+                dataobjattr   =>"secscan.ictoid||' - '". #muss irgendwann objid
+                                "||W5SIEM_secent.category||' - '".
+                                "||secscan.scanperspective"),
+
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Date(
@@ -305,7 +346,7 @@ sub new
                 history       =>0,
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'W5SIEM_secscan.importdate'),
+                dataobjattr   =>'secscan.importdate'),
 
       new kernel::Field::Link(
                 name          =>'qref',
@@ -499,19 +540,39 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="W5SIEM_secent join W5SIEM_secscan ".
-            "on W5SIEM_secent.ref=W5SIEM_secscan.ref";
+   my $from="W5SIEM_secent ".
+            "join ".
+            "(select W5SIEM_secscan.*,".
+            "decode(rank() over (partition by ".
+                "case ".
+                  "when title like '%_vFWI_%' ".
+                      "then ictoid||'_vFWI' ".
+                  "else ictoid||'_STD' ".
+                "end ".
+            "order by launch_datetime desc),1,1,0) islatest,".
+              "case ".
+                "when title like '%_vFWI_%' ".
+                    "then 'SharedVLAN' ".
+                "else 'CNDTAG' ".
+              "end scanperspective ".
+            "from W5SIEM_secscan ".
+            ") secscan ".
+            "on W5SIEM_secent.ref=secscan.ref";
    return($from);
 }
+
 
 
 sub initSearchQuery
 {
    my $self=shift;
-   if (!defined(Query->Param("search_sdate"))){
-     Query->Param("search_sdate"=>">now-3M");
+   if (!defined(Query->Param("search_islatest"))){
+     Query->Param("search_islatest"=>$self->T("yes"));
    }
 }
+
+
+
 
 
 
