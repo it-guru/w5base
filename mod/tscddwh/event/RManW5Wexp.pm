@@ -189,7 +189,9 @@ sub RManW5Wexp
           
           my $d=hash2xml($xrec);
           #print $d;
-          $os->SnapRecord($rec->{id},$rec->{name},"base::workflow",$d);
+          if ($rec->{id} ne "15396714090001"){
+             $os->SnapRecord($rec->{id},$rec->{name},"base::workflow",$d);
+          }
 
           ($rec,$msg)=$wf->getNext();
        } until(!defined($rec));
