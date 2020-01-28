@@ -114,6 +114,7 @@ sub RManW5Wexp
       wffields.ibiprice
       wffields.riskmgmtcondition
       wffields.solutionopt
+      wffields.applicationbase
    );
 
 
@@ -189,7 +190,8 @@ sub RManW5Wexp
           
           my $d=hash2xml($xrec);
           #print $d;
-          if ($rec->{id} ne "15396714090001"){
+          if ($rec->{id} eq "15396714090001"){
+             print Dumper($rec);
              $os->SnapRecord($rec->{id},$rec->{name},"base::workflow",$d);
           }
 
