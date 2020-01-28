@@ -190,8 +190,7 @@ sub RManW5Wexp
           
           my $d=hash2xml($xrec);
           #print $d;
-          if ($rec->{id} eq "15396714090001"){
-             print Dumper($rec);
+          if ($rec->{id} ne "15396714090001"){
              $os->SnapRecord($rec->{id},$rec->{name},"base::workflow",$d);
           }
 
