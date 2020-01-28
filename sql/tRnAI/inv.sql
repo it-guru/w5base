@@ -28,7 +28,7 @@ create table tRnAI_system(
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table tRnAI_useraccount(
   id              bigint(20)   NOT NULL,
-  system          bigint(20)   NOT NULL,
+#  system          bigint(20)   NOT NULL,
   name            varchar(80)  NOT NULL,
   email           varchar(128),domain varchar(40),
   expdate         datetime,
@@ -42,7 +42,7 @@ create table tRnAI_useraccount(
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (id),
   unique(name),
-  FOREIGN KEY (system) REFERENCES tRnAI_system (id) ON DELETE RESTRICT
+#  FOREIGN KEY (system) REFERENCES tRnAI_system (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table tRnAI_usbsrv(
   id              bigint(20)   NOT NULL,

@@ -81,17 +81,17 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'tRnAI_useraccount.comments'),
 
-      new kernel::Field::TextDrop(
-                name          =>'system',
-                label         =>'VDI-Systemname',
-                vjointo       =>\'tRnAI::system',
-                vjoinon       =>['systemid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'systemid',
-                label         =>'systemid',
-                dataobjattr   =>'tRnAI_useraccount.system'),
+      #new kernel::Field::TextDrop(
+      #          name          =>'system',
+      #          label         =>'VDI-Systemname',
+      #          vjointo       =>\'tRnAI::system',
+      #          vjoinon       =>['systemid'=>'id'],
+      #          vjoindisp     =>'name'),
+      #
+      #new kernel::Field::Link(
+      #          name          =>'systemid',
+      #          label         =>'systemid',
+      #          dataobjattr   =>'tRnAI_useraccount.system'),
 
       new kernel::Field::SubList(
                 name          =>'systems',
