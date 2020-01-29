@@ -1352,9 +1352,94 @@ sub Validate
       }
    }
 
-   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"fullname"));
+   {
+      my $applid=effVal($oldrec,$newrec,"applid");
+      if (effChanged($oldrec,$newrec,"applid")){
+         if (effVal($oldrec,$newrec,"runonclusts")){
+            my $itclustsid=effVal($oldrec,$newrec,"itclustsid");
+            if (defined($itclustsid)){
+               if (!$self->ValidateApplOnClusterService($applid,$itclustsid)){
+                  $self->LastMsg(ERROR,
+                          "selected application not running ".
+                          "on clusterservice from current instance");
+                  return(0);
+               }
+            }
+         }
+         else{
+            my $systemid=effVal($oldrec,$newrec,"systemid");
+            if (defined($systemid)){
+               if (!$self->ValidateApplOnSystem($applid,$systemid)){
+                  $self->LastMsg(ERROR,
+                          "selected application not running ".
+                          "on logical system from current instance");
+                  return(0);
+               }
+            }
+         }
+      }
+      if (effChanged($oldrec,$newrec,"itclustsid")){
+         my $itclustsid=effVal($oldrec,$newrec,"itclustsid");
+         if (defined($itclustsid)){
+            if (!$self->ValidateApplOnClusterService($applid,$itclustsid)){
+               $self->LastMsg(ERROR,
+                       "selected clusterservice is not running ".
+                       "application from current instance");
+               return(0);
+            }
+
+         } 
+      }
+      if (effChanged($oldrec,$newrec,"systemid")){
+         my $systemid=effVal($oldrec,$newrec,"systemid");
+         if (defined($systemid)){
+            if (!$self->ValidateApplOnSystem($applid,$systemid)){
+               $self->LastMsg(ERROR,
+                       "selected logical system is not running ".
+                       "application from current instance");
+               return(0);
+            }
+         }
+      }
+   }
+
+   if (!$self->HandleCIStatusModification($oldrec,$newrec,"fullname")){
+      return(0);
+   }
    return(1);
 }
+
+
+sub ValidateApplOnSystem
+{
+   my $self=shift;
+   my $applid=shift;
+   my $systemid=shift;
+
+   my $lnk=getModuleObject($self->Config,"itil::lnkapplsystem");
+   $lnk->SetFilter({applid=>\$applid,systemid=>\$systemid});
+   my ($lrec,$msg)=$lnk->getOnlyFirst(qw(it applid systemid reltyp));
+   if (defined($lrec) && $lrec->{reltyp} ne "instance"){
+      return(1);
+   }
+   return(0);
+}
+
+sub ValidateApplOnClusterService
+{
+   my $self=shift;
+   my $applid=shift;
+   my $itclustsvcid=shift;
+
+   my $lnk=getModuleObject($self->Config,"itil::lnkitclustsvcappl");
+   $lnk->SetFilter({applid=>\$applid,itclustsvcid=>\$itclustsvcid});
+   my ($lrec,$msg)=$lnk->getOnlyFirst(qw(it applid itclustsvcid));
+   if (defined($lrec)){
+      return(1);
+   }
+   return(0);
+}
+
 
 
 sub FinishWrite
