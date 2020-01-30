@@ -111,6 +111,14 @@ sub new
                 vjoindisp     =>['severity','firstoccur',
                                  'messagetext','resultreturnedshorted']),
 
+      new kernel::Field::SubList(
+                name          =>'files',
+                label         =>'Audit Files',
+                group         =>'auditfiles',
+                vjointo       =>\'tsAuditSrv::auditfile',
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>['filename','mdate']),
+
       new kernel::Field::Text(
                 name          =>'patchstatus',
                 label         =>'Patch Status',
@@ -282,7 +290,7 @@ sub isViewValid
    my @l=qw(default);
 
    if ($rec->{registered}){
-      push(@l,"audit","auditmsgs","w5basedata","source");
+      push(@l,"audit","auditmsgs","auditfiles","w5basedata","source");
    }
 
    return(@l);
@@ -301,7 +309,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default auditmsgs audit w5basedata source));
+   return(qw(header default auditmsgs audit auditfiles w5basedata source));
 }
 
 sub Initialize
