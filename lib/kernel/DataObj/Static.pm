@@ -21,6 +21,9 @@ use vars qw(@ISA);
 use kernel;
 use kernel::DataObj;
 use Text::ParseWords;
+use JSON;
+use LWP::UserAgent;
+
 @ISA = qw(kernel::DataObj);
 
 sub new
@@ -33,8 +36,9 @@ sub new
 sub data
 {
    my $self=shift;
+   my $filterset=shift;
    if (ref($self->{data}) eq "CODE"){
-      return(&{$self->{data}}($self));
+      return(&{$self->{data}}($self,$filterset));
    }
    return($self->{data});
 }
@@ -64,10 +68,10 @@ sub tieRec
 {
    my $self=shift;
 
-   if (defined($self->data->[$self->{'Pointer'}])){
+   if (defined($self->{CurrentData}->[$self->{'Pointer'}])){
       my %rec;
       tie(%rec,'kernel::DataObj::Static::rec',$self,
-          $self->data->[$self->{'Pointer'}]);
+          $self->{CurrentData}->[$self->{'Pointer'}]);
       return(\%rec);
    }
    return(undef);
@@ -94,12 +98,16 @@ sub getFirst
    my $self=shift;
    $self->{'Pointer'}=undef;
 
-   
+
+   $self->{CurrentData}=$self->data($self->{FilterSet});
+
+   return(undef,"DataCollectError") if (!defined($self->{CurrentData}) || 
+                                        ref($self->{CurrentData}) ne "ARRAY"); 
 
 #
 #   ## hier muss bei Gelegenheit mal ein Order Verfahren rein!
 
-   my @l=0..$#{$self->data};
+   my @l=0..$#{$self->{CurrentData}};
 
 
    my @o=$self->GetCurrentOrder();
@@ -110,11 +118,11 @@ sub getFirst
    }
    @o=grep(!/^linenumber$/,@o);
    my @orderbuf;
-   for(my $c=0;$c<=$#{$self->data};$c++){
+   for(my $c=0;$c<=$#{$self->{CurrentData}};$c++){
       push(@orderbuf,{
          id=>$c,
          ostring=>substr(join(";",map({
-            my $d=$self->data->[$c]->{$_};
+            my $d=$self->{CurrentData}->[$c]->{$_};
             $d=join("|",sort(@$d)) if (ref($d) eq "ARRAY");
             $d;
          } @o)),0,80),
@@ -127,7 +135,7 @@ sub getFirst
    $self->{'Pointer'}=shift(@{$self->{'Index'}});
    return(undef) if (!defined($self->{'Pointer'}));
    while(!($self->CheckFilter()) && 
-         defined($self->data->[$self->{'Index'}->[$self->{'Pointer'}]])){ 
+         defined($self->{CurrentData}->[$self->{'Index'}->[$self->{'Pointer'}]])){ 
       $self->{'Pointer'}=shift(@{$self->{'Index'}});
       return(undef) if (!defined($self->{'Pointer'}));
    }
@@ -141,7 +149,7 @@ sub getNext
    return(undef) if (!defined($self->{'Pointer'}));
 
    while(!($self->CheckFilter()) && 
-         defined($self->data->[$self->{'Index'}->[$self->{'Pointer'}]])){ 
+         defined($self->{CurrentData}->[$self->{'Index'}->[$self->{'Pointer'}]])){ 
       $self->{'Pointer'}=shift(@{$self->{'Index'}});
       return(undef) if (!defined($self->{'Pointer'}));
    }
@@ -328,6 +336,137 @@ sub CheckFilter
    return(0) if ($failcount); 
    return(1);
 }
+
+
+########################################################################
+# REST Extensions to handle REST Calls as Static (Cached) Data structes#
+########################################################################
+
+sub GetRESTCredentials
+{
+   my $self=shift;
+   my $dbname=shift;
+   my %p;
+
+   $p{dbconnect}=$self->Config->Param('DATAOBJCONNECT');
+   $p{dbpass}=$self->Config->Param('DATAOBJPASS');
+
+   foreach my $v (qw(dbconnect dbpass)){
+      if ((ref($p{$v}) ne "HASH" || !defined($p{$v}->{$dbname})) &&
+          $v ne "dbschema"){
+         my $msg=sprintf("Connect(%s): essential information '%s' missing",
+                    $dbname,$v);
+         $self->LastMsg(ERROR,$msg);
+         return();
+      }
+      if (defined($p{$v}->{$dbname}) && $p{$v}->{$dbname} ne ""){
+         $p{$v}=$p{$v}->{$dbname};
+      }
+   }
+   return($p{dbconnect},$p{dbpass});
+}
+
+
+sub DoRESTcall
+{
+   my $self=shift;
+   my %p=@_;
+
+   my $ua=new LWP::UserAgent(env_proxy=>0);
+   $ua->protocols_allowed( ['https','http','connect'] );
+   if ($p{useproxy}){
+      my $probeipproxy=$self->Config->Param("http_proxy");
+      if ($probeipproxy ne ""){
+         $probeipproxy=~s/^http:/connect:/;
+         $ua->proxy(['https'],$probeipproxy);
+      }
+   }
+   if ($p{method} eq "GET"){
+       
+   }
+   my $req;
+   if ($p{method} eq "GET"){
+      $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+   }
+
+   my $response=$ua->request($req);
+   if ($response->is_success) {
+      my $d=decode_json($response->decoded_content);
+      if (ref($d) eq "HASH"){
+         my $dd=&{$p{success}}($self,$d);
+         if (defined($dd)){
+            return($dd);
+         }
+      }
+   }
+   else{
+       my $statusline=$response->status_line;
+       $self->LastMsg(ERROR,"unexpected result from REST call: ".$statusline);
+   }
+   return(undef);
+}
+
+
+sub CollectREST
+{
+   my $self=shift;
+   my %p=@_;
+
+   my $cachetime=$p{cachetime};
+   $cachetime=10 if (!defined($cachetime));
+
+   my $c=$self->Context();
+   if (!exists($c->{RESTCallResult}) || 
+       $c->{RESTCallResult}->{t}<time()-$cachetime){
+      my $dbname=$p{dbname};
+      my ($baseurl,$apikey)=$self->GetRESTCredentials($dbname);
+      if (!defined($baseurl) || !defined($apikey)){
+         return(undef);
+      }
+      my $dataobjurl=&{$p{url}}($self,$baseurl,$apikey);
+      if (!defined($dataobjurl)){
+         $self->LastMsg(ERROR,"no REST URL can be created");
+         return(undef);
+      }
+      my $Headers=[];
+      if ($p{headers}){
+         $Headers=&{$p{headers}}($self,$baseurl,$apikey);
+      }
+
+      my $Content;
+      if ($p{content}){
+         $Content=&{$p{content}}($self,$baseurl,$apikey)
+      }
+      $p{method}="GET" if (!exists($p{method}));
+      $p{format}="JSON" if (!exists($p{format}));
+
+      my $Data=$self->DoRESTcall(
+         method=>$p{method}, url=>$dataobjurl,
+         content=>$Content,      headers=>$Headers,
+         useproxy=>$p{useproxy},
+         BasicAuthUser=>undef, BasicAuthPass=>undef,
+         format=>$p{format},
+         success=>$p{success}
+      );
+      $c->{RESTCallResult}={
+         DATA=>$Data,
+         t=>time()
+      };
+   }
+   if (exists($c->{RESTCallResult})){
+      return($c->{RESTCallResult}->{DATA});
+   }
+   return(undef);
+}
+
+
+
+
+
+
+
+
+########################################################################
 
 
 
