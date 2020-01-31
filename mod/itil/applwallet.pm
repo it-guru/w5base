@@ -405,7 +405,12 @@ sub Validate
       # "Alternative Name" analyse
       my $alternativeNames;
 
-      my $exts=$x509->extensions_by_oid();
+      my $exts;
+
+      eval('$exts=$x509->extensions_by_oid();');
+      if ($@){
+         msg(WARN,"x509::extensions_by_oid crashed with $@");
+      }
       if (ref($exts) eq "HASH"){
          foreach my $oid (keys(%$exts)){
            my $ext=$exts->{$oid};
