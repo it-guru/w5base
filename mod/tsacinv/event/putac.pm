@@ -401,6 +401,9 @@ sub mkAcFtpRecAsset
          my %flt=(location=>$w5locrec->{location},
                   locationtype=>\'Site',
                   zipcode=>$w5locrec->{zipcode});
+         if ($rec->{class} ne "BUNDLE"){ #Only Bundles are allowed on 
+            $flt{isdatacenter}=\'0';     #DataCenter Locations (Housing-Concept)
+         }
          $acloc->ResetFilter();
          $acloc->SetFilter(\%flt);
          my @l=$acloc->getHashList(qw(fullname code w5locid));
@@ -417,6 +420,9 @@ sub mkAcFtpRecAsset
          if ($locmap{$rec->{locationid}} eq "0"){
             my %flt=(location=>$w5locrec->{location},
                      locationtype=>\'Site');
+            if ($rec->{class} ne "BUNDLE"){ #Only Bundles are allowed on 
+               $flt{isdatacenter}=\'0';     #DataCenter 
+            }                               #Locations (Housing-Concept)
             $acloc->ResetFilter();
             $acloc->SetFilter(\%flt);
             @l=$acloc->getHashList(qw(fullname code w5locid));
