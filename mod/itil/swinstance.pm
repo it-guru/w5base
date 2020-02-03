@@ -1395,8 +1395,8 @@ sub Validate
          if (defined($systemid)){
             if (!$self->ValidateApplOnSystem($applid,$systemid)){
                $self->LastMsg(ERROR,
-                       "selected logical system is not running ".
-                       "application from current instance");
+                       "The selected logical system is not assigned ".
+                       "to the application of the current software instance");
                return(0);
             }
          }

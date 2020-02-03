@@ -84,5 +84,4 @@
 'selected application not running on clusterservice from current instance'=>{de=>'die ausgewählte Anwendung wird nicht auf dem ClusterService der aktuellen Software-Instanz ausgeführt'},
 'selected application not running on logical system from current instance'=>{de=>'die ausgewählte Anwendung wird nicht auf dem logischen System der aktuellen Software-Instanz ausgeführt'},
 'selected clusterservice is not running application from current instance'=>{de=>'der ausgewählte ClusterService führt nicht die Anwendung der aktuellen Software-Instanz aus'},
-'selected logical system is not running application from current instance'=>{de=>'das ausgewählte logische System führt nicht die Anwendung der aktuellen Software-Instanz aus'},
-
+'The selected logical system is not assigned to the application of the current software instance'=>{de=>'das ausgewählte logische System ist nicht der Anwendung der aktuellen Software-Instanz zugeordnet'},
