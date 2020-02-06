@@ -21,12 +21,14 @@ NONE
 
 [en:]
 
-The quality rule checks whether the application, log. system and software installation that is connected to the the software instance is in status "available/in project", "inactive/stored" or "installed/active" and is valid. Additionally it is checked if a logical system is assigned to the application. It is not possible to assign a system to the relevant application by the instance.Software installation is not necessary in case of software instances of type SAP / R2 or SAP / R3.
+The quality rule checks whether the application, log. system and software installation that is connected to the software instance is in status "available/in project", "inactive/stored" or "installed/active" and is valid.
+Additionally it is checked if a logical system is assigned to the application. It is not possible to assign a system to the relevant application by the instance.Software installation is not necessary in case of software instances of type SAP / R2 or SAP / R3.
 
 
 [de:]
 
-Die QRule prüft, ob die mit der Software Instanz verbundene Anwendung, log. System oder Software-Installation im Status "verfügbar/in Projektierung", "zeitweise inaktiv" oder "installiert/aktiv" und gültig ist. Zusätzlich wird geprüft, ob ein log. System von der Anwendung heraus zugeordnet wurde. Es ist nicht möglich, ein System durch die Instanz der betreffenden Anwendung zuzuordnen. Bei Software-Instanzen vom Typ SAP/R2 oder SAP/R3 ist keine Software-Installation notwendig.
+Die QRule prüft, ob die mit der Software Instanz verbundene Anwendung, log. System und Software-Installation im Status "verfügbar/in Projektierung", "zeitweise inaktiv" oder "installiert/aktiv" und gültig ist.
+Zusätzlich wird geprüft, ob ein log. System von der Anwendung heraus zugeordnet wurde. Es ist nicht möglich, ein System durch die Instanz der betreffenden Anwendung zuzuordnen. Bei Software-Instanzen vom Typ SAP/R2 oder SAP/R3 ist keine Software-Installation notwendig.
 
 =cut
 #######################################################################
