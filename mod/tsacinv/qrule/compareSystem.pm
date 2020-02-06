@@ -201,6 +201,15 @@ sub qcheckRecord
             $forcedupd={};
          }
       }
+      if ($rec->{systemid} ne "" && ($parrec->{usage}=~m/^INVOICE_ONLY/)){
+         $parrec=undef;
+         push(@qmsg,"TSI has migrate the system to INVOICE_ONLY, ".
+                    "soo it needs to be removed from Darwin->IT-Inventar");
+         $forcedupd={};
+         $errorlevel=3;
+         return($self->HandleWfRequest($dataobj,$rec,
+                                 \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
+      }
    }
 
    #
