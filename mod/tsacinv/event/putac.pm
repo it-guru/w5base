@@ -506,6 +506,7 @@ sub SendXmlToAM_asset
    my $asset=getModuleObject($self->Config,"TS::asset");
    my $acsystem=getModuleObject($self->Config,"tsacinv::system");
    my $acasset=getModuleObject($self->Config,"tsacinv::asset");
+   my $mand=getModuleObject($self->Config,"tsacinv::mandator");
 
    my %filter=(srcsys=>\'w5base',cistatusid=>[2,3,4,5]);
    $self->{DebugMode}=0;
@@ -518,6 +519,21 @@ sub SendXmlToAM_asset
       if ($#assetname!=-1){
          $filter{name}=\@assetname;
       }
+   }
+   my $mandconfig;
+   {  # mandator init
+      $mand->SetFilter({cistatusid=>[3,4]});
+      $mand->SetCurrentView(qw(id grpid defaultassignmentid 
+                               defaultassignment doexport));
+      $mandconfig=$mand->getHashIndexed(qw(grpid doexport));
+      if (ref($mandconfig) ne "HASH"){
+         return({exitcode=>1,msg=>msg(ERROR,"can not read mandator config")});
+      }
+      my @mandid=map({$_->{grpid}} @{$mandconfig->{doexport}->{1}});
+      if ($#mandid==-1){
+         return({exitcode=>1,msg=>msg(ERROR,"no export mandator")});
+      }
+      $filter{mandatorid}=\@mandid;
    }
    my (%fh,%filename);
 
