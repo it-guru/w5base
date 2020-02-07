@@ -44,15 +44,20 @@ sub FormatedDetail
 
    if ($mode=~m/^[>]{0,1}HtmlDetail/){
       $d=[$d] if (ref($d) ne "ARRAY");
-      return(join("; ",map({ my $m=$_;
-                             $m=~s/</&lt;/g;
-                             $m=~s/>/&gt;/g;
-                             my $ml=$_;
-                             $ml=~s/"/&quote;/g;
-                            "<a target='_blank' ".
-                               "class='emaillink' ".
-                               "href=\"$ml\">$m</a>"
-                           } @{$d})));
+      return(join("; ",map({
+         my $m=$_;
+         $m=~s/</&lt;/g;
+         $m=~s/>/&gt;/g;
+         my $ml=$_;
+         $ml=~s/"/&quote;/g;
+         #$m=FancyLinks($m);
+         if (length($m)>65){
+            $m=TextShorter($m,65,"URL");
+         }
+         "<a target='_blank' ".
+           "class='emaillink' ".
+           "href=\"$ml\">$m</a>";
+      } @{$d})));
    }
    return($self->SUPER::FormatedDetail($current,$mode));
 }
