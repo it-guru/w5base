@@ -1,6 +1,7 @@
 'tssiem::secent'=>{de=>'Qualys: SecEntry',en=>'Qualys: SecEntry'},
 'fieldgroup.scan'=>{de=>'Scan',en=>'Scan'},
 'fieldgroup.sslcert'=>{de=>'SSL Cert',en=>'SSL Cert'},
+'fieldgroup.msgtracking'=>{de=>'Message Tracking',en=>'Message Tracking'},
 'first detect'=>{de=>'erstmalig erkannt'},
 'is latest'=>{de=>'ist aktuell'},
 'perspective'=>{de=>'Perspective'},

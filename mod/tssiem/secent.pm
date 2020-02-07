@@ -321,23 +321,71 @@ sub new
                 dataobjattr   =>'W5SIEM_secent.id'),
 
       new kernel::Field::Text(
-                name          =>'msghash',
-                group         =>'source',
-                label         =>'Message-MD5-Hash',
-                dataobjattr   =>"replace(standard_hash(".
-                                "secscan.ictoid||'-'".  # muss irgendwann objid
-                                "||W5SIEM_secent.ipaddress||'-'".
-                                "||W5SIEM_secent.port||'-'".
-                                "||W5SIEM_secent.qid".
-                                ",'MD5'),' ','')"),
-
-      new kernel::Field::Text(
                 name          =>'exptickettitle',
-                group         =>'source',
+                group         =>'msgtracking',
+                readonly      =>1,
                 label         =>'expected PRM title',
                 dataobjattr   =>"secscan.ictoid||' - '". #muss irgendwann objid
                                 "||W5SIEM_secent.category||' - '".
                                 "||secscan.scanperspective"),
+
+      new kernel::Field::Text(
+                name          =>'msghash',
+                group         =>'msgtracking',
+                readonly      =>1,
+                selectfix     =>1,
+                label         =>'Message-MD5-Hash',
+                dataobjattr   =>getMsgHashSQL()),
+
+      new kernel::Field::TextURL(
+                name          =>'msghashurl',
+                group         =>'msgtracking',
+                readonly      =>1,
+                label         =>'Message-URL',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $app=$self->getParent();
+                   my $EventJobBaseUrl=$app->Config->Param("EventJobBaseUrl");
+                   my $url=$EventJobBaseUrl;
+                   $url.="/" if (!($url=~m/\/$/)); 
+                   $url.="auth/tssiem/secent/ByHash/";
+                   $url.=$current->{msghash};
+                   return($url);
+                }),
+
+      new kernel::Field::Link(
+                name          =>'ofid',
+                label         =>'Overflow ID',
+                readonly      =>1,
+                group         =>'msgtracking',
+                dataobjattr   =>'W5SIEM_secent_of.msghash'),
+
+
+      new kernel::Field::Text(
+                name          =>'prmid',
+                label         =>'ProblemTicketID',
+                group         =>'msgtracking',
+                dataobjattr   =>'W5SIEM_secent_of.prmid'),
+
+      new kernel::Field::Textarea(
+                name          =>'prmidcomment',
+                label         =>'ProblemTicket Comments',
+                group         =>'msgtracking',
+                dataobjattr   =>'W5SIEM_secent_of.prmcomment'),
+
+      new kernel::Field::Text(
+                name          =>'rskid',
+                label         =>'RiskTicketID',
+                group         =>'msgtracking',
+                dataobjattr   =>'W5SIEM_secent_of.rskid'),
+
+      new kernel::Field::Textarea(
+                name          =>'rskidcomment',
+                label         =>'RiskTicket Comments',
+                group         =>'msgtracking',
+                dataobjattr   =>'W5SIEM_secent_of.rskcomment'),
+
 
       new kernel::Field::RecordUrl(),
 
@@ -360,9 +408,59 @@ sub new
         sdate ipaddress tracking_method os qid name vuln_status ent_type
        severity port ssl firstdetect lastdetect vendor_reference impact
        exploitability));
-   $self->setWorktable("W5SIEM_secent");
+   $self->setWorktable("W5SIEM_secent_of");
    return($self);
 }
+
+
+sub getMsgHashSQL
+{
+   my $d="replace(standard_hash(".
+         "secscan.ictoid||'-'".  # muss irgendwann objid
+         "||W5SIEM_secent.ipaddress||'-'".
+         "||W5SIEM_secent.port||'-'".
+         "||W5SIEM_secent.qid".
+         ",'MD5'),' ','')";
+   return($d);
+}
+
+
+sub ValidatedUpdateRecord
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my @filter=@_;
+
+   $filter[0]={ofid=>\$oldrec->{msghash}};
+   $newrec->{ofid}=$oldrec->{msghash};  # als Referenz in der Overflow 
+   if (!defined($oldrec->{ofid})){      # msghash verwenden
+      return($self->SUPER::ValidatedInsertRecord($newrec));
+   }
+   return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
+}
+
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orgrec=shift;
+
+
+   if (effChanged($oldrec,$newrec,"prmid")){
+      my $prmid=effVal($oldrec,$newrec,"prmid");
+      if ($prmid ne "" && !($prmid=~m/^PRM/)){ # da muss noch ein besserer 
+                                               # check rein!
+         $self->LastMsg(ERROR,"prmid could not be changed at now");
+         return(undef);
+      }
+   }
+   return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
+}
+
 
 
 
@@ -371,7 +469,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
 
-   my @l=qw(default source header scan);
+   my @l=qw(default source header scan msgtracking);
 
    if ($rec->{qid} eq "86002"){
       push(@l,"sslcert");
@@ -379,6 +477,39 @@ sub isViewValid
    
    return(@l);
 }
+
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),qw(ByHash));
+}
+
+
+sub ByHash
+{
+   my ($self)=@_;
+   my $idfield=$self->IdField();
+   my $idname=$idfield->Name();
+   my $val="undefined";
+   if (defined(Query->Param("FunctionPath"))){
+      $val=Query->Param("FunctionPath");
+   }
+   $val=~s/^\///;
+   $val="UNDEF" if ($val eq "");
+
+   $self->ResetFilter();
+   $self->SetFilter({msghash=>\$val,islatest=>\'1'});
+   my ($secrec,$msg)=$self->getOnlyFirst(qw(srcid)); 
+   my $id=$val;
+   if (defined($secrec)){
+      $id=$secrec->{srcid};
+   }
+   $self->HtmlGoto("../ById/$id");
+   return();
+}
+
+
 
 
 
@@ -557,9 +688,12 @@ sub getSqlFrom
               "end scanperspective ".
             "from W5SIEM_secscan ".
             ") secscan ".
-            "on W5SIEM_secent.ref=secscan.ref";
+            "on W5SIEM_secent.ref=secscan.ref ".
+            "left outer join W5SIEM_secent_of on ".
+            getMsgHashSQL()."=W5SIEM_secent_of.msghash";
    return($from);
 }
+
 
 
 
@@ -583,7 +717,9 @@ sub SecureSetFilter
    my @flt=@_;
 
    if (!$self->IsMemberOf([qw(admin w5base.tssiem.secscan.read
-                                    w5base.tssiem.secent.read)],
+                              w5base.tssiem.secent.read
+                              w5base.tssiem.secent.write
+                              w5base.tssiem.secent.read)],
                           "RMember")){
       my @addflt;
       $self->tssiem::secscan::addICTOSecureFilter(\@addflt);
@@ -601,7 +737,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","scan","sslcert","source");
+   return("header","default","scan","sslcert","msgtracking","source");
 }
 
 
@@ -624,6 +760,20 @@ sub isQualityCheckValid
 
 
 sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   if (defined($rec)){
+      if ($self->IsMemberOf([qw(admin w5base.tssiem.secent.write)])){
+         return("msgtracking");
+      }
+   }
+   return(undef);
+}
+
+         
+
+sub isDeleteValid
 {
    my $self=shift;
    my $rec=shift;

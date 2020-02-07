@@ -107,9 +107,29 @@ CREATE SEQUENCE "W5SIEM_secent_seq"
 grant select on "W5SIEM_secent_seq" to W5SIEM;
 create or replace synonym W5SIEM.secent_seq for "W5SIEM_secent_seq";
 
+-- ---------------------------------------------------------------
+-- Overflow-Handling for secent PRM Ticket numbers
+
+-- drop table "W5SIEM_secent_of";
+create table "W5SIEM_secent_of" (
+ msghash              VARCHAR2(64),
+ id                   INTEGER,     -- dummy id entry
+ prmid                VARCHAR2(32),
+ prmcomment           VARCHAR2(4000),
+ rskid                VARCHAR2(32),
+ rskcomment           VARCHAR2(4000),
+ modifyuser           NUMBER(*,0),
+ dmodifydate          DATE,
+ constraint "W5SIEM_secent_of_pk" primary key (msghash)
+);
+grant select,insert,update,delete on "W5SIEM_secent_of" to W5I;
+create or replace synonym W5I.W5SIEM_secent_of for "W5SIEM_secent_of";
+-- ---------------------------------------------------------------
 
 
 
+
+--- ab hier sind alles nur Tests und versuche!
 
 -- drop table "W5SIEM_secscanruntime";
 create table "W5SIEM_secscanruntime" (
