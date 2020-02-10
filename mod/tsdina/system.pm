@@ -264,7 +264,7 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    my @view=qw(header default sysenv os source);
-   push (@view,'lpar') if (defined $rec->{lparmode});
+   push (@view,'lpar') if (defined($rec->{lparmode}));
    push (@view,'swinstances');
    return @view;
 }
