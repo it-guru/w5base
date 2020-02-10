@@ -695,10 +695,23 @@ sub Import
          }
          { # add addition write contacts
            my %addwr=();
-           foreach my $fld (qw(tsmid tsm2id opmid opm2id applmgrid databossid)){
-              if ($w5applrec->{$fld} ne "" && 
-                  $w5applrec->{$fld} ne $curdataboss){
-                 $addwr{$w5applrec->{$fld}}++;
+           foreach my $fld (qw(tsmid tsm2id opmid opm2id applmgrid 
+                               databossid contacts)){
+              if ($fld eq "contacts"){
+                 foreach my $crec (@{$w5applrec->{contacts}}){
+                    my $roles=$crec->{roles};
+                    $roles=[$roles] if (ref($roles) ne "ARRAY");
+                    if (in_array($roles,"write") &&
+                        $crec->{targetid} ne ""){
+                       $addwr{$crec->{target}}->{$crec->{targetid}}++;
+                    }
+                 } 
+              }
+              else{
+                 if ($w5applrec->{$fld} ne "" && 
+                     $w5applrec->{$fld} ne $curdataboss){
+                    $addwr{'base::user'}->{$w5applrec->{$fld}}++;
+                 }
               }
            }
            my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
@@ -708,30 +721,31 @@ sub Import
            });
            my @cur=$lnkcontact->getHashList(qw(ALL));
            $lnkcontact->ResetFilter();
-           foreach my $userid (keys(%addwr)){
-              my @old=grep({
-                 $_->{target} eq 'base::user' &&
-                 $_->{targetid} eq $userid
-              } @cur);
-              if ($#old==-1){
-                 $lnkcontact->ValidatedInsertRecord({
-                    target=>'base::user',
-                    targetid=>$userid,
-                    roles=>['write'],
-                    refid=>$identifyby,
-                    comments=>"inherited by application",
-                    parentobj=>$sys->SelfAsParentObject()
-                 });   
-              }
-              else{
-                 my @curroles=$old[0]->{roles};
-                 if (ref($curroles[0]) eq "ARRAY"){
-                    @curroles=@{$curroles[0]};
+           foreach my $ctype (keys(%addwr)){
+              foreach my $contactid (keys(%{$addwr{$ctype}})){
+                 my @old=grep({
+                    $_->{target} eq $ctype && $_->{targetid} eq $contactid
+                 } @cur);
+                 if ($#old==-1){
+                    $lnkcontact->ValidatedInsertRecord({
+                       target=>$ctype,
+                       targetid=>$contactid,
+                       roles=>['write'],
+                       refid=>$identifyby,
+                       comments=>"inherited by application",
+                       parentobj=>$sys->SelfAsParentObject()
+                    });   
                  }
-                 if (!in_array(\@curroles,"write")){
-                    $lnkcontact->ValidatedUpdateRecord($old[0],{
-                       roles=>[@curroles,'write'],
-                    },{id=>\$old[0]->{id}});   
+                 else{
+                    my @curroles=$old[0]->{roles};
+                    if (ref($curroles[0]) eq "ARRAY"){
+                       @curroles=@{$curroles[0]};
+                    }
+                    if (!in_array(\@curroles,"write")){
+                       $lnkcontact->ValidatedUpdateRecord($old[0],{
+                          roles=>[@curroles,'write'],
+                       },{id=>\$old[0]->{id}});   
+                    }
                  }
               }
            }
