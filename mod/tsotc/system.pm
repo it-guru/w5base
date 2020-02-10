@@ -126,20 +126,20 @@ sub new
                 timezone      =>'CET',
                 dataobjattr   =>"date_created"),
 
-      new kernel::Field::Text(
-                name          =>'appl',
-                htmlwidth     =>'150px',
-                group         =>'source',
-                label         =>'Application',
-                vjointo       =>\'itil::appl',
-                vjoinon       =>['appw5baseid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Text(
-                name          =>'appw5baseid',
-                group         =>'source',
-                label         =>'Application W5BaseID',
-                dataobjattr   =>'metadata.darwin_app_w5baseid'),
+#      new kernel::Field::Text(
+#                name          =>'appl',
+#                htmlwidth     =>'150px',
+#                group         =>'source',
+#                label         =>'Application',
+#                vjointo       =>\'itil::appl',
+#                vjoinon       =>['appw5baseid'=>'id'],
+#                vjoindisp     =>'name'),
+#
+#      new kernel::Field::Text(
+#                name          =>'appw5baseid',
+#                group         =>'source',
+#                label         =>'Application W5BaseID',
+#                dataobjattr   =>'metadata.darwin_app_w5baseid'),
 
       new kernel::Field::MDate(
                 name          =>'mdate',
