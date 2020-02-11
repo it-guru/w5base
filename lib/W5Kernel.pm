@@ -5,7 +5,7 @@ use strict;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 @EXPORT = qw(
-             &trim &rtrim &ltrim &limitlen &in_array &first_index
+             &trim &rtrim &ltrim &limitlen &in_array &first_index &base36
              &extractLanguageBlock
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
              );
@@ -72,6 +72,19 @@ sub sysmsg
             syslog($priority,$msg);
             closelog();');
    }
+}
+
+
+sub base36
+{
+  my ($val) = @_;
+  my $symbols=join('','0'..'9','A'..'Z');
+  my $b36='';
+  while($val){
+    $b36=substr($symbols,$val % 36,1).$b36;
+    $val=int($val/36);
+  }
+  return($b36||'0');
 }
 
 

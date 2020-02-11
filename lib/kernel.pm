@@ -83,6 +83,7 @@ use charnames ':full';
 @EXPORT = qw(&Query &LangTable &extractLanguageBlock 
              &globalContext &NowStamp &CalcDateDuration
              &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array &first_index
+             &base36
              &hash2xml &xml2hash &effVal &effChanged &effChangedVal
              &Debug &UTF8toLatin1 &Html2Latin1
              &Datafield2Hash &Hash2Datafield &CompressHash
