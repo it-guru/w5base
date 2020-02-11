@@ -51,8 +51,14 @@ sub ScanNewSystems
    if ($queryparam ne ""){
       msg(INFO,"try to import name='$queryparam'");
       $datastream->SetFilter({name=>$queryparam});
-      my ($rec,$msg)=$datastream->getOnlyFirst(@datastreamview);
-      if ($self->analyseRecord($datastream,$rec)){
+      my @l=$datastream->getHashList(@datastreamview);
+      my $cnt=0;
+      foreach my $rec (@l){
+         if ($self->analyseRecord($datastream,$rec)){
+            $cnt++;
+         }
+      }
+      if ($cnt){
          return({exitcode=>0,exitmsg=>'ok'});
       }
       else{
@@ -218,7 +224,7 @@ sub analyseRecord
    my $w5sys=$self->getPersistentModuleObject("W5BaseSys","itil::system");
    my $wfa=$self->getPersistentModuleObject("W5BaseWa","base::workflowaction");
    my $user=$self->getPersistentModuleObject("W5BaseUser","base::user");
-   my $w5baseid=$sys->Import({importname=>$rec->{name}});
+   my $w5baseid=$sys->Import({importname=>$rec->{id}});
 
    if (defined($w5baseid)){   # create Notification
       $w5sys->SetFilter({id=>\$w5baseid});

@@ -47,6 +47,21 @@ sub new
                 dataobjattr   =>"server_name"),
 
       new kernel::Field::Text(
+                name          =>'altname',
+                sqlorder      =>'desc',
+                label         =>'alternate Systemname',
+                depend        =>["name","cdateunixtimstamp"],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $name=$current->{name};
+                   $name=~s/[^a-z0-9_-]/_/g;
+                   $name=TextShorter($current->{name},40);
+
+                   return(lc($name."__".base36($current->{cdateunixtimstamp})));
+                }),
+
+      new kernel::Field::Text(
                 name          =>'state',
                 sqlorder      =>'desc',
                 label         =>'System State',
@@ -118,6 +133,14 @@ sub new
                 vjointo       =>\'tsotc::ipaddress',
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['name',"hwaddr","itcloudareaid"]),
+
+      new kernel::Field::Text(
+                name          =>'cdateunixtimstamp',
+                group         =>'source',
+                label         =>'Creation-Unixtimestamp',
+                timezone      =>'CET',
+                dataobjattr   =>"extract(epoch from date_created ".
+                                "at time zone 'CET')"),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -300,7 +323,17 @@ sub Import
       $importname=$param->{importname};
       $importname=~s/[^a-z0-9_-].*$//i; # prevent wildcard and or filters
       if ($importname ne ""){
-         $flt={name=>$importname};
+         if ($importname=~m/^[0-9a-f]{8}-
+                             [0-9a-f]{4}-
+                             [0-9a-f]{4}-
+                             [0-9a-f]{4}-
+                             [0-9a-f]{12}$/xi){
+            $flt={id=>$importname};
+            printf STDERR ("use uuid mode\n");
+         }
+         else{
+            $flt={name=>$importname};
+         }
       }
       else{
          return(undef);
@@ -329,7 +362,8 @@ sub Import
 
    $self->ResetFilter();
    $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(name cdate id contactemail availability_zone
+   my @l=$self->getHashList(qw(name altname 
+                               cdate id contactemail availability_zone
                                projectid));
    if ($#l==-1){
       $self->LastMsg(ERROR,"Systemname not found in OTC");
@@ -682,6 +716,15 @@ sub Import
          }
          elsif ($w5applrec->{opmode} eq "cbreakdown"){
             $newrec->{iscbreakdown}=1;
+         }
+      }
+      {
+         my $newname=$newrec->{name};
+         $sys->ResetFilter();
+         $sys->SetFilter({name=>\$newname});
+         my ($chkrec)=$sys->getOnlyFirst(qw(id name));
+         if (defined($chkrec)){
+            $newrec->{name}=$sysrec->{altname};
          }
       }
       $identifyby=$sys->ValidatedInsertRecord($newrec);

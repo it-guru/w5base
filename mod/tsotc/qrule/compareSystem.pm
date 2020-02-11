@@ -163,13 +163,28 @@ sub qcheckRecord
                                        id=>"!".$rec->{id}});
                   my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
                   if (defined($chkrec)){
-                     $nameok=0;
-                     my $m='systemname from OTC is already in use '.
-                           'by an other system - '.
-                           'contact OTC Admin to make the systemname unique!';
-                     push(@qmsg,$m);
-                     push(@dataissue,$m);
-                     $errorlevel=3 if ($errorlevel<3);
+                     $dataobj->ResetFilter();
+                     $dataobj->SetFilter({name=>\$parrec->{altname},
+                                          id=>"!".$rec->{id}});
+                     my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
+                     if (!defined($chkrec)){
+                        $parrec->{name}=$parrec->{altname}; 
+                        push(@qmsg,"systemname is not unique - please ".
+                                   "change the systemname in OTC");
+                        push(@qmsg,"using alternate systemname with ".
+                                   "unique sufix");
+                        $errorlevel=2 if ($errorlevel<2);
+                     }
+                     else{
+                        $nameok=0;
+                        my $m='systemname from OTC is already in use '.
+                              'by an other system - '.
+                              'contact OTC Admin to make '.
+                              'the systemname unique!';
+                        push(@qmsg,$m);
+                        push(@dataissue,$m);
+                        $errorlevel=3 if ($errorlevel<3);
+                     }
                   }
                }
 

@@ -5,6 +5,7 @@
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'fieldgroup.iaascontacts'=>{de=>'IaaS Kontakte',en=>'IaaS Contacts'},
 'fieldgroup.iaccontacts'=>{de=>'IaC Kontakte',en=>'IaC Contacts'},
+'alternate Systemname'=>{de=>'alternativer Systemname'},
 'Contact email'=>{de=>'Kontakt E-Mail'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},
 'Application'=>{de=>'Anwendung'},
