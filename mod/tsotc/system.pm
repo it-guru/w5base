@@ -170,28 +170,37 @@ sub getSqlFrom
    my @flt=@_;
    my ($worktable,$workdb)=$self->getWorktable();
    my $selfasparent=$self->SelfAsParentObject();
-   my $from="$worktable 
-left outer join (
-  select distinct ON(server_uuid) server_uuid,asp,darwin_app_w5baseid,w from (
-    select * from (
-      select distinct server_uuid,asp,darwin_app_w5baseid,
-         (case when asp is not null then 1 else 0 end) +
-         (case when darwin_app_w5baseid is not null then 1 else 0 end) as w
-         from otc4darwin_ias_srv_metadata_vw
-      union
-         select distinct server_uuid,asp,darwin_app_w5baseid,
-         (case when asp is not null then 1 else 0 end) +
-         (case when darwin_app_w5baseid is not null then 1 else 0 end) as w
-         from otc4darwin_iac_srv_metadata_vw 
-     ) as prepremeta order by server_uuid,w desc --to get row with most notnulls
-   ) as premetadata
-) as metadata 
-on otc4darwin_server_vw.server_uuid=metadata.server_uuid
-join (  -- project_uuids scheinen auch nicht mehr eindeutig
-  select distinct project_uuid,project_name
-  from otc4darwin_projects_vw
-) as otc4darwin_projects_vw 
-on otc4darwin_server_vw.project_uuid=otc4darwin_projects_vw.project_uuid";
+   my @view=$self->getCurrentView();
+
+   my $from="$worktable ";
+   if (in_array(\@view,["ALL","contactemail"])){
+      $from.="left outer join ( ".
+             "select distinct ON(server_uuid) server_uuid,asp,".
+             "darwin_app_w5baseid,w from (".
+               "select * from (".
+                 "select distinct server_uuid,asp,darwin_app_w5baseid,".
+                    "(case when asp is not null then 1 else 0 end) +".
+                    "(case when darwin_app_w5baseid is not null ".
+                           "then 1 else 0 end) as w ".
+                    "from otc4darwin_ias_srv_metadata_vw ".
+                 " union ".
+                    "select distinct server_uuid,asp,darwin_app_w5baseid, ".
+                    "(case when asp is not null then 1 else 0 end) + ".
+                    "(case when darwin_app_w5baseid is not null ".
+                           "then 1 else 0 end) as w ".
+                    "from otc4darwin_iac_srv_metadata_vw ".
+                ") as prepremeta order by server_uuid,w desc ".
+              ") as premetadata ".
+             ") as metadata on ".
+             "otc4darwin_server_vw.server_uuid=metadata.server_uuid ";
+   }
+
+   $from.="join (".
+            "select distinct project_uuid,project_name ".
+             "from otc4darwin_projects_vw ".
+          ") as otc4darwin_projects_vw ".
+          "on otc4darwin_server_vw.project_uuid=".
+          "otc4darwin_projects_vw.project_uuid";
    return($from);
 }
 
