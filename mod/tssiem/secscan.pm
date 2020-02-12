@@ -19,10 +19,9 @@ package tssiem::secscan;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::App::Web;
-use kernel::DataObj::DB;
+use tssiem::lib::Listedit;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+@ISA=qw(tssiem::lib::Listedit);
 
 sub new
 {
@@ -103,11 +102,11 @@ sub new
                 label         =>'Security Entries',
                 group         =>'results',
                 vjointo       =>'tssiem::secent',
-                htmllimit     =>10,
+                htmllimit     =>30,
                 forwardSearch =>1,
                 vjoinbase     =>[{pci_vuln=>'yes',severity=>[1,2,3]}],
                 vjoinon       =>['qref'=>'qref'],
-                vjoindisp     =>['ipaddress','name']),
+                vjoindisp     =>['ipaddress','port','name']),
 
       new kernel::Field::Number(
                 name          =>'secentcnt',
@@ -346,46 +345,15 @@ sub new
 }
 
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
-   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
-   if (defined($self->{DB})){
-      $self->{DB}->do("alter session set cursor_sharing=force");
-   }
-   if (defined($self->{DB})){
-      $self->{DB}->{db}->{LongReadLen}=1024*1024*15;    #15MB
-   }
-
-   return(1) if (defined($self->{DB}));
-   return(0);
-}
 
 sub getSqlFrom
 {
    my $self=shift;
    my $mode=shift;
    my @flt=@_;
-   my $from="";
 
-   $from.="(select ".
-          "W5SIEM_secscan.*,".
-          "decode(rank() over (partition by ".
-              "case ".
-                "when title like '%_vFWI_%' ".
-                    "then ictoid||'_vFWI' ".
-                "else ictoid||'_STD' ".
-              "end ".
-          "order by launch_datetime desc),1,1,0) islatest,".
-              "case ".
-                "when title like '%_vFWI_%' ".
-                    "then 'SharedVLAN' ".
-                "else 'CNDTAG' ".
-              "end scanperspective ".
-          "from W5SIEM_secscan ".
-          ") secscan";
+   my $secscansql=$self->getSecscanFromSQL();
+   my $from="($secscansql) secscan";
 
    return($from);
 }
@@ -402,67 +370,6 @@ sub initSearchQuery
    #  Query->Param("search_sdate"=>">now-3M");
    #}
 }
-
-
-sub addICTOSecureFilter
-{
-   my $self=shift;
-   my $addflt=shift;
-
-
-
-   my $userid=$self->getCurrentUserId();
-   $userid=-1 if (!defined($userid) || $userid==0);
-
-   if ($self->isDataInputFromUserFrontend()){
-      if (!$self->IsMemberOf([qw(admin w5base.tssiem.secscan.read)],
-          "RMember")){
-         #my %pgrps=$self->getGroupsOf($ENV{REMOTE_USER},
-         #         [orgRoles(),qw(RCFManager RCFManager2 RAuditor RMonitor)],
-         #         "both");
-         my %pgrps=();
-         my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
-         my @grpid=grep(/^[0-9]+/,keys(%grp),keys(%pgrps));
-         @grpid=qw(-99) if ($#grpid==-1);
-
-         my $appl=$self->getPersistentModuleObject("w5appl","TS::appl");
-
-         my @flt=();
-         push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],applmgrid=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],semid=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],sem2id=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],tsmid=>\$userid});
-         push(@flt,{cistatusid=>[3,4,5],tsm2id=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],opmid=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],opm2id=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],businessteamid=>\@grpid});
-         #push(@flt,{cistatusid=>[3,4,5],itsemteamid=>\@grpid});
-         #push(@flt,{cistatusid=>[3,4,5],responseteam=>\@grpid});
-
-         $appl->SetFilter(\@flt);
-         $appl->SetCurrentView(qw(ictono));
-         my $i=$appl->getHashIndexed("ictono");
-
-         my @ictoid=keys(%{$i->{ictono}});
-         @ictoid=qw(-1) if ($#ictoid==-1);
-
-         my %ictono=();
-         map({$ictono{$_}++ } @ictoid);
-         if ($ENV{REMOTE_USER} ne "anonymous" && keys(%ictono)>0){
-            push(@$addflt,
-                       {ictono=>[keys(%ictono)]}
-            );
-         }
-         else{
-            push(@$addflt,
-                       {ictono=>['-99']}
-            );
-         }
-      }
-   }
-}
-
 
 
 sub SecureSetFilter

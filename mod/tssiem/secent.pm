@@ -19,13 +19,12 @@ package tssiem::secent;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::App::Web;
-use kernel::DataObj::DB;
+use tssiem::lib::Listedit;
 use kernel::Field;
-use tssiem::secscan;
 use Date::Parse;
 use kernel::date;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+@ISA=qw(tssiem::lib::Listedit);
+
 
 sub new
 {
@@ -40,7 +39,7 @@ sub new
                 label         =>'ICTO-ID',
                 group         =>'scan',
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>"ictoid"),  # In Zukunft sollte die dann
+                dataobjattr   =>"secscan.ictoid"),  # In Zukunft sollte die dann
                                             # irgendwann optional sein
       new kernel::Field::Text(
                 name          =>'itscanobjectid',
@@ -48,8 +47,9 @@ sub new
                 searchable    =>0,
                 group         =>'scan',
                 label         =>'IT-ScanObjectID',
-                dataobjattr   =>"ictoid"),  # da kann dann ICTOID oder W5BID
-                                            # irgendwann mal drin sein.
+                dataobjattr   =>"secscan.ictoid"), # da kann dann ICTOID 
+                                                   # oder W5BID irgendwann 
+                                                   # mal drin sein.
       new kernel::Field::Date(
                 name          =>'sdate',
                 label         =>'Scan date',
@@ -84,6 +84,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'tracking_method',
                 label         =>'Tracking Meth',
+                searchable    =>0,
                 dataobjattr   =>"W5SIEM_secent.tracking_method"),
 
       new kernel::Field::Text(
@@ -104,6 +105,13 @@ sub new
                 htmldetail    =>0,
                 label         =>'is latest',
                 dataobjattr   =>"secscan.islatest"),
+
+      new kernel::Field::Boolean(
+                name          =>'isdup',
+                htmldetail    =>0,
+                selectfix     =>1,
+                label         =>'is duplicate',
+                dataobjattr   =>"decode(dupsecent.ref,NULL,0,1)"),
 
       new kernel::Field::Text(
                 name          =>'qid',
@@ -134,6 +142,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'severity',
                 label         =>'Severity',
+                selectfix     =>1,
                 dataobjattr   =>"W5SIEM_secent.severity"),
 
       new kernel::Field::Text(
@@ -247,6 +256,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'pci_vuln',
                 label         =>'PCI Vuln',
+                selectfix     =>1,
                 dataobjattr   =>"W5SIEM_secent.pci_vuln"),
 
       new kernel::Field::Text(
@@ -258,7 +268,7 @@ sub new
                 name          =>'perspective',
                 htmldetail    =>0,
                 label         =>'perspective',
-                dataobjattr   =>"scanperspective"),
+                dataobjattr   =>"secscan.scanperspective"),
 
       new kernel::Field::Text(
                 name          =>'scanname',
@@ -469,11 +479,19 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
 
-   my @l=qw(default source header scan msgtracking);
+   my @l=qw(default source header scan);
 
    if ($rec->{qid} eq "86002"){
       push(@l,"sslcert");
    }
+   if (lc($rec->{pci_vuln}) eq "yes" &&
+       ($rec->{severity} eq "1" ||
+        $rec->{severity} eq "2" ||
+        $rec->{severity} eq "3") &&
+       $rec->{isdup} eq "0" ){
+      push(@l,"msgtracking");
+   }
+
    
    return(@l);
 }
@@ -653,46 +671,35 @@ sub parseSSL
 }
 
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
-   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
-   if (defined($self->{DB})){
-      $self->{DB}->do("alter session set cursor_sharing=force");
-   }
-
-   return(1) if (defined($self->{DB}));
-   return(0);
-}
-
 
 sub getSqlFrom
 {
    my $self=shift;
+
+   my $secscansql=$self->getSecscanFromSQL();
    my $from="W5SIEM_secent ".
-            "join ".
-            "(select W5SIEM_secscan.*,".
-            "decode(rank() over (partition by ".
-                "case ".
-                  "when title like '%_vFWI_%' ".
-                      "then ictoid||'_vFWI' ".
-                  "else ictoid||'_STD' ".
-                "end ".
-            "order by launch_datetime desc),1,1,0) islatest,".
-              "case ".
-                "when title like '%_vFWI_%' ".
-                    "then 'SharedVLAN' ".
-                "else 'CNDTAG' ".
-              "end scanperspective ".
-            "from W5SIEM_secscan ".
-            ") secscan ".
-            "on W5SIEM_secent.ref=secscan.ref ".
+            "join ($secscansql) secscan ".
+               "on W5SIEM_secent.ref=secscan.ref ".
+            "left outer join ($secscansql) dupsecscan ".
+               "on secscan.ictoid=dupsecscan.ictoid ".
+                   " and dupsecscan.islatest='1' ".
+                   " and dupsecscan.scanperspective='CNDTAG' ".
+                   " and secscan.scanperspective<>'CNDTAG' ".
+            "left outer join ( ".  # prevent duplicated old messages
+                  "select distinct ref,ipaddress,port,category,qid ".
+                  "from W5SIEM_secent".
+               ") dupsecent ".
+               "on dupsecscan.ref=dupsecent.ref ".
+                   " and W5SIEM_secent.ipaddress=dupsecent.ipaddress ".
+                   " and W5SIEM_secent.port=dupsecent.port ".
+                   " and W5SIEM_secent.category=dupsecent.category ".
+                   " and W5SIEM_secent.qid=dupsecent.qid ".
             "left outer join W5SIEM_secent_of on ".
-            getMsgHashSQL()."=W5SIEM_secent_of.msghash";
+               getMsgHashSQL()."=W5SIEM_secent_of.msghash";
    return($from);
 }
+
+
 
 
 
@@ -702,6 +709,9 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_islatest"))){
      Query->Param("search_islatest"=>$self->T("yes"));
+   }
+   if (!defined(Query->Param("search_isdup"))){
+     Query->Param("search_isdup"=>$self->T("no"));
    }
 }
 
@@ -722,7 +732,7 @@ sub SecureSetFilter
                               w5base.tssiem.secent.read)],
                           "RMember")){
       my @addflt;
-      $self->tssiem::secscan::addICTOSecureFilter(\@addflt);
+      $self->addICTOSecureFilter(\@addflt);
       push(@flt,\@addflt);
    }
    return($self->SetFilter(@flt));
