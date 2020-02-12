@@ -117,7 +117,7 @@ sub ScanNewSystems
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
             $exitmsg=$lastmsg;
             %flt=( 
-               cdate=>">=\"$laststamp GMT-60m\" AND <now-5m"
+               cdate=>">=\"$laststamp GMT-30m\" AND <now-5m"
             );
          }
       }
@@ -134,34 +134,38 @@ sub ScanNewSystems
 
       if (defined($rec)){
          READLOOP: do{
-            if ($skiplevel==2){
-               if ($rec->{id} ne $lastid){
-                  $skiplevel=3;
-               }
-            }
-            if ($skiplevel==1){
-               if ($rec->{cdate} ne $laststamp){
-                  msg(WARN,"record with id '$lastid' missing in datastream");
-                  msg(WARN,"this can result in skiped records!");
-                  $skiplevel=3;
-               }
-            }
-            if ($skiplevel==0){
-               if (defined($laststamp) && defined($lastid)){
-                  if ($laststamp eq $rec->{cdate}){
-                     $skiplevel=1;
-                  }
-               }
-               else{
-                  $skiplevel=3;
-               }
-            }
-            if ($skiplevel==1){
-               if ($lastid eq $rec->{id}){
-                  msg(INFO,"got ladid point $lastid");
-                  $skiplevel=2;
-               }
-            }
+            # 
+            #  Remove of Skip-Handing because cdate stream problem (cdate
+            #  is not creation in OTC Integrated!)
+            # 
+            #if ($skiplevel==2){
+            #   if ($rec->{id} ne $lastid){
+            #      $skiplevel=3;
+            #   }
+            #}
+            #if ($skiplevel==1){
+            #   if ($rec->{cdate} ne $laststamp){
+            #      msg(WARN,"record with id '$lastid' missing in datastream");
+            #      msg(WARN,"this can result in skiped records!");
+            #      $skiplevel=3;
+            #   }
+            #}
+            #if ($skiplevel==0){
+            #   if (defined($laststamp) && defined($lastid)){
+            #      if ($laststamp eq $rec->{cdate}){
+            #         $skiplevel=1;
+            #      }
+            #   }
+            #   else{
+            #      $skiplevel=3;
+            #   }
+            #}
+            #if ($skiplevel==1){
+            #   if ($lastid eq $rec->{id}){
+            #      msg(INFO,"got ladid point $lastid");
+            #      $skiplevel=2;
+            #   }
+            #}
             if ($skiplevel==0 ||  # = no records to skip
                 $skiplevel==3){   # = all skips are done
                $cnt++;
