@@ -520,16 +520,32 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
                mode=>'QualityCheck',
                datasource=>$partnerlabel
             );
-            if ($dataobj->NotifiedValidatedUpdateRecord(
-                   \%notifycontrol,
+            my $bk=undef;
+            if (defined($partnerlabel)){
+               $bk=$dataobj->NotifiedValidatedUpdateRecord(\%notifycontrol,
                    $rec,$forcedupd,
-                   {$idname=>\$rec->{$idname}})){
-               push(@$qmsg,"all desired fields has been updated: ".
-                          join(", ",keys(%$forcedupd)));
+                   {$idname=>\$rec->{$idname}}
+               );
+            }
+            else{
+               $bk=$dataobj->ValidatedUpdateRecord(
+                   $rec,$forcedupd,
+                   {$idname=>\$rec->{$idname}}
+               );
+            }
+
+            if ($bk){
+               my @updfields=grep(!/^(srcload|mdate)$/,keys(%$forcedupd));
+               if ($#updfields!=-1){
+                  push(@$qmsg,"all desired fields has been updated: ".
+                             join(", ",@updfields));
+               }
                foreach my $k (keys(%$forcedupd)){
                   $rec->{$k}=$forcedupd->{$k};
-                  $checksession->{EssentialsChangedCnt}++;
-                  $checksession->{EssentialsChanged}->{$k}++
+                  if ($k ne "srcload" && $k ne "mdate"){
+                     $checksession->{EssentialsChangedCnt}++;
+                     $checksession->{EssentialsChanged}->{$k}++
+                  }
                }
             }
             else{
