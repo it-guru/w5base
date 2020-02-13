@@ -810,9 +810,11 @@ sub qcheckRecord
    }
 
    if (keys(%$forcedupd)){
-      #printf STDERR ("fifi request a forceupd=%s\n",Dumper($forcedupd));
+      if (keys(%$forcedupd)==1 && exists($forcedupd->{srcload})){
+         $forcedupd->{mdate}=$rec->{mdate};  # do not change mdate
+      }
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,{id=>\$rec->{id}})){
-         my @fld=grep(!/^srcload$/,keys(%$forcedupd));
+         my @fld=grep(!/^(srcload|mdate)$/,keys(%$forcedupd));
          if ($#fld!=-1){
             push(@qmsg,"all desired fields has been updated: ".join(", ",@fld));
             $checksession->{EssentialsChangedCnt}++;
