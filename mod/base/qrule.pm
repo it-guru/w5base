@@ -728,11 +728,15 @@ sub nativQualityCheck
          if (defined($idfield)){
             my $id=$idfield->RawValue($rec);
             if ($id ne ""){
-               $parent->ValidatedUpdateRecord($rec,{
+               my $updrec={
                    lastqcheck=>NowStamp("en"),
                    mdate=>$rec->{mdate}         # don't change mdate, because
-               }, {$idfield->Name()=>\$id});    # lastqcheck is not a "real"
-            }                                   # record data
+               };                               # lastqcheck is not a "real"
+                                                # record data
+               $parent->ValidatedUpdateRecord($rec,$updrec,
+                   {$idfield->Name()=>\$id}
+               );
+            }                               
          }
       }
       $parent->postQualityCheckRecord($rec,@param);
