@@ -197,14 +197,19 @@ sub qcheckRecord
              exists($forcedupd->{systemid}) &&
              ($parrec->{usage}=~m/^INVOICE_ONLY/)){
             $parrec=undef;
-            push(@qmsg,"Invoice only systems are not allowed to import");
+            my $msg="invoice systems are not allowed ".
+                    "to be imported/created";
+            push(@qmsg,$msg);
+            push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
             $forcedupd={};
          }
       }
       if ($rec->{systemid} ne "" && ($parrec->{usage}=~m/^INVOICE_ONLY/)){
          $parrec=undef;
-         push(@qmsg,"TSI has migrate the system to INVOICE_ONLY, ".
-                    "soo it needs to be removed from Darwin->IT-Inventar");
+         push(@qmsg,"TSI has migrated the system to INVOICE_ONLY, ".
+                    "therefore it needs to be removed ".
+                    "from Darwin -> IT-Inventor");
          $forcedupd={};
          $errorlevel=3;
          return($self->HandleWfRequest($dataobj,$rec,

@@ -68,5 +68,6 @@
 'full CI-Name'=>{de=>'vollständiger CI-Name'},
 'marked as delete'=>{de=>'gelöscht markiert'},
 'is protected network device'=>{de=>'ist geschütztes Netzwerk System'},
-'Invoice systems are not allowed to import'=>{de=>'Systeme, die nur zur Verrechnung existieren, dürfen nicht importiert werden.'},
+'invoice systems are not allowed to import'=>{de=>'Verrechnungssysteme dürfen nicht importiert werden'},
+
 
