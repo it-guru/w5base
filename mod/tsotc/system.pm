@@ -329,7 +329,7 @@ sub Import
                              [0-9a-f]{4}-
                              [0-9a-f]{12}$/xi){
             $flt={id=>$importname};
-            printf STDERR ("use uuid mode\n");
+            #printf STDERR ("use uuid mode\n");
          }
          else{
             $flt={name=>$importname};
