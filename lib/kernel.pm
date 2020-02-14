@@ -93,7 +93,7 @@ use charnames ':full';
              &FormatJsDialCall &HashExtr
              &mkMailInlineAttachment &haveSpecialChar
              &getModuleObject &getConfigObject &generateToken
-             &isDataInputFromUserFrontend &orgRoles &extractLangEntry
+             &orgRoles &extractLangEntry
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16
              &utf8_to_latin1
              &TextShorter
@@ -824,16 +824,6 @@ sub Debug
 {
    return($W5V2::Debug);
 }
-
-sub isDataInputFromUserFrontend
-{
-   if (($ENV{SCRIPT_URI} ne "" || getClientAddrIdString() ne "" ) &&
-       $W5V2::OperationContext ne "QualityCheck"){
-      return(1);
-   }
-   return(0);
-}
-
 
 
 sub globalContext

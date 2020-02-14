@@ -492,6 +492,7 @@ sub isWriteValid
 
    return("default") if (!defined($oldrec));
 
+
    my $itcloudid=$oldrec->{"cloudid"};
    my $applid=$oldrec->{"applid"};
    if ($self->isWriteOnITCloudValid($itcloudid,"default")){

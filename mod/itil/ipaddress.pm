@@ -920,7 +920,7 @@ sub isParentOPvalid
       if ($mode eq "read"){ 
          @blkl=$p->isViewValid($l[0]);
       }
-      if (isDataInputFromUserFrontend()){
+      if ($self->isDataInputFromUserFrontend()){
          if (!grep(/^ALL$/,@blkl) && !grep(/^ipaddresses$/,@blkl)){
             return(0);
          }
@@ -952,7 +952,7 @@ sub isParentOPvalid
       if ($mode eq "read"){ 
          @blkl=$p->isViewValid($l[0]);
       }
-      if (isDataInputFromUserFrontend()){
+      if ($self->isDataInputFromUserFrontend()){
          if (!grep(/^ALL$/,@blkl) && !grep(/^ipaddresses$/,@blkl)){
             $self->LastMsg(ERROR,"no access") if ($mode eq "write");
             return(0);

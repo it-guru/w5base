@@ -733,6 +733,8 @@ sub Import
       if (defined($w5applrec)){
          { # create application relation
             my $lnkapplsys=getModuleObject($self->Config,"itil::lnkapplsystem");
+            my $DataInputState=$lnkapplsys->isDataInputFromUserFrontend();
+            $lnkapplsys->isDataInputFromUserFrontend(0); # process as sys mode
             $lnkapplsys->SetFilter({
                systemid=>\$identifyby,
                applid=>\$w5applrec->{id}
@@ -744,6 +746,7 @@ sub Import
                   applid=>$w5applrec->{id}
                });
             }
+            $lnkapplsys->isDataInputFromUserFrontend($DataInputState);
          }
          { # add addition write contacts
            my %addwr=();

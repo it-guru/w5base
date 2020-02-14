@@ -145,6 +145,7 @@ sub postQualityCheckRecord
 sub SecureSetFilter
 {
    my $self=shift;
+   $self->isDataInputFromUserFrontend(1);
    return($self->SetFilter(@_));
 }
 
@@ -1202,6 +1203,13 @@ sub isDataInputFromUserFrontend
 {
    my $self=shift;
    $self->Context->{DataInputFromUserFrontend}=$_[0] if (defined($_[0]));
+   if (!exists($self->Context->{DataInputFromUserFrontend})){
+      # doing default isDataInputFromUserFrontend handling (from kernel.pm)
+      if (($ENV{SCRIPT_URI} ne "" || getClientAddrIdString() ne "" ) &&
+          $W5V2::OperationContext ne "QualityCheck"){
+         return(1);
+      }
+   }
    return($self->Context->{DataInputFromUserFrontend});
 }
 

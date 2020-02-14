@@ -190,7 +190,7 @@ sub Validate
          delete($newrec->{systemid});
       }
    }
-   if (isDataInputFromUserFrontend()){
+   if ($self->isDataInputFromUserFrontend()){
       if (!$self->itil::lib::Listedit::isWriteOnSystemValid(
               effVal($oldrec,$newrec,"systemid"),"sysiface")){
          $self->LastMsg(ERROR,"no write access to specifed system");

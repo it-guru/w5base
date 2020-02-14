@@ -266,7 +266,7 @@ sub isParentWriteable
          if (defined($sysrec)){
             $sysfound++;
             my @write=$sys->isWriteValid($sysrec);
-            if (isDataInputFromUserFrontend()){
+            if ($self->isDataInputFromUserFrontend()){
                if (grep(/^ALL$/,@write) || grep(/^ipaddresses$/,@write)){
                   return(1);
                }
@@ -279,7 +279,7 @@ sub isParentWriteable
          if (defined($isvrec)){
             $isvfound++;
             my @write=$isv->isWriteValid($isvrec);
-            if (isDataInputFromUserFrontend()){
+            if ($self->isDataInputFromUserFrontend()){
                if (grep(/^ALL$/,@write) || grep(/^ipaddresses$/,@write)){
                   return(1);
                }

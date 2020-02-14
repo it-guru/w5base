@@ -517,13 +517,6 @@ sub Validate
    }
    ########################################################################
 
-#   if ($self->isDataInputFromUserFrontend()){
-#      if (!$self->isWriteOnApplValid($applid,"systems")){
-#         $self->LastMsg(ERROR,"no access");
-#         return(undef);
-#      }
-#   }
-
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
    return(1);
