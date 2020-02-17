@@ -68,6 +68,27 @@ sub new
                 dataobjattr   =>'vou.code'),
 
       new kernel::Field::Select(
+                name          =>'responsibleorg',
+                htmleditwidth =>'40%',
+                label         =>'responsible organisation',
+                vjoineditbase =>{grpid=>"200"},
+                vjointo       =>'base::grp',
+                vjoinon       =>['rorgid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'rorgid',
+                label         =>'responsible organisation ID',
+                dataobjattr   =>'vou.rorg'),
+
+      new kernel::Field::Select(
+                name          =>'outype',
+                label         =>'Unit Type',
+                value         =>['HUB','SERVICE'],
+                htmleditwidth =>'130px',
+                dataobjattr   =>'vou.grouptype'),
+
+      new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
                 label         =>'CI-State',
@@ -79,36 +100,107 @@ sub new
       new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
+                selectfix     =>1,
                 dataobjattr   =>'vou.cistatus'),
 
       new kernel::Field::Databoss(),
 
       new kernel::Field::Link(
                 name          =>'databossid',
+                selectfix     =>1,
                 group         =>'comments',
                 dataobjattr   =>'vou.databoss'),
 
       new kernel::Field::Contact(
                 name          =>'leader',
                 AllowEmpty    =>1,
-                label         =>'Business Owner',
+                label         =>'Business Owner - Business',
                 vjoinon       =>'leaderid'),
 
       new kernel::Field::Link(
                 name          =>'leaderid',
                 dataobjattr   =>'vou.leader'),
 
-      new kernel::Field::Select(
-                name          =>'outype',
-                label         =>'Unit Type',
-                value         =>['HUB','SERVICE'],
-                htmleditwidth =>'130px',
-                dataobjattr   =>'vou.grouptype'),
+      new kernel::Field::Contact(
+                name          =>'leaderit',
+                AllowEmpty    =>1,
+                label         =>'Business Owner - IT',
+                vjoinon       =>'leaderid'),
+
+      new kernel::Field::Link(
+                name          =>'leaderitid',
+                dataobjattr   =>'vou.leaderit'),
+
+      new kernel::Field::Text(
+                name          =>'canvasid',
+                label         =>'CanvasID',
+                group         =>'canvas',
+                dataobjattr   =>'vou.canvasid'),
+
+      new kernel::Field::Text(
+                name          =>'canvasfield',
+                label         =>'Canvas/Business field',
+                group         =>'canvas',
+                dataobjattr   =>'vou.canvasfield'),
+
+      new kernel::Field::Contact(
+                name          =>'canvasownerbu',
+                group         =>'canvas',
+                AllowEmpty    =>1,
+                label         =>'Canvas Owner - Business',
+                vjoinon       =>'canvasownerbuid'),
+
+      new kernel::Field::Link(
+                name          =>'canvasownerbuid',
+                group         =>'canvas',
+                dataobjattr   =>'vou.canvasownerbuid'),
+
+      new kernel::Field::Contact(
+                name          =>'canvasownerit',
+                AllowEmpty    =>1,
+                group         =>'canvas',
+                label         =>'Canvas Owner - IT',
+                vjoinon       =>'canvasowneritid'),
+
+      new kernel::Field::Link(
+                name          =>'canvasowneritid',
+                dataobjattr   =>'vou.canvasowneritid'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
                 dataobjattr   =>'vou.description'),
+
+      new kernel::Field::Text(
+                name          =>'seg',
+                label         =>'Segemente/Tribe',
+                dataobjattr   =>'vou.segment'),
+
+      new kernel::Field::Contact(
+                name          =>'rte',
+                AllowEmpty    =>1,
+                label         =>'RTE ?',
+                vjoinon       =>'rteid'),
+
+      new kernel::Field::Link(
+                name          =>'rteid',
+                dataobjattr   =>'vou.rte'),
+
+      new kernel::Field::Contact(
+                name          =>'spc',
+                AllowEmpty    =>1,
+                label         =>'SPC ?',
+                vjoinon       =>'spcid'),
+
+      new kernel::Field::Link(
+                name          =>'spcid',
+                dataobjattr   =>'vou.spc'),
+
+
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                group         =>'contacts'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -198,7 +290,11 @@ sub new
    };
    $self->setDefaultView(qw(shortname name cistatus code cdate mdate));
    $self->setWorktable("vou");
-   $self->{CI_Handling}={uniquename=>"shortname",uniquesize=>8};
+   $self->{CI_Handling}={
+      uniquename=>"shortname",
+      uniquesize=>8,
+      activator=>["admin","w5base.TS.vou"]
+   };
    return($self);
 }
 
@@ -226,7 +322,7 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default comments source));
+   return(qw(header default canvas contacts comments source));
 }
 
 
@@ -303,12 +399,24 @@ sub isViewValid
 sub isWriteValid
 {
    my $self=shift;
+   my @l;
 
-   my @l=$self->SUPER::isWriteValid(@_);
+   if (!defined($_[0])){
+      @l=$self->SUPER::isWriteValid(@_);
+   }
 
-   return("default","comments") if (in_array(\@l,"ALL"));
+   my $rec=shift;
+   my $userid=$self->getCurrentUserId();
+   if ($userid eq $rec->{databossid}){
+      push(@l,"ALL");
+   }
+   
 
-   return(undef);
+
+
+   @l=("default","comments","canvas","contacts") if (in_array(\@l,"ALL"));
+
+   return(@l);
 }
 
 sub initSearchQuery
