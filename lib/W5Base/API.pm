@@ -330,7 +330,7 @@ use FindBin qw($RealScript);
 use Config;
 use POSIX qw(strftime);
 
-$VERSION = "1.1";
+$VERSION = "2.0";
 @ISA = qw(Exporter);
 @EXPORT = qw(&msg &ERROR &WARN &DEBUG &INFO $RealScript
              &XGetOptions
@@ -428,30 +428,44 @@ sub XGetOptions
       printf STDERR ("ERROR: $!\n");
       exit(255);
    }
-   if (!defined(${$param->{'webuser=s'}}) && !$param{noautologin}){
-      my $u;
-      while(1){
-         printf("login user: ");
-         $u=<STDIN>;
-         $u=~s/\s*$//;
-         last if ($u ne "");
+   if (exists($param->{'X-API-Key=s'})){
+      if (!defined(${$param->{'X-API-Key=s'}}) && !$param{noautologin}){
+         my $u;
+         while(1){
+            printf("X-API-Key: ");
+            $u=<STDIN>;
+            $u=~s/\s*$//;
+            last if ($u ne "");
+         }
+         ${$param->{'X-API-Key=s'}}=$u;
       }
-      ${$param->{'webuser=s'}}=$u;
    }
-   if (!defined(${$param->{'webpass=s'}}) && !$param{noautologin}){
-      my $p="";
-      system("stty -echo 2>/dev/null");
-      $SIG{INT}=sub{ system("stty echo 2>/dev/null");print("\n");exit(1)};
-      while(1){
-         printf("password: ");
-         $p=<STDIN>;
-         $p=~s/\s*$//;
-         printf("\n");
-         last if ($p ne "");
+   else{
+      if (!defined(${$param->{'webuser=s'}}) && !$param{noautologin}){
+         my $u;
+         while(1){
+            printf("login user: ");
+            $u=<STDIN>;
+            $u=~s/\s*$//;
+            last if ($u ne "");
+         }
+         ${$param->{'webuser=s'}}=$u;
       }
-      system("stty echo 2>/dev/null");
-      $SIG{INT}='default';
-      ${$param->{'webpass=s'}}=$p;
+      if (!defined(${$param->{'webpass=s'}}) && !$param{noautologin}){
+         my $p="";
+         system("stty -echo 2>/dev/null");
+         $SIG{INT}=sub{ system("stty echo 2>/dev/null");print("\n");exit(1)};
+         while(1){
+            printf("password: ");
+            $p=<STDIN>;
+            $p=~s/\s*$//;
+            printf("\n");
+            last if ($p ne "");
+         }
+         system("stty echo 2>/dev/null");
+         $SIG{INT}='default';
+         ${$param->{'webpass=s'}}=$p;
+      }
    }
    if (${$param->{store}}){
       my $sresult=XSaveStoreFile($storefile,$param);
@@ -604,6 +618,9 @@ sub createConfig
    $W5Base::Pass=$pass;
    $base.="/" if (!($base=~m/\/$/));
    $lang="en" if ($lang eq "");
+   if ($user eq "X-API-Key"){
+      $base=~s#/auth/$#/public/#;  # API Keys always uses public url
+   }
    my $proxy=$base.="base/interface/SOAP";
    my $uri="http://w5base.net/interface/SOAP";
 
@@ -622,6 +639,7 @@ sub createConfig
       push(@proxyparam,"timeout",$param{timeout});
    }
    my $SOAP=SOAP::Lite->uri($uri)->proxy(@proxyparam)->xmlschema("2001");
+
 
 
 #   my @r=$SOAP->Ping({lang=>\$lang})->result;
@@ -691,6 +709,9 @@ sub getModuleObject
                                                 lang=>\$config->{lang}})");
    return(undef) if (!defined($SOAPresult));
    my $result=$SOAPresult->result;
+   if ($config->{user} eq "X-API-Key"){
+      $SOAP->transport->http_request->header("X-API-Key"=>$config->{pass});
+   }
    return(undef) if (!defined($result) || $result->{exitcode}!=0);
    return(new W5Base::ModuleObject(CONFIG=>$config,SOAP=>$SOAP,
                                    NAME=>$objectname));
@@ -754,6 +775,9 @@ sub LastMsg
       return(@{$self->{lastmsg}});
    }
    return(0) if (!defined($self->{lastmsg}));
+   if (ref($self->{lastmsg}) ne "ARRAY"){
+      $self->{lastmsg}=[$self->{lastmsg}];
+   }
    return($#{$self->{lastmsg}}+1);
 }
 
