@@ -19,6 +19,7 @@ package kernel::cgi;
 use strict;
 use kernel;
 use Data::Dumper;
+use JSON;
 use CGI(qw(-oldstyle_urls));
 
 sub new
@@ -32,6 +33,7 @@ sub new
    else{
       if ( $ENV{QUERY_STRING} ne "MOD=base::interface&FUNC=SOAP" &&
            $ENV{QUERY_STRING} ne "FUNC=SOAP&MOD=base::interface"){
+
          if ($#_==-1 && defined($W5V2::CurrentFastCGIRequest)){
             $self->{'cgi'}=$W5V2::CurrentFastCGIRequest;
          }
@@ -44,6 +46,22 @@ sub new
       }
    }
    $self=bless($self,$type);
+
+   if ($#_==-1 &&
+       $ENV{CONTENT_TYPE} eq "application/json" && 
+       $ENV{REQUEST_METHOD} eq "POST"){   # seems to be a JSON POST Request
+      my $jsonpost=$self->Param("POSTDATA");
+      my $d;
+      eval('use JSON; $d=decode_json($jsonpost);');
+      if ($@ ne ""){
+         die("POST Request with JSON Data failed: $@");
+      }
+      foreach my $name (keys(%$d)){
+         $self->{'cgi'}->param(-name=>$name,-value=>$d->{$name});
+      }
+      $self->{'cgi'}->delete("POSTDATA");
+   }
+
    #
    # Using full QUERY_STRING in POST Request did get problems in situations
    # where forms get default values on open by passing query_strings
