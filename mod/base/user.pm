@@ -1855,7 +1855,7 @@ sub getValidWebFunctions
 {  
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(), qw(MyDetail SSHPublicKey 
-          AddrBook RightsOverview RightsOverviewLoader ImportUser)); 
+          APIKeys AddrBook RightsOverview RightsOverviewLoader ImportUser)); 
 }
 
 sub SelfAsParentObject    # this method is needed because existing derevations
@@ -1876,6 +1876,113 @@ sub AddrBook
                                    'kernel.App.Web.css'],
                            body=>1,form=>1,
                            title=>$self->T("Address book"));
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+sub APIKeys
+{
+   my $self=shift;
+   my $userid=Query->Param("userid");
+   $self->ResetFilter(); 
+   $self->SetFilter({userid=>\$userid});
+   my ($urec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           body=>1,form=>1,
+                           title=>$self->T("Modify/View API Keys"));
+   printf("<script language=JavaScript>");
+   printf("function dropAPI(id){");
+   printf(" document.forms[0].elements['dropid'].value=id;");
+   printf(" document.forms[0].submit();");
+   printf("}");
+   printf("</script>");
+   if (defined($urec)){
+      my $ua=getModuleObject($self->Config,"base::useraccount");
+      print $self->getParsedTemplate("tmpl/base.contact.APIKeys.head");
+      if ($self->IsMemberOf("admin") ||
+          $self->getCurrentUserId()==$urec->{userid}){ 
+         my $ipaddr=Query->Param("ipaddr");
+         $ipaddr=~s/[^0-9a-f.:, ]/x/gi;
+         if ((my $dropid=Query->Param("dropid")) ne ""){
+            $ua->SetFilter({account=>\$dropid,userid=>\$userid});
+            my ($acrec,$msg)=$ua->getOnlyFirst(qw(ALL));
+            if (defined($acrec)){
+               $ua->ValidatedDeleteRecord($acrec);
+            }
+         }
+         if (Query->Param("add") ne ""){
+            my $apinum=$userid*time();
+            my $apiname=base36($apinum);
+            my $random_number1=int(rand(8888888888888))*time();
+            my $random_number2=int(rand(9999999999999))*time();
+            my $apitoken=lc(sprintf("%s%s%s",base36($userid),
+                                 base36($random_number1*$random_number1),
+                                 base36(time()*$random_number1)));
+            $apitoken=TextShorter($apitoken,40);
+            my $newkey={
+               account=>'API-ACCOUNT/'.$apiname,
+               ipacl=>$ipaddr,
+               userid=>$userid,
+               apitoken=>$apitoken
+            };
+            $ua->ValidatedInsertRecord($newkey);
+         }
+         my @msglist;
+         my $msg="&nbsp;";
+         if ($self->LastMsg()!=0){
+            @msglist=$self->LastMsg();
+         }
+         else{
+            $ipaddr=""; 
+         }
+         printf("<hr>");
+         printf("<table margin=5 border=0 width=100%>");
+         printf("<tr>");
+         printf("<td><input type=text ".
+                "style=\"width:100%\" value=\"%s\" name=ipaddr></td>",$ipaddr);
+         printf("<td width=1%><input type=submit value=\"%s\" name=add></td>",
+                    "create new key");
+         printf("</tr>");
+         printf("</table>");
+
+         @msglist=map({quoteHtml($_)} @msglist);
+         $msg="<div class=lastmsg>".join("<br>\n",map({
+           if ($_=~m/^ERROR/){
+              $_="<font style=\"color:red;\">".$_."</font>";
+           }
+           if ($_=~m/^WARN/){
+              $_="<font style=\"color:brown;\">".$_."</font>";
+           }
+           $_;
+         } @msglist))."</div>";
+         printf("%s",$msg);
+         printf("<hr>");
+         print("<input type=hidden name=userid value=\"$userid\">");
+         print("<input type=hidden name=dropid value=\"\">");
+      }
+      $ua->ResetFilter();
+      $ua->SetFilter({apitoken=>"![EMPTY]",userid=>\$userid});
+      my @l=$ua->getHashList(qw(ALL));
+      printf("<div style=\"width:100%;height:170px;overflow:auto\">");
+      printf("<table border=0 margin=5 cellspacing=3 cellpadding=3 width=100%>");
+      foreach my $apirec (@l){
+        printf("<tr><td>");
+        my $del="<img style=\"cursor:pointer\" title=\"delete key\" ".
+                "onclick=\"dropAPI('".$apirec->{account}."');\" ".
+                "src=\"../../base/load/minidelete.gif\" border=0>";
+        printf("<table style=\"border-width:1px;border-style:solid\" width=100%>");
+        printf("<tr><td>%s</td><td width=40 rowspan=2 align=right valign=top>%s</td></tr>",
+               $apirec->{account},$del);
+        printf("<tr><td>API-Key:%s</td></tr>",$apirec->{apitoken});
+        printf("<tr><td colspan=2>IP-ACL:%s</td></tr>",$apirec->{ipacl});
+        printf("</table>");
+        printf("</td></tr>");
+      }
+      printf("</table>");
+      printf("</div>");
+   }
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
@@ -1952,7 +2059,13 @@ sub getDetailFunctions
    my $userid=$self->getCurrentUserId();
    my @f;
    if ($self->getCurrentSecState()>1){ 
-      @f=($self->T("SSH Public Key")=>'SSHPublicKey');
+      push(@f,($self->T("SSH Public Key")=>'SSHPublicKey'));
+   }
+   if (defined($rec) &&
+       $rec->{userid} eq $userid || $self->IsMemberOf("admin")){
+      if ($self->getCurrentSecState()>1){ 
+         push(@f,($self->T("API-Keys")=>'APIKeys'));
+      }
    }
    if (!defined($rec) || ($rec->{ssh1publickey} eq "" && 
                           $rec->{ssh2publickey} eq "" &&
@@ -1973,7 +2086,15 @@ function SSHPublicKey(id)
 {
    showPopWin('SSHPublicKey?userid=$id',null,360,FinishSSHPublicKey);
 }
+function APIKeys(id)
+{
+   showPopWin('APIKeys?userid=$id',500,360,FinishAPIKeys);
+}
 function FinishSSHPublicKey()
+{
+}
+
+function FinishAPIKeys()
 {
 }
 

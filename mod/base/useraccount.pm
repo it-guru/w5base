@@ -122,6 +122,15 @@ sub new
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>'email'),
 
+      new kernel::Field::Link(
+                name          =>'apitoken',
+                label         =>'API Token',
+                dataobjattr   =>'useraccount.apitoken'),
+
+      new kernel::Field::Link(
+                name          =>'ipacl',
+                label         =>'API IP access control',
+                dataobjattr   =>'useraccount.ipacl')
    );
    $self->setWorktable("useraccount");
    $self->setDefaultView(qw(account contactfullname surname givenname));
@@ -317,6 +326,26 @@ sub Validate
       return(0);
    }
    $newrec->{account}=$name;
+   if (effVal($oldrec,$newrec,"apitoken") ne ""){
+      my $ipacl=effVal($oldrec,$newrec,"ipacl");
+      my @l=grep(!/^\s*$/,split(/[; ,]+/,$ipacl));
+      if ($#l==-1){
+         $self->LastMsg(ERROR,"apikey needs IP-Address binding");
+         return(undef);
+      }
+      if (!defined($oldrec) || $oldrec->{ipacl} ne $ipacl){
+         my %ipacl;
+         map({$ipacl{$_}++;} @l);
+         if (keys(%ipacl)>5){
+            $self->LastMsg(ERROR,"apikey can only be bound to 5 adresses");
+            return(undef);
+         }
+         my $newipacl=join(", ",sort(keys(%ipacl)));
+         $newrec->{ipacl}=$newipacl;
+      }
+   }
+
+
    return(1);
 }
 
