@@ -3340,8 +3340,13 @@ sub Result
          }
       }
 
-
       my $format=Query->Param("FormatAs");
+      if (!defined($format)){
+         if (lc($ENV{HTTP_ACCEPT}) eq "application/json"){
+            Query->Param("FormatAs"=>"nativeJSON");
+            $format="nativeJSON";
+         }
+      }
       #msg(INFO,"FormatAs from query: $format");
       if (defined($param{FormatAs})){
          Query->Param("FormatAs"=>$param{FormatAs});

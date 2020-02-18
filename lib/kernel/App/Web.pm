@@ -41,11 +41,49 @@ sub RunWebApp
 
    binmode(STDOUT,':raw');
    binmode(STDERR,':raw');
-
+   if (!defined($ENV{REMOTE_USER}) || $ENV{REMOTE_USER} eq ""){
+      if ($ENV{HTTP_X_API_KEY} ne ""){
+         my $ua=getModuleObject($instdir,$configname,"base::useraccount");
+         $ua->SetFilter({apitoken=>\$ENV{HTTP_X_API_KEY}});
+         my @l=$ua->getHashList(qw(ALL));
+         my $uarec;
+         if ($#l==0){ 
+            $uarec=$l[0];
+         }
+         my $msg="X-API-Key denied";
+         if (defined($uarec)){
+            my $ipacl=$uarec->{ipacl};
+            my $clip=getClientAddrIdString(1);
+            my @ipacl=split(/[,; ]+/,$ipacl);
+            if (!in_array(\@ipacl,$clip)){
+               $uarec=undef;
+               $msg.=" - Client IP $clip mismatch";
+            }
+         }
+         if (defined($uarec)){
+            $ENV{REMOTE_USER}=$uarec->{account};
+            $ENV{SCRIPT_URI}=~s#/public/#/auth/#;
+         }
+         else{
+            printf("Status: 403 Forbidden - $msg\n");
+            if ($ENV{HTTP_ACCEPT}=~m#text/xml#){
+               printf("Content-type: text/xml\n\n".
+                      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            }
+            else{
+               printf("Content-type: text/plain\n\n".
+                      "ERROR: $msg\n");
+            }
+            return(0);
+         }
+      }
+   }
    my $cgi=new kernel::cgi();
    #msg(INFO,"query=%s",Dumper(scalar($cgi->MultiVars())));
    my $MOD=$cgi->UrlParam("MOD");
    my $objectkey=$ENV{'SCRIPT_NAME'}.":".$MOD;
+
+
    if (!exists($W5V2::ObjCache{$objectkey})){
       my $o=getModuleObject($instdir,$configname,$MOD);
       if (!defined($o)){

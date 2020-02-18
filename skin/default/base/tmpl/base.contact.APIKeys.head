@@ -1,0 +1,10 @@
+<div style="width:100%;margin:5px">
+<center>
+<b>The API-Key Feature is experimental and currently without any supported!!!</b>
+</center>
+<br>
+API Keys allowing technical Access to the current user contact rights
+by specifing "X-API-Token" HTTP-Header and using the /public/ url-Path.<br>
+API Keys are automaticly deleted, if the are longer then 10 days unused.
+An API-Key needs always an IP-Binding (max. 5 IP-Adresses) which needs to be specified on create.
+</div>
