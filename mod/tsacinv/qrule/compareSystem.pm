@@ -33,16 +33,16 @@ If the system type is vmware, the AssetID from AssetManager will NOT be imported
 
 [en:]
 
-If the logical system is maintained in AssetManager by the MU and only 
-mirrored to W5Base/Darwin, set the field "allow automatic updates by interfaces"
-in the block "Control-/Automationinformations" to "yes".
+If the logical system is maintained in AssetManager by the TSI and only 
+mirrored to W5Base/Darwin, set the field "allow automatic updates by 
+interfaces" in the block "Control-/Automationinformations" to "yes". 
 The data will then be synchronised automatically.
 
 [de:]
 
-Falls das logische System in AssetManager durch die MU gepflegt ist,
-sollte das Feld "automatisierte Updates durch Schnittstellen zulassen"
-im Block "Steuerungs-/Automationsdaten" auf "ja" gesetzt werden.
+Falls das logische System in AssetManager durch die TSI gepflegt ist, 
+sollte das Feld "automatisierte Updates durch Schnittstellen zulassen" 
+im Block "Steuerungs-/Automationsdaten" auf "ja" gesetzt werden
 
 
 =cut
@@ -209,7 +209,7 @@ sub qcheckRecord
          $parrec=undef;
          push(@qmsg,"TSI has migrated the system to INVOICE_ONLY, ".
                     "therefore it needs to be removed ".
-                    "from Darwin -> IT-Inventor");
+                    "from Darwin -> IT-Inventory");
          $forcedupd={};
          $errorlevel=3;
          return($self->HandleWfRequest($dataobj,$rec,

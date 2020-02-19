@@ -22,4 +22,4 @@
 'substituted assetid for %s from %s to %s based on ADOP-T'=>{de=>'Ersetze AssetID für %s von %s auf %s aufgrund von ADOP-T Mapping'},
 'not acceptable CO-Number format'=>{de=>'Nicht verwendbares Format für Kontierungsobjekt'},
 'invoice systems are not allowed to be imported/created'=>{de=>'reine Verrechnungssysteme dürfen nicht importiert/angelegt werden'},
-'TSI has migrated the system to INVOICE_ONLY, therefore it needs to be removed from Darwin -> IT-Inventor'=>{de=>'TSI hat das System auf INVOICE_ONLY migriert, daher muss es aus Darwin->IT-Inventar entfernt werden'},
+'TSI has migrated the system to INVOICE_ONLY, therefore it needs to be removed from Darwin -> IT-Inventory'=>{de=>'TSI hat das System auf INVOICE_ONLY migriert, daher muss es aus Darwin->IT-Inventar entfernt werden'},
