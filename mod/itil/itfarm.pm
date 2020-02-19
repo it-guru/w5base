@@ -354,7 +354,6 @@ sub Validate
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
-
    my $name=effVal($oldrec,$newrec,"name");
    my $combound=effVal($oldrec,$newrec,"combound");
    my $shortname=effVal($oldrec,$newrec,"shortname");
@@ -374,18 +373,16 @@ sub Validate
       return(0);
    }
    if ($shortname eq ""){
-      if ($oldrec->{shortname} ne ""){
+      if (defined($oldrec) && $oldrec->{shortname} ne ""){
          $newrec->{shortname}=undef;
       }
    }
 
    $fullname=~s/ /_/g;
-
    if (length($fullname)<5){
       $self->LastMsg(ERROR,"invalid serverfarm name specified");
       return(0);
    }
-
    if (!defined($oldrec) || $oldrec->{fullname} ne $fullname){
       $newrec->{fullname}=$fullname;
    }
@@ -412,7 +409,7 @@ sub Validate
       }
    }
    ########################################################################
-  
+
    return(1);
 }
 
