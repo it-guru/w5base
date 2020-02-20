@@ -104,6 +104,8 @@ sub doCleanup
    my $ul=getModuleObject($self->Config,"base::userlogon");
    $ul->BulkDeleteRecord({'logondate'=>$CleanupUserLogon});
 
+   my $obj=getModuleObject($self->Config,"base::useraccount");
+   $obj->CleanupUnunsedAPIKeys();
 }
 
 

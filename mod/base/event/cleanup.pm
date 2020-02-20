@@ -38,10 +38,20 @@ sub Init
 
    $self->RegisterEvent("AutoFinishWorkflows","AutoFinishWorkflows");
    $self->RegisterEvent("CleanupLnkGrpUser","LnkGrpUser");
+   $self->RegisterEvent("CleanupAPIKeys","cleanAPIKeys");
    $self->RegisterEvent("CleanupWebFS","CleanupWebFS");
    $self->RegisterEvent("CleanupLnkContact","CleanupLnkContact");
    $self->RegisterEvent("CleanupLnkMandatorContact","LnkMandatorContact");
    return(1);
+}
+
+
+sub cleanAPIKeys
+{
+   my $self=shift;
+
+   my $obj=getModuleObject($self->Config,"base::useraccount");
+   return($obj->CleanupUnunsedAPIKeys());
 }
 
 

@@ -96,9 +96,8 @@ sub new
       new kernel::Field::Date(
                 name          =>'lastlogon',
                 group         =>'control',
-                depend        =>["account"],
-                onRawValue    =>\&getLastLogon,
-                label         =>'Last-Logon'),
+                label         =>'Last-Logon',
+                dataobjattr   =>'userlogon.logondate'),
 
       new kernel::Field::Link(
                 name          =>'requestemailwf',
@@ -137,20 +136,23 @@ sub new
    return($self);
 }
 
-sub getLastLogon
+
+
+sub getSqlFrom
 {
    my $self=shift;
-   my $current=shift;
-   my $account=$current->{account};
-   return(undef) if ($account eq "");
-   my $ul=$self->getParent->getPersistentModuleObject("ul","base::userlogon");
-   $ul->SetFilter({account=>\$account});
-   $ul->Limit(1);
-   my ($ulrec,$msg)=$ul->getOnlyFirst(qw(logondate));
-   return($ulrec->{logondate});
+   my ($worktable,$workdb)=$self->getWorktable();
 
-   return(undef);
+   my $from="$worktable";
+
+   if ($self->isFieldReferencedInCurrentRequest("lastlogon")){
+      $from.=" left outer join (select account,max(logondate) logondate ".
+          "from userlogon group by account) userlogon ".
+          "on $worktable.account=userlogon.account";
+   }
+   return($from);
 }
+
 
 sub allowHtmlFullList
 {
@@ -365,5 +367,45 @@ sub isWriteValid
    return("default") if ($self->IsMemberOf("admin"));
    return(undef);
 }
+
+
+sub CleanupUnunsedAPIKeys
+{
+   my $self=shift;
+
+   my $objop=$self->Clone();
+
+   $self->SetFilter([
+     {
+        lastlogon=>"<now-10d",
+        apitoken=>"![EMPTY]",
+        cdate=>"<now-10d",
+        account=>"API-ACCOUNT/*"
+     },
+     {
+        lastlogon=>"[EMPTY]",
+        apitoken=>"![EMPTY]",
+        cdate=>"<now-10d",
+        account=>"API-ACCOUNT/*"
+     }
+   ]);
+   $self->SetCurrentView(qw(ALL));
+
+   my ($rec,$msg)=$self->getFirst(unbuffered=>1);
+   my $c=0;
+   my %o;
+   my $deletecount=0;
+   if (defined($rec)){
+      do{
+         $objop->ValidatedDeleteRecord($rec);
+         $deletecount++;
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+   return({exitcode=>0,deletecount=>$deletecount});
+
+}
+
+
 
 1;

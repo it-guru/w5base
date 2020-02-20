@@ -67,6 +67,29 @@ sub getFilterSet
 }
 
 
+# check if a specifed field/fieldlist is referenced in current request.
+# this is needed to create dynamisc outerjoins
+sub isFieldReferencedInCurrentRequest
+{
+   my $self=shift;
+   my $field=shift;
+
+   $field=[$field] if (ref($field) ne "ARRAY");
+   if (in_array([$self->getCurrentView()],[@$field,"ALL"])){
+      return(1);
+   }
+   foreach my $flt ($self->getFilterSet()){
+      $flt=[$flt] if (ref($flt) ne "ARRAY");
+      foreach my $hflt (@$flt){
+         if (ref($hflt) eq "HASH" && in_array([keys(%$hflt)],$field)){
+            return(1);
+         }
+      }
+   }
+   return(0);
+}
+
+
 sub SetNamedFilter
 {
    my $self=shift;
