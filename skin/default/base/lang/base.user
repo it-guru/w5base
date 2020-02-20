@@ -160,3 +160,6 @@
          de=>'%d von %d Kontakten erfolgreich importiert'},
 'add organisational tree'=>{de=>'Organisationsbaum hinzufügen'},
 'usertyp change not allowed with existing contacts'=>{de=>'Änderung des Usertyps nicht erlaubt bei vorhandenen Kontakten'},
+'create new key'=>{de=>'neuen Key erzeugen'},
+'delete key'=>{de=>'API-Key löschen'},
+'Modify/View API Keys'=>{de=>'Änderung/Anzeigen von API-Keys'},

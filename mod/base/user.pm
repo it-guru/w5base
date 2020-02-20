@@ -1943,7 +1943,7 @@ sub APIKeys
          printf("<td><input type=text ".
                 "style=\"width:100%\" value=\"%s\" name=ipaddr></td>",$ipaddr);
          printf("<td width=1%><input type=submit value=\"%s\" name=add></td>",
-                    "create new key");
+                    $self->T("create new key"));
          printf("</tr>");
          printf("</table>");
 
@@ -1969,11 +1969,14 @@ sub APIKeys
       printf("<table border=0 margin=5 cellspacing=3 cellpadding=3 width=100%>");
       foreach my $apirec (@l){
         printf("<tr><td>");
-        my $del="<img style=\"cursor:pointer\" title=\"delete key\" ".
+        my $del="<img style=\"cursor:pointer\" title=\"".
+                $self->T("delete key")."\" ".
                 "onclick=\"dropAPI('".$apirec->{account}."');\" ".
                 "src=\"../../base/load/minidelete.gif\" border=0>";
-        printf("<table style=\"border-width:1px;border-style:solid\" width=100%>");
-        printf("<tr><td>%s</td><td width=40 rowspan=2 align=right valign=top>%s</td></tr>",
+        printf("<table style=\"border-width:1px;border-style:solid\" ".
+               "width=100%>");
+        printf("<tr><td>%s</td><td width=40 rowspan=2 align=right ".
+               "valign=top>%s</td></tr>",
                $apirec->{account},$del);
         printf("<tr><td>API-Key:%s</td></tr>",$apirec->{apitoken});
         printf("<tr><td colspan=2>IP-ACL:%s</td></tr>",$apirec->{ipacl});
@@ -2088,7 +2091,7 @@ function SSHPublicKey(id)
 }
 function APIKeys(id)
 {
-   showPopWin('APIKeys?userid=$id',500,360,FinishAPIKeys);
+   showPopWin('APIKeys?userid=$id',500,390,FinishAPIKeys);
 }
 function FinishSSHPublicKey()
 {
