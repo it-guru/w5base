@@ -1214,6 +1214,36 @@ sub Validate
       return(0);
    }
 
+   if (defined($oldrec)){
+      if (effChanged($oldrec,$newrec,"cistatusid")){
+         my $old=$oldrec->{cistatusid};
+         my $new=$newrec->{cistatusid};
+         if ($old==3 || $old==4){
+            if ($new<$old || $new>4){
+               my $found4=0;
+               my $found=0;
+               foreach my $sysrec (@{$oldrec->{systems}}){
+                  if ($sysrec->{cistatusid}>=3 &&
+                      $sysrec->{cistatusid}<6){
+                     $found4++;
+                  }
+                  $found++;
+               }
+               if ($found4 && $new!=4){
+                  $self->LastMsg(ERROR,"CI-State change not allowed while ".
+                                       "existing active logical systems");
+                  return(0);
+               }
+               if ($found && ($new<3 || $new>4)){
+                  $self->LastMsg(ERROR,"CI-State change not allowed while ".
+                                       "existing logical systems");
+                  return(0);
+               }
+            }
+         }
+      }
+   }
+
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
 
