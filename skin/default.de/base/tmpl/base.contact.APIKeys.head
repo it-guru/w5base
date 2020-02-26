@@ -1,0 +1,13 @@
+<div style="width:100%;margin:5px">
+<center>
+<b>Das API-Key Feature ist experimentel und akuell ohne Support!!!</b>
+</center>
+<br>
+API Keys erlauben einen technischen Zugriff mit den aktuellen Kontakt-Rechten
+über die Angabe des "X-API-Token" im HTTP-Header. 
+Der API Zugriff muss immer über die /public/ auf das W5Base System erfolgen.<br>
+API Keys werden automatisch gelöscht, wenn diese länger als 10 Tage nicht
+verwendet werden.
+Ein API-Key benötigt immer eine IP-Zuordnung (max. 5 IP-Adressen) die bei
+der Erstellung des Keys angegeben werden muss.
+</div>
