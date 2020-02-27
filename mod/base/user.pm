@@ -158,12 +158,18 @@ sub new
                    my $self=shift;
                    my $rec=shift;
                    return(0) if ($self->getParent->IsMemberOf("admin"));
+                   return(0) if (defined($rec) && 
+                                 in_array([qw(3 4 5 )],$rec->{cistatusid}) &&
+                                 $self->getParent->IsMemberOf(
+                                  $rec->{managedbyid},["RContactAdmin"],
+                                  "down"));
                    return(1) if (defined($rec) && 
                                  $rec->{cistatusid}>2 &&
                                  !$self->getParent->IsMemberOf("admin"));
                    return(0);
                 },
                 label         =>'CI-State',
+                depend        =>['managedbyid'],
                 vjointo       =>'base::cistatus',
                 vjoineditbase =>{id=>">0 AND <7"},
                 vjoinon       =>['cistatusid'=>'id'],
@@ -1794,10 +1800,11 @@ sub isWriteValid
          }
       }
    }
-   if ($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0){
+   if ($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0 && 
+       $rec->{cistatusid}<6){
       if ($self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"down")){
          my @l=("introdution","private","officeacc","office",
-                "comments","control");
+                "comments","control","name");
          return($self->expandByDataACL(undef,@l));
       }
    }
