@@ -239,6 +239,7 @@ sub new
                 name          =>'maintlevel',
                 label         =>'Maintenance Level',
                 group         =>'maint',
+                htmldetail    =>'NotEmpty',
                 vjointo       =>\'tsacinv::contract',
                 vjoinon       =>['maintlevelid'=>'contractid'],
                 vjoindisp     =>'name'),
@@ -407,7 +408,16 @@ sub new
                 name          =>'maitcond',
                 group         =>'maint',
                 label         =>'Maintenance Codition',
+                htmldetail    =>'NotEmpty',
                 dataobjattr   =>'"maitcond"'),
+
+      new kernel::Field::Date(
+                name          =>'eohs',
+                label         =>'end of hardware support',
+                dayonly       =>1,
+                group         =>'maint',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'"Withdrawn_support"'),
 
       new kernel::Field::Link(
                 name          =>'locationid',
