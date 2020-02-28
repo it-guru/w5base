@@ -104,7 +104,7 @@ sub new
                 vjointo       =>'tssiem::secent',
                 htmllimit     =>30,
                 forwardSearch =>1,
-                vjoinbase     =>[{pci_vuln=>'yes',severity=>[1,2,3]}],
+                vjoinbase     =>[{pci_vuln=>'yes',severity=>[4,5]}],
                 vjoinon       =>['qref'=>'qref'],
                 vjoindisp     =>['ipaddress','port','name']),
 
@@ -118,7 +118,7 @@ sub new
                 dataobjattr   =>"(select count(*) from W5SIEM_secent ".
                                 "where secscan.ref=W5SIEM_secent.ref ".
                                 " and W5SIEM_secent.pci_vuln='yes' and ".
-                                "  W5SIEM_secent.severity in (1,2,3))"),
+                                "  W5SIEM_secent.severity in (4,5))"),
 
       new kernel::Field::Textarea(
                 name          =>'starget',

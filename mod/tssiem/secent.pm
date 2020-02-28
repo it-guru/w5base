@@ -485,9 +485,8 @@ sub isViewValid
       push(@l,"sslcert");
    }
    if (lc($rec->{pci_vuln}) eq "yes" &&
-       ($rec->{severity} eq "1" ||
-        $rec->{severity} eq "2" ||
-        $rec->{severity} eq "3") &&
+       ($rec->{severity} eq "4" ||
+        $rec->{severity} eq "5") &&
        $rec->{isdup} eq "0" ){
       push(@l,"msgtracking");
    }
