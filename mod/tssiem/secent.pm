@@ -351,6 +351,7 @@ sub new
                 name          =>'msghashurl',
                 group         =>'msgtracking',
                 readonly      =>1,
+                searchable    =>0,
                 label         =>'Message-URL',
                 onRawValue    =>sub{
                    my $self=shift;

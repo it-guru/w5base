@@ -92,8 +92,64 @@ sub isWriteValid
    return(undef);
 }
 
-         
+
+
+sub addICTOSecureFilter
+{
+   my $self=shift;
+   my $addflt=shift;
 
 
 
+   my $userid=$self->getCurrentUserId();
+   $userid=-1 if (!defined($userid) || $userid==0);
+
+   if ($self->isDataInputFromUserFrontend()){
+      if (!$self->IsMemberOf([qw(admin w5base.tssiem.secscan.read)],
+          "RMember")){
+         #my %pgrps=$self->getGroupsOf($ENV{REMOTE_USER},
+         #         [orgRoles(),qw(RCFManager RCFManager2 RAuditor RMonitor)],
+         #         "both");
+         my %pgrps=();
+         my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
+         my @grpid=grep(/^[0-9]+/,keys(%grp),keys(%pgrps));
+         @grpid=qw(-99) if ($#grpid==-1);
+
+         my $appl=$self->getPersistentModuleObject("w5appl","TS::appl");
+
+         my @flt=();
+         push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],applmgrid=>\$userid});
+         #push(@flt,{cistatusid=>[3,4,5],semid=>\$userid});
+         #push(@flt,{cistatusid=>[3,4,5],sem2id=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],tsmid=>\$userid});
+         push(@flt,{cistatusid=>[3,4,5],tsm2id=>\$userid});
+         #push(@flt,{cistatusid=>[3,4,5],opmid=>\$userid});
+         #push(@flt,{cistatusid=>[3,4,5],opm2id=>\$userid});
+         #push(@flt,{cistatusid=>[3,4,5],businessteamid=>\@grpid});
+         #push(@flt,{cistatusid=>[3,4,5],itsemteamid=>\@grpid});
+         #push(@flt,{cistatusid=>[3,4,5],responseteam=>\@grpid});
+
+         $appl->SetFilter(\@flt);
+         $appl->SetCurrentView(qw(ictono));
+         my $i=$appl->getHashIndexed("ictono");
+
+         my @ictoid=keys(%{$i->{ictono}});
+         @ictoid=qw(-1) if ($#ictoid==-1);
+
+         my %ictono=();
+         map({$ictono{$_}++ } @ictoid);
+         if ($ENV{REMOTE_USER} ne "anonymous" && keys(%ictono)>0){
+            push(@$addflt,
+                       {ictono=>[keys(%ictono)]}
+            );
+         }
+         else{
+            push(@$addflt,
+                       {ictono=>['-99']}
+            );
+         }
+      }
+   }
+}
 1;
