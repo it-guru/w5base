@@ -31,6 +31,15 @@ sub new
    return($self);
 }
 
+
+sub isAppletVisible
+{
+   my $self=shift;
+   my $app=shift;
+
+   return(1);
+}
+
 sub getJSObjectClass
 {
    my $self=shift;
@@ -51,9 +60,9 @@ sub getJSObjectClass
    $tmpl=~s/::/./g;
    $tmpl="tmpl/".$tmpl.".js";
 
-printf STDERR ("load skinbase=$skinbase tmpl=$tmpl\n");
-   
-   my $prog=$app->getParsedTemplate($tmpl,$opt);
+
+   my $prog="";
+   $prog=$app->getParsedTemplate($tmpl,$opt);
    utf8::encode($prog);
    return($prog);
 }

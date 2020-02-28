@@ -116,14 +116,16 @@ sub jsApplets
       my $jsengine=new JSON();
       foreach my $sobj (values(%{$self->{Explore}})){
          my $d;
-         if ($sobj->can("getObjectInfo")){
-            $d=$sobj->getObjectInfo($self,$lang);
-         }
-         if (defined($d)){
-            my $selfname=$sobj->Self();
-            my $jsdata=$jsengine->encode($d);
-            utf8::encode($jsdata);
-            printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+         if ($sobj->isAppletVisible($self)){
+            if ($sobj->can("getObjectInfo")){
+               $d=$sobj->getObjectInfo($self,$lang);
+            }
+            if (defined($d)){
+               my $selfname=$sobj->Self();
+               my $jsdata=$jsengine->encode($d);
+               utf8::encode($jsdata);
+               printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+            }
          }
       }
    }
