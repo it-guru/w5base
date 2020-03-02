@@ -4,6 +4,7 @@
 'fieldgroup.msgtracking'=>{de=>'Message Tracking',en=>'Message Tracking'},
 'first detect'=>{de=>'erstmalig erkannt'},
 'is latest'=>{de=>'ist aktuell'},
+'is Message Tracking active'=>{de=>'ist Message Tracking aktiv'},
 'is duplicate'=>{de=>'ist doppelt'},
 'perspective'=>{de=>'Perspective'},
 'expected PRM title'=>{de=>'erwarteter PRM Titel'},

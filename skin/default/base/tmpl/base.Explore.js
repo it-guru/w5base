@@ -369,7 +369,7 @@ div.SearchInp{
 input#SearchInp{
   width:95%
 }
-div.SearchLabel{
+div.SearchLabel,div.FieldLabel,div.FieldData{
   padding:5px;
   line-height:25px;
   background-color: #f0f0f0;

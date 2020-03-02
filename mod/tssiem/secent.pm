@@ -30,7 +30,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=5 if (!exists($param{MainSearchFieldLines}));
+   $param{MainSearchFieldLines}=6 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -112,6 +112,13 @@ sub new
                 selectfix     =>1,
                 label         =>'is duplicate',
                 dataobjattr   =>"decode(dupsecent.ref,NULL,0,1)"),
+
+      new kernel::Field::Boolean(
+                name          =>'ismsgtrackingactive',
+                htmldetail    =>0,
+                selectfix     =>1,
+                label         =>'is Message Tracking active',
+                dataobjattr   =>$self->getMsgTrackingFlagSQL()),
 
       new kernel::Field::Text(
                 name          =>'qid',
@@ -335,9 +342,11 @@ sub new
                 group         =>'msgtracking',
                 readonly      =>1,
                 label         =>'expected PRM title',
-                dataobjattr   =>"secscan.ictoid||' - '". #muss irgendwann objid
+                dataobjattr   =>"'QualysIPScan:'".
+                                "||secscan.ictoid||' - '".#muss irgendwann objid
                                 "||W5SIEM_secent.category||' - '".
-                                "||secscan.scanperspective"),
+                                "||secscan.scanperspective||'-'".
+                                "||'S'||W5SIEM_secent.severity"),
 
       new kernel::Field::Text(
                 name          =>'msghash',
@@ -485,9 +494,7 @@ sub isViewValid
    if ($rec->{qid} eq "86002"){
       push(@l,"sslcert");
    }
-   if (lc($rec->{pci_vuln}) eq "yes" &&
-       ($rec->{severity} eq "4" ||
-        $rec->{severity} eq "5") &&
+   if ($rec->{ismsgtrackingactive} eq "1" &&
        $rec->{isdup} eq "0" ){
       push(@l,"msgtracking");
    }

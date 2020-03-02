@@ -51,26 +51,60 @@ sub Initialize
 }
 
 
+sub getPerspectiveDecodeSQL
+{
+   my $self=shift;
+   my $pref=shift;
+
+   my $PerspectiveDecode="case ".
+                         "when ${pref}title like '%_vFWI_%' ".
+                         "then 'SharedVLAN' ".
+                         "else 'CNDTAG' ".
+                         "end";
+   return($PerspectiveDecode);
+}
+
+
 
 sub getSecscanFromSQL
 {
    my $self=shift;
 
-   my $PerspectiveDecode="case ".
-                         "when title like '%_vFWI_%' ".
-                         "then 'SharedVLAN' ".
-                         "else 'CNDTAG' ".
-                         "end";
-
+   my $PerspectiveDecode=$self->getPerspectiveDecodeSQL("W5SIEM_secscan.");
    my $d="select W5SIEM_secscan.*,".
          "decode(rank() over (partition by ictoid||($PerspectiveDecode) ".
          "order by launch_datetime desc),1,1,0) islatest,".
          "($PerspectiveDecode) scanperspective ".
          "from W5SIEM_secscan ".
-#         "where launch_datetime>current_date-100 ".  #Scan needs from last 100d
+         "where launch_datetime>current_date-100 ".  #Scan needs from last 100d
          "order by ictoid";
 
    return($d);
+}
+
+
+sub getMsgTrackingFlagSQL
+{
+   my $self=shift;
+   my $PerspectiveDecode=$self->getPerspectiveDecodeSQL("secscan.");
+
+   my $sql="(case ".
+           "when ($PerspectiveDecode)='Internet' ".
+           "then (case when (W5SIEM_secent.severity=3 OR ".
+                           "W5SIEM_secent.severity=4 OR ".
+                           "W5SIEM_secent.severity=5) AND  ".
+                           "W5SIEM_secent.pci_vuln like 'yes' ".
+                      "then '1' ".
+                      "else '0' ".
+                  "end) ".
+           "else (case when (W5SIEM_secent.severity=4 OR ".
+                           "W5SIEM_secent.severity=5) AND ".
+                           "W5SIEM_secent.pci_vuln like 'yes' ".
+                      "then '1' ".
+                      "else '0' ".
+                  "end) ".
+           "end) ";
+    return($sql);
 }
 
 
