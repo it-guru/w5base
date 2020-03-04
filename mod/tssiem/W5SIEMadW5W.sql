@@ -115,6 +115,8 @@ create table "W5SIEM_secent_of" (
  msghash              VARCHAR2(64),
  id                   INTEGER,     -- dummy id entry
  prmid                VARCHAR2(32),
+ firstprmid           VARCHAR2(32),
+ firstprmiddate       DATE,
  prmcomment           VARCHAR2(4000),
  rskid                VARCHAR2(32),
  rskcomment           VARCHAR2(4000),

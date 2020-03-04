@@ -388,6 +388,22 @@ sub new
                 group         =>'msgtracking',
                 dataobjattr   =>'W5SIEM_secent_of.prmid'),
 
+      new kernel::Field::Text(
+                name          =>'prmid1st',
+                label         =>'first ProblemTicketID',
+                group         =>'msgtracking',
+                htmldetail    =>0,
+                readonly      =>1,
+                dataobjattr   =>'W5SIEM_secent_of.firstprmid'),
+
+      new kernel::Field::Date(
+                name          =>'prmid1stdate',
+                group         =>'msgtracking',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'first ProblemTicketID Date',
+                dataobjattr   =>'W5SIEM_secent_of.firstprmiddate'),
+
       new kernel::Field::Textarea(
                 name          =>'prmidcomment',
                 label         =>'ProblemTicket Comments',
@@ -405,6 +421,72 @@ sub new
                 label         =>'RiskTicket Comments',
                 group         =>'msgtracking',
                 dataobjattr   =>'W5SIEM_secent_of.rskcomment'),
+
+      new kernel::Field::Text(
+                name          =>'desiredsm9applid',
+                label         =>'desired SM9 ApplicationID',
+                group         =>'msgtracking',
+                htmldetail    =>0,
+                depend        =>[qw(ictono ipaddress perspective 
+                                    severity systems)],
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>\&calcSM9desVars),
+
+      new kernel::Field::Text(
+                name          =>'desiredsm9applci',
+                label         =>'desired SM9 Application CI',
+                group         =>'msgtracking',
+                htmldetail    =>0,
+                depend        =>[qw(ictono ipaddress perspective 
+                                    severity systems)],
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>\&calcSM9desVars),
+
+      new kernel::Field::Text(
+                name          =>'desiredsm9applag',
+                label         =>'desired SM9 Problem Assignmentgroup',
+                group         =>'msgtracking',
+                htmldetail    =>0,
+                depend        =>[qw(ictono ipaddress perspective 
+                                    severity systems)],
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>\&calcSM9desVars),
+
+      new kernel::Field::Text(
+                name          =>'desiredsm9prmprio',
+                label         =>'desired SM9 Problem Prio',
+                group         =>'msgtracking',
+                htmldetail    =>0,
+                depend        =>[qw(ictono ipaddress perspective 
+                                    severity systems)],
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>\&calcSM9desVars),
+
+      new kernel::Field::Text(
+                name          =>'desiredsm9prmcbi',
+                label         =>'desired SM9 Problem CBI',
+                group         =>'msgtracking',
+                htmldetail    =>0,
+                depend        =>[qw(ictono ipaddress perspective 
+                                    severity systems)],
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>\&calcSM9desVars),
+
+      new kernel::Field::Text(
+                name          =>'desiredsm9daystofix',
+                label         =>'desired SM9 Problem Days to fix',
+                group         =>'msgtracking',
+                htmldetail    =>0,
+                depend        =>[qw(ictono ipaddress perspective 
+                                    severity systems)],
+                readonly      =>1,
+                searchable    =>0,
+                onRawValue    =>\&calcSM9desVars),
 
 
       new kernel::Field::RecordUrl(),
@@ -430,6 +512,120 @@ sub new
        exploitability));
    $self->setWorktable("W5SIEM_secent_of");
    return($self);
+}
+
+
+sub calcSM9desVars   # find SM9 App based on ip and ictoid
+{
+   my $self=shift;
+   my $rec=shift;
+   my $app=$self->getParent();
+   my $C=$app->Context();
+   my $name=$self->Name();
+   my $idfield=$app->IdField();
+   my $id=$idfield->RawValue($rec);
+
+   $C->{sm9Cache}={} if (!exists($C->{sm9Cache}));
+   $C=$C->{sm9Cache};
+
+   if (!exists($C->{$id})){
+      my $tsapp=$app->getPersistentModuleObject("w5TSappl","TS::appl");
+      my $ip=$rec->{ipaddress};
+      my $ictono=$rec->{ictono};
+      my $systemsfld=$app->getField("systems",$rec);
+      my $systems=$systemsfld->RawValue($rec);
+      my $smrec={};
+      my @applid;
+      if ($#{$systems}!=-1){
+         foreach my $sysrec (@{$systems}){
+            if (ref($sysrec->{applications}) eq "ARRAY"){
+               foreach my $applrec (@{$sysrec->{applications}}){
+                  if (!in_array(\@applid,$applrec->{applid})){
+                     push(@applid,$applrec->{applid});
+                  }
+               }
+            }
+         }
+      }
+      if ($#applid==-1 && $ictono ne ""){ # Hack - IP is not direct referenced
+         $tsapp->ResetFilter();           # in any application - so we try to
+         my $flt={                        # get first found prod application
+            cistatusid=>"<6",             # in ICT-Object
+            ictono=>\$ictono
+         };
+         $tsapp->SetFilter($flt);
+         my @l=$tsapp->getHashList(qw(cistatusid opmode applid id));
+         if ($#l<50){
+            foreach my $arec (@l){
+               if ($#applid==-1 && $arec->{opmode} eq "prod"){
+                  push(@applid,$arec->{id});
+               }
+            }
+            foreach my $arec (@l){
+               if ($#applid==-1){
+                  push(@applid,$arec->{id});
+               }
+            }
+         }
+      }
+      if ($#applid!=-1){
+         $tsapp->ResetFilter();
+         my $flt={
+            cistatusid=>"<6",
+            id=>\@applid
+         };
+         if ($ictono ne ""){
+            $flt->{ictono}=\$ictono;
+         }
+         $tsapp->SetFilter($flt);
+         my @l=$tsapp->getHashList(qw(cistatusid acapplname applid 
+                                    acinmassingmentgroup));
+         if ($#l!=-1){
+            while(my $arec=shift(@l)){
+               if ($arec->{applid} ne ""){
+                  $smrec->{desiredsm9applid}=$arec->{applid};
+                  $smrec->{desiredsm9applci}=$arec->{acapplname};
+                  $smrec->{desiredsm9applag}=$arec->{acinmassingmentgroup};
+                  if (lc($rec->{perspective}) eq "internet"){
+                     if ($rec->{severity} eq "5"){
+                        $smrec->{desiredsm9prmprio}="HIGH"; 
+                        $smrec->{desiredsm9daystofix}=2*30;  # 2 Monate
+                        $smrec->{desiredsm9prmcbi}="HIGH"; 
+                     }
+                     if ($rec->{severity} eq "4"){
+                        $smrec->{desiredsm9prmprio}="MEDIUM"; 
+                        $smrec->{desiredsm9daystofix}=3*30;  # 3 Monate
+                        $smrec->{desiredsm9prmcbi}="MEDIUM"; 
+                     }
+                     if ($rec->{severity} eq "3"){
+                        $smrec->{desiredsm9prmprio}="MEDIUM"; 
+                        $smrec->{desiredsm9prmcbi}="LOW"; 
+                        $smrec->{desiredsm9daystofix}=6*30;  # 6 Monate
+                     }
+                  }
+                  else{
+                     if ($rec->{severity} eq "5"){
+                        $smrec->{desiredsm9prmprio}="HIGH"; 
+                        $smrec->{desiredsm9daystofix}=2*30;  # 2 Monate
+                        $smrec->{desiredsm9prmcbi}="HIGH"; 
+                     }
+                     if ($rec->{severity} eq "4"){
+                        $smrec->{desiredsm9prmprio}="MEDIUM"; 
+                        $smrec->{desiredsm9prmcbi}="MEDIUM"; 
+                        $smrec->{desiredsm9daystofix}=6*30;  # 3 Monate
+                     }
+                  }
+                  last;
+               }
+            }
+         }
+      }
+      #print STDERR Dumper($rec);
+      #print STDERR Dumper(\@applid);
+      $C->{$id}=$smrec;
+   }
+
+   return($C->{$id}->{$name});
 }
 
 
@@ -469,16 +665,73 @@ sub Validate
    my $newrec=shift;
    my $orgrec=shift;
 
+   my $prmid=effVal($oldrec,$newrec,"prmid");
 
    if (effChanged($oldrec,$newrec,"prmid")){
-      my $prmid=effVal($oldrec,$newrec,"prmid");
-      if ($prmid ne "" && !($prmid=~m/^PRM/)){ # da muss noch ein besserer 
-                                               # check rein!
-         $self->LastMsg(ERROR,"prmid could not be changed at now");
+      if ($prmid ne ""){
+         if (!($prmid=~m/^PM[0-9]+$/)){ 
+            $self->LastMsg(ERROR,"problem ticket not correct formated");
+            return(undef);
+         }
+         my $pm=$self->getPersistentModuleObject("w5sm9pm",
+                                                            "tssm::prm");
+         if (!defined($pm) || !$pm->Ping()){
+            $self->LastMsg(ERROR,"SM9 not available to verify prm ticket");
+            return(undef);
+         }
+         $pm->SetFilter({problemnumber=>\$prmid});
+         my ($prmrec,$msg)=$pm->getOnlyFirst(qw(problemnumber name
+                                                  description status));
+         if (!defined($prmrec)){ 
+            $self->LastMsg(ERROR,"PRM TicketID does not exists in SM9");
+            return(undef);
+         }
+         if (!$self->ValidatePRMTicket($oldrec,$newrec,$prmrec)){
+            return(undef);
+         }
+      }
+   }
+
+   if (defined($oldrec) && $oldrec->{prmid1st} eq "" && $prmid ne ""){
+      $newrec->{prmid1st}=$prmid;
+      $newrec->{prmid1stdate}=NowStamp("en");
+   }
+
+   return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
+}
+
+
+sub ValidatePRMTicket
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $prmrec=shift;
+
+   my $exptickettitle=effVal($oldrec,$newrec,"exptickettitle");
+   if ($exptickettitle ne $prmrec->{name}){
+      $self->LastMsg(ERROR,"PRM Ticket title is not correct");
+      return(undef);
+   }
+   my @desc=split(/[\r\n]+/,$prmrec->{description});
+   @desc=grep(/\/ByHash\/[A-Z,0-9]{5,40}\s*$/,@desc);
+
+   my %h;
+   map({
+      my $l=$_;
+      $l=~s/^.*\/ByHash\///;
+      $l=~s/\s*$//;
+      $h{$l}++;
+   } @desc);
+
+   my $msghash=effVal($oldrec,$newrec,"msghash");
+   if ($msghash ne ""){
+      if (!in_array([keys(%h)],$msghash)){
+         $self->LastMsg(ERROR,"SecEntry is not referenced in PRM Ticket");
          return(undef);
       }
    }
-   return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
+   return(1);
 }
 
 
