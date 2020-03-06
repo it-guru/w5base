@@ -46,20 +46,23 @@ sub new
       }
    }
    $self=bless($self,$type);
-
-   if ($#_==-1 &&
-       $ENV{CONTENT_TYPE} eq "application/json" && 
-       $ENV{REQUEST_METHOD} eq "POST"){   # seems to be a JSON POST Request
-      my $jsonpost=$self->Param("POSTDATA");
-      my $d;
-      eval('use JSON; $d=decode_json($jsonpost);');
-      if ($@ ne ""){
-         die("POST Request with JSON Data failed: $@");
+   
+   if ($#_==-1){
+      my $ContentType=$ENV{CONTENT_TYPE};
+      $ContentType=~s/;.*$//; # stripe charset
+      if ($ContentType eq "application/json" && 
+          $ENV{REQUEST_METHOD} eq "POST"){   # seems to be a JSON POST Request
+         my $jsonpost=$self->Param("POSTDATA");
+         my $d;
+         eval('use JSON; $d=decode_json($jsonpost);');
+         if ($@ ne ""){
+            die("POST Request with JSON Data failed: $@");
+         }
+         foreach my $name (keys(%$d)){
+            $self->{'cgi'}->param(-name=>$name,-value=>$d->{$name});
+         }
+         $self->{'cgi'}->delete("POSTDATA");
       }
-      foreach my $name (keys(%$d)){
-         $self->{'cgi'}->param(-name=>$name,-value=>$d->{$name});
-      }
-      $self->{'cgi'}->delete("POSTDATA");
    }
 
    #
