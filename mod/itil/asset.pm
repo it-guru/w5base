@@ -1230,8 +1230,8 @@ sub Validate
                   $found++;
                }
                if ($found4 && $new!=4){
-                  $self->LastMsg(ERROR,"CI-State change not allowed while ".
-                                       "existing active logical systems");
+                  $self->LastMsg(ERROR,"CI-State change not allowed ".
+                                       "while existing active logical systems");
                   return(0);
                }
                if ($found && ($new<3 || $new>4)){
