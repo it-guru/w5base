@@ -6,77 +6,212 @@ define(["datadumper"],function (){
    $.extend(ClassAppletLib[applet].class.prototype,ClassApplet.prototype);
 
 
-   ClassAppletLib[applet].class.prototype.tOpen=function(btn,e){
+   ClassAppletLib[applet].class.prototype.StorePRM=function(frm,rec,next){
       var app=this.app;
       var appletobj=this;
 
-      console.log("fifi:"+$(btn).data('exptickettitle'));
-      console.log("curdata",app.curDataset);
-      $(".spinner").show();
-      app.showDialog(function(){
-         var dialog = document.createElement('div');
-         $(dialog).css("height","100%");
-         $(dialog).append("<form id=SearchFrm style=\"height:100%\">"+
-                          "<table id=SearchTab width=97% height=90% "+
-                          "border=0>"+
-                          "<tr height=1%><td nowrap colspan=2>"+
-        "<h1>PRM Ticket - geht noch nicht!</h1>"+
-                "</td></tr>"+
-
-                "<tr height=1%><td valign=top width=10%>"+
-                "<div class='FieldLabel'>"+
-                "PRM-TicketID:</div></td>"+
-                "<td valign=top>"+
-                "<div class='FieldLabel'>"+
-                "<input type=text id=prmid></div>"+
-                "</td></tr>"+
-
-                "<tr height=1%><td valign=top width=10%>"+
-                "<div class='FieldLabel'>"+
-                "Application:</div></td>"+
-                "<td valign=top>"+
-                "<div class='FieldLabel'>"+
-                "<input type=text id=appl></div>"+
-                "</td></tr>"+
-
-                "<tr height=1%><td valign=top width=10%>"+
-                "<div class='FieldLabel'>"+
-                "Assignmentgroup:</div></td>"+
-                "<td valign=top>"+
-                "<div class='FieldLabel'>"+
-                "<input type=text id=assi></div>"+
-                "</td></tr>"+
-
-                "<tr height=1%><td valign=top width=10%>"+
-                "<div class='FieldLabel'>"+
-                "SM9 PRM Prio:</div></td>"+
-                "<td valign=top>"+
-                "<div class='FieldLabel'>"+
-                "<input type=text id=sm9prio></div>"+
-                "</td></tr>"+
-
-                "<tr><td valign=top width=10%>"+
-                "</td>"+
-                "<td valign=top>"+
-                "<div class='FieldLabel'>"+
-                "<textarea id=prmtext rows=5 style=\"width:80%\"></textarea>"+
-                "</div>"+
-                "</td></tr>"+
-
-                "<tr height=1%><td colspan=2 align=center>"+
-                "<input class=ticketcreate type=button "+
-                "value=\"save\" "+
-                "style=\"width:80%\">"+
-                "</td></tr>"+
-                "</table></form>");
-        $(dialog).find(".ticketcreate").click(function(e){
-           console.log(e);
-        });
-        return(dialog);
-      },function(){
-         console.log("Close of dialog");
-      });
    };
+   ClassAppletLib[applet].class.prototype.StoreOrLinkTicket=function(btn,e,frm){
+      var app=this.app;
+      var appletobj=this;
+
+      var prmid=$(frm).find("#prmid").first().val();
+      $(frm).queue("prm",[]);
+
+      var title=$(frm).find("#ttitle").first().val();
+      if (prmid==""){  // create a new prm
+         $(frm).queue("prm",function(next){
+            console.log("PRM Create");
+            $("#oplog").append("Try creating of ProblemTicket: "); 
+            $("#oplog").append("<font color=red>not supported at now</font><br>");
+           // $(frm).find("#prmid").first().val("PM11833");
+            setTimeout(function(){
+               next();
+            },1000);
+         });
+      }
+      for(var c=0;c<app.data.length;c++){
+         if (app.data[c].exptickettitle==title){
+            console.log("add "+c+" to queue");
+            (function(){
+                var rec=app.data[c];
+                console.log("rec=",rec);
+                $(frm).queue("prm",function(next){
+                    var prmid=$(frm).find("#prmid").first().val();
+                    if (prmid!=""){
+                       var log=$('#oplog');
+                       log.append(" Saving "+rec.srcid+" ... "); 
+                       $.ajax({
+                          type:'POST',
+                          url:"../../tssiem/secent/Modify",
+                          data:JSON.stringify({
+                             OP:'save',
+                             srcid:rec.srcid,
+                             Formated_prmid:prmid
+                          }),
+                          dataType:'json',
+                          contentType:"application/json; charset=utf-8",
+                          success:function(d){
+                             console.log("result d=",d);
+                             if (d.LastMsg){
+                                log.append("<font color=red>"+
+                                           d.LastMsg.join(" ")+"</font><br>");
+                             }
+                             else{
+                                log.append("<font color=green>OK</font><br>");
+                             }
+                             log.scrollTop(log.prop("scrollHeight"));
+                             setTimeout(function(){
+                                next();
+                             },1000);
+                          },
+                          error:function(){
+                             log.append("<font color=red>Fail</font><br>");
+                             log.scrollTop(log.prop("scrollHeight"));
+                             next();
+                          }
+                       });
+                    }
+                    else{
+                       next();
+                    }
+                });
+            })();
+         }
+      }
+      $(frm).queue("prm",function(next){
+         console.log("all done - world is ok");
+         setTimeout(function(){
+            $("#oplog").remove();
+         },4000);
+         next();
+      });
+
+       
+
+      console.log("frm=",frm);
+      var d="<div style=\"position:absolute;background-color:white;height:40px;overflow:hidden;overflow-y:auto;top:50px;left:50%;margin-left:-40%;width:80%;height:60%;border-style:solid;border-color:black;border-width:2px\" id=oplog>Start processing ...<br><br></div>";
+      $(frm).append(d);
+      $(frm).dequeue("prm");
+
+   };
+   ClassAppletLib[applet].class.prototype.getDialogForm=function(){
+      var d="<table class=ModalForm width=100% border=0>"+
+
+            "<tr height=1%><td valign=top width=10%>"+
+            "<div class='FieldLabel'>"+
+            "PRM-TicketID:</div></td>"+
+            "<td valign=top>"+
+            "<div class='FieldLabel'>"+
+            "<input type=text id=prmid></div>"+
+            "</td></tr>"+
+
+            "<tr height=1%><td valign=top width=10%>"+
+            "<div class='FieldLabel'>"+
+            "Title:</div></td>"+
+            "<td valign=top>"+
+            "<div class='FieldLabel'>"+
+            "<input type=text style=\"width:100%\" readonly "+
+            "id=ttitle></div>"+
+            "</td></tr>"+
+
+            "<tr height=1%><td valign=top width=10%>"+
+            "<div class='FieldLabel'>"+
+            "Application:</div></td>"+
+            "<td valign=top>"+
+            "<div class='FieldLabel'>"+
+            "<input type=text style=\"width:70%\" readonly "+
+            "id=desiredsm9applci></div>"+
+            "</td></tr>"+
+
+            "<tr height=1%><td valign=top width=10%>"+
+            "<div class='FieldLabel'>"+
+            "Assignmentgroup:</div></td>"+
+            "<td valign=top>"+
+            "<div class='FieldLabel'>"+
+            "<input type=text  style=\"width:100%\" readonly "+
+            "id=desiredsm9applag></div>"+
+            "</td></tr>"+
+
+            "<tr height=1%><td valign=top width=10%>"+
+            "<div class='FieldLabel'>"+
+            "SM9 PRM CBI:</div></td>"+
+            "<td valign=top>"+
+            "<div class='FieldLabel'>"+
+            "<input type=text id=desiredsm9prmcbi readonly ></div>"+
+            "</td></tr>"+
+
+            "<tr>"+
+            "<td valign=top colspan=2>"+
+            "<div class='FieldLabel' align=center>"+
+            "<textarea id=prmtext readonly rows=10 style=\"width:100%\">"+
+            "</textarea>"+
+            "</div>"+
+            "</td></tr>"+
+
+            "</table>";
+      return(d);
+   };
+   ClassAppletLib[applet].class.prototype.tOpen=function(btn,e,text){
+      var app=this.app;
+      var appletobj=this;
+      var rec=app.data[$(btn).attr('data-id')];
+
+      $(".spinner").show();
+
+
+      app.Config().then(function(cfg){
+          var w5obj=getModuleObject(cfg,'tssiem::secent');
+                w5obj.SetFilter({
+                   srcid:rec.srcid
+                });
+                w5obj.findRecord("ALL",function(data){
+                   var frec=data[0];
+                   app.showDialog(function(){
+                      var dialog = document.createElement('div');
+                      //$(dialog).css("position","relative");
+                      //$(dialog).css("height","auto");
+                      var title=$("<div id=title>PRM Ticket</div>")
+                      var content=$("<div id=content></div>")
+                      var control=document.createElement('div');
+                      $(control).prop("id","control"); 
+                      $(control).css("text-align","center"); 
+                      $(dialog).append(title);
+                      $(dialog).append(content);
+                  
+                      var button=document.createElement("button");
+                      $(button).text("save");
+                      $(button).click(function(e){
+                         var frm=$(this).parent().parent().parent();
+                         return(appletobj.StoreOrLinkTicket(this,e,frm));
+                      });
+                      $(control).append(button);
+                      $(dialog).append(control);
+                      $(content).append(appletobj.getDialogForm());
+                      $(content).find("#prmtext").first().val(text); 
+
+                      $(content).find("#ttitle")
+                         .first().val(frec.exptickettitle); 
+                     
+                      $(content).find("#desiredsm9applag")
+                         .first().val(frec.desiredsm9applag); 
+                     
+                      $(content).find("#desiredsm9applci")
+                         .first().val(frec.desiredsm9applci); 
+
+                      $(content).find("#desiredsm9prmcbi")
+                         .first().val(frec.desiredsm9prmcbi); 
+
+                      $(dialog).find(".ticketcreate").click(function(e){
+                         console.log(e);
+                      });
+                      return(dialog);
+                   },function(){
+                      console.log("Close of dialog");
+                   });
+                });
+       });
+    };
 
 
 
@@ -93,11 +228,13 @@ define(["datadumper"],function (){
                    ismsgtrackingactive:'1',
                    prmid:'[EMPTY]',
                 });
-                w5obj.findRecord("ictono,exptickettitle,msghashurl,perspective",
+                w5obj.findRecord("ictono,exptickettitle,msghashurl,"+
+                                 "srcid,perspective",
                                  function(data){
                    // detect all objects need to be preloaded
                    console.log(data);
                    $("#analysedData").html("");
+                   $(".spinner").hide();
                    var cnt=data.length;
                    var ttitle;
                    var curdiv;
@@ -125,9 +262,7 @@ define(["datadumper"],function (){
                          var button=document.createElement("button");
                          $(button).html("PRM-Ticket");
                          $(button).css("float","right");
-                         $(button).data({
-                            exptickettitle:data[c].exptickettitle
-                         });
+                         $(button).attr('data-id',c);
                          $(button).addClass("tOpen");
                          $(curtik).html("<b>Short-Description:</b> "+
                                         data[c].exptickettitle+"<br>"+
@@ -135,9 +270,6 @@ define(["datadumper"],function (){
                                         data[c].perspective+"<br>"+
                                         "<b>Description:</b>");
                          $(curtik).append(button);
-                         $(curtxt).append("The following Qualys "+
-                                          "Scan-Entries are needed to "+
-                                          "be fixed:\n");
                          $(curtik).append(curtxt);
                          $("#analysedData").append(curdiv);
                          ttitle=data[c].exptickettitle;
@@ -149,9 +281,15 @@ define(["datadumper"],function (){
                        appletobj.loadEntries();
                    });
                    $(".tOpen").click(function(e){
-                      return(appletobj.tOpen(this,e));
+                      var p=$(this).parent();
+                      var xmp=$(p).find("xmp").first();
+                      var xmptext="";
+                      if (xmp){
+                         xmptext=xmp.text();
+                      }
+                      return(appletobj.tOpen(this,e,xmptext));
                    });
-                   app.curDataset=data;
+                   app.data=data;
                    //$("#analysedData").html("<xmp>"+Dumper(data)+"</xmp>");
                    window.dispatchEvent(new Event('resize'));
                    ok("OK");
@@ -183,7 +321,6 @@ define(["datadumper"],function (){
                    "<div style=\"text-align:center\">"+
                    "<div class=analyseLoader>"+
                    'Analysing Entries...<br>'+
-                   '<img src="../../base/load/ajaxloader.gif">'+
                    "</div>"+
                    "</div>"+
                    "</div>";

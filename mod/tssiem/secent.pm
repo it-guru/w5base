@@ -651,7 +651,8 @@ sub ValidatedUpdateRecord
    $filter[0]={ofid=>\$oldrec->{msghash}};
    $newrec->{ofid}=$oldrec->{msghash};  # als Referenz in der Overflow 
    if (!defined($oldrec->{ofid})){      # msghash verwenden
-      return($self->SUPER::ValidatedInsertRecord($newrec));
+      my $newid=$self->SUPER::ValidatedInsertRecord({ofid=>$oldrec->{msghash}});
+     # return($self->SUPER::ValidatedInsertRecord($newrec));
    }
    return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
 }
@@ -667,14 +668,14 @@ sub Validate
 
    my $prmid=effVal($oldrec,$newrec,"prmid");
 
-   if (effChanged($oldrec,$newrec,"prmid")){
+
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"prmid")){
       if ($prmid ne ""){
          if (!($prmid=~m/^PM[0-9]+$/)){ 
             $self->LastMsg(ERROR,"problem ticket not correct formated");
             return(undef);
          }
-         my $pm=$self->getPersistentModuleObject("w5sm9pm",
-                                                            "tssm::prm");
+         my $pm=$self->getPersistentModuleObject("w5sm9pm","tssm::prm");
          if (!defined($pm) || !$pm->Ping()){
             $self->LastMsg(ERROR,"SM9 not available to verify prm ticket");
             return(undef);
@@ -709,6 +710,7 @@ sub ValidatePRMTicket
    my $prmrec=shift;
 
    my $exptickettitle=effVal($oldrec,$newrec,"exptickettitle");
+
    if ($exptickettitle ne $prmrec->{name}){
       $self->LastMsg(ERROR,"PRM Ticket title is not correct");
       return(undef);

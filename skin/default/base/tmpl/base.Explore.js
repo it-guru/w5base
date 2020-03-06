@@ -216,7 +216,7 @@ body{
     top: 0;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
+    overflow: hidden; 
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
@@ -227,8 +227,27 @@ body{
     padding: 20px;
     padding-top: 5px;
     border: 1px solid #888;
+    overflow:hidden;
     width: 80%; 
     height: 50%;
+    min-width:600px;
+    min-height:400px;
+    position:relative; // to allow absolute enties
+}
+
+.modal-content #title{
+   font-size:18px;
+   font-weight:700;
+   padding-right:80px;
+   overflow:hidden;
+   padding-top:15px;
+   padding-bottom:15px;
+}
+.modal-content #content{
+   overflow-y:auto;
+   overflow-x:hidden;
+}
+.modal-content #control{
 }
 
 .closebtn {
@@ -369,10 +388,14 @@ div.SearchInp{
 input#SearchInp{
   width:95%
 }
+input{
+   box-sizing : border-box;
+}
+textarea{
+   box-sizing : border-box;
+   resize: vertical;
+}
 div.SearchLabel,div.FieldLabel,div.FieldData{
-  padding:5px;
-  line-height:25px;
-  background-color: #f0f0f0;
 }
 div#SearchContainer{
   margin-top:2px;
@@ -382,6 +405,12 @@ div#SearchContainer{
 div#SearchResult{
   overflow-x:hidden;
   overflow-y:scroll;
+}
+
+.ModalForm td{
+  background-color: #f0f0f0;
+  padding:5px;
+  line-height:25px;
 }
 
 </style>
@@ -985,9 +1014,10 @@ var W5ExploreClass=function(){
 
    this.showDialog=function(genContent,exitCode){
       var modal=document.createElement('div');
-      $(modal).id='myModal';
+      $(modal).prop('id','myModal');
       $(modal).addClass('modal-dialog');
       $(modal).addClass('modal-background');
+console.log("modal=",modal);
       var modalframe=document.createElement('div');
       $(modalframe).addClass('modal-content');
       $(modalframe).append("<span class='closebtn'>&times;</span>");
@@ -1001,6 +1031,20 @@ var W5ExploreClass=function(){
       $(".spinner").hide();
       $(modal).show();
       $(modal).on('resize',function(e){
+         var hc=$("#myModal div#content").outerHeight();
+         var hm=$("#myModal .modal-content").height();
+         var ht=$("#myModal div#title").outerHeight();
+         var hs=$("#myModal div#control").outerHeight();
+         if (hm && hc){
+            var controlh=hm;
+            if (ht){
+               controlh-=ht;
+            }
+            if (hs){
+               controlh-=hs;
+            }
+            $("#myModal div#content").height(controlh);
+         }
          e.stopPropagation();
       });
       $('.modal-content  div').first().trigger('resize');
