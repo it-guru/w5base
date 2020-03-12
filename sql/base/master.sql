@@ -254,7 +254,7 @@ alter table location add databoss bigint(20);
 alter table postitnote add parentobj varchar(30) NOT NULL;
 alter table postitnote add parentid  varchar(30);
 alter table postitnote add grp  bigint(20);
-alter table postitnote add key parentg(parentobj,parentid,grp);
+alter table postitnote add key parentg(parentobj,parentid,grp),add unique(name,parentid,parentobj);
 alter table postitnote add key parentm(mandator,parentobj,parentid);
 CREATE TABLE interviewcat (
   id bigint(20) NOT NULL default '0',

@@ -171,13 +171,45 @@ sub isCopyValid
 }
 
 
+sub prepUploadRecord                       # pre processing interface
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   my $idobj=$self->IdField();
+   my $idname;
+
+   if (defined($idobj)){
+      $idname=$idobj->Name();
+      if (!exists($newrec->{$idname}) || $newrec->{$idname} eq ""){
+         if (exists($newrec->{parentid}) && $newrec->{parentid} ne "" &&
+             exists($newrec->{parentobj}) && $newrec->{parentobj} ne "" &&
+             exists($newrec->{name}) && $newrec->{name} ne ""){
+            my $i=$self->Clone();
+            $i->SecureSetFilter({parentobj=>\$newrec->{parentobj},
+                                 parentid=>\$newrec->{parentid},
+                                 name=>\$newrec->{name}});
+            my ($rec,$msg)=$i->getOnlyFirst($idname);
+            if (defined($rec)){
+               $newrec->{$idname}=$rec->{$idname};
+               delete($newrec->{parentid});
+               delete($newrec->{parentobj});
+               delete($newrec->{name});
+            }
+         }
+      }
+   }
+   return(1);
+}
+
+
+
 
 sub SecureSetFilter
 {
    my $self=shift;
    my @flt=@_;
 
- #  if (!$self->IsMemberOf([qw(admin)],"RMember")){
    my $userid=$self->getCurrentUserId();
    foreach my $flt (@flt){
       $flt->{creatorid}=\$userid; 
