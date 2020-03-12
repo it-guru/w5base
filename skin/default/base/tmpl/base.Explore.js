@@ -365,6 +365,37 @@ body{
             user-select: none; 
 }
 
+.mtiletxt div.visi{
+  position:absolute;
+  left:15px;
+  bottom:10px;
+  width:20px;
+  height:20px;
+  cursor:pointer;
+  background:url(../../../public/base/load/visibility_empty.gif)  no-repeat;
+  background-size: 20px 20px;
+}
+
+.mtiletxt div.vision{
+  position:absolute;
+  left:15px;
+  bottom:10px;
+  width:20px;
+  height:20px;
+  background:url(../../../public/base/load/visibility_on.gif)  no-repeat;
+  background-size: 20px 20px;
+}
+
+.mtiletxt div.visioff{
+  position:absolute;
+  left:15px;
+  bottom:10px;
+  width:20px;
+  height:20px;
+  background:url(../../../public/base/load/visibility_off.gif)  no-repeat;
+  background-size: 20px 20px;
+}
+
 .mtiletxt:hover{
   background-color: #ffffff;
   transition: background-color 0.4s;
@@ -588,11 +619,68 @@ var ClassAppletLib=new Object();
 
 //////////////////////////////////////////////////////////////////////////
 // Main Application Class
+var W5AppletHideController=function(_app){
+   this.hiddenApplets=new Array();
+   this._fullView=0;
+   this.app=_app;
+
+   this.loadHiddenApplets=function(){
+      var o=this.app.GetApplicationKeyItem("ExplorerTileHide");
+      var a=o ? o.split('|') : [];
+      this.hiddenApplets=a;
+   };
+   this.saveHiddenApplets=function(){
+      var a=this.hiddenApplets.join('|');
+      this.app.SetApplicationKeyItem("ExplorerTileHide",a);
+   }
+
+   this.fullView=function(newMode){
+      if (newMode===undefined){
+         return(this._fullView);
+      }
+      this._fullView=newMode;
+      return(this._fullView);
+   };
+   
+
+   this.isAppletVisible=function(k){
+      if (this._fullView){
+         return(true);
+      }
+      if (!this.isAppletHidden(k)){
+         return(true);
+      }
+      return(false);
+   };
+   this.isAppletHidden=function(k){
+      if (jQuery.inArray(k,this.hiddenApplets)!=-1){
+         return(true);
+      }
+      return(false);
+   };
+
+
+   this.hideApplet=function(k){
+      if (jQuery.inArray(k,this.hiddenApplets)==-1){
+         this.hiddenApplets.push(k);
+         this.saveHiddenApplets();
+      }
+   };
+   this.showApplet=function(k){
+      if (jQuery.inArray(k,this.hiddenApplets)!=-1){
+         this.hiddenApplets=$.grep(this.hiddenApplets,function(n,i){
+            return(n==k);
+         },true);
+         this.saveHiddenApplets();
+      }
+   };
+};
 
 var W5ExploreClass=function(){
    this.console=new Object();
    this.runingApplet=new Object();
    this._opStack=new Array();
+   this.hideControl=new W5AppletHideController(this);
 
    this.spinnerOpts={
         lines: 13 // The number of lines to draw
@@ -705,16 +793,20 @@ var W5ExploreClass=function(){
 
          var mfirst = document.createElement('div');
          mfirst.id='mpathfirst';
-         if (window.name=='msel'){      //in this case, 
-            mfirst.innerHTML="\u2756";  // i in fullwindow with title mode
-            $(mfirst).css("cursor","pointer");
-            $(mfirst).click(function(){
-               window.location="../menu/msel";
-            });
-         }
-         else{
-            mfirst.innerHTML="\u2756";
-         }
+         mfirst.title='ShowAll';
+         $(mfirst).css("cursor","pointer");
+         var app=this;
+         $(mfirst).click(function(){
+            if (app.hideControl.fullView()){
+               app.hideControl.fullView(0);
+            }
+            else{
+               app.hideControl.fullView(1);
+            }
+            app.LayoutMenuLayer();
+            app.showAppletList();
+         });
+         mfirst.innerHTML="\u2756";  // i in fullwindow with title mode
          this.mpathline.appendChild(mfirst);
 
          this.mpath = document.createElement('ul');
@@ -1017,7 +1109,6 @@ var W5ExploreClass=function(){
       $(modal).prop('id','myModal');
       $(modal).addClass('modal-dialog');
       $(modal).addClass('modal-background');
-console.log("modal=",modal);
       var modalframe=document.createElement('div');
       $(modalframe).addClass('modal-content');
       $(modalframe).append("<span class='closebtn'>&times;</span>");
@@ -1075,8 +1166,139 @@ console.log("modal=",modal);
       //$("#workspace").html("<br><br><center><h1>W5Explore</h1></center>");
    }
 
+   this.GetApplicationKeyItem=function(k,callb){// Interface to read pers Varis
+      var oString=localStorage.getItem(k);
+      var val;
+      var loadSync=0;
+      var load=0;
+
+      if (oString){
+         var o;
+         try{
+            o=JSON.parse(oString);
+         }
+         catch(e){
+            console.log("parse error",e);
+         }
+         if (o){
+            val=o.value;
+            var now=new Date().getTime();
+            if (o.timestamp+6000<now){   //refresh after 60sec
+               console.log("get Needed for ",k);
+               load=1;
+               loadSync=1;   // test if sync load makes problems
+            }
+         }
+         else{  // local object is invalid
+            load=1;
+            loadSync=1;
+         }
+      }
+      else{
+         load=1;
+         loadSync=1;
+      }
+      if (load){
+         var request={   // der IE bekommt das nicht richtig als POST "gebacken"
+            type:'GET',
+            url:"../../base/note/Result",
+            data:{
+               search_name:k,
+               search_parentobj:'base::Explore',
+               search_parentid:k,
+               FormatAs:'nativeJSON',
+               T:(new Date().getTime())
+            },
+            dataType:'json',
+            success:function(d){
+               var v;
+               if (d && d[0]){
+                  //console.log("got from server d=",d[0]);
+                  v=d[0].comments;
+                  var o={value:v,timestamp: new Date().getTime()};
+                  localStorage.setItem(k,JSON.stringify(o));
+               }
+               if (callb){
+                  callb(v);
+               }
+            },
+            error:function(e){
+               console.log("load Errorerror=",e);
+               if (callb){
+                  callb();
+               }
+            }
+         };
+         if (loadSync){
+            request.async=false;
+         }
+         $.ajax(request);
+      }
+      else{
+         if (callb){
+            callb(val);
+         }
+      }
+      return(val);
+   };
+
+   this.SetApplicationKeyItem=function(k,v){ // Interface to write pers Variales
+      var val=localStorage.getItem(k);
+      try{
+         val=JSON.parse(val);
+      }
+      catch(e){
+         console.log("parse error",e);
+      }
+      if (!(val) || val.value!=v){   // send it to server
+         //console.log("sending k=v",k,v,"to server curvalue=",val.value);
+         var request={
+            type:'POST',
+            url:"../../base/note/Modify",
+            data:JSON.stringify({
+               OP:'save',
+               Formated_name:k,
+               Formated_comments:v,
+               Formated_parentobj:'base::Explore',
+               Formated_parentid:k
+            }),
+            dataType:'json',
+            contentType:"application/json; charset=utf-8",
+            success:function(d){
+               console.log("SetApplicationKeyItem server result d=",d);
+            },
+            error:function(e){
+               console.log("error=",e);
+            }
+         };
+         $.ajax(request);
+      }
+      var o={value:v,timestamp: new Date().getTime()};
+      localStorage.setItem(k,JSON.stringify(o));
+   };
+
+
    this.showAppletList=function(){
+      var app=this;  // prepair some readings to ensure K-Varis are current
+      var lastuxday=app.GetApplicationKeyItem("ExplorerStart",function(v){
+          if (v=="" || v===undefined){
+             console.log("HEY - NEW and FIRST Start",v);
+          }
+          var uxday=(((new Date().getTime())/1000)/(24*60*60)).toFixed(0);
+          app.SetApplicationKeyItem("ExplorerStart",uxday);
+
+          app.GetApplicationKeyItem("ExplorerTileHide",function(v){
+             app.GetApplicationKeyItem("ExplorerTileOrder",function(v){
+                app._showAppletList();
+             });
+          });
+      });
+   }
+
+
+   this._showAppletList=function(){
       var app=this;
+
       $("#workspace").html("");
       var p=document.createElement('div');
       $(p).addClass("parent");
@@ -1085,25 +1307,87 @@ console.log("modal=",modal);
       var appletCnt=appletKey.length;
       for(var c=0;c<appletCnt;c++){
          var k=appletKey[c];
-         var e=document.createElement('div');
-         $(e).addClass("item");
-         var tile=document.createElement('div');
-         $(tile).attr("data-id",k);
-         $(tile).addClass("mtile");
-         $(tile).click(function(e){
-             var applet=$(this).attr("data-id");
-             app.runApplet(applet);
-         });
-         var m=document.createElement('div');
-         $(m).addClass("mtiletxt");
-         var htmltext="<span>"+ClassAppletLib[k].desc.label+"</span>";
-         htmltext+="<p>"+ClassAppletLib[k].desc.description+"</p>";
-         htmltext+="<small>"+ClassAppletLib[k].desc.sublabel+"</small>";
-         $(m).html(htmltext);
-         tile.appendChild(m);
-         e.appendChild(tile);
-         p.appendChild(e);
+         if (app.hideControl.isAppletVisible(k)){
+            var e=document.createElement('div');
+            $(e).addClass("item");
+            var tile=document.createElement('div');
+            $(e).attr("data-id",k);
+            $(tile).addClass("mtile");
+            $(tile).click(function(e){
+                var applet=$(this).parent().attr("data-id");
+                app.runApplet(applet);
+            });
+            var m=document.createElement('div');
+            $(m).addClass("mtiletxt");
+            var htmltext="<span>"+ClassAppletLib[k].desc.label+"</span>";
+            htmltext+="<p>"+ClassAppletLib[k].desc.description+"</p>";
+            htmltext+="<small>"+ClassAppletLib[k].desc.sublabel+"</small>";
+            htmltext+="<div class=visi title=\"switch visibility\"></div>";
+            $(m).html(htmltext);
+            if (app.hideControl.fullView()){
+               if (app.hideControl.isAppletHidden(k)){
+                  $(m).find(".visi").addClass("vision");
+               }
+               else{
+                  $(m).find(".visi").addClass("visioff");
+               }
+            }
+            tile.appendChild(m);
+            e.appendChild(tile);
+            p.appendChild(e);
+         }
       }
+
+
+      $(p).find(".visi").click(function(e){
+         var k=$(this).parent().parent().parent().attr("data-id");
+         if (app.hideControl.isAppletHidden(k)){
+            app.hideControl.showApplet(k);
+         }
+         else{
+            app.hideControl.hideApplet(k);
+         }
+         if (!app.hideControl.fullView()){
+            $(this).parent().parent().parent().remove();
+         }
+         else{
+            $(this).removeClass("vision");
+            $(this).removeClass("visioff");
+            if (app.hideControl.isAppletHidden(k)){
+               $(this).addClass("vision");
+            }
+            else{
+               $(this).addClass("visioff");
+            }
+         }
+         e.preventDefault();
+         e.stopPropagation();
+         return(true);
+      });
+
+      $(p).find(".visi").hover(function(e){
+         if (!app.hideControl.fullView()){
+            if (app.hideControl.isAppletHidden(k)){
+               $(this).addClass("vision");
+            }
+            else{
+               $(this).addClass("visioff");
+            }
+         }
+      },
+      function(e){
+         if (!app.hideControl.fullView()){
+            if (app.hideControl.isAppletHidden(k)){
+               $(this).removeClass("vision");
+            }
+            else{
+               $(this).removeClass("visioff");
+            }
+         }
+      });
+
+
+
       for(var c=0;c<appletCnt;c++){
          var e=document.createElement('div');
          $(e).addClass("dummyItem");
@@ -1123,7 +1407,7 @@ console.log("modal=",modal);
          forceFallback: true,      // needed for ieEdge mode
          store: {
             get: function (sortable) {
-               var order = localStorage.getItem(sortable.options.group.name);
+               var order = app.GetApplicationKeyItem("ExplorerTileOrder");
                var a=order ? order.split('|') : [];
                //console.log("get:",a);
                return(a);
@@ -1131,8 +1415,7 @@ console.log("modal=",modal);
             set: function (s) {
                var order = s.toArray();
                var a=order.join('|');
-               //console.log("set:",a);
-              localStorage.setItem(s.options.group.name,a);
+               app.SetApplicationKeyItem("ExplorerTileOrder",a);
             }
        }
       });
@@ -1140,10 +1423,11 @@ console.log("modal=",modal);
    }
 
 
-
    this.MainMenu=function(runpath){
       var app=this;
+
       this.LayoutMenuLayer();
+      this.hideControl.loadHiddenApplets();
       if (runpath!=undefined){
          app.showW5ExploreLogo("");
       }
