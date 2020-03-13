@@ -133,7 +133,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL") if ($self->IsMemberOf("admin"));
+   return("default") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 
