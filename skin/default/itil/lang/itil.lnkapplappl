@@ -12,6 +12,8 @@
                     de=>'Implementation der Schnittstelle'},
 'fieldgroup.classi'=>{en=>'Classification of interface',
                     de=>'Klassifizierung der Schnittstelle'},
+'fieldgroup.toapplcontacts'=>{en=>'to Application - Contacts',
+                    de=>'nach Anwendung - Kontakte'},
 'fieldgroup.interfacescomp'=>{
     de=>'spezielle Schnittstellen Komponenten/Einzelheiten und Kontakte',
     en=>'individual Interface components and contacts'},

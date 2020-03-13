@@ -39,6 +39,8 @@
    de=>'Fachliche Verantwortung/Architektur',
    en=>'Functional accountability/architecture'
 },
+'fieldgroup.toapplcontacts'=>{en=>'to Application - Contacts',
+                    de=>'nach Anwendung - Kontakte'},
 'fieldgroup.delmgmt'=>{de=>'Service Delivery Management',en=>'Service Delivery Management'},
 'fieldgroup.customer'=>{de=>'Kunde/Auftraggeber',en=>'Customer'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},

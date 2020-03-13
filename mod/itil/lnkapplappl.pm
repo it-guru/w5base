@@ -578,6 +578,11 @@ sub new
                 label         =>'to ApplID',
                 dataobjattr   =>'lnkapplappl.toappl'),
 
+
+
+
+
+
       new kernel::Field::Link(
                 name          =>'secfromapplsectarget',
                 noselect      =>'1',
@@ -650,24 +655,76 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'toappl.businessteam'),
 
+
+      new kernel::Field::Contact(
+                name          =>'toapplapplmgr',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'toapplcontacts',
+                label         =>'Application Manager',
+                translation   =>'itil::appl',
+                vjoinon       =>'sectoapplapplmgrid'),
+
+      new kernel::Field::Contact(
+                name          =>'toappltsm',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'toapplcontacts',
+                label         =>'Technical Solution Manager',
+                translation   =>'itil::appl',
+                vjoinon       =>'sectoappltsmid'),
+
+      new kernel::Field::Contact(
+                name          =>'toappltsm2',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'toapplcontacts',
+                label         =>'Deputy Technical Solution Manager',
+                translation   =>'itil::appl',
+                vjoinon       =>'sectoappltsm2id'),
+
+      new kernel::Field::Contact(
+                name          =>'toapplopm',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'toapplcontacts',
+                label         =>'Operation Manager',
+                translation   =>'itil::appl',
+                vjoinon       =>'sectoapplopmid'),
+
+      new kernel::Field::Contact(
+                name          =>'toapplopm2',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'toapplcontacts',
+                label         =>'Deputy Operation Manager',
+                translation   =>'itil::appl',
+                vjoinon       =>'sectoapplopm2id'),
+
+
+      new kernel::Field::Link(
+                name          =>'sectoapplapplmgrid',
+                dataobjattr   =>'toappl.applmgr'),
+
       new kernel::Field::Link(
                 name          =>'sectoappltsmid',
-                noselect      =>'1',
                 dataobjattr   =>'toappl.tsm'),
 
       new kernel::Field::Link(
                 name          =>'sectoappltsm2id',
-                noselect      =>'1',
                 dataobjattr   =>'toappl.tsm2'),
 
       new kernel::Field::Link(
                 name          =>'sectoapplopmid',
-                noselect      =>'1',
                 dataobjattr   =>'toappl.opm'),
 
       new kernel::Field::Link(
                 name          =>'sectoapplopm2id',
-                noselect      =>'1',
                 dataobjattr   =>'toappl.opm2'),
 
 
@@ -1201,7 +1258,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @l=qw(header default ifagreement agreement comdetails impl
-             interfacescomp desc classi source history);
+             interfacescomp desc classi source history toapplcontacts);
    if (defined($rec) && exists($rec->{ifagreementneeded}) &&
        !$rec->{ifagreementneeded}){
       @l=grep(!/^agreement$/,@l);
