@@ -13,6 +13,7 @@
 'Order acceptation'=>{de=>'Auftragsannahme'},
 'Order acceptation deputy'=>{de=>'Auftragsannahme Vertretung'},
 'Technical Contact'=>{de=>'technischer-Ansprechpartner'},
+'Technical Approver'=>{de=>'technischer-Genehmiger'},
 'Information contact'=>{de=>'Informationspartner'},
 'Event information contact'=>{de=>'Ereignis-Informationspartner'},
 'Projectmanager'=>{de=>'Projektmanager'},
@@ -22,3 +23,4 @@
 'privacy read'=>{de=>'vertrauliches lesen'},
 'Productmanager'=>{de=>'Produktmanager'},
 'Application manager deputy'=>{de=>'Applicationmanager Vertreter'},
+'role Technical Approver cannot be assigned to groups'=>{de=>'Rolle Technischer Genehmiger kann nicht an Gruppen zugewiesen werden'},

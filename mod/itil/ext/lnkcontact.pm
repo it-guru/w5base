@@ -64,6 +64,8 @@ sub getPosibleRoles
                                                  $self->Self),
          "techcontact"     =>$self->getParent->T("Technical Contact",
                                                  $self->Self),
+         "techapprove"     =>$self->getParent->T("Technical Approver",
+                                                 $self->Self),
          "vendor"          =>$self->getParent->T("Vendor Contact",
                                                  $self->Self),
          "infocontact"     =>$self->getParent->T("Information contact",
@@ -271,6 +273,13 @@ sub Validate
                orderin1      =>$self->getParent->T("Order acceptation"),
                developercoord=>$self->getParent->T("Development coordination")
                },$roles,$oldrec,$newrec,$parentobj,$refid)){
+            return(0);
+         }
+      }
+      if (in_array("techapprove",$roles)){
+         if (effVal($oldrec,$newrec,"target") eq "base::grp"){
+            $app->LastMsg(ERROR,
+                "role Technical Approver cannot be assigned to groups");
             return(0);
          }
       }
