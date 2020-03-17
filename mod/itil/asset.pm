@@ -888,6 +888,40 @@ sub hideOnBundle{
    return(1);
 }
 
+
+sub preQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($rec->{cistatusid}>=6){
+      my ($uniquesuff)=$rec->{name}=~m/(\[[0-9]+\])$/;
+      if ($self->getField("srcid")){
+         if ($uniquesuff ne "" && !($rec->{srcid}=~m/\[[0-9]\]$/)){
+            my $nowstamp=NowStamp("en");
+            my $age=CalcDateDuration($rec->{mdate},$nowstamp);
+            if ($age->{days}>7){
+               my $idfield=$self->IdField();
+               if (defined($idfield)){
+                  my $id=$idfield->RawValue($rec);
+                  if ($id ne ""){
+                     $self->ValidatedUpdateRecord($rec,{
+                        mdate=>NowStamp("en"),
+                        srcid=>$rec->{srcid}.$uniquesuff
+                     },{$idfield->Name()=>$id});
+                     $rec->{srcid}=$rec->{srcid}.$uniquesuff;
+                     $rec->{mdate}=NowStamp("en");
+                  }
+               }
+            }
+         }
+      }
+   }
+   return(1);
+}
+
+
+
 sub PhoneUsage
 {
    my $self=shift;
