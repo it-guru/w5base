@@ -11,7 +11,7 @@
 'fieldgroup.adm'=>{de=>'Administration/DBA',en=>'Administration/DBA'},
 'fieldgroup.monisla'=>{de=>'Service Monitoring und SLA Überwachung',en=>'Service Monitoring and SLA'},
 'fieldgroup.relations'=>{de=>'Instanz Relationen',en=>'Instance relations'},
-'fieldgroup.ssl'=>{de=>'SSL Prüfsystem',en=>'SSL Verification'},
+'fieldgroup.ssl'=>{de=>'SSL Zertifikats-Prüfsystem',en=>'SSL Verification'},
 'fieldgroup.sec'=>{en=>'Security and data privacy',de=>'Sicherheit und Datenschutz'},
 'fieldgroup.swinstancerunnodes'=>{en=>'posible instance run nodes/systems',de=>'möglich Instanz Ausführungs-Nodes/Systeme'},
 'posible instance run nodes/systems'=>{de=>'möglich Instanz Ausführungs-Nodes/Systeme'},
