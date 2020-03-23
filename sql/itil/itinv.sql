@@ -1764,3 +1764,4 @@ alter table lnkapplappl add gwappl bigint(20) default NULL,add ifrelation varcha
 alter table wallet add altname longtext;
 alter table ipaddress  add itcloudarea bigint(20) default NULL,add key(itcloudarea);
 alter table swinstance  add itcloudarea bigint(20) default NULL,add key(itcloudarea);
+alter table accessurl add isonsharedproxy int(1) default '0',add do_ssl_cert_check int(1) default '0',add ssl_cert_check datetime default NULL,add ssl_cert_end datetime default NULL,add ssl_cert_begin datetime default NULL,add ssl_state varchar(128) default NULL,add ssl_cert_exp_notify1 datetime default NULL,add ssl_cipher varchar(40) default NULL,add ssl_certserial varchar(40) default NULL,add ssl_version varchar(40) default NULL,add ssl_certdump longtext   default NULL,add ssl_certsighash varchar(40) default NULL;

@@ -83,6 +83,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'applcistatus',
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'applinfo',
                 label         =>'Application CI-State',
                 vjointo       =>'base::cistatus',
@@ -127,6 +128,18 @@ sub new
                 label         =>'only for internal communication in application',
                 dataobjattr   =>'accessurl.is_internal'),
 
+      new kernel::Field::Boolean(
+                name          =>'is_onshproxy',
+                group         =>'class',
+                label         =>'URL is hosted on Shared-Reverse Proxy',
+                dataobjattr   =>'accessurl.isonsharedproxy'),
+
+      new kernel::Field::Boolean(
+                name          =>'do_sslcertcheck',
+                group         =>'class',
+                selectfix     =>1,
+                label         =>'perform cyclic SSL certificate checks',
+                dataobjattr   =>'accessurl.do_ssl_cert_check'),
 
       new kernel::Field::TextDrop(
                 name          =>'lnkapplappl',
@@ -158,6 +171,13 @@ sub new
                 label         =>'Hostname',
                 dataobjattr   =>'accessurl.hostname'),
 
+      new kernel::Field::Number(
+                name          =>'ipport',
+                group         =>'urlinfo',
+                readonly      =>1,
+                label         =>'IP-Port',
+                dataobjattr   =>'accessurl.ipport'),
+                                                   
       new kernel::Field::SubList(
                 name          =>'lastipaddresses',
                 label         =>'last known IP-Adresses',
@@ -166,13 +186,97 @@ sub new
                 vjoinon       =>['id'=>'lnkapplurlid'],
                 vjoindisp     =>['name','srcload']),
 
-      new kernel::Field::Number(
-                name          =>'ipport',
-                group         =>'urlinfo',
+
+
+      new kernel::Field::Date(
+                name          =>'sslbegin',
+                history       =>0,
+                group         =>'ssl',
+                depend        =>['sslurl'],
+                label         =>'SSL Certificate Begin',
+                dataobjattr   =>'accessurl.ssl_cert_begin'),
+
+      new kernel::Field::Date(
+                name          =>'sslend',
+                history       =>0,
+                group         =>'ssl',
+                depend        =>['sslurl'],
+                label         =>'SSL Certificate End',
+                dataobjattr   =>'accessurl.ssl_cert_end'),
+
+      new kernel::Field::Date(
+                name          =>'sslcheck',
+                history       =>0,
                 readonly      =>1,
-                label         =>'IP-Port',
-                dataobjattr   =>'accessurl.ipport'),
-                                                   
+                group         =>'ssl',
+                label         =>'SSL last Certificate check',
+                dataobjattr   =>'accessurl.ssl_cert_check'),
+
+      new kernel::Field::Text(
+                name          =>'sslstate',
+                readonly      =>1,
+                group         =>'ssl',
+                label         =>'SSL State',
+                dataobjattr   =>'accessurl.ssl_state'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_cipher',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'ssl',
+                label         =>'detected SSL Cipher',
+                dataobjattr   =>'accessurl.ssl_cipher'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_version',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'ssl',
+                label         =>'detected SSL Version',
+                dataobjattr   =>'accessurl.ssl_version'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_certdump',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'ssl',
+                label         =>'detected SSL Certificate',
+                dataobjattr   =>'accessurl.ssl_certdump'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_cert_serialno',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'ssl',
+                label         =>'detected SSL Certificate Serial',
+                dataobjattr   =>'accessurl.ssl_certserial'),
+
+#      new kernel::Field::Text(
+#                name          =>'ssl_cert_issuerdn',
+#                readonly      =>1,
+#                xhtmldetail    =>'NotEmpty',
+#                group         =>'ssl',
+#                label         =>'detected SSL Issuer DN',
+#                dataobjattr   =>'accessurl.ssl_certissuerdn'),
+
+      new kernel::Field::Text(
+                name          =>'ssl_cert_signature_algo',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'ssl',
+                label         =>'detected SSL Certificate signature algo',
+                dataobjattr   =>'accessurl.ssl_certsighash'),
+
+      new kernel::Field::Date(
+                name          =>'sslexpnotify1',
+                history       =>0,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'ssl',
+                label         =>'Notification of Certificate Expiration',
+                dataobjattr   =>'accessurl.ssl_cert_exp_notify1'),
+
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -241,6 +345,7 @@ sub new
 
       new kernel::Field::Mandator(
                 group         =>'applinfo',
+                htmldetail    =>0,
                 readonly      =>1),
 
       new kernel::Field::Link(
@@ -253,6 +358,7 @@ sub new
                 vjointo       =>'itil::appl',
                 dontrename    =>1,
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'applinfo',
                 uploadable    =>0,
                 fields        =>[qw(databoss databossid applmgr applmgrid)]),
@@ -268,6 +374,7 @@ sub new
                 label         =>'ApplicationID',
                 readonly      =>1,
                 uploadable    =>0,
+                htmldetail    =>0,
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
 
@@ -275,6 +382,7 @@ sub new
                 name          =>'customer',
                 label         =>'Customer',
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'applinfo',
                 translation   =>'itil::appl',
                 vjointo       =>'base::grp',
@@ -286,6 +394,7 @@ sub new
                 name          =>'applcustomerprio',
                 label         =>'Customers Application Prioritiy',
                 readonly      =>1,
+                htmldetail    =>0,
                 translation   =>'itil::appl',
                 group         =>'applinfo',
                 dataobjattr   =>'appl.customerprio'),
@@ -390,6 +499,10 @@ sub Validate
    my $name=effVal($oldrec,$newrec,"name");
 
    my $uri=$self->URLValidate($name);
+   if ($uri->{name} ne $name){
+      $newrec->{name}=$uri->{name};
+      $name=$uri->{name};
+   }
    if ($uri->{error}) {
       $self->LastMsg(ERROR,$uri->{error});
       return(undef);
@@ -431,6 +544,26 @@ sub Validate
    if (effVal($oldrec,$newrec,"scheme") ne $uri->{scheme}){
       $newrec->{scheme}=$uri->{scheme};
    }
+
+   my $scheme=effVal($oldrec,$newrec,"scheme");
+   my $do_sslcertcheck=effVal($oldrec,$newrec,"do_sslcertcheck");
+   if ($do_sslcertcheck){
+      if ($scheme ne "https"){
+         $self->LastMsg(ERROR,"certificate checks only posible on https urls");
+         return(undef);
+      }
+   }
+
+   my $is_onshproxy=effVal($oldrec,$newrec,"is_onshproxy");
+
+   if ($is_onshproxy){
+      if ($uri->{path} eq "/" || $uri->{path} eq ""){
+         $self->LastMsg(ERROR,
+                  "on Shared-Reverse-Proxy URLs a path in URL is needed");
+         return(undef);
+      }
+   }
+
    return(1);
 }
 
@@ -438,7 +571,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default class applinfo urlinfo lastipaddresses source));
+          qw(header default class applinfo urlinfo ssl lastipaddresses source));
 }
 
 
@@ -448,9 +581,14 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
+   return("header","default","class") if (!defined($rec));
 
-   my @l=qw(header default history class applinfo urlinfo source history);
+   my @l=qw(header default history class applinfo urlinfo 
+            source history);
+
+   if ($rec->{do_sslcertcheck}){
+      push(@l,"ssl");
+   }
 
    if ($#{$rec->{lastipaddresses}}!=-1){
       push(@l,"lastipaddresses");
