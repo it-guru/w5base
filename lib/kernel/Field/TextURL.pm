@@ -102,6 +102,7 @@ sub URLValidate
    if (URI->new($name)->path() eq "/"){
       $name=~s{/\s*$}{};
    }
+   $uri{path}=URI->new($name)->path();
    
    $uri{name}=$name;
 
