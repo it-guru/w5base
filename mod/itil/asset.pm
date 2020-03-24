@@ -901,16 +901,20 @@ sub preQualityCheckRecord
             my $nowstamp=NowStamp("en");
             my $age=CalcDateDuration($rec->{mdate},$nowstamp);
             if ($age->{days}>7){
+               my $newmdate=$rec->{mdate};
+               if ($age->{days}<60){   # bei sehr alten Datensätzen den mdate
+                  $newmdate=$nowstamp; # nicht verändern - das gibt sonst 
+               }                       # Probleme beim verschrotten
                my $idfield=$self->IdField();
                if (defined($idfield)){
                   my $id=$idfield->RawValue($rec);
                   if ($id ne ""){
                      $self->ValidatedUpdateRecord($rec,{
-                        mdate=>NowStamp("en"),
+                        mdate=>$newmdate,
                         srcid=>$rec->{srcid}.$uniquesuff
                      },{$idfield->Name()=>$id});
                      $rec->{srcid}=$rec->{srcid}.$uniquesuff;
-                     $rec->{mdate}=NowStamp("en");
+                     $rec->{mdate}=$newmdate;
                   }
                }
             }
