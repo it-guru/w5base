@@ -780,7 +780,19 @@ sub new
                 vjoinbase     =>{'cistatusid'=>'<=5'},
                 vjointo       =>'itil::swinstancerule',
                 vjoinon       =>['id'=>'swinstanceid'],
-                vjoindisp     =>['fullname','cistatus']),
+                vjoindisp     =>['fullname','cistatus'],
+                vjoininhash   =>['fullname','cistatusid',
+                                 'parentobj','refid']),
+
+
+      new kernel::Field::Text(
+                name          =>'relatedapplications',
+                group         =>'swinstancerules',
+                htmldetail    =>0,
+                depend        =>['configrules','applid'],
+                label         =>'related applications',
+                onRawValue    =>\&calculateRelAppl),
+
 
       new kernel::Field::SubList(
                 name          =>'lnkswinstanceparam',
@@ -944,6 +956,53 @@ sub new
    $self->setWorktable("swinstance");
    return($self);
 }
+
+sub calculateRelAppl
+{
+   my $self=shift;
+   my $current=shift;
+   my $app=$self->getParent();
+
+   my @applid=($current->{applid});
+
+   my $fo=$app->getField("configrules");
+   my $f=$fo->RawValue($current);
+
+   my $lnkapplsysobj;
+
+   foreach my $rulerec (@$f){
+      if ($rulerec->{cistatusid}>2 && $rulerec->{cistatusid}<6){
+         if ($rulerec->{parentobj} eq "itil::appl" &&
+             $rulerec->{refid} ne ""){
+            push(@applid,$rulerec->{refid});
+         }
+         if ($rulerec->{parentobj} eq "itil::system" &&
+             $rulerec->{refid} ne ""){
+            if (!defined($lnkapplsysobj)){
+               $lnkapplsysobj=$app->getPersistentModuleObject("clnkapplsys",
+                                                        "itil::lnkapplsystem");
+               $lnkapplsysobj->SetFilter({systemid=>\$rulerec->{refid}});
+               my @rel=$lnkapplsysobj->getHashList(qw(applid));
+               foreach my $lnkrec (@rel){
+                  push(@applid,$lnkrec->{applid});
+               }
+            }
+         }
+      }
+   }
+
+
+   my $o=$app->getPersistentModuleObject("capplications","itil::appl");
+   $o->SetFilter({id=>\@applid,cistatusid=>[3,4,5]});
+   my @l=$o->getHashList(qw(name));
+
+   my @names;
+   foreach my $arec (@l){
+      push(@names,$arec->{name});
+   }
+   return(\@names);
+}
+
 
 sub getPosibleInstanceTypes
 {

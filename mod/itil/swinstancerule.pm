@@ -51,7 +51,9 @@ sub new
                 htmlwidth     =>'400px',
                 htmldetail    =>0,
                 readonly      =>1,
-                dataobjattr   =>"if (swinstancerule.ruletype='RESLNK',concat(swinstancerule.rulelabel,':',appl.name),swinstancerule.rulelabel)"),
+                dataobjattr   =>"if (swinstancerule.ruletype='RESLNK',".
+                                "concat(swinstancerule.rulelabel,':',".
+                                "appl.name),swinstancerule.rulelabel)"),
        
       new kernel::Field::Text(
                 name          =>'rulelabel',
@@ -220,6 +222,7 @@ sub new
                 label         =>'Application',
                 vjointo       =>'itil::appl',
                 vjoinon       =>['refid'=>'id'],
+                vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
@@ -504,6 +507,12 @@ sub Validate
                 effVal($oldrec,$newrec,"resname"));
       if (effVal($oldrec,$newrec,"parentobj") ne "itil::appl"){
          $newrec->{parentobj}="itil::appl";
+      }
+      my $resname=effVal($oldrec,$newrec,"resname");
+      if (($resname eq "") || ($resname=~m/\s/) ||
+          haveSpecialChar($resname)){
+         $self->LastMsg(ERROR,"invalid or missing resource name");
+         return(0);
       }
    }
    elsif ($ruletype eq "CFRULE"){

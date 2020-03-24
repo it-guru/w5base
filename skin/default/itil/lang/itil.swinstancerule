@@ -85,4 +85,4 @@ en=>'Dear Requestor,
 the config-rule "%s" 
 requested has been <b>rejected</b>. For further informaitons
 please contact the instanz-admin.'},
-
+'invalid or missing resource name'=>{de=>'ungültiger oder fehlender Resource-Name'},
