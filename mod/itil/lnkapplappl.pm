@@ -657,6 +657,16 @@ sub new
 
 
       new kernel::Field::Contact(
+                name          =>'toappldataboss',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                group         =>'toapplcontacts',
+                label         =>'Databoss',
+                translation   =>'itil::appl',
+                vjoinon       =>'sectoappldatabossid'),
+
+      new kernel::Field::Contact(
                 name          =>'toapplapplmgr',
                 readonly      =>1,
                 htmldetail    =>0,
@@ -706,6 +716,10 @@ sub new
                 translation   =>'itil::appl',
                 vjoinon       =>'sectoapplopm2id'),
 
+
+      new kernel::Field::Link(
+                name          =>'sectoappldatabossid',
+                dataobjattr   =>'toappl.databoss'),
 
       new kernel::Field::Link(
                 name          =>'sectoapplapplmgrid',
