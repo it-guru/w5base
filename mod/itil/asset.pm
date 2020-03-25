@@ -897,7 +897,8 @@ sub preQualityCheckRecord
    if ($rec->{cistatusid}>=6){
       my ($uniquesuff)=$rec->{name}=~m/(\[[0-9]+\])$/;
       if ($self->getField("srcid")){
-         if ($uniquesuff ne "" && !($rec->{srcid}=~m/\[[0-9]\]$/)){
+         if ($uniquesuff ne "" && !($rec->{srcid}=~m/\[[0-9]\]$/) &&
+             $rec->{srcid} ne ""){
             my $nowstamp=NowStamp("en");
             my $age=CalcDateDuration($rec->{mdate},$nowstamp);
             if ($age->{days}>7){
