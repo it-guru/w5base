@@ -105,6 +105,8 @@ sub qcheckRecord
             $sslstate="Check OK";
             if (ref($res->{sslcert}) eq "HASH" && 
                 $res->{sslcert}->{exitcode} eq "0"){
+              # $res->{sslcert}->{ssl_cert_begin}="2017-01-01 00:00:00";
+              # $res->{sslcert}->{ssl_cert_end}="2020-04-01 00:00:00";
                if ($res->{sslcert}->{ssl_cert_begin} eq "" ||
                    $res->{sslcert}->{ssl_cert_end} eq ""){
                   printf STDERR ("ERROR: missing SSL start/end data ".

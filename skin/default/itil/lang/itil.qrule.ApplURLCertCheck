@@ -1,2 +1,3 @@
 'itil::qrule::ApplURLCertCheck'=>{de=>'KommunikationsURL Zertifikats-Check',en=>'CommunicationURL Cert-Check'},
-
+'Certificate expires in a few days'=>{de=>'Zertifikat verfällt in wenigen Tagen'},
+'Certificate has expired'=>{de=>'Zertifikat ist abgelaufen'},
