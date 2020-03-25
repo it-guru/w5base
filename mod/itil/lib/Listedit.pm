@@ -1287,15 +1287,22 @@ sub handleCertExpiration
          my ($databoss,$msg)=$uobj->getOnlyFirst(qw(userid tz lastlang));
 
          my %ul;
+         my @fields=qw(tsmid tsm2id opmid opm2id);
          if (exists($parentrec->{applid}) && $parentrec->{applid}){
             my $aobj=getModuleObject($self->getParent->Config,'itil::appl');
             $aobj->SetFilter({id=>\$parentrec->{applid}});
-            my @fields=qw(tsmid tsm2id opmid opm2id);
             my ($arec,$msg)=$aobj->getOnlyFirst(@fields);
             if (defined($arec)){
                foreach my $f (@fields){
-                  $ul{$arec->{$f}}={};
+                  if ($arec->{$f} ne ""){
+                     $ul{$arec->{$f}}={};
+                  }
                }
+            }
+         }
+         foreach my $f (@fields){
+            if (exists($parentrec->{$f}) && $parentrec->{$f} ne ""){
+               $ul{$parentrec->{$f}}={};
             }
          }
          $parentobj->getWriteAuthorizedContacts($parentrec,
