@@ -1957,6 +1957,15 @@ sub getSubDataObjFieldObjsByView
    my @fobjs;
    my $class;
 
+   return();  # based on 
+      # https://darwin.telekom.de/darwin/auth/base/workflow/ById/15843478470001
+      # ... scheint es besser zu sein, die Felder in Workflows immer über
+      # das Dynamic (wffields) element aufzulösen - da es ansonsten zu 
+      # doppelt-Nennungen bei der View "ALL" kommt.
+      # Falls dies nicht passt, wird es wirklich kniffelig da es sonst schwierig
+      # wird, diese doppelt-Nennungen (über wffields und getFieldObjsByView
+      # zu verhindern)
+      #
    if (defined($param{current}) && defined($param{current}->{class})){
       $class=$param{current}->{class};
    }
@@ -1975,7 +1984,7 @@ sub getSubDataObjFieldObjsByView
       next if (defined($class) && $class ne $SubDataObj);
       my $sobj=$self->{SubDataObj}->{$SubDataObj};
       if ($sobj->can("getFieldObjsByView")){
-         push(@fobjs,$sobj->getFieldObjsByView($view,%param));
+    #     push(@fobjs,$sobj->getFieldObjsByView($view,%param));
       }
    }
    return(@fobjs);

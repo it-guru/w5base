@@ -3554,8 +3554,22 @@ sub getFieldObjsByView
          }
       }
    }
-
-   return(@fobjs,$self->getSubDataObjFieldObjsByView($view,%param),@subl);
+   my @SubDataObjFields=$self->getSubDataObjFieldObjsByView($view,%param);
+#   if ($self->Self()=~m/^base::workflow/){
+      #printf STDERR ("fifi1: %s\n",join(",",map({$_->Name()."-".$_->getParent()} @fobjs)));
+      #printf STDERR ("fifi2: %s\n",join(",",map({$_->Name()."-".$_->getParent()} @SubDataObjFields)));
+#      printf STDERR ("fifi1: %s\n",join(",",map({$_->Name()} @fobjs)));
+#      printf STDERR ("fifi2: %s\n",join(",",map({$_->Name()} @SubDataObjFields)));
+#   }
+#
+#   my @full=();  # now remove doublicates - not beautyfull
+#   foreach my $f (@fobjs,@SubDataObjFields,@subl){ # remove dups
+#      if (!in_array(\@full,$f)){
+#         push (@full,$f);
+#      }
+#   }
+   my @full=(@fobjs,@SubDataObjFields,@subl);
+   return(@full);
 }
 
 sub getSubDataObjFieldObjsByView
