@@ -135,8 +135,10 @@ sub qcheckRecord
    # Level 2
    #
    if (defined($parrec)){
-      if ($rec->{name} ne $parrec->{assetid}){
-         $forcedupd->{name}=$parrec->{assetid};
+      if ($rec->{cistatusid}<6){
+         if ($rec->{name} ne $parrec->{assetid}){
+            $forcedupd->{name}=$parrec->{assetid};
+         }
       }
       if ($parrec->{srcsys} eq "W5Base"){
          if ($rec->{srcsys} ne "w5base"){
