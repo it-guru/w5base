@@ -240,6 +240,20 @@ sub Sendmail
             "\n";
          $mail.="Message-ID: <".$rec->{id}.'@'.$rec->{initialconfig}.'@'.
                 $rec->{initialsite}.'@'."W5Base>\n";
+         my $emailcategory=$rec->{emailcategory};
+         $emailcategory=[$emailcategory] if (ref($emailcategory) ne "ARRAY");
+         foreach my $cat (@$emailcategory){
+            $cat=trim($cat);
+            if ($cat ne ""){
+               $mail.="X-W5Category: $cat :X-W5Category\n";
+            }
+         }
+         if ($template ne ""){
+            $mail.="X-W5MailTemplate: $template :X-W5MailTemplate\n";
+         }
+         if ($opmode ne ""){
+            $mail.="X-W5OPMode: $opmode :X-W5OPMode\n";
+         }
          $mail.="Mime-Version: 1.0\n";
          msg(DEBUG,"SMTP Message Header Size: ".length($mail));
          if (length($mail)>25000){

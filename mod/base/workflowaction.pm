@@ -462,6 +462,7 @@ sub NotifyForward
    my $fwdname=shift;
    my $comments=shift;
    my %param=@_;
+   my $emailcategory=["NotifyForward"];
 
    $param{mode}="FW:" if (!defined($param{mode}));  # default ist forward
 
@@ -588,6 +589,11 @@ sub NotifyForward
            $workflowname);
       }
    }
+   if ($param{mode} ne ""){
+      my $modecategory=$param{mode};
+      $modecategory=~s/:$//;
+      push(@$emailcategory,"ForwardMode:$modecategory");
+   }
    
    my $url=$self->getAbsolutByIdUrl($wfheadid,{dataobj=>'base::workflow'});
 
@@ -653,6 +659,7 @@ sub NotifyForward
    if (!($labelhead=~m/:$/)){
       $labelhead.=":";
    }
+   
 
    if (my $id=$wf->Store(undef,{
            class    =>'base::workflow::mailsend',
@@ -664,6 +671,7 @@ sub NotifyForward
            emailhead=>$labelhead,
            emailpostfix=>$emailpostfix,
            emailtext=>$comments,
+           emailcategory=>$emailcategory
           })){
       my %d=(step=>'base::workflow::mailsend::waitforspool');
       my $r=$wf->Store($id,%d);

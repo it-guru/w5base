@@ -2738,6 +2738,13 @@ sub externalMailHandler
       }
       $notiy{emailto}=\@t;
       $notiy{emailcc}=\@c;
+      $notiy{emailcategory}=["W5Base","W5BaseMail"];
+      if ($parent ne ""){
+         push(@{$notiy{emailcategory}},"DataObj:$parent");
+      }
+      if ($id ne ""){
+         push(@{$notiy{emailcategory}},"DataID:$id");
+      }
       if (Query->Param("senderbcc") ne ""){
          my $userid=$self->getCurrentUserId();
          my $UserCache=$self->Cache->{User}->{Cache};

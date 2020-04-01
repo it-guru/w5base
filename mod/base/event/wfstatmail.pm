@@ -323,6 +323,7 @@ sub sendNotify
       $rec{name}.=" (".$rec{additional}->{totaljobs}.")";
    }
    $rec{emailtemplate}='wfstatmail';
+   $rec{emailcategory}=['WorkflowStatus'];
    #$rec{emailcc}=['hartmut.vogler@t-systems.com'];
    #       emaillang     =>$lang,
 
