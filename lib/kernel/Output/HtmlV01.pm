@@ -100,10 +100,8 @@ sub ProcessHead
          "src=\"../../../public/base/load/toolbox.js\"></script>\n";
    $d.="<script language=JavaScript type=\"text/javascript\" ".
          "src=\"../../../public/base/load/url.js\"></script>\n";
-       "</script>\n";
    $d.="<script language=JavaScript type=\"text/javascript\" ".
          "src=\"../../../public/base/load/OutputHtml.js\"></script>\n";
-       "</script>\n";
    $d.=$self->{fieldsPageHeader};
 
 
@@ -153,6 +151,7 @@ sub ProcessHead
       $d.="var SortTableResultTable;\n";
       $d.="addEvent(window,\"load\",checkHtmlNativeControlBar);\n";
       $d.="addEvent(window,\"load\",InitTabResultTable);\n";
+      $d.="addEvent(window,\"load\",addClipIconFunc);\n";
       $d.="function checkHtmlNativeControlBar(){\n";
       $d.=" var e=document.getElementById(\"HtmlNativeControlBar\");\n";
       $d.=" if (window.top == window.self){\n";
@@ -192,6 +191,9 @@ sub ProcessHead
       $d.="}\n";
       $d.="</script>\n";
    }
+   $d.="<script language=JavaScript>\n";
+   $d.="addEvent(window,\"load\",addClipIconFunc);\n";
+   $d.="</script>\n";
 
    $d.="<table class=datatable id=ResultTable width=\"100%\">\n".
        "<thead><tr class=headline>";
@@ -421,7 +423,13 @@ sub ProcessLine
          my $cl=$rec->{fclick};
          $cl=~s/"/&quot;/g;
          $d.=" onClick=\"$cl\"" if ($rec->{fclick} ne "");
-         $d.=" style=\"$rec->{style}\"$rec->{nowrap}>".$rec->{data}."</td>\n";
+         $d.=" style=\"$rec->{style}\"$rec->{nowrap}>".$rec->{data};
+         if (trim($rec->{data}) ne ""){
+            $d.="<div class=clipicon>".
+                "<img src=\"../../base/load/edit_copy.gif\">".
+                "</div>\n";
+         }
+         $d.="</td>\n";
       }
    }
    $d.="</tr>\n";

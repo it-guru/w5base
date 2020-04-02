@@ -133,6 +133,23 @@ table.datatable thead tr th{
    z-index: 5;
 }
 
+div.clipicon {
+  position: absolute;
+  display: inline-block;
+  top:0;
+  right:0;
+  z-index:99;
+}
+
+div.clipicon img {
+  opacity: 0;
+  transition: opacity .5s, top .5s;
+}
+
+div.clipicon:hover img {
+  opacity: 1;
+}
+
 
 a.viewselect{
    cursor:pointer;
@@ -152,6 +169,7 @@ td.datafield{
    padding-right:5px;
    width:15%;
    vertical-align:top;
+   position: relative;
 }
 th.headfield{
    padding-left:5px;
