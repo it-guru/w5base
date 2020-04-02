@@ -10,3 +10,4 @@
 'more'=>{de=>'weitere'},
 'click to see full list'=>{de=>'klicken Sie hier, um die vollständige Liste zu erhalten'},
 'Access to this report is not granted, because the minimum count of analysed users of %d is not reached.'=>{de=>'Der Zugriff auf diesen Report ist nicht gestattet, da die minimale Anzahl der Ausgewerteten Nutzer/Mitarbeiter von %d nicht erreicht wurde.'},
+'No statistic informations recorded'=>{de=>'Keine aufgezeichneten Statistikinfomrationen vorhanden'},

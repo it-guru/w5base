@@ -1029,8 +1029,41 @@ EOF
       
       $Y=$year;
       $M=$mon;
+
       $dstrange=sprintf("%04d%02d",$year,$mon);
       $altdstrange=sprintf("%04d%02d",$altyear,$altmon);
+      if (1){   # check if a group stat record is available for cherren month
+         $self->ResetFilter();
+         $self->SecureSetFilter({
+            sgroup=>"Group",
+            dstrange=>\$dstrange,
+            statstream=>\'default'
+         });
+         $self->Limit(3);
+         my @l=$self->getHashList(qw(-dstrange sgroup id));
+         if ($#l==-1){
+            $self->ResetFilter();
+            $self->SecureSetFilter({
+               sgroup=>"Group",
+               dstrange=>"!*KW*",
+               mdate=>'>now-3M',
+               statstream=>\'default'
+            });
+            my @l=$self->getHashList(qw(-dstrange sgroup id));
+            if ($#l==-1){
+               print "<tr><td valign=top><br><b>".
+                     $self->T("No statistic informations recorded").
+                     "</b></td></tr>";
+               print "</table>";
+               print $self->HtmlBottom(body=>1,form=>1);
+               return();
+            }
+            else{
+               $dstrange=$l[0]->{dstrange};
+               $altdstrange=$l[0]->{dstrange};
+            }
+         }
+      }
    }
 
 
