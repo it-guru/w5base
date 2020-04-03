@@ -805,6 +805,15 @@ sub processRecord
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "Base.Total.User.Count",1);
       }
+      my %grpnames;
+      foreach my $grp (@{$rec->{groups}}){
+         my $roles=$grp->{roles};
+         $roles=[$roles] if (ref($roles) ne "ARRAY");
+         if (in_array($roles,[orgRoles(),"RMember"])){
+            $grpnames{$grp->{group}}++;
+         }
+      }
+      $self->getParent->storeStatVar("Group",[keys(%grpnames)],{},"User",1);
    }
    elsif ($module eq "base::grp"){
       my $name=$rec->{fullname};
@@ -826,7 +835,6 @@ sub processRecord
       $self->getParent->storeStatVar("Group",$name,{maxlevel=>0},
                                      "SubGroups",$subunitcount);
 
-      $self->getParent->storeStatVar("Group",$name,{},"User",$userscount);
       $self->getParent->storeStatVar("Group",$name,{maxlevel=>0},
                                      "User.Direct",$userscount);
 
