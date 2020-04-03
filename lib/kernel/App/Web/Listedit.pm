@@ -2041,9 +2041,10 @@ sub Detail
 {
    my $self=shift;
    my %param=@_;
-
    if ($ENV{REQUEST_METHOD} eq "GET"){  # try to convert GET to POST
       my %param=Query->MultiVars();
+      delete($param{MOD});  # MOD and FUNC are genered from W5Base-Kernel - this
+      delete($param{FUNC}); # makes no sense to forward them.
       $self->HtmlGoto("Detail",post=>\%param);
       return();
    }

@@ -1496,8 +1496,15 @@ sub HtmlGoto
 <form method=post action="$target">
 EOF
    if (defined($param{post})){
-      foreach my $k (%{$param{post}}){
-         printf("<input type=hidden name=$k value=\"%s\">",$param{post}->{$k});
+      foreach my $k (keys(%{$param{post}})){
+         if ($k=~m/^[a-z0-9_-]+$/i){  # forward only allowed param names
+            my $paramval=$param{post}->{$k};
+            $paramval=~s/"/&quot;/g;
+            my $paramname=$k;
+            $paramname=~s/"/&quot;/g;
+            printf("<input type=hidden name=\"%s\" value=\"%s\">",
+                   $paramname,$paramval);
+         }
       }
    }
    print <<EOF;
