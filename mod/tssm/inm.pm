@@ -80,6 +80,7 @@ sub new
                 name          =>'dstobj',
                 group         =>'amdst',
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'AMObj',
                 dataobjattr   =>
                      tssm::lib::io::getAMObjDecode( SELpref."device2m1.type")),
@@ -96,6 +97,7 @@ sub new
                 name          =>'dstamname',
                 group         =>'amdst',
                 htmldetail    =>0,
+                searchable    =>0,
                 label         =>'AMName',
                 altnamestore  =>'dstraw',
                 htmlwidth     =>'200',
@@ -117,6 +119,7 @@ sub new
                 name          =>'dstid',
                 group         =>'amdst',
                 label         =>'AMID',
+                searchable    =>0,
                 htmldetail    =>0,
                 dataobjattr   =>SELpref."device2m1.id"),
 
