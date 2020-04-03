@@ -53,3 +53,4 @@
 'Description'=>{de=>'Beschreibung'},
 'Incident create'=>{de=>'Incident erstellen'},
 'affected services'=>{de=>'betroffene Services'},
+'W5Base TSM deputy'=>{de=>'W5Base TSM Vertreter'},

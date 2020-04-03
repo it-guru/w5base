@@ -718,6 +718,17 @@ sub new
                 vjoinon       =>['tsm2id'=>'userid'],
                 vjoindisp     =>'email'),
 
+      new kernel::Field::TextDrop(
+                name          =>'tsm2posix',
+                group         =>'technical',
+                label         =>'Deputy Technical Solution Manager POSIX',
+                vjointo       =>'base::user',
+                searchable    =>0,
+                htmldetail    =>0,
+                readonly      =>1,
+                vjoinon       =>['tsm2id'=>'userid'],
+                vjoindisp     =>'posix'),
+
       new kernel::Field::Link(
                 name          =>'tsm2id',
                 group         =>'technical',

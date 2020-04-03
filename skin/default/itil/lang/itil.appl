@@ -29,6 +29,7 @@
 'Technical Solution Manager Office-Phone'=>{de=>'Technical Solution Manager Telefonnummer'},
 'Technical Solution Manager Mobile-Phone'=>{de=>'Technical Solution Manager Handy-Nummer'},
 'Deputy Technical Solution Manager E-Mail'=>{de=>'TSM Vertreter E-Mail'},
+'Deputy Technical Solution Manager POSIX'=>{de=>'TSM Vertreter POSIX'},
 'Application name'=>{de=>'Anwendungsname'},
 'Application Group'=>{de=>'Anwendungsgruppe'},
 'Application Description'=>{de=>'Anwendungsbeschreibung'},

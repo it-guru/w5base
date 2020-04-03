@@ -356,6 +356,15 @@ sub new
                 depend        =>[qw(devicename dstobj dstid)]),
 
       new kernel::Field::Text(
+                name          =>'w5base_tsm2posix',
+                searchable    =>0,
+                htmldetail    =>0,
+                group         =>'w5basedata',
+                label         =>'W5Base TSM deputy',
+                onRawValue    =>\&AddW5BaseData,
+                depend        =>[qw(devicename dstobj dstid)]),
+
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
@@ -432,19 +441,22 @@ sub AddW5BaseData
       }
       my %appl;
       my %tsmposix;
+      my %tsm2posix;
       if ($#flt!=-1){
          $w5appl->ResetFilter();
          $w5appl->SetFilter(\@flt);
-         my @l=$w5appl->getHashList(qw(name tsmposix));
+         my @l=$w5appl->getHashList(qw(name tsmposix tsm2posix));
          foreach my $arec (@l){
             $appl{$arec->{name}}++ if ($arec->{name} ne "");
             $tsmposix{$arec->{tsmposix}}++ if ($arec->{tsmposix} ne "");
+            $tsm2posix{$arec->{tsm2posix}}++ if ($arec->{tsm2posix} ne "");
 
          }
       }
       my %l;
       $l{w5base_appl}=[sort(keys(%appl))];
       $l{w5base_tsmposix}=[sort(keys(%tsmposix))];
+      $l{w5base_tsm2posix}=[sort(keys(%tsm2posix))];
       $c->{W5BaseRel}->{$cachekey}=\%l;
    }
    return($c->{W5BaseRel}->{$cachekey}->{$self->Name});
