@@ -4,6 +4,10 @@
 'fieldgroup.contact'=>{de=>'Incident-Kontaktdaten',en=>'Incident-Contacts'},
 'fieldgroup.close'=>{de=>'Abschluss Informationen',en=>'Closing Informations'},
 'fieldgroup.relations'=>{de=>'Verknüpfungen',en=>'Relations'},
+'fieldgroup.w5basedata'=>{de=>'W5Base/Darwin Daten',
+                          en=>'W5Base/Darwin Data'},
+'fieldgroup.amdst'=>{de=>'SACM Zielverknüpfung',en=>'SACM Destination Relation'},
+
 'Brief Description'=>{de=>'Kurzbeschreibung'},
 'Created'=>{de=>'Erstellt'},
 'Closing time'=>{de=>'Abschlusszeitpunkt'},

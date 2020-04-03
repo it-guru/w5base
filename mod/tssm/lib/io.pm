@@ -1221,5 +1221,22 @@ sub identifyW5UserFromOperator
 }
 
 
+sub getAMObjDecode
+{
+   my $depend=shift;
+
+   return(
+          "decode($depend,".
+               "'application','tsacinv::appl',".
+               "'computer','tsacinv::system',".
+               "'networkcomponents','tsacinv::system',".
+               "'generic','tsacinv::asset',".
+               "'runningsoftware','tsacinv::swinstance',".
+               "NULL)"
+       );
+}
+
+
+
 
 1;

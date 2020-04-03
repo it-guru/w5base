@@ -74,6 +74,16 @@ sub new
                 label         =>'DeviceID',
                 dataobjattr   =>SELpref.'probsummarym1.logical_name'),
 
+
+
+     new kernel::Field::Text(
+                name          =>'dstobj',
+                group         =>'amdst',
+                htmldetail    =>0,
+                label         =>'AMObj',
+                dataobjattr   =>
+                     tssm::lib::io::getAMObjDecode( SELpref."device2m1.type")),
+
       new kernel::Field::Text(
                 name          =>'devicename',
                 label         =>'Devicename',
@@ -81,6 +91,36 @@ sub new
                 vjoinon       =>['deviceid'=>'deviceid'],
                 vjoindisp     =>'fullname',
                 dataobjattr   =>SELpref.'probsummarym1.tsi_ci_name'),
+
+     new kernel::Field::MultiDst (
+                name          =>'dstamname',
+                group         =>'amdst',
+                htmldetail    =>0,
+                label         =>'AMName',
+                altnamestore  =>'dstraw',
+                htmlwidth     =>'200',
+                dst           =>[
+                                 'tsacinv::system'=>'fullname',
+                                 'tsacinv::appl'=>'fullname',
+                                 'tsacinv::asset'=>'fullname',
+                                ],
+                dsttypfield   =>'dstobj',
+                dstidfield    =>'dstid'),
+
+     new kernel::Field::Link(
+                name          =>'dstraw',
+                group         =>'amdst',
+                label         =>'AM Name',
+                dataobjattr   =>SELpref."device2m1.title"),
+
+     new kernel::Field::Text(
+                name          =>'dstid',
+                group         =>'amdst',
+                label         =>'AMID',
+                htmldetail    =>0,
+                dataobjattr   =>SELpref."device2m1.id"),
+
+
 
 ##      new kernel::Field::Text(
 ##                name          =>'custapplication',
@@ -298,6 +338,24 @@ sub new
                 dataobjattr   =>SELpref.'probsummarym1.assignee_name'),
 
       new kernel::Field::Text(
+                name          =>'w5base_appl',
+                group         =>'w5basedata',
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'W5Base Application',
+                onRawValue    =>\&AddW5BaseData,
+                depend        =>[qw(devicename dstobj dstid)]),
+
+      new kernel::Field::Text(
+                name          =>'w5base_tsmposix',
+                searchable    =>0,
+                htmldetail    =>0,
+                group         =>'w5basedata',
+                label         =>'W5Base TSM',
+                onRawValue    =>\&AddW5BaseData,
+                depend        =>[qw(devicename dstobj dstid)]),
+
+      new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
@@ -318,6 +376,82 @@ sub new
                             downtimestart downtimeend status name));
    return($self);
 }
+
+
+sub AddW5BaseData
+{
+   my $self=shift;
+   my $current=shift;
+   my $dstobj=$current->{dstobj};
+   my $dstid=$current->{dstid};
+   my $cachekey=$current->{devicename};
+
+   my $app=$self->getParent();
+   my $c=$self->getParent->Context();
+   return(undef) if (!defined($cachekey) || $cachekey eq "");
+   if (!defined($c->{W5BaseRel}->{$cachekey})){
+      my $w5sys=$app->getPersistentModuleObject("W5BaseSys","itil::system");
+      my $w5appl=$app->getPersistentModuleObject("W5BaseAppl","itil::appl");
+      my @applid;
+      my @applapplid;
+      if ($dstobj eq "tsacinv::appl" && $dstid ne ""){
+         push(@applapplid,$dstid);
+      }
+      my @systemid;
+      if ($dstobj eq "tsacinv::system" && $dstid ne ""){
+         push(@systemid,$dstid);
+      }
+      my ($applapplidfromkey)=$cachekey=~m/\((A\d+)\)$/;
+      if (($#applapplid==-1) && $applapplidfromkey ne ""){
+         push(@applapplid,$applapplidfromkey);
+      }
+      my ($systemidfromkey)=$cachekey=~m/\((S\d+)\)$/;
+      if (($#systemid==-1) && $systemidfromkey ne ""){
+         push(@systemid,$systemidfromkey);
+      }
+      if ($#systemid!=-1){
+         $w5sys->ResetFilter();
+         $w5sys->SetFilter({systemid=>\@systemid});
+         my ($rec,$msg)=$w5sys->getOnlyFirst(qw(applications));
+         my %l=();
+         if (defined($rec)){
+            if (defined($rec->{applications}) &&
+                ref($rec->{applications}) eq "ARRAY"){
+               foreach my $app (@{$rec->{applications}}){
+                  push(@applid,$app->{applid}) if ($app->{applid} ne "");
+               }
+            }
+         }
+      }
+      my @flt;
+      if ($#applid!=-1){
+         push(@flt,{id=>\@applid});
+      }
+      if ($#applapplid!=-1){
+         push(@flt,{applid=>\@applapplid});
+      }
+      my %appl;
+      my %tsmposix;
+      if ($#flt!=-1){
+         $w5appl->ResetFilter();
+         $w5appl->SetFilter(\@flt);
+         my @l=$w5appl->getHashList(qw(name tsmposix));
+         foreach my $arec (@l){
+            $appl{$arec->{name}}++ if ($arec->{name} ne "");
+            $tsmposix{$arec->{tsmposix}}++ if ($arec->{tsmposix} ne "");
+
+         }
+      }
+      my %l;
+      $l{w5base_appl}=[sort(keys(%appl))];
+      $l{w5base_tsmposix}=[sort(keys(%tsmposix))];
+      $c->{W5BaseRel}->{$cachekey}=\%l;
+   }
+   return($c->{W5BaseRel}->{$cachekey}->{$self->Name});
+
+}
+
+
 
 sub getResolvAssignment
 {
@@ -400,7 +534,8 @@ sub Initialize
 sub getDetailBlockPriority                # posibility to change the block order
 {
    my $self=shift;
-   return(qw(header default status relations contact close source));
+   return(qw(header default status relations contact close amdst
+             w5basedata source));
 }
 
 
@@ -408,8 +543,10 @@ sub getDetailBlockPriority                # posibility to change the block order
 sub getSqlFrom
 {
    my $self=shift;
-   #my $from="probsummarym1,probsummarym1,probsummarya1,probsummarya5";
-   my $from=TABpref."probsummarym1 ".SELpref."probsummarym1";
+
+   my $from=TABpref."probsummarym1 ".SELpref."probsummarym1 ".
+         "left outer join ".TABpref."device2m1 ".SELpref."device2m1 ".
+         "on ".SELpref."probsummarym1.tsi_ci_name=".SELpref."device2m1.ci_name";
    return($from);
 }
 
@@ -434,7 +571,8 @@ sub isViewValid
    if (defined($rec)){
       $st=$rec->{status};
    }
-   my @l=qw(header default status relations contact close source);
+   my @l=qw(header default status relations contact close w5basedata 
+            amdst source);
 
    if ($rec->{srcsys} ne ""){
       push(@l,"source");

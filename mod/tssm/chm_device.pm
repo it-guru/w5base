@@ -119,7 +119,8 @@ sub new
                 name          =>'dstobj',
                 group         =>'amdst',
                 label         =>'Destination-AMObj',
-                dataobjattr   =>getAMObjDecode( SELpref."device2m1.type")),
+                dataobjattr   =>
+                     tssm::lib::io::getAMObjDecode( SELpref."device2m1.type")),
 
      new kernel::Field::MultiDst (
                 name          =>'dstamname',
@@ -173,22 +174,6 @@ sub getDetailBlockPriority                # posibility to change the block order
 sub isQualityCheckValid
 {
    return(0);
-}
-
-
-sub getAMObjDecode
-{
-   my $depend=shift;
-
-   return(
-          "decode($depend,".
-               "'application','tsacinv::appl',".
-               "'computer','tsacinv::system',".
-               "'networkcomponents','tsacinv::system',".
-               "'generic','tsacinv::asset',".
-               "'runningsoftware','tsacinv::swinstance',".
-               "NULL)"
-       );
 }
 
 
