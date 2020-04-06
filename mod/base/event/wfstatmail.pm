@@ -283,6 +283,8 @@ sub SendMyJobs
                                     emailpostfix=>\@emailpostfix,
                                     emailprefix=>\@emailprefix,
                                     emailsubtitle=>\@emailsubtitle,
+                                    emailcategory =>['W5Base',
+                                                     'WorkflowStatus'],
                                     additional=>{contact=>$urec->{fullname},
                                                  wfcount=>$wfcount,
                                                  totaljobs=>$totaljobs,
