@@ -335,7 +335,10 @@ sub doNotify
          emailbcc=>[
    #         11634953080001,   # HV
             12663941300002    # Roland
-         ]
+         ],
+         emailcategory =>['Qualys',
+                          'tssiem::event::SSLcertMon',
+                          'SSLCertificateNearExpired']
       );
    }
    if ($lastlang ne ""){

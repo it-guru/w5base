@@ -278,6 +278,9 @@ sub doNotify
       $wfa->Notify("INFO",$subject,$tmpl, 
          emailto=>\@emailto, 
          emailcc=>\@emailcc, 
+         emailcategory =>['Qualys',
+                          'tssiem::event::SecScanMon',
+                          'NewSecScan'],
          emailbcc=>[
          #   11634953080001, # HV
             12663941300002  # Roland
