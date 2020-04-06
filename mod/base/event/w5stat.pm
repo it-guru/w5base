@@ -345,6 +345,7 @@ sub sendOverviewData
           emaillang     =>$lang,
           emailfrom     =>$emailto,
           emailtext     =>\@emailtext,
+          emailcategory =>['W5Base','WorkflowStatus','w5stat'],
           emailto       =>$emailto,
           emailfrom     =>'"'.$sitename.'"'." <>",
           additional    =>{
