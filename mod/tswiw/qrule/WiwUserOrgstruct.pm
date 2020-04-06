@@ -638,7 +638,10 @@ sub NotifyNewTeamRelation
               name     =>$subject,
               %adr,
               emailhead=>$label,
-              emailtext=>$mailtext
+              emailtext=>$mailtext,
+              emailcategory =>['WIW',
+                               'tswiw::qrule::WiwUserOrgstruct',
+                               'NewOrgRelation']
              })){
          my %d=(step=>'base::workflow::mailsend::waitforspool');
          my $r=$wf->Store($id,%d);
