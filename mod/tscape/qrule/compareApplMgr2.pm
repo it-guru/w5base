@@ -124,30 +124,24 @@ sub qcheckRecord
             $lnkcontact=getModuleObject($self->getParent->Config,
                                                  "base::lnkcontact");
          #}
-         my $pmexists=0;
+         my $am2exists=0;
          foreach my $crec (@{$rec->{contacts}}){
             my $roles=$crec->{roles};
             $roles=[$roles] if (ref($roles) ne "ARRAY");
             if (in_array($roles,"applmgr2")){
-               $pmexists++;
+               $am2exists++;
             }
          }
-         if (!$pmexists){    # Wenn in Darwin kein Projektmanager erfasst, dann
-            $autocorrect=1;  # darf der PM direkt aus CAPE übernommen werden.
-         }                   # request: 14151779290001
- 
-         $autocorrect=1;     # Nach einer Meinungsänderung von Peter soll nun
-                             # mit dem Request 14447420560003 der 
-                             # Projektmanager IMMER hart übernommen werden.
+         $autocorrect=1; 
  
          foreach my $amid (@am_soll){
-            my $pmfound=0;
+            my $am2found=0;
             foreach my $crec (@{$rec->{contacts}}){
                my $roles=$crec->{roles};
                $roles=[$roles] if (ref($roles) ne "ARRAY");
                if ($crec->{target} eq "base::user" &&
                    $crec->{targetid} eq $amid){
-                  $pmfound=1;
+                  $am2found=1;
                   if (!in_array($roles,"applmgr2")){
                      if ($autocorrect){
                         push(@notifymsg,sprintf(
@@ -171,7 +165,7 @@ sub qcheckRecord
                   }
                }
             }
-            if (!$pmfound){
+            if (!$am2found){
                my $user=getModuleObject($self->getParent->Config,"base::user");
                $user->SetFilter({userid=>\$amid});
                my ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
