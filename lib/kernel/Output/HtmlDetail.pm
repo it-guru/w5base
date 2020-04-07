@@ -170,7 +170,9 @@ function onResize()
 
 }
 addEvent(window, "load",   onNew);
-addEvent(window, "resize",   onResize);
+addEvent(window, "resize", onResize);
+addEvent(window, "load",   add_clipIconFunc);
+
 
 EOF
    $d.="</script>\n\n";
@@ -711,6 +713,7 @@ EOF
 <div style="text-align:$align;width:100%;overflow:hidden">
                           \%$name(detail)\%</div>
 </td></tr></table>
+<div class=clipicon><img title="copy" src="../../base/load/edit_copy.gif"></div>
 </td>
 EOF
                      $CurMatrixCol++;
@@ -727,6 +730,7 @@ EOF
 <div style="width:100%;overflow:hidden">
                           \%$name(detail)\%</div>
 </td></tr></table>
+<div class=clipicon><img title="copy" src="../../base/load/edit_copy.gif"></div>
 </td>
 EOF
                   }

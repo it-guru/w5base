@@ -398,6 +398,26 @@ img.printspacer{
 } 
 
 
+div.clipicon {
+  position: absolute;
+  display: inline-block;
+  top:0;
+  right:0;
+  z-index:99;
+}
+
+div.clipicon img {
+  opacity: 0;
+  transition: opacity .5s, top .5s;
+}
+
+div.clipicon:hover img {
+  opacity: 1;
+}
+
+
+
+
 
 @media print{
    div.HtmlDetailIndex{

@@ -76,6 +76,7 @@ td.finput{
    border-color:silver;
    padding-left:3px;
    padding-right:5px;
+   position:relative;
 }
 td.containerfname{
    white-space:nowrap;
@@ -192,6 +193,31 @@ input.finput{
    padding-left:2px;
    padding-right:2px;
 }
+
+div.clipicon {
+  position: absolute;
+  display: inline-block;
+  top:0;
+  right:0;
+  z-index:99;
+  cursor:pointer;
+}
+
+.finput div.clipicon {
+  top:3;
+}
+
+
+div.clipicon img {
+  opacity: 0;
+  transition: opacity .5s, top .5s;
+}
+
+div.clipicon:hover img {
+  opacity: 1;
+}
+
+
 
 a.button:link    {
             font-family:Arial,Adobe Helvetica,Helvetica;

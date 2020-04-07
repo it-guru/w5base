@@ -139,6 +139,11 @@ div.clipicon {
   top:0;
   right:0;
   z-index:99;
+  cursor:pointer;
+}
+
+.datafield > div.clipicon {
+  top:3;
 }
 
 div.clipicon img {

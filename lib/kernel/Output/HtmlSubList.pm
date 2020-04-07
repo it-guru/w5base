@@ -404,7 +404,14 @@ sub ProcessLine
       $data="&nbsp;" if ($data=~m/^\s*$/);
       $d.=" style=\"$style\"";
       $d.=" title=\"$weblinkname\"";
-      $d.="$nowrap>".$data."</td>\n";
+      $d.="$nowrap>".$data;
+         if (trim($data) ne ""){
+            $d.="<div class=clipicon>".
+                "<img title=\"copy\" src=\"../../base/load/edit_copy.gif\">".
+                "</div>\n";
+         }
+      $d.="</td>\n";
+
    }
    $d.="</tr>\n";
    $self->{lineclass}++;

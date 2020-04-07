@@ -151,7 +151,6 @@ sub ProcessHead
       $d.="var SortTableResultTable;\n";
       $d.="addEvent(window,\"load\",checkHtmlNativeControlBar);\n";
       $d.="addEvent(window,\"load\",InitTabResultTable);\n";
-      $d.="addEvent(window,\"load\",addClipIconFunc);\n";
       $d.="function checkHtmlNativeControlBar(){\n";
       $d.=" var e=document.getElementById(\"HtmlNativeControlBar\");\n";
       $d.=" if (window.top == window.self){\n";
@@ -192,7 +191,7 @@ sub ProcessHead
       $d.="</script>\n";
    }
    $d.="<script language=JavaScript>\n";
-   $d.="addEvent(window,\"load\",addClipIconFunc);\n";
+   $d.="addEvent(window,\"load\",add_clipIconFunc);\n";
    $d.="</script>\n";
 
    $d.="<table class=datatable id=ResultTable width=\"100%\">\n".
@@ -426,7 +425,7 @@ sub ProcessLine
          $d.=" style=\"$rec->{style}\"$rec->{nowrap}>".$rec->{data};
          if (trim($rec->{data}) ne ""){
             $d.="<div class=clipicon>".
-                "<img src=\"../../base/load/edit_copy.gif\">".
+                "<img title=\"copy\" src=\"../../base/load/edit_copy.gif\">".
                 "</div>\n";
          }
          $d.="</td>\n";
