@@ -379,6 +379,7 @@ sub Import
             $notifyParam{emailcc}=$cloudrec->{supportid};
          }
          push(@{$notifyParam{emailcategory}},"SystemImport");
+         push(@{$notifyParam{emailcategory}},"ImportFail");
          push(@{$notifyParam{emailcategory}},"OTC");
 
          $itcloud->NotifyWriteAuthorizedContacts($cloudrec,

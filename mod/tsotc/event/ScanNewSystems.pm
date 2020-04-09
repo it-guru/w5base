@@ -259,6 +259,7 @@ sub doNotify
 
 
    $w5sys->NotifyWriteAuthorizedContacts($rec,{},{
+             emailcategory=>['OTC','SystemImport'],
              emailbcc=>[
                11634953080001, # HV
             ]
