@@ -73,6 +73,28 @@ sub Init
                       "tRnAI::usbsrvport",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.RnAI.instance",
+                      "tRnAI::instance",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.RnAI.instance.new",
+                      "tRnAI::instance",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.RnAI.instance.lnklic",
+                      "tRnAI::lnkinstlic",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.RnAI.license",
+                      "tRnAI::license",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.RnAI.license.new",
+                      "tRnAI::license",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

@@ -7,3 +7,8 @@
 'Tools.RnAI.usbsrv'=>{de=>'USB-Server',en=>'USB-Server'},
 'Tools.RnAI.usbsrv.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.RnAI.usbsrv.port'=>{de=>'Port',en=>'Port'},
+'Tools.RnAI.instance'=>{de=>'Instanz',en=>'Instance'},
+'Tools.RnAI.instance.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.RnAI.instance.lnklic'=>{de=>'Verkn. Lizenz',en=>'Link License'},
+'Tools.RnAI.license'=>{de=>'Lizenz',en=>'License'},
+'Tools.RnAI.license.new'=>{de=>'Neueingabe',en=>'New'},

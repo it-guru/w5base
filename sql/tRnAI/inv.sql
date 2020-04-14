@@ -102,3 +102,61 @@ create table tRnAI_lnkuseraccountsystem(
   FOREIGN KEY (system) REFERENCES tRnAI_system (id) ON DELETE CASCADE,
   FOREIGN KEY (useraccount) REFERENCES tRnAI_useraccount (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table tRnAI_instance(
+  id              bigint(20)   NOT NULL,
+  name            varchar(128) NOT NULL,
+  system          bigint(20),
+  software        bigint(20),
+  subcustomer     varchar(40),
+  iusage          varchar(20),
+  contact         bigint(20),
+  contact2        bigint(20),
+  tcpport         int(20),
+  additional longtext    default NULL,
+  comments   longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  FOREIGN KEY (system)  REFERENCES tRnAI_system (id) ON DELETE RESTRICT,
+  unique(name)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table tRnAI_license(
+  id         bigint(20)   NOT NULL,
+  fullname   varchar(128) NOT NULL,
+  name       varchar(40) NOT NULL,
+  ponum      varchar(40),
+  plmnum     varchar(40),
+  units      int(20),
+  expdate    datetime,
+  additional longtext    default NULL,
+  comments   longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  unique(fullname)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+create table tRnAI_lnkinstlic(
+  id         bigint(20)   NOT NULL,
+  instance   bigint(20)   NOT NULL,
+  license    bigint(20)   NOT NULL,
+  additional longtext     default NULL,
+  comments   longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  unique(instance,license),
+  FOREIGN KEY (instance) REFERENCES tRnAI_instance (id) ON DELETE CASCADE,
+  FOREIGN KEY (license)  REFERENCES tRnAI_license (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
