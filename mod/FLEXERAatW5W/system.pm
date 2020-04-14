@@ -19,10 +19,9 @@ package FLEXERAatW5W::system;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::App::Web;
-use kernel::DataObj::DB;
+use FLEXERAatW5W::lib::Listedit;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+@ISA=qw(FLEXERAatW5W::lib::Listedit);
 
 sub new
 {
@@ -235,42 +234,6 @@ sub checkIfVM
    return(0) if (!defined($current));
    return(1) if ($current->{is_vm});
    return(0);
-}
-
-
-
-sub isQualityCheckValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(0);
-}
-
-
-sub initSqlWhere
-{
-   my $self=shift;
-   my $where="";
-
-   my $userid=$self->getCurrentUserId();
-   $userid=-1 if (!defined($userid) || $userid==0);
-
-   if ($self->isDataInputFromUserFrontend()){
-      if (!$self->IsMemberOf([qw(admin
-                                 w5base.tsflexera.read
-                              )],
-          "RMember") &&
-          !$self->IsMemberOf([qw(
-                                 DTAG.GHQ.VTI.DTIT.E.E-DTO.E-DTOPL
-                              )],
-          "RMember","up") ){
-         $where="(BEACONID is null ".
-                "or BEACONID='DEU0360DEVLAB' ".
-                "or BEACONID='DEU0360WSICTS')";
-      }
-   }
-
-   return($where);
 }
 
 

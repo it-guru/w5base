@@ -19,10 +19,10 @@ package FLEXERAatW5W::instpkgsoftware;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::App::Web;
-use kernel::DataObj::DB;
+use FLEXERAatW5W::lib::Listedit;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+@ISA=qw(FLEXERAatW5W::lib::Listedit);
+
 
 sub new
 {
@@ -133,16 +133,6 @@ sub new
 }
 
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5warehouse"));
-   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
-   return(1) if (defined($self->{DB}));
-   return(0);
-}
-
 sub getSqlFrom
 {
    my $self=shift;
@@ -172,8 +162,6 @@ sub initSearchQuery
 
 
 
-
-
 #sub getRecordImageUrl
 #{
 #   my $self=shift;
@@ -181,15 +169,6 @@ sub initSearchQuery
 #   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 #}
          
-
-
-
-sub isQualityCheckValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(0);
-}
 
 
 
