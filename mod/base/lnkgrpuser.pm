@@ -96,8 +96,8 @@ sub new
             }
             if ($self->getParent->isDataInputFromUserFrontend()){
                if (!$self->getParent->IsMemberOf("admin")){
-                  my @allowed=(qw(RMember REmployee RReportReceive 
-                                  RBoss RBoss2 RTimeManager));
+                  my @allowed=(qw(RReportReceive RTimeManager RMember));
+                  push(@allowed,orgRoles());
                   my $removed=0;
                   foreach my $modlist ((\@addlist,\@dellist)){
                      my @rolechk=@$modlist;
@@ -108,6 +108,7 @@ sub new
                         }
                      } 
                   }
+
                   if ($removed){
                      $self->getParent->LastMsg(WARN,"some role changes are ".
                                        "not done - you are only Org-Admin");
