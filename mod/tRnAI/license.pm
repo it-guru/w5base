@@ -42,12 +42,6 @@ sub new
                 dataobjattr   =>'tRnAI_license.id'),
                                                   
       new kernel::Field::Text(
-                name          =>'fullname',
-                readonly      =>1,
-                label         =>'Lizense-Description',
-                dataobjattr   =>'tRnAI_license.fullname'),
-
-      new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Lizense-Label',
                 dataobjattr   =>'tRnAI_license.name'),
@@ -62,19 +56,34 @@ sub new
                 label         =>'PLM Ticket Number',
                 dataobjattr   =>'tRnAI_license.plmnum'),
 
+      new kernel::Field::Date(
+                name          =>'expdate',
+                label         =>'Expiry-Date',
+                dayonly       =>1,
+                dataobjattr   =>'tRnAI_license.expdate'),
+
+                                                  
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'tRnAI_license.comments'),
 
+      new kernel::Field::Text(
+                name          =>'fullname',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Lizense-Description',
+                dataobjattr   =>'tRnAI_license.fullname'),
 
-#      new kernel::Field::SubList(
-#                name          =>'usbports',
-#                label         =>'USB-Ports',
-#                group         =>'usbports',
-#                vjointo       =>\'tRnAI::licenseport',
-#                vjoinon       =>['id'=>'licenseid'],
-#                vjoindisp     =>['name','system']),
+
+      new kernel::Field::SubList(
+                name          =>'instances',
+                label         =>'Instances',
+                group         =>'instances',
+                subeditmsk    =>'subedit.instances',
+                vjointo       =>\'tRnAI::lnkinstlic',
+                vjoinon       =>['id'=>'licenseid'],
+                vjoindisp     =>['instance','system']),
 
 
       new kernel::Field::CDate(
@@ -117,7 +126,7 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(name tcpport cdate mdate));
+   $self->setDefaultView(qw(fullname expdate cdate mdate));
    $self->setWorktable("tRnAI_license");
    return($self);
 }
@@ -135,9 +144,7 @@ sub getRecordImageUrl
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(
-          qw(header default 
-             source));
+   return( qw(header default instances source));
 }
 
 
@@ -147,11 +154,41 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if ((!defined($oldrec) || defined($newrec->{name})) &&
-       (($newrec->{name}=~m/^\s*$/) || length($newrec->{name})<3)){
-      $self->LastMsg(ERROR,"invalid name specified");
+   my $fullname=effVal($oldrec,$newrec,"fullname");
+   my $name=effVal($oldrec,$newrec,"name");
+   my $ponum=effVal($oldrec,$newrec,"ponum");
+   my $plmnum=effVal($oldrec,$newrec,"plmnum");
+   if ($plmnum=~m/[^0-9]/){
+      $self->LastMsg(ERROR,"invalid PLM Ticket Number");
       return(0);
    }
+   if ($ponum=~m/[^0-9]/){
+      $self->LastMsg(ERROR,"invalid Purchase Order Number");
+      return(0);
+   }
+   $name=~s/\s/_/g;
+   $name=~s/-//g;
+   my $fname="";
+   $fname.=$name if ($name ne "");
+   if ($ponum ne ""){
+      $fname.="-" if ($fname ne "");
+      $fname.=$ponum;
+   }
+   if ($plmnum ne ""){
+      $fname.="-" if ($fname ne "");
+      $fname.=$plmnum;
+   }
+   if (trim($fname) eq ""){
+      $self->LastMsg(ERROR,
+               "missing necessary informations to create Lizense-Description");
+      return(0);
+   }
+   if (trim($fname) ne trim($fullname)){
+      $newrec->{fullname}=trim($fname);
+   }
+
+
+
    return(1);
 }
 
@@ -161,7 +198,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default);
+   my @wrgrp=qw(default instances);
 
    return(@wrgrp) if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
    return(undef);
@@ -174,7 +211,9 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    return("ALL") if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
-   return("header","default","source") if ($self->IsMemberOf(["w5base.RnAI.inventory.read"],undef,"direct"));
+   if ($self->IsMemberOf(["w5base.RnAI.inventory.read"],undef,"direct")){
+      return("header","default","instances","source");
+   }
    return(undef);
 }
 

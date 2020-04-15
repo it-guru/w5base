@@ -1,3 +1,8 @@
 'tRnAI::license'=>{de=>'Lizenz',en=>'License'},
+'fieldgroup.instances'=>{de=>'Instanzen',en=>'Instances'},
+'Instances'=>{de=>'Instanzen'},
 'Lizense-Description'=>{de=>'Lizenzbezeichnung'},
 'Lizense-Label'=>{de=>'Lizenze-Name'},
+'Purchase Order Number'=>{de=>'Bestellnummer'},
+'PLM Ticket Number'=>{de=>'PLM Ticket Nummer'},
+'Expiry-Date'=>{de=>'Verfallsdatum'},

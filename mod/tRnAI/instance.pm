@@ -60,7 +60,40 @@ sub new
       new kernel::Field::Number(
                 name          =>'tcpport',
                 label         =>'TCP-Port',
+                precision     =>'0',
+                editrange     =>[1,65535],
+                htmleditwidth =>'50px',
                 dataobjattr   =>'tRnAI_instance.tcpport'),
+
+      new kernel::Field::TextDrop(
+                name          =>'system',
+                label         =>'System',
+                vjointo       =>\'tRnAI::system',
+                vjoindisp     =>'name',
+                vjoinon       =>['systemid'=>'id']),
+
+      new kernel::Field::Link(
+                name          =>'systemid',
+                label         =>'SystemID',
+                dataobjattr   =>'tRnAI_instance.system'),
+
+
+      new kernel::Field::TextDrop(
+                name          =>'software',
+                label         =>'Software',
+                vjointo       =>\'itil::software',
+                vjoindisp     =>'name',
+                vjoinon       =>['softwareid'=>'id']),
+
+      new kernel::Field::Link(
+                name          =>'softwareid',
+                label         =>'SoftwareID',
+                dataobjattr   =>'tRnAI_instance.software'),
+
+      new kernel::Field::Text(
+                name          =>'softwareversion',
+                label         =>'Software Version',
+                dataobjattr   =>'tRnAI_instance.version'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -68,14 +101,38 @@ sub new
                 dataobjattr   =>'tRnAI_instance.comments'),
 
 
-#      new kernel::Field::SubList(
-#                name          =>'usbports',
-#                label         =>'USB-Ports',
-#                group         =>'usbports',
-#                vjointo       =>\'tRnAI::instanceport',
-#                vjoinon       =>['id'=>'instanceid'],
-#                vjoindisp     =>['name','system']),
+      new kernel::Field::TextDrop(
+                name          =>'customer',
+                label         =>'Customer',
+                readonly      =>1,
+                group         =>'cust',
+                vjointo       =>\'tRnAI::system',
+                vjoindisp     =>'customer',
+                vjoinon       =>['systemid'=>'id']),
 
+      new kernel::Field::TextDrop(
+                name          =>'department',
+                label         =>'Department',
+                readonly      =>1,
+                group         =>'cust',
+                vjointo       =>\'tRnAI::system',
+                vjoindisp     =>'customer',
+                vjoinon       =>['systemid'=>'id']),
+
+      new kernel::Field::Text(
+                name          =>'subcustomer',
+                group         =>'cust',
+                label         =>'Sub-Customer',
+                dataobjattr   =>'tRnAI_instance.subcustomer'),
+
+      new kernel::Field::SubList(
+                name          =>'licenses',
+                label         =>'licenses',
+                group         =>'licenses',
+                subeditmsk    =>'subedit.licenses',
+                vjointo       =>\'tRnAI::lnkinstlic',
+                vjoinon       =>['id'=>'instanceid'],
+                vjoindisp     =>['license','expdate']),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -117,7 +174,8 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(name tcpport cdate mdate));
+   $self->setDefaultView(qw(name system tcpport 
+                            customer department subcustomer mdate));
    $self->setWorktable("tRnAI_instance");
    return($self);
 }
@@ -135,9 +193,7 @@ sub getRecordImageUrl
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(
-          qw(header default 
-             source));
+   return(qw(header default cust licenses source));
 }
 
 
@@ -147,11 +203,25 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+
+   my $name=effVal($oldrec,$newrec,"name");
+
    if ((!defined($oldrec) || defined($newrec->{name})) &&
-       (($newrec->{name}=~m/^\s*$/) || length($newrec->{name})<3)){
-      $self->LastMsg(ERROR,"invalid name specified");
+       (($name=~m/^\s*$/) || length($name)<3) || haveSpecialChar($name)){
+      $self->LastMsg(ERROR,"invalid instance name specified");
       return(0);
    }
+
+   my $tcpport=effVal($oldrec,$newrec,"tcpport");
+   if ($tcpport eq ""){
+      $self->LastMsg(ERROR,"missing TCP port number");
+      return(0);
+   }
+
+
+
+
+
    return(1);
 }
 
@@ -161,7 +231,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default);
+   my @wrgrp=qw(default cust licenses);
 
    return(@wrgrp) if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
    return(undef);
@@ -174,7 +244,9 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    return("ALL") if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
-   return("header","default","source") if ($self->IsMemberOf(["w5base.RnAI.inventory.read"],undef,"direct"));
+   if ($self->IsMemberOf(["w5base.RnAI.inventory.read"],undef,"direct")){
+      return("header","default","cust","licenses","source");
+   }
    return(undef);
 }
 

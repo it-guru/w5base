@@ -78,14 +78,29 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'tRnAI_lnkinstlic.comments'),
 
+      new kernel::Field::Date(
+                name          =>'expdate',
+                label         =>'Expiry-Date',
+                translation   =>'tRnAI::license',
+                group         =>'license',
+                readonly      =>'1',
+                dayonly       =>1,
+                dataobjattr   =>'tRnAI_license.expdate'),
 
-#      new kernel::Field::SubList(
-#                name          =>'usbports',
-#                label         =>'USB-Ports',
-#                group         =>'usbports',
-#                vjointo       =>\'tRnAI::lnkinstlicport',
-#                vjoinon       =>['id'=>'lnkinstlicid'],
-#                vjoindisp     =>['name','system']),
+      new kernel::Field::TextDrop(
+                name          =>'system',
+                label         =>'System',
+                group         =>'system',
+                translation   =>'tRnAI::system',
+                vjointo       =>\'tRnAI::system',
+                vjoindisp     =>'name',
+                vjoinon       =>['systemid'=>'id']),
+
+      new kernel::Field::Link(
+                name          =>'systemid',
+                group         =>'system',
+                label         =>'SystemID',
+                dataobjattr   =>'tRnAI_instance.system'),
 
 
       new kernel::Field::CDate(
@@ -128,7 +143,7 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(name tcpport cdate mdate));
+   $self->setDefaultView(qw(license instance system mdate));
    $self->setWorktable("tRnAI_lnkinstlic");
    return($self);
 }
@@ -142,13 +157,28 @@ sub new
 #}
 
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="$worktable ".
+            "left outer join tRnAI_license ".
+              "on tRnAI_lnkinstlic.license=tRnAI_license.id ".
+            "left outer join tRnAI_instance ".
+              "on tRnAI_lnkinstlic.instance=tRnAI_instance.id ".
+            "left outer join tRnAI_system ".
+              "on tRnAI_instance.system=tRnAI_system.id ";
+   return($from);
+}
+
+
+
+
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(
-          qw(header default 
-             source));
+   return( qw(header default instance license system source));
 }
 
 
@@ -158,11 +188,11 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if ((!defined($oldrec) || defined($newrec->{name})) &&
-       (($newrec->{name}=~m/^\s*$/) || length($newrec->{name})<3)){
-      $self->LastMsg(ERROR,"invalid name specified");
-      return(0);
-   }
+  # if ((!defined($oldrec) || defined($newrec->{name})) &&
+  #     (($newrec->{name}=~m/^\s*$/) || length($newrec->{name})<3)){
+  #    $self->LastMsg(ERROR,"invalid name specified");
+  #    return(0);
+  # }
    return(1);
 }
 
@@ -185,7 +215,9 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    return("ALL") if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
-   return("header","default","source") if ($self->IsMemberOf(["w5base.RnAI.inventory.read"],undef,"direct"));
+   if ($self->IsMemberOf(["w5base.RnAI.inventory.read"],undef,"direct")){
+      return("header","default","instance","license","system","source");
+   }
    return(undef);
 }
 

@@ -2,6 +2,8 @@
 'fieldgroup.useraccounts'=>{de=>'User-Accounts',en=>'User-Accounts'},
 'fieldgroup.customer'=>{de=>'Kunde',en=>'Customer'},
 'fieldgroup.add'=>{en=>'Additional Infos',de=>'Zusatzinformationen'},
+'fieldgroup.instances'=>{de=>'Instanzen',en=>'Instances'},
+'Instances'=>{de=>'Instanzen'},
 'IP-Address'=>{de=>'IP-Adresse'},
 'invalid system name specified'=>{de=>'ungültiger Systemname angegeben'},
 'invalid serviceid specified'=>{de=>'ungültige ServiceID angegeben'},

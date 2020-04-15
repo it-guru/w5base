@@ -158,6 +158,15 @@ sub new
                 label         =>'Additional Software',
                 dataobjattr   =>'tRnAI_system.addsoft'),
 
+      new kernel::Field::SubList(
+                name          =>'instances',
+                label         =>'Instances',
+                group         =>'instances',
+                subeditmsk    =>'subedit.instances',
+                vjointo       =>\'tRnAI::lnkinstlic',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['instance']),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
@@ -283,9 +292,7 @@ sub Validate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(
-          qw(header default customer add useraccounts 
-             source));
+   return( qw(header default customer add instances useraccounts source));
 }
 
 
