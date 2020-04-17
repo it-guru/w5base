@@ -677,7 +677,10 @@ sub ShowEntry
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','w5stat.css'],
                            js=>['toolbox.js','subModal.js',
-                                'jquery.js','jquery.segbar.js','Chart.min.js'],
+                                'jquery.js','jquery.segbar.js',
+                                'Chart.min.js',
+                                'sortabletable.js',
+                                'sortabletable_sorttype_idate.js'],
                            body=>1,form=>1,
                            title=>$title);
 
@@ -772,6 +775,23 @@ EOF
          print("</div>");
       }
    }
+   my $d="";
+   $d.="<script language=JavaScript>\n";
+   $d.="function InitSortTables(){\n";
+   $d.=" var elements=document.getElementsByClassName('sortableTable');\n";
+   $d.=" for(var i=0;i<elements.length;i++){\n";
+   $d.="  var cols=['String','String','String','String','String'];\n";
+   $d.="  var s=SortTableResultTable=new SortableTable(elements[i],cols);\n";
+   $d.=" }\n";
+   $d.="}\n";
+   $d.="addEvent(window,\"load\",InitSortTables);";
+   $d.="</script>\n";
+   print $d;
+#   $d.="
+#         $d.="function InitTabResultTable(){\n";
+#      $d.="SortTableResultTable=new SortableTable(".
+#          "document.getElementById(\"ResultTable\"), [$sortline]);\n";
+
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
@@ -923,8 +943,6 @@ sub Presenter
                            title=>"W5Base Statistik Presenter");
    print $self->HtmlSubModalDiv(prefix=>$rootpath);
    print("<style>body{overflow:hidden}</style>");
-
-
 
    my $requestid=$p;
    $requestid=~s/[^\d]//g;

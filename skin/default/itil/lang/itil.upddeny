@@ -73,6 +73,10 @@
    de=>'Nein, wegen andauernden hoher Risiken bei der Durchführung/beim Betrieb',
    en=>'No - on a long-term base joined with too high risks'
 },
+'UpdateDeny(180)'=>{
+   de=>'Nein, Update/Refresh aber mittelfristig bereits eingeplant',
+   en=>'No - but Update/Refresh already planned for the medium term'
+},
 'UpdateDeny(99)'=>{de=>'Nein - sonstige Gründe',
               en=>'No - other reasons'},
 

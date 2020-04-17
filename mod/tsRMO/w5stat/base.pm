@@ -45,10 +45,10 @@ sub getPresenter
    my $self=shift;
 
    my @l=(
-          'RMO'=>{
+          'AMR'=>{
                          opcode=>\&displayRMO,
                          overview=>undef,
-                         group=>['Group','Application'],
+                         group=>['Application'],
                          prio=>2100,
                       }
          );
@@ -441,7 +441,7 @@ sub displayRMO
    }
 
    if (exists($rmostat->{stats}->{'RMO.Appl.Index'})){
-      $d.="<h2>RMO-Index:</h2>";
+      $d.="<h2>AMR-Index:</h2>";
       my $red=int($rmostat->{stats}->{'RMO.Appl.Index'}->[0]);
       my $green=100-$red;
       $d.=$self->mkSegBar("RMOindex",[
@@ -665,9 +665,13 @@ sub displayRMO
       { # Instance
          for(my $i=0;$i<=$#i;$i++){
             if ($i==0){
-               $d.="<table class=statTab>";
-               $d.="<thead><tr><th>Software-Instanz Name</th><th width=10>Data Issue</th>".
-                       "</tr></thead>";
+               $d.="<table class=\"statTab sortableTable\">";
+               $d.="<thead>".
+                   "<tr>".
+                   "<th>Software-Instanz Name</th>".
+                   "<th width=10>Data Issue</th>".
+                   "</tr>".
+                   "</thead>";
             }
             $d.="<tr>";
             $d.="<td>".$i[$i]->{name}."</td>";
@@ -694,23 +698,39 @@ sub displayRMO
          @swinst=sort({$a->{fullname} cmp $b->{fullname}} @swinst);
          for(my $i=0;$i<=$#swinst;$i++){
             if ($i==0){
-               $d.="<table class=statTab>";
+               $d.="<table class=\"statTab sortableTable\">";
                $d.="<thead><tr><th>Software-Installation</th>".
+                   "<th width=10>Installationsort</th>".
+                   "<th width=10>Installationtyp</th>".
                    "<th width=10>Patch/Release Rating</th>".
                    "<th width=1%></th>".
                    "</tr></thead>";
             }
             $d.="<tr>";
             $d.="<td valign=top>";
+            my $fullname=$swinst[$i]->{fullname};
+            my ($location,$typ);
+            if (my ($n,$t,$l)=$fullname=~m/^(.*)\s*\((.*)\@(.*)\)$/){
+               $fullname=$n;
+               $location=$l;
+               $typ=$t;
+            }
+            elsif (my ($n,$t)=$fullname=~m/^(.*)\s*\((.*)\)$/){
+               $fullname=$n;
+               $typ=$t;
+            }
+
             if (exists($swinstById->{id}->{$swinst[$i]->{id}})){
                $d.=$app->OpenByIdWindow($swinst[$i]->{dataobj},
                                         $swinst[$i]->{id},
-                                        $swinst[$i]->{fullname});
+                                        $fullname);
             }
             else{
-               $d.=$swinst[$i]->{fullname};
+               $d.=$fullname;
             }
             $d.="</td>";
+            $d.="<td>".$location."</td>";
+            $d.="<td>".$typ."</td>";
             $d.="<td align=center valign=top>".
                 SignImg($swinst[$i]->{instrating}).
                 "</td>";
@@ -954,7 +974,7 @@ sub processRecord
                   $tcc_color="green";
                }
                if ($tccrec->{osroadmapstate}=~m/^OK unrestricted/){
-                  $tcc_color="blue";
+                  $tcc_color="gray";
                }
             }
             $systemsystemid{$tccrec->{systemid}}->{roadmap_color}=$tcc_color;
@@ -1111,7 +1131,7 @@ sub processRecord
                   $instrating="green";
                }
                if ($swirec->{softwareinstrelstate}=~m/^OK unrestricted/){
-                  $instrating="blue";
+                  $instrating="gray";
                }
                my $softwareinstrelmsg=$swirec->{softwareinstrelmsg};
                $softwareinstrelmsg=~s/;/ /g;

@@ -52,17 +52,18 @@ sub new
       # 35 fällt weg
       # 38 fällt weg
       {id=>38 }, # Nein, Retirement
-      {id=>40 }, # Nein, fehlendes Budget
-      {id=>50 }, # Nein, fehlende Resourcen
+      #{id=>40 }, # Nein, fehlendes Budget
+      #{id=>50 }, # Nein, fehlende Resourcen
       {id=>60 }, # Nein, fehlende oder negative Testergebnisse
       {id=>70 }, # Nein, hohes Risiko
-      {id=>99 }, # Nein, other 
+      #{id=>99 }, # Nein, other 
       {id=>110 }, # Nein langfristig Technische Kompatibilitätsgründe
       {id=>120 }, # Nein, langfristig keine Freigabe durch Hersteller
       {id=>130 }, # Nein, langfristig keine Freigabe durch Kunde
-      {id=>140 }, # Nein, langfristig fehlendes Budget
-      {id=>150 }, # Nein, langfristig fehlende Resourcen
+      #{id=>140 }, # Nein, langfristig fehlendes Budget
+      #{id=>150 }, # Nein, langfristig fehlende Resourcen
       {id=>170 }, # Nein, langfristig hohes Risiko
+      {id=>180 }, # Nein, mittelfristig bereits geplant
       ];
    $self->setDefaultView(qw(id enname dename));
    return($self);

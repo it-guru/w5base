@@ -1,4 +1,4 @@
-'tsRMO::w5stat::base::RMO'=>{de=>'RMO',en=>'RMO'},
+'tsRMO::w5stat::base::AMR'=>{de=>'AMR',en=>'AMR'},
 'not acceptable'=>{de=>'nicht akzeptabel'},
 'justified or not relevant'=>{de=>'begründet oder nicht relevant'},
 'alright'=>{de=>'in Ordnung'},
@@ -9,6 +9,6 @@ de=>'Die Anwendung %s ist RMO relevant und wird im Management-Report berücksicht
 en=>'The Application %s is RMO relevant and will be reported in management views.'
 },
 'APPISNOTRELEVANT'=>{
-de=>'Die Anwendung %s ist nicht RMO relevant. Dieser Report dient nur zur Bewertung der Anwendung durch AM oder TSM.',
-en=>'The Application %s is not RMO relevant.'
+de=>'Die Anwendung %s ist nicht AMR relevant. Dieser Report dient nur zur Bewertung der Anwendung durch AM oder TSM.',
+en=>'The Application %s is not AMR relevant.'
 },
