@@ -49,37 +49,26 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
+   my $title="";
+
+   my $tset=Query->Param('$TITLE$');
+   if ($tset ne ""){
+      $tset=~s/[<>;]//g;
+      $title=$tset;
+   }
+
    $d.=$app->HttpHeader("text/html");
    $d.=$app->HtmlHeader(style=>['default.css',
                                 'Output.HtmlSubList.css',
                                 'Output.HtmlViewLine.css',
                                 'Output.HtmlV01.css'],
-                        title=>'',
+                        title=>$title,
                         body=>1,
                         );
 
 
    return($d);
 }
-
-#sub Init
-#{
-#   my ($self,$fh)=@_;
-#   my $app=$self->getParent->getParent();
-#   $self->{fieldobjects}=[];
-#   $self->{fieldkeys}={};
-#   my @view=$app->getFieldObjsByView([$app->getCurrentView()]);
-#   for(my $c=0;$c<=$#view;$c++){
-#      my $field=$view[$c];
-#      my $name=$field->Name();
-#      push(@{$self->{fieldobjects}},$field);
-#      $self->{fieldkeys}->{$name}=$#{$self->{fieldobjects}};
-#   }
-#   return();
-#}
-
-
-
 
 
 sub ProcessHead
