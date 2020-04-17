@@ -65,6 +65,12 @@ sub new
                 dataobjattr   =>'PUBLISHERNAME'),
 
       new kernel::Field::Text(
+                name          =>'softwarename',
+                label         =>'Software-Name',
+                ignorecase    =>1,
+                dataobjattr   =>'FULLNAME'),
+
+      new kernel::Field::Text(
                 name          =>'version',
                 label         =>'SoftwareTitleVersion',
                 ignorecase    =>1,
