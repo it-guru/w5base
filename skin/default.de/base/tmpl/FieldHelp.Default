@@ -32,7 +32,10 @@ In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
 <td nowrap valign=top><b>a* AND *s</b></td>
 <td>... mit einem großgeschriebenen AND können Sie mehrere Ausdrücke
     "und" verknüpfen. Im Beispiel werden z.B. die Datensätze aufgelistet,
-    die mit a anfangen und gleichzeitig mit s aufhören.</td>
+    die mit a anfangen und gleichzeitig mit s aufhören.<br>
+    Es ist allerdings zu beachten, das nicht jedes Daten-Backend AND und
+    OR Verknüpfungen auswerten kann. Aus diesem Grund kann 
+    diese Funktion nicht über alle Datenobjekte hin garantiert werden.</td>
 </tr>
 
 <tr>

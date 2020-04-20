@@ -20,6 +20,19 @@ In this case you can use the following expressions and wildcards:<br>
 </tr>
 
 <tr>
+<td nowrap valign=top><b>a* AND *s</b></td>
+<td>...  with a capital AND you can combine several 
+    expressions "and". The example lists the data records that 
+    begin with a <u>and</u> end with s.<br>
+    Please note that not every Data-Backend can evaluate AND 
+    and OR operators. For this reason, this function cannot be 
+    guaranteed for all data objects.
+    </td>
+</tr>
+
+
+
+<tr>
 <td nowrap valign=top><b>[SELF]</b></td>
 <td>... this expression will be replaced by the current fullqualified
     contact name.
