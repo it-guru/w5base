@@ -1,4 +1,5 @@
 'tsRMO::w5stat::base::AMR'=>{de=>'AMR',en=>'AMR'},
+'tsRMO::w5stat::base::AMR::LONG'=>{de=>'AMR - Application Management Report',en=>'AMR - Application Management Report'},
 'not acceptable'=>{de=>'nicht akzeptabel'},
 'justified or not relevant'=>{de=>'begründet oder nicht relevant'},
 'alright'=>{de=>'in Ordnung'},

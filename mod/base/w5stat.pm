@@ -669,7 +669,10 @@ sub ShowEntry
    my $requesttag=Query->Param("tag");
    my ($rmod,$rtag)=$requesttag=~m/^(.*)::([^:]+)$/;
    my $title=$self->T("W5Base Statistic Presenter");
-   my $subtitle=$self->T($requesttag,$rmod);
+   my $subtitle=$self->T($requesttag."::LONG",$rmod);
+   if ($subtitle eq $requesttag."::LONG"){
+      $subtitle=$self->T($requesttag,$rmod);
+   }
    $subtitle="" if ($requesttag eq "ALL");
    $title.=" - ".$subtitle;
    my $MinReportUserGroupCount=$self->Config->Param("MinReportUserGroupCount");
@@ -735,9 +738,12 @@ EOF
                }
             }
             my %P=@Presenter;
+
      
             foreach my $p (sort({$P{$a}->{prio} <=> $P{$b}->{prio}} keys(%P))){
-               if (defined($P{$p}->{opcode}) && 
+               if ((in_array($P{$p}->{group},$primrec->{sgroup}) ||
+                    $p eq "overview") &&
+                   defined($P{$p}->{opcode}) && 
                    ($rtag eq $p || $requesttag eq "ALL")){
                   my ($d,$ovdata)=
                          &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
@@ -746,7 +752,12 @@ EOF
                       if ($requesttag ne "base::w5stat::overview::overview" &&
                           $d ne ""){
                          my ($rmod,$rtag)=$requesttag=~m/^(.*)::([^:]+)$/;
-                         my $subtitle=$self->T($requesttag,$P{$p}->{module});
+                         my $subtitle=$self->T($requesttag."::LONG",
+                                          $P{$p}->{module});
+                         if ($subtitle eq $requesttag."::LONG"){
+                            $subtitle=$self->T($requesttag,$P{$p}->{module});
+                         }
+            
                          $htmlReport.="<hr style=\"width:50%;margin-top:40px;".
                                       "margin-bottom:20px\">".
                                       "<div class=chartsublabel ".

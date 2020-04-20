@@ -40,6 +40,7 @@ sub getPresenter
           'w5baseitil'=>{
                          opcode=>\&displayW5Base,
                          overview=>\&overviewW5Base,
+                         group=>['Group','Application'],
                          prio=>500,
                       },
           'appl'=>{
