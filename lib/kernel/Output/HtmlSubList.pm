@@ -140,11 +140,6 @@ sub ProcessHead
 var SortTable$tableid;
 function InitTab$tableid(){
 SortTable$tableid=new SortableTable(document.getElementById("$tableid"), [$sortline]);
-SortTable$tableid.onsort=function () {
-var rows = SortTable$tableid.tBody.rows;
-var l = rows.length;
-for (var i = 0; i < l; i++) { SortableTableremoveClassName(rows[i]); SortableTableaddClassName(rows[i], i % 2 ? "subline2":"subline1"); } }; SortTable$tableid.sort(0,false);
-}
 $activeateSort
 </script>
 EOF
@@ -203,9 +198,8 @@ sub ProcessLine
 
 
 
-   $self->{lineclass}=1 if (!exists($self->{lineclass}));
    my $d="";
-   my $lineclass="subline".$self->{lineclass};
+   my $lineclass="subline";
    my $lineonclick;
 
    my $idfield;
@@ -414,8 +408,6 @@ sub ProcessLine
 
    }
    $d.="</tr>\n";
-   $self->{lineclass}++;
-   $self->{lineclass}=1 if ($self->{lineclass}>2);
    return($d);
 }
 sub ProcessBottom

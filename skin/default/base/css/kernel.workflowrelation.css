@@ -21,16 +21,18 @@ div.editSubList{
    height:110px;
    overflow:auto;
 }
-tr.subline1{
-   background:#DDDDDD;
-   cursor:default;
-}
-tr.subline2{
-   background:#CCCCCC;
-   cursor:default;
-}
-tr.linehighlight{
-   background:#b0c5ec;
+
+tr.subline{
    cursor:pointer;
 }
+tr.subline:nth-child(odd){
+   background:#DDDDDD;
+}
+tr.subline:nth-child(even) {
+  background: #CCCCCC;
+}
+tr.subline:hover{
+   background:#b0c5ec;
+}
+
 

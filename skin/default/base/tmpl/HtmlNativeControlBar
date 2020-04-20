@@ -57,10 +57,10 @@ function  HtmlNativeControlBarFilter(){
          }
       } 
       if (found){
-        tr[i].style.display = "";
+        removeClass(tr[i],"hidden");
       } 
       else{
-        tr[i].style.display = "none";
+        addClass(tr[i],"hidden");
       }
    }
    input.focus();

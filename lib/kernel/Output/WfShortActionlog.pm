@@ -124,9 +124,8 @@ sub ProcessLine
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
    my $userid=$app->getCurrentUserId();
-   $self->{lineclass}=1 if (!exists($self->{lineclass}));
    my $d="";
-   my $lineclass="subline".$self->{lineclass};
+   my $lineclass="subline";
    my $lineonclick;
    my $idfield=$app->IdField();
    my $idfieldname=$idfield->Name();
@@ -151,9 +150,7 @@ sub ProcessLine
    }
 
 
-   $d.="<tr class=$lineclass ".
-       "onMouseOver=\"this.className='linehighlight'\" ".
-       "onMouseOut=\"this.className='$lineclass'\">\n";
+   $d.="<tr class=\"$lineclass\">";
   
    if ($lineonclick ne ""){
       $d.="<td class=subdatafield onClick=$lineonclick ".

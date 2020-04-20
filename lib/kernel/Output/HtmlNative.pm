@@ -149,9 +149,8 @@ sub ProcessLine
    my @view=@{$recordview};
    my $fieldbase={};
    map({$fieldbase->{$_->Name()}=$_} @view);
-   $self->{lineclass}=1 if (!exists($self->{lineclass}));
    my $d="";
-   my $lineclass="subline".$self->{lineclass};
+   my $lineclass="subline";
    my $lineonclick;
    my $idfield=$app->IdField();
    my $idfieldname=undef;
@@ -192,9 +191,7 @@ sub ProcessLine
          }
       }
    }
-   $d.="<tr class=$lineclass ".
-       "onMouseOver=\"this.className='linehighlight'\" ".
-       "onMouseOut=\"this.className='$lineclass'\">\n";
+   $d.="<tr class=$lineclass ";
    my @l=();
    for(my $c=0;$c<=$#view;$c++){
       my $nowrap="";
@@ -259,8 +256,6 @@ sub ProcessLine
       }
    }
    $d.="</tr>\n";
-   $self->{lineclass}++;
-   $self->{lineclass}=1 if ($self->{lineclass}>2);
    return($d);
 }
 

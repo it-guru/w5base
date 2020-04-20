@@ -153,14 +153,15 @@ sub ProcessHead
       $d.="function InitTabResultTable(){\n";
       $d.="SortTableResultTable=new SortableTable(".
           "document.getElementById(\"ResultTable\"), [$sortline]);\n";
-      $d.="SortTableResultTable.onsort=function (){\n";
-      $d.=" var rows = SortTableResultTable.tBody.rows\n";
-      $d.=" var l = rows.length;\n";
-      #$d.=" console.log(rows);\n";
-      $d.=" for (var i = 0; i < l; i++) { \n".
-          "   SortableTableremoveClassName(rows[i]); \n".
-          "   SortableTableaddClassName(rows[i], \n".
-          "        i % 2 ? \"subline2\":\"subline1\"); } };\n"; 
+      #$d.="SortTableResultTable.onsort=function (){\n";
+      #$d.=" var rows = SortTableResultTable.tBody.rows\n";
+      #$d.=" var l = rows.length;\n";
+      #$d.="};\n";
+
+      #$d.=" for (var i = 0; i < l; i++) { \n".
+      #    "   SortableTableremoveClassName(rows[i]); \n".
+      #    "   SortableTableaddClassName(rows[i], \n".
+      #    "        i % 2 ? \"subline2\":\"subline1\"); } };\n"; 
       if ($self->getParent->getParent->{AutoSortTableHtmlV01}){
          my $sortdata=$self->getParent->getParent->{AutoSortTableHtmlV01};
          AUTOSORT: foreach my $fld (keys(%$sortdata)){
@@ -224,11 +225,10 @@ sub ProcessLine
    my @view=@{$recordview};
    my $fieldbase={};
    map({$fieldbase->{$_->Name()}=$_} @view);
-   $self->{lineclass}=1 if (!exists($self->{lineclass}));
    $self->{fieldHeaders}={} if (!exists($self->{fieldHeaders}));
    $self->{fieldsPageHeader}="" if (!exists($self->{fieldsPageHeader}));
    my $d="";
-   my $lineclass="subline".$self->{lineclass};
+   my $lineclass="subline";
    my $lineonclick;
    my $idfield=$app->IdField();
    my $idfieldname=undef;
@@ -286,9 +286,7 @@ sub ProcessLine
          }
       }
    }
-   $d.="<tr class=$lineclass ".
-       "onMouseOver=\"this.className='linehighlight'\" ".
-       "onMouseOut=\"this.className='$lineclass'\"";
+   $d.="<tr class=\"$lineclass\"";
    if ($id ne "" && $idfieldname ne ""){
       my $dataid=$id;
       $dataid=~s/[^0-9a-z_-]/_/gi;
@@ -421,8 +419,6 @@ sub ProcessLine
       }
    }
    $d.="</tr>\n";
-   $self->{lineclass}++;
-   $self->{lineclass}=1 if ($self->{lineclass}>2);
    return($d);
 }
 

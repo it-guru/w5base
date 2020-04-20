@@ -3481,7 +3481,6 @@ sub ListRel
    }
 
 
-   my $linecolor=1;
    my $relcount=0;
 
    my $isadmin=0;
@@ -3540,13 +3539,10 @@ sub ListRel
                $onclick="onClick=linkedit($rec->{id})";
             }
 
-            my $lineclass="subline$linecolor"; 
+            my $lineclass="subline"; 
             if ($mode ne "mail"){
-               $d.="<tr class=$lineclass ".
-                   "onMouseOver=\"this.className='linehighlight'\" ".
-                   "onMouseOut=\"this.className='$lineclass'\"><td>";
+               $d.="<tr class=\"$lineclass\"><td>";
             }
-            $linecolor=1 if ($linecolor>2);
 
 
             my $rowspan=1;
