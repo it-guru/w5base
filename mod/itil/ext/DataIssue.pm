@@ -86,6 +86,11 @@ sub getControlRecord
              targetid  =>'id'
            },
            {
+             dataobj   =>'itil::applgrp',
+             target    =>'fullname',
+             targetid  =>'id'
+           },
+           {
              dataobj   =>'itil::swinstance',
              target    =>'fullname',
              targetid  =>'id'
@@ -126,6 +131,7 @@ sub DataIssueCompleteWriteRequest
    my $affectedobject=effVal($oldrec,$newrec,"affectedobject");
 
    if (($affectedobject=~m/::appl$/)   ||
+       ($affectedobject=~m/::applgrp$/) ||
        ($affectedobject=~m/::custcontract$/) ||
        ($affectedobject=~m/::supcontract$/) ||
        ($affectedobject=~m/::swinstance$/) ||

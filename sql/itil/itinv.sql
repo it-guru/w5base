@@ -1765,3 +1765,17 @@ alter table wallet add altname longtext;
 alter table ipaddress  add itcloudarea bigint(20) default NULL,add key(itcloudarea);
 alter table swinstance  add itcloudarea bigint(20) default NULL,add key(itcloudarea);
 alter table accessurl add isonsharedproxy int(1) default '0',add do_ssl_cert_check int(1) default '0',add ssl_cert_check datetime default NULL,add ssl_cert_end datetime default NULL,add ssl_cert_begin datetime default NULL,add ssl_state varchar(128) default NULL,add ssl_cert_exp_notify1 datetime default NULL,add ssl_cipher varchar(40) default NULL,add ssl_certserial varchar(40) default NULL,add ssl_version varchar(40) default NULL,add ssl_certdump longtext   default NULL,add ssl_certsighash varchar(40) default NULL;
+create table addlnkapplgrpsystem (
+  id         bigint(20) NOT NULL,
+  idtoken    varchar(40) NOT NULL,
+  applgrp    bigint(20)  NOT NULL,
+  system     bigint(20)  NOT NULL,
+  additional  longtext   default NULL,
+  comments    longtext   default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (id), UNIQUE KEY idtoken (idtoken),key(applgrp),key(system),
+  UNIQUE KEY token (applgrp,system),
+  FOREIGN KEY fk_sys  (system) REFERENCES system (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_agrp (applgrp) REFERENCES applgrp (id) ON DELETE CASCADE
+) ENGINE=INNODB;
