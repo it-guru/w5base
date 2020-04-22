@@ -234,6 +234,22 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'qlnkapplsystem.comments'),
 
+      new kernel::Field::Container(
+                name          =>'additional',
+                label         =>'Additionalinformations',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $rec=$param{current};
+                   my $d=$rec->{$self->Name()};
+                   if (ref($d) eq "HASH" && keys(%$d)){
+                      return(1);
+                   }
+                   return(0);
+                },
+                dataobjattr   =>'qlnkapplsystem.additional'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -590,8 +606,48 @@ sub new
                 uivisible     =>0,
                 translation   =>'itil::system',
                 label         =>'mangaged by rules of SOX',
-                dataobjattr   =>
-                'if (asset.no_sox_inherit,0,if (system.no_sox_inherit,0,appl.is_soxcontroll))'),
+                dataobjattr   =>'if (asset.no_sox_inherit,0,'.
+                                'if (system.no_sox_inherit,0,'.
+                                'appl.is_soxcontroll))'),
+
+      new kernel::Field::TextDrop(
+                name          =>'applgrp',
+                htmlwidth     =>'250px',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'Applicationgroup',
+                vjointo       =>'itil::applgrp',
+                vjoinon       =>['applgrpid'=>'id'],
+                vjoindisp     =>'fullname',
+                group         =>'applgrp',
+                dataobjattr   =>'applgrp.fullname'),
+                                                   
+      new kernel::Field::Select(
+                name          =>'applgrpcistatus',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                htmlwidth     =>'80px',
+                group         =>'applgrp',
+                label         =>'Applicationgroup CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['applgrpcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+                                                  
+      new kernel::Field::Interface(
+                name          =>'applgrpid',
+                label         =>'W5Base Applicationgroup ID',
+                readonly      =>1,
+                group         =>'applgrp',
+                dataobjattr   =>'applgrp.id'),
+
+
+      new kernel::Field::Interface(
+                name          =>'applgrpcistatusid',
+                label         =>'Applicationgroup CI-State',
+                readonly      =>1,
+                group         =>'applgrp',
+                dataobjattr   =>'applgrp.cistatus'),
+
 
       new kernel::Field::Interface(
                 name          =>'systemcistatusid',
@@ -1008,7 +1064,13 @@ sub getSqlFrom
             "and qlnkapplsystem.appl=secsystemlnkcontact.refid ".
            
             "left outer join costcenter secsystemcostcenter ".
-            "on secsystemappl.conumber=secsystemcostcenter.name ";
+            "on secsystemappl.conumber=secsystemcostcenter.name ".
+
+            "left outer join lnkapplgrpappl ".
+            "on lnkapplgrpappl.appl=qlnkapplsystem.appl ".
+
+            "left outer join applgrp ".
+            "on applgrp.id=lnkapplgrpappl.applgrp ";
 
    return($from);
 }
@@ -1103,7 +1165,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default misc applinfo systeminfo assetinfo));
+          qw(default misc applgrp applinfo systeminfo assetinfo));
 }
 
 

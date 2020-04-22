@@ -1,6 +1,6 @@
-package TS::Reporter::ictoimport;
+package tscape::event::CapeICTOimport;
 #  W5Base Framework
-#  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2019  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,66 +19,59 @@ package TS::Reporter::ictoimport;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::Reporter;
-@ISA=qw(kernel::Reporter);
+use kernel::Event;
+@ISA=qw(kernel::Event);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
    $self->{fieldlist}=[qw(ictono)];
-   $self->{name}="ICTO-Object to ApplicationGroup import";
+
    return($self);
 }
 
-sub getDefaultIntervalMinutes
-{
-   my $self=shift;
 
-   return(90,['6:00',
-              '8:00',
-              '9:00',
-              '10:00',
-              '11:00',
-              '12:00',
-              '13:00',
-              '14:00',
-              '15:00',
-              '16:00',
-              '18:00'
-              ]);    
-}
-
-sub Process             # will be run as a spereate Process (PID)
+sub CapeICTOimport
 {
    my $self=shift;
 
    my $appl=getModuleObject($self->Config,"TS::appl");
-   return(1) if ($appl->isSuspended());
+   return({}) if ($appl->isSuspended());
    $appl->SetFilter({cistatusid=>\'4'});
    my $oldictono;
    my %icto=();
    my $start=NowStamp("en");
+   msg(INFO,"start reading icto-id list");
    foreach my $arec ($appl->getHashList(@{$self->{fieldlist}},"id")){
       if ($arec->{ictono} ne ""){
          my $i=lc($arec->{ictono});
          $icto{$i}=[] if (!exists($icto{$i}));
          push(@{$icto{$i}},$arec->{id});
-         $self->logRecord($arec) if ($oldictono ne $arec->{ictono});
       }
       $oldictono=$arec->{ictono};
    }
+   if (0){  # reduce data for debugging
+      foreach my $i (keys(%icto)){
+         if (!in_array([$i],[qw(icto-4175 icto-2054 xicto-4380)])){
+            delete($icto{$i});
+         }
+      }
+   }
+   my $nicto=keys(%icto);
+   msg(INFO,"found  $nicto ictos");
    my $agrp=getModuleObject($self->Config,"itil::applgrp");
-   return(1) if ($agrp->isSuspended());
+   return({}) if ($agrp->isSuspended());
    my $m=getModuleObject($self->Config,"base::mandator");
-   return(1) if ($m->isSuspended());
+   return({}) if ($m->isSuspended());
    my $grp=getModuleObject($self->Config,"base::grp");
-   return(1) if ($grp->isSuspended());
+   return({}) if ($grp->isSuspended());
    my $i=getModuleObject($self->Config,"tscape::archappl");
-   return(1) if ($i->isSuspended());
+   return({}) if ($i->isSuspended());
    my $la=getModuleObject($self->Config,"itil::lnkapplgrpappl");
-   return(1) if ($la->isSuspended());
+   return({}) if ($la->isSuspended());
 
 
    my $iname=$i->Self();
@@ -149,54 +142,23 @@ sub Process             # will be run as a spereate Process (PID)
          }
       }
    }
-   $agrp->BulkDeleteRecord({'srcload'=>"<\"$start\"",srcsys=>\$iname});
+   $agrp->ResetFilter();
+   $agrp->SetFilter({'srcload'=>"<\"$start\"",srcsys=>\$iname});
+   $agrp->SetCurrentView(qw(ALL));
+   my $opagrp=$agrp->Clone();
+
+   my ($arec,$msg)=$agrp->getFirst(unbuffered=>1);
+   if (defined($arec)){
+      do{
+         $opagrp->ValidatedUpdateRecord($arec,{cistatusid=>6},{
+            id=>\$arec->{id}
+         });
+         ($arec,$msg)=$agrp->getNext();
+      }until(!defined($arec));
+   }
    $la->BulkDeleteRecord({'srcload'=>"<\"$start\"",srcsys=>\$iname});
-   return(0);
+   return({exitcode=>0});
 }
-
-sub logRecord
-{
-   my $self=shift;
-   my $arec=shift;
-
-   my $d=sprintf("%s\n",$arec->{ictono});
-   print($d);
-}
-
-
-
-sub onChange
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   my $msg="";
-   my $old=CSV2Hash($oldrec->{textdata},"ictono");
-   my $new=CSV2Hash($newrec->{textdata},"ictono");
-   foreach my $id (keys(%{$old->{ictono}})){
-      if (!exists($new->{ictono}->{$id})){
-         my $m=$self->T('- "%s" (W5BaseID:%s) has left the list');
-         $msg.=sprintf($m."\n",$old->{ictono}->{$id}->{ictono},$id);
-         #$msg.="  ".join(",",
-         #    map({$_=$old->{id}->{$id}->{$_}} keys(%{$old->{id}->{$id}})));
-      }
-   }
-   foreach my $id (keys(%{$new->{ictono}})){
-      if (!exists($old->{ictono}->{$id})){
-         my $m=$self->T('+ "%s" (W5BaseID:%s) has been added to the list');
-         $msg.=sprintf($m."\n",$new->{ictono}->{$id}->{ictono},$id);
-      }
-   }
-   if ($msg ne ""){
-      $msg="Dear W5Base User,\n\n".
-           "the following changes where detected in the report:\n\n".
-           $msg;
-   }
-
-   return($msg);
-}
-
 
 
 1;
