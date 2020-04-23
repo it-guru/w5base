@@ -530,6 +530,30 @@ sub Validate
       $self->LastMsg(ERROR,"invalid refid '$refid' in parent object '$parentobj'");
       return(0);
    }
+
+   my $rold;
+   my $rnew;
+   if (defined($oldrec) && exists($oldrec->{roles})){
+      $rold=$oldrec->{roles};
+      if (ref($rold) eq "ARRAY"){
+         $rold=join(",",sort(@{$rold}));
+      }
+   }
+   if (defined($newrec) && exists($newrec->{roles})){
+      $rnew=$newrec->{roles};
+      if (ref($rnew) eq "ARRAY"){
+         $rnew=join(",",sort(@{$rnew}));
+      }
+   }
+   if (defined($oldrec) &&
+       !effChanged($oldrec,$newrec,"comments") &&
+       !effChanged($oldrec,$newrec,"refid") &&
+       !effChanged($oldrec,$newrec,"parentobj") &&
+       !effChanged($oldrec,$newrec,"target") &&
+       !effChanged($oldrec,$newrec,"targetid") &&
+       trim($rold) eq trim($rnew)){   # prevent empty updates
+      %{$newrec}=();  
+   }
    return(1) if ($self->IsMemberOf("admin"));
 
    if ($self->isDataInputFromUserFrontend()){
@@ -590,6 +614,38 @@ sub isWriteValid
       return(undef);
    }
    return("default");
+}
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orig=shift;
+
+   my $parentobj=effVal($oldrec,$newrec,"parentobj");
+   my $refid=effVal($oldrec,$newrec,"refid");
+   #msg(INFO,"lnkcontact parent mdate update");
+   if ($parentobj ne "" && $refid ne ""){
+      my $p=getModuleObject($self->Config,$parentobj);
+      my $mdate;
+      if (defined($p)){
+         $mdate=$p->getField("mdate");
+      }
+      if (defined($p) && defined($mdate)){
+         my $idname=$p->IdField->Name();
+         my %flt=($idname=>\$refid);
+         $p->SetFilter(\%flt);
+         my @l=$p->getHashList(qw(ALL));
+         if ($#l==0){
+            my $now=NowStamp("en");
+            #msg(INFO,"lnkcontact parent mdate update to $now");
+            $p->ValidatedUpdateRecord($l[0],{mdate=>$now},\%flt);
+         }
+      }
+   }
+   return($self->SUPER::FinishWrite($oldrec,$newrec,$orig));
 }
 
 

@@ -2563,22 +2563,27 @@ sub ValidatedUpdateRecordTransactionless
       if (my $validatednewrec=$self->validateFields($oldrec,$newrec,\%comprec)){
          if ($self->Validate($oldrec,$validatednewrec,\%comprec)){
             $self->finishWriteRequestHash($oldrec,$validatednewrec);
-            my $bak=$self->UpdateRecord($validatednewrec,@filter);
-            if ($bak){
-               if (effChanged($oldrec,$newrec,"stateid")){
-                  $self->SendRemoteEvent("sch",$oldrec,$newrec);
-               }
-               if (effChanged($oldrec,$newrec,"cistatusid")){
-                  $self->SendRemoteEvent("sch",$oldrec,$newrec);
-               }
-               $self->SendRemoteEvent("upd",$oldrec,$newrec);
-               $self->FinishWrite($oldrec,$validatednewrec,\%comprec);
-               $self->StoreUpdateDelta("update",$oldrec,\%comprec) if ($bak);
-               foreach my $v (keys(%$newrec)){
-                  $oldrec->{$v}=$newrec->{$v};
-               }
+            if (keys(%{$validatednewrec})==0){
+               return(1);
             }
-            return($bak);
+            else{
+               my $bak=$self->UpdateRecord($validatednewrec,@filter);
+               if ($bak){
+                  if (effChanged($oldrec,$newrec,"stateid")){
+                     $self->SendRemoteEvent("sch",$oldrec,$newrec);
+                  }
+                  if (effChanged($oldrec,$newrec,"cistatusid")){
+                     $self->SendRemoteEvent("sch",$oldrec,$newrec);
+                  }
+                  $self->SendRemoteEvent("upd",$oldrec,$newrec);
+                  $self->FinishWrite($oldrec,$validatednewrec,\%comprec);
+                  $self->StoreUpdateDelta("update",$oldrec,\%comprec) if ($bak);
+                  foreach my $v (keys(%$newrec)){
+                     $oldrec->{$v}=$newrec->{$v};
+                  }
+               }
+               return($bak);
+             }
          }
          else{
             if ($self->LastMsg()==0){
