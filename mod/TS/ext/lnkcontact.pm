@@ -47,6 +47,8 @@ sub getPosibleRoles
       return(
              "write"           =>$self->getParent->T("write",
                                                      $self->Self),
+             "RAdmin"          =>$self->getParent->T("RAdmin",
+                                                     $self->Self),
             );
    }
    return();

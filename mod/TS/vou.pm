@@ -31,7 +31,10 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=5 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
+
+
 
    $self->{useMenuFullnameAsACL}=$self->Self();
 
@@ -53,11 +56,14 @@ sub new
                 name          =>'shortname',
                 label         =>'Shortname',
                 size          =>'8',
+                htmlwidth     =>'80',
+                htmleditwidth =>'80',
                 dataobjattr   =>'vou.shortname'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
+                selectfix     =>1,
                 dataobjattr   =>'vou.name'),
 
       new kernel::Field::Text(
@@ -70,6 +76,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'responsibleorg',
                 htmleditwidth =>'40%',
+                selectfix     =>1,
                 label         =>'responsible organisation',
                 vjoineditbase =>{grpid=>"200"},
                 vjointo       =>'base::grp',
@@ -79,6 +86,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'rorgid',
                 label         =>'responsible organisation ID',
+                selectfix     =>1,
                 dataobjattr   =>'vou.rorg'),
 
       new kernel::Field::Select(
@@ -90,7 +98,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                htmleditwidth =>'40%',
+                htmleditwidth =>'50%',
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0 AND <7"},
                 vjointo       =>'base::cistatus',
@@ -113,8 +121,8 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'leader',
-                AllowEmpty    =>1,
                 label         =>'Business Owner - Business',
+                AllowEmpty    =>1,
                 vjoinon       =>'leaderid'),
 
       new kernel::Field::Link(
@@ -123,9 +131,9 @@ sub new
 
       new kernel::Field::Contact(
                 name          =>'leaderit',
-                AllowEmpty    =>1,
                 label         =>'Business Owner - IT',
-                vjoinon       =>'leaderid'),
+                AllowEmpty    =>1,
+                vjoinon       =>'leaderitid'),
 
       new kernel::Field::Link(
                 name          =>'leaderitid',
@@ -172,28 +180,54 @@ sub new
                 dataobjattr   =>'vou.description'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Fullname',
+                htmldetail    =>0,
+                dataobjattr   =>"concat(".
+                                "vou.shortname,".
+                                "if (vou.name<>'','-',''),".
+                                "vou.name".
+                                ")"),
+
+      new kernel::Field::TextDrop(
+                name          =>'reprgrp',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'representing group',
+                group         =>'vouattr',
+                vjointo       =>'base::grp',
+                vjoinbase     =>{srcsys=>[$self->SelfAsParentObject()]},
+                vjoinon       =>['id'=>'srcid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Text(
                 name          =>'seg',
+                group         =>'vouattr',
                 label         =>'Segemente/Tribe',
                 dataobjattr   =>'vou.segment'),
 
       new kernel::Field::Contact(
                 name          =>'rte',
                 AllowEmpty    =>1,
-                label         =>'RTE ?',
+                group         =>'vouattr',
+                label         =>'RTE',
                 vjoinon       =>'rteid'),
 
       new kernel::Field::Link(
                 name          =>'rteid',
+                group         =>'vouattr',
                 dataobjattr   =>'vou.rte'),
 
       new kernel::Field::Contact(
                 name          =>'spc',
                 AllowEmpty    =>1,
-                label         =>'SPC ?',
+                label         =>'SPC',
+                group         =>'vouattr',
                 vjoinon       =>'spcid'),
 
       new kernel::Field::Link(
                 name          =>'spcid',
+                group         =>'vouattr',
                 dataobjattr   =>'vou.spc'),
 
 
@@ -322,7 +356,7 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default canvas contacts comments source));
+   return(qw(header default vouattr canvas contacts comments source));
 }
 
 
@@ -340,12 +374,37 @@ sub Validate
       my $newshortname=$newrec->{shortname};
       $newshortname=~s/\[\d+\]$//;
       if ($newshortname=~m/^\s*$/ || 
-          !($newshortname=~m/^[a-z0-9]+$/i) ||
+          !($newshortname=~m/^[a-z0-9_]+$/i) ||
           length($newshortname)>8){
          $self->LastMsg(ERROR,"invalid shortname specified");
          return(0);
       }
    }
+   my $ocistatusid=undef;
+   $ocistatusid=$oldrec->{cistatusid} if (defined($oldrec));
+   my $ncistatusid=effVal($oldrec,$newrec,"cistatusid");
+
+   if ($ocistatusid>=4 && $ncistatusid<4){
+      $self->LastMsg(ERROR,"cistatus back to planning is not allowed");
+      return(0);
+
+   }
+   if ($ncistatusid>=4 && $ncistatusid<6){
+      if (effVal($oldrec,$newrec,"leaderid") eq "" &&
+          effVal($oldrec,$newrec,"leaderitid") eq ""){
+         $self->LastMsg(ERROR,
+                 "a business owner is needed for selected CI-State");
+         return(0);
+      }
+      if (length(trim(effVal($oldrec,$newrec,"name")))<5){
+         $self->LastMsg(ERROR,
+                 "Name field not sufficient filled");
+         return(0);
+      }
+   }
+
+
+
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
       my $userid=$self->getCurrentUserId();
       if (!defined($oldrec)){
@@ -396,10 +455,128 @@ sub isViewValid
    return("ALL");
 }
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($rec->{cistatusid}>=4){
+      if ($rec->{cistatusid}>=6){
+         my $d=CalcDateDuration($rec->{mdate},NowStamp("en"));
+         if ($d->{days}>6){
+            return($self->isWriteValid($rec));
+         }
+      }
+      return(0);
+   }
+   return($self->isWriteValid($rec));
+}
+
+
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("TS::vou");
+}
+
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $rorgid=effVal($oldrec,$newrec,"rorgid");  # noch nicht ausgewertet!
+
+   my $id=effVal($oldrec,$newrec,"id");
+   my $cistatus=effVal($oldrec,$newrec,"cistatusid");
+   my $shortname=effVal($oldrec,$newrec,"shortname");
+   my $name=effVal($oldrec,$newrec,"name");
+
+   if ($cistatus>3){
+      $self->syncToGroups($id,$cistatus,$shortname,$name,$oldrec,$newrec);
+   }
+   return(1);
+}
+
+
+sub syncToGroups
+{
+   my $self=shift;
+   my ($id,$cistatus,$shortname,$name,$oldrec,$newrec)=@_;
+   my $leaderid=effVal($oldrec,$newrec,"leaderid");
+   my $leaderitid=effVal($oldrec,$newrec,"leaderitid");
+
+   my $leader=$leaderid;
+   $leader=$leaderitid if ($leaderitid ne "");
+
+   my $basegrpname=effVal($oldrec,$newrec,"responsibleorg");
+   my $parentgrp=$basegrpname.".DigitalHub";
+   my $fullname=$parentgrp.".".$shortname;
+
+   printf STDERR ("fifi syncToGroups: $fullname\n");
+
+   my $grp=$self->getPersistentModuleObject("w5grp","base::grp");
+   $grp->SetFilter([{
+      fullname=>$fullname
+   },
+   {
+      srcsys=>[$self->SelfAsParentObject()],
+      srcid=>\$id
+   }]);
+   my @l=$grp->getHashList(qw(fullname name description srcsys srcid cistatusid
+                              grpid is_orggroup parent parentid));
+   my $grpid;
+   if ($#l==-1){   # Gruppe muss neu erzeugt werden
+      $grpid=$grp->ValidatedInsertRecord({
+         name=>$shortname,
+         cistatusid=>$cistatus,
+         parent=>$parentgrp,
+         is_orggroup=>1,
+         description=>$name,
+         srcsys=>$self->SelfAsParentObject(),
+         srcid=>$id,
+         srcload=>NowStamp("en")
+      });
+      msg(INFO,"group created with id=$grpid");
+   }
+   elsif($#l==0){  # Ein Datensatz muss aktualisiert werden
+      my $upd={};
+      $upd->{name}=$shortname      if ($l[0]->{name} ne $shortname);
+      $upd->{description}=$name    if ($l[0]->{description} ne $name);
+      $upd->{cistatusid}=$cistatus if ($l[0]->{cistatusid} ne $cistatus);
+      $upd->{srcid}=$id            if ($l[0]->{srcid} ne $id);
+      $upd->{is_orggroup}="1"      if ($l[0]->{is_orggroup} ne "1");
+      if ($l[0]->{srcsys} ne $self->SelfAsParentObject()){
+         $upd->{srcsys}=$self->SelfAsParentObject();
+      }
+      if (keys(%$upd)){
+         $upd->{srcload}=NowStamp("en");
+         $grp->ValidatedUpdateRecord($l[0],$upd,{grpid=>\$l[0]->{grpid}});
+      }
+      $grpid=$l[0]->{grpid};
+   }
+   elsif($#l==1){  # einer muss aussortiert werden
+     msg(ERROR,"double grp record target in vou syncToGroups");
+   }
+   else{
+      die("vou hard error while update on $fullname");
+   }
+   if ($grpid ne "" && $grpid>1){
+      printf STDERR ("check contacts in $grpid\n");
+   }
+}
+
+
+
+
+
+
 sub isWriteValid
 {
    my $self=shift;
    my @l;
+
 
    if (!defined($_[0])){
       @l=$self->SUPER::isWriteValid(@_);
@@ -410,11 +587,14 @@ sub isWriteValid
    if ($userid eq $rec->{databossid}){
       push(@l,"ALL");
    }
-   
+   if ($self->IsMemberOf($self->{CI_Handling}->{activator})){
+      push(@l,"ALL");
+   }
 
 
-
-   @l=("default","comments","canvas","contacts") if (in_array(\@l,"ALL"));
+   if (in_array(\@l,"ALL")){
+      @l=("default","vouattr","comments","canvas","contacts");
+   }
 
    return(@l);
 }
