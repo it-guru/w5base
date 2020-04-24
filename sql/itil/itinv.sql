@@ -1779,3 +1779,4 @@ create table addlnkapplgrpsystem (
   FOREIGN KEY fk_sys  (system) REFERENCES system (id) ON DELETE CASCADE,
   FOREIGN KEY fk_agrp (applgrp) REFERENCES applgrp (id) ON DELETE CASCADE
 ) ENGINE=INNODB;
+alter table appl add respmethod varchar(40) default 'ROLEBASED';

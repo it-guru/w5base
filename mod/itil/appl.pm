@@ -374,8 +374,37 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 explore       =>'190',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "ROLEBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
                 group         =>'technical',
                 label         =>'Technical Solution Manager',
+                vjoinon       =>'tsmid'),
+
+      new kernel::Field::Contact(
+                name          =>'techresponse',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                explore       =>190,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "FUNCBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
+                group         =>'technical',
+                label         =>'technical responsible',
                 vjoinon       =>'tsmid'),
 
       new kernel::Field::Contact(
@@ -384,8 +413,38 @@ sub new
                                  'usertyp'=>[qw(extern user)]},
                 group         =>'opmgmt',
                 explore       =>'195',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "ROLEBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
                 AllowEmpty    =>1,
                 label         =>'Operation Manager',
+                vjoinon       =>'opmid'),
+
+      new kernel::Field::Contact(
+                name          =>'opresponse',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                explore       =>195,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "FUNCBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
+                AllowEmpty    =>1,
+                group         =>'opmgmt',
+                label         =>'operational responsible',
                 vjoinon       =>'opmid'),
 
       new kernel::Field::SubList(
@@ -692,6 +751,16 @@ sub new
       new kernel::Field::Contact(
                 name          =>'tsm2',
                 AllowEmpty    =>1,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "ROLEBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 group         =>'technical',
@@ -699,12 +768,59 @@ sub new
                 vjoinon       =>'tsm2id'),
 
       new kernel::Field::Contact(
+                name          =>'techresponse2',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "FUNCBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
+                group         =>'technical',
+                label         =>'deputy technical responsible',
+                vjoinon       =>'tsm2id'),
+
+      new kernel::Field::Contact(
                 name          =>'opm2',
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 AllowEmpty    =>1,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "ROLEBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
                 group         =>'opmgmt',
                 label         =>'Deputy Operation Manager',
+                vjoinon       =>'opm2id'),
+
+      new kernel::Field::Contact(
+                name          =>'opresponse2',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "FUNCBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
+                AllowEmpty    =>1,
+                group         =>'opmgmt',
+                label         =>'deputy operational responsible',
                 vjoinon       =>'opm2id'),
 
       new kernel::Field::TextDrop(
@@ -825,6 +941,16 @@ sub new
                                  'usertyp'=>[qw(extern user)]},
                 AllowEmpty    =>1,
                 explore       =>170,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "ROLEBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
                 group         =>'functional',
                 label         =>'Application Manager',
                 vjoinon       =>'applmgrid'),
@@ -833,6 +959,26 @@ sub new
                 name          =>'applmgrid',
                 group         =>'customer',
                 dataobjattr   =>'appl.applmgr'),
+
+      new kernel::Field::Contact(
+                name          =>'overallresponse',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                AllowEmpty    =>1,
+                explore       =>170,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{rmethod} eq "FUNCBASED"){
+                      return(1);
+                   }
+                   return(0);
+                },
+                group         =>'functional',
+                label         =>'overall responsible',
+                vjoinon       =>'applmgrid'),
 
       new kernel::Field::Text(
                 name          =>'itnormodel',
@@ -1037,7 +1183,18 @@ sub new
                                  'reference',
                                  'cbreakdown'],  # see also opmode at system
                 htmleditwidth =>'200px',
-               dataobjattr   =>'appl.opmode'),
+                dataobjattr   =>'appl.opmode'),
+
+      new kernel::Field::Select(
+                name          =>'rmethod',
+                label         =>'responsibility methodology',
+                selectfix     =>1,
+                transprefix   =>'rmeth.',
+                value         =>['ROLEBASED',
+                                 'FUNCBASED'],
+                htmleditwidth =>'200px',
+                dataobjattr   =>'appl.respmethod'),
+
 
       new kernel::Field::Text(
                 name          =>'assetassetids',
