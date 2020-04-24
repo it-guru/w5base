@@ -617,16 +617,12 @@ sub isWriteValid
 }
 
 
-sub FinishWrite
+sub UpdateParentMdate
 {
    my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $orig=shift;
+   my $parentobj=shift;
+   my $refid=shift;
 
-   my $parentobj=effVal($oldrec,$newrec,"parentobj");
-   my $refid=effVal($oldrec,$newrec,"refid");
-   #msg(INFO,"lnkcontact parent mdate update");
    if ($parentobj ne "" && $refid ne ""){
       my $p=getModuleObject($self->Config,$parentobj);
       my $mdate;
@@ -645,7 +641,33 @@ sub FinishWrite
          }
       }
    }
+
+}
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orig=shift;
+
+   my $parentobj=effVal($oldrec,$newrec,"parentobj");
+   my $refid=effVal($oldrec,$newrec,"refid");
+   $self->UpdateParentMdate($parentobj,$refid);
    return($self->SUPER::FinishWrite($oldrec,$newrec,$orig));
+}
+
+sub FinishDelete
+{
+   my $self=shift;
+   my $oldrec=shift;
+
+
+   my $parentobj=$oldrec->{parentobj};
+   my $refid=$oldrec->{refid};
+   $self->UpdateParentMdate($parentobj,$refid);
+   return($self->SUPER::FinishDelete($oldrec));
 }
 
 
