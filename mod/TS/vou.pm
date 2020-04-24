@@ -563,7 +563,57 @@ sub syncToGroups
       die("vou hard error while update on $fullname");
    }
    if ($grpid ne "" && $grpid>1){
-      printf STDERR ("check contacts in $grpid\n");
+      my %orgadmin;
+      foreach my $crec (@{$oldrec->{contacts}}){
+         if ($crec->{target} eq "base::user"){
+            my $r=$crec->{roles};
+            $r=[$r] if (ref($r) ne "ARRAY");
+            if (in_array($r,"RAdmin") && $crec->{targetid} ne ""){
+               $orgadmin{$crec->{targetid}}++;
+            }
+         }
+      }
+      my @orgadmin=keys(%orgadmin);
+
+      
+
+      printf STDERR ("contacts=%s\n",Dumper($oldrec->{contacts}));
+      my $lnkgrp=$self->getPersistentModuleObject("w5lgrp","base::lnkgrpuser");
+      $lnkgrp->SetFilter({grpid=>\$grpid});
+      my @l=$lnkgrp->getHashList(qw(ALL));
+
+
+      $lnkgrp->RoleSyncIn(\@l,{
+            RBoss=>[$leader],
+            RAdmin=>\@orgadmin
+         },
+         {
+            onInsert=>sub{
+               my $self=shift;
+               my $newrec=shift;
+               $newrec->{grpid}=$grpid;
+               $newrec->{srcsys}="TS::vou";
+               $newrec->{srcload}=NowStamp("en");
+               if (!in_array($newrec->{roles},"RBoss")){
+                  push(@{$newrec->{roles}},"REmployee");
+               }
+               if (!in_array($newrec->{roles},"RMember")){
+                  push(@{$newrec->{roles}},"RMember");
+               }
+               return(1);
+            },
+            onUpdate=>sub{
+               my $self=shift;
+               my $oldrec=shift;
+               my $newrec=shift;
+               if ($oldrec->{srcsys} eq ""){
+                  $newrec->{srcsys}="TS::vou";
+               }
+               $newrec->{srcload}=NowStamp("en");
+               return(1);
+            },
+         }
+      );
    }
 }
 

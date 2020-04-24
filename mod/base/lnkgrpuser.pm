@@ -700,6 +700,120 @@ sub getRecordImageUrl
 }
 
 
+sub RoleSyncIn
+{
+   my $self=shift;
+   my $cur=shift;
+   my $rules=shift;
+   my $param=shift;
+
+
+   my $oldstate=$self->isDataInputFromUserFrontend();
+   $self->isDataInputFromUserFrontend(0);
+   my %insrec;
+   my %updrec;
+   my %delrec;
+   foreach my $rulerole (keys(%{$rules})){
+      foreach my $uid (@{$rules->{$rulerole}}){
+         my $uidfound=0;
+         foreach my $crec (@{$cur}){
+            my $r=$crec->{roles};
+            $r=[$r] if (ref($r) ne "ARRAY");
+            $r=[@{$r}];
+            if ($crec->{userid} eq $uid){
+               if (in_array($r,$rulerole)){
+                  $uidfound++;
+               }
+               else{
+                  push($r,$rulerole);
+                  $updrec{$crec->{userid}}=[$crec,{
+                     userid=>$crec->{userid},
+                     grpid=>$crec->{grpid},
+                     roles=>$r,
+                  }];
+               }
+            }
+         }
+         if (!$uidfound){
+            printf STDERR ("fifi not found $uid for role $rulerole\n");
+            if (exists($updrec{$uid})){
+               if (!in_array($updrec{$uid}->[1]->{roles},$rulerole)){
+                  push(@{$updrec{$uid}->[1]->{roles}},$rulerole);
+               }
+            }
+            else{
+               if (!exists($insrec{$uid})){
+                  $insrec{$uid}={
+                     userid=>$uid,
+                     roles=>[$rulerole],
+                  };
+               }
+               else{
+                  push(@{$insrec{$uid}->{roles}},$rulerole);
+               }
+            }
+         }
+      }
+   }
+   foreach my $crec (@{$cur}){
+      my $r=$crec->{roles};
+      $r=[$r] if (ref($r) ne "ARRAY");
+      $r=[@{$r}];
+      foreach my $rulerole (keys(%{$rules})){
+         if (in_array($r,$rulerole)){
+            if (!in_array($rules->{$rulerole},$crec->{userid})){
+               $r=[grep(!/^${rulerole}$/,@$r)];
+               if ($#{$r}==-1){
+                  $delrec{$crec->{userid}}=$crec;
+               }
+               else{
+                  $updrec{$crec->{userid}}=[$crec,{
+                     userid=>$crec->{userid},
+                     grpid=>$crec->{grpid},
+                     roles=>$r,
+                  }];
+               }
+            }
+         }
+      }
+   }
+   foreach my $insrec (values(%insrec)){
+      printf STDERR ("DEBUG: insrec:%s\n",Dumper($insrec));
+      my $doIt=1;
+      if ($param->{onInsert}){
+         $doIt=&{$param->{onInsert}}($self,$insrec);
+      }
+      if ($doIt){
+         $self->ValidatedInsertRecord($insrec);
+      }
+   }
+   foreach my $updrec (values(%updrec)){
+      printf STDERR ("DEBUG: updrec:%s\n",Dumper($updrec->[1]));
+      my $doIt=1;
+      if ($param->{onUpdate}){
+         $doIt=&{$param->{onUpdate}}($self,$updrec->[0],$updrec->[1]);
+      }
+      if ($doIt){
+         $self->ValidatedUpdateRecord($updrec->[0],$updrec->[1],
+            {lnkgrpuserid=>$updrec->[0]->{lnkgrpuserid}});
+      }
+   }
+   foreach my $delrec (values(%delrec)){
+      printf STDERR ("DEBUG: delrec:%s\n",Dumper($delrec));
+      my $doIt=1;
+      if (!exists($insrec{$delrec->{userid}})){  # do not delete, if update 
+         if ($param->{onDelete}){                # needed
+            $doIt=&{$param->{onDelete}}($self,$delrec);
+         }
+         if ($doIt){
+            $self->ValidatedDeleteRecord($delrec);
+         }
+      }
+   }
+   $self->isDataInputFromUserFrontend($oldstate);
+}
+
+
 
 
 sub NotifyOrgAdminActionToAdmin
