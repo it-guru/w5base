@@ -391,12 +391,18 @@ sub DoRESTcall
 
    my $response=$ua->request($req);
    if ($response->is_success) {
+      #print STDERR ("Debug1: result=%s\n",$response->decoded_content);
       my $d=decode_json($response->decoded_content);
-      if (ref($d) eq "HASH"){
+      #print STDERR ("Debug2: result=%s\n",Dumper($d));
+      if (ref($d) eq "HASH" || ref($d) eq "ARRAY"){
          my $dd=&{$p{success}}($self,$d);
          if (defined($dd)){
             return($dd);
          }
+      }
+      else{
+         $self->LastMsg(ERROR,
+                        "unexpected data structure returend from REST call");
       }
    }
    else{
