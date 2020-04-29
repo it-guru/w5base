@@ -138,6 +138,11 @@ sub Validate
    my $applgrp=effVal($oldrec,$newrec,"applgrpid");
    my $system=effVal($oldrec,$newrec,"systemid");
 
+   if ($applgrp eq "" || $system eq ""){
+      $self->LastMsg(ERROR,"missing systemid or applgrpid");
+      return(undef);
+   }
+
    my $idtoken=$applgrp."-".$system;
  
    my $chk=effVal($oldrec,$newrec,"idtoken");
