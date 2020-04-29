@@ -42,6 +42,110 @@ sub Init
    return(1);
 }
 
+sub createSplitHeader
+{
+   my $self=shift;
+   my $wf=shift;
+   my $rec=shift;
+   my $from=shift;
+   my $Emailto=shift;
+   my $Emailcc=shift;
+   my $Emailbcc=shift;
+   my $emailsig=shift;
+
+   my $mail="";
+
+   my $to=join(",\n ",@$Emailto);
+   if (defined($emailsig) && $emailsig->{fromaddress} ne ""){
+      $mail.="From: $emailsig->{fromaddress}\n";
+   }else{
+      $mail.="From: $from\n";
+   }
+   $mail.="To: $to\n" if ($to ne "");
+   if (defined($emailsig) && $emailsig->{replyto} ne ""){
+      $mail.="Reply-To: $emailsig->{replyto}\n";
+   }
+   my $cc=join(",\n ",@$Emailcc);
+   my $bcc=join(",\n ",@$Emailbcc);
+   
+   
+   $mail.="Cc: $cc\n" if ($cc ne "");
+   $mail.="bcc: $bcc\n" if ($bcc ne "");
+   $mail.="Subject: ".mimeencode($rec->{name})."\n";
+   $mail.="Date: ".
+      $wf->ExpandTimeExpression($rec->{createdate},"RFC822","GMT","GMT").
+      "\n";
+   my $emailcategory=$rec->{emailcategory};
+   $emailcategory=[$emailcategory] if (ref($emailcategory) ne "ARRAY");
+   foreach my $cat (@$emailcategory){
+      $cat=trim($cat);
+      if ($cat ne ""){
+         $mail.="X-W5Category: $cat :X-W5Category\n";
+      }
+   }
+
+   return($mail);
+
+}
+
+sub createSplitEmailHead
+{
+   my $self=shift;
+   my $wf=shift;
+   my $rec=shift;
+   my $from=shift;
+   my $FullEmailto=shift;
+   my $FullEmailcc=shift;
+   my $FullEmailbcc=shift;
+   my $Emailto=shift;
+   my $Emailcc=shift;
+   my $Emailbcc=shift;
+   my $emailsig=shift;
+   my $splitnum=shift;
+   my $mail="";
+
+   @{$Emailto}=();
+   @{$Emailcc}=();
+   @{$Emailbcc}=();
+
+   my $emailHead;
+
+   my $headCheckCnt=0;
+
+   do{
+      if ($#{$FullEmailto}!=-1){
+         push(@{$Emailto},shift(@{$FullEmailto}));
+      }
+      if ($#{$FullEmailcc}!=-1){
+         push(@{$Emailcc},shift(@{$FullEmailcc}));
+      }
+      if ($#{$FullEmailbcc}!=-1){
+         push(@{$Emailbcc},shift(@{$FullEmailbcc}));
+      }
+      $emailHead=$self->createSplitHeader(
+         $wf, $rec, $from,
+         $Emailto, $Emailcc, $Emailbcc,
+         $emailsig
+      );
+      msg(DEBUG,"headcheck loop $headCheckCnt finished - l=".
+                length($emailHead));
+      $headCheckCnt++;
+   }while((length($emailHead)<22000 || 
+           $headCheckCnt<=1) &&     # 1st loop always have to work 
+          ($#{$FullEmailto}!=-1 ||  # if some idiot sends a 21k EMail Address
+           $#{$FullEmailcc}!=-1 || 
+           $#{$FullEmailbcc}!=-1));
+   if ($$splitnum==0 && (        # processing first block, but there are
+         $#{$FullEmailto}!=-1 || # some emails in todo List
+         $#{$FullEmailcc}!=-1 ||
+         $#{$FullEmailbcc}!=-1)){
+      $$splitnum=1;  # now the upper routines know we are in splitmode
+   }
+   $mail=$emailHead;
+
+   return($mail);
+}
+
 sub Sendmail
 {
    my $self=shift;
@@ -126,7 +230,6 @@ sub Sendmail
                $rec->{$d}=[];
             }
          }
-         my $mail;
          my @emaillang=split(/[,;\-.]/,$rec->{emaillang});
          my $e=$rec->{emaillang};
          @emaillang=@{$rec->{emaillang}} if (ref($rec->{emaillang}) eq "ARRAY");
@@ -185,7 +288,6 @@ sub Sendmail
                           $m;
                          } @emailto);
          }
-         my $to=join(",\n ",@emailto);
          # CC Handling
          $rec->{emailcc}=[$rec->{emailcc}] if (ref($rec->{emailcc}) ne "ARRAY");
          my @emailcc=@{$rec->{emailcc}};
@@ -201,7 +303,6 @@ sub Sendmail
                           $m;
                          } @emailcc);
          }
-         my $cc=join(",\n ",@emailcc);
          # BCC Handling
          if (ref($rec->{emailbcc}) ne "ARRAY"){
             $rec->{emailbcc}=[$rec->{emailbcc}];
@@ -219,62 +320,45 @@ sub Sendmail
                           $m;
                          } @emailbcc);
          }
-         my $bcc=join(",\n ",@emailbcc);
-         #msg(DEBUG,"building mail header\nto=%s\ncc=%s\nbcc=%s\nallowed=%s",
-         #    Dumper(\@emailto),Dumper(\@emailcc),Dumper(\@emailbcc),
-         #    Dumper(\@mailallow));
-         if (defined($emailsig) && $emailsig->{fromaddress} ne ""){
-            $mail.="From: $emailsig->{fromaddress}\n";
-         }else{
-            $mail.="From: $from\n";
-         }
-         $mail.="To: $to\n" if ($to ne "");
-         if (defined($emailsig) && $emailsig->{replyto} ne ""){
-            $mail.="Reply-To: $emailsig->{replyto}\n";
-         }
-         $mail.="Cc: $cc\n" if ($cc ne "");
-         $mail.="bcc: $bcc\n" if ($bcc ne "");
-         $mail.="Subject: ".mimeencode($rec->{name})."\n";
-         $mail.="Date: ".
-            $wf->ExpandTimeExpression($rec->{createdate},"RFC822","GMT","GMT").
-            "\n";
-         $mail.="Message-ID: <".$rec->{id}.'@'.$rec->{initialconfig}.'@'.
-                $rec->{initialsite}.'@'."W5Base>\n";
-         my $emailcategory=$rec->{emailcategory};
-         $emailcategory=[$emailcategory] if (ref($emailcategory) ne "ARRAY");
-         foreach my $cat (@$emailcategory){
-            $cat=trim($cat);
-            if ($cat ne ""){
-               $mail.="X-W5Category: $cat :X-W5Category\n";
-            }
-         }
-         if ($template ne ""){
-            $mail.="X-W5MailTemplate: $template :X-W5MailTemplate\n";
-         }
-         if ($opmode ne ""){
-            $mail.="X-W5OPMode: $opmode :X-W5OPMode\n";
-         }
-         $mail.="Mime-Version: 1.0\n";
-         msg(DEBUG,"SMTP Message Header Size: ".length($mail));
-         if (length($mail)>25000){
-            msg(DEBUG,"======================");
-            msg(DEBUG,"SMTP to:".length($to));
-            msg(DEBUG,"SMTP cc:".length($cc));
-            msg(DEBUG,"SMTP bcc:".length($bcc));
-            msg(DEBUG,"SMTP Header LIMIT !!!!");
-            msg(DEBUG,"======================");
-            my $wfop=$wf->Clone();
-            my $finerec={state=>22,
-                         eventend=>NowStamp("en"),
-                         closedate=>NowStamp("en"),
-                         step=>'base::workflow::mailsend::finish'};
-            $wfop->Action->StoreRecord( $rec->{id},"note",
-                 {translation=>'base::workflow::sendmail'},
-                 "message header size exceeds limit"
+
+
+         my @FullEmailto=@emailto;
+         my @FullEmailcc=@emailcc;
+         my @FullEmailbcc=@emailbcc;
+         my $splitnum=0;
+         my $splitokcount=0;
+         do{   # split large Mails
+            my $mail=$self->createSplitEmailHead(
+               $wf, $rec, $from,
+               \@FullEmailto, \@FullEmailcc, \@FullEmailbcc,
+               \@emailto, \@emailcc, \@emailbcc,
+               $emailsig,
+               \$splitnum
             );
-            $wfop->Store($rec,$finerec);
-         }
-         else{
+            my $MessageId=$rec->{id};
+            if ($splitnum>=1){
+               $MessageId.=".".$splitnum;
+            }
+          
+            $mail.="Message-ID: <".$MessageId.'@'.$rec->{initialconfig}.'@'.
+                   $rec->{initialsite}.'@'."W5Base>\n";
+            if ($template ne ""){
+               $mail.="X-W5MailTemplate: $template :X-W5MailTemplate\n";
+            }
+            if ($opmode ne ""){
+               $mail.="X-W5OPMode: $opmode :X-W5OPMode\n";
+            }
+            $mail.="Mime-Version: 1.0\n";
+
+            if ($splitnum>=1){
+               sleep(1); # sendmail calls nicht zu schnell durchführen
+               my $wfop=$wf->Clone();
+               $wfop->Action->StoreRecord( $rec->{id},"note",
+                    {translation=>'base::workflow::sendmail'},
+                    "message splitmode pack $splitnum",undef,
+                    {TopHeaderSize=>length($mail)}
+               );
+            }
             $mail.="Content-Type: multipart/mixed; boundary=\"$mixbound\"\n";
             $mail.="--$mixbound";
             $mail.="\n";
@@ -300,8 +384,8 @@ sub Sendmail
                   $smstext=$plaintext;
                }
             }
-
-
+          
+          
             $mail.="\n--$bound";
             $mail.="\n";
             my $relbound="Rel.$bound";
@@ -335,8 +419,8 @@ sub Sendmail
                   $useadditional{$knew}=$additional{$k};
                }
             }
-
-
+          
+          
             if ($app->getSkinFile($app->SkinBase()."/".$formname)){
                $maildata=$app->getParsedTemplate($formname,
                                         {static=>{
@@ -462,7 +546,7 @@ sub Sendmail
                if (defined($emailsig) && $emailsig->{htmlsig} ne ""){
                   $mailsignature=$emailsig->{htmlsig};
                }
-    
+          
                $maildata=$app->getParsedTemplate($formname,{
                                               static=>{
                                                  %additional,
@@ -472,7 +556,7 @@ sub Sendmail
                                               }});
             }
             $mail.=$maildata;
-
+          
             $mail.="\n--$relbound";
             #msg(DEBUG,"adding pictures to mail body as multiplart content");
             for(my $c=1;$c<=9;$c++){
@@ -505,14 +589,14 @@ sub Sendmail
                $mail.="METHOD:PUBLISH\n";
                $mail.="PRODID:http://$rec->{initialsite}\n";
                $mail.="VERSION:2.0\n";
-
+          
                $mail.="BEGIN:VTIMEZONE\n";
                $mail.="TZID:GMT\n";
                $mail.="BEGIN:STANDARD\n";
                $mail.="TZOFFSETTO:+0000\n";
                $mail.="END:STANDARD\n";
                $mail.="END:VTIMEZONE\n";
-
+          
                $mail.="BEGIN:VEVENT\n";
                $mail.="SUMMARY:$rec->{name}\n";
                # aus absender
@@ -562,11 +646,11 @@ sub Sendmail
                   $mail.="TRIGGER;RELATED=START:-PT".$rec->{terminnotify}."M\n";
                   $mail.="END:VALARM\n";
                }
-
+          
                $mail.="END:VEVENT\n";
                $mail.="END:VCALENDAR\n";
             }
-
+          
             $mail.="\n--$bound--\n";
             {
                my $wfa=getModuleObject($self->Config,"base::wfattach");
@@ -637,18 +721,20 @@ sub Sendmail
                print F $mail;
                close(F);
                push(@processed,$rec->{id});
-               if (open(D,">/tmp/mail.dump.tmp")){
-                  my $wfop=$wf->Clone();
-                  my $finerec={state=>21,
-                               eventend=>NowStamp("en"),
-                               closedate=>NowStamp("en"),
-                               step=>'base::workflow::mailsend::finish'};
+               if (open(D,">/tmp/mail.dump${splitnum}.tmp")){
                   print D $mail;
-                  #print D "\n----\n".Dumper($finerec);
-                  $wfop->Store($rec,$finerec);
-                  close(D);
                }
+               $splitokcount++;
             }
+            $splitnum++;
+         }while($#FullEmailto!=-1 || $#FullEmailcc!=-1 || $#FullEmailbcc!=-1);
+         if ($splitokcount>0){
+            my $wfop=$wf->Clone();
+            my $finerec={state=>21,
+                         eventend=>NowStamp("en"),
+                         closedate=>NowStamp("en"),
+                         step=>'base::workflow::mailsend::finish'};
+            $wfop->Store($rec,$finerec);
          }
          #msg(DEBUG,"try to load next record");
          ($rec,$msg)=$wf->getNext();
