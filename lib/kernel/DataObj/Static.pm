@@ -381,24 +381,44 @@ sub DoRESTcall
          $ua->proxy(['https'],$probeipproxy);
       }
    }
-   if ($p{method} eq "GET"){
-       
-   }
    my $req;
    if ($p{method} eq "GET"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers});
    }
-
+   if ($p{method} eq "POST"){
+      $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
+   }
+   if ($p{method} eq "PUT"){
+      $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+   }
+   if ($p{method} eq "DELETE"){
+      $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+   }
    my $response=$ua->request($req);
+   my $code=$response->code();
+   my $message=$response->message();
    if ($response->is_success) {
-      #print STDERR ("Debug1: result=%s\n",$response->decoded_content);
-      my $d=decode_json($response->decoded_content);
+      printf STDERR ("Debug1: code=$code message=$message result=%s\n",$response->decoded_content);
+      my $respcontent=$response->decoded_content;
+      if ($p{preprocess}){
+         $respcontent=&{$p{preprocess}}($self,$respcontent,$code,$message);
+      }
+      my $d=decode_json($respcontent);
       #print STDERR ("Debug2: result=%s\n",Dumper($d));
       if (ref($d) eq "HASH" || ref($d) eq "ARRAY"){
-         my $dd=&{$p{success}}($self,$d);
-         if (defined($dd)){
-            return($dd);
+         if ($p{success}){
+            my $dd=&{$p{success}}($self,$d,$code,$message);
+            if (defined($dd)){
+               if (wantarray()){
+                  return($dd,$code,$message);
+               }
+               return($dd);
+            }
          }
+         if (wantarray()){
+            return($d,$code,$message);
+         }
+         return($d);
       }
       else{
          $self->LastMsg(ERROR,
@@ -413,6 +433,29 @@ sub DoRESTcall
 }
 
 
+sub getQueryToken
+{
+   my $self=shift;
+   my $token="";
+
+   my %h=Query->MultiVars();
+
+   my $idobj=$self->IdField();
+   if (defined($idobj)){
+      my $idname=$idobj->Name();
+      if (defined($h{$idname})){
+         return("$idname:$h{$idname}");
+      }
+   }
+   foreach my $v (sort(keys(%h))){
+      if ($v=~m/^search_/ && $h{$v} ne ""){
+         $token.="&$v=$h{$v}";
+      }
+   }
+   return($token);
+}
+
+
 sub CollectREST
 {
    my $self=shift;
@@ -421,9 +464,14 @@ sub CollectREST
    my $cachetime=$p{cachetime};
    $cachetime=10 if (!defined($cachetime));
 
+   my $token="JSON";
+   $token=$p{requesttoken} if (defined($p{requesttoken}));
+   # requesttoken is needed, to identify query in query-cache
+
    my $c=$self->Context();
-   if (!exists($c->{RESTCallResult}) || 
-       $c->{RESTCallResult}->{t}<time()-$cachetime){
+
+   if (!exists($c->{"RESTCallResult.$token"}) || 
+       $c->{"RESTCallResult.$token"}->{t}<time()-$cachetime){
       my $dbname=$p{dbname};
       my ($baseurl,$apikey)=$self->GetRESTCredentials($dbname);
       if (!defined($baseurl) || !defined($apikey)){
@@ -446,21 +494,25 @@ sub CollectREST
       $p{method}="GET" if (!exists($p{method}));
       $p{format}="JSON" if (!exists($p{format}));
 
-      my $Data=$self->DoRESTcall(
+      my @data=$self->DoRESTcall(
          method=>$p{method}, url=>$dataobjurl,
          content=>$Content,      headers=>$Headers,
          useproxy=>$p{useproxy},
          BasicAuthUser=>undef, BasicAuthPass=>undef,
          format=>$p{format},
-         success=>$p{success}
+         success=>$p{success},
+         preprocess=>$p{preprocess}
       );
-      $c->{RESTCallResult}={
-         DATA=>$Data,
+      $c->{"RESTCallResult.$token"}={
+         DATA=>\@data,
          t=>time()
       };
    }
-   if (exists($c->{RESTCallResult})){
-      return($c->{RESTCallResult}->{DATA});
+   if (exists($c->{"RESTCallResult.$token"})){
+      if (wantarray()){
+         return(@{$c->{"RESTCallResult.$token"}->{DATA}});
+      }
+      return($c->{"RESTCallResult.$token"}->{DATA}->[0]);
    }
    return(undef);
 }
