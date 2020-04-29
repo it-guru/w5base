@@ -86,10 +86,158 @@ sub qcheckRecord
       applcistatusid=>[4]
    });
 
-   my @l=$lobj->getHashList(qw(systemid applid));
+   my @l=$lobj->getHashList(qw(systemid applgrpid));
+   my %ul;
+   foreach my $lrec (@l){
+      $ul{$lrec->{applgrpid}."-".$lrec->{systemid}}=$lrec;
+   }
+   @l=values(%ul);
 
-   printf STDERR ("l=%s\n",Dumper(\@l));
-   printf STDERR ("n=%d\n",$#l+1);
+
+
+   my @systemid;
+   map({push(@systemid,$_->{systemid});} @l);
+
+   #printf STDERR ("l=%s\n",Dumper(\@l));
+   #printf STDERR ("n=%d\n",$#l+1);
+   #printf STDERR ("systemid=%s\n",join(",",@systemid));
+
+   my $laddobj=getModuleObject($dataobj->Config,"itil::addlnkapplgrpsystem");
+   $laddobj->SetFilter({
+      applgrpid=>\$rec->{id},
+      systemid=>\@systemid
+   });
+   my $opladdobj=$laddobj->Clone();
+   $laddobj->SetCurrentView(qw(systemid applgrpid additional id));
+   my $ladd=$laddobj->getHashIndexed(qw(systemid));
+   printf STDERR ("addl=%s\n",Dumper($ladd));
+
+
+   my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
+   my $tsosmac=getModuleObject($dataobj->Config,"TASTEOS::tsosmachine");
+
+   my $TSOSsystemid=$rec->{additional}->{TasteOS_SystemID}->[0];
+
+   my $tsossysrec={
+      name=>$rec->{fullname},
+      icto=>$rec->{applgrpid},
+      description=>"ICTO: $rec->{applgrpid}"
+   };
+
+   sub insNewTSOSsys
+   {
+      my $nrec=shift;
+
+      my $newid=$tsossys->ValidatedInsertRecord($nrec);
+      if ($newid ne ""){
+         $TSOSsystemid=$newid;
+         my %add=%{$rec->{additional}};
+         $add{TasteOS_SystemID}=$newid;
+         $dataobj->ValidatedUpdateRecord(
+            $rec,{additional=>\%add},
+            {id=>$rec->{id}}
+         );
+      }
+      return($newid);
+   }
+
+   if ($TSOSsystemid eq ""){
+      $TSOSsystemid=insNewTSOSsys($tsossysrec);
+   }
+   else{
+      my $bk=$tsossys->ValidatedUpdateRecord(
+         {},$tsossysrec,
+         {id=>$TSOSsystemid
+      });
+      if ($bk eq ""){  # target does not exists anymore
+         my @lastmsg=$tsossys->LastMsg();
+         if (grep(/401 Unauthorized/,@lastmsg)){
+            my $newid=insNewTSOSsys($tsossysrec);
+            if ($newid ne ""){
+               $TSOSsystemid=$newid;
+            }
+            else{
+               die("ganz schlecht");
+            }
+         }
+
+      }
+   }
+   printf STDERR ("fifi upd TSOSsystemid=$TSOSsystemid\n");
+   sub insNewTSOSmac
+   {
+      my $nrec=shift;
+      my $lrec=shift;
+      my $ladd=shift;
+
+      my $newid=$tsosmac->ValidatedInsertRecord($nrec);
+      if ($newid ne ""){
+         if (!exists($ladd->{$lrec->{systemid}})){
+            my %add=(TasteOS_MachineID=>$newid);
+printf STDERR ("fifi insNewTSOSmac $newid\n");
+            
+            $opladdobj->ValidatedInsertRecord({
+               systemid=>$lrec->{systemid},
+               applgrpid=>$lrec->{applgrpid},
+               additional=>\%add
+            });
+         }
+         else{
+printf STDERR ("fifi insNewTSOSmac update $newid in id=".$ladd->{$lrec->{systemid}}->{id}."\n");
+            my %add=%{$ladd->{$lrec->{systemid}}->{additional}};
+            $add{TasteOS_MachineID}=$newid;
+            $opladdobj->ValidatedUpdateRecord(
+               $ladd->{$lrec->{systemid}},
+               {additional=>\%add},
+               {id=>$ladd->{$lrec->{systemid}}->{id}}
+            );
+         }
+      }
+      return($newid);
+   }
+
+   if ($TSOSsystemid ne ""){
+      foreach my $lrec (@l){
+         my $TSOSmachineid;
+         if (exists($ladd->{systemid}->{$lrec->{systemid}})){
+            $TSOSmachineid=$ladd->{systemid}->{$lrec->{systemid}}->{additional}->{TasteOS_MachineID}->[0];
+         }
+         printf STDERR ("fifi TSOSmachineid for $lrec->{systemid} : $TSOSmachineid\n");
+         my $tsosmacrec={
+            name=>$lrec->{system},
+            systemid=>$TSOSsystemid
+         };
+         
+         if ($TSOSmachineid eq ""){
+            my $newid=insNewTSOSmac($tsosmacrec,$lrec,$ladd->{systemid});
+         }
+         else{
+            my $bk=$tsosmac->ValidatedUpdateRecord(
+               {},$tsosmacrec,
+               {id=>$TSOSmachineid
+            });
+            if ($bk eq ""){  # target does not exists anymore
+               my @lastmsg=$tsosmac->LastMsg();
+               if (grep(/401 Unauthorized/,@lastmsg)){
+                  my $newid=insNewTSOSmac($tsosmacrec,$lrec,$ladd->{systemid});
+                  if ($newid ne ""){
+                     $TSOSmachineid=$newid;
+                  }
+                  else{
+                     die("ganz schlecht");
+                  }
+               }
+           
+            }
+
+         }
+
+      }
+   }
+
+
+
+
 
 
 

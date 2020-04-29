@@ -1,4 +1,4 @@
-package TASTEOS::tsossystem;
+package TASTEOS::tsosmachine;
 #  W5Base Framework
 #  Copyright (C) 2020  Hartmut Vogler (it@guru.de)
 #
@@ -31,38 +31,37 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Id(     
-            name              =>'id',
-            searchable        =>1,
-            htmldetail        =>'NotEmpty',
-            label             =>'SystemID'),
+      new kernel::Field::Text(           # this is not of type ::Id - because
+            name               =>'id',   # a record is not direct openable
+            searchable         =>1,      # by id (systemid is needed)
+            htmlwidth          =>'200px',
+            align              =>'left',
+            label              =>'MachineID'),
 
       new kernel::Field::Text(     
-            name              =>'name',
-            searchable        =>1,
-            label             =>'Name'),
+            name               =>'systemid',
+            searchable         =>1,
+            label              =>'SystemID'),
 
       new kernel::Field::Text(     
-            name              =>'icto',
-            searchable        =>1,
-            label             =>'ICTO-ID'),
+            name               =>'name',
+            searchable         =>1,
+            htmlwidth          =>'200px',
+            label              =>'Name'),
 
       new kernel::Field::Text(     
-            name              =>'description',
-            searchable        =>1,
-            label             =>'Description'),
+            name               =>'riskCategoryName',
+            searchable         =>1,
+            label              =>'risk Category Name'),
 
-      new kernel::Field::SubList(
-                name          =>'machines',
-                label         =>'Machines',
-                group         =>'machines',
-                searchable    =>0,
-                vjointo       =>'TASTEOS::tsosmachine',
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name','id']),
+      new kernel::Field::Text(     
+            name               =>'riskCategoryFactor',
+            searchable         =>1,
+            label              =>'risk Category Factor'),
+
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name icto description));
+   $self->setDefaultView(qw(id name description));
    return($self);
 }
 
@@ -71,14 +70,18 @@ sub DataCollector
    my $self=shift;
    my $filterset=shift;
 
+
+   return(undef) if (!$self->genericSimpleFilterCheck4TASTEOS($filterset));
    my $filter=$filterset->{FILTER}->[0];
+   return(undef) if (!$self->checkMinimalFilter4TASTEOS($filter,"systemid"));
    my $query=$self->decodeFilter2Query4TASTEOS($filter);
+   my $systemid=$query->{systemid};
 
-   my $dbclass="icto/system-metadata";
+   my $dbclass="icto/machine-metadata";
 
-   my $d=$self->CollectREST(
+   return($self->CollectREST(
       dbname=>'TASTEOS',
-      requesttoken=>"SEARCH.".time(),
+      requesttoken=>$systemid,
       url=>sub{
          my $self=shift;
          my $baseurl=shift;
@@ -91,15 +94,17 @@ sub DataCollector
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
-         my $headers=['access-token'=>$apikey,
-                      'Content-Type'=>'application/json'];
- 
-         return($headers);
+         return(['access-token'=>$apikey,
+                 'Content-Type','application/json',
+                 'system-id',$systemid]);
       },
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
          if (ref($data) eq "ARRAY"){
+            map({
+                      $_->{systemid}=$query->{systemid};
+                   } @{$data});
             return($data);
          }
          else{
@@ -107,52 +112,35 @@ sub DataCollector
          }
          return(undef);
       }
-   );
-   return($d);
-}
-
-sub isViewValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return("default") if (!defined($rec));
-   return("ALL");
-}
-
-sub isWriteValid
-{
-   my $self=shift;
-   my $rec=shift;
-   if ($self->IsMemberOf("admin")){
-      return("default");
-   }
-   return(undef);
+   ));
 }
 
 
-sub Validate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
 
-   if (effVal($oldrec,$newrec,"name") eq ""){
-      $self->LastMsg(ERROR,"invalid name specified");
-      return(undef);
-   }
 
-   return(1);
-}
 
 sub InsertRecord
 {
    my $self=shift;
    my $newrec=shift;  # hash ref
 
-   my $dbclass="systems";
+   my $dbclass="machines";
+
+   my %new;
+   foreach my $k (keys(%$newrec)){
+      my $dk=$k;
+      $dk="system-id" if ($k eq "systemid");
+      $new{$dk}=$newrec->{$k};
+      $new{$dk}=$new{$dk}->[0] if (ref($new{$dk}) eq "ARRAY");
+   }
+
+
+
+
 
    my $d=$self->CollectREST(
       dbname=>'TASTEOS',
+      requesttoken=>"INS.".$newrec->{name}.time(),
       method=>'POST',
       url=>sub{
          my $self=shift;
@@ -167,22 +155,25 @@ sub InsertRecord
          my $baseurl=shift;
          my $apikey=shift;
          return(['access-token'=>$apikey,
-                 'name'=>$newrec->{name},
-                 'description'=>$newrec->{description},
+                 %new,
                  'Content-Type','application/json']);
       },
       preprocess=>sub{   # create a valid JSON response
          my $self=shift;
          my $d=shift;
+         my $code=shift;
+         my $message=shift;
          $d=trim($d);
+printf STDERR ("fifi got: $code - $message - d=$d\n");
          $d=~s/'//g;
          $d=~s/"//g;
-         my $resp="{\"systemid\":\"$d\"}";
+         my $resp="{\"machineid\":\"$d\"}";
          return($resp);
       }
    );
+printf STDERR ("fifi inserted: $d->{machineid}\n");
 
-   return($d->{systemid});
+   return($d->{machineid});
 }
 
 
@@ -206,7 +197,9 @@ sub UpdateRecord
    }
 
 
-   my $dbclass="systems/$id";
+   my $dbclass="machines/$id";
+
+printf STDERR ("fifi UpdateRecord: $dbclass %s\n",Dumper(\%upd));
 
    my ($d,$code,$message)=$self->CollectREST(
       dbname=>'TASTEOS',
@@ -233,6 +226,7 @@ sub UpdateRecord
          my $d=shift;
          my $code=shift;
          my $message=shift;
+printf STDERR ("fifi got: $code - $message - d=$d\n");
          my $resp="[]";
          return($resp);
       }
@@ -249,7 +243,7 @@ sub DeleteRecord
    my $self=shift;
    my $oldrec=shift;  # hash ref
 
-   my $dbclass="systems/$oldrec->{id}";
+   my $dbclass="machine/$oldrec->{id}";
 
    my ($d,$code,$message)=$self->CollectREST(
       dbname=>'TASTEOS',
@@ -286,14 +280,6 @@ sub DeleteRecord
    }
    return(undef);
 }
-
-
-
-
-
-
-
-
 
 
 

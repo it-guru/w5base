@@ -77,6 +77,57 @@ sub isQualityCheckValid
 }
 
 
+sub genericSimpleFilterCheck4TASTEOS
+{
+   my $self=shift;
+   my $filterset=shift;
+
+   if (!ref($filterset) eq "HASH" ||
+       keys(%{$filterset})!=1 ||
+       !exists($filterset->{FILTER}) ||
+       ref($filterset->{FILTER}) ne "ARRAY" ||
+       $#{$filterset->{FILTER}}!=0){
+      $self->LastMsg(ERROR,"requested filter not supported by REST backend");
+      print STDERR Dumper($filterset);
+      return(undef);
+   }
+   return(1);
+}
+
+sub checkMinimalFilter4TASTEOS
+{
+   my $self=shift;
+   my $filter=shift;
+   my @fields=@_;   # at now only 1 field works
+
+   my $field=$fields[0];
+
+   if (!exists($filter->{$field}) ||
+       !($filter->{$field}=~m/^[a-z0-9-]{20,50}$/)){
+      $self->LastMsg(ERROR,"mandatary filter not specifed");
+      print STDERR Dumper($filter);
+      return(undef);
+   }
+   return(1);
+}
+
+
+sub decodeFilter2Query4TASTEOS
+{
+   my $self=shift;
+   my $filter=shift;
+
+   my $query={};
+
+   foreach my $fn (keys(%$filter)){
+      $query->{$fn}=$filter->{$fn};
+      $query->{$fn}=${$query->{$fn}} if (ref($query->{$fn}) eq "SCALAR");
+      $query->{$fn}=join(" ",@{$query->{$fn}}) if (ref($query->{$fn}) eq "ARRAY");
+   }
+   return($query);
+}
+
+
 
 
 1;
