@@ -161,8 +161,14 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'expiration',
+                htmldetail    =>'NotEmptyOrEdit',
                 label         =>'Expiration-Date',
                 dataobjattr   =>'lnkcontact.expiration'),
+
+      #
+      #  Achtung: Das Expiration-Handling ist NICHT sauber implementiert.
+      #           Das Problem ist, das der alertstate nicht korrekt behandelt
+      #           wird - und dies auch nicht so einfach machbar ist.
 
       new kernel::Field::Select(
                 name          =>'alertstate',
@@ -180,7 +186,12 @@ sub new
                 },
                 readonly      =>1,
                 label         =>'Alert-State',
-                dataobjattr   =>'lnkcontact.alertstate'),
+                dataobjattr   =>"if (datediff(now(),lnkcontact.expiration)>0,".
+                                "'red',".
+                                "if (datediff(now(),".
+                                "lnkcontact.expiration)>-14,'orange',".
+                                "if (datediff(now(),".
+                                "lnkcontact.expiration)>-28,'yellow','')))"),
 
       new kernel::Field::Text(
                 name          =>'comments',
@@ -474,6 +485,8 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+printf STDERR Dumper($newrec);
+
    my $targetid=effVal($oldrec,$newrec,"targetid");
    my $target=effVal($oldrec,$newrec,"target");
    if ($target eq "" || $targetid eq ""){
@@ -545,11 +558,42 @@ sub Validate
          $rnew=join(",",sort(@{$rnew}));
       }
    }
+
+#   my $expiration=effVal($oldrec,$newrec,"expiration");
+#   my $curalert=effVal($oldrec,$newrec,"alertstate");
+#   my $dur=CalcDateDuration($expiration,NowStamp('en'));
+#   my $newalert="";
+#
+#   if ($expiration ne ""){
+#      if ($dur->{totalseconds}>=0) {
+#         $newalert="red";
+#      } elsif ($dur->{days}>-21) {
+#         $newalert="orange";
+#      } elsif ($dur->{days}>-28) {
+#         $newalert="yellow";
+#      }
+#      else{
+#         $newalert="";
+#      }
+#   }
+#   else{
+#      $newalert="";
+#   }
+#
+#   if ((defined($oldrec) && $oldrec->{alertstate} ne $newalert) ||
+#       !defined($oldrec)){
+#      $newrec->{alertstate}=$newalert;
+#   }
+
+
+
+
    if (defined($oldrec) &&
        !effChanged($oldrec,$newrec,"comments") &&
        !effChanged($oldrec,$newrec,"refid") &&
-       !effChanged($oldrec,$newrec,"parentobj") &&
        !effChanged($oldrec,$newrec,"target") &&
+       !effChanged($oldrec,$newrec,"expiration") &&
+       !effChanged($oldrec,$newrec,"alertstate") &&
        !effChanged($oldrec,$newrec,"targetid") &&
        trim($rold) eq trim($rnew)){   # prevent empty updates
       %{$newrec}=();  

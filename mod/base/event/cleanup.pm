@@ -107,48 +107,6 @@ sub CleanupLnkContact
             }
          }
 
-         # handle mandator contacts
-         if ($rec->{parentobj} eq 'base::mandator') {
-            my $dur=CalcDateDuration($rec->{expiration},NowStamp('en'));
-
-            if (!defined($rec->{expiration})) {
-               if (defined($rec->{alertstate})) {
-                  $objop->ValidatedUpdateRecord($rec,
-                             {alertstate=>undef,
-                              editor=>$rec->{editor},
-                              realeditor=>$rec->{realeditor},
-                              mdate=>$rec->{mdate}},
-                             {id=>\$rec->{id}});
-               }
-            }
-            elsif ($dur->{days}>0) {
-               # delete roles
-               $needdelete++;
-            }
-            elsif ($dur->{days}>-21) {
-               # set alertstate orange
-               if ($rec->{alertstate} ne 'orange') {
-                  $objop->ValidatedUpdateRecord($rec,
-                             {alertstate=>'orange',
-                              editor=>$rec->{editor},
-                              realeditor=>$rec->{realeditor},
-                              mdate=>$rec->{mdate}},
-                             {id=>\$rec->{id}});
-               }
-            }
-            elsif ($dur->{days}>-28) {
-               # set alertstate yellow
-               if ($rec->{alertstate} ne 'yellow') {
-                  $objop->ValidatedUpdateRecord($rec,
-                             {alertstate=>'yellow',
-                              editor=>$rec->{editor},
-                              realeditor=>$rec->{realeditor},
-                              mdate=>$rec->{mdate}},
-                             {id=>\$rec->{id}});
-               }
-            }
-         }
-
          if ($needdelete){
             $objop->ValidatedDeleteRecord($rec);
             $deletecount++;
