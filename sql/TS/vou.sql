@@ -11,7 +11,7 @@ create table vou (
   leader      bigint(20), leaderit  bigint(20),
   rorg bigint(20) not null,
   description longtext    default NULL,
-  comments    blob,
+  comments    blob, rampupid varchar(20),
   canvasid    varchar(10),
   canvasfield varchar(40),
   canvasownerbuid bigint(20),

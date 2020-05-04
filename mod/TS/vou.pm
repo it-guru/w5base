@@ -55,7 +55,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'shortname',
                 label         =>'Shortname',
-                size          =>'8',
+                size          =>'12',
                 htmlwidth     =>'80',
                 htmleditwidth =>'80',
                 dataobjattr   =>'vou.shortname'),
@@ -72,6 +72,11 @@ sub new
                 htmldetail    =>'NotEmpty',
                 readonly      =>1,
                 dataobjattr   =>'vou.code'),
+
+      new kernel::Field::Text(
+                name          =>'rampupid',
+                label         =>'Ramp-Up ID',
+                dataobjattr   =>'vou.rampupid'),
 
       new kernel::Field::Select(
                 name          =>'responsibleorg',
@@ -375,9 +380,20 @@ sub Validate
       $newshortname=~s/\[\d+\]$//;
       if ($newshortname=~m/^\s*$/ || 
           !($newshortname=~m/^[a-z0-9_]+$/i) ||
-          length($newshortname)>8){
+          length($newshortname)>12){
          $self->LastMsg(ERROR,"invalid shortname specified");
          return(0);
+      }
+   }
+   if (!defined($oldrec) || defined($newrec->{rampupid})){
+      my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
+      if ($cistatusid>2 && $cistatusid<6){
+         my $rampupid=$newrec->{rampupid};
+         if ($rampupid=~m/^\s*$/ || 
+             !($rampupid=~m/^XH[0-9_]+$/)){
+            $self->LastMsg(ERROR,"invalid Ramp-Up ID specified");
+            return(0);
+         }
       }
    }
    my $ocistatusid=undef;
