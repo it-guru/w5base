@@ -80,7 +80,7 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'expdate',
-                label         =>'Expiry-Date',
+                label         =>'Expiration Date',
                 translation   =>'tRnAI::license',
                 group         =>'license',
                 readonly      =>'1',

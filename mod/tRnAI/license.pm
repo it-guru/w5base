@@ -43,7 +43,7 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Lizense-Label',
+                label         =>'License Label',
                 dataobjattr   =>'tRnAI_license.name'),
 
       new kernel::Field::Text(
@@ -58,7 +58,7 @@ sub new
 
       new kernel::Field::Date(
                 name          =>'expdate',
-                label         =>'Expiry-Date',
+                label         =>'Expiration Date',
                 dayonly       =>1,
                 dataobjattr   =>'tRnAI_license.expdate'),
 
@@ -72,7 +72,7 @@ sub new
                 name          =>'fullname',
                 readonly      =>1,
                 htmldetail    =>0,
-                label         =>'Lizense-Description',
+                label         =>'License Description',
                 dataobjattr   =>'tRnAI_license.fullname'),
 
 
