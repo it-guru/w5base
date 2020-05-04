@@ -48,10 +48,10 @@ sub process
                $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
             }
 
-           # $self->CleanupWasted();
-           # $self->doCleanup();
-           # $self->CleanupWorkflows();
-           # $self->CleanupHistory();
+            $self->CleanupWasted();
+            $self->doCleanup();
+            $self->CleanupWorkflows();
+            $self->CleanupHistory();
             msg(DEBUG,"Call CleanupLnkContactExp");
             my $bk=$joblog->W5ServerCall("rpcCallEvent","CleanupLnkContactExp");
             if ($jobid ne ""){
