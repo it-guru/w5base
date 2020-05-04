@@ -449,20 +449,6 @@ sub Validate
 }
 
 
-sub FinishWrite
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   my $comprec=shift;
-   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
-      return(0);
-   }
-   return(1);
-}
-
-
-
 sub isViewValid
 {
    my $self=shift;
@@ -512,6 +498,9 @@ sub FinishWrite
    if ($cistatus>3){
       $self->syncToGroups($id,$cistatus,$shortname,$name,$oldrec,$newrec);
    }
+   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+      return(0);
+   }
    return(1);
 }
 
@@ -529,8 +518,6 @@ sub syncToGroups
    my $basegrpname=effVal($oldrec,$newrec,"responsibleorg");
    my $parentgrp=$basegrpname.".DigitalHub";
    my $fullname=$parentgrp.".".$shortname;
-
-   printf STDERR ("fifi syncToGroups: $fullname\n");
 
    my $grp=$self->getPersistentModuleObject("w5grp","base::grp");
    $grp->SetFilter([{
@@ -593,7 +580,7 @@ sub syncToGroups
 
       
 
-      printf STDERR ("contacts=%s\n",Dumper($oldrec->{contacts}));
+      #printf STDERR ("contacts=%s\n",Dumper($oldrec->{contacts}));
       my $lnkgrp=$self->getPersistentModuleObject("w5lgrp","base::lnkgrpuser");
       $lnkgrp->SetFilter({grpid=>\$grpid});
       my @l=$lnkgrp->getHashList(qw(ALL));
