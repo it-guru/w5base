@@ -116,7 +116,7 @@ sub new
                 readonly      =>1,
                 group         =>'cust',
                 vjointo       =>\'tRnAI::system',
-                vjoindisp     =>'customer',
+                vjoindisp     =>'department',
                 vjoinon       =>['systemid'=>'id']),
 
       new kernel::Field::Text(
