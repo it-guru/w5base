@@ -41,6 +41,7 @@ sub Init
    $self->RegisterEvent("CleanupAPIKeys","cleanAPIKeys");
    $self->RegisterEvent("CleanupWebFS","CleanupWebFS");
    $self->RegisterEvent("CleanupLnkContact","CleanupLnkContact");
+   $self->RegisterEvent("CleanupLnkContactExp","CleanupLnkContactExp");
    $self->RegisterEvent("CleanupLnkMandatorContact","LnkMandatorContact");
    return(1);
 }
@@ -62,6 +63,46 @@ sub LnkMandatorContact
    $param{flt}={parentobj=>'base::mandator'};
 
    return($self->CleanupLnkContact(%param));
+}
+
+
+
+
+
+sub CleanupLnkContactExp
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $obj=getModuleObject($self->Config,"base::lnkcontact");
+   my $objop=$obj->Clone();
+
+
+   $obj->SetFilter({expiration=>"<now-14d"});
+   $obj->SetCurrentView(qw(ALL));
+   
+   my ($rec,$msg)=$obj->getFirst(unbuffered=>1);
+   my $c=0;
+   my %o;
+   my $deletecount=0;
+   if (defined($rec)){
+      do{
+         my $needdelete=1;
+         msg(INFO,"process $rec->{parentobj} ($rec->{refid})");
+         if ($needdelete){
+            $W5V2::HistoryComments="base::event::CleanupLnkContactExp\n".
+                                   "by expiration $rec->{expiration}\n";
+            $objop->ValidatedDeleteRecord($rec);
+            $W5V2::HistoryComments=undef;
+            $deletecount++;
+         }
+         #if ($deletecount){
+         #   return({exitcode=>0,deletecount=>$deletecount});
+         #}
+         ($rec,$msg)=$obj->getNext();
+      } until(!defined($rec));
+   }
+   return({exitcode=>0,deletecount=>$deletecount});
 }
 
 

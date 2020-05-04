@@ -48,10 +48,12 @@ sub process
                $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
             }
 
-            $self->CleanupWasted();
-            $self->doCleanup();
-            $self->CleanupWorkflows();
-            $self->CleanupHistory();
+           # $self->CleanupWasted();
+           # $self->doCleanup();
+           # $self->CleanupWorkflows();
+           # $self->CleanupHistory();
+            msg(DEBUG,"Call CleanupLnkContactExp");
+            my $bk=$joblog->W5ServerCall("rpcCallEvent","CleanupLnkContactExp");
             if ($jobid ne ""){
                if ($joblog->Ping()){
                   $joblog->ValidatedUpdateRecord({id=>$jobid},
@@ -78,7 +80,11 @@ sub process
       $self->FullContextReset();
       $sleep=60 if ($sleep>60);
       die('lost my parent W5Server process - not good') if (getppid()==1);
-      sleep($sleep);
+      my $targettime=time()+$sleep;
+      do{
+        #msg(DEBUG,"sleep ".time()." target=$targettime doForceCleanup $self->{doForceCleanup}");
+        sleep(1);
+      }while((time()<$targettime) && !$self->{doForceCleanup});
    }
 }
 
@@ -289,6 +295,7 @@ sub CleanupWorkflows
 sub reload
 {
    my $self=shift;
+   msg(DEBUG," got reload");
    $self->{doForceCleanup}++;
 }
 
