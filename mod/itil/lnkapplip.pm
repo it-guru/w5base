@@ -102,6 +102,10 @@ sub getSqlFrom
       from lnkitclustsvcappl,ipaddress 
       where lnkitclustsvcappl.itclustsvc=ipaddress.lnkitclustsvc
    union
+   select itcloudarea.appl applid,ipaddress.id ipid 
+      from itcloudarea,ipaddress 
+      where itcloudarea.id=ipaddress.itcloudarea
+   union
    select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
       from lnkitclustsvcappl
            join lnkitclustsvc on lnkitclustsvcappl.itclustsvc=lnkitclustsvc.id

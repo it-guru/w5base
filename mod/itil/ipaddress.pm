@@ -101,7 +101,7 @@ sub new
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'systemid',
                 selectfix     =>1,
                 label         =>'SystemID',
@@ -150,7 +150,7 @@ sub new
                 vjoinon       =>['itclustsvcid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'itclustsvcid',
                 selectfix     =>1,
                 label         =>'ClusterserviceID',
@@ -348,21 +348,6 @@ sub new
                 vjoinon       =>['furthersystemid'=>'systemid'],
                 vjoindisp     =>['tsm2email']),
 
-      new kernel::Field::TextDrop(
-                name          =>'itcloudarea',
-                group         =>'further',
-                label         =>'Cloud Area',
-                htmldetail    =>'NotEmpty',
-                vjointo       =>'itil::itcloudarea',
-                vjoinon       =>['itcloudareaid'=>'id'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'itcloudareaid',
-                label         =>'CloudAreaID',
-                group         =>'further',
-                dataobjattr   =>'ipaddress.itcloudarea'),
-                                                  
       new kernel::Field::Select(
                 name          =>'network',
                 htmleditwidth =>'280px',
@@ -372,6 +357,28 @@ sub new
                 vjoinon       =>['networkid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::TextDrop(
+                name          =>'itcloudarea',
+                group         =>'default',
+                label         =>'Cloud Area',
+                htmldetail    =>'NotEmpty',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if (defined($current));
+                   return(0);
+                },
+                vjointo       =>'itil::itcloudarea',
+                vjoinon       =>['itcloudareaid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Interface(
+                name          =>'itcloudareaid',
+                label         =>'CloudAreaID',
+                selectfix     =>1,
+                group         =>'default',
+                dataobjattr   =>'ipaddress.itcloudarea'),
+                                                  
       new kernel::Field::SubList(
                 name          =>'dnsaliases',
                 label         =>'DNS-Aliases',
@@ -851,13 +858,17 @@ sub isParentSpecified
    my $oldrec=shift;
    my $newrec=shift;
 
+
    my $itclustsvcid=effVal($oldrec,$newrec,"itclustsvcid");
    my $systemid=effVal($oldrec,$newrec,"systemid");
-   if ($systemid<=0 && $itclustsvcid <=0){
+   my $itcloudareaid=effVal($oldrec,$newrec,"itcloudareaid");
+   if ($systemid<=0 && $itclustsvcid <=0 && $itcloudareaid<=0){
       $self->LastMsg(ERROR,"invalid parent object reference specified");
       return(0);
    } 
-   return(0) if (!($self->isParentWriteable($systemid,$itclustsvcid)));
+   if (!($self->isParentWriteable($systemid,$itclustsvcid,$itcloudareaid))){
+      return(0);
+   }
    return(1);
 
 }
@@ -871,9 +882,11 @@ sub isParentWriteable
    my $self=shift;
    my $systemid=shift;
    my $itclustsvcid=shift;
+   my $itcloudareaid=shift;
 
-   return($self->isParentOPvalid("write",$systemid,$itclustsvcid));
-
+   return(
+      $self->isParentOPvalid("write",$systemid,$itclustsvcid,$itcloudareaid)
+   );
 }
 
 sub isParentReadable
@@ -881,8 +894,9 @@ sub isParentReadable
    my $self=shift;
    my $systemid=shift;
    my $itclustsvcid=shift;
+   my $itcloudareaid=shift;
 
-   return($self->isParentOPvalid("read",$systemid,$itclustsvcid));
+   return($self->isParentOPvalid("read",$systemid,$itclustsvcid,$itcloudareaid));
 
 }
 
@@ -892,6 +906,7 @@ sub isParentOPvalid
    my $mode=shift;
    my $systemid=shift;
    my $itclustsvcid=shift;
+   my $itcloudareaid=shift;
 
    if ($systemid ne ""){
       my $p=$self->getPersistentModuleObject("itil::system");
@@ -930,7 +945,6 @@ sub isParentOPvalid
       my $p=$self->getPersistentModuleObject("itil::lnkitclustsvc");
       my $idname=$p->IdField->Name();
       my %flt=($idname=>\$itclustsvcid);
-      $p->ResetFilter();
       if ($mode eq "write"){ 
          $p->SetFilter(\%flt);
       }
@@ -957,6 +971,65 @@ sub isParentOPvalid
             $self->LastMsg(ERROR,"no access") if ($mode eq "write");
             return(0);
          }
+      }
+   }
+   if ($itclustsvcid eq "" && $systemid eq ""){
+      if ($itcloudareaid ne ""){
+         my $p=$self->getPersistentModuleObject("itil::itcloudarea");
+         my $idname=$p->IdField->Name();
+         my %flt=($idname=>\$itcloudareaid);
+         if ($mode eq "write"){ 
+            $p->SetFilter(\%flt);
+         }
+         else{
+            $p->SecureSetFilter(\%flt,\%flt);  # do not use isDirectHandling
+         }
+         my @l=$p->getHashList(qw(ALL));
+         if ($#l!=0){
+            if ($mode eq "write"){
+               $self->LastMsg(ERROR,
+                              "invalid cloudarea reference to itcloudarea=".
+                              $itcloudareaid);
+               return(0);
+            }
+         }
+         my $itcloudid=$l[0]->{cloudid};
+         my $pp=$self->getPersistentModuleObject("itil::itcloud");
+         my $idname=$pp->IdField->Name();
+         my %flt=($idname=>\$itcloudid);
+         if ($mode eq "write"){ 
+            $pp->SetFilter(\%flt);
+         }
+         else{
+            $pp->SecureSetFilter(\%flt,\%flt);  # do not use isDirectHandling
+         }
+         my @l=$pp->getHashList(qw(ALL));
+         if ($#l!=0){
+            if ($mode eq "write"){
+               $self->LastMsg(ERROR,
+                              "invalid cloud reference to itcloudarea=".
+                              $itcloudareaid);
+               return(0);
+            }
+         }
+         my @blkl;
+         if ($mode eq "write"){ 
+            @blkl=$pp->isWriteValid($l[0]);
+         }
+         if ($mode eq "read"){ 
+            @blkl=$pp->isViewValid($l[0]);
+         }
+         if ($self->isDataInputFromUserFrontend()){
+            if (!grep(/^ALL$/,@blkl) && !grep(/^default$/,@blkl)){
+               $self->LastMsg(ERROR,"no access") if ($mode eq "write");
+               return(0);
+            }
+            return(1) if ($mode eq "read");
+         }
+      }
+      else{
+         $self->LastMsg(ERROR,"doa felt woas") if ($mode eq "write");
+         return(0);
       }
    }
    return(1);
@@ -986,7 +1059,8 @@ sub isViewValid
    push(@def,"source");
    if ($self->IsMemberOf("admin") ||
        $self->IsMemberOf("w5base.itil.ipaddress.read") ||
-       $self->isParentReadable($rec->{systemid},$rec->{itclustsvcid})){
+       $self->isParentReadable($rec->{systemid},$rec->{itclustsvcid},
+                               $rec->{itcloudareaid})){
       push(@def,"history");
       push(@def,"ipnets");
       push(@def,"relatedto","further");
