@@ -1,4 +1,4 @@
-'TS::vou'=>{de=>'virutelle Organisationseinheit',en=>'virtuel organisational unit'},
+'TS::vou'=>{de=>'virtuelle Organisationseinheit',en=>'virtuel organisational unit'},
 'fieldgroup.comments'=>{de=>'Bemerkungen',en=>'Comments'},
 'fieldgroup.canvas'=>{de=>'Canvas',en=>'Canvas'},
 'fieldgroup.vouattr'=>{de=>'Organisationseinheit Atribute',en=>'organisational attributes'},
