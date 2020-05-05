@@ -40,3 +40,5 @@
 'You have not the necessary rights to view this record'=>{de=>'Sie haben nicht die erforderlichen Rechte, um diesen Datensatz zu sehen'},
 'Query parameter missing'=>{de=>'Keine Aufrufparameter übergeben'},
 'hide item'=>{de=>'Element verstecken'},
+'delete operation on invalid record'=>{de=>'Datensatz Lösch-Versuch auf ungültigem Datensatz'},
+'Modify operations are only alowed by Method POST'=>{de=>'Modify-Operationen sind nur mit Methode POST zulässig'},

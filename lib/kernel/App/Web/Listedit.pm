@@ -1787,7 +1787,19 @@ sub HandleDelete
    my $self=shift;
    my $mode=shift;
 
-   my $id=Query->Param("CurrentIdToEdit");
+   my $id;
+
+   if ($mode eq "Modify"){
+      my $idfield=$self->IdField();
+      if (defined($idfield)){
+         $id=Query->Param($idfield->Name());
+      }
+   }
+   else{
+      $id=Query->Param("CurrentIdToEdit");
+   }
+
+
    my $flt=undef;
    if (defined($id)){
       $flt={$self->IdField->Name()=>\$id};
@@ -1795,8 +1807,10 @@ sub HandleDelete
    }
    if (defined($flt)){
       $self->SetCurrentView(qw(ALL));
+      my $cnt=0;
       $self->ForeachFilteredRecord(sub{
                                my $rec=$_;
+                               $cnt++;
                                if ($self->SecureValidatedDeleteRecord($rec)){
                                   if ($rec->{$self->IdField->Name()} eq $id){
                                      Query->Delete("CurrentIdToEdit");
@@ -1807,6 +1821,9 @@ sub HandleDelete
                                            "SecureValidatedDeleteRecord error");
                                }
                             });
+     if ($cnt==0 && $mode eq "Modify"){
+        $self->LastMsg(ERROR,"delete operation on invalid record");
+     }
    }
    else{
       $self->LastMsg(ERROR,"HandleDelete with no filter informations");
@@ -1931,24 +1948,30 @@ sub Modify
    my $idfield=$self->IdField();
    my $id;
    my $op=Query->Param("OP");
-   if (!defined($idfield)){
-      $self->LastMsg(ERROR,"Modify operations only allowed on ".
-                           "dataobjects with IdField");
-   }
-   elsif($op ne "save" && $op ne "delete"){
-      $self->LastMsg(ERROR,"no valid OP specified in Modify-call");
+
+   if ($ENV{REQUEST_METHOD} ne "POST"){
+      $self->LastMsg(ERROR,"Modify operations are only alowed by Method POST");
    }
    else{
-      $id=Query->Param($idfield->Name());
-      if ($id eq "" && $op eq "delete"){
-         $self->LastMsg(ERROR,"delete OP only allowed with specific id");
+      if (!defined($idfield)){
+         $self->LastMsg(ERROR,"Modify operations only allowed on ".
+                              "dataobjects with IdField");
+      }
+      elsif($op ne "save" && $op ne "delete"){
+         $self->LastMsg(ERROR,"no valid OP specified in Modify-call");
       }
       else{
-         $op=$self->ProcessDataModificationOP("Modify");
          $id=Query->Param($idfield->Name());
-         if ($id eq ""){
-            if ($self->LastMsg()==0){
-               $self->LastMsg(ERROR,"unexpected id after $op operation");
+         if ($id eq "" && $op eq "delete"){
+            $self->LastMsg(ERROR,"delete OP only allowed with specific id");
+         }
+         else{
+            $op=$self->ProcessDataModificationOP("Modify");
+            $id=Query->Param($idfield->Name());
+            if ($id eq ""){
+               if ($self->LastMsg()==0){
+                  $self->LastMsg(ERROR,"unexpected id after $op operation");
+               }
             }
          }
       }
