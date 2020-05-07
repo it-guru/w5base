@@ -35,7 +35,7 @@
 'Application Description'=>{de=>'Anwendungsbeschreibung'},
 'fieldgroup.finance'=>{de=>'Kundenbetreuung/Vertragsgestaltung',en=>'Customer contact / Contract management'},
 'fieldgroup.opmode'=>{de=>'Betriebsparameter',en=>'Operationalparameters'},
-'fieldgroup.technical'=>{de=>'Technische Verantwortung',en=>'technical'},
+'fieldgroup.technical'=>{de=>'Technische Verantwortung',en=>'Technical Responsibility'},
 'fieldgroup.functional'=>{
    de=>'Fachliche Verantwortung/Architektur',
    en=>'Functional accountability/architecture'
@@ -211,8 +211,8 @@
 'add systems'=>{de=>'logische Systeme hinzufügen'},
 'individual attributes'=>{de=>'individuelle Attribute'},
 'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},
-'Overall Responsible'=>{de=>'Gesamtverantwortlich'},
-'Technical Responsible'=>{de=>'technisch Verantwortlich'},
-'deputy Technical Responsible'=>{de=>'technisch Verantwortlicher Vertreter'},
-'Operational Responsible'=>{de=>'operativ Verantwortlich'},
-'deputy Operational Responsible'=>{de=>'operativ Verantwortlicher Vertreter'},
+'Overall Responsible'=>{de=>'Gesamtverantwortlicher'},
+'Technical Responsible'=>{de=>'technisch Verantwortlicher'},
+'deputy Technical Responsible'=>{de=>'technisch Verantwortlicherer Vertreter'},
+'Operational Responsible'=>{de=>'operativ Verantwortlicher'},
+'deputy Operational Responsible'=>{de=>'operativ Verantwortlicherer Vertreter'},
