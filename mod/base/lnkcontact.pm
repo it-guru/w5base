@@ -485,8 +485,6 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-printf STDERR Dumper($newrec);
-
    my $targetid=effVal($oldrec,$newrec,"targetid");
    my $target=effVal($oldrec,$newrec,"target");
    if ($target eq "" || $targetid eq ""){
