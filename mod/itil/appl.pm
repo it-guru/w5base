@@ -782,7 +782,7 @@ sub new
                    return(0);
                 },
                 group         =>'technical',
-                label         =>'deputy Technical Responsible',
+                label         =>'Deputy Technical Responsible',
                 vjoinon       =>'tsm2id'),
 
       new kernel::Field::Contact(
@@ -820,7 +820,7 @@ sub new
                 },
                 AllowEmpty    =>1,
                 group         =>'opmgmt',
-                label         =>'deputy Operational Responsible',
+                label         =>'Deputy Operational Responsible',
                 vjoinon       =>'opm2id'),
 
       new kernel::Field::TextDrop(

@@ -213,6 +213,6 @@
 'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},
 'Overall Responsible'=>{de=>'Gesamtverantwortlicher'},
 'Technical Responsible'=>{de=>'technisch Verantwortlicher'},
-'deputy Technical Responsible'=>{de=>'technisch Verantwortlicherer Vertreter'},
+'Deputy Technical Responsible'=>{de=>'technisch verantwortlicherer Vertreter'},
 'Operational Responsible'=>{de=>'operativ Verantwortlicher'},
-'deputy Operational Responsible'=>{de=>'operativ Verantwortlicherer Vertreter'},
+'Deputy Operational Responsible'=>{de=>'operativ verantwortlicherer Vertreter'},
