@@ -257,13 +257,17 @@ sub doNotify
    my $rec=shift;
    my $debug="";
 
+   my %notifyParam=(
+      emailcategory=>['OTC','SystemImport'],
+      emailbcc=>[
+         11634953080001, # HV
+      ]
+   );
 
-   $w5sys->NotifyWriteAuthorizedContacts($rec,{},{
-             emailcategory=>['OTC','SystemImport'],
-             emailbcc=>[
-               11634953080001, # HV
-            ]
-         },{},sub{
+   push(@{$notifyParam{emailcategory}},"ImportSuccess");
+
+               
+   $w5sys->NotifyWriteAuthorizedContacts($rec,{},\%notifyParam,{},sub{
       my ($subject,$ntext);
       my $subject=$datastream->T("automatic system import from OTC",
                                  'tsotc::event::ScanNewSystems')." : ".
