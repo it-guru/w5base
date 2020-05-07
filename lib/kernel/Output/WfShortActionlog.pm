@@ -102,7 +102,7 @@ sub ProcessHead
           "<tr><td class=mainblock>".
           "<div style=\"overflow:hidden\">\n";
    }
-   $d.="<table class=subdatatable width=\"100%\">\n<tr class=subheadline>";
+   $d.="<table class=wfactsubdatatable width=\"100%\">\n<tr class=subheadline>";
    my $col=0;
    foreach my $f (qw(cdate name)){
       next if (!exists($self->{fieldkeys}->{$f}));

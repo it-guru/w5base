@@ -50,6 +50,7 @@ div.context_menu {
 	background-color: ThreeDFace;
 	display: none;
         visiblity:hidden;
+   z-index:200;
 }
 
 div.context_menu td.std {

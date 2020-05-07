@@ -133,6 +133,26 @@ table.datatable thead tr th{
    z-index: 5;
 }
 
+table.datatable tr.subline{
+   cursor:pointer;
+   visibility:visible;
+   background:#DDDDDD;
+}
+
+
+table.datatable tr.subline:nth-child(odd){
+   background:#DDDDDD;
+}
+table.datatable tr.subline:nth-child(even){
+  background: #CCCCCC;
+}
+
+
+table.datatable tr.subline:hover{
+   background:#b0c5ec;
+}
+
+
 div.clipicon {
   position: absolute;
   display: inline-block;

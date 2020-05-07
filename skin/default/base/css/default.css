@@ -94,6 +94,7 @@ div.context_menu {
 	background-color: ThreeDFace;
 	display: none;
         visibility:hidden;
+   z-index:200;
 }
 
 div.context_menu td.std {

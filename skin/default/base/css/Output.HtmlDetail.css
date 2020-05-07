@@ -143,6 +143,7 @@ div.detailfieldspec{
    visible:hidden;
    display:none;
    margin-top:18px;
+   z-index:100;
 }
 
 

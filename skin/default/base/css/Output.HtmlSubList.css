@@ -65,9 +65,7 @@ td.viewtab_spacer_right{
    xwidth:100px;
    border-bottom-style:solid;border-width:1px;border-color:#000000;
 }
-xbody{
-   background:#ffffff;
-}
+.hidden{display:none;}
 
 div.directsublist
 {
@@ -84,6 +82,9 @@ div.SubList{
    border-color:#000000;
    margin-bottom:5px;
 }
+
+
+
 table.subdatatable{
    border-collapse:collapse;
    border-width:1px;
@@ -95,44 +96,22 @@ table.subdatatable{
 td.subheadline{
 }
 
-tr.subline{
+table.subdatatable tr.subline{
    cursor:pointer;
    visibility:visible;
-}
-.hidden{display:none;}
-
-
-//tr.subline{
-//   background:#DDDDDD;
-//}
-//tr.subline:nth-child(even) {
-//  background: #CCCCCC;
-//}
-//
-//.subline.hidden ~ tr.subline:nth-child(odd){
-//   background:#DDDDDD;
-//}
-//.subline.hidden ~ tr.subline:nth-child(even) {
-//  background: #CCCCCC;
-//}
-
-tr.subline:nth-child(odd){
    background:#DDDDDD;
 }
-tr.subline:nth-child(even){
+
+
+table.subdatatable tr.subline:nth-child(odd){
+   background:#DDDDDD;
+}
+table.subdatatable tr.subline:nth-child(even){
   background: #CCCCCC;
 }
 
-//
-//.hidden ~ tr.subline:nth-child(odd){
-//   background:#DDDDDD;
-//}
-//.hidden ~ tr.subline:nth-child(even) {
-//  background: #CCCCCC;
-}
 
-
-tr.subline:hover{
+table.subdatatable tr.subline:hover{
    background:#b0c5ec;
 }
 
@@ -142,6 +121,7 @@ td.subdatafield{
    width:15%;
    vertical-align:top;
    position:relative;
+   cursor:pointer;
 }
 th.subheadfield{
    padding-left:5px;
@@ -153,6 +133,39 @@ th.subheadfield{
    border-bottom-style:solid;
    cursor:pointer;
 }
+
+
+
+
+
+
+table.wfactsubdatatable{
+   border-collapse:collapse;
+   border-width:1px;
+   border-style:solid;
+   border-color:#000000;
+   border-top-style:none;
+   margin-bottom:1px;
+}
+td.subheadline{
+}
+
+table.wfactsubdatatable tr.subline{
+   cursor:pointer;
+   visibility:visible;
+   background:#DDDDDD;
+}
+
+
+
+table.wfactsubdatatable tr.subline:hover{
+   background:#b0c5ec;
+}
+
+
+
+
+
 
 .sort-arrow {
 	width:					11px;
