@@ -404,7 +404,7 @@ sub new
                    return(0);
                 },
                 group         =>'technical',
-                label         =>'technical responsible',
+                label         =>'Technical Responsible',
                 vjoinon       =>'tsmid'),
 
       new kernel::Field::Contact(
@@ -444,7 +444,7 @@ sub new
                 },
                 AllowEmpty    =>1,
                 group         =>'opmgmt',
-                label         =>'operational responsible',
+                label         =>'Operational Responsible',
                 vjoinon       =>'opmid'),
 
       new kernel::Field::SubList(
@@ -782,7 +782,7 @@ sub new
                    return(0);
                 },
                 group         =>'technical',
-                label         =>'deputy technical responsible',
+                label         =>'deputy Technical Responsible',
                 vjoinon       =>'tsm2id'),
 
       new kernel::Field::Contact(
@@ -820,7 +820,7 @@ sub new
                 },
                 AllowEmpty    =>1,
                 group         =>'opmgmt',
-                label         =>'deputy operational responsible',
+                label         =>'deputy Operational Responsible',
                 vjoinon       =>'opm2id'),
 
       new kernel::Field::TextDrop(
@@ -977,7 +977,7 @@ sub new
                    return(0);
                 },
                 group         =>'functional',
-                label         =>'overall responsible',
+                label         =>'Overall Responsible',
                 vjoinon       =>'applmgrid'),
 
       new kernel::Field::Text(
@@ -1187,7 +1187,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'rmethod',
-                label         =>'responsibility methodology',
+                label         =>'Responsibility Model',
                 selectfix     =>1,
                 transprefix   =>'rmeth.',
                 value         =>['ROLEBASED',
