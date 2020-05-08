@@ -735,7 +735,6 @@ sub RoleSyncIn
             }
          }
          if (!$uidfound){
-            printf STDERR ("fifi not found $uid for role $rulerole\n");
             if (exists($updrec{$uid})){
                if (!in_array($updrec{$uid}->[1]->{roles},$rulerole)){
                   push(@{$updrec{$uid}->[1]->{roles}},$rulerole);
