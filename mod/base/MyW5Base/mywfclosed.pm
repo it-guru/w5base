@@ -49,6 +49,32 @@ sub Init
    my $self=shift;
    $self->{DataObj}=getModuleObject($self->getParent->Config,"base::workflow");
    return(0) if (!defined($self->{DataObj}));
+
+   $self->{Field}->{trangefield}=new kernel::Field::Text(
+                Parent        =>$self,
+                name          =>'trangefield',
+                selectsearch  =>sub{
+                   my $self=shift;
+                   my @l;
+                   push(@l,
+                      ["eventend","Ereignisende"],
+                      ["eventstart","Ereignisbegin"]
+                   );
+                   return(@l);
+                },
+                value         =>[qw(eventstart eventend)],
+                label         =>'time of event');
+   $self->{Field}->{trangefield}->setParent($self);
+
+   $self->{Field}->{trange}=new kernel::Field::Date(
+                Parent        =>$self,
+                name          =>'trange',
+                label         =>'point of time');
+   $self->{Field}->{trange}->setParent($self);
+
+
+
+
    return(1);
 }
 
@@ -56,24 +82,40 @@ sub getQueryTemplate
 {
    my $self=shift;
    my $timelabel=$self->getParent->T("Change end time");;
-   my $timedrop=$self->getTimeRangeDrop("search_eventend",
-                                        $self->getParent,
-                                        qw(month));
    my $dd=$self->getDefaultStdButtonBar();
+
+   if (!defined(Query->Param("search_trange"))){
+      Query->Param("search_trange"=>"currentmonth");
+   }
+
+
+   my $trangefieldl=$self->{Field}->{trangefield}->Label;
+   my $trangefields=$self->{Field}->{trangefield}->FormatedSearch();
+
+   my $trangel=$self->{Field}->{trange}->Label;
+   my $tranges=$self->{Field}->{trange}->FormatedSearch();
+
+
    my $d=<<EOF;
 <div class=searchframe>
 <table class=searchframe>
 <tr>
 <td class=fname width=10%>\%name(label)\%:</td>
 <td class=finput width=40% >\%name(search)\%</td>
-<td class=fname width=10%>\%eventend(label)\%:</td>
-<td class=finput width=40%>$timedrop</td>
-</tr>
-<tr>
 <td class=fname width=10%>\%class(label)\%:</td>
 <td class=finput width=40% >\%class(search)\%</td>
+</tr>
+<tr>
+<td class=fname width=10%>$trangefieldl:</td>
+<td class=finput width=40% >$trangefields</td>
+<td class=fname width=10%>$trangel:</td>
+<td class=finput width=40% >$tranges</td>
+</tr>
+<tr>
 <td class=fname>\%state(label)\%</td>
 <td class=finput>\%stateid(search)\%</td>
+<td class=fname width=10%>&nbsp;</td>
+<td class=finput width=40% >&nbsp;</td>
 </tr>
 </table>
 </div>
@@ -90,17 +132,33 @@ sub Result
    my $dc=Query->Param("EXVIEWCONTROL");
 
 
+   #printf STDERR "Q=".Query->Dumper();
+   #printf STDERR Dumper(\%q);
+   if ($q{trangefield} ne "eventstart" &&
+       $q{trangefield} ne "eventend"){
+      $self->LastMsg(ERROR,"invalid range field selected");
+      return(undef);
+   }
+   if ($q{trange} eq ""){
+      $self->LastMsg(ERROR,"missing timerange filter");
+      return(undef);
+   }
+   $q{$q{trangefield}}=$q{trange};
+   delete($q{trangefield});
+   delete($q{trange});
+
+
+
    my $userid=$self->getParent->getCurrentUserId();
    $userid=-1 if (!defined($userid) || $userid==0);
    my %q1=%q;
 
    my $searchuser=[$userid];
    if ($dc eq "TEAM"){
-      my %grp=$self->getParent->getGroupsOf($ENV{REMOTE_USER},
-                                            ["REmployee","RChief"],
-                                            "down");
+      my $useracc=$ENV{REMOTE_USER};
+      my %grp=$self->getParent->getGroupsOf($useracc,[orgRoles()],"down");
       my @grpids=keys(%grp);
-      if ($#grpids<5){
+      if ($#grpids<11){
          @grpids=(qw(-1)) if ($#grpids==-1);
          my $lnk=getModuleObject($self->getParent->Config,"base::lnkgrpuser");
          $lnk->SetFilter({grpid=>\@grpids});
@@ -119,10 +177,20 @@ sub Result
       $q1{stateid}=$q1{stateid}." AND >16"
    }
 
-
    $self->{DataObj}->ResetFilter();
    $self->{DataObj}->SecureSetFilter([\%q1]);
+
+   my $n=$self->{DataObj}->CountRecords();
+
+   if ($n>50){
+      $self->LastMsg(ERROR,"query not selective enough");
+      return(undef);
+   }
+
+
+
    $self->{DataObj}->setDefaultView(qw(eventend eventstart class state name));
+
 
    return($self->{DataObj}->Result(ExternalFilter=>1));
 }

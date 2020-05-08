@@ -1,2 +1,6 @@
 'base::MyW5Base::mywfclosed'=>{de=>'Workflow: von mir erstellte und bereits beendete Workflows',
                          en=>'Workflow: closed workflows created by me'},
+'point of time'=>{de=>'Zeitpunkt'},
+'time of event'=>{de=>'Ereigniszeitpunkt'},
+'missing timerange filter'=>{de=>'fehlender Zeitbereichsfilter'},
+'query not selective enough'=>{de=>'Abfrage nicht selektiv genug'},
