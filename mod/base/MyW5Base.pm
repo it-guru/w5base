@@ -349,8 +349,10 @@ sub Result
    print $self->HtmlHeader(style=>['default.css','mainwork.css',
                                    'kernel.App.Web.css'],
                            body=>1,form=>1);
-   $self->LastMsg(ERROR,"the requested query isn't supported or ".
-                        "has internal errors procreated");
+   if ($self->LastMsg()==0){
+      $self->LastMsg(ERROR,"the requested query isn't supported or ".
+                           "has internal errors procreated");
+   }
    my @msglist;
    if ($self->LastMsg()){
       @msglist=$self->LastMsg();
