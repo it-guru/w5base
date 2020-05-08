@@ -1501,7 +1501,12 @@ sub getSearchHash
       if ($v=~m/^search_/ && $h{$v} ne ""){
          my $v2=$v;
          $v2=~s/^search_//;
-         $h{$v2}=trim($h{$v});
+         if (ref($h{$v}) eq "ARRAY"){
+            $h{$v2}=$h{$v};
+         }
+         else{
+            $h{$v2}=trim($h{$v});
+         }
          if (my ($webclip)=$h{$v2}=~m/\[\@(WebClip.*)\@\]/){
             my $nobj=getModuleObject($self->Config(),"base::note");
             my $userid=$self->getCurrentUserId();
