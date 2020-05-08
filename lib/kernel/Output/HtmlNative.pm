@@ -191,7 +191,7 @@ sub ProcessLine
          }
       }
    }
-   $d.="<tr class=$lineclass ";
+   $d.="<tr class=$lineclass>";
    my @l=();
    for(my $c=0;$c<=$#view;$c++){
       my $nowrap="";
@@ -252,7 +252,9 @@ sub ProcessLine
       }
       else{
          $d.="<td valign=top align=$rec->{align}";
-         $d.=" style=\"$rec->{style}\"$rec->{nowrap}>".$rec->{data}."</td>\n";
+         $d.=" style=\"$rec->{style}\"$rec->{nowrap}>".
+             $rec->{data}.
+             "</td>\n";
       }
    }
    $d.="</tr>\n";
