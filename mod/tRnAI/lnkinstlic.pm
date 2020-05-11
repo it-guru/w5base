@@ -78,6 +78,13 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'tRnAI_lnkinstlic.comments'),
 
+      new kernel::Field::Text(
+                name          =>'ponum',
+                htmlwidth     =>'150px',
+                translation   =>'tRnAI::license',
+                label         =>'Purchase Order Number',
+                dataobjattr   =>'tRnAI_license.ponum'),
+
       new kernel::Field::Date(
                 name          =>'expdate',
                 label         =>'Expiration Date',

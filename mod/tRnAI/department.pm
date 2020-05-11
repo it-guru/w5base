@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tRnAI::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -35,20 +36,35 @@ sub new
    $self->AddFields(
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Customer',
-                dataobjattr   =>'tRnAI_system.department'),
+                label         =>'Department',
+                dataobjattr   =>'tRnAI_department.department'),
 
    );
    $self->setDefaultView(qw(name cdate mdate));
-   $self->setWorktable("tRnAI_system");
+   $self->setWorktable("tRnAI_department");
    return($self);
 }
+
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="(select department from tRnAI_system ".
+            " union ".
+            " select department from tRnAI_instance) tRnAI_department";
+   return($from);
+}
+
+
+
 
 sub initSqlWhere
 {
    my $self=shift;
    my $mode=shift;
-   my $where="tRnAI_system.department<>''";
+   my $where="tRnAI_department.department<>''";
    return($where);
 }
 
@@ -66,7 +82,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL") if ($self->IsMemberOf("w5base.RnAI.inventory",undef,"up"));
+   return("ALL") if ($self->tRnAI::lib::Listedit::isViewValid($rec));
    return(undef);
 }
 

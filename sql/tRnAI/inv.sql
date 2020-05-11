@@ -107,8 +107,8 @@ create table tRnAI_instance(
   name            varchar(128) NOT NULL,
   system          bigint(20),
   software        bigint(20), version varchar(30),
-  subcustomer     varchar(40),
-  iusage          varchar(20),
+  customer        varchar(40), department      varchar(40),
+  iusage          varchar(20), subcustomer varchar(40),
   contact         bigint(20),
   contact2        bigint(20),
   tcpport         int(20) not NULL,
@@ -121,7 +121,7 @@ create table tRnAI_instance(
   editor     varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
   PRIMARY KEY  (id),
-  FOREIGN KEY (system)  REFERENCES tRnAI_system (id) ON DELETE RESTRICT,
+  FOREIGN KEY (system)  REFERENCES system (id) ON DELETE RESTRICT,
   unique(name)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table tRnAI_license(

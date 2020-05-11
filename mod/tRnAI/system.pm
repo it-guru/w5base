@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use itil::lib::Listedit;
+use tRnAI::lib::Listedit;
 @ISA=qw(use itil::lib::Listedit kernel::DataObj::DB);
 
 sub new
@@ -30,6 +31,8 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->{useMenuFullnameAsACL}="1";
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -303,7 +306,7 @@ sub isWriteValid
 
    my @wrgrp=qw(default customer useraccounts add);
 
-   return(@wrgrp) if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
+   return(@wrgrp) if ($self->tRnAI::lib::Listedit::isWriteValid($rec));
    return(undef);
 }
 
@@ -313,8 +316,9 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("header","default","customer") if (!defined($rec));
-   return("ALL") if ($self->IsMemberOf("w5base.RnAI.inventory",undef,"up"));
-   return("ALL") if ($self->IsMemberOf("admin"));
+   return("ALL") if ($self->tRnAI::lib::Listedit::isViewValid($rec));
+   my @l=$self->SUPER::isViewValid($rec);
+   return("ALL") if (in_array(\@l,[qw(default ALL)]));
    return(undef);
 }
 

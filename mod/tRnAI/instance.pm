@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use tRnAI::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -30,6 +31,7 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
+   $self->{useMenuFullnameAsACL}="1";
    $self->AddFields(
       new kernel::Field::Linenumber(
                 name          =>'linenumber',
@@ -67,8 +69,9 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'system',
-                label         =>'System',
-                vjointo       =>\'tRnAI::system',
+                label         =>'logical System',
+                group         =>'applsrv',
+                vjointo       =>\'TS::system',
                 vjoindisp     =>'name',
                 vjoinon       =>['systemid'=>'id']),
 
@@ -101,29 +104,43 @@ sub new
                 dataobjattr   =>'tRnAI_instance.comments'),
 
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Select(
                 name          =>'customer',
                 label         =>'Customer',
-                readonly      =>1,
-                group         =>'cust',
-                vjointo       =>\'tRnAI::system',
-                vjoindisp     =>'customer',
-                vjoinon       =>['systemid'=>'id']),
+                group         =>'customer',
+                allowfree     =>1,
+                allowempty    =>1,
+                weblinkto     =>'none',
+                htmleditwidth =>'300px',
+                vjointo       =>\'tRnAI::customer',
+                vjoindisp     =>'name',
+                vjoinon       =>['rawcustomer'=>'name']),
 
-      new kernel::Field::TextDrop(
+      new kernel::Field::Link(
+                name          =>'rawcustomer',
+                label         =>'Customer raw',
+                group         =>'customer',
+                dataobjattr   =>'tRnAI_instance.customer'),
+
+      new kernel::Field::Select(
                 name          =>'department',
                 label         =>'Department',
-                readonly      =>1,
-                group         =>'cust',
-                vjointo       =>\'tRnAI::system',
-                vjoindisp     =>'department',
-                vjoinon       =>['systemid'=>'id']),
+                group         =>'customer',
+                allowfree     =>1,
+                allowempty    =>1,
+                weblinkto     =>'none',
+                htmleditwidth =>'300px',
+                vjointo       =>\'tRnAI::department',
+                vjoindisp     =>'name',
+                vjoinon       =>['rawdepartment'=>'name']),
 
-      new kernel::Field::Text(
-                name          =>'subcustomer',
-                group         =>'cust',
-                label         =>'Sub-Customer',
-                dataobjattr   =>'tRnAI_instance.subcustomer'),
+      new kernel::Field::Link(
+                name          =>'rawdepartment',
+                label         =>'Department raw',
+                group         =>'customer',
+                dataobjattr   =>'tRnAI_instance.department'),
+
+
 
       new kernel::Field::SubList(
                 name          =>'licenses',
@@ -132,7 +149,7 @@ sub new
                 subeditmsk    =>'subedit.licenses',
                 vjointo       =>\'tRnAI::lnkinstlic',
                 vjoinon       =>['id'=>'instanceid'],
-                vjoindisp     =>['license','expdate']),
+                vjoindisp     =>['license','ponum','expdate']),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -193,7 +210,7 @@ sub getRecordImageUrl
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default cust licenses source));
+   return(qw(header default applsrv customer licenses source));
 }
 
 
@@ -231,9 +248,9 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default cust licenses);
+   my @wrgrp=qw(default customer applsrv licenses);
 
-   return(@wrgrp) if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
+   return(@wrgrp) if ($self->tRnAI::lib::Listedit::isWriteValid($rec));
    return(undef);
 }
 
@@ -242,11 +259,19 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
+   return("header","default","applsrv") if (!defined($rec));
    return("ALL") if ($self->IsMemberOf(["w5base.RnAI.inventory","admin"]));
-   if ($self->IsMemberOf(["w5base.RnAI.inventory.read"],undef,"direct")){
-      return("header","default","cust","licenses","source");
+
+   my @vl=("header","default","customer","applsrv","licenses","source");
+
+
+   if ($self->tRnAI::lib::Listedit::isViewValid($rec)){
+      return(@vl);
    }
+   my @l=$self->SUPER::isViewValid($rec);
+   return(@vl) if (in_array(\@l,[qw(default ALL)]));
+
+
    return(undef);
 }
 
