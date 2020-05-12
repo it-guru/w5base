@@ -97,6 +97,8 @@ use charnames ':full';
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16
              &utf8_to_latin1
              &TextShorter
+             &joinCsvLine
+             &splitCsvLine
              &getClientAddrIdString
              &is_POSIXmktime_Clean
              &Stacktrace);
@@ -181,6 +183,25 @@ sub is_POSIXmktime_Clean
    }
    return(0);
 }
+
+sub joinCsvLine
+{
+   return(join(";",map({
+      my $v=$_;
+      $v=~s/;//g;
+      $v=~s/\n//g;
+      $v=~s/\r//g;
+      $v;
+   } @_)));
+}
+
+sub splitCsvLine
+{
+   return(split(/;/,$_[0]));
+}
+
+
+
 
 sub ObjectRecordCodeResolver
 {
