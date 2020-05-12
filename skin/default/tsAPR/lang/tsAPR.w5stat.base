@@ -1,0 +1,15 @@
+'tsAPR::w5stat::base::APR'=>{de=>'APR',en=>'APR'},
+'tsAPR::w5stat::base::APR::LONG'=>{de=>'APR - Application Patch Report',en=>'APR - Application Patch Report'},
+'not acceptable'=>{de=>'nicht akzeptabel'},
+'risk acceptance exists'=>{de=>'Risikoakzeptanz vorhanden'},
+'alright'=>{de=>'in Ordnung'},
+'problmeatic or soon problematic'=>{de=>'problematisch oder demnächst problematisch'},
+'unidentifiable'=>{de=>'nicht ermittelbar'},
+'APPISRELEVANT'=>{
+de=>'Die Anwendung %s ist APR relevant und wird im Management-Report berücksichtig.',
+en=>'The Application %s is APR relevant and will be reported in management views.'
+},
+'APPISNOTRELEVANT'=>{
+de=>'Die Anwendung %s ist nicht APR relevant. Dieser Report dient nur zur Bewertung der Anwendung durch AM oder TSM.',
+en=>'The Application %s is not APR relevant.'
+},
