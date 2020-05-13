@@ -111,12 +111,6 @@ sub getQueryTemplate
 <td class=fname width=10%>$trangel:</td>
 <td class=finput width=40% >$tranges</td>
 </tr>
-<tr>
-<td class=fname>\%state(label)\%</td>
-<td class=finput>\%stateid(search)\%</td>
-<td class=fname width=10%>&nbsp;</td>
-<td class=finput width=40% >&nbsp;</td>
-</tr>
 </table>
 </div>
 $dd
@@ -182,7 +176,7 @@ sub Result
 
    my $n=$self->{DataObj}->CountRecords();
 
-   if ($n>50){
+   if ($n>500){
       $self->LastMsg(ERROR,"query not selective enough");
       return(undef);
    }
