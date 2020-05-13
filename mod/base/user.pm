@@ -2141,16 +2141,16 @@ sub GetW5BaseUserID
       $self->ResetFilter();
       if ($useAs eq "email"){
          my $n=lc($name);
-         $self->SetFilter({emails=>\$n});
+         $self->SetFilter({emails=>\$n,cistatusid=>[3,4,5]});
       }
       elsif ($useAs eq "posix"){
-         $self->SetFilter({posix=>\$name});
+         $self->SetFilter({posix=>\$name,cistatusid=>[3,4,5]});
       }
       elsif ($useAs eq "dsid"){
-         $self->SetFilter({dsid=>\$name});
+         $self->SetFilter({dsid=>\$name,cistatusid=>[3,4,5]});
       }
       elsif ($useAs eq "userid"){
-         $self->SetFilter({userid=>\$name});
+         $self->SetFilter({userid=>\$name,cistatusid=>[3,4,5]});
       }
       else{
          return(undef);
