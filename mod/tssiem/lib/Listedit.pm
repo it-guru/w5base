@@ -141,9 +141,6 @@ sub addICTOSecureFilter
    if ($self->isDataInputFromUserFrontend()){
       if (!$self->IsMemberOf([qw(admin w5base.tssiem.secscan.read)],
           "RMember")){
-         #my %pgrps=$self->getGroupsOf($ENV{REMOTE_USER},
-         #         [orgRoles(),qw(RCFManager RCFManager2 RAuditor RMonitor)],
-         #         "both");
          my %pgrps=();
          my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
          my @grpid=grep(/^[0-9]+/,keys(%grp),keys(%pgrps));
@@ -154,15 +151,17 @@ sub addICTOSecureFilter
          my @flt=();
          push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
          push(@flt,{cistatusid=>[3,4,5],applmgrid=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],semid=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],sem2id=>\$userid});
          push(@flt,{cistatusid=>[3,4,5],tsmid=>\$userid});
          push(@flt,{cistatusid=>[3,4,5],tsm2id=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],opmid=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],opm2id=>\$userid});
-         #push(@flt,{cistatusid=>[3,4,5],businessteamid=>\@grpid});
-         #push(@flt,{cistatusid=>[3,4,5],itsemteamid=>\@grpid});
-         #push(@flt,{cistatusid=>[3,4,5],responseteam=>\@grpid});
+
+
+         push(@flt,{
+            cistatusid=>[3,4,5],
+            sectargetid=>\$userid,
+            sectarget=>\'base::user',
+            secroles=>"*roles=?applmgr2?=roles*"
+         });
+
 
          $appl->SetFilter(\@flt);
          $appl->SetCurrentView(qw(ictono));
