@@ -143,6 +143,11 @@ SortTable$tableid=new SortableTable(document.getElementById("$tableid"), [$sortl
 $activeateSort
 </script>
 EOF
+   if ($self->{SubListEdit}==1){
+      $d.="<script language=JavaScript>\n";
+      $d.="addEvent(window,\"load\",add_clipIconFunc);\n";
+      $d.="</script>\n";
+   }
    if ($param->{ParentMode} eq "HtmlNative"){
       $d.="<table width=\"100%\">\n";
    }
