@@ -147,6 +147,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'canvasid',
                 label         =>'CanvasID',
+                htmleditwidth =>'80px',
+                size          =>'3',
                 group         =>'canvas',
                 dataobjattr   =>'vou.canvasid'),
 
@@ -401,9 +403,10 @@ sub Validate
    my $ncistatusid=effVal($oldrec,$newrec,"cistatusid");
 
    if ($ocistatusid>=4 && $ncistatusid<4){
-      $self->LastMsg(ERROR,"cistatus back to planning is not allowed");
-      return(0);
-
+      if (!$self->IsMemberOf($self->{CI_Handling}->{activator})){
+         $self->LastMsg(ERROR,"cistatus back to planning is not allowed");
+         return(0);
+      }
    }
    if ($ncistatusid>=4 && $ncistatusid<6){
       if (effVal($oldrec,$newrec,"leaderid") eq "" &&
@@ -416,6 +419,23 @@ sub Validate
          $self->LastMsg(ERROR,
                  "Name field not sufficient filled");
          return(0);
+      }
+   }
+
+   if (exists($newrec->{canvasid})){
+      my $canvasid=$newrec->{canvasid};
+      if ($canvasid ne ""){
+         if ($canvasid=~m/^[0-9]+$/){
+            $canvasid=sprintf("C%02d",$canvasid);
+         }
+         $canvasid=uc($canvasid);
+         if (!($canvasid=~m/^C[0-9]{2}$/)){
+            $self->LastMsg(ERROR,"invalid format of CanvasID");
+            return(0);
+         }
+         if ($newrec->{canvasid} ne $canvasid){
+            $newrec->{canvasid}=$canvasid;
+         }
       }
    }
 
@@ -490,12 +510,15 @@ sub FinishWrite
 
    my $rorgid=effVal($oldrec,$newrec,"rorgid");  # noch nicht ausgewertet!
 
+
    my $id=effVal($oldrec,$newrec,"id");
    my $cistatus=effVal($oldrec,$newrec,"cistatusid");
    my $shortname=effVal($oldrec,$newrec,"shortname");
    my $name=effVal($oldrec,$newrec,"name");
 
-   if ($cistatus>3){
+   my $reprgrp=effVal($oldrec,$newrec,"reprgrp"); # schon mal aktiv gewesen?
+
+   if ($cistatus>3 || $reprgrp ne ""){
       $self->syncToGroups($id,$cistatus,$shortname,$name,$oldrec,$newrec);
    }
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){

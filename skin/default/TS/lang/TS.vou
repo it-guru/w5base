@@ -17,3 +17,4 @@
 'Name field not sufficient filled'=>{de=>'Namensfeld nicht ausreichend gefüllt'},
 'cistatus back to planning is not allowed'=>{de=>'CI-Statusänderung zurück in den Planungsstatus ist nicht zulässig'},
 'invalid Ramp-Up ID specified'=>{de=>'ungültige Ramp-Up ID angegeben'},
+'invalid format of CanvasID'=>{de=>'ungültiges Format der CanvasID'},
