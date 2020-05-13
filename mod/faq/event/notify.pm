@@ -89,8 +89,19 @@ sub FaqNotify
       if ($faqrec->{ownerid}>0){
          my $user=getModuleObject($self->Config,"base::user");
          $user->SetFilter({userid=>\$faqrec->{ownerid}});
-         my ($urec,$msg)=$user->getOnlyFirst(qw(email));
-         $fromemail=$urec->{email} if (defined($urec) && $urec->{email} ne "");
+         my ($urec,$msg)=$user->getOnlyFirst(qw(email fullname));
+         #$fromemail=$urec->{email} if (defined($urec) && $urec->{email} ne "");
+         if (defined($urec) && $urec->{fullname} ne ""){
+            $fromemail=$urec->{fullname};
+            $fromemail=~s/["<>]//g;
+            $fromemail="\"$fromemail\" <>";
+         }
+      }
+
+      my @emailcategory=();
+      push(@emailcategory,"faqchanged");
+      if ($faqrec->{categorie} ne ""){
+         push(@emailcategory,"FAQ-Category $faqrec->{categorie}");
       }
      
      
@@ -99,6 +110,7 @@ sub FaqNotify
                                 name   =>$subject,
                                 emailfrom    =>$fromemail,
                                 emailbcc     =>\@emailto,
+                                emailcategory=>\@emailcategory,
                                 additional   =>{label=>$label},
                                 emailprefix  =>$emailprefix,
                                 emailtemplate=>"faq/faqmail",

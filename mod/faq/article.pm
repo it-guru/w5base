@@ -624,15 +624,16 @@ sub FinishWrite
    my $url=$self->getAbsolutByIdUrl($id);
    $url=~s#/public/#/auth/#g;
    my $lang=$self->Lang();
+   my $userid=$self->getCurrentUserId();
 
    if (effVal($oldrec,$newrec,"published") eq "1"){
       my %p=(eventname=>'faqchanged',
              spooltag=>'faqchanged-'.$id,
              redefine=>'1',
              retryinterval=>600,
-             firstcalldelay=>900,
+             firstcalldelay=>3600,
              eventparam=>$id.";".$url.";".$lang,
-             userid=>11634953080001);
+             userid=>$userid);
       my $res;
       if ($self->isDataInputFromUserFrontend() && 
           !defined($newrec->{viewcount})){
