@@ -210,21 +210,21 @@ sub doNotify
    $appl->ResetFilter();
    $appl->SetFilter({ictono=>\$ictono,cistatusid=>"<6"});
 
-   my @l=$appl->getHashList(qw(applmgr tsmid));
+   my @l=$appl->getHashList(qw(id name applmgr tsmid contacts));
 
    my %uid;
 
    foreach my $arec (@l){
       $uid{cc}->{$arec->{tsmid}}++;
       $uid{to}->{$arec->{applmgrid}}++;
-      #foreach my $crec (@{$arec->{contacts}}){
-      #   my $roles=$crec->{roles};
-      #   $roles=[$roles] if (ref($roles) ne "ARRAY");
-      #   if ($crec->{target} eq "base::user" &&
-      #       in_array($roles,"applmgr2")){
-      #      $uid{$crec->{targetid}}++;
-      #   }
-      #}
+      foreach my $crec (@{$arec->{contacts}}){
+         my $roles=$crec->{roles};
+         $roles=[$roles] if (ref($roles) ne "ARRAY");
+         if ($crec->{target} eq "base::user" &&
+             in_array($roles,"applmgr2")){
+            $uid{cc}->{$crec->{targetid}}++;
+         }
+      }
    }
 
 
