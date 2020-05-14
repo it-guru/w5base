@@ -342,7 +342,9 @@ sub displayAPR
                              APR.System.TCC.check_status
                              APR.System.TCC.os_base_setup
                              APR.System.TCC.roadmap)){
-         $appkpi->{$prefix.".".$color}=0;
+         if (grep(/^$prefix/,keys(%{$rmostat->{stats}}))){
+            $appkpi->{$prefix.".".$color}=0;
+         }
       }
    }
    if ($rmostat->{sgroup} eq "Group" ||
@@ -395,6 +397,9 @@ sub displayAPR
       }
       $d.="</table>".$self->getParent->T("HEAD1",'tsAPR::w5stat::base');
    }
+   return(undef) if (!keys(%$appkpi));
+
+
 
 
 
@@ -698,7 +703,8 @@ sub processData
    ));
    if ($appl->Config->Param("W5BaseOperationMode") eq "dev"){
       $appl->SetFilter({cistatusid=>'<=4',
-                        name=>'W5* Dina* TSG_VIRTUELLE_T-SERVER* NGSS*Perfo*'});
+                        name=>'W5* Dina* TSG_VIRTUELLE_T-SERVER* '.
+                              'NGSS*Perfo* ServiceOn*'});
    }
    else{
       $appl->SetFilter({cistatusid=>'4'});
@@ -735,7 +741,7 @@ sub processRecord
 
    if ($module eq "tsAPR::appl"){
       msg(INFO,"APR Processs $rec->{name}");
-      print STDERR Dumper($rec);
+      #print STDERR Dumper($rec);
       my %systemid=();
       my @systemid=();
       my @w5sysid=();
@@ -769,7 +775,7 @@ sub processRecord
 
             denyupd
          ));
-         print STDERR Dumper(\@l);
+         #print STDERR Dumper(\@l);
          foreach my $tccrec (@l){
             if (exists($systemid{uc($tccrec->{systemid})})){
                push(@w5sysid,$systemid{uc($tccrec->{systemid})});
@@ -1002,34 +1008,39 @@ sub processRecord
                                          method=>'add'},
                                         "APR.SoftwareInst",$l);
       }
-
-      foreach my $k (keys(%$appkpi)){
-         $self->getParent->storeStatVar("Application",
-            [$rec->{name}],{
-               nosplit=>1,nameid=>$rec->{id}
-            },
-            $k,$appkpi->{$k}
-         );
-      }
-      if ($isAPRrelevant){
-       #  $self->getParent->storeStatVar("Group",\@repOrg,{
-       #      nosplit=>1,method=>'add'},
-       #      "APR.Appl.List",$ApplIndexLine);
-       #  $self->getParent->storeStatVar("Group",\@repOrg,{
-       #      method=>'avg'},
-       #      "APR.Appl.Index",$redPercent);
-
-         $self->getParent->storeStatVar("Group",\@repOrg,{},"APR.Appl.Count",1);
-         $self->getParent->storeStatVar("Application",
-            [$rec->{name}],{
-               nosplit=>1,nameid=>$rec->{id}
-            },
-            "APR.Appl.Count",1
-         );
+      if ($#{$rec->{systems}}!=-1){
          foreach my $k (keys(%$appkpi)){
-            $self->getParent->storeStatVar("Group",\@repOrg,{},
-                                           $k,$appkpi->{$k});
+            $self->getParent->storeStatVar("Application",
+               [$rec->{name}],{
+                  nosplit=>1,nameid=>$rec->{id}
+               },
+               $k,$appkpi->{$k}
+            );
          }
+         if ($isAPRrelevant){
+            $self->getParent->storeStatVar("Group",
+               \@repOrg,{},"APR.Appl.Count",1
+            );
+            $self->getParent->storeStatVar("Application",
+               [$rec->{name}],{
+                  nosplit=>1,nameid=>$rec->{id}
+               },
+               "APR.Appl.Count",1
+            );
+            foreach my $k (keys(%$appkpi)){
+               $self->getParent->storeStatVar("Group",\@repOrg,{},
+                                              $k,$appkpi->{$k});
+            }
+         }
+      }
+      else{
+         $self->getParent->storeStatVar("Group",\@repOrg,{},"APR.Appl.Count",0);
+         $self->getParent->storeStatVar("Application",
+            [$rec->{name}],{
+               nosplit=>1,nameid=>$rec->{id}
+            },
+            "APR.Appl.Count",0
+         );
       }
    }
 }
