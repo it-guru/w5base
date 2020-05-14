@@ -9,7 +9,140 @@
 de=>'Die Anwendung %s ist APR relevant und wird im Management-Report berücksichtig.',
 en=>'The Application %s is APR relevant and will be reported in management views.'
 },
+
+'located at'=>{de=>'vorgefunden auf/an'},
+
+
 'APPISNOTRELEVANT'=>{
 de=>'Die Anwendung %s ist nicht APR relevant. Dieser Report dient nur zur Bewertung der Anwendung durch AM oder TSM.',
 en=>'The Application %s is not APR relevant.'
 },
+
+'APRAPPCNT'=>{
+de=>'Anzahl APR relevanter Anwendungen',
+en=>'Count of APR relevant applications'
+},
+
+'APRSYSCNT'=>{
+de=>'von APR relevanten Anwendungen verwendete logische Systeme mit TCC Report',
+en=>'logical systems used by APR relevant applications with TCC Report'
+},
+
+'APRINSTCNT'=>{
+de=>'Software-Installationen die von APR relevanten Anwendungen genutzt werden können',
+en=>'Software installations that can be used by APR relevant applications'
+},
+
+
+
+'HEAD1'=>{
+de=>'
+Die Kennzahlen werden immer bezogen auf eine Anwendung ermittelt 
+und dann bezogen auf Betriebsteam/Betriebsbereich und Mandant 
+auf alle darüberliegenden Organisationsebenen agregiert. 
+Dies bedeutet, dass wenn z.B. einen Hardware von mehreren 
+Anwendungen verwendet wird, kann es zu Mehrfachzählungen kommen.
+',en=>'
+The key figures are always determined in relation to an application
+and then related to the operating team/operating area and client
+to all levels of organization above.
+This means, for example, that if one hardware is shared by several
+applications is used, multiple counts may occur.
+'},
+
+
+'SOFTINST.LABEL'=>{
+de=>'
+Software-Installationen
+',en=>'
+Software-Installations
+'},
+
+'SOFTINST.DESC'=>{
+de=>'
+Bewertet werden alle Software-Installationen, die im 
+IT-Inventar erfasst wurden. Die Bewertung<br>erfolgt nach
+dem Software-Set "TelekomIT Roadmap".<br>
+Das betreffende SoftwareSet ist unter ...<br>
+&nbsp;<i>IT-Inventar-&gt;Prozesssteuerung-&gt;Software Management</i><br>
+... abfragbar.
+',en=>'
+All software installations are evaluated, which are included in the
+IT inventory have been recorded. The valuation is carried out according to
+the "TelekomIT Roadmap" software set.<br>
+'},
+
+
+'TOTALTCC.LABEL'=>{
+de=>'
+TCC Gesamtstatus
+',en=>'
+TCC Total-State
+'},
+
+'TOTALTCC.DESC'=>{
+de=>'
+Der TCC Gesammtstatus wird aus dem von der T-Systems<br>
+zugelieferten TCC Report aus SmartCube ermittelt.<br>
+Die Rohdaten (bzw. die aktuellen Daten) für die Auswertung können unter ...<br>
+&nbsp;<i>IT-Universum -&gt; SmartCube -&gt; TCC</i><br>
+... abgerufen werden.
+',en=>'
+The TCC overall status is calculated from the data provided by T-Systems<br>
+supplied TCC report is determined from SmartCube.<br>
+The raw data (or the current data) for the evaluation 
+can be viewed under ...<br>
+&nbsp;<i>IT Universe -&gt; SmartCube -&gt; TCC </i><br>
+... can be retrieved.
+'},
+
+
+'TCCBASE.LABEL'=>{
+de=>'
+TCC BaseSetup Bewertung
+',en=>'
+TCC BaseSetup Rating
+'},
+
+'TCCBASE.DESC'=>{
+de=>'
+Die Bewertung des BaseSetups wird von T-Systems vorgenommen
+und im SmartCube TCC Report dargestellt.<br>
+Die Rohdaten (bzw. die aktuellen Daten) für die Auswertung können unter ...<br>
+&nbsp;<i>IT-Universum -&gt; SmartCube -&gt; TCC</i><br>
+... abgerufen werden.
+',en=>'
+The assessment of the base setup is carried out by T-Systems
+and displayed in the SmartCube TCC Report.<br>
+The raw data (or the current data) for the evaluation 
+can be viewed under ...<br>
+&nbsp;<i>IT Universe -&gt; SmartCube -&gt; TCC </i><br>
+... can be retrieved.
+'},
+
+
+'OSRATE.LABEL'=>{
+de=>'
+TCC Bewertung der Betriebssystemversion
+',en=>'
+TCC Rating on Operation System Version
+'},
+
+'OSRATE.DESC'=>{
+de=>'
+Die Bewertung des Betriebssystems wird von T-Systems vorgenommen
+und im SmartCube TCC Report dargestellt.<br>
+Die Rohdaten (bzw. die aktuellen Daten) für die Auswertung können unter ...<br>
+&nbsp;<i>IT-Universum -&gt; SmartCube -&gt; TCC</i><br>
+... abgerufen werden.
+',en=>'
+The assessment of the operation system version is carried out by T-Systems
+and displayed in the SmartCube TCC Report.<br>
+The raw data (or the current data) for the evaluation 
+can be viewed under ...<br>
+&nbsp;<i>IT Universe -&gt; SmartCube -&gt; TCC </i><br>
+... can be retrieved.
+'},
+
+
+

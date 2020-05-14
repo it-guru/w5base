@@ -15,6 +15,28 @@
    border-width:1px;
 }
 
+
+div.clipicon {
+  position: absolute;
+  display: inline-block;
+  top:0;
+  right:0;
+  z-index:99;
+  cursor:pointer;
+}
+
+div.clipicon img {
+  opacity: 0;
+  transition: opacity .5s, top .5s;
+}
+
+div.clipicon:hover img {
+  opacity: 1;
+}
+
+
+
+
 @media print {
    #reportFrame{
       margin:0px;

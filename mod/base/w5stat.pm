@@ -679,7 +679,7 @@ sub ShowEntry
    $MinReportUserGroupCount=int($MinReportUserGroupCount);
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','w5stat.css'],
-                           js=>['toolbox.js','subModal.js',
+                           js=>['toolbox.js','subModal.js','OutputHtml.js',
                                 'jquery.js','jquery.segbar.js',
                                 'Chart.min.js',
                                 'sortabletable.js',
@@ -796,6 +796,9 @@ EOF
    $d.=" }\n";
    $d.="}\n";
    $d.="addEvent(window,\"load\",InitSortTables);";
+   $d.="</script>\n";
+   $d.="<script language=JavaScript>\n";
+   $d.="addEvent(window,\"load\",add_clipIconFunc);\n";
    $d.="</script>\n";
    print $d;
 #   $d.="

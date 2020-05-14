@@ -257,7 +257,7 @@ sub displayAPR
    my %DIid;
    if (exists($rmostat->{stats}->{'APR.Appl.List'})){
       @appl=map({
-         my @fld=split(/;/,$_);
+         my @fld=split(/;/,trim($_));
          my $pos=0; 
          my $rec={id=>$fld[$pos++]};
          $rec->{name}=$fld[$pos++];
@@ -295,7 +295,7 @@ sub displayAPR
       }
       if (exists($rmostat->{stats}->{'APR.System'})){
          @s=map({
-            my @fld=splitCsvLine($_);
+            my @fld=splitCsvLine(trim($_));
             my $pos=0; 
             my $rec={id=>$fld[$pos++]};
             $rec->{name}=$fld[$pos++];
@@ -308,12 +308,13 @@ sub displayAPR
             $rec->{os_base_setup_color}=$fld[$pos++];
             $rec->{roadmap_color}=$fld[$pos++];
             $rec->{roadmap_state}=$fld[$pos++];
+            $rec->{commented}=$fld[$pos++];
             $rec;
          } @{$rmostat->{stats}->{'APR.System'}});
       }
       if (exists($rmostat->{stats}->{'APR.SoftwareInst'})){
          @swinst=map({
-            my @fld=split(/;/,$_);
+            my @fld=split(/;/,trim($_));
             my $pos=0; 
             my $rec={id=>$fld[$pos++]};
             $rec->{dataobj}=$fld[$pos++];
@@ -321,6 +322,9 @@ sub displayAPR
             $rec->{fullname}=$fld[$pos++];
             $rec->{instrating}=$fld[$pos++];
             $rec->{ratingmsg}=$fld[$pos++];
+            $rec->{locatedat}=$fld[$pos++];
+            $rec->{commented}=$fld[$pos++];
+            $rec->{software}=$fld[$pos++];
             $rec;
          } @{$rmostat->{stats}->{'APR.SoftwareInst'}});
           
@@ -341,12 +345,6 @@ sub displayAPR
          $appkpi->{$prefix.".".$color}=0;
       }
    }
-   #if ($rmostat->{sgroup} eq "Application"){
-   #   foreach my $rec (@swinst){
-   #      my $color=$rec->{instrating};
-   #      $appkpi->{'APR.SoftwareInst.Rating.'.$color}++;
-   #   }
-   #}
    if ($rmostat->{sgroup} eq "Group" ||
        $rmostat->{sgroup} eq "Application"){
       foreach my $color (keys(%colors)){
@@ -379,56 +377,70 @@ sub displayAPR
 
    if ($rmostat->{sgroup} eq "Group"){
       $d.="<table class=statTab style=\"width:70%\">";
-      $d.=sprintf("<tr><td>APR relevante Anwendungen:</td>".
-                  "<td>%d</td></tr>",$applcnt);
+      $d.=sprintf("<tr><td>%s:</td>".
+                  "<td>%d</td></tr>",
+                  $self->getParent->T("APRAPPCNT",'tsAPR::w5stat::base'),
+                  $applcnt);
       if (exists($rmostat->{stats}->{'APR.System.Count'})){
-         $d.=sprintf("<tr><td nowrap>von APR relevanten Anwendungen ".
-                     "verwendete logische Systeme:</td><td>%d</td></tr>",
+         $d.=sprintf("<tr><td>%s:</td>".
+                     "<td>%d</td></tr>",
+                     $self->getParent->T("APRSYSCNT",'tsAPR::w5stat::base'),
                      $rmostat->{stats}->{'APR.System.Count'}->[0]);
       }
       if (exists($rmostat->{stats}->{'APR.SoftwareInst.Count'})){
-         $d.=sprintf("<tr><td nowrap>Software-Installationen die ".
-                     "von APR relevanten ".
-                     "Anwendungen genutzt werden:</td><td>%d</td></tr>",
+         $d.=sprintf("<tr><td>%s:</td>".
+                     "<td>%d</td></tr>",
+                     $self->getParent->T("APRINSTCNT",'tsAPR::w5stat::base'),
                      $rmostat->{stats}->{'APR.SoftwareInst.Count'}->[0]);
       }
-      $d.="</table>";
-      $d.="Die Kennzahlen werden immer bezogen auf eine Anwendung ermittelt ".
-          "und dann bezogen auf Betriebsteam/Betriebsbereich und Mandant ".
-          "auf alle darüberliegenden Organisationsebenen agregiert. ".
-          "Dies bedeutet, dass wenn z.B. einen Hardware von mehreren ".
-          "Anwendungen verwendet wird, kann es zu Mehrfachzählungen kommen.";
+      $d.="</table>".$self->getParent->T("HEAD1",'tsAPR::w5stat::base');
    }
 
 
 
    $d.="<hr>";
-   if (grep(/^APR.SoftwareInst.Rating/,keys(%{$appkpi}))){
-      $d.="<h3>Software-Installationen (TelekomIT Roadmap bewertet):</h3>";
-      $d.="Software:";
-      $d.=$self->mkSegBar("swinstrating",$self->mkSegBarDSet($appkpi,
-                          "APR.SoftwareInst.Rating"));
-      $d.="<hr>";
-   }
    if (grep(/^APR.System.TCC.check_status/,keys(%{$appkpi}))){
-      $d.="<h3>TCC Gesamtstatus:</h3>";
-      $d.=":";
+      $d.="<h2>".
+          $self->getParent->T("TOTALTCC.LABEL",'tsAPR::w5stat::base').
+          ":</h2>";
+      $d.="<p>".
+          $self->getParent->T("TOTALTCC.DESC",'tsAPR::w5stat::base').
+          ":</p>";
       $d.=$self->mkSegBar("tcctotal",$self->mkSegBarDSet($appkpi,
                           "APR.System.TCC.check_status"));
       $d.="<hr>";
    }
    if (grep(/^APR.System.TCC.os_base_setup/,keys(%{$appkpi}))){
-      $d.="<h3>TCC BaseSetup:</h3>";
-      $d.=":";
+      $d.="<h2>".
+          $self->getParent->T("TCCBASE.LABEL",'tsAPR::w5stat::base').
+          ":</h2>";
+      $d.="<p>".
+          $self->getParent->T("TCCBASE.DESC",'tsAPR::w5stat::base').
+          ":</p>";
       $d.=$self->mkSegBar("tccbase",$self->mkSegBarDSet($appkpi,
                           "APR.System.TCC.os_base_setup"));
       $d.="<hr>";
    }
    if (grep(/^APR.System.TCC.roadmap/,keys(%{$appkpi}))){
-      $d.="<h3>TCC Betriebssystem:</h3>";
-      $d.=":";
+      $d.="<h2>".
+          $self->getParent->T("OSRATE.LABEL",'tsAPR::w5stat::base').
+          ":</h2>";
+      $d.="<p>".
+          $self->getParent->T("OSRATE.DESC",'tsAPR::w5stat::base').
+          ":</p>";
       $d.=$self->mkSegBar("tccroadmap",$self->mkSegBarDSet($appkpi,
                           "APR.System.TCC.roadmap"));
+      $d.="<hr>";
+   }
+   if (grep(/^APR.SoftwareInst.Rating/,keys(%{$appkpi}))){
+      $d.="<h2>".
+          $self->getParent->T("SOFTINST.LABEL",'tsAPR::w5stat::base').
+          ":</h2>";
+      $d.="<p>".
+          $self->getParent->T("SOFTINST.DESC",'tsAPR::w5stat::base').
+          ":</p>";
+      $d.=$self->mkSegBar("swinstrating",$self->mkSegBarDSet($appkpi,
+                          "APR.SoftwareInst.Rating"));
       $d.="<hr>";
    }
    if ($rmostat->{sgroup} eq "Application"){
@@ -472,11 +484,14 @@ sub displayAPR
                $d.="<thead><tr><th width=1%>System</th>".
                        "<th width=20%>SystemID</th>".
                        "<th width=1%>TCC Gesamtstatus</th>".
-                       "<th width=1%>Fehlender Patch, freigegeben vor x Tagen</th>".
+                       "<th width=1%>".
+                       "Fehlender Patch, freigegeben vor x Tagen".
+                       "</th>".
                        "<th width=10%>Red Alert</th>".
                        "<th width=20%>Betriebssystem</th>".
                        "<th width=20%>OS BaseSetup</th>".
                        "<th width=20>OS Roadmap State</th>".
+                       "<th width=20>cmt</th>".
                        "</tr></thead>";
             }
             $d.="<tr>";
@@ -517,30 +532,47 @@ sub displayAPR
             $d.="</td>";
 
             $d.="<td>";
-            $d.=$s[$i]->{os_base_setup}."&nbsp;".SignImg($s[$i]->{os_base_setup_color});
+            $d.=$s[$i]->{os_base_setup}."&nbsp;".
+                SignImg($s[$i]->{os_base_setup_color});
             $d.="</td>";
 
             $d.="<td align=center>";
             $d.=$s[$i]->{roadmap_state};
+            $d.="</td>";
+            $d.="<td align=center>";
+            if ($s[$i]->{commented} ne "" && $s[$i]->{commented}>0){
+               $d.="X";
+            }
+            else{
+               $d.="&nbsp;";
+            }
             $d.="</td>";
             $d.="</tr>";
          }
          $d.="</table>" if ($#s!=-1);
       }
       { # Software Installations
+         my %swheadmap=();
          @swinst=sort({$a->{fullname} cmp $b->{fullname}} @swinst);
          for(my $i=0;$i<=$#swinst;$i++){
             if ($i==0){
                $d.="<table class=\"statTab sortableTable\">";
                $d.="<thead><tr><th>Software-Installation</th>".
-                   "<th width=10>Patch/Release Rating</th>".
+                   "<th width=1%>Patch/Release Rating</th>".
+                   "<th width=1%>cmt</th>".
                    "<th width=1%></th>".
                    "</tr></thead>";
             }
             $d.="<tr>";
             $d.="<td valign=top>";
             my $fullname=$swinst[$i]->{fullname};
-            $d.=$fullname;
+            if (exists($swinstById->{id}->{$swinst[$i]->{id}})){
+               $d.=$app->OpenByIdWindow("itil::lnksoftware",
+                                        $swinst[$i]->{id},$fullname);
+            }
+            else{
+               $d.=$fullname;
+            }
             $d.="</td>";
             $d.="<td align=center valign=top>".
                 SignImg($swinst[$i]->{instrating}).
@@ -549,10 +581,58 @@ sub displayAPR
             if ($swinst[$i]->{instrating} eq "blue"){
                $ratingmsg="";
             }
+            if ($swinst[$i]->{commented} ne "" && $swinst[$i]->{commented}>0){
+               $d.="<td width=1% align=center>X</td>";
+            }
+            else{
+               $d.="<td width=1%>&nbsp;</td>";
+            }
+            if ($swinst[$i]->{instrating} ne "" &&
+                $swinst[$i]->{instrating} ne "green"){
+               my $k=$swinst[$i]->{software}."-".$swinst[$i]->{instrating};
+               if (!exists($swheadmap{$k})){
+                  $swheadmap{$k}={
+                     rating=>$swinst[$i]->{instrating},
+                     software=>$swinst[$i]->{software},
+                     locatedat=>{}
+                  };
+               }
+               $swheadmap{$k}->{locatedat}->{$swinst[$i]->{locatedat}}++;
+            }
             $d.="<td width=2%>".$ratingmsg."</td>";
             $d.="</tr>";
          }
-         $d.="</table>" if ($#i!=-1);
+         $d.="</table>" if ($#swinst!=-1);
+         my $i=0;
+         foreach my $k (sort(keys(%swheadmap))){
+            if ($i==0){
+               $d.="<table class=\"statTab sortableTable\">";
+               $d.="<thead><tr><th>Software</th>".
+                   "<th>Rating</th>".
+                   "<th style=\"text-align:left\">".
+                   $self->getParent->T("located at",'tsAPR::w5stat::base').
+                   "</th>".
+                   "</tr></thead>";
+            }
+            $d.="<tr>";
+            $d.="<td valign=top width=20%>";
+            $d.=$swheadmap{$k}->{software};
+            $d.="</td>";
+            $d.="<td valign=top align=center width=15%>".
+                SignImg($swheadmap{$k}->{rating});
+            $d.="</td>";
+            $d.="<td valign=top width=65%><div style=\"position:relative\">".
+                join(", ",sort(keys(%{$swheadmap{$k}->{locatedat}})));
+            $d.="<div class=clipicon>".
+                "<img title=\"copy\" src=\"../../base/load/edit_copy.gif\">".
+                "</div>\n";
+            $d.="</div></td>";
+            $d.="</tr>";
+            $i++;
+         }
+         $d.="</table>" if (keys(%swheadmap));
+
+
       }
    }
 
@@ -619,8 +699,6 @@ sub processData
    if ($appl->Config->Param("W5BaseOperationMode") eq "dev"){
       $appl->SetFilter({cistatusid=>'<=4',
                         name=>'W5* Dina* TSG_VIRTUELLE_T-SERVER* NGSS*Perfo*'});
-      $appl->SetFilter({cistatusid=>'<=4',
-                        name=>'W5Base/Darwin'});
    }
    else{
       $appl->SetFilter({cistatusid=>'4'});
@@ -689,6 +767,7 @@ sub processRecord
             roadmap_state
             w5systemid
 
+            denyupd
          ));
          print STDERR Dumper(\@l);
          foreach my $tccrec (@l){
@@ -700,9 +779,13 @@ sub processRecord
       }
       my $mgmtitemgroup=$rec->{mgmtitemgroup};
       $mgmtitemgroup=[$mgmtitemgroup] if (ref($mgmtitemgroup) ne "ARRAY");
-      if (grep(/^TOP.*Telekom.*$/i,@$mgmtitemgroup)){
-         $isAPRrelevant=1;
-      }
+      #
+      # Laut Karin Flamm sind nur Anwendungen relevant, die TCC Systeme
+      # aufweisen
+      #
+      #if (grep(/^TOP.*Telekom.*$/i,@$mgmtitemgroup)){
+      #   $isAPRrelevant=1;
+      #}
       if ($app->Config->Param("W5BaseOperationMode") eq "dev"){
          if (($rec->{name}=~m/\(P\)$/) || ($rec->{name}=~m/^W5B/)){
             $isAPRrelevant=1;
@@ -734,9 +817,11 @@ sub processRecord
                   softwareset=>$self->{Roadmap}->[0]->{name}
                });
             }
-            foreach my $swirec ($o->getHashList(qw(id fullname 
+            foreach my $swirec ($o->getHashList(qw(id fullname software
                                                    softwareinstrelstate
-                                                   softwareinstrelmsg))){
+                                                   softwareinstrelmsg
+                                                   itclustsvc system
+                                                   denyupd))){
                #print Dumper($swirec);
                my $instrating="";
                if ($swirec->{softwareinstrelstate}=~m/^FAIL/){
@@ -761,21 +846,31 @@ sub processRecord
                if ($swirec->{systemid} ne ""){
                   $refid=$swirec->{systemid};
                }
+               my $locatedat="";
+               if ($swirec->{system} ne ""){
+                  $locatedat=$swirec->{system};
+               }
+               if ($swirec->{itclustsvc} ne ""){
+                  $locatedat=$swirec->{itclustsvc};
+               }
                $swinst{$swirec->{id}}={
                    id=>$swirec->{id},
                    dataobj=>$swinstdataobj,
                    refid=>$refid,
                    instrating=>$instrating,
                    fullname=>$swirec->{fullname},
-                   ratingmsg=>$softwareinstrelmsg
+                   ratingmsg=>$softwareinstrelmsg,
+                   denyupd=>$swirec->{denyupd},
+                   locatedat=>$locatedat,
+                   software=>$swirec->{software}
                };
             }
          }
       }
 
-      printf STDERR ("fifi swinst=%s\n",Dumper(\%swinst));
+      #printf STDERR ("fifi swinst=%s\n",Dumper(\%swinst));
 
-      printf STDERR ("fifi w5sysid=%s\n",join(",",@w5sysid));
+      #printf STDERR ("fifi w5sysid=%s\n",join(",",@w5sysid));
 
       my $appkpi={};
       my $name=$rec->{name};
@@ -811,6 +906,9 @@ sub processRecord
       # ---- start analytics and store of statvars ----
 
       foreach my $tccrec (@tccsys){
+         if (!$isAPRrelevant){  # Seltsam - aber von Karin F. so gewünscht
+            $isAPRrelevant=1;
+         }
          $appkpi->{'APR.System.Count'}++;
          my $l=joinCsvLine(
                $tccrec->{w5systemid},
@@ -823,7 +921,8 @@ sub processRecord
                $tccrec->{os_base_setup},
                $tccrec->{os_base_setup_color},
                $tccrec->{roadmap_color},
-               $tccrec->{roadmap_state}
+               $tccrec->{roadmap_state},
+               $tccrec->{denyupd}
          )."\n";
 
          { 
@@ -876,13 +975,7 @@ sub processRecord
       }
       foreach my $swiid (sort(keys(%swinst))){
          $appkpi->{'APR.SoftwareInst.Count'}++;
-         my $l="";
-         $l.=$swinst{$swiid}->{id}.";";
-         $l.=$swinst{$swiid}->{dataobj}.";";
-         $l.=$swinst{$swiid}->{refid}.";";
-         $l.=$swinst{$swiid}->{fullname}.";";
          my $ratingcolor=$swinst{$swiid}->{instrating};
-         $l.=$ratingcolor.";";
          { 
             if (in_array([keys(%colors)],$ratingcolor)){
                $appkpi->{'APR.SoftwareInst.Rating.'.$ratingcolor}++;
@@ -891,8 +984,17 @@ sub processRecord
                $appkpi->{'APR.SoftwareInst.Rating.gray'}++;
             }
          }
-         $l.=$swinst{$swiid}->{ratingmsg}.";";
-         $l.="\n";
+         my $l=joinCsvLine(
+            $swinst{$swiid}->{id},
+            $swinst{$swiid}->{dataobj},
+            $swinst{$swiid}->{refid},
+            $swinst{$swiid}->{fullname},
+            $ratingcolor,
+            $swinst{$swiid}->{ratingmsg},
+            $swinst{$swiid}->{locatedat},
+            $swinst{$swiid}->{denyupd},
+            $swinst{$swiid}->{software}
+         )."\n";
          $self->getParent->storeStatVar("Application",
                                         [$rec->{name}],
                                         {nosplit=>1,
