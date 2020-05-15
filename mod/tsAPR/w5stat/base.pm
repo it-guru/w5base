@@ -103,25 +103,15 @@ sub processDataInit
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+sub copyFrm
+{
+   return("<div style=\"position:relative\">\n".
+          join("\n",@_).
+          "<div class=clipicon>".
+          "<img title=\"copy\" src=\"../../base/load/edit_copy.gif\">".
+          "</div>\n".
+          "</div>\n");
+}
 
 
 
@@ -501,15 +491,26 @@ sub displayAPR
             }
             $d.="<tr>";
             $d.="<td nowrap>";
-            if (exists($sById->{id}->{$s[$i]->{id}})){
-               $d.=$app->OpenByIdWindow("itil::system",
-                                        $s[$i]->{id},$s[$i]->{name});
+            if ($s[$i]->{systemid} ne "" && 
+               exists($tccById->{systemid}->{$s[$i]->{systemid}})){
+              $d.=copyFrm(
+                     $app->OpenByIdWindow("tssmartcube::tcc",
+                                          $s[$i]->{systemid},
+                                          $s[$i]->{name})
+              );
             }
             else{
-               $d.=$s[$i]->{name};
+              $d.=copyFrm($s[$i]->{systemid});
             }
+            #if (exists($sById->{id}->{$s[$i]->{id}})){
+            #   $d.=$app->OpenByIdWindow("itil::system",
+            #                            $s[$i]->{id},$s[$i]->{name});
+            #}
+            #else{
+            #   $d.=$s[$i]->{name};
+            #}
             $d.="</td>";
-            $d.="<td>".$s[$i]->{systemid}."</td>";
+            $d.="<td>".copyFrm($s[$i]->{systemid})."</td>";
 
             $d.="<td align=center>";
             $d.=SignImg($s[$i]->{check_status_color});
@@ -525,15 +526,7 @@ sub displayAPR
 
             $d.="<td>";
             $d.=$s[$i]->{roadmap}."&nbsp;";
-            if ($s[$i]->{systemid} ne "" && 
-               exists($tccById->{systemid}->{$s[$i]->{systemid}})){
-              $d.=$app->OpenByIdWindow("tssmartcube::tcc",
-                                        $s[$i]->{systemid},
-                                        SignImg($s[$i]->{roadmap_color}));
-            }
-            else{
-              $d.=SignImg($s[$i]->{roadmap_color});
-            }
+            $d.=SignImg($s[$i]->{roadmap_color});
             $d.="</td>";
 
             $d.="<td>";
@@ -572,11 +565,13 @@ sub displayAPR
             $d.="<td valign=top>";
             my $fullname=$swinst[$i]->{fullname};
             if (exists($swinstById->{id}->{$swinst[$i]->{id}})){
-               $d.=$app->OpenByIdWindow("itil::lnksoftware",
-                                        $swinst[$i]->{id},$fullname);
+               $d.=copyFrm(
+                      $app->OpenByIdWindow("itil::lnksoftware",
+                                           $swinst[$i]->{id},$fullname)
+               );
             }
             else{
-               $d.=$fullname;
+               $d.=copyFrm($fullname);
             }
             $d.="</td>";
             $d.="<td align=center valign=top>".
@@ -593,7 +588,8 @@ sub displayAPR
                $d.="<td width=1%>&nbsp;</td>";
             }
             if ($swinst[$i]->{instrating} ne "" &&
-                $swinst[$i]->{instrating} ne "green"){
+                $swinst[$i]->{instrating} ne "green" &&
+                $swinst[$i]->{software} ne ""){
                my $k=$swinst[$i]->{software}."-".$swinst[$i]->{instrating};
                if (!exists($swheadmap{$k})){
                   $swheadmap{$k}={
@@ -621,17 +617,14 @@ sub displayAPR
             }
             $d.="<tr>";
             $d.="<td valign=top width=20%>";
-            $d.=$swheadmap{$k}->{software};
+            $d.=copyFrm($swheadmap{$k}->{software});
             $d.="</td>";
             $d.="<td valign=top align=center width=15%>".
                 SignImg($swheadmap{$k}->{rating});
             $d.="</td>";
-            $d.="<td valign=top width=65%><div style=\"position:relative\">".
-                join(", ",sort(keys(%{$swheadmap{$k}->{locatedat}})));
-            $d.="<div class=clipicon>".
-                "<img title=\"copy\" src=\"../../base/load/edit_copy.gif\">".
-                "</div>\n";
-            $d.="</div></td>";
+            $d.="<td valign=top width=65%>".
+                copyFrm(join(", ",sort(keys(%{$swheadmap{$k}->{locatedat}}))));
+            $d.="</td>";
             $d.="</tr>";
             $i++;
          }
@@ -873,9 +866,7 @@ sub processRecord
             }
          }
       }
-
       #printf STDERR ("fifi swinst=%s\n",Dumper(\%swinst));
-
       #printf STDERR ("fifi w5sysid=%s\n",join(",",@w5sysid));
 
       my $appkpi={};

@@ -104,24 +104,15 @@ sub processDataInit
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+sub copyFrm
+{
+   return("<div style=\"position:relative\">\n".
+          join("\n",@_).
+          "<div class=clipicon>".
+          "<img title=\"copy\" src=\"../../base/load/edit_copy.gif\">".
+          "</div>\n".
+          "</div>\n");
+}
 
 
 
@@ -342,14 +333,17 @@ sub displayRMO
       }
       if (exists($rmostat->{stats}->{'RMO.SoftwareInst'})){
          @swinst=map({
-            my @fld=split(/;/,$_);
+            my @fld=split(/;/,trim($_));
             my $pos=0; 
             my $rec={id=>$fld[$pos++]};
             $rec->{dataobj}=$fld[$pos++];
+            $rec->{refid}=$fld[$pos++];
             $rec->{fullname}=$fld[$pos++];
-            $rec->{dataissue}=$fld[$pos++];
             $rec->{instrating}=$fld[$pos++];
             $rec->{ratingmsg}=$fld[$pos++];
+            $rec->{locatedat}=$fld[$pos++];
+            $rec->{commented}=$fld[$pos++];
+            $rec->{software}=$fld[$pos++];
             $rec;
          } @{$rmostat->{stats}->{'RMO.SoftwareInst'}});
           
@@ -577,24 +571,25 @@ sub displayRMO
             $d.="<tr>";
             $d.="<td nowrap>";
             if (exists($sById->{id}->{$s[$i]->{id}})){
-               $d.=$app->OpenByIdWindow("itil::system",
-                                        $s[$i]->{id},$s[$i]->{name});
+               $d.=copyFrm($app->OpenByIdWindow("itil::system",
+                                        $s[$i]->{id},$s[$i]->{name}));
             }
             else{
-               $d.=$s[$i]->{name};
+               $d.=copyFrm($s[$i]->{name});
             }
             $d.="</td>";
-            $d.="<td>".$s[$i]->{systemid}."</td>";
-            $d.="<td>".$s[$i]->{productline}."</td>";
+            $d.="<td>".copyFrm($s[$i]->{systemid})."</td>";
+            $d.="<td>".copyFrm($s[$i]->{productline})."</td>";
             $d.="<td align=center>";
             if ($s[$i]->{systemid} ne "" && 
                exists($tccById->{systemid}->{$s[$i]->{systemid}})){
-              $d.=$app->OpenByIdWindow("tssmartcube::tcc",
+              $d.=copyFrm($app->OpenByIdWindow("tssmartcube::tcc",
                                         $s[$i]->{systemid},
-                                        SignImg($s[$i]->{tcccolor}));
+                                        SignImg($s[$i]->{tcccolor}))
+              );
             }
             else{
-              $d.=SignImg($s[$i]->{tcccolor});
+              $d.=copyFrm(SignImg($s[$i]->{tcccolor}));
             }
             $d.="</td>";
             {
@@ -674,34 +669,35 @@ sub displayRMO
                    "</thead>";
             }
             $d.="<tr>";
-            $d.="<td>".$i[$i]->{name}."</td>";
+            $d.="<td>".copyFrm($i[$i]->{name})."</td>";
             {
                my $DItext="";
                if ($i[$i]->{dataissue} ne ""){
                   my ($DIid,$DIcol)=DIsplit($i[$i]->{dataissue});
                   if ($DIid ne "" && exists($DIById->{id}->{$DIid})){
-                     $DItext=$app->OpenByIdWindow("base::workflow",
-                                               $DIid,
-                                               $DItext=SignImg($DIcol));
+                     $DItext=copyFrm(
+                                $app->OpenByIdWindow("base::workflow",
+                                                     $DIid,
+                                                     $DItext=SignImg($DIcol))
+                     );
                   }
                   else{
-                     $DItext=SignImg($DIcol);
+                     $DItext=copyFrm(SignImg($DIcol));
                   }
                }
-               $d.="<td align=center width=10>".$DItext."</td>";
+               $d.="<td align=center width=10>".copyFrm($DItext)."</td>";
             }
             $d.="</tr>";
          }
          $d.="</table>" if ($#i!=-1);
       }
       { # Software Installations
+         my %swheadmap=();
          @swinst=sort({$a->{fullname} cmp $b->{fullname}} @swinst);
          for(my $i=0;$i<=$#swinst;$i++){
             if ($i==0){
                $d.="<table class=\"statTab sortableTable\">";
                $d.="<thead><tr><th>Software-Installation</th>".
-                   "<th width=10>Installationsort</th>".
-                   "<th width=10>Installationtyp</th>".
                    "<th width=10>Patch/Release Rating</th>".
                    "<th width=1%></th>".
                    "</tr></thead>";
@@ -709,34 +705,36 @@ sub displayRMO
             $d.="<tr>";
             $d.="<td valign=top>";
             my $fullname=$swinst[$i]->{fullname};
-            my ($location,$typ);
-            if (my ($n,$t,$l)=$fullname=~m/^(.*)\s*\((.*)\@(.*)\)$/){
-               $fullname=$n;
-               $location=$l;
-               $typ=$t;
-            }
-            elsif (my ($n,$t)=$fullname=~m/^(.*)\s*\((.*)\)$/){
-               $fullname=$n;
-               $typ=$t;
-            }
-
             if (exists($swinstById->{id}->{$swinst[$i]->{id}})){
-               $d.=$app->OpenByIdWindow($swinst[$i]->{dataobj},
-                                        $swinst[$i]->{id},
-                                        $fullname);
+               $d.=copyFrm($app->OpenByIdWindow($swinst[$i]->{dataobj},
+                                                $swinst[$i]->{id},
+                                                $fullname)
+               );
             }
             else{
-               $d.=$fullname;
+               $d.=copyFrm($fullname);
             }
             $d.="</td>";
-            $d.="<td>".$location."</td>";
-            $d.="<td>".$typ."</td>";
             $d.="<td align=center valign=top>".
                 SignImg($swinst[$i]->{instrating}).
                 "</td>";
             my $ratingmsg=$swinst[$i]->{ratingmsg};
             if ($swinst[$i]->{instrating} eq "blue"){
                $ratingmsg="";
+            }
+            if ($swinst[$i]->{instrating} ne "" &&
+                $swinst[$i]->{instrating} ne "green" &&
+                $swinst[$i]->{instrating} ne "gray" &&
+                $swinst[$i]->{software} ne ""){
+               my $k=$swinst[$i]->{software}."-".$swinst[$i]->{instrating};
+               if (!exists($swheadmap{$k})){
+                  $swheadmap{$k}={
+                     rating=>$swinst[$i]->{instrating},
+                     software=>$swinst[$i]->{software},
+                     locatedat=>{}
+                  };
+               }
+               $swheadmap{$k}->{locatedat}->{$swinst[$i]->{locatedat}}++;
             }
             $d.="<td width=2%>".$ratingmsg."</td>";
             #{
@@ -756,7 +754,32 @@ sub displayRMO
             #}
             $d.="</tr>";
          }
-         $d.="</table>" if ($#i!=-1);
+         $d.="</table>" if ($#swinst!=-1);
+         my $i=0;
+         foreach my $k (sort(keys(%swheadmap))){
+            if ($i==0){
+               $d.="<table class=\"statTab sortableTable\">";
+               $d.="<thead><tr><th>Software</th>".
+                   "<th>Rating</th>".
+                   "<th style=\"text-align:left\">".
+                   $self->getParent->T("located at",'tsAPR::w5stat::base').
+                   "</th>".
+                   "</tr></thead>";
+            }
+            $d.="<tr>";
+            $d.="<td valign=top width=20%>";
+            $d.=copyFrm($swheadmap{$k}->{software});
+            $d.="</td>";
+            $d.="<td valign=top align=center width=15%>".
+                SignImg($swheadmap{$k}->{rating});
+            $d.="</td>";
+            $d.="<td valign=top width=65%>".
+                copyFrm(join(", ",sort(keys(%{$swheadmap{$k}->{locatedat}}))));
+            $d.="</td>";
+            $d.="</tr>";
+            $i++;
+         }
+         $d.="</table>" if (keys(%swheadmap));
       }
    }
    if ($#appl!=-1){ # RMO-Index direkt zugeordneter Anwendungen
@@ -1110,9 +1133,11 @@ sub processRecord
                $o->SetFilter({applications    =>\$rec->{name},
                               softwareset=>$self->{Roadmap}->[0]->{name}});
             }
-            foreach my $swirec ($o->getHashList(qw(id fullname 
+            foreach my $swirec ($o->getHashList(qw(id fullname software
                                                    softwareinstrelstate
-                                                   softwareinstrelmsg))){
+                                                   softwareinstrelmsg
+                                                   itclustsvc system
+                                                   denyupd))){
                #print Dumper($swirec);
                my $instrating="green";
                if ($swirec->{softwareinstrelstate}=~m/^FAIL/){
@@ -1136,12 +1161,32 @@ sub processRecord
                my $softwareinstrelmsg=$swirec->{softwareinstrelmsg};
                $softwareinstrelmsg=~s/;/ /g;
                $softwareinstrelmsg=~s/\n/ /g;
+               my $refid;
+               if ($swirec->{itclustsvcid} ne ""){
+                  $refid=$swirec->{itclustsvcid};
+               }
+               if ($swirec->{systemid} ne ""){
+                  $refid=$swirec->{systemid};
+               }
+               my $locatedat="";
+               if ($swirec->{system} ne ""){
+                  $locatedat=$swirec->{system};
+               }
+               if ($swirec->{itclustsvc} ne ""){
+                  $locatedat=$swirec->{itclustsvc};
+               }
+
+
                $swinst{$swirec->{id}}={
                    id=>$swirec->{id},
                    dataobj=>$swinstdataobj,
+                   refid=>$refid,
                    instrating=>$instrating,
                    fullname=>$swirec->{fullname},
-                   ratingmsg=>$softwareinstrelmsg
+                   ratingmsg=>$softwareinstrelmsg,
+                   denyupd=>$swirec->{denyupd},
+                   locatedat=>$locatedat,
+                   software=>$swirec->{software}
                };
             }
          }
@@ -1203,20 +1248,25 @@ sub processRecord
       }
       foreach my $swiid (sort(keys(%swinst))){
          $appkpi->{'RMO.SoftwareInst.Count'}++;
-         my $l="";
-         $l.=$swinst{$swiid}->{id}.";";
-         $l.=$swinst{$swiid}->{dataobj}.";";
-         $l.=$swinst{$swiid}->{fullname}.";";
-         $l.=$swinst{$swiid}->{dataissue}.";";
          my $ratingcolor=$swinst{$swiid}->{instrating};
          if ($ratingcolor eq ""){
             $ratingcolor="green";
          }
-         $l.=$ratingcolor.";";
+         my $l=joinCsvLine(
+            $swinst{$swiid}->{id},
+            $swinst{$swiid}->{dataobj},
+            $swinst{$swiid}->{refid},
+            $swinst{$swiid}->{fullname},
+            $ratingcolor,
+            $swinst{$swiid}->{ratingmsg},
+            $swinst{$swiid}->{locatedat},
+            $swinst{$swiid}->{denyupd},
+            $swinst{$swiid}->{software}
+         )."\n";
+
          if (in_array([keys(%colors)],$ratingcolor)){
             $appkpi->{'RMO.SoftwareInst.Rating.'.$ratingcolor}++;
          }
-         $l.=$swinst{$swiid}->{ratingmsg}.";";
          $self->getParent->storeStatVar("Application",
                                         [$rec->{name}],
                                         {nosplit=>1,

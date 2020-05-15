@@ -6,7 +6,7 @@
 'problmeatic or soon problematic'=>{de=>'problematisch oder demnächst problematisch'},
 'unidentifiable'=>{de=>'nicht ermittelbar'},
 'APPISRELEVANT'=>{
-de=>'Die Anwendung %s ist APR relevant und wird im Management-Report berücksichtig.',
+de=>'Die Anwendung %s ist APR relevant und wird im Management-Report berücksichtigt.',
 en=>'The Application %s is APR relevant and will be reported in management views.'
 },
 
