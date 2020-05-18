@@ -120,8 +120,8 @@ sub qcheckRecord
 
    my $tsossysrec={
       name=>$rec->{fullname},
-      icto=>$rec->{applgrpid},
-      description=>"ICTO: $rec->{applgrpid}"
+      ictoNumber=>$rec->{applgrpid},
+      description=>NowStam("en")
    };
 
    sub insNewTSOSsys
@@ -174,7 +174,7 @@ sub qcheckRecord
       if ($newid ne ""){
          if (!exists($ladd->{$lrec->{systemid}})){
             my %add=(TasteOS_MachineID=>$newid);
-printf STDERR ("fifi insNewTSOSmac $newid\n");
+            #printf STDERR ("fifi insNewTSOSmac $newid\n");
             
             $opladdobj->ValidatedInsertRecord({
                systemid=>$lrec->{systemid},
@@ -183,7 +183,7 @@ printf STDERR ("fifi insNewTSOSmac $newid\n");
             });
          }
          else{
-printf STDERR ("fifi insNewTSOSmac update $newid in id=".$ladd->{$lrec->{systemid}}->{id}."\n");
+            #printf STDERR ("fifi insNewTSOSmac update $newid in id=".$ladd->{$lrec->{systemid}}->{id}."\n");
             my %add=%{$ladd->{$lrec->{systemid}}->{additional}};
             $add{TasteOS_MachineID}=$newid;
             $opladdobj->ValidatedUpdateRecord(
@@ -202,7 +202,7 @@ printf STDERR ("fifi insNewTSOSmac update $newid in id=".$ladd->{$lrec->{systemi
          if (exists($ladd->{systemid}->{$lrec->{systemid}})){
             $TSOSmachineid=$ladd->{systemid}->{$lrec->{systemid}}->{additional}->{TasteOS_MachineID}->[0];
          }
-         printf STDERR ("fifi TSOSmachineid for $lrec->{systemid} : $TSOSmachineid\n");
+         #printf STDERR ("fifi TSOSmachineid for $lrec->{systemid} : $TSOSmachineid\n");
          my $tsosmacrec={
             name=>$lrec->{system},
             systemid=>$TSOSsystemid

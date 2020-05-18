@@ -43,7 +43,7 @@ sub new
             label             =>'Name'),
 
       new kernel::Field::Text(     
-            name              =>'icto',
+            name              =>'ictoNumber',
             searchable        =>1,
             label             =>'ICTO-ID'),
 
@@ -62,7 +62,7 @@ sub new
                 vjoindisp     =>['name','id']),
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name icto description));
+   $self->setDefaultView(qw(id name ictoNumber description));
    return($self);
 }
 
@@ -168,6 +168,7 @@ sub InsertRecord
          my $apikey=shift;
          return(['access-token'=>$apikey,
                  'name'=>$newrec->{name},
+                 'icto'=>$newrec->{ictoNumber},
                  'description'=>$newrec->{description},
                  'Content-Type','application/json']);
       },
@@ -202,7 +203,9 @@ sub UpdateRecord
 
    my %upd=();
    foreach my $k (keys(%$newrec)){
-      $upd{$k}=$newrec->{$k};
+      my $dstk=$k;
+      $dstk="icto" if ($dstk eq "ictoNumber");
+      $upd{$dstk}=$newrec->{$k};
    }
 
 
