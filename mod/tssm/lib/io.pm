@@ -714,8 +714,9 @@ sub detectSrcLoad
 
    my $d=CalcDateDuration($reqstamp,NowStamp("en"));
    if (defined($d) && $d->{totalseconds}<0){
-      msg(ERROR,"desired srcload timestamp for $id is in the ".
-                "future '$reqstamp'");
+      my $n=$d->{totalseconds}*-1;
+      msg(ERROR,"desired srcload timestamp for $id is ".
+                $n." sec in the future '$reqstamp'");
       $reqstamp=NowStamp("en");
    }
    return($reqstamp);
