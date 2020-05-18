@@ -735,6 +735,7 @@ sub HousingAnalyse
              my $housingivosystemid;
              if ($#housingsystemid==0){
                 $housingivosystemid=$housingsystemid[0];
+                msg(INFO,"using HOUSING $housingivosystemid");
              }
              else{
                 msg(INFO,"multiple HOUSING Systems on TSI RZ Location ".
@@ -766,6 +767,7 @@ sub HousingAnalyse
                       );
                    }
                    else{
+                      msg(INFO,"do TrSysAutD2AwithIVOmod for assetid $assetid");
                       $self->addMessage("TrSysAutD2AwithIVOmod",
                          $housingivosystemid,
                          $amasset{$assetid}->{tsacinv_locationfullname},
@@ -806,6 +808,9 @@ sub HousingAnalyse
                          );
                       }
                    }
+                }
+                else{
+                   msg(INFO,"HOUSING only exists with srcsys AssetManager");
                 }
              }
              else{
