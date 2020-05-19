@@ -1142,6 +1142,10 @@ var W5ExploreClass=function(){
       $(modalframe).find("input:text:visible:first").focus();
    }
 
+   this.closeDialog=function(){
+      $('#myModal').remove();
+   }
+
 
 
    this.showW5ExploreLogo=function(applet){

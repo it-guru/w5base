@@ -11,7 +11,7 @@ define(["datadumper"],function (){
       var appletobj=this;
 
    };
-   ClassAppletLib[applet].class.prototype.StoreOrLinkTicket=function(btn,e,frm){
+   ClassAppletLib[applet].class.prototype.StoreOrLinkTicket=function(btn,e,frm,okCleanup){
       var app=this.app;
       var appletobj=this;
 
@@ -19,70 +19,134 @@ define(["datadumper"],function (){
       $(frm).queue("prm",[]);
 
       var title=$(frm).find("#ttitle").first().val();
+
+      var AffectedCI=$(frm).find("#desiredsm9applci").first().val();
+
+      var CBI=$(frm).find("#desiredsm9prmcbi").first().val();
+
+      var AssignmentGroup=$(frm).find("#desiredsm9applag").first().val();
+      var Description=$(frm).find("#prmtext").first().val();
+
+
+
+
       if (prmid==""){  // create a new prm
          $(frm).queue("prm",function(next){
             console.log("PRM Create");
-            $("#oplog").append("Try creating of ProblemTicket: "); 
-            $("#oplog").append("<font color=red>not supported at now</font><br>");
-           // $(frm).find("#prmid").first().val("PM11833");
-            setTimeout(function(){
-               next();
-            },1000);
+            $("#oplog").append("Try creating of ProblemTicket:<br>"); 
+
+            var prmreq={
+               'Customer':"DEUTSCHE TELEKOM",
+               'AffectedCI':AffectedCI,
+               'CBI':CBI,
+               'Category1':'SECURITY',
+               'Category2':'DATA SECURITY',
+               'AssignmentGroup':AssignmentGroup,
+               'EventRisk':'NORMAL',
+               'Description':Description,
+               'ManagerGroup':'TIT.TSI.HU.SCANTEAM',
+               'Title':title,
+               'TriggeredBy':'SECURITY INFO',
+
+            };
+            console.log("prmreq=",prmreq);
+            prmreq.AssignmentGroup="TIT.TSI.DE.W5BASE";
+            prmreq.AffectedCI="W5BASE/DARWIN (APPL052025)";
+            $.ajax({
+               type:'POST',
+               url:"../../tssm/prm/openProblem",
+               data:JSON.stringify(prmreq),
+               dataType:'json',
+               //contentType:"application/json; charset=utf-8",
+               contentType:"application/json",
+               success:function(d){
+                  console.log("result d=",d);
+                  if (d.exitcode!=0){
+                     for(var c=0;c<d.exitmsg.length;c++){
+                        $("#oplog").append("<font color=red>ERROR: "+
+                                           d.exitmsg[c]+
+                                           "</font><br>");
+                        $("#oplog").scrollTop($("#oplog").prop("scrollHeight"));
+                     }
+                     setTimeout(function(){
+                        next();
+                     },2000);
+                  }
+                  else{
+                     $("#oplog").append("ProblemTicket '"+d.id+
+                                        "' succesfuly created<br>"); 
+                     $(frm).find("#prmid").first().val(d.id);
+                     next();
+                  }
+               },
+               error:function(){
+                  $("#oplog").append("<font color=red>Fail</font><br>");
+                  $("#oplog").scrollTop($("#oplog").prop("scrollHeight"));
+                  setTimeout(function(){
+                     next();
+                  },2000);
+               }
+            });
          });
       }
-      for(var c=0;c<app.data.length;c++){
-         if (app.data[c].exptickettitle==title){
-            console.log("add "+c+" to queue");
-            (function(){
-                var rec=app.data[c];
-                console.log("rec=",rec);
-                $(frm).queue("prm",function(next){
-                    var prmid=$(frm).find("#prmid").first().val();
-                    if (prmid!=""){
-                       var log=$('#oplog');
-                       log.append(" Saving "+rec.srcid+" ... "); 
-                       $.ajax({
-                          type:'POST',
-                          url:"../../tssiem/secent/Modify",
-                          data:JSON.stringify({
-                             OP:'save',
-                             srcid:rec.srcid,
-                             Formated_prmid:prmid
-                          }),
-                          dataType:'json',
-                          contentType:"application/json; charset=utf-8",
-                          success:function(d){
-                             console.log("result d=",d);
-                             if (d.LastMsg){
-                                log.append("<font color=red>"+
-                                           d.LastMsg.join(" ")+"</font><br>");
-                             }
-                             else{
-                                log.append("<font color=green>OK</font><br>");
-                             }
-                             log.scrollTop(log.prop("scrollHeight"));
-                             setTimeout(function(){
+      $(frm).queue("prm",function(baseNext){
+         for(var c=0;c<app.data.length;c++){
+            if (app.data[c].exptickettitle==title){
+               console.log("add "+c+" to queue");
+               (function(){
+                   var rec=app.data[c];
+                   console.log("rec=",rec);
+                   $(frm).queue("prm",function(next){
+                       var prmid=$(frm).find("#prmid").first().val();
+                       if (prmid!=""){
+                          var log=$('#oplog');
+                          log.append(" Saving "+rec.srcid+" ... "); 
+                          $.ajax({
+                             type:'POST',
+                             url:"../../tssiem/secent/Modify",
+                             data:JSON.stringify({
+                                OP:'save',
+                                srcid:rec.srcid,
+                                Formated_prmid:prmid
+                             }),
+                             dataType:'json',
+                             contentType:"application/json; charset=utf-8",
+                             success:function(d){
+                                console.log("result d=",d);
+                                if (d.LastMsg){
+                                   log.append("<font color=red>"+
+                                             d.LastMsg.join(" ")+"</font><br>");
+                                }
+                                else{
+                                  log.append("<font color=green>OK</font><br>");
+                                }
+                                log.scrollTop(log.prop("scrollHeight"));
+                                setTimeout(function(){
+                                   next();
+                                },1000);
+                             },
+                             error:function(){
+                                log.append("<font color=red>Fail</font><br>");
+                                log.scrollTop(log.prop("scrollHeight"));
                                 next();
-                             },1000);
-                          },
-                          error:function(){
-                             log.append("<font color=red>Fail</font><br>");
-                             log.scrollTop(log.prop("scrollHeight"));
-                             next();
-                          }
-                       });
-                    }
-                    else{
-                       next();
-                    }
-                });
-            })();
+                             }
+                          });
+                       }
+                       else{
+                          next();
+                       }
+                   });
+               })();
+            }
          }
-      }
+         baseNext();
+      });
       $(frm).queue("prm",function(next){
          console.log("all done - world is ok");
          setTimeout(function(){
             $("#oplog").remove();
+            app.closeDialog();
+            okCleanup();
          },4000);
          next();
       });
@@ -152,7 +216,7 @@ define(["datadumper"],function (){
             "</table>";
       return(d);
    };
-   ClassAppletLib[applet].class.prototype.tOpen=function(btn,e,text){
+   ClassAppletLib[applet].class.prototype.tOpen=function(btn,e,text,okCleanup){
       var app=this.app;
       var appletobj=this;
       var rec=app.data[$(btn).attr('data-id')];
@@ -183,7 +247,7 @@ define(["datadumper"],function (){
                       $(button).text("save");
                       $(button).click(function(e){
                          var frm=$(this).parent().parent().parent();
-                         return(appletobj.StoreOrLinkTicket(this,e,frm));
+                         return(appletobj.StoreOrLinkTicket(this,e,frm,okCleanup));
                       });
                       $(control).append(button);
                       $(dialog).append(control);
@@ -282,12 +346,16 @@ define(["datadumper"],function (){
                    });
                    $(".tOpen").click(function(e){
                       var p=$(this).parent();
+                      var pp=$(this).parent().parent();
+                      var okCleanup=function(){
+                         pp.hide('slow', function(){ pp.remove(); });
+                      };
                       var xmp=$(p).find("xmp").first();
                       var xmptext="";
                       if (xmp){
                          xmptext=xmp.text();
                       }
-                      return(appletobj.tOpen(this,e,xmptext));
+                      return(appletobj.tOpen(this,e,xmptext,okCleanup));
                    });
                    app.data=data;
                    //$("#analysedData").html("<xmp>"+Dumper(data)+"</xmp>");

@@ -329,6 +329,16 @@ sub isUploadValid
    return(0);
 }
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   my @l=$self->SUPER::getValidWebFunctions();
+   push(@l,"openProblem");
+   return(@l);
+}
+
+
+
 
 
 sub initSearchQuery
@@ -397,6 +407,121 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
+
+
+sub openProblem
+{
+   my ($self)=@_;
+ 
+   if (!defined($self->{JSON})){
+      eval('use JSON;$self->{JSON}=new JSON;');
+   }
+   $self->{JSON}->utf8(1);  # all JSON Handling based on UTF8
+
+
+   print $self->HttpHeader("application/json");
+   my $q=Query->MultiVars();
+   my $dbclass="problemManagement/openProblem";
+
+
+   if ($self->isDataInputFromUserFrontend()){
+      msg(INFO,"force setting ProblemManager");
+      $q->{"ProblemManager"}='anonymous';
+      my $userid=$self->getCurrentUserId();
+      my $userobj=getModuleObject($self->Config,'base::user');
+      $userobj->SetFilter({userid=>\$userid});
+      my ($urec,$msg)=$userobj->getOnlyFirst(qw(posix));
+      if (defined($urec) && $urec->{posix} ne ""){
+         msg(INFO,"setting ProblemManager to ".uc($urec->{posix}));
+         $q->{"ProblemManager"}=uc($urec->{posix});
+      }
+   }
+   #print STDERR "q=".Dumper($q);
+
+
+
+
+   my $d=$self->CollectREST(
+      dbname=>'pacman',
+      method=>'POST',
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         $baseurl.="/"  if (!($baseurl=~m/\/$/));
+         my $dataobjurl=$baseurl.$dbclass;
+         return($dataobjurl);
+      },
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         return(['authorization'=>"Basic $apikey",
+                 'Content-Type','application/json']);
+      },
+      content=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $content=$self->{JSON}->pretty->encode($q);
+         #printf STDERR ("fifi call content=%s\n",$content);
+         return($content);
+      },
+      onfail=>sub{  # f.e. handle bad request
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         if ($code eq "400"){ # bad request
+            return($self->{JSON}->decode($content));
+         }
+         printf STDERR ("fifi onfail handler for code=$statusline\n");
+         print STDERR $content;
+         return(undef);
+      }
+   );
+   my $res;
+   if (ref($d) eq "HASH"){
+      if (exists($d->{'response'})){
+         if (ref($d->{'response'}) eq "HASH"){
+            if (exists($d->{'response'}->{'@message'}) &&
+                $d->{'response'}->{'@message'} eq "Success"){
+               $res={%{$d->{'response'}->{'model'}}};
+               if (defined($res->{keys}) &&
+                   defined($res->{keys}->{ProblemID})){
+                  $res->{id}=$res->{keys}->{ProblemID};
+               }
+               $res->{exitcode}='0';
+               $res->{exitmsg}=['OK'];
+            }
+            else{
+               if (exists($d->{'response'}->{'messages'}) &&
+                   ref($d->{'response'}->{'messages'}) eq "ARRAY"){
+                  my %res=(exitcode=>'200');
+                  $res=\%res;
+                  $res->{exitmsg}=$d->{'response'}->{'messages'};
+               }
+            }
+         }
+         if (ref($d->{'response'}) eq "ARRAY"){
+            my %res=(exitcode=>'100');
+            $res=\%res;
+            $res->{exitmsg}=$d->{'response'};
+         }
+      }
+   }
+   if (defined($res)){
+      print($self->{JSON}->pretty->encode($res));
+   }
+   else{
+      msg(ERROR,"unexpected Result on openProblem JSON Op");
+      msg(ERROR,"Query=".Dumper($q));
+      msg(ERROR,"Result=".Dumper($d));
+   }
+   return("");
+}
+
+
 
 
 1;
