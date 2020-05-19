@@ -139,16 +139,16 @@ define(["datadumper"],function (){
                })();
             }
          }
+         $(frm).queue("prm",function(next){
+            console.log("all done - world is ok");
+            setTimeout(function(){
+               $("#oplog").remove();
+               app.closeDialog();
+               okCleanup();
+            },4000);
+            next();
+         });
          baseNext();
-      });
-      $(frm).queue("prm",function(next){
-         console.log("all done - world is ok");
-         setTimeout(function(){
-            $("#oplog").remove();
-            app.closeDialog();
-            okCleanup();
-         },4000);
-         next();
       });
 
        
