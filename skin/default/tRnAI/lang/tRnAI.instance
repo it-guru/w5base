@@ -10,3 +10,4 @@
 'Sub-Customer'=>{de=>'Unter-Kunde'},
 'invalid instance name specified'=>{de=>'ungültiger Instanz-Name'},
 'missing TCP port number'=>{de=>'fehlende TCP Port-Nummer'},
+'licenses'=>{de=>'Lizenzen'},
