@@ -89,7 +89,7 @@ sub new
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['applcistatusid'=>'id'],
                 vjoindisp     =>'name'),
-                                                  
+
       new kernel::Field::Select(
                 name          =>'network',
                 htmleditwidth =>'280px',
@@ -104,6 +104,30 @@ sub new
                 label         =>'NetworkID',
                 dataobjattr   =>'accessurl.network'),
 
+      new kernel::Field::TextDrop(
+                name          =>'itcloudarea',
+                group         =>'default',
+                label         =>'Cloud Area',
+                htmldetail    =>'NotEmpty',
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   return(1) if (defined($current));
+                   return(0);
+                },
+                vjointo       =>'itil::itcloudarea',
+                vjoinon       =>['itcloudareaid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Interface(
+                name          =>'itcloudareaid',
+                label         =>'CloudAreaID',
+                selectfix     =>1,
+                group         =>'default',
+                dataobjattr   =>'accessurl.itcloudarea'),
+
+
+                                                  
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
@@ -514,12 +538,67 @@ sub Validate
          $newrec->{ipport}=$uri->{port};
    }
 
+   my $itcloudareaid=effVal($oldrec,$newrec,"itcloudareaid");
+
+   my $itcloudareaaccess=0;
+
+   if ($itcloudareaid ne ""){
+      my $itca=$self->getPersistentModuleObject("itil::itcloudarea");
+      $itca->SetFilter({id=>\$itcloudareaid});
+      my ($carec,$msg)=$itca->getOnlyFirst(qw(ALL));
+      if (!defined($carec)){
+         $self->LastMsg(ERROR,"invalid cloudareaid specified");
+         return(undef);
+      }
+      else{
+         if ($carec->{cistatusid} ne "4"){
+            $self->LastMsg(ERROR,"specified cloudarea is not installed/active");
+            return(undef);
+         }
+         else{
+            my $itc=$self->getPersistentModuleObject("itil::itcloud");
+            $itc->SetFilter({id=>\$carec->{cloudid},cistatusid=>[3,4,5]});
+            my ($clrec,$msg)=$itc->getOnlyFirst(qw(ALL));
+            if (!defined($clrec)){
+               $self->LastMsg(ERROR,"no valid cloud referenced");
+               return(undef);
+            }
+            else{
+               my @l=$itc->isWriteValid($clrec);
+               if (!in_array(\@l,[qw(default ALL)])){
+                  $self->LastMsg(ERROR,"no write access to cloud");
+                  return(undef);
+               }
+               else{
+                  $itcloudareaaccess=1;
+               }
+               my $applid=effVal($oldrec,$newrec,"applid");
+               if ($applid ne $carec->{applid}){
+                  $newrec->{applid}=$carec->{applid};
+               }
+            }
+         }
+      }
+   }
+
+
+
+
+
+
    my $applid=effVal($oldrec,$newrec,"applid");
    if ($applid eq ""){
       $self->LastMsg(ERROR,"no valid application specifed");
       return(undef);
    }
-   if ($self->isDataInputFromUserFrontend()){
+   my $networkid=effVal($oldrec,$newrec,"networkid");
+   if ($networkid eq ""){
+      $self->LastMsg(ERROR,"no valid ip network specified");
+      return(undef);
+   }
+
+
+   if (!$itcloudareaaccess && $self->isDataInputFromUserFrontend()){
       if (!$self->isWriteToApplValid($applid)){
          $self->LastMsg(ERROR,"no write access to requested application");
          return(undef);
@@ -530,12 +609,11 @@ sub Validate
         exists($newrec->{is_interface}) ||
         exists($newrec->{is_interal}))
        &&
-       (effVal($oldrec,$newrec,"is_userfrontend") eq "0" &&
-        effVal($oldrec,$newrec,"is_interface") eq "0" &&
-        effVal($oldrec,$newrec,"is_internal") eq "0" )){
+       (effVal($oldrec,$newrec,"is_userfrontend")==0 &&
+        effVal($oldrec,$newrec,"is_interface")==0 &&
+        effVal($oldrec,$newrec,"is_internal")==0 )){
       $self->LastMsg(ERROR,"no classification specified");
       return(undef);
-
    }
 
    if (effVal($oldrec,$newrec,"name") ne $name){
@@ -554,15 +632,22 @@ sub Validate
       }
    }
 
-   my $is_onshproxy=effVal($oldrec,$newrec,"is_onshproxy");
-
-   if ($is_onshproxy){
-      if ($uri->{path} eq "/" || $uri->{path} eq ""){
-         $self->LastMsg(ERROR,
-                  "on Shared-Reverse-Proxy URLs a path in URL is needed");
-         return(undef);
-      }
-   }
+   # 
+   # Es wurde festgestellt, dass auch ReverseProxys durchaus auf 
+   # unterschiedlichen DNS Namen mit der gleichen IP-Adresse arbeiten
+   # können (Beispiel wäre die CaaS Plattform) - damit wird es 
+   # dann notwendig, dass auch / Paths auf ReverseProxys
+   # liegen duerfen.
+   # 
+   #my $is_onshproxy=effVal($oldrec,$newrec,"is_onshproxy");
+   #
+   #if ($is_onshproxy){
+   #   if ($uri->{path} eq "/" || $uri->{path} eq ""){
+   #      $self->LastMsg(ERROR,
+   #               "on Shared-Reverse-Proxy URLs a path in URL is needed");
+   #      return(undef);
+   #   }
+   #}
 
    return(1);
 }

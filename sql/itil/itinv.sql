@@ -1226,7 +1226,7 @@ create table accessurl (
   is_userfrontend int(1) default '0',scheme   varchar(20) not null,
   is_interface    int(1) default '0',hostname varchar(128),  
   is_internal     int(1) default '0',ipport   int(10),      
-  comments    longtext     default NULL,
+  comments    longtext     default NULL,itcloudarea bigint(20) default NULL,
   createdate  datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate  datetime NOT NULL default '0000-00-00 00:00:00',
   createuser  bigint(20) NOT NULL default '0',
@@ -1235,7 +1235,7 @@ create table accessurl (
   realeditor  varchar(100) NOT NULL default '',
   srcsys      varchar(100) default 'w5base',
   srcid       varchar(20) default NULL,
-  srcload     datetime    default NULL,
+  srcload     datetime    default NULL,FOREIGN KEY cloudarea(itcloudarea) REFERENCES itcloudarea(id) ON DELETE CASCADE,
   PRIMARY KEY  (id), FOREIGN KEY appl (appl) REFERENCES appl (id) ON DELETE CASCADE,
   UNIQUE KEY fullname (fullname,network),
   UNIQUE KEY `srcsys` (srcsys,srcid)
