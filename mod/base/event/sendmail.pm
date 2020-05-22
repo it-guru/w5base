@@ -112,15 +112,20 @@ sub createSplitEmailHead
 
    my $headCheckCnt=0;
 
+   my $rcpcnt=0;
+
    do{
       if ($#{$FullEmailto}!=-1){
          push(@{$Emailto},shift(@{$FullEmailto}));
+         $rcpcnt++;
       }
       if ($#{$FullEmailcc}!=-1){
          push(@{$Emailcc},shift(@{$FullEmailcc}));
+         $rcpcnt++;
       }
       if ($#{$FullEmailbcc}!=-1){
          push(@{$Emailbcc},shift(@{$FullEmailbcc}));
+         $rcpcnt++;
       }
       $emailHead=$self->createSplitHeader(
          $wf, $rec, $from,
@@ -132,6 +137,7 @@ sub createSplitEmailHead
       $headCheckCnt++;
    }while((length($emailHead)<18000 || 
            $headCheckCnt<=1) &&     # 1st loop always have to work 
+          $rcpcnt<1500 &&
           ($#{$FullEmailto}!=-1 ||  # if some idiot sends a 21k EMail Address
            $#{$FullEmailcc}!=-1 || 
            $#{$FullEmailbcc}!=-1));
