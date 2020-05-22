@@ -130,7 +130,7 @@ sub createSplitEmailHead
       msg(DEBUG,"headcheck loop $headCheckCnt finished - l=".
                 length($emailHead));
       $headCheckCnt++;
-   }while((length($emailHead)<22000 || 
+   }while((length($emailHead)<18000 || 
            $headCheckCnt<=1) &&     # 1st loop always have to work 
           ($#{$FullEmailto}!=-1 ||  # if some idiot sends a 21k EMail Address
            $#{$FullEmailcc}!=-1 || 
