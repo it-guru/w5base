@@ -26,7 +26,6 @@ please contact the Helpdesk ...
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/14549173480001
 
-
 If you are sure that an application is not relevant for architecture 
 and is not configured in CAPE (i.e. pure technical applications 
 that provide technical access to networks) , then there is the 
@@ -45,7 +44,10 @@ be entered.
 the attribute "Application is not architecture relevant" has 
 to be set to "yes" and you are not allowed to enter an 
 ICTO-ID, i.e. you must delete the actual ICTO-ID, if one 
-has been given already.
+has been given already. If the existing entry in the 
+field "Application is not IT architecture relevant" needs to 
+be changed, please contact the mailbox "FMB Telekom IT SACM"
+mailto:FMB.FMB-Telekom-IT-SACM@t-systems.com
 
 The rule which lead to this issue won't be executed on 
 this application anymore. 
@@ -67,7 +69,6 @@ kontaktieren Sie bitte den HelpDesk:
 
 https://darwin.telekom.de/darwin/auth/base/user/ById/14549173480001
 
-
 Sollte sicher sein, dass eine Anwendung nicht durch die 
 IT-Architektur erfasst wird (z.B. eine rein technische Anwendung 
 die technischen Zugang zu Netzwerken ermöglicht), so muss in 
@@ -85,8 +86,10 @@ gültige ICTO-ID angegeben werden.
 2. Oder die Anwendung ist nicht IT-Architektur-relevant, 
 dann muss das Attribut "Anwendung ist nicht IT-Architektur 
 relevant" auf "ja" gesetzt werden und es darf keine 
-ICTO-ID angegeben werden.
-
+ICTO-ID angegeben werden. Muss eine Änderung des vorhandenen 
+Eintrages an dem Feld "Anwendung ist nicht IT-Architektur relevant" 
+vorgenommen werden, so kontaktieren Sie bitte das 
+Postfach "FMB Telekom IT SACM" mailto:FMB.FMB-Telekom-IT-SACM@t-systems.com
 
 Die Regel, die zu diesem Data-Issue führte, wird dann auf 
 die Anwendung nicht mehr angewendet.
