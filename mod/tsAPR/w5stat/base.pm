@@ -437,12 +437,7 @@ sub displayAPR
          $d.=sprintf($self->getParent->T("SOFTINST.SWG",'tsAPR::w5stat::base'),
                      $gray);
          delete($appkpi->{'APR.SoftwareInst.Rating.gray'});
-
       }
-
-      print STDERR Dumper($appkpi);
-
-
       $d.=":</p>";
       $d.=$self->mkSegBar("swinstrating",$self->mkSegBarDSet($appkpi,
                           "APR.SoftwareInst.Rating"));
