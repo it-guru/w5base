@@ -431,9 +431,19 @@ sub displayAPR
       $d.="<h2>".
           $self->getParent->T("SOFTINST.LABEL",'tsAPR::w5stat::base').
           ":</h2>";
-      $d.="<p>".
-          $self->getParent->T("SOFTINST.DESC",'tsAPR::w5stat::base').
-          ":</p>";
+      $d.="<p>".$self->getParent->T("SOFTINST.DESC",'tsAPR::w5stat::base');
+      if (exists($appkpi->{'APR.SoftwareInst.Rating.gray'})){
+         my $gray=$appkpi->{'APR.SoftwareInst.Rating.gray'};
+         $d.=sprintf($self->getParent->T("SOFTINST.SWG",'tsAPR::w5stat::base'),
+                     $gray);
+         delete($appkpi->{'APR.SoftwareInst.Rating.gray'});
+
+      }
+
+      print STDERR Dumper($appkpi);
+
+
+      $d.=":</p>";
       $d.=$self->mkSegBar("swinstrating",$self->mkSegBarDSet($appkpi,
                           "APR.SoftwareInst.Rating"));
       $d.="<hr>";

@@ -72,6 +72,15 @@ IT inventory have been recorded. The valuation is carried out according to
 the "TelekomIT Roadmap" software set.<br>
 '},
 
+'SOFTINST.SWG'=>{
+de=>'
+Es wurden %d Software-Installationen nicht bewertet, da keine entsprechenden
+Regelwerke vorhanden sind.
+',en=>'
+There are %d software installations, which are can\'t be rated because
+missing rules.
+'},
+
 
 'TOTALTCC.LABEL'=>{
 de=>'
