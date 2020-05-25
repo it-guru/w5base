@@ -41,27 +41,25 @@ sub new
                 label         =>'LinkID',
                 dataobjattr   =>'mandatordataacl.id'),
 
-#      new kernel::Field::Select(
-#                name          =>'mandator',
-#                label         =>'Mandator',
-#                vjointo       =>'base::mandator',
-#                vjoinon       =>['mid'=>'id'],
-#                vjoindisp     =>'name'),
-
-      new kernel::Field::Mandator(
-                name          =>'mandator',
-                allowany      =>1,
+      new kernel::Field::Select(              # Attention: Mandator field type 
+                name          =>'mandator',   # is not useable at this point
+                label         =>'Mandator',
+                vjointo       =>'base::mandator',
                 vjoinon       =>['mid'=>'id'],
-                allowall      =>1),
+                useNullEmpty  =>1,
+                allowempty    =>1,
+                vjoindisp     =>'name'),
 
       new kernel::Field::Link(
                 name          =>'mid',
+                label         =>'MandatorMID',
                 dataobjattr   =>'mandatordataacl.mandator'),
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
                 readonly      =>1,
                 sqlorder      =>'NONE',
+                label         =>'MandatorID',
                 dataobjattr   =>'mandator.grpid'),
 
       new kernel::Field::Text(
