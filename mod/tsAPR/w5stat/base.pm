@@ -396,40 +396,40 @@ sub displayAPR
    $d.="<hr>";
    if (grep(/^APR.System.TCC.check_status/,keys(%{$appkpi}))){
       $d.="<h2>".
-          $self->getParent->T("TOTALTCC.LABEL",'tsAPR::w5stat::base').
+          trim($self->getParent->T("TOTALTCC.LABEL",'tsAPR::w5stat::base')).
           ":</h2>";
       $d.="<p>".
           $self->getParent->T("TOTALTCC.DESC",'tsAPR::w5stat::base').
-          ":</p>";
+          "</p>";
       $d.=$self->mkSegBar("tcctotal",$self->mkSegBarDSet($appkpi,
                           "APR.System.TCC.check_status"));
       $d.="<hr>";
    }
    if (grep(/^APR.System.TCC.os_base_setup/,keys(%{$appkpi}))){
       $d.="<h2>".
-          $self->getParent->T("TCCBASE.LABEL",'tsAPR::w5stat::base').
+          trim($self->getParent->T("TCCBASE.LABEL",'tsAPR::w5stat::base')).
           ":</h2>";
       $d.="<p>".
           $self->getParent->T("TCCBASE.DESC",'tsAPR::w5stat::base').
-          ":</p>";
+          "</p>";
       $d.=$self->mkSegBar("tccbase",$self->mkSegBarDSet($appkpi,
                           "APR.System.TCC.os_base_setup"));
       $d.="<hr>";
    }
    if (grep(/^APR.System.TCC.roadmap/,keys(%{$appkpi}))){
       $d.="<h2>".
-          $self->getParent->T("OSRATE.LABEL",'tsAPR::w5stat::base').
+          trim($self->getParent->T("OSRATE.LABEL",'tsAPR::w5stat::base')).
           ":</h2>";
       $d.="<p>".
           $self->getParent->T("OSRATE.DESC",'tsAPR::w5stat::base').
-          ":</p>";
+          "</p>";
       $d.=$self->mkSegBar("tccroadmap",$self->mkSegBarDSet($appkpi,
                           "APR.System.TCC.roadmap"));
       $d.="<hr>";
    }
    if (grep(/^APR.SoftwareInst.Rating/,keys(%{$appkpi}))){
       $d.="<h2>".
-          $self->getParent->T("SOFTINST.LABEL",'tsAPR::w5stat::base').
+          trim($self->getParent->T("SOFTINST.LABEL",'tsAPR::w5stat::base')).
           ":</h2>";
       $d.="<p>".$self->getParent->T("SOFTINST.DESC",'tsAPR::w5stat::base');
       if (exists($appkpi->{'APR.SoftwareInst.Rating.gray'})){
@@ -438,7 +438,7 @@ sub displayAPR
                      $gray);
          delete($appkpi->{'APR.SoftwareInst.Rating.gray'});
       }
-      $d.=":</p>";
+      $d.="</p>";
       $d.=$self->mkSegBar("swinstrating",$self->mkSegBarDSet($appkpi,
                           "APR.SoftwareInst.Rating"));
       $d.="<hr>";

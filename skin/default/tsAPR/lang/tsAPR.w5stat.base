@@ -61,8 +61,8 @@ Software-Installations
 'SOFTINST.DESC'=>{
 de=>'
 Bewertet werden alle Software-Installationen, die im 
-IT-Inventar erfasst wurden. Die Bewertung<br>erfolgt nach
-dem Software-Set "TelekomIT Roadmap".<br>
+IT-Inventar erfasst wurden. Die Bewertung erfolgt nach
+dem Software-Set "TelekomIT Roadmap". 
 Das betreffende SoftwareSet ist unter ...<br>
 &nbsp;<i>IT-Inventar-&gt;Prozesssteuerung-&gt;Software Management</i><br>
 ... abfragbar.
@@ -91,13 +91,13 @@ TCC Total-State
 
 'TOTALTCC.DESC'=>{
 de=>'
-Der TCC Gesammtstatus wird aus dem von der T-Systems<br>
+Der TCC Gesammtstatus wird aus dem von der T-Systems
 zugelieferten TCC Report aus SmartCube ermittelt.<br>
 Die Rohdaten (bzw. die aktuellen Daten) für die Auswertung können unter ...<br>
 &nbsp;<i>IT-Universum -&gt; SmartCube -&gt; TCC</i><br>
 ... abgerufen werden.
 ',en=>'
-The TCC overall status is calculated from the data provided by T-Systems<br>
+The TCC overall status is calculated from the data provided by T-Systems
 supplied TCC report is determined from SmartCube.<br>
 The raw data (or the current data) for the evaluation 
 can be viewed under ...<br>
