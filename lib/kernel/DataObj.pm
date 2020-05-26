@@ -907,30 +907,51 @@ sub getWriteRequestHash
       foreach my $fobj (@fieldlist){
          my $field=$fobj->Name();
          if ($mode eq "web" || $mode eq "Modify"){
-            my @val=Query->Param($field);
-            if ($#val==-1){
-               @val=Query->Param("Formated_".$field);
-               if ($#val!=-1){
-                  my $rawWrRequest=$fobj->doUnformat(\@val,$rec);
-                  #msg(INFO,"getWriteRequestHash: var=$field $rawWrRequest");
-                  if (!defined($rawWrRequest)){
-                     msg(WARN,"can not unformat $field");
-                     if ($self->LastMsg()!=0){
-                        msg(ERROR,"break getWriteRequestHash() doe LastMsgs");
-                        return(undef);
-                     }
-                     next;
-                  }
-                  #msg(INFO,"Unformated $field:%s",Dumper($rawWrRequest));
-                  foreach my $k (keys(%{$rawWrRequest})){
-                     $rec->{$k}=$rawWrRequest->{$k};
-                  }
-               }
-           
-            }
-            else{
+            my @val=Query->Param("Formated_".$field);
+            if ($#val!=-1){
                $rec->{$field}=$val[0];
-               $rec->{$field}=\@val if ($#val>0);
+               $rec->{$field}=\@val  if ($#val>0);
+            }
+         }
+      }
+      foreach my $fobj (@fieldlist){
+         my $field=$fobj->Name();
+         if ($mode eq "upload"){
+            if (!($fobj->prepUploadRecord($newrec,$oldrec))){
+               return(undef);
+            }
+         }
+         if ($mode eq "web" || $mode eq "Modify"){
+            if (!($fobj->prepUploadRecord($rec,$oldrec))){
+               return(undef);
+            }
+         }
+      }
+
+
+      foreach my $fobj (@fieldlist){
+         my $field=$fobj->Name();
+         if ($mode eq "web" || $mode eq "Modify"){
+            my @val=Query->Param($field);
+            if ($#val!=-1){
+               $rec->{$field}=\@val;
+            }
+            if (exists($rec->{$field})){
+               if (ref($rec->{$field}) ne "ARRAY"){
+                  $rec->{$field}=[$rec->{$field}];
+               }
+               my $rawWrRequest=$fobj->doUnformat($rec->{$field},$rec);
+               if (!defined($rawWrRequest)){
+                  msg(WARN,"can not unformat $field");
+                  if ($self->LastMsg()!=0){
+                     msg(ERROR,"break getWriteRequestHash() doe LastMsgs");
+                     return(undef);
+                  }
+                  next;
+               }
+               foreach my $k (keys(%{$rawWrRequest})){
+                  $rec->{$k}=$rawWrRequest->{$k};
+               }
             }
          }
          if ($mode eq "upload"){
@@ -947,6 +968,8 @@ sub getWriteRequestHash
       use Data::HexDump;
       return($newrec) if ($mode eq "upload");
    }
+printf STDERR ("fifi old=%s\n",Dumper($oldrec));
+printf STDERR ("fifi new=%s\n",Dumper($rec));
    return($rec);
 }
 
