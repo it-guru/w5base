@@ -243,6 +243,37 @@ sub new
                 label         =>'Contacts',
                 group         =>'contacts'),
 
+      new kernel::Field::SubList(
+                name          =>'applications',
+                label         =>'operated applications',
+                htmlwidth     =>'300px',
+                group         =>'appl',
+                readonly      =>1,
+                searchable    =>0,
+                htmllimit     =>100,
+                depend        =>['srcid','reprgrp'],
+                vjointo       =>'itil::appl',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjoinon       =>['reprgrp'=>'businessteam'],
+                vjoinonfinish =>sub{
+                   my $self=shift;
+                   my $flt=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   if (ref($flt) eq "HASH"){
+                      if (exists($flt->{businessteam}) &&
+                          $flt->{businessteam} ne ""){
+                         $flt->{businessteam}=$flt->{businessteam}." ".
+                                              $flt->{businessteam}.".*";
+                      }
+                   }
+                   return($flt);
+                },
+                vjoindisp     =>['name','cistatus','businessteam']),
+
+
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'comments',
@@ -363,7 +394,7 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default vouattr canvas contacts comments source));
+   return(qw(header default vouattr canvas contacts appl comments source));
 }
 
 

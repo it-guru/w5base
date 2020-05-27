@@ -1,6 +1,7 @@
 'TS::vou'=>{de=>'virtuelle Organisationseinheit',en=>'virtuel organisational unit'},
 'fieldgroup.comments'=>{de=>'Bemerkungen',en=>'Comments'},
 'fieldgroup.canvas'=>{de=>'Canvas',en=>'Canvas'},
+'fieldgroup.appl'=>{de=>'betriebene Anwendungen',en=>'operated applications'},
 'fieldgroup.vouattr'=>{de=>'Organisationseinheit Atribute',en=>'organisational attributes'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
 'representing group'=>{de=>'repräsentierende Gruppe'},
@@ -18,3 +19,4 @@
 'cistatus back to planning is not allowed'=>{de=>'CI-Statusänderung zurück in den Planungsstatus ist nicht zulässig'},
 'invalid Ramp-Up ID specified'=>{de=>'ungültige Ramp-Up ID angegeben'},
 'invalid format of CanvasID'=>{de=>'ungültiges Format der CanvasID'},
+'operated applications'=>{de=>'betriebene Anwendungen'},
