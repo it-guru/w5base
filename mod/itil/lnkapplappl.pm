@@ -811,7 +811,7 @@ sub orderSearchMaskFields
    my $searchfields=shift;
    my @searchfields=$self->SUPER::orderSearchMaskFields($searchfields);
 
-   foreach my $fname (qw(gwappl ifrel)){
+   foreach my $fname (qw(gwappl2 ifrel gwappl)){
       if (in_array(\@searchfields,$fname)){
          @searchfields=grep({$_ ne $fname} @searchfields);
          splice(@searchfields,
