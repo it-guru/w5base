@@ -308,11 +308,15 @@ sub getNews
          my $icon=$iconobj->FormatedDetail($rec,"HtmlDetail");
          my $utz=$self->UserTimezone();
          my $cdate=$rec->{cdate};
-         $cdate=$self->ExpandTimeExpression($cdate,"ultrashort","GMT",$utz);
-         if ($rec->{entrycount}==0){
-            $name="<b>".$name."</b>";
+         my $bstart="";
+         my $bend="";
+         my $dd=CalcDateDuration($cdate,NowStamp("en"));
+         if (defined($dd) && $dd->{totaldays}<15){
+            $bstart="<b>";
+            $bend="</b>";
          }
-         else{
+         $cdate=$self->ExpandTimeExpression($cdate,"ultrashort","GMT",$utz);
+         if ($rec->{entrycount}>0){
             $name.=" ($rec->{entrycount})";
          }
          my $link="openwin(\"../../faq/forum/Topic/$rec->{id}".
@@ -321,8 +325,12 @@ sub getNews
                   "status=no,resizable=yes,scrollbars=auto\")";
          $d.="<tr height=24 class=newsline$newsline>".
              "<td width=25 align=center valign=center>$icon</td>".
-             "<td valign=center><a href=JavaScript:$link class=news>$name</a> ".
-             "</td><td width=1% nowrap align=center>$cdate</td></tr>";
+             "<td valign=center><a href=JavaScript:$link class=news>".
+             $bstart.$name.$bend.
+             "</a> ".
+             "</td><td width=1% nowrap align=center>".
+             $bstart.$cdate.$bend.
+             "</td></tr>";
          $newsline++;
          $newsline=1 if ($newsline>2);
          $newscount++;
