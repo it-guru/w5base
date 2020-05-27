@@ -968,8 +968,6 @@ sub getWriteRequestHash
       use Data::HexDump;
       return($newrec) if ($mode eq "upload");
    }
-printf STDERR ("fifi old=%s\n",Dumper($oldrec));
-printf STDERR ("fifi new=%s\n",Dumper($rec));
    return($rec);
 }
 
