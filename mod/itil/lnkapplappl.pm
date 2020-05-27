@@ -45,9 +45,21 @@ sub new
                 label         =>'Interface Relation',
                 value         =>[qw(DIRECT INDIRECT)],
                 default       =>'DIRECT',
+                htmleditwidth =>'100px',
                 jsonchanged   =>\&getifrelHandlingScript,
                 jsoninit      =>\&getifrelHandlingScript,
                 dataobjattr   =>'lnkapplappl.ifrelation'),
+
+      new kernel::Field::TextDrop(
+                name          =>'fromappl',
+                htmlwidth     =>'250px',
+                label         =>'from Application',
+                vjointo       =>'itil::appl',
+                vjoineditbase =>{cistatusid=>[2,3,4,5]},
+                SoftValidate  =>1,
+                vjoinon       =>['fromapplid'=>'id'],
+                vjoindisp     =>'name',
+                dataobjattr   =>'fromappl.name'),
 
       new kernel::Field::TextDrop(
                 name          =>'gwappl',
@@ -63,15 +75,17 @@ sub new
                 dataobjattr   =>'gwappl.name'),
 
       new kernel::Field::TextDrop(
-                name          =>'fromappl',
+                name          =>'gwappl2',
                 htmlwidth     =>'250px',
-                label         =>'from Application',
-                vjointo       =>'itil::appl',
+                label         =>'further Gateway Application',
+                htmldetail    =>'NotEmptyOrEdit',
                 vjoineditbase =>{cistatusid=>[2,3,4,5]},
                 SoftValidate  =>1,
-                vjoinon       =>['fromapplid'=>'id'],
+                AllowEmpty    =>1,
+                vjointo       =>'itil::appl',
+                vjoinon       =>['gwappl2id'=>'id'],
                 vjoindisp     =>'name',
-                dataobjattr   =>'fromappl.name'),
+                dataobjattr   =>'gwappl2.name'),
 
       new kernel::Field::TextDrop(
                 name          =>'toappl',
@@ -103,6 +117,9 @@ sub new
                                 "if (gwappl.id is not null,".
                                 "concat('-',gwappl.name,'-:'),".
                                 "''),".
+                                "if (gwappl2.id is not null,".
+                                "concat('-',gwappl2.name,'-:'),".
+                                "''),".
                                 "toappl.name,':',lnkapplappl.conprotocol)"),
 
       new kernel::Field::Link(
@@ -130,7 +147,8 @@ sub new
                 transprefix   =>'contype.',
                 dataobjattr   =>"concat(".
                                 "if (lnkapplappl.ifrelation=".
-                                "'INDIRECT','I',''),".
+                                "'INDIRECT',".
+                                "if (gwappl2.name is null,'I','II'),''),".
                                 "lnkapplappl.contype)"),
 
       new kernel::Field::Interface(
@@ -564,6 +582,11 @@ sub new
                 dataobjattr   =>'lnkapplappl.gwappl'),
 
       new kernel::Field::Interface(
+                name          =>'gwappl2id',
+                label         =>'further gateway ApplID',
+                dataobjattr   =>'lnkapplappl.gwappl2'),
+
+      new kernel::Field::Interface(
                name          =>'fromapplopmode',
                label         =>'from Appl primary operation mode',
                dataobjattr   =>'fromappl.opmode'),
@@ -809,6 +832,8 @@ sub getSqlFrom
             "on lnkapplappl.fromappl=fromappl.id ".
             "left outer join appl as gwappl ".
             "on lnkapplappl.gwappl=gwappl.id ".
+            "left outer join appl as gwappl2 ".
+            "on lnkapplappl.gwappl2=gwappl2.id ".
 
             "left outer join lnkcontact toappllnkcontact ".
             "on toappllnkcontact.parentobj='itil::appl' ".
@@ -842,19 +867,24 @@ sub getifrelHandlingScript
 
 var d=document.forms[0].elements['Formated_ifrel'];
 var c=document.forms[0].elements['Formated_gwappl'];
+var c2=document.forms[0].elements['Formated_gwappl2'];
 
 if (d){
    var v=d.options[d.selectedIndex].value;
    if (v!="" && v!="DIRECT"){
       if (c){
          c.disabled=false;
-         //addClass(c,"disabledClass");
+      }
+      if (c2){
+         c2.disabled=false;
       }
    }
    else{
       if (c){
          c.disabled=true;
-         //removeClass(c,"disabledClass");
+      }
+      if (c2){
+         c2.disabled=true;
       }
    }
 }
@@ -1083,6 +1113,15 @@ sub Validate
 
    my $ifrel=effVal($oldrec,$newrec,"ifrel");
    $ifrel="DIRECT" if ($ifrel eq "");
+
+   my $gwappl2id=effVal($oldrec,$newrec,"gwappl2id");
+   my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
+   if ($gwapplid eq "" && $gwappl2id ne ""){
+      $newrec->{gwapplid}=$gwappl2id;
+      $newrec->{gwappl2id}=undef;
+   }
+
+
 
    my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
    if ($ifrel eq "DIRECT"){    # indirekt auf direkt
