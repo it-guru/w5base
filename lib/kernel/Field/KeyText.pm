@@ -205,7 +205,7 @@ sub Validate
          }
       }
       if (defined($self->{vjointo})){   # input handling in workflow init
-         my $newval=$newrec->{$name};
+         my $newval=trim($newrec->{$name});
          my $elementcount=1;
          my $filter={$self->{vjoindisp}=>'"'.$newval.'"'};
          if (ref($newval) eq "ARRAY"){
