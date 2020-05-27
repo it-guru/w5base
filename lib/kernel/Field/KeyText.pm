@@ -205,13 +205,18 @@ sub Validate
          }
       }
       if (defined($self->{vjointo})){   # input handling in workflow init
-         my $newval=trim($newrec->{$name});
+         my $newval=$newrec->{$name};
          my $elementcount=1;
-         my $filter={$self->{vjoindisp}=>'"'.$newval.'"'};
+         my $filter;
          if (ref($newval) eq "ARRAY"){
             $filter={$self->{vjoindisp}=>$newval};
             $elementcount=$#{$newval}+1;
          }
+         else{
+            $newval=trim($newval);
+         }
+         $filter={$self->{vjoindisp}=>'"'.$newval.'"'};
+
 
          $self->FieldCache->{LastDrop}=undef;
 
