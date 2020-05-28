@@ -522,7 +522,7 @@ sub SendXmlToAM_asset
    }
    my $mandconfig;
    {  # mandator init
-      $mand->SetFilter({cistatusid=>[3,4]});
+      $mand->SetFilter({cistatusid=>[3,4,5]});
       $mand->SetCurrentView(qw(id grpid defaultassignmentid 
                                defaultassignment doexport));
       $mandconfig=$mand->getHashIndexed(qw(grpid doexport));
@@ -606,7 +606,7 @@ sub SendXmlToAM_instance
       $filter{id}=\@w5id;
    }
    {  # mandator init  # same as  SendXmlToAM_appl
-      $mand->SetFilter({cistatusid=>[3,4]});
+      $mand->SetFilter({cistatusid=>[3,4,5]});
       $mand->SetCurrentView(qw(id grpid defaultassignmentid 
                                defaultassignment doexport));
       $mandconfig=$mand->getHashIndexed(qw(grpid doexport));
@@ -1091,10 +1091,11 @@ sub SendXmlToAM_appl
       $filter{id}=\@w5id;
    }
    {  # mandator init
-      $mand->SetFilter({cistatusid=>[3,4]});
+      $mand->SetFilter({cistatusid=>[3,4,5]});
       $mand->SetCurrentView(qw(id grpid defaultassignmentid 
                                defaultassignment doexport));
-      $mandconfig=$mand->getHashIndexed(qw(grpid doexport));
+      $mandconfig=$mand->getHashIndexed(qw(grpid name doexport));
+      #msg(DEBUG,"mandconfig=%s",Dumper($mandconfig));
       if (ref($mandconfig) ne "HASH"){
          return({exitcode=>1,msg=>msg(ERROR,"can not read mandator config")});
       }
@@ -1104,6 +1105,7 @@ sub SendXmlToAM_appl
       }
       $filter{mandatorid}=\@mandid;
    }
+   #msg(INFO,"filter=%s",Dumper(\%filter));
 
 
   # $filter{name}="*w5base*";
