@@ -24,8 +24,8 @@ en=>'Count of APR relevant applications'
 },
 
 'APRSYSCNT'=>{
-de=>'von APR relevanten Anwendungen verwendete logische Systeme mit TCC Report',
-en=>'logical systems used by APR relevant applications with TCC Report'
+de=>'von APR relevanten Anwendungen verwendete logische Systeme im TCC Report',
+en=>'logical systems used by APR relevant applications in TCC Report'
 },
 
 'APRINSTCNT'=>{
@@ -37,11 +37,11 @@ en=>'Software installations that can be used by APR relevant applications'
 
 'HEAD1'=>{
 de=>'
-Die Kennzahlen werden immer bezogen auf eine Anwendung ermittelt 
-und dann bezogen auf Betriebsteam/Betriebsbereich und Mandant 
-auf alle darüberliegenden Organisationsebenen agregiert. 
-Dies bedeutet, dass wenn z.B. einen Hardware von mehreren 
-Anwendungen verwendet wird, kann es zu Mehrfachzählungen kommen.
+Die Kennzahlen werden immer bezogen auf eine Anwendung 
+ermittelt und bezogen auf Betriebsteam/Betriebsbereich 
+und Mandant auf alle darüberliegenden Organisationsebenen 
+aggregiert. Dies bedeutet, dass es zu Mehrfachzählungen 
+kommen kann, wenn das System von mehreren Anwendungen verwendet wird.
 ',en=>'
 The key figures are always determined in relation to an application
 and then related to the operating team/operating area and client
@@ -91,8 +91,8 @@ TCC Total-State
 
 'TOTALTCC.DESC'=>{
 de=>'
-Der TCC Gesammtstatus wird aus dem von der T-Systems
-zugelieferten TCC Report aus SmartCube ermittelt.<br>
+Der TCC Gesamtstatus wird aus dem von der T-Systems
+zugelieferten TCC Report aus SmartCube ermittelt.
 Die Rohdaten (bzw. die aktuellen Daten) für die Auswertung können unter ...<br>
 &nbsp;<i>IT-Universum -&gt; SmartCube -&gt; TCC</i><br>
 ... abgerufen werden.

@@ -369,18 +369,18 @@ sub displayAPR
 
    if ($rmostat->{sgroup} eq "Group"){
       $d.="<table class=statTab style=\"width:70%\">";
-      $d.=sprintf("<tr><td>%s:</td>".
+      $d.=sprintf("<tr><td>%s</td>".
                   "<td>%d</td></tr>",
                   $self->getParent->T("APRAPPCNT",'tsAPR::w5stat::base'),
                   $applcnt);
       if (exists($rmostat->{stats}->{'APR.System.Count'})){
-         $d.=sprintf("<tr><td>%s:</td>".
+         $d.=sprintf("<tr><td>%s</td>".
                      "<td>%d</td></tr>",
                      $self->getParent->T("APRSYSCNT",'tsAPR::w5stat::base'),
                      $rmostat->{stats}->{'APR.System.Count'}->[0]);
       }
       if (exists($rmostat->{stats}->{'APR.SoftwareInst.Count'})){
-         $d.=sprintf("<tr><td>%s:</td>".
+         $d.=sprintf("<tr><td>%s</td>".
                      "<td>%d</td></tr>",
                      $self->getParent->T("APRINSTCNT",'tsAPR::w5stat::base'),
                      $rmostat->{stats}->{'APR.SoftwareInst.Count'}->[0]);
