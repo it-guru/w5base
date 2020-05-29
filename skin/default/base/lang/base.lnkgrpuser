@@ -20,4 +20,4 @@
 'Expiration-Date'=>{de=>'Verfallsdatum'},
 'expiration to long in the past'=>{de=>'Verfallsdatum zu weit in der Vergangenheit'},
 'role relation with your security state not allowed'=>{de=>'Rollenzuordnung mit Ihrem Sicherheitsstatus für diese Gruppe nicht erlaubt'},
-'incorrect role combination'=>{de=>'unzuläassige Rollen Kombination'}
+'incorrect role combination'=>{de=>'unzulässige Rollen Kombination'}
