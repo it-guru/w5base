@@ -412,7 +412,8 @@ sub Validate
       my $newshortname=$newrec->{shortname};
       $newshortname=~s/\[\d+\]$//;
       if ($newshortname=~m/^\s*$/ || 
-          !($newshortname=~m/^[a-z0-9_]+$/i) ||
+          !($newshortname=~m/^[a-z0-9_-]+$/i) ||
+          ($newshortname=~m/^[0-9-]/i) ||
           length($newshortname)>12){
          $self->LastMsg(ERROR,"invalid shortname specified");
          return(0);
