@@ -229,7 +229,8 @@ sub HandleCIStatus
                return(0);
             }
          }
-         elsif ($newrec->{cistatusid}>2){
+         elsif (effChanged($oldrec,$newrec,"cistatusid") && 
+                $newrec->{cistatusid}>2){
             if ($oldrec->{cistatusid}<4){
                if (!$self->isActivator($oldrec,$newrec,%param)){
                   $self->LastMsg(ERROR,"you are not authorized to set ".
