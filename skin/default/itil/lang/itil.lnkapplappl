@@ -147,3 +147,5 @@
 'no valid gateway application specified'=>{de=>'keine gültige Gateway-Anwendung angegeben'},
 'gateway application not allowed'=>{de=>'Gateway-Anwendung nicht erlaubt'},
 'further Gateway Application'=>{de=>'weitere Gateway-Anwendung'},
+'to application not allowed as gateway application'=>{de=>'"nach Anwendung" nicht als Gateway-Anwendung erlaubt'},
+'from application not allowed as gateway application'=>{de=>'"von Anwendung" nicht als Gateway-Anwendung erlaubt'},

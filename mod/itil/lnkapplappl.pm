@@ -1114,16 +1114,43 @@ sub Validate
    my $ifrel=effVal($oldrec,$newrec,"ifrel");
    $ifrel="DIRECT" if ($ifrel eq "");
 
+   my $fromapplid=effVal($oldrec,$newrec,"fromapplid");
+   my $toapplid=effVal($oldrec,$newrec,"toapplid");
+   my $gwappl2id=effVal($oldrec,$newrec,"gwappl2id");
+   my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
+
+   if ($fromapplid ne "" && 
+       ($fromapplid eq $gwapplid || $fromapplid eq $gwappl2id)){
+      $self->LastMsg(ERROR,
+                     "from application not allowed as gateway application");
+      return(0);
+   }
+
+   if ($toapplid ne "" && 
+       ($toapplid eq $gwapplid || $toapplid eq $gwappl2id)){
+      $self->LastMsg(ERROR,
+                     "to application not allowed as gateway application");
+      return(0);
+   }
+
+
+
    my $gwappl2id=effVal($oldrec,$newrec,"gwappl2id");
    my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
    if ($gwapplid eq "" && $gwappl2id ne ""){
       $newrec->{gwapplid}=$gwappl2id;
       $newrec->{gwappl2id}=undef;
    }
-
-
-
+   my $gwappl2id=effVal($oldrec,$newrec,"gwappl2id");
    my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
+   if ($gwapplid eq "" && $gwappl2id ne "" && $gwapplid eq $gwappl2id){
+      $newrec->{gwapplid}=$gwappl2id;
+      $newrec->{gwappl2id}=undef;
+   }
+
+   my $gwappl2id=effVal($oldrec,$newrec,"gwappl2id");
+   my $gwapplid=effVal($oldrec,$newrec,"gwapplid");
+
    if ($ifrel eq "DIRECT"){    # indirekt auf direkt
       if (!exists($newrec->{ifrel})){
          if (exists($newrec->{gwapplid}) && $newrec->{gwapplid} ne ""){
@@ -1131,11 +1158,16 @@ sub Validate
          }
       }
       else{
-         if (!exists($newrec->{gwapplid})){
-            $newrec->{gwapplid}=undef;
+         if (!exists($newrec->{gwapplid}) && !exists($newrec->{gwappl2id})){
+            if ($gwapplid ne ""){
+               $newrec->{gwapplid}=undef;
+            }
+            if ($gwappl2id ne ""){
+               $newrec->{gwappl2id}=undef;
+            }
          }
          else{
-            if ($gwapplid ne ""){
+            if ($gwapplid ne "" || $gwappl2id ne ""){
                $self->LastMsg(ERROR,"gateway application not allowed");
                return(0);
             }
