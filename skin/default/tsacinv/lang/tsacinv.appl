@@ -36,6 +36,7 @@
 'ApplicationID not found in AssetManager'=>{de=>'ApplicationID konnte in AssetManager nicht gefunden werden'},
 'direct connected Shared-Storage Servers'=>{de=>'direkt verbundene Shared-Storage Server'},
 'direct connected Shared-Network Components'=>{de=>'direkt verbundene Shared-Netzwerk Komponenten'},
+'direct connected Shared-Network SystemIDs'=>{de=>'direkt verbundene Shared-Netzwerk SystemIDs'},
 'full CI-Name'=>{de=>'vollständiger CI-Name'},
 'marked as delete'=>{de=>'gelöscht markiert'},
 'is generic only'=>{de=>'nur als Kerndatensatz vorhanden'},
