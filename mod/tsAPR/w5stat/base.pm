@@ -32,10 +32,10 @@ sub new
 
    $self->{Colors}=[
       red=>'not acceptable',
-      yellow=>'problmeatic or soon problematic',
+      yellow=>'problematic or soon problematic',
       blue=>'risk acceptance exists',
       green=>'alright',
-      gray=>'unidentifiable'
+      gray=>'not identified'
    ];
    return($self);
 }

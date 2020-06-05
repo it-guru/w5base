@@ -3,8 +3,8 @@
 'not acceptable'=>{de=>'nicht akzeptabel'},
 'risk acceptance exists'=>{de=>'Risikoakzeptanz vorhanden'},
 'alright'=>{de=>'in Ordnung'},
-'problmeatic or soon problematic'=>{de=>'problematisch oder demnächst problematisch'},
-'unidentifiable'=>{de=>'nicht ermittelbar'},
+'problematic or soon problematic'=>{de=>'problematisch oder demnächst problematisch'},
+'not identified'=>{de=>'nicht ermittelbar'},
 'APPISRELEVANT'=>{
 de=>'Die Anwendung %s ist APR relevant und wird im Management-Report berücksichtigt.',
 en=>'The Application %s is APR relevant and will be reported in management views.'
@@ -25,7 +25,7 @@ en=>'Count of APR relevant applications'
 
 'APRSYSCNT'=>{
 de=>'von APR relevanten Anwendungen verwendete logische Systeme im TCC Report',
-en=>'logical systems used by APR relevant applications in TCC Report'
+en=>'Logical systems used by APR relevant applications in TCC Report'
 },
 
 'APRINSTCNT'=>{
@@ -43,11 +43,10 @@ und Mandant auf alle darüberliegenden Organisationsebenen
 aggregiert. Dies bedeutet, dass es zu Mehrfachzählungen 
 kommen kann, wenn das System von mehreren Anwendungen verwendet wird.
 ',en=>'
-The key figures are always determined in relation to an application
-and then related to the operating team/operating area and client
-to all levels of organization above.
-This means, for example, that if one hardware is shared by several
-applications is used, multiple counts may occur.
+The key figures are always determined in relation to an application and 
+aggregated to all higher organizational levels regarding the operating 
+team/operating area and mandator. This means that multiple counts can 
+occur if the system is shared by several applications.
 '},
 
 
@@ -67,9 +66,7 @@ Das betreffende SoftwareSet ist unter ...<br>
 &nbsp;<i>IT-Inventar-&gt;Prozesssteuerung-&gt;Software Management</i><br>
 ... abfragbar.
 ',en=>'
-All software installations are evaluated, which are included in the
-IT inventory have been recorded. The valuation is carried out according to
-the "TelekomIT Roadmap" software set.<br>
+All software installations included in the IT inventory are evaluated. The evaluation is carried out according to the "TelekomIT Roadmap" software set.<br>
 '},
 
 'SOFTINST.SWG'=>{
@@ -77,8 +74,7 @@ de=>'
 Es wurden %d Software-Installationen nicht bewertet, da keine entsprechenden
 Regelwerke vorhanden sind.
 ',en=>'
-There are %d software installations, which are can\'t be rated because
-missing rules.
+In total, %d software installations cannot be evaluated because of missing rules.
 '},
 
 
@@ -97,12 +93,8 @@ Die Rohdaten (bzw. die aktuellen Daten) für die Auswertung können unter ...<br>
 &nbsp;<i>IT-Universum -&gt; SmartCube -&gt; TCC</i><br>
 ... abgerufen werden.
 ',en=>'
-The TCC overall status is calculated from the data provided by T-Systems
-supplied TCC report is determined from SmartCube.<br>
-The raw data (or the current data) for the evaluation 
-can be viewed under ...<br>
-&nbsp;<i>IT Universe -&gt; SmartCube -&gt; TCC </i><br>
-... can be retrieved.
+The TCC overall status is based on the TCC SmartCube report provided by T-Systems.<br>
+The raw data (resp. the current data) for the evaluation can be retrieved under <i>IT Universe -&gt; SmartCube -&gt; TCC </i>.
 '},
 
 
@@ -123,10 +115,8 @@ Die Rohdaten (bzw. die aktuellen Daten) für die Auswertung können unter ...<br>
 ',en=>'
 The assessment of the base setup is carried out by T-Systems
 and displayed in the SmartCube TCC Report.<br>
-The raw data (or the current data) for the evaluation 
-can be viewed under ...<br>
-&nbsp;<i>IT Universe -&gt; SmartCube -&gt; TCC </i><br>
-... can be retrieved.
+The TCC overall status is based on the TCC SmartCube report provided by T-Systems.<br>
+The raw data (resp. the current data) for the evaluation can be retrieved under <i>IT Universe -&gt; SmartCube -&gt; TCC </i>.
 '},
 
 
@@ -147,10 +137,8 @@ Die Rohdaten (bzw. die aktuellen Daten) für die Auswertung können unter ...<br>
 ',en=>'
 The assessment of the operation system version is carried out by T-Systems
 and displayed in the SmartCube TCC Report.<br>
-The raw data (or the current data) for the evaluation 
-can be viewed under ...<br>
-&nbsp;<i>IT Universe -&gt; SmartCube -&gt; TCC </i><br>
-... can be retrieved.
+The TCC overall status is based on the TCC SmartCube report provided by T-Systems.<br>
+The raw data (resp. the current data) for the evaluation can be retrieved under <i>IT Universe -&gt; SmartCube -&gt; TCC </i>.
 '},
 
 
