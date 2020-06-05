@@ -871,7 +871,7 @@ sub getWriteRequestHash
    my $mode=shift;
    my $oldrec=shift;
    my $newrec=shift;
-printf STDERR ("fifi request $mode\n");
+
    if (!defined($mode)){
       msg(WARN,"getWriteRequestHash no mode specified");
       $mode="web";
