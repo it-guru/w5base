@@ -934,25 +934,36 @@ sub getWriteRequestHash
          my $field=$fobj->Name();
          if ($mode eq "web" || $mode eq "Modify"){
             my @val=Query->Param($field);
-            if ($#val!=-1){
-               $rec->{$field}=\@val;
-            }
-            if (exists($rec->{$field})){
-               if (ref($rec->{$field}) ne "ARRAY"){
-                  $rec->{$field}=[$rec->{$field}];
-               }
-               my $rawWrRequest=$fobj->doUnformat($rec->{$field},$rec);
-               if (!defined($rawWrRequest)){
-                  msg(WARN,"can not unformat $field");
-                  if ($self->LastMsg()!=0){
-                     msg(ERROR,"break getWriteRequestHash() doe LastMsgs");
-                     return(undef);
+            if ($#val==-1){
+               @val=Query->Param("Formated_".$field);
+               if ($#val!=-1){
+                  if ($mode eq "Modify"){ # allow direct access in API mode
+                     if ($#val==0){
+                        $rec->{$field}=$val[0];
+                     }
+                     else{
+                        $rec->{$field}=\@val;
+                     }
                   }
-                  next;
+                  my $rawWrRequest=$fobj->doUnformat(\@val,$rec);
+                  #msg(INFO,"getWriteRequestHash: var=$field $rawWrRequest");
+                  if (!defined($rawWrRequest)){
+                     msg(WARN,"can not unformat $field");
+                     if ($self->LastMsg()!=0){
+                        msg(ERROR,"break getWriteRequestHash() doe LastMsgs");
+                        return(undef);
+                     }
+                     next;
+                  }
+                  #msg(INFO,"Unformated $field:%s",Dumper($rawWrRequest));
+                  foreach my $k (keys(%{$rawWrRequest})){
+                     $rec->{$k}=$rawWrRequest->{$k};
+                  }
                }
-               foreach my $k (keys(%{$rawWrRequest})){
-                  $rec->{$k}=$rawWrRequest->{$k};
-               }
+            }
+            else{
+               $rec->{$field}=$val[0];
+               $rec->{$field}=\@val if ($#val>0);
             }
          }
          if ($mode eq "upload"){
