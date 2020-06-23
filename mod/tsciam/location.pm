@@ -74,7 +74,7 @@ sub Initialize
    my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"tsciam"));
    return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
 
-   return(1) if (defined($self->{tswiw}));
+   return(1) if (defined($self->{tsciam}));
    return(0);
 }
 

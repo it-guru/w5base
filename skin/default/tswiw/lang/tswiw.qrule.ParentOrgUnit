@@ -1,5 +1,0 @@
-'tswiw::qrule::ParentOrgUnit'=>{de=>'Prüfung der Elterneinheit über WhoIsWho',
-                                en=>'Check the parent orgunit by WhoIsWho'},
-"orgunit id not found in WhoIsWho"=>{de=>'Org-Einheit ID (srcid) konnte in WhoIsWho nicht gefunden werden'},
-"parent unit in WhoIsWho doesn't matches"=>{de=>'Elterneinheit ist nicht mit WhoIsWho Struktur identisch'},
-'no group with WhoIsWho authority'=>{de=>'Gruppe ist nicht unter WhoIsWho Verwaltung'},

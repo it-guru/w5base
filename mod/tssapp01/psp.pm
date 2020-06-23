@@ -88,8 +88,8 @@ sub new
                 name          =>'databoss',
                 group         =>'contacts',
                 label         =>'Projectmanager EMail',
-                vjointo       =>'tswiw::user',
-                vjoinon       =>['databosswiw'=>'uid'],
+                vjointo       =>'tsciam::user',
+                vjoinon       =>['databosswiw'=>'wiwid'],
                 vjoindisp     =>'email'),
 
       new kernel::Field::Text(
@@ -98,33 +98,6 @@ sub new
                 label         =>'Projectmanager WIW ID',
                 dataobjattr   =>'"tssapp01::psp".w5responsiblewiw'),
 
-#      new kernel::Field::TextDrop(
-#                name          =>'sm',
-#                group         =>'contacts',
-#                vjointo       =>'tswiw::user',
-#                label         =>'CBM EMail',
-#                vjoinon       =>['smwiw'=>'uid'],
-#                vjoindisp     =>'email'),
-
-#      new kernel::Field::Text(
-#                name          =>'smwiw',
-#                group         =>'contacts',
-#                label         =>'CBM WIW ID',
-#                dataobjattr   =>'interface_tssapp01_01.smwiw'),
-
-#      new kernel::Field::TextDrop(
-#                name          =>'dm',
-#                group         =>'contacts',
-#                label         =>'Deliverymanager EMail',
-#                vjointo       =>'tswiw::user',
-#                vjoinon       =>['dmwiw'=>'uid'],
-#                vjoindisp     =>'email'),
-
-#      new kernel::Field::Text(
-#                name          =>'dmwiw',
-#                group         =>'contacts',
-#                label         =>'Deliverymanager WIW ID',
-#                dataobjattr   =>'interface_tssapp01_01.dmwiw'),
 
       new kernel::Field::Text(
                 name          =>'saphier',

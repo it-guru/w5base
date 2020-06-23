@@ -188,11 +188,16 @@ sub new
    );
 
    my $adv=getModuleObject($self->Config,"itil::appladv");
-   my @allmodules=$adv->getAllPosibleApplModules();
-   $self->{allModules}=[];
-   while(my $k=shift(@allmodules)){
-      shift(@allmodules);
-      push(@{$self->{allModules}},$k);
+   if (defined($adv)){
+      my @allmodules=$adv->getAllPosibleApplModules();
+      $self->{allModules}=[];
+      while(my $k=shift(@allmodules)){
+         shift(@allmodules);
+         push(@{$self->{allModules}},$k);
+      }
+   }
+   else{
+      msg(ERROR,"can not create itil::appladv object");
    }
 
    foreach my $module (@{$self->{allModules}}){

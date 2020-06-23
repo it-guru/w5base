@@ -66,8 +66,8 @@ sub new
                 name          =>'responsible',
                 group         =>'contacts',
                 label         =>'costcenter responsible EMail',
-                vjointo       =>'tswiw::user',
-                vjoinon       =>['responsiblewiw'=>'uid'],
+                vjointo       =>'tsciam::user',
+                vjoinon       =>['responsiblewiw'=>'wiwid'],
                 vjoindisp     =>'email'),
 
       new kernel::Field::Text(

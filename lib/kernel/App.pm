@@ -998,6 +998,7 @@ sub getSkin
    my @skin=split(/:/,$self->Config->Param('SKIN'));
    $skin[0]="default"                  if ($skin[0] eq "");
    # Check if W5SKIN is set
+   return("default") if (!defined(Query));
    my $userskin=Query->Cookie("W5SKIN");
    if ($userskin ne ""){
       if (in_array(\@skin,$userskin)){

@@ -1,4 +1,0 @@
-'tswiw::qrule::WiwUser'=>{de=>'WhoIsWho Aktualisierung der Kontaktdaten',en=>'WhoIsWho Interface of contact data'},
-'some fields has been updated'=>{de=>'einige Felder wurden aktualisiert'},
-'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
-'different values stored in WhoIsWho'=>{de=>'in WhoIsWho sind andere Inhalte gespeichert'},

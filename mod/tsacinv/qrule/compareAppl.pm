@@ -157,7 +157,6 @@ sub qcheckRecord
          }
          else{
             if ($rec->{srcsys} eq "AssetManager"){
-               my $tswiw=getModuleObject($self->getParent->Config,"tswiw::user");
                my $sys=getModuleObject($self->getParent->Config(),"itil::system");
                #
                # Filter for conumbers, which are allowed to use in darwin
@@ -212,14 +211,6 @@ sub qcheckRecord
                                       \@qmsg,\@dataissue,\$errorlevel,
                                       mode=>'native');
                      }
-                     else{
-                    #    $tswiw->Log(ERROR,"basedata",
-                    #              "CBM '$parrec->{sememail}' ".
-                    #              "for application '".$rec->{name}."' ".
-                    #              "can not be located in W5Base and WhoIsWho ".
-                    #              "while import(qrule) of application ".
-                    #              "from AssetManager\n-");
-                     }
                   }
                }
 
@@ -234,14 +225,6 @@ sub qcheckRecord
                                    \@qmsg,\@dataissue,\$errorlevel,
                                    mode=>'native');
                   }
-                  else{
-                   #  $tswiw->Log(ERROR,"basedata",
-                   #            "TSM '$parrec->{tsmemail}' ".
-                   #            "for application '".$rec->{name}."' ".
-                   #            "can not be located in W5Base and WhoIsWho ".
-                   #            "while import(qrule) of application ".
-                   #            "from AssetManager\n-");
-                  }
                }
                if ($parrec->{tsm2email} ne ""){
                   my $tsmid=$user->GetW5BaseUserID($parrec->{tsm2email},"email",
@@ -253,14 +236,6 @@ sub qcheckRecord
                                    $autocorrect,$forcedupd,$wfrequest,
                                    \@qmsg,\@dataissue,\$errorlevel,
                                    mode=>'native');
-                  }
-                  else{
-                   #  $tswiw->Log(ERROR,"basedata",
-                   #            "TSM2 '$parrec->{tsm2email}' ".
-                   #            "for application '".$rec->{name}."' ".
-                   #            "can not be located in W5Base and WhoIsWho ".
-                   #            "while import(qrule) of application ".
-                   #            "from AssetManager\n-");
                   }
                }
                if ($parrec->{opmemail} ne ""){
@@ -274,14 +249,6 @@ sub qcheckRecord
                                    \@qmsg,\@dataissue,\$errorlevel,
                                    mode=>'native');
                   }
-                  else{
-                   #  $tswiw->Log(ERROR,"basedata",
-                   #            "OPM '$parrec->{opmemail}' ".
-                   #            "for application '".$rec->{name}."' ".
-                   #            "can not be located in W5Base and WhoIsWho ".
-                   #            "while import(qrule) of application ".
-                   #            "from AssetManager\n-");
-                  }
                }
                if ($parrec->{opm2email} ne ""){
                   my $opmid=$user->GetW5BaseUserID($parrec->{opm2email},"email",
@@ -293,14 +260,6 @@ sub qcheckRecord
                                    $autocorrect,$forcedupd,$wfrequest,
                                    \@qmsg,\@dataissue,\$errorlevel,
                                    mode=>'native');
-                  }
-                  else{
-                   #  $tswiw->Log(ERROR,"basedata",
-                   #            "OPM2 '$parrec->{opm2email}' ".
-                   #            "for application '".$rec->{name}."' ".
-                   #            "can not be located in W5Base and WhoIsWho ".
-                   #            "while import(qrule) of application ".
-                   #            "from AssetManager\n-");
                   }
                }
                $self->IfComp($dataobj,

@@ -1,3 +1,0 @@
-'tswiw::qrule::checkWiWorgarea'=>{de=>'Überprüfung der Organisationsberechisdaten direkt in WhoIsWho',en=>'check of orgarea data direct in WhoIsWho'},
-'no tOuSD value'=>{de=>'kein Inhalt im Feld tOuSD'},
-'tOuSD includes invalid characters. valids are'=>{de=>'tOuSD enthält ungültige Zeichen. Gültige Zeichen sind'},
