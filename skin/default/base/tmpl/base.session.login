@@ -39,7 +39,6 @@ kind of login will fail!<br>
 <div class=loginframe>
 <div class=loginhead>WebSSO Login</div>
 This kind of login process uses IBM Web-Seal technologie. 
-To login with your WhoIsWho account, use this kind of login process.
 <br>
 <center>
 <input type=button value=" Select WebSSO Login process ">

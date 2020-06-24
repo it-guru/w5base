@@ -9,9 +9,8 @@
 Sie sind derzeit nicht angemeldet! Diverse Funktionen in dieser WEB-Anwendung
 sind nur möglich, wenn Sie sich Authentifiziert/Angemeldet haben.<br>
 Die Anmeldung ins W5Base Framework erfolgt mit Ihrem "normalen" WindowsNT 
-Domain Account oder der WhoIsWho Kennung. Wenn Sie z.B. Ihren Account 
-Mueller.Hans in der SUED3 Domain haben geben Sie <b>sued3/</b>mueller.hans (oder 
-z.B. <b>wiw/</b>hmueller für die WhoIsWho Anmeldung) als Anmeldename ein. <br>
+Domain Account. Wenn Sie z.B. Ihren Account 
+Mueller.Hans in der SUED3 Domain haben geben Sie <b>sued3/</b>mueller.hans als Anmeldename ein. <br>
 Achten Sie darauf, dass der Anmeldename (Account) kleingeschrieben werden muss.<br>
 Bitte beachten Sie, dass Sonderzeichen (äöüß) und Leerzeichen im Passwort zu Problemen führen können.
 </div>

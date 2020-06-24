@@ -15,7 +15,7 @@
 
 To log on to W5Base/Darwin you can use your ...
 <ul>
-<li>... WhoIsWho-Account,</li>
+<li>... CIAM-Account,</li>
 <li>... WindowsNT-Domain-Account</li>
 <li>... or if you have a Windows 7 system, with your EMEA1-Account (NT-Domain EMEA1)</li>
 </ul>
@@ -33,7 +33,7 @@ Windows NT: sued3/mueller.hans
 </div>
 
 <div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
-WhoIsWho: wiw/hmueller
+CIAM: ciam/skin/tsystems/base/tmpl/login
 </div>
 
 <div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">

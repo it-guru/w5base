@@ -73,7 +73,7 @@ $(document).ready(function (){
 
 </td></tr><tr><td align=left valign=top>
 <div id=op>
-Reanalyse parent groups based on WhoIsWho
+Reanalyse parent groups based on enterprise identity management.
 
 </div>
 </td></tr></table>

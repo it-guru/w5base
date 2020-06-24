@@ -8,10 +8,9 @@
 <div style="padding:10px;width:400px;border-style:solid;border-color:darkgreen;border-width:4px;text-align:left">
 You are not logged in at the moment! Many functions in these application are
 only posible, if you are authenticated
-The login at the W5Base Framework is possible takes place with your "normal" WindowsNT 
-Domain Account or the WhoIsWho Login. If you got f.e.  the Account 
-Mueller.Hans in the SUED3 Domain, you have to use sued3/mueller.hans (or 
-z.B. wiw/hmueller for WhoIsWho) as your loginname at this application. 
+The login at the W5Base Framework is possible takes place with your "normal" WindowsNT Domain Account. If you got f.e. the Account 
+Mueller.Hans in the SUED3 Domain, you have to use sued3/mueller.hans
+as your loginname at this application. 
 </div>
 <hr width=80%>
 To continue please klick at login.<br>

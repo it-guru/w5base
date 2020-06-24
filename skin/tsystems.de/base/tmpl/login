@@ -13,9 +13,9 @@
 
 <!--
 Die Anmeldung ins W5Base Framework erfolgt mit Ihrem "normalen" WindowsNT 
-Domain Account oder der WhoIsWho Kennung. Wenn Sie z.B. Ihren Account 
+Domain Account oder der CIAM Kennung. Wenn Sie z.B. Ihren Account 
 Mueller.Hans in der SUED3 Domain haben geben Sie <b>sued3/</b>mueller.hans (oder 
-z.B. <b>wiw/</b>hmueller für die WhoIsWho Anmeldung) als Anmeldename ein. 
+z.B. <b>ciam/</b>mueller.hans@telekom.de für die CIAM Anmeldung) als Anmeldename ein. 
 Falls Ihr Arbeitsplatz bereits auf Windows7 umgestellt ist, sollten Sie sich
 auch mit Ihrem EMEA1 Account (also z.B. <b>emea1/a???????</b> ) anmelden können.<br>
 <br>
@@ -24,7 +24,7 @@ auch mit Ihrem EMEA1 Account (also z.B. <b>emea1/a???????</b> ) anmelden können.
 
 In der Anwendung W5Base/Darwin können Sie sich mit Ihrer ...
 <ul>
-<li>... WhoIsWho-Kennung,</li>
+<li>... CIAM-Kennung,</li>
 <li>... WindowsNT-Domain-Account</li>
 <li>... oder falls bereits auf Windows 7 migriert mit Ihrem EMEA1-Account (NT-Domain EMEA1)</li>
 </ul>
@@ -41,8 +41,8 @@ und sich damit für die Nutzung registrieren. <br>
 Windows NT: sued3/mueller.hans
 </div>
 
-<div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
-WhoIsWho: wiw/hmueller
+<div style="padding:1px;margin:1px;width:220px;border-style:solid;border-color:gray;border-width:1px;float:left">
+CIAM: ciam/mueller.hans@telekom.de
 </div>
 
 <div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
