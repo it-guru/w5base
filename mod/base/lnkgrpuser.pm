@@ -777,7 +777,7 @@ sub RoleSyncIn
       }
    }
    foreach my $insrec (values(%insrec)){
-      printf STDERR ("DEBUG: insrec:%s\n",Dumper($insrec));
+      #printf STDERR ("DEBUG: insrec:%s\n",Dumper($insrec));
       my $doIt=1;
       if ($param->{onInsert}){
          $doIt=&{$param->{onInsert}}($self,$insrec);
@@ -787,7 +787,7 @@ sub RoleSyncIn
       }
    }
    foreach my $updrec (values(%updrec)){
-      printf STDERR ("DEBUG: updrec:%s\n",Dumper($updrec->[1]));
+      #printf STDERR ("DEBUG: updrec:%s\n",Dumper($updrec->[1]));
       my $doIt=1;
       if ($param->{onUpdate}){
          $doIt=&{$param->{onUpdate}}($self,$updrec->[0],$updrec->[1]);
@@ -798,7 +798,7 @@ sub RoleSyncIn
       }
    }
    foreach my $delrec (values(%delrec)){
-      printf STDERR ("DEBUG: delrec:%s\n",Dumper($delrec));
+      #printf STDERR ("DEBUG: delrec:%s\n",Dumper($delrec));
       my $doIt=1;
       if (!exists($insrec{$delrec->{userid}})){  # do not delete, if update 
          if ($param->{onDelete}){                # needed
