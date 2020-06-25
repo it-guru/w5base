@@ -24,12 +24,12 @@ en=>'Count of APR relevant applications'
 },
 
 'APRSYSCNT'=>{
-de=>'von APR relevanten Anwendungen verwendete logische Systeme im TCC Report',
+de=>'Von APR relevanten Anwendungen verwendete logische Systeme im TCC Report',
 en=>'Logical systems used by APR relevant applications in TCC Report'
 },
 
 'APRINSTCNT'=>{
-de=>'Software-Installationen die von APR relevanten Anwendungen genutzt werden können',
+de=>'Software-Installationen, die von APR relevanten Anwendungen genutzt werden können',
 en=>'Software installations that can be used by APR relevant applications'
 },
 
@@ -67,6 +67,7 @@ Das betreffende SoftwareSet ist unter ...<br>
 ... abfragbar.
 ',en=>'
 All software installations included in the IT inventory are evaluated. The evaluation is carried out according to the "TelekomIT Roadmap" software set.<br>
+The relevant software set can be found under &nbsp;<i>IT Inventory->Processcontrol->Software Management </i><br>
 '},
 
 'SOFTINST.SWG'=>{
