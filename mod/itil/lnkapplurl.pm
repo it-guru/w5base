@@ -147,7 +147,7 @@ sub new
                 dataobjattr   =>'accessurl.is_interface'),
 
       new kernel::Field::Boolean(
-                name          =>'is_interal',
+                name          =>'is_internal',
                 group         =>'class',
                 label         =>'only for internal communication in application',
                 dataobjattr   =>'accessurl.is_internal'),
@@ -607,13 +607,13 @@ sub Validate
    if ((!defined($oldrec) ||
         exists($newrec->{is_userfrontend}) ||
         exists($newrec->{is_interface}) ||
-        exists($newrec->{is_interal}))
-       &&
-       (effVal($oldrec,$newrec,"is_userfrontend")==0 &&
-        effVal($oldrec,$newrec,"is_interface")==0 &&
-        effVal($oldrec,$newrec,"is_internal")==0 )){
-      $self->LastMsg(ERROR,"no classification specified");
-      return(undef);
+        exists($newrec->{is_internal}))){
+       if (effVal($oldrec,$newrec,"is_userfrontend")==0 &&
+           effVal($oldrec,$newrec,"is_interface")==0 &&
+           effVal($oldrec,$newrec,"is_internal")==0 ){
+          $self->LastMsg(ERROR,"no classification specified");
+          return(undef);
+       }
    }
 
    if (effVal($oldrec,$newrec,"name") ne $name){
