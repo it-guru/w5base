@@ -13,38 +13,38 @@
 
 <img align=right style="position:relative;top:-40px;right:-10px;align:right" src="../../../public/base/load/logo_200x78.jpg">
 
-To log on to W5Base/Darwin you can use your ...
+<br>To log in to W5Base/Darwin you can use your ...
 <ul>
-<li>... WindowsNT-Domain-Account</li>
-<li>... or if you have a Windows 7 system, with your EMEA1-Account (NT-Domain EMEA1)</li>
+<li>... EMEA account, or</li>
+<li>... CIAM account.</li>
 </ul>
-Please use your password from the authentification system accordingly.
+Please use your password from the corresponding authentication system.
 <br>
 <div style="clear:both;height:5px"></div>
 
-If you are not already a registered user for W5Base/Darwin, please log on in the way just shown above.<br>
+If you are not already a registered user, please log in with your new credentials.<br>
 The entry of a Pn-Dup email address is not allowed! Accounts with this email address will be denied. Please use your corporate email address!<br>
-After your first logon, you will receive a registration email with confirmation instructions and your account will be activated after the confirmation.  <br>
+After your first login, you will receive a registration email with confirmation instructions. Your account will be activated after the confirmation.  <br>
 <div style="clear:both;height:10px"></div>
-<b>Example:</b> &nbsp;Account Mueller.Hans, Domäne sued3:<br>
-<div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
-Windows NT: sued3/mueller.hans
-</div>
+<b>Example account:</b> &nbsp;Account Mueller.Hans, Domäne: EMEA1<br>
 
-<div style="padding:1px;margin:1px;width:200px;border-style:solid;border-color:gray;border-width:1px;float:left">
+<div style="padding:1px;margin:1px;width:260px;border-style:solid;border-color:gray;border-width:1px;float:left">
 EMEA1 Account: emea1/a???????
+</div>
+<div style="padding:1px;margin:1px;width:260px;border-style:solid;border-color:gray;border-width:1px;float:left">
+CIAM Account: ciam/hans.mueller@telekom.de
 </div>
 
 <div style="clear:both;height:5px"></div>
 
-Some functionalities and data areas in W5Base/Darwin are also accessible without logging on. Please use only lower case letters for account name when logging on and please don't use space characters in your password.
+Some functionalities and data areas in W5Base/Darwin are also accessible without logging in. Please use only lower case letters for account name when logging on and please don't use space characters in your password.
 <br>
 <div style="clear:both;height:10px"></div>
 At <a href="http://find.telekom.de" target=_blank>http://find.telekom.de</a> you can use a simpler frontend with reduced barriers.
 
 </div>
 <hr width=80%>
-Um fortzufahren klicken Sie bitte auf <b>"W5Base/Darwin Login"</b>.<br>
+To continue please click on <b>"W5Base/Darwin Login"</b>.<br>
 <p><b>
 <script language="JavaScript">
 function dologin()
