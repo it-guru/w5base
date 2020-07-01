@@ -77,6 +77,13 @@ sub Validate
          return(0);
       }
    }
+   if ($eventstart ne "" ){
+      my $duration=CalcDateDuration($eventstart,NowStamp("en"));
+      if ($duration->{totalseconds}<0){
+         $self->LastMsg(ERROR,"eventstart can not be in the future");
+         return(0);
+      }
+   }
 
 
    if (defined($oldrec) && $oldrec->{eventstatnature} ne "" &&
@@ -198,6 +205,7 @@ sub getDynamicFields
                 translation   =>'itil::workflow::base',
                 vjointo       =>'itil::appl',
                 vjoinon       =>['affectedapplicationid'=>'id'],
+                vjoineditbase =>{cistatusid=>"<6"},
                 vjoindisp     =>'name',
                 keyhandler    =>'kh',
                 container     =>'headref',
@@ -3898,6 +3906,13 @@ sub Process
       if ($h->{eventstart} eq ""){
          $self->LastMsg(ERROR,"invalid event start"); 
          return(0);
+      }
+      if ($h->{eventstart} ne "" ){
+         my $duration=CalcDateDuration($h->{eventstart},NowStamp("en"));
+         if ($duration->{totalseconds}<0){
+            $self->LastMsg(ERROR,"eventstart can not be in the future");
+            return(0);
+         }
       }
       if ($h->{eventendexpected} ne ""){
          my $dur=CalcDateDuration($h->{eventstart},

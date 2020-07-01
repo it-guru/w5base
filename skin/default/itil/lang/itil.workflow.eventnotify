@@ -189,6 +189,7 @@
 'if customer is responsible, it is not allowed to set a specific IT-Provider'=>{de=>'Wenn der Kunde verantwortlich ist, dann darf kein konkreter IT-Provider angegeben sein'},
 'if customer is responsible, you need to set a specific customer'=>{de=>'Wenn der Kunde verantwortlich ist, muss dieser konkret angegeben werden'},
 "qc eventend can't be sooner as eventend"=>{de=>"Betriebsfreigabe kann nicht vor technisches Ereignisende sein"},
+"eventstart can not be in the future"=>{de=>"Ereignisbegin kann nicht in der Zukunft liegen"},
 'event is consequence of other events'=>{de=>'Ereignis ist Folgeeffekt eines anderen Ereignisses'},
 'consequence of events'=>{de=>'Ereignis ausgelöst durch'},
 'Affected applicationgroup'=>{de=>'betroffene Anwendungsgruppe'},
