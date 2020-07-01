@@ -1385,11 +1385,15 @@ sub Validate
       $newrec->{sslexpnotify1}=undef;
    }
 
+
+
    if ((effChanged($oldrec,$newrec,"systemid") ||
         effChanged($oldrec,$newrec,"itclustsid")) &&  # reset software inst
        !exists($newrec->{lnksoftwaresystemid})){
       $newrec->{lnksoftwaresystemid}=undef;
    }
+
+
    if (!effVal($oldrec,$newrec,"runonclusts")){
       if (effVal($oldrec,$newrec,"itclustsid") ne ""){
          $newrec->{itclustsid}=undef;
@@ -1411,7 +1415,9 @@ sub Validate
       }
    }
 
-   {
+   my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
+
+   if ($cistatusid eq "4" || $cistatusid eq "3"){
       my $applid=effVal($oldrec,$newrec,"applid");
       if (effChanged($oldrec,$newrec,"applid")){
          if (effVal($oldrec,$newrec,"runonclusts")){
