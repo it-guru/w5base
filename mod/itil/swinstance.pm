@@ -1419,8 +1419,9 @@ sub Validate
 
    if ($cistatusid eq "4" || $cistatusid eq "3"){
       my $applid=effVal($oldrec,$newrec,"applid");
-      if (effChanged($oldrec,$newrec,"applid")){
-         if (effVal($oldrec,$newrec,"runonclusts")){
+      if (effChanged($oldrec,$newrec,"applid") || 
+          effChanged($oldrec,$newrec,"cistatusid")){
+         if (effVal($oldrec,$newrec,"runonclusts") ){
             my $itclustsid=effVal($oldrec,$newrec,"itclustsid");
             if (defined($itclustsid)){
                if (!$self->ValidateApplOnClusterService($applid,$itclustsid)){
@@ -1443,7 +1444,8 @@ sub Validate
             }
          }
       }
-      if (effChanged($oldrec,$newrec,"itclustsid")){
+      if (effChanged($oldrec,$newrec,"itclustsid") ||
+          effChanged($oldrec,$newrec,"cistatusid")){
          my $itclustsid=effVal($oldrec,$newrec,"itclustsid");
          if (defined($itclustsid)){
             if (!$self->ValidateApplOnClusterService($applid,$itclustsid)){
@@ -1455,7 +1457,8 @@ sub Validate
 
          } 
       }
-      if (effChanged($oldrec,$newrec,"systemid")){
+      if (effChanged($oldrec,$newrec,"systemid") ||
+          effChanged($oldrec,$newrec,"cistatusid")){
          my $systemid=effVal($oldrec,$newrec,"systemid");
          if (defined($systemid)){
             if (!$self->ValidateApplOnSystem($applid,$systemid)){
