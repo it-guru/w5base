@@ -287,20 +287,15 @@ sub qcheckRecord
          else{
             if ($rec->{posix} ne ""){
                my $o=getModuleObject($self->getParent->Config(),
-                                     "tswiw::user");
+                                     "tsciam::user");
                if (defined($o)){
                   my $chkid=$rec->{posix};
-                  $o->SetFilter({uid=>\$chkid});
-                  my ($wiwrec,$msg)=$o->getOnlyFirst(qw(uid));
-                  if (defined($wiwrec)){
+                  $o->SetFilter({wiwid=>\$chkid});
+                  my ($ciamrec,$msg)=$o->getOnlyFirst(qw(id));
+                  if (defined($ciamrec)){
                      #
                      # Ein Problem, das wir erstmal ignorieren
                      #
-                     #
-                     #$dataobj->Log(ERROR,"basedata",
-                     #    "WIWID '$rec->{posix}' for ".
-                     #    "'$rec->{fullname}' not found in CIAM (but ".
-                     #    "exists in WIW)");
                   }
                   else{
                      my $u=getModuleObject($self->getParent->Config(),
