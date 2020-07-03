@@ -917,11 +917,13 @@ sub getWriteRequestHash
       }
       foreach my $fobj (@fieldlist){
          my $field=$fobj->Name();
-         if ($mode eq "upload"){
-            if (!($fobj->prepUploadRecord($newrec,$oldrec))){
-               return(undef);
-            }
-         }
+        # Das muss raus, da ansonsten bei Select Boxen zweimal der Inhalt
+        # vom XLS Upload versucht wird zu übersetzen
+        # if ($mode eq "upload"){   
+        #    if (!($fobj->prepUploadRecord($newrec,$oldrec))){
+        #       return(undef);
+        #    }
+        # }
          if ($mode eq "Modify"){
             if (!($fobj->prepUploadRecord($rec,$oldrec))){
                return(undef);
@@ -972,12 +974,11 @@ sub getWriteRequestHash
             }
          }
       }
-      if ($mode eq "Modify"){
+      if ($mode eq "Modify"){   # es könnte sein, das dieser Block raus muss
          if (!($self->prepUploadRecord($rec))){
             return(undef);
          }
       }
-      use Data::HexDump;
       return($newrec) if ($mode eq "upload");
    }
    return($rec);
