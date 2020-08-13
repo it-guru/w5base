@@ -99,6 +99,21 @@ sub new
                    return();
                 }),
 
+
+      new kernel::Field::Text(
+                name          =>'respvorg',
+                label         =>'responsible DigitalHub/ServiceHub',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'HUB'),
+
+
+      new kernel::Field::Text(
+                name          =>'canvas',
+                label         =>'Canvas ID',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'CANVAS'),
+
+
       new kernel::Field::Contact(
                 name          =>'applmgr',
                 label         =>'Application Manager',

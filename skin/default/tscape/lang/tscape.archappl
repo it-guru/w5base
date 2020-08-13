@@ -12,3 +12,4 @@
                     en=>'Applicationversions'},
 
 'all reference Costcenters'=>{de=>'alle referenzierten Kontierungsobjekte'},
+'responsible DigitalHub/ServiceHub'=>{de=>'verantwortlicher DigitalHub/ServiceHub'},
