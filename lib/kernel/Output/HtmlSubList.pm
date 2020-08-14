@@ -141,6 +141,7 @@ var SortTable$tableid;
 function InitTab$tableid(){
 SortTable$tableid=new SortableTable(document.getElementById("$tableid"), [$sortline]);
 $activeateSort
+}
 </script>
 EOF
    if ($self->{SubListEdit}==1){
