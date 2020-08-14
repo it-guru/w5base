@@ -291,6 +291,7 @@ sub InitRequest
    if (exists($self->Cache->{W5Server})){
       $W5V2::W5Server=$self->Cache->{W5Server};
    }
+   $ENV{REMOTE_USER}=trim($ENV{REMOTE_USER}); # remove all spaces
    return(0) if (!$self->DatabaseLowInit());
    if (defined($self->Cache->{W5Base})){
       if ($self->Self() ne "base::load"){
