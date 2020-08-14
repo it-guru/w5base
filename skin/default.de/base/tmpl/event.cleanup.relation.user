@@ -1,8 +1,9 @@
 Sehr geehrte/r Benutzer/in,
 
-diese Email informiert Sie darüber, dass Ihre Zuordnung zu der Gruppe "<b>%group%</b>" mit den aktuell eingetragenen Rollen "<b>%roles(formated)%</b>" verfallen ist. Der Eintrag im W5Base System wird in 4 Wochen entferrnt. 
+diese Email informiert Sie darüber, dass Ihre Zuordnung zu der Gruppe "<b>%group%</b>" mit den aktuell eingetragenen Rollen "<b>%roles(formated)%</b>" verfallen ist. Der Eintrag im W5Base System wird in 4 Wochen entfernt. 
 
-Bitte beachten Sie, dass die org. Gruppenzuordnungen aus dem Personalwerwaltungssystem vorgegeben wird. Dies kann eine Auswirkung einer Umorganisation oder eines Wechsels des Team, etc.
+Bitte beachten Sie, dass die org. Gruppenzuordnungen aus dem Personalverwaltungssystem vorgegeben wird. 
+Dies kann eine Auswirkung einer Umorganisation oder eines Wechsels des Team, etc. sein.
 
 Es kann passieren, dass:
 
@@ -31,7 +32,7 @@ Was sollten Sie tun:
 
       - und Sie bei der Gruppe die Rolle "Mitarbeiter, Mitglied" 
         haben, wenden Sie sich bitte an Ihren Team Leiter, ihren 
-        lokalen HR-Anschprechspartner um dies im 
+        lokalen HR-Anschprechpartner um dies im 
         Personalwerwaltungssystem zu pflegen.
 
       - bei Gruppen mit anderen Rollen wenden Sie sich an 
