@@ -138,3 +138,5 @@
 'TSSlovakia.kern.location'=>{de=>'Standort',en=>'Location'},
 'TSSlovakia.kern.location.new'=>{de=>'Neueingabe',en=>'New'},
 'TSSlovakia.kern.interview'=>{de=>'CI-Interview',en=>'CI-Interview'},
+'TSSlovakia.proc.vou'=>{de=>'virtuelle Org-Einheit',en=>'virtuel Org-Unit'},
+'TSSlovakia.proc.vou.new'=>{de=>'Neueingabe',en=>'New'},

@@ -372,6 +372,19 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("TSSlovakia.proc",
+                      "tmpl/welcome",
+                      prio=>20000);
+
+   $self->RegisterObj("TSSlovakia.proc.vou",
+                      "TS::vou",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("TSSlovakia.proc.vou.new",
+                      "TS::vou",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
 
    return(1);
 }
