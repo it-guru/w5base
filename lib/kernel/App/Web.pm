@@ -2069,6 +2069,191 @@ sub InitWorkflow
 }
 
 
+
+sub _simpleRESTCallHandler_ParamCheck
+{
+   my $self=shift;
+   my $qfields=shift;
+   my $param=shift;
+
+   if (ref($qfields) ne "HASH"){
+      return({
+         exitcode=>1000,
+         exitmsg=>'internal error in parameter definition'
+      });
+   }
+   foreach my $v (keys(%$param)){
+      if (!exists($qfields->{$v})){
+         return({
+            exitcode=>1001,
+            exitmsg=>"invalid query parameter '$v'"
+         });
+      }
+   }
+   foreach my $v (keys(%$qfields)){
+      if ($qfields->{$v}->{mandatory}){
+         if (!exists($param->{$v}) ||
+              $param->{$v} eq ""){
+            return({
+               exitcode=>1002,
+               exitmsg=>"missing mandatory parameter '$v'"
+            });
+         }
+      }
+   }
+
+   return(undef);
+
+}
+
+sub _simpleRESTCallHandler_SendResult
+{
+   my $self=shift;
+   my $directCall=shift;
+   my $result=shift;
+
+   #printf STDERR ("HTTP_ACCEPT_CHARSET=%s\n",$ENV{HTTP_ACCEPT_CHARSET});
+
+   if (!$directCall){
+      my @accept=split(/\s*,\s*/,lc($ENV{HTTP_ACCEPT}));
+      if (in_array(\@accept,["application/json","text/javascript"])){
+         print $self->HttpHeader("application/json");
+         my $JSON;
+         eval("use JSON;\$JSON=new JSON;");
+         if ($@ eq ""){
+      #      $jsonok=1;
+            $JSON->utf8(1);
+            print $JSON->pretty->encode($result);
+         }
+      }
+      if (in_array(\@accept,["application/xml"])){
+      }
+   }
+   return($result);
+
+}
+
+sub simpleRESTCallHandler
+{
+   my $self=shift;
+   my $qfields=shift;
+   my $authorize=shift;
+   my $f=shift;
+   my @param=@_;
+
+
+   if ($#param==-1){   # Web-Call
+      my $q=Query->MultiVars();
+      my @path=split(/\//,$q->{FUNC});
+      if ($#path>0 && ref($qfields) eq "HASH"){
+         shift(@path);
+         for(my $c=0;$c<=$#path;$c++){
+            foreach my $v (keys(%$qfields)){
+               if (exists($qfields->{$v}->{path})){
+                  if ($qfields->{$v}->{path}==$c){
+                     $q->{$v}=$path[$c];
+                  }
+               }
+            }
+         }
+      }
+      delete($q->{RootPath});
+      delete($q->{FunctionPath});
+      delete($q->{FUNC});
+      delete($q->{MOD});
+      my @accept=split(/\s*,\s*/,lc($ENV{HTTP_ACCEPT}));
+      if (in_array(\@accept,["application/json","application/xml",
+                             "text/javascript"])){
+         my $chk=$self->_simpleRESTCallHandler_ParamCheck($qfields,$q);
+         if ($chk){
+            return($self->_simpleRESTCallHandler_SendResult(0,$chk));
+         }
+         else{
+            if (defined($authorize)){
+               if (!(&{$authorize}($self,$q))){
+                  return($self->_simpleRESTCallHandler_SendResult(0,{
+                     exitcode=>401,
+                     exitmsg=>'Unauthorized'
+                  }));
+               }
+            }
+            my $result=&{$f}($self,$q);
+            return($self->_simpleRESTCallHandler_SendResult(0,$result));
+         }
+      }
+      else{
+         my @l=caller(1);
+         print $self->HttpHeader("text/html");
+         print $self->HtmlHeader(
+                           body=>1,
+                           js=>['jquery.js'],
+                           title=>"W5Base REST Debugger");
+         my $fForm="<fieldset>";
+         $fForm.="<legend>Call Parameters:</legend>";
+
+         foreach my $v (keys(%$qfields)){
+            my $typ=$qfields->{$v}->{typ};
+            $typ="STRING" if ($typ eq "");
+            my $init=$qfields->{$v}->{init};
+            $init=~s/"/&quot;/g;
+            if ($typ eq "STRING"){
+               $fForm.="<div>";
+               $fForm.="<label for=\"$v\">$v</label>";
+               $fForm.="<input type=\"input\" name=\"$v\" id=\"$v\" ".
+                       "value=\"$init\">";
+               $fForm.="</div>\n";
+            }
+         }
+         $fForm.="</fieldset>";
+         my $SCRIPT_URI=$ENV{SCRIPT_URI};
+         if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+            $SCRIPT_URI=~s/^http:/https:/;
+         }
+
+         print $self->getParsedTemplate(
+               "tmpl/kernel.simpleRESTform",
+               { 
+                  skinbase=>'base',
+                  static=>{
+                     FIELDS=>$fForm,
+                     SCRIPT_URI=>$SCRIPT_URI
+                  }
+               }
+             );
+
+         printf("</body>");
+         printf("</html>");
+      }
+   }
+   else{
+      my $paramHashCall=undef;
+      if ($#param==0 && ref($param[0]) eq "HASH"){  # direct call with HASH
+         $paramHashCall=$param[0];
+
+      }
+      else{  # direct call with array
+         my %h=@param;
+         $paramHashCall=\%h;
+      }
+      my $chk=$self->_simpleRESTCallHandler_ParamCheck($qfields,$paramHashCall);
+      if ($chk){
+         return($self->_simpleRESTCallHandler_SendResult(1,$chk));
+      }
+      else{
+         my $result=&{$f}($self,$paramHashCall);
+         return($self->_simpleRESTCallHandler_SendResult(1,$result));
+      }
+   }
+   return({exitcode=>-1,exitmsg=>'internal error'});
+}
+
+
+
+
+
+
+
+
 ######################################################################
 
 1;

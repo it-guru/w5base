@@ -1,0 +1,81 @@
+<script language="JavaScript">
+
+$(document).ready(function(){
+
+   $("#doPost").click(function(){
+      var form=$("#form");
+      console.log("form="+form.serialize());
+
+      $("#resultset").show();
+      $("#result").text("");
+      $.ajax({
+          type: "POST",
+          data: form.serialize(),
+          dataType: "json",
+          url: window.location.pathname,
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+          success: function(data) {
+             console.log("data=",data);
+             $("#result").text(JSON.stringify(data,undefined,2));
+          },
+          error: function(e) {
+              console.log("e=",e);
+          //    alert('error handling here');
+          }
+      });
+
+
+
+   });
+});
+
+</script>
+<style>
+fieldset{
+   background:#eee;
+}
+legend{
+  margin-top: 19px;
+  font-weight: bold;
+  background: #ddd;
+  border: 1px solid #999;
+}
+label{
+   display: inline-block;
+   text-align: right;
+   float: left;
+   width:200px;
+}
+
+#form input{  
+    display: inline-block;
+    text-align: left;
+    float: left;
+    width:200px;
+    margin-left:10px;
+}
+
+form{
+   width:640px;
+   margin: 0 auto;
+}
+
+</style>
+<form id=form>
+<h1>W5Base simpleRESTCall Debugger</h1>
+<h4>%SCRIPT_URI%</h4>
+%FIELDS%
+<br>
+<input id=doPost type=button style="text-align:center;width:100%;margin:0px" value="POST with application/javascript REQUEST">
+<br>
+<br>
+
+<fieldset id=resultset style="display:none">
+<legend>Result</legend>
+<xmp id=result>
+</xmp>
+</fieldset>
+
+</form>
+
