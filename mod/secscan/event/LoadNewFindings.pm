@@ -40,7 +40,7 @@ sub LoadNewFindings
    my $joblog=getModuleObject($self->Config,"base::joblog");
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
    $self->{appl}=getModuleObject($self->Config,"TS::appl");
-   $self->{ipaddress}=getModuleObject($self->Config,"itil::ipaddress");
+   $self->{ipaddress}=getModuleObject($self->Config,"TS::ipaddress");
    $self->{wf}=getModuleObject($self->Config,"base::workflow");
    my $user=getModuleObject($self->Config,"base::user");
 
@@ -249,54 +249,44 @@ sub analyseRecord
 
    my $ipaddr=$rec->{ipaddr};
 
-   $self->{ipaddress}->ResetFilter();
-   $self->{ipaddress}->SetFilter({name=>\$ipaddr,cistatusid=>\'4'});
+   my $aresult=$self->{ipaddress}->Analyse({ipaddr=>$ipaddr});
 
-   my @l=$self->{ipaddress}->getHashList(qw(id applications dnsname 
-                                            name system itclustsvc));
-   my %applid;
-   if ($#l!=-1){
-      foreach my $iprec (@l){
-         if (ref($iprec->{applications}) eq "ARRAY"){
-            foreach my $applrec (@{$iprec->{applications}}){
-               if ($applrec->{applid} ne ""){
-                  $applid{$applrec->{applid}}++;
-               }
-            }
-         }
-      }
+
+   if (ref($aresult) ne "HASH" ||
+       $aresult->{exitcode} ne "0"){
+      msg(ERROR,"invalid Analyse result for IP-Address $ipaddr");
+      print STDERR Dumper($aresult);
+      die();
    }
-
-   # now all applications are detected
-   my $applrec;
-
-   if (keys(%applid)){
-      $self->{appl}->ResetFilter();
-      $self->{appl}->SetFilter({cistatusid=>"<6",
-                                applmgrid=>"![EMPTY]",
-                                id=>[keys(%applid)]
-      });
-      my @appls=$self->{appl}->getHashList(qw(+cdate name
-                                              tsmid tsm2id opmid opm2id 
-                                              applmgrid));
-      if ($#appls!=-1){
-         $applrec=$appls[0];
-      }
-      #print Dumper(\@l);
-      #print Dumper(\@appls);
-   }
+   $aresult=$aresult->{result};
 
    my $reponsibleid;
    my %altreponsibleid;
-   if (defined($applrec)){
-      $reponsibleid=$applrec->{applmgrid};
-      foreach my $fname (qw(tsmid tsm2id opmid opm2id)){
-         if ($applrec->{$fname} ne $reponsibleid &&
-             $applrec->{$fname} ne ""){
-            $altreponsibleid{$applrec->{$fname}}++;
+
+   if (ref($aresult->{'Admin-C'}) eq "ARRAY"){
+      if (exists($aresult->{'Admin-C'}->[0]->{userid})){
+         $reponsibleid=$aresult->{'Admin-C'}->[0]->{userid};
+      }
+      for(my $c=1;$c<=$#{$aresult->{'Admin-C'}};$c++){
+         if (exists($aresult->{'Admin-C'}->[$c]->{userid})){
+            $altreponsibleid{$aresult->{'Admin-C'}->[$c]->{userid}}++;
          }
       }
    }
+   if (ref($aresult->{'Tech-C'}) eq "ARRAY"){
+      for(my $c=0;$c<=$#{$aresult->{'Tech-C'}};$c++){
+         if (exists($aresult->{'Tech-C'}->[$c]->{userid})){
+            $altreponsibleid{$aresult->{'Tech-C'}->[$c]->{userid}}++;
+         }
+      }
+   }
+
+
+   # print STDERR Dumper($aresult);
+   # printf STDERR ("\nresp=%s\n",$reponsibleid);
+   # printf STDERR ("\nalt=%s\n",Dumper(\%altreponsibleid));
+   # exit(1);
+
 
 
 
@@ -392,63 +382,10 @@ sub analyseRecord
       if (!$rec->{hstate}){
          $upd->{hstate}="NOTAUTOHANDLED";
       }
-      #if ($rec->{comments} eq ""){
       if (1){
          my $newcomments="";
-         my $ipflt=$rec->{ipaddr};
-         $ipflt=~s/\*//g;
-         $ipflt=~s/\?//g;
-         msg(INFO,"try to query NOAH on ip $ipflt");
-         if ($ipflt ne ""){
-            my $noa=getModuleObject($dataobj->Config,"tsnoah::ipaddress");
-            $noa->SetFilter({name=>$ipflt});
-            my @l=$noa->getHashList(qw(name systemname urlofcurrentrec));
-            if ($#l!=-1){
-               $newcomments.="NOAH IP-Informations:\n".join("\n\n",map({
-                  $_->{systemname}."\n".$_->{urlofcurrentrec};
-               } @l));
-            }
-            if (1){
-               # now we try to find the correct networks
-               my @netmask=qw(0 0 0 0);
-               my @network=qw(0 0 0 0);
-               my @flt;
-               foreach my $ipaddr (split(/[\s;]+/,$rec->{ipaddr})){
-                   my @okt=split(/\./,$ipaddr);
-                   for(my $o=0;$o<=3;$o++){
-                      my $bitmask=128;
-                      for(my $bit=0;$bit<8;$bit++){
-                         $bitmask=(128>>$bit)|$bitmask;
-                         $netmask[$o]=$bitmask;
-                         my $netmask=join(".",@netmask);
-                         for(my $n=0;$n<4;$n++){
-                            $network[$n]=$okt[$n]&$netmask[$n];
-                         }
-                         my $network=join(".",@network);
-                         push(@flt,{
-                            name=>\$network,
-                            subnetmask=>\$netmask 
-                         });
-                      }
-                   }
-               }
-               if ($#flt!=-1){
-                  my $noa=getModuleObject($dataobj->Config,"tsnoah::ipnet");
-                  $noa->SetFilter(\@flt);
-                  my @l=$noa->getHashList(qw(fullname name subnetmask
-                                             urlofcurrentrec));
-                  if ($#l!=-1){
-                     if ($newcomments ne ""){
-                        $newcomments.="\n\n";
-                     }
-                     $newcomments.="NOAH IP-Networks:\n".join("\n\n",map({
-                        $_->{fullname}."\n".$_->{name}." ".
-                        "(".$_->{subnetmask}.")\n".
-                        $_->{urlofcurrentrec};
-                     } @l));
-                  }
-               }
-            }
+         if (exists($aresult->{notes}) && $aresult->{notes} ne ""){
+            $newcomments=$aresult->{notes};
          }
          if (trim($rec->{comments}) ne trim($newcomments)){
             $upd->{comments}=$newcomments;
