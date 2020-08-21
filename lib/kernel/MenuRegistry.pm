@@ -42,11 +42,12 @@ sub RegisterObj
    my $user=$c->{UserObject};
    my $grp=$c->{GroupObject};
 
+
    if (!defined($p)){
       $p=getModuleObject($self->Config,"base::menu");
       $c->{MenuAccessObject}=$p;
    }
-   return(undef) if (!$p->IsMemberOf("admin"));
+#   return(undef) if (!$p->IsMemberOf("admin"));
    if (!defined($user)){
       $user=getModuleObject($self->Config,"base::user");
       $c->{UserObject}=$user;
@@ -93,7 +94,7 @@ sub RegisterObj
       #printf STDERR ("fifi insert $name\n");
       if (my $mid=$p->ValidatedInsertRecord(\%rec)){
          $p->{MenuIsChanged}=1;
-         printf STDERR ("new Menuid=$mid\n");
+         msg(INFO,"new inserted menu entry for $name at id $mid\n");
          if (defined($param{defaultacl})){
             if (ref($param{defaultacl}) ne "ARRAY"){
                $param{defaultacl}=[$param{defaultacl}];
@@ -113,7 +114,10 @@ sub RegisterObj
                   $found=1 if (defined($chkrec));
                }
                if ($found){
+                  my $oldstate=$dfield->vjoinobj->isDataInputFromUserFrontend();
+                  $dfield->vjoinobj->isDataInputFromUserFrontend(0);
                   $dfield->vjoinobj->ValidatedInsertRecord(\%rec);
+                  $dfield->vjoinobj->isDataInputFromUserFrontend($oldstate);
                }
             }
          }
@@ -124,13 +128,15 @@ sub RegisterObj
           $rec{func} ne $mc->{fullname}->{$name}->{func} ||
           $rec{param} ne $mc->{fullname}->{$name}->{param} ||
           ($mc->{fullname}->{$name}->{target} eq "" && $rec{tranlation} ne "")){
-         #printf STDERR ("fifi update $name\n");
+         my $oldstate=$p->isDataInputFromUserFrontend();
+         $p->isDataInputFromUserFrontend(0);
          if ($p->ValidatedUpdateRecord(
                             $mc->{fullname}->{$name},
                             \%rec,
                             {menuid=>\$mc->{fullname}->{$name}->{menuid}})){
             $p->{MenuIsChanged}=1;
          }
+         $p->isDataInputFromUserFrontend($oldstate);
       }
    }
 }

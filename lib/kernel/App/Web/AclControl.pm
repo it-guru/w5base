@@ -206,9 +206,11 @@ sub Validate
          $pobj=getModuleObject($self->Config,$parentobj);
       }
       if (defined($pobj)){
-         if (!$self->checkParentWriteAccess($pobj,$refid)){
-            $self->LastMsg(ERROR,"insufficient access to parent object");
-            return(undef);
+         if ($self->isDataInputFromUserFrontend()){
+            if (!$self->checkParentWriteAccess($pobj,$refid)){
+               $self->LastMsg(ERROR,"insufficient access to parent object");
+               return(undef);
+            }
          }
       }
       else{
