@@ -54,9 +54,9 @@ sub LoadNewFindings
 
    if ($queryparam ne "" && $queryparam ne "FORCEALL"){
       $datastream->SetFilter({id=>\$queryparam});
+      $datastream->SetCurrentOrder("+findcdate","+id");
       foreach my $rec ($datastream->getHashList(@datastreamview)){
           my $res={};
-print STDERR Dumper($rec);
           $self->analyseRecord($datastream,$rec,$res);
       }
       return({exitcode=>0,exitmsg=>'DEBUG: ok'});
