@@ -327,7 +327,8 @@ sub analyseRecord
       if ($#WfRec!=-1){
          msg(INFO,"  already exists with WorkflowID=$WfRec[0]->{id}");
          $WfRec=$WfRec[0];
-         if ($WfRec->{stateid}>15){
+         if ($WfRec->{stateid}>15 || 
+             $WfRec->{secfindingreponsibleid} ne $reponsibleid){
             msg(INFO,"need to reactivate $WfRec->{id}");
             my $wfop=$self->{wf}->Clone(); 
             my $newrec={
