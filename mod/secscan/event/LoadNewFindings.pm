@@ -327,8 +327,8 @@ sub analyseRecord
       if ($#WfRec!=-1){
          msg(INFO,"  already exists with WorkflowID=$WfRec[0]->{id}");
          $WfRec=$WfRec[0];
-         if ($WfRec->{stateid}>15 || 
-             $WfRec->{secfindingreponsibleid} ne $reponsibleid){
+
+         if ($WfRec->{stateid}>15){
             msg(INFO,"need to reactivate $WfRec->{id}");
             my $wfop=$self->{wf}->Clone(); 
             my $newrec={
@@ -343,8 +343,22 @@ sub analyseRecord
                msg(INFO,"ok - it was reactivated $WfRec->{id}");
             }
          }
-      #   $self->{wf}->Action->StoreRecord($WfRec->{id},"note",
-      #                              {additional=>{}},"recreation detected");
+         elsif($WfRec->{step} eq "secscan::workflow::FindingHndl::main"){
+            msg(INFO,"need to reassign $WfRec->{id}");
+            my $wfop=$self->{wf}->Clone(); 
+            my $newrec={
+                  secfindingreponsibleid=>$reponsibleid,
+                  detaildescription=>$rec->{detailspec} 
+            };
+            if (keys(%altreponsibleid)){
+               $newrec->{secfindingaltreponsibleid}=
+                  [sort(keys(%altreponsibleid))];
+            }
+            if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
+               msg(INFO,"ok - it was reassigned $WfRec->{id}");
+            }
+
+         }
       }
       if (!defined($WfRec)){
          my $newrec={

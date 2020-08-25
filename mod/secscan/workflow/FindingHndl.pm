@@ -557,8 +557,11 @@ sub getPosibleActions
       if ($WfRec->{step} ne "secscan::workflow::FindingHndl::finish"){
          push(@l,"wfforceobsolete");
       }
-      if ($WfRec->{stateid}>15){
+      if ($WfRec->{stateid}>15 ){
          push(@l,"wfreactivate");
+      }
+      if ($WfRec->{step} eq "secscan::workflow::FindingHndl::main"){
+         push(@l,"wfreassign");
       }
    }
    if ($WfRec->{stateid} > 1 && $WfRec->{stateid} <17){
@@ -1193,6 +1196,7 @@ sub nativProcess
    my $actions=shift;
    my $userid=$self->getParent->getParent->getCurrentUserId();
 
+
    if ($op ne "" && !grep(/^$op$/,@{$actions})){
       $self->LastMsg(ERROR,"invalid disalloed action requested");
       msg(ERROR,"invalid requested operation was '$op'");
@@ -1319,6 +1323,42 @@ sub nativProcess
         #                    fwdtargetid=>$store->{fwdtargetid},
         #                    fwdtargetname=>'RiskCoordinator');
          return(1);
+      }
+   }
+   elsif ($op eq "wfreassign"){
+      if ($WfRec->{fwdtargetid} eq "15632883160001" && #reassign nur wenn deffwd
+          $WfRec->{fwdtarget} eq "base::user" &&
+          in_array($self->getParent->{tester}, $h->{secfindingreponsibleid})){ 
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         my $store={fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if (!in_array($self->getParent->{tester},
+                       $h->{secfindingreponsibleid})){
+            $store->{fwdtargetid}=15632883160001;
+            $store->{fwdtarget}="base::user";
+         }
+         else{
+            $store->{fwdtargetid}=$h->{secfindingreponsibleid};
+            $store->{fwdtarget}="base::user";
+         }
+         if (defined($h->{secfindingaltreponsibleid})){
+            $store->{secfindingaltreponsibleid}=$h->{secfindingreponsibleid};
+         }
+         if ($self->StoreRecord($WfRec,$store)){
+            my $id=$WfRec->{id};
+            my $aobj=$self->getParent->getParent->Action();
+         
+            if (defined($h->{secfindingaltreponsibleid})){
+               my $wsref=$h->{secfindingaltreponsibleid};
+               $wsref=[$wsref] if (ref($wsref) ne "ARRAY");
+               foreach my $a (@{$wsref}){
+                  $self->getParent->getParent->AddToWorkspace(
+                         $id,"base::user",$a);
+               }
+            }
+            $self->getParent->NotifySecurityFindingForward({id=>$id});
+            $self->PostProcess($op,$h,$actions);
+         }
       }
    }
    elsif($op eq "wffine"){
