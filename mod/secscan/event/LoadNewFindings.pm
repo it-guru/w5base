@@ -44,12 +44,19 @@ sub LoadNewFindings
    $self->{wf}=getModuleObject($self->Config,"base::workflow");
    my $user=getModuleObject($self->Config,"base::user");
 
-   my @datastreamview=qw(ALL);
+   my @datastreamview=qw(id hstate hostname ipaddr isdel itemrawdesc 
+                         ofid name mdate startdate enddate
+                         wfheadid wfref wfhandeled  hstate
+                         secitem sectokenid sectreadrules spec 
+                         srcid srcsys respemail);
+   # NICHT ALL verwenden, da die recup* Felder die Abfrage extrem langsam
+   # machen würden
 
-   if ($queryparam ne ""){
+   if ($queryparam ne "" && $queryparam ne "FORCEALL"){
       $datastream->SetFilter({id=>\$queryparam});
       foreach my $rec ($datastream->getHashList(@datastreamview)){
           my $res={};
+print STDERR Dumper($rec);
           $self->analyseRecord($datastream,$rec,$res);
       }
       return({exitcode=>0,exitmsg=>'DEBUG: ok'});
@@ -83,8 +90,8 @@ sub LoadNewFindings
    my $exitmsg="done";
    my $laststamp;
    my $lastid;
-   my %flt;
-   {    #analyse lastSuccessRun
+   my %flt=(isdel=>\'0');;
+   if ($queryparam ne "FORCEALL"){    #analyse lastSuccessRun
       %flt=( 
          findcdate=>">$startstamp",
          isdel=>\'0'
@@ -109,7 +116,7 @@ sub LoadNewFindings
       }
    }
 
-   { # process new records
+   if (1){ # process new records
       my $skiplevel=0;
       my $recno=0;
       $datastream->ResetFilter();
@@ -169,56 +176,38 @@ sub LoadNewFindings
                msg(ERROR,"db record problem: %s",$msg);
                return({exitcode=>1,msg=>$msg});
             }
-            if ($recno>50){  # limit record-handing in one pass
-               last;
+            if ($queryparam ne "FORCEALL"){
+               if ($recno>50){  # limit record-handing in one pass
+                  last;
+               } 
             } 
          }until(!defined($rec));
       }
    }
-   my $dataop=$datastream->Clone();
-   $datastream->ResetFilter();
-   $datastream->SetFilter({
-      wfhandeled=>\'1',
-      findmdate=>'<now-7d',
-      isdel=>\'1'
-   });
-   my ($rec,$msg)=$datastream->getFirst();
+   if ($queryparam ne "FORCEALL"){
+      my $dataop=$datastream->Clone();
+      $datastream->ResetFilter();
+      $datastream->SetFilter({
+         wfhandeled=>\'1',
+         findmdate=>'<now-3d',
+         isdel=>\'1'
+      });
+      $datastream->SetCurrentView(@datastreamview);
+      $datastream->SetCurrentOrder("+findcdate","+id");
+      my ($rec,$msg)=$datastream->getFirst();
 
-   if (defined($rec)){
-      do{
-         msg(INFO,"cleanup finding id=$rec->{id}");
-         my $srcsys="secscan::finding";
-         my $srcid=$rec->{id};
-         my $srckey=$srcsys."::".$srcid;  # because length of srcid :-[
-
-         my $wfop=$self->{wf}->Clone(); 
-         $self->{wf}->ResetFilter();
-         $self->{wf}->SetFilter({
-            srcsys=>\$srckey,
-            step=>"!secscan::workflow::FindingHndl::finish"
-         });
-         foreach my $wfrec ($self->{wf}->getHashList(qw(id))){
-            msg(INFO,"cleanup workflow id=$wfrec->{id}");
-            if ($wfop->nativProcess('wfforceobsolete',{},$wfrec->{id})){
-               $dataop->ValidatedUpdateRecord($rec,{
-                  wfhandeled=>'0',
-                  hstate=>"OBSOLETE"
-               },{id=>\$rec->{id}});
+      if (defined($rec)){
+         do{
+            msg(INFO,"cleanup finding id=$rec->{id}");
+            $self->analyseRecord($datastream,$rec,$res);
+            ($rec,$msg)=$datastream->getNext();
+            if (defined($msg)){
+               msg(ERROR,"db record problem: %s",$msg);
+               return({exitcode=>1,msg=>$msg});
             }
-         }
-         
-
-
-
-
-         ($rec,$msg)=$datastream->getNext();
-         if (defined($msg)){
-            msg(ERROR,"db record problem: %s",$msg);
-            return({exitcode=>1,msg=>$msg});
-         }
-      }until(!defined($rec));
+         }until(!defined($rec));
+      }
    }
-
 
 
 
@@ -245,7 +234,37 @@ sub analyseRecord
    msg(INFO,"  SecToken  :$rec->{name}");
    msg(INFO,"  Host      :$rec->{hostname}");
    msg(INFO,"  IpAddr    :$rec->{ipaddr}");
-   msg(INFO,"  SecTokenID: $rec->{sectokenid}");
+   msg(INFO,"  SecTokenID:$rec->{sectokenid}");
+   msg(INFO,"  wfhandeled:$rec->{wfhandeled}");
+   msg(INFO,"  isdel:     $rec->{isdel}");
+
+   if ($rec->{isdel} eq "1"){
+      if ($rec->{wfhandeled} eq "1"){
+         my $dataop=$dataobj->Clone();
+         my $srcsys="secscan::finding";
+         my $srcid=$rec->{id};
+         my $srckey=$srcsys."::".$srcid;  # because length of srcid :-[
+
+         my $wfop=$self->{wf}->Clone(); 
+         $self->{wf}->ResetFilter();
+         $self->{wf}->SetFilter({
+            srcsys=>\$srckey,
+            step=>"!secscan::workflow::FindingHndl::finish"
+         });
+         foreach my $wfrec ($self->{wf}->getHashList(qw(id))){
+            msg(INFO,"cleanup workflow id=$wfrec->{id}");
+            if ($wfop->nativProcess('wfforceobsolete',{},$wfrec->{id})){
+               $dataop->ValidatedUpdateRecord($rec,{
+                  wfhandeled=>'0',
+                  hstate=>"OBSOLETE"
+               },{id=>\$rec->{id}});
+            }
+         }
+      }
+      return(); 
+   }
+
+
 
    my $ipaddr=$rec->{ipaddr};
 
