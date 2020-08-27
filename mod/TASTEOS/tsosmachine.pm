@@ -31,9 +31,9 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Text(           # this is not of type ::Id - because
-            name               =>'id',   # a record is not direct openable
-            searchable         =>1,      # by id (systemid is needed)
+      new kernel::Field::Id(          
+            name               =>'id',  
+            searchable         =>1,    
             htmlwidth          =>'200px',
             align              =>'left',
             label              =>'MachineID'),
@@ -41,7 +41,33 @@ sub new
       new kernel::Field::Text(     
             name               =>'systemid',
             searchable         =>1,
+            readonly      =>sub{
+               my $self=shift;
+               my $rec=shift;
+               if (defined($rec)){
+                  return(1);
+               }
+               return(0);
+            },
             label              =>'SystemID'),
+
+     # new kernel::Field::TextDrop(                 # Static Datenobjekte  
+     #       name               =>'system',         # koenen keine 
+     #       searchable         =>1,                # Kreuzreferenzierungen!!
+     #       vjointo            =>'TASTEOS::tsossystem',
+     #       vjoinon            =>['systemid'=>'id'],
+     #       vjoindisp          =>'name',
+     #       uivisible     =>sub{
+     #              my $self=shift;
+     #              my $mode=shift;
+     #              my %param=@_;
+     #              if (exists($param{current})){
+     #                 return(1);
+     #              }
+     #              return(0);
+     #       },
+     #       readonly           =>1,
+     #       label              =>'System'),
 
       new kernel::Field::Text(     
             name               =>'name',
@@ -59,11 +85,44 @@ sub new
             searchable         =>1,
             label              =>'risk Category Factor'),
 
+      new kernel::Field::Text(
+            name              =>'description',
+            searchable        =>1,
+            label             =>'Description'),
+
    );
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name description));
    return($self);
 }
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("default") if (!defined($rec));
+   return("ALL");
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   if ($self->IsMemberOf("admin")){
+      return("default");
+   }
+   return(undef);
+}
+
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
+}
+
+
 
 sub DataCollector
 {
@@ -73,15 +132,25 @@ sub DataCollector
 
    return(undef) if (!$self->genericSimpleFilterCheck4TASTEOS($filterset));
    my $filter=$filterset->{FILTER}->[0];
-   return(undef) if (!$self->checkMinimalFilter4TASTEOS($filter,"systemid"));
+
+   if (!exists($filter->{id})){
+      return(undef) if (!$self->checkMinimalFilter4TASTEOS($filter,"systemid"));
+   }
    my $query=$self->decodeFilter2Query4TASTEOS($filter);
    my $systemid=$query->{systemid};
 
    my $dbclass="icto/machine-metadata";
+   my $requesttoken=$systemid;
+
+   if ($query->{id} ne ""){  # change op, if machine id is direct addressed
+      $dbclass="machines/$query->{id}";
+      $requesttoken=$query->{id};
+   }
+
 
    return($self->CollectREST(
       dbname=>'TASTEOS',
-      requesttoken=>$systemid,
+      requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;
          my $baseurl=shift;
@@ -94,21 +163,44 @@ sub DataCollector
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
-         return(['access-token'=>$apikey,
-                 'Content-Type','application/json',
-                 'system-id',$systemid]);
+
+         my $h=[
+            'access-token'=>$apikey,
+            'Content-Type','application/json',
+         ];
+
+         if ($systemid ne ""){
+            push(@$h,'system-id',$systemid);
+         }
+         return($h);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            return([],"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data TSOS response");
+         return(undef);
       },
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
+
          if (ref($data) eq "ARRAY"){
             map({
                       $_->{systemid}=$query->{systemid};
                    } @{$data});
             return($data);
          }
-         else{
-            $self->LastMsg(ERROR,"unexpected data structure from REST call");
+         else{  # zugriff direkt über den GET Request auf EINE machine
+            $data->{systemid}=$data->{systemId}; # fixup API Bug
+            return([$data]);
          }
          return(undef);
       }
@@ -164,14 +256,12 @@ sub InsertRecord
          my $code=shift;
          my $message=shift;
          $d=trim($d);
-printf STDERR ("fifi got: $code - $message - d=$d\n");
          $d=~s/'//g;
          $d=~s/"//g;
          my $resp="{\"machineid\":\"$d\"}";
          return($resp);
       }
    );
-printf STDERR ("fifi inserted: $d->{machineid}\n");
 
    return($d->{machineid});
 }
@@ -199,7 +289,7 @@ sub UpdateRecord
 
    my $dbclass="machines/$id";
 
-printf STDERR ("fifi UpdateRecord: $dbclass %s\n",Dumper(\%upd));
+   #printf STDERR ("fifi UpdateRecord: $dbclass %s\n",Dumper(\%upd));
 
    my ($d,$code,$message)=$self->CollectREST(
       dbname=>'TASTEOS',
@@ -213,12 +303,19 @@ printf STDERR ("fifi UpdateRecord: $dbclass %s\n",Dumper(\%upd));
          my $dataobjurl=$baseurl.$dbclass;
          return($dataobjurl);
       },
+      content=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $d=encode_json(\%upd);
+         #printf STDERR ("content=$d\n");
+         return($d);
+      },
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
          return(['access-token'=>$apikey,
-                 %upd,
                  'Content-Type','application/json']);
       },
       preprocess=>sub{   # create a valid JSON response
@@ -226,7 +323,6 @@ printf STDERR ("fifi UpdateRecord: $dbclass %s\n",Dumper(\%upd));
          my $d=shift;
          my $code=shift;
          my $message=shift;
-printf STDERR ("fifi got: $code - $message - d=$d\n");
          my $resp="[]";
          return($resp);
       }
@@ -243,7 +339,7 @@ sub DeleteRecord
    my $self=shift;
    my $oldrec=shift;  # hash ref
 
-   my $dbclass="machine/$oldrec->{id}";
+   my $dbclass="machines/$oldrec->{id}";
 
    my ($d,$code,$message)=$self->CollectREST(
       dbname=>'TASTEOS',
@@ -262,6 +358,7 @@ sub DeleteRecord
          my $baseurl=shift;
          my $apikey=shift;
          return(['access-token'=>$apikey,
+                 'machineId'=>$oldrec->{id},
                  'Content-Type','application/json']);
       },
       preprocess=>sub{   # create a valid JSON response

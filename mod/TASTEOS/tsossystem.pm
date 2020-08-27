@@ -76,9 +76,16 @@ sub DataCollector
 
    my $dbclass="icto/system-metadata";
 
+   my $requesttoken="SEARCH.".time();
+
+   if ($query->{id} ne ""){  # change op, if machine id is direct addressed
+      $dbclass="systems/$query->{id}";
+      $requesttoken=$query->{id};
+   }
+
    my $d=$self->CollectREST(
       dbname=>'TASTEOS',
-      requesttoken=>"SEARCH.".time(),
+      requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;
          my $baseurl=shift;
@@ -87,6 +94,7 @@ sub DataCollector
          my $dataobjurl=$baseurl.$dbclass;
          return($dataobjurl);
       },
+
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
@@ -103,7 +111,8 @@ sub DataCollector
             return($data);
          }
          else{
-            $self->LastMsg(ERROR,"unexpected data structure from REST call");
+            return([$data]);
+          #  $self->LastMsg(ERROR,"unexpected data structure from REST call");
          }
          return(undef);
       }
@@ -123,6 +132,10 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
+   if ($rec->{name} eq "Default System" &&
+       $rec->{ictoNumber} eq ""){
+      return(undef);
+   }
    if ($self->IsMemberOf("admin")){
       return("default");
    }
@@ -143,6 +156,17 @@ sub Validate
 
    return(1);
 }
+
+
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
+}
+
+
 
 sub InsertRecord
 {
@@ -171,6 +195,17 @@ sub InsertRecord
                  'icto'=>$newrec->{ictoNumber},
                  'description'=>$newrec->{description},
                  'Content-Type','application/json']);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+
+         printf STDERR ("onfail: code=$code statusline=$statusline content=$content\n");
+
+         $self->LastMsg(ERROR,"unexpected data TSOS insert response");
+         return(undef);
       },
       preprocess=>sub{   # create a valid JSON response
          my $self=shift;
@@ -204,7 +239,7 @@ sub UpdateRecord
    my %upd=();
    foreach my $k (keys(%$newrec)){
       my $dstk=$k;
-      $dstk="icto" if ($dstk eq "ictoNumber");
+   #   $dstk="icto" if ($dstk eq "ictoNumber");
       $upd{$dstk}=$newrec->{$k};
    }
 
@@ -223,13 +258,35 @@ sub UpdateRecord
          my $dataobjurl=$baseurl.$dbclass;
          return($dataobjurl);
       },
+      content=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $d=encode_json(\%upd);
+         #printf STDERR ("content=$d\n");
+         return($d);
+      },
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
-         return(['access-token'=>$apikey,
-                 %upd,
-                 'Content-Type','application/json']);
+         my $h=[
+            'access-token'=>$apikey,
+            'Content-Type','application/json'
+         ];
+         #printf STDERR ("dbclass=$dbclass hupd=%s\n",Dumper($h));
+         return($h);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+
+         #printf STDERR ("onfail: code=$code statusline=$statusline content=$content\n");
+
+         $self->LastMsg(ERROR,"unexpected data TSOS update response");
+         return(undef);
       },
       preprocess=>sub{   # create a valid JSON response
          my $self=shift;

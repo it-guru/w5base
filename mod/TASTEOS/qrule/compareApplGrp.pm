@@ -77,6 +77,7 @@ sub qcheckRecord
    my $errorlevel=0;
 
    return(0,undef) if ($rec->{cistatusid}!=4);
+   return(undef)   if ($rec->{applgrpid} eq "");
 
    my $lobj=getModuleObject($dataobj->Config,"itil::lnkapplsystem");
 
@@ -86,11 +87,12 @@ sub qcheckRecord
       applcistatusid=>[4]
    });
 
-   my @l=$lobj->getHashList(qw(systemid applgrpid));
+   my @l=$lobj->getHashList(qw(systemid applgrpid id));
    my %ul;
    foreach my $lrec (@l){
       $ul{$lrec->{applgrpid}."-".$lrec->{systemid}}=$lrec;
    }
+printf STDERR ("fifi ul=%s\n",Dumper(\%ul));
    @l=values(%ul);
 
 
@@ -116,12 +118,62 @@ sub qcheckRecord
    my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
    my $tsosmac=getModuleObject($dataobj->Config,"TASTEOS::tsosmachine");
 
+
+   $tsossys->ResetFilter();
+   $tsossys->SetFilter({ictoNumber=>$rec->{applgrpid}});
+   $tsossys->SetCurrentView(qw(id ictoNumber machines));
+   my $curSys=$tsossys->getHashIndexed(qw(ictoNumber));
+#printf STDERR ("curSys getHashIndexed=%s\n",Dumper($curSys));
+
+   #printf STDERR ("curSys=%s\n",Dumper($curSys));
+
+
+
    my $TSOSsystemid=$rec->{additional}->{TasteOS_SystemID}->[0];
+
+
+   $tsossys->ResetFilter();
+   $tsossys->SetFilter({id=>$TSOSsystemid});  # check if systemid still exists
+   my ($srec,$msg)=$tsossys->getOnlyFirst(qw(id name));
+   if (!defined($srec)){
+      $TSOSsystemid=undef;
+   }
+
+   my @delList;
+   my @idl;
+   if (ref($curSys->{ictoNumber}->{$rec->{applgrpid}}) eq "ARRAY"){
+      @idl=map({$_->{id}} @{$curSys->{ictoNumber}->{$rec->{applgrpid}}});
+   }
+   else{
+      if (ref($curSys->{ictoNumber}) eq "HASH"){
+         @idl=$curSys->{ictoNumber}->{$rec->{applgrpid}}->{id};
+      }
+   }
+printf STDERR ("fifi idl=%s\n",Dumper(\@idl));
+   if ($#idl!=-1){
+      if ($TSOSsystemid ne "" &&
+          in_array(\@idl,$TSOSsystemid)){  # cleanup andere ICTOs
+         push(@delList,grep(!/^$TSOSsystemid$/,@idl));
+      }
+      else{
+         @delList=@idl;
+         $TSOSsystemid=undef;
+      }
+   }
+printf STDERR ("fifi delList=%s\n",Dumper(\@delList));
+   foreach my $id (@delList){  # cleanup old system records (not stored local)
+      if ($id ne ""){
+         $tsossys->ValidatedDeleteRecord({id=>$id});
+      }
+   }
+printf STDERR ("fifi delEnd\n");
+
+
 
    my $tsossysrec={
       name=>$rec->{fullname},
       ictoNumber=>$rec->{applgrpid},
-      description=>NowStam("en")
+      description=>NowStamp("en")
    };
 
    sub insNewTSOSsys
@@ -149,21 +201,8 @@ sub qcheckRecord
          {},$tsossysrec,
          {id=>$TSOSsystemid
       });
-      if ($bk eq ""){  # target does not exists anymore
-         my @lastmsg=$tsossys->LastMsg();
-         if (grep(/401 Unauthorized/,@lastmsg)){
-            my $newid=insNewTSOSsys($tsossysrec);
-            if ($newid ne ""){
-               $TSOSsystemid=$newid;
-            }
-            else{
-               die("ganz schlecht");
-            }
-         }
-
-      }
    }
-   printf STDERR ("fifi upd TSOSsystemid=$TSOSsystemid\n");
+   #printf STDERR ("fifi upd TSOSsystemid=$TSOSsystemid\n");
    sub insNewTSOSmac
    {
       my $nrec=shift;
@@ -196,6 +235,8 @@ sub qcheckRecord
       return($newid);
    }
 
+
+
    if ($TSOSsystemid ne ""){
       foreach my $lrec (@l){
          my $TSOSmachineid;
@@ -207,7 +248,13 @@ sub qcheckRecord
             name=>$lrec->{system},
             systemid=>$TSOSsystemid
          };
-         
+
+         $tsosmac->ResetFilter();
+         $tsosmac->SetFilter({id=>$TSOSmachineid});
+         my ($mrec,$msg)=$tsosmac->getOnlyFirst(qw(id name systemid));
+         if (!defined($mrec)){
+            $TSOSmachineid=undef;
+         }
          if ($TSOSmachineid eq ""){
             my $newid=insNewTSOSmac($tsosmacrec,$lrec,$ladd->{systemid});
          }
@@ -216,27 +263,23 @@ sub qcheckRecord
                {},$tsosmacrec,
                {id=>$TSOSmachineid
             });
-            if ($bk eq ""){  # target does not exists anymore
-               my @lastmsg=$tsosmac->LastMsg();
-               if (grep(/401 Unauthorized/,@lastmsg)){
-                  my $newid=insNewTSOSmac($tsosmacrec,$lrec,$ladd->{systemid});
-                  if ($newid ne ""){
-                     $TSOSmachineid=$newid;
-                  }
-                  else{
-                     die("ganz schlecht");
-                  }
-               }
-           
-            }
-
          }
 
       }
    }
 
 
-
+   $tsossys->ResetFilter();
+   $tsossys->SetFilter({name=>\"Default System",ictoNumber=>\""});
+   my ($defrec,$msg)=$tsossys->getOnlyFirst(qw(id name machines));
+   if (defined($defrec)){
+      if (ref($defrec->{machines}) eq "ARRAY"){
+         foreach my $mrec (@{$defrec->{machines}}){
+            $tsosmac->ResetFilter();
+            $tsosmac->ValidatedDeleteRecord({id=>$mrec->{id}});
+         }
+      }
+   }
 
 
 
