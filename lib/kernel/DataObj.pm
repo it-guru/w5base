@@ -4988,6 +4988,8 @@ sub DoRESTcall
    my $self=shift;
    my %p=@_;
 
+   my $reqtrace="---\n";
+
    my $ua;
    eval('
       use JSON;
@@ -5010,19 +5012,38 @@ sub DoRESTcall
    my $req;
    if ($p{method} eq "GET"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+      $reqtrace.=$p{method}." ".$p{url}."\n";
    }
    if ($p{method} eq "POST"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
+      $reqtrace.=$p{method}." ".$p{url}."\n";
    }
    if ($p{method} eq "PUT"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+      $reqtrace.=$p{method}." ".$p{url}."\n";
    }
    if ($p{method} eq "DELETE"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+      $reqtrace.=$p{method}." ".$p{url}."\n";
+   }
+   if (ref($p{headers}) eq "ARRAY"){
+      my @p=@{$p{headers}};
+      while(my $var=shift(@p)){
+         my $val=shift(@p);
+         $reqtrace.=$var.": ".$val."\n";
+      }
+
    }
    if (defined($p{content})){
       $req->content($p{content});
+      if (length($p{content})<1000){
+         $reqtrace.=$p{content};
+      }
+      else{
+         $reqtrace.="[CLOB more then 1000 char]\n";
+      }
    }
+   
 
 
 
@@ -5055,18 +5076,25 @@ sub DoRESTcall
          return($d);
       }
       else{
+         msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,
                         "unexpected data structure returend from REST call");
       }
    }
    else{
       my $statusline=$response->status_line;
+      $reqtrace.="Response:\n$code $statusline\n";
+      if ($response->decoded_content ne ""){
+         $reqtrace.=$response->decoded_content."\n";
+      }
       if ($p{onfail}){
          return(
-            &{$p{onfail}}($self,$code,$statusline,$response->decoded_content)
+            &{$p{onfail}}($self,$code,$statusline,$response->decoded_content,
+                          $reqtrace)
          );
       }
       else{
+         msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,"unexpected result from REST call: ".$statusline);
       }
    }
