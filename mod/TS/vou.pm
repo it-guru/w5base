@@ -458,10 +458,15 @@ sub Validate
       my $canvasid=$newrec->{canvasid};
       if ($canvasid ne ""){
          if ($canvasid=~m/^[0-9]+$/){
-            $canvasid=sprintf("C%02d",$canvasid);
+            if ($canvasid<100){
+               $canvasid=sprintf("C%02d",$canvasid);
+            }
+            else{
+               $canvasid=sprintf("C%03d",$canvasid);
+            }
          }
          $canvasid=uc($canvasid);
-         if (!($canvasid=~m/^C[0-9]{2}$/)){
+         if (!($canvasid=~m/^C[0-9]{2,3}$/)){
             $self->LastMsg(ERROR,"invalid format of CanvasID");
             return(0);
          }
