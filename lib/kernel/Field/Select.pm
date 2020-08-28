@@ -405,6 +405,7 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $comprec=shift;
    my $name=$self->{name};
 
 
@@ -416,7 +417,7 @@ sub Validate
             if (defined($self->{vjointo}) &&
                 defined($self->{vjoinon}) &&
                 ref($self->{vjoinon}) eq "ARRAY"){
-               return({$self->{vjoinon}->[0]=undef});
+               return({$self->{vjoinon}->[0]=>undef});
             }
 
             return({$self->Name()=>undef});
@@ -458,7 +459,12 @@ sub Validate
                if (defined($self->{vjointo}) &&
                    defined($self->{vjoinon}) &&
                    ref($self->{vjoinon}) eq "ARRAY"){
-                  return({$self->{vjoinon}->[0]=>$backmap{$val}});
+                  if (exists($backmap{$val})){ # store value is the string
+                     return({$self->{vjoinon}->[0]=>$backmap{$val}});
+                  }
+                  else{  # field has already the id value
+                     return({});
+                  }
                }
                $self->getParent->LastMsg(ERROR,"invalid write request ".
                                                "to Select field '$name'");
@@ -563,6 +569,7 @@ sub Unformat
          return($self->SUPER::Unformat($formated,$rec));
       }
       elsif (defined($self->{vjoinon})){
+         delete($rec->{$self->{name}}); # prevent log of old name in select
          if ($self->{multisize}>0){
             $r->{$self->{vjoinon}->[0]}=$formated;
          }
