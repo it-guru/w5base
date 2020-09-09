@@ -1352,7 +1352,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'slacontroltool',
                 group         =>'monisla',
-                label         =>'SLA control tool type',
+                label         =>'raw SLA control tool type',
                 dataobjattr   =>'appl.slacontroltool'),
 
       new kernel::Field::Number(
