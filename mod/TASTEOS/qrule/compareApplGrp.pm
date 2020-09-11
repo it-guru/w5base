@@ -62,6 +62,65 @@ sub getPosibleTargets
    return(["itil::applgrp"]);
 }
 
+   sub insNewTSOSmac
+   {
+      my $dataobj=shift;
+      my $tsosmac=shift;
+      my $opladdobj=shift;
+      my $rec=shift;
+      my $nrec=shift;
+      my $lrec=shift;
+      my $ladd=shift;
+
+      my $newid=$tsosmac->ValidatedInsertRecord($nrec);
+      if ($newid ne ""){
+         if (!exists($ladd->{$lrec->{systemid}})){
+            my %add=(TasteOS_MachineID=>$newid);
+            #printf STDERR ("fifi insNewTSOSmac $newid\n");
+            
+printf STDERR ("fifi insert new MachineID=$newid\n");
+            $opladdobj->ValidatedInsertRecord({
+               systemid=>$lrec->{systemid},
+               applgrpid=>$lrec->{applgrpid},
+               additional=>\%add
+            });
+         }
+         else{
+            #printf STDERR ("fifi insNewTSOSmac update $newid in id=".$ladd->{$lrec->{systemid}}->{id}."\n");
+            my %add=%{$ladd->{$lrec->{systemid}}->{additional}};
+            $add{TasteOS_MachineID}=$newid;
+printf STDERR ("fifi update new MachineID=$newid\n");
+            $opladdobj->ValidatedUpdateRecord(
+               $ladd->{$lrec->{systemid}},
+               {additional=>\%add},
+               {id=>$ladd->{$lrec->{systemid}}->{id}}
+            );
+         }
+      }
+      return($newid);
+   }
+
+   sub insNewTSOSsys
+   {
+      my $dataobj=shift;
+      my $tsossys=shift;
+      my $rec=shift;
+      my $nrec=shift;
+
+      my $newid=$tsossys->ValidatedInsertRecord($nrec);
+      printf STDERR ("create new SystemID=$newid\n");
+      if ($newid ne ""){
+         my %add=%{$rec->{additional}};
+         $add{TasteOS_SystemID}=$newid;
+         my $bk=$dataobj->ValidatedUpdateRecord(
+            $rec,{additional=>\%add},
+            {id=>$rec->{id}}
+         );
+         printf STDERR ("update system $rec->{id} bk=$bk\n");
+      }
+      return($newid);
+   }
+
 sub qcheckRecord
 {
    my $self=shift;
@@ -75,9 +134,40 @@ sub qcheckRecord
    my @qmsg;
    my @dataissue;
    my $errorlevel=0;
+   my %contact;
 
    return(0,undef) if ($rec->{cistatusid}!=4);
    return(undef)   if ($rec->{applgrpid} eq "");
+
+   my $appl=getModuleObject($dataobj->Config,"itil::appl");
+   $appl->SetFilter({
+      applgrpid=>\$rec->{id},
+      cistatusid=>[4]
+   });
+   my @a=$appl->getHashList(qw(tsmid tsm2id applmgrid contacts));
+   foreach my $arec (@a){
+      foreach my $fld (qw(tsmid tsm2id applmgrid)){
+         if ($arec->{$fld} ne ""){
+            $contact{$arec->{$fld}}={};
+         }
+      }
+      foreach my $crec (@{$arec->{contacts}}){
+         my $roles=$crec->{roles};
+         $roles=[$roles] if (ref($roles) ne "ARRAY");
+         if ($crec->{target} eq "base::user" &&
+             in_array($roles,"applmgr2")){
+            $contact{$crec->{targetid}}={};
+         }
+      }
+   }
+   if (keys(%contact)){
+      my $user=getModuleObject($dataobj->Config,"base::user");
+      $user->SetFilter({cistatusid=>[4],userid=>[keys(%contact)]});
+      foreach my $urec ($user->getHashList(qw(email userid))){
+         $contact{$urec->{userid}}=$urec;
+      }
+   }
+
 
    my $lobj=getModuleObject($dataobj->Config,"itil::lnkapplsystem");
 
@@ -92,7 +182,7 @@ sub qcheckRecord
    foreach my $lrec (@l){
       $ul{$lrec->{applgrpid}."-".$lrec->{systemid}}=$lrec;
    }
-printf STDERR ("fifi ul=%s\n",Dumper(\%ul));
+#printf STDERR ("fifi ul=%s\n",Dumper(\%ul));
    @l=values(%ul);
 
 
@@ -112,11 +202,12 @@ printf STDERR ("fifi ul=%s\n",Dumper(\%ul));
    my $opladdobj=$laddobj->Clone();
    $laddobj->SetCurrentView(qw(systemid applgrpid additional id));
    my $ladd=$laddobj->getHashIndexed(qw(systemid));
-   printf STDERR ("addl=%s\n",Dumper($ladd));
+   #printf STDERR ("addl=%s\n",Dumper($ladd));
 
 
    my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
    my $tsosmac=getModuleObject($dataobj->Config,"TASTEOS::tsosmachine");
+   #printf STDERR ("rec=%s\n",Dumper($rec));
 
 
    $tsossys->ResetFilter();
@@ -125,18 +216,20 @@ printf STDERR ("fifi ul=%s\n",Dumper(\%ul));
    my $curSys=$tsossys->getHashIndexed(qw(ictoNumber));
 #printf STDERR ("curSys getHashIndexed=%s\n",Dumper($curSys));
 
-   #printf STDERR ("curSys=%s\n",Dumper($curSys));
 
+   my $dd=Dumper($rec->{additional});
 
 
    my $TSOSsystemid=$rec->{additional}->{TasteOS_SystemID}->[0];
 
-
-   $tsossys->ResetFilter();
-   $tsossys->SetFilter({id=>$TSOSsystemid});  # check if systemid still exists
-   my ($srec,$msg)=$tsossys->getOnlyFirst(qw(id name));
-   if (!defined($srec)){
-      $TSOSsystemid=undef;
+   if ($TSOSsystemid ne ""){
+      $tsossys->ResetFilter();
+      $tsossys->SetFilter({id=>$TSOSsystemid}); # check if systemid still exists
+      my ($srec,$msg)=$tsossys->getOnlyFirst(qw(id name));
+      if (!defined($srec)){
+         msg(WARN,"stored systemid $TSOSsystemid does not exists in TasteOS");
+         $TSOSsystemid=undef;
+      }
    }
 
    my @delList;
@@ -149,7 +242,6 @@ printf STDERR ("fifi ul=%s\n",Dumper(\%ul));
          @idl=$curSys->{ictoNumber}->{$rec->{applgrpid}}->{id};
       }
    }
-printf STDERR ("fifi idl=%s\n",Dumper(\@idl));
    if ($#idl!=-1){
       if ($TSOSsystemid ne "" &&
           in_array(\@idl,$TSOSsystemid)){  # cleanup andere ICTOs
@@ -160,13 +252,12 @@ printf STDERR ("fifi idl=%s\n",Dumper(\@idl));
          $TSOSsystemid=undef;
       }
    }
-printf STDERR ("fifi delList=%s\n",Dumper(\@delList));
    foreach my $id (@delList){  # cleanup old system records (not stored local)
       if ($id ne ""){
+         msg(WARN,"drop systemid $id in TasteOS");
          $tsossys->ValidatedDeleteRecord({id=>$id});
       }
    }
-printf STDERR ("fifi delEnd\n");
 
 
 
@@ -176,25 +267,8 @@ printf STDERR ("fifi delEnd\n");
       description=>NowStamp("en")
    };
 
-   sub insNewTSOSsys
-   {
-      my $nrec=shift;
-
-      my $newid=$tsossys->ValidatedInsertRecord($nrec);
-      if ($newid ne ""){
-         $TSOSsystemid=$newid;
-         my %add=%{$rec->{additional}};
-         $add{TasteOS_SystemID}=$newid;
-         $dataobj->ValidatedUpdateRecord(
-            $rec,{additional=>\%add},
-            {id=>$rec->{id}}
-         );
-      }
-      return($newid);
-   }
-
    if ($TSOSsystemid eq ""){
-      $TSOSsystemid=insNewTSOSsys($tsossysrec);
+      $TSOSsystemid=insNewTSOSsys($dataobj,$tsossys,$rec,$tsossysrec);
    }
    else{
       my $bk=$tsossys->ValidatedUpdateRecord(
@@ -203,37 +277,6 @@ printf STDERR ("fifi delEnd\n");
       });
    }
    #printf STDERR ("fifi upd TSOSsystemid=$TSOSsystemid\n");
-   sub insNewTSOSmac
-   {
-      my $nrec=shift;
-      my $lrec=shift;
-      my $ladd=shift;
-
-      my $newid=$tsosmac->ValidatedInsertRecord($nrec);
-      if ($newid ne ""){
-         if (!exists($ladd->{$lrec->{systemid}})){
-            my %add=(TasteOS_MachineID=>$newid);
-            #printf STDERR ("fifi insNewTSOSmac $newid\n");
-            
-            $opladdobj->ValidatedInsertRecord({
-               systemid=>$lrec->{systemid},
-               applgrpid=>$lrec->{applgrpid},
-               additional=>\%add
-            });
-         }
-         else{
-            #printf STDERR ("fifi insNewTSOSmac update $newid in id=".$ladd->{$lrec->{systemid}}->{id}."\n");
-            my %add=%{$ladd->{$lrec->{systemid}}->{additional}};
-            $add{TasteOS_MachineID}=$newid;
-            $opladdobj->ValidatedUpdateRecord(
-               $ladd->{$lrec->{systemid}},
-               {additional=>\%add},
-               {id=>$ladd->{$lrec->{systemid}}->{id}}
-            );
-         }
-      }
-      return($newid);
-   }
 
 
 
@@ -243,7 +286,6 @@ printf STDERR ("fifi delEnd\n");
          if (exists($ladd->{systemid}->{$lrec->{systemid}})){
             $TSOSmachineid=$ladd->{systemid}->{$lrec->{systemid}}->{additional}->{TasteOS_MachineID}->[0];
          }
-         #printf STDERR ("fifi TSOSmachineid for $lrec->{systemid} : $TSOSmachineid\n");
          my $tsosmacrec={
             name=>$lrec->{system},
             systemid=>$TSOSsystemid
@@ -256,16 +298,22 @@ printf STDERR ("fifi delEnd\n");
             $TSOSmachineid=undef;
          }
          if ($TSOSmachineid eq ""){
-            my $newid=insNewTSOSmac($tsosmacrec,$lrec,$ladd->{systemid});
+            my $newid=insNewTSOSmac($dataobj, $tsosmac,$opladdobj,
+                                    $rec,$tsosmacrec,$lrec,$ladd->{systemid});
          }
          else{
-            my $bk=$tsosmac->ValidatedUpdateRecord(
-               {},$tsosmacrec,
-               {id=>$TSOSmachineid
-            });
+            if ($mrec->{systemid} ne $tsosmacrec->{systemid} ||
+                $mrec->{name}     ne $tsosmacrec->{name}){
+               my $bk=$tsosmac->ValidatedUpdateRecord(
+                  {},$tsosmacrec,
+                  {id=>$TSOSmachineid
+               });
+            }
          }
 
       }
+      my @email=map({$_->{email}} values(%contact));
+      printf STDERR ("set acl of $TSOSsystemid to %s\n",join(",",@email));
    }
 
 

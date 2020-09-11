@@ -156,6 +156,7 @@ sub DataCollector
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
+         $baseurl=~s/v1/v0/g if ($dbclass=~m/machine-metadata$/);
          my $dataobjurl=$baseurl.$dbclass;
          return($dataobjurl);
       },
@@ -221,7 +222,7 @@ sub InsertRecord
    my %new;
    foreach my $k (keys(%$newrec)){
       my $dk=$k;
-      $dk="system-id" if ($k eq "systemid");
+      $dk="systemId" if ($k eq "systemid");
       $new{$dk}=$newrec->{$k};
       $new{$dk}=$new{$dk}->[0] if (ref($new{$dk}) eq "ARRAY");
    }
@@ -283,7 +284,9 @@ sub UpdateRecord
 
    my %upd=();
    foreach my $k (keys(%$newrec)){
-      $upd{$k}=$newrec->{$k};
+      my $kk=$k;
+      $kk="systemId" if ($k eq "systemid");  # systemid->systemId map
+      $upd{$kk}=$newrec->{$k};
    }
 
 

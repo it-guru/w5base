@@ -155,7 +155,7 @@ sub new
                    if (!defined($rec->{$self->Name()})){
                       return(0);
                    }
-                   return(0);
+                   #return(0);
                    return(1);
                 },
                 dataobjattr   =>'applgrp.additional'),

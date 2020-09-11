@@ -74,7 +74,7 @@ sub DataCollector
    my $filter=$filterset->{FILTER}->[0];
    my $query=$self->decodeFilter2Query4TASTEOS($filter);
 
-   my $dbclass="icto/system-metadata";
+   my $dbclass="systems";
 
    my $requesttoken="SEARCH.".time();
 
@@ -107,14 +107,14 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         if (ref($data) eq "ARRAY"){
-            return($data);
+         if (ref($data) ne "ARRAY"){
+            $data=[$data];
          }
-         else{
-            return([$data]);
-          #  $self->LastMsg(ERROR,"unexpected data structure from REST call");
+         foreach my $rec (@$data){
+            $rec->{ictoNumber}=$rec->{systemNumber};
+            delete($rec->{systemNumber});
          }
-         return(undef);
+         return($data);
       }
    );
    return($d);
@@ -192,7 +192,7 @@ sub InsertRecord
          my $apikey=shift;
          return(['access-token'=>$apikey,
                  'name'=>$newrec->{name},
-                 'icto'=>$newrec->{ictoNumber},
+                 'systemNumber'=>$newrec->{ictoNumber},
                  'description'=>$newrec->{description},
                  'Content-Type','application/json']);
       },
