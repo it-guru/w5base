@@ -1170,7 +1170,9 @@ sub New
       $self->PrepairCopy($CopyFromId);
    }
 
-   if (Query->Param($self->IdField->Name()) ne ""){
+   my $idfield=$self->IdField();
+
+   if (defined($idfield) && Query->Param($idfield->Name()) ne ""){
       if (Query->Param("ModeSelectCurrentMode") eq "new"){
          Query->Delete("ModeSelectCurrentMode");
       }
@@ -1681,10 +1683,14 @@ sub HandleSave
    my $oldrec=undef;
    my $id=Query->Param("CurrentIdToEdit");
    my $idobj=$self->IdField();
-   my $idname=$idobj->Name();
+   my $idname;
    my $flt=undef;
 
-   if ($mode eq "Modify"){  # Ajax Operaton
+   if (defined($idobj)){
+      $idname=$idobj->Name();
+   }
+
+   if (defined($idname) && $mode eq "Modify"){  # Ajax Operaton
       $id=Query->Param($idname);
    }
    if (defined($id) && $id ne ""){

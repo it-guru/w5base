@@ -330,7 +330,10 @@ sub ProcessLine
    my $d="";
    $currentfieldgroup=undef if ($currentfieldgroup eq "");
    my $field=$app->IdField();
-   my $id=$field->RawValue($rec);
+   my $id;
+   if (defined($field)){
+      $id=$field->RawValue($rec);
+   }
    if ($self->Context->{LINE}>0){
       $d.="<div style=\"height:2px;overflow:hidden;padding:0;maring:0\">".
           "&nbsp;</div>";
@@ -945,7 +948,11 @@ sub ProcessBottom
    my @view=$app->getCurrentView();
    my @pers=qw(CurrentFieldGroupToEdit isCopyFromId CurrentIdToEdit OP
                ScrollY AllowClose FilterViewGroups CurrentDetailMode);
-   my $idname=$app->IdField->Name();
+   my $idname;
+   my $idfieldobj=$app->IdField();
+   if (defined($idfieldobj)){
+      $idname=$idfieldobj->Name();
+   }
    if (defined($idname) && defined(Query->Param($idname))){
       push(@pers,$idname);
    }
