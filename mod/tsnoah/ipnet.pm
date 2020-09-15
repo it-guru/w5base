@@ -55,15 +55,33 @@ sub new
                 label         =>'Subnet mask',
                 dataobjattr   =>'ipnet.subnetz_maske'),
 
+      new kernel::Field::Text(
+                name          =>'netrange',
+                label         =>'Network range',
+                ignorecase    =>1,
+                weblinkto     =>'tsnoah::netrange',
+                weblinkon     =>['netid'=>'id'],
+                dataobjattr   =>'netz.netzname'),
+
+      new kernel::Field::Email(
+                name          =>'email',
+                label         =>'Contact E-Mail',
+                dataobjattr   =>'lower(netz.saconansprechpartner)'),
+
       new kernel::Field::Link(
                 name          =>'vlanid',
                 label         =>'VLAN-ID',
                 dataobjattr   =>'ipnet.vlan_id'),
 
       new kernel::Field::Link(
-                name          =>'regionid',
-                label         =>'RegionID',
-                dataobjattr   =>'ipnet.region_id'),
+                name          =>'vlanid',
+                label         =>'VLAN-ID',
+                dataobjattr   =>'ipnet.vlan_id'),
+
+      new kernel::Field::Link(
+                name          =>'netid',
+                label         =>'NetzId',
+                dataobjattr   =>'ipnet.netz_id'),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
@@ -108,7 +126,9 @@ sub Initialize
 sub getSqlFrom
 {
    my $self=shift;
-   my $from="tsiimp.DARWIN_SUBNETZ ipnet";
+   my $from="tsiimp.DARWIN_SUBNETZ ipnet ".
+            "left outer join tsiimp.DARWIN_NETZ netz ".
+            "on ipnet.netz_id=netz.netz_id";
 
    return($from);
 }

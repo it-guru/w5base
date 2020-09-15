@@ -208,8 +208,14 @@ sub doAnalyse
                my $noa=getModuleObject($self->Config,"tsnoah::ipnet");
                $noa->SetFilter(\@flt);
                my @l=$noa->getHashList(qw(fullname name subnetmask
-                                          urlofcurrentrec));
+                                          urlofcurrentrec email));
+               my $email;
                if ($#l!=-1){
+                  foreach my $noahnet (@l){
+                     if ($email eq "" && $noahnet->{email} ne ""){
+                        $email=$noahnet->{email};
+                     }
+                  }
                   if ($newcomments ne ""){
                      $newcomments.="\n\n";
                   }
@@ -218,6 +224,17 @@ sub doAnalyse
                      "(".$_->{subnetmask}.")\n".
                      $_->{urlofcurrentrec};
                   } @l));
+               }
+               if ($email ne ""){
+                  my $flt={emails=>\$email};
+                  $flt->{cistatusid}=[3,4,5];
+                  my $user=getModuleObject($self->Config,"base::user");
+                  $user->ResetFilter();
+                  $user->SetFilter($flt);
+                  my ($urec)=$user->getOnlyFirst(qw(userid));
+                  if (defined($urec)){
+                     $userid{$urec->{userid}}={};
+                  }
                }
             }
          }
@@ -266,36 +283,50 @@ sub doAnalyse
       $userid=$user->getHashIndexed(qw(userid));
    }
    # create prio list of cadmin tadmin
-   foreach my $arec (@applrec){
-      my $cadminset=0;
-      foreach my $fld (@applcadminfields){
-         if (exists($userid->{userid}->{$arec->{$fld}}) &&
-             !exists($cadmin{$arec->{$fld}})){
-            $cadmin{$arec->{$fld}}++;
-            push(@cadmin,$userid->{userid}->{$arec->{$fld}});
-            $cadminset++;
+   if ($#applrec!=-1){
+      foreach my $arec (@applrec){
+         my $cadminset=0;
+         foreach my $fld (@applcadminfields){
+            if (exists($userid->{userid}->{$arec->{$fld}}) &&
+                !exists($cadmin{$arec->{$fld}})){
+               $cadmin{$arec->{$fld}}++;
+               push(@cadmin,$userid->{userid}->{$arec->{$fld}});
+               $cadminset++;
+            }
+         }
+         foreach my $fld (@appltadminfields){
+            if (exists($userid->{userid}->{$arec->{$fld}}) &&
+                !exists($tadmin{$arec->{$fld}})){
+               $tadmin{$arec->{$fld}}++;
+               push(@tadmin,$userid->{userid}->{$arec->{$fld}});
+            }
+         }
+         if ($cadminset){
+            if (!in_array(\@indication,"application: ".$arec->{name})){
+               unshift(@indication,"application: ".$arec->{name});
+            }
+            if (!in_array(@refurl,$arec->{urlofcurrentrec})){
+               unshift(@refurl,$arec->{urlofcurrentrec});
+            }
+         }
+         else{
+            if (!in_array(@refurl,$arec->{urlofcurrentrec})){
+               push(@refurl,$arec->{urlofcurrentrec});
+            }
          }
       }
-      foreach my $fld (@appltadminfields){
-         if (exists($userid->{userid}->{$arec->{$fld}}) &&
-             !exists($tadmin{$arec->{$fld}})){
-            $tadmin{$arec->{$fld}}++;
-            push(@tadmin,$userid->{userid}->{$arec->{$fld}});
-         }
+   }
+   else{
+      # admin-c resolved by NOAH
+      my @userids=sort(keys(%userid));
+      if (exists($userid->{userid}->{$userids[0]}) &&
+          !exists($cadmin{$userids[0]})){
+         push(@cadmin,$userid->{userid}->{$userids[0]});
       }
-      if ($cadminset){
-         if (!in_array(\@indication,"application: ".$arec->{name})){
-            unshift(@indication,"application: ".$arec->{name});
-         }
-         if (!in_array(@refurl,$arec->{urlofcurrentrec})){
-            unshift(@refurl,$arec->{urlofcurrentrec});
-         }
-      }
-      else{
-         if (!in_array(@refurl,$arec->{urlofcurrentrec})){
-            push(@refurl,$arec->{urlofcurrentrec});
-         }
-      }
+
+
+
+      
    }
 
 

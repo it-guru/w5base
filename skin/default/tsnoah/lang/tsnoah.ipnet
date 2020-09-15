@@ -1,7 +1,10 @@
-'tsnoah::ipnet'=>{de=>'IP-Subnet',en=>'IP-Subnet'},
+'tsnoah::ipnet'=>{de=>'NOAH: IP-Subnet',en=>'NOAH: IP-Subnet'},
 'Subnet label'=>{de=>'Subnet Bezeichnung'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'IP-Addresses'=>{de=>'IP-Adressen'},
 'Systems'=>{de=>'Systeme'},
+'Network range'=>{de=>'Netzbereich'},
+'Contact E-Mail'=>{de=>'Kontakt E-Mail'},
+
 

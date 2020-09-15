@@ -46,6 +46,10 @@ sub Init
                       "tsnoah::vlan",
                       defaultacl=>['valid_user']);
    
+   $self->RegisterObj("itu.noah.netrange",
+                      "tsnoah::netrange",
+                      defaultacl=>['valid_user']);
+   
    $self->RegisterObj("itu.noah.ipnet",
                       "tsnoah::ipnet",
                       defaultacl=>['valid_user']);
