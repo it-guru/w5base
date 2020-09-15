@@ -2981,8 +2981,9 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
       $htmlresult.="<table>\n";
    }
    my @l=qw(mandator applmgr 
-           sem sem2 delmgr delmgr2 tsm tsm2 databoss 
-           businessteam systemnames);
+            itsem itsem2
+            sem sem2 delmgr delmgr2 tsm tsm2 databoss 
+            businessteam systemnames);
    if ($ENV{REMOTE_USER} eq "anonymous"){
       @l=qw(mandator applmgr);
    }
@@ -2999,11 +3000,24 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
          }
       }
       elsif ($rec->{$v} ne ""){
-         my $name=$self->getField($v)->Label();
-         my $data=$self->findtemplvar({current=>$rec,mode=>"Html"},
-                                      $v,"formated");
-         $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
-                      "<td valign=top>$data</td></tr>\n";
+         my $show=1;
+         if (in_array([qw(itsem itsem2 sem sem2 delmgr delmgr2)],$v)){
+            if ($rec->{haveitsem}){
+               if ($v eq "itsem" || $v eq "itsem2"){
+                  $show=1;
+               }
+               else{ 
+                  $show=0;
+               }
+            }
+         }
+         if ($show){
+            my $name=$self->getField($v)->Label();
+            my $data=$self->findtemplvar({current=>$rec,mode=>"Html"},
+                                         $v,"formated");
+            $htmlresult.="<tr><td nowrap valign=top width=1%>$name:</td>".
+                         "<td valign=top>$data</td></tr>\n";
+         }
       }
    }
 

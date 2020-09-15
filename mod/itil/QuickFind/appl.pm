@@ -86,6 +86,7 @@ sub QuickFindDetail
    my @view=qw(mandator delmgr delmgr2 conumber cistatus
                applmgr
                sem sem2 tsm tsm2 databoss
+               itsem itsem2
                systemnames
                customerprio phonenumbers
                description businessteam);
