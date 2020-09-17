@@ -522,6 +522,22 @@ sub calcBaseApplicationExpertGroup
                 phonename=>[],
                 label=>"IT-Servicemanager"
             },
+            'opcanvasowner'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Canvas Owner",'TS::appl'),
+                sublabel=>$self->getParent->T("(operational)",'TS::appl')
+            },
+            'opbusinessownerit'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Business Owner IT",'TS::appl'),
+                sublabel=>$self->getParent->T("(operational)",'TS::appl')
+            },
             'leadprmmgr'=>{
                 userid=>[],
                 email=>[],
@@ -584,6 +600,49 @@ sub calcBaseApplicationExpertGroup
          push(@{$a{dba}->{userid}},$rec->{tsmid});
       }
    }
+   if ($m ne ""){
+      my @path=split(/\./,$m);
+      my @flt;
+      my $mm=$m;
+      for(my $c=0;$c<=$#path;$c++){
+         push(@flt,$mm);
+         $mm=~s/\.[^.]+?$//;
+      }
+      my $vou=getModuleObject($self->getParent->Config,"TS::vou");
+      $vou->SetFilter({reprgrp=>\@flt});
+      my ($vourec,$msg)=$vou->getOnlyFirst(qw(
+                   canvasownerbuid 
+                   canvasowneritid
+                   leaderitid
+                   leaderid
+      ));
+      if (defined($vourec)){
+
+         my $canvasownerbuid=$vourec->{canvasownerbuid};
+         if (ref($canvasownerbuid) ne "ARRAY"){
+            $canvasownerbuid=[$canvasownerbuid];
+         }
+         foreach my $uid (@{$canvasownerbuid}){
+            if ($uid ne ""){
+               push(@{$a{opcanvasowner}->{userid}},$uid);
+            }
+         }
+
+         my $leaderitid=$vourec->{leaderitid};
+         if (ref($leaderitid) ne "ARRAY"){
+            $leaderitid=[$leaderitid];
+         }
+         foreach my $uid (@{$leaderitid}){
+            if ($uid ne ""){
+               push(@{$a{opbusinessownerit}->{userid}},$uid);
+            }
+         }
+      }
+   }
+
+
+
+
 
 
    my $swi=getModuleObject($self->getParent->Config,"itil::swinstance");

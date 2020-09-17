@@ -38,3 +38,4 @@
 'RTO.3'=>{de=>'3 (168h)'                 ,en=>'3 (168h)'},
 'RTO.4'=>{de=>'4 (>168h)'                ,en=>'4 (>168h)'},
 'Change approver groups'=>{de=>'Change-Approver Gruppen'},
+'(operational)'=>{de=>'(betrieblich)'}
