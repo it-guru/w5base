@@ -149,37 +149,87 @@ sub new
                 label         =>'CanvasID',
                 htmleditwidth =>'80px',
                 size          =>'3',
+                readonly      =>1,
+                group         =>'canvas',
+                vjointo       =>'TS::lnkcanvas',
+                vjoinon       =>['id'=>'vouid'],
+                vjoindisp     =>'canvascanvasid'),
+
+      new kernel::Field::Text(
+                name          =>'oldcanvasid',
+                label         =>'CanvasID (deprecate)',
+                htmleditwidth =>'80px',
+                size          =>'3',
                 group         =>'canvas',
                 dataobjattr   =>'vou.canvasid'),
 
-      new kernel::Field::Text(
-                name          =>'canvasfield',
-                label         =>'Canvas/Business field',
-                group         =>'canvas',
-                dataobjattr   =>'vou.canvasfield'),
+#      new kernel::Field::Text(
+#                name          =>'canvasfield',
+#                label         =>'Canvas/Business field',
+#                group         =>'canvas',
+#                dataobjattr   =>'vou.canvasfield'),
 
       new kernel::Field::Contact(
                 name          =>'canvasownerbu',
                 group         =>'canvas',
                 AllowEmpty    =>1,
+                readonly      =>1,
                 label         =>'Canvas Owner - Business',
                 vjoinon       =>'canvasownerbuid'),
 
       new kernel::Field::Link(
                 name          =>'canvasownerbuid',
                 group         =>'canvas',
+                vjointo       =>'TS::lnkcanvas',
+                vjoinon       =>['id'=>'vouid'],
+                vjoindisp     =>'canvasownerid'),
+
+      new kernel::Field::Contact(
+                name          =>'oldcanvasownerbu',
+                group         =>'canvas',
+                AllowEmpty    =>1,
+                label         =>'Canvas Owner - Business (deprecate)',
+                vjoinon       =>'oldcanvasownerbuid'),
+
+      new kernel::Field::Link(
+                name          =>'oldcanvasownerbuid',
+                group         =>'canvas',
                 dataobjattr   =>'vou.canvasownerbuid'),
 
       new kernel::Field::Contact(
                 name          =>'canvasownerit',
-                AllowEmpty    =>1,
+                readonly      =>1,
                 group         =>'canvas',
                 label         =>'Canvas Owner - IT',
                 vjoinon       =>'canvasowneritid'),
 
       new kernel::Field::Link(
                 name          =>'canvasowneritid',
+                vjointo       =>'TS::lnkcanvas',
+                vjoinon       =>['id'=>'vouid'],
+                vjoindisp     =>'canvasowneritid'),
+
+      new kernel::Field::Contact(
+                name          =>'oldcanvasownerit',
+                AllowEmpty    =>1,
+                group         =>'canvas',
+                label         =>'Canvas Owner - IT (deprecate)',
+                vjoinon       =>'oldcanvasowneritid'),
+
+      new kernel::Field::Link(
+                name          =>'oldcanvasowneritid',
                 dataobjattr   =>'vou.canvasowneritid'),
+
+      new kernel::Field::SubList(
+                name          =>'canvas',
+                label         =>'Canvas relations',
+                htmlwidth     =>'300px',
+                group         =>'canvas',
+                readonly      =>1,
+                vjointo       =>'TS::lnkcanvas',
+                vjoinon       =>['id'=>'vouid'],
+                vjoindisp     =>['canvas','fraction','ictono']),
+
 
       new kernel::Field::Textarea(
                 name          =>'description',

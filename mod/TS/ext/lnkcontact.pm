@@ -49,6 +49,25 @@ sub getPosibleRoles
                                                      $self->Self),
              "RAdmin"          =>$self->getParent->T("RAdmin",
                                                      $self->Self),
+             "rte"       =>$self->getParent->T("RTE (Release Train Engineer)",
+                                               $self->Self),
+             "spc"       =>$self->getParent->T("SPC (SAFe Programm Consultant)",
+                                               $self->Self),
+             "pm"        =>$self->getParent->T("PM (Product Manager)",
+                                               $self->Self),
+             "sa"        =>$self->getParent->T("SA (System Architect)",
+                                               $self->Self),
+             "rem"       =>$self->getParent->T("REM (Resourcemanager)",
+                                               $self->Self),
+            );
+   }
+   if ($parentobj=~m/^.+::canvas$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::canvas$/)){
+      return(
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self)
             );
    }
    return();

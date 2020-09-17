@@ -722,6 +722,20 @@ sub Init
                       "itil::riskmgmtbase",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("AL_TCom.proc.canvas",
+                      "TS::canvas",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.proc.canvas.relation",
+                      "TS::lnkcanvas",
+                      func=>'MainWithNew',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.proc.canvas.new",
+                      "TS::canvas",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.proc.vou",
                       "TS::vou",
                       defaultacl=>['valid_user']);
