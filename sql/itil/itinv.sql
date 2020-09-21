@@ -1780,3 +1780,4 @@ create table addlnkapplgrpsystem (
   FOREIGN KEY fk_agrp (applgrp) REFERENCES applgrp (id) ON DELETE CASCADE
 ) ENGINE=INNODB;
 alter table appl add respmethod varchar(40) default 'ROLEBASED';
+alter table swinstance add software bigint(20) default NULL,add version varchar(30) default NULL,add ipaddress bigint(20) default NULL;

@@ -1406,5 +1406,54 @@ sub handleCertExpiration
 }
 
 
+sub validateSoftwareVersion
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $version=effVal($oldrec,$newrec,"version");
+   my $softwareid=effVal($oldrec,$newrec,"softwareid");
+   my $sw=getModuleObject($self->Config,"itil::software");
+   $sw->SetFilter({id=>\$softwareid});
+   my ($rec,$msg)=$sw->getOnlyFirst(qw(releaseexp));
+   if (!defined($rec)){
+      $self->LastMsg(ERROR,"invalid software specified");
+      return(undef);
+   }
+   my $releaseexp=$rec->{releaseexp};
+   if (defined($ENV{SERVER_SOFTWARE})){
+      if (!($releaseexp=~m/^\s*$/)){
+         my $chk;
+         eval("\$chk=\$version=~m$releaseexp;");
+         if ($@ ne "" || !($chk)){
+            $self->LastMsg(ERROR,"invalid software version specified");
+            return(undef);
+         }
+      }
+   }
+   return(1);
+}
+
+
+sub SoftwareInstFullnameSql
+{
+   my $self=shift;
+
+   my $d="concat(software.name,".
+         "if (lnksoftwaresystem.version<>'',".
+         "concat('-',lnksoftwaresystem.version),''),".
+         "if (lnksoftwaresystem.parent is null,".
+         "if (lnksoftwaresystem.system is not null,".
+         "concat(' (system installed\@',system.name,".
+         "if (lnksoftwaresystem.instpath<>'',".
+         "concat(':',lnksoftwaresystem.instpath),''),')'),".
+         "' (cluster service installed)'),' (Option)'))";
+
+   return($d);
+}
+
+
+
 
 1;

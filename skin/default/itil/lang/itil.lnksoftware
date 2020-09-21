@@ -19,8 +19,6 @@
 'Installationtyp'=>{de=>'Installations Typ'},
 'Installation date'=>{de=>'Installationsdatum'},
 'Installation path'=>{de=>'Installationsverzeichnis'},
-'invalid software version specified'=>{
-               de=>'ungültiger Software-Versionsausdruck'},
 'invalid software specified'=>{de=>'keine oder ungültige Software'},
 'invalid installation path'=>{de=>'ungültiges Installationsverzeichnis'},
 'License Mandator'=>{de=>'Lizenz Mandant'},

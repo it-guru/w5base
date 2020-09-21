@@ -23,7 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
 use itil::lib::Listedit;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB itil::lib::Listedit);
 
 sub new
 {
@@ -53,16 +53,7 @@ sub new
                 searchable    =>0,
                 readonly      =>1,
                 htmldetail    =>0,
-                dataobjattr   =>
-                   "concat(software.name,".
-                   "if (lnksoftwaresystem.version<>'',".
-                   "concat('-',lnksoftwaresystem.version),''),".
-                   "if (lnksoftwaresystem.parent is null,".
-                   "if (lnksoftwaresystem.system is not null,".
-                   "concat(' (system installed\@',system.name,".
-                   "if (lnksoftwaresystem.instpath<>'',".
-                   "concat(':',lnksoftwaresystem.instpath),''),')'),".
-                   "' (cluster service installed)'),' (Option)'))"),
+                dataobjattr   =>$self->SoftwareInstFullnameSql()),
                                                  
       new kernel::Field::TextDrop(
                 name          =>'software',
@@ -978,26 +969,11 @@ sub Validate
    if (!defined($oldrec) && $newrec->{instdate} eq ""){
       $newrec->{instdate}=NowStamp("en");
    }
-   my $version=effVal($oldrec,$newrec,"version");
-   my $sw=getModuleObject($self->Config,"itil::software");
-   $sw->SetFilter({id=>\$softwareid});
-   my ($rec,$msg)=$sw->getOnlyFirst(qw(releaseexp));
-   if (!defined($rec)){
-      $self->LastMsg(ERROR,"invalid software specified");
-      return(undef);
-   }
-   my $releaseexp=$rec->{releaseexp};
-   if (defined($ENV{SERVER_SOFTWARE})){
-      if (!($releaseexp=~m/^\s*$/)){
-         my $chk;
-         eval("\$chk=\$version=~m$releaseexp;");
-         if ($@ ne "" || !($chk)){
-            $self->LastMsg(ERROR,"invalid software version specified");
-            return(undef);
-         }
-      }
-   }
 
+
+   return(undef) if (!$self->validateSoftwareVersion($oldrec,$newrec));
+
+   my $version=effVal($oldrec,$newrec,"version");
    if ($version ne "" && exists($newrec->{version})){  #release details gen
       #VersionKeyGenerator($oldrec,$newrec);
       if (my ($rel,$patch)=$version=~m/^(.*\d)(p\d.*)$/){

@@ -95,8 +95,32 @@ sub qcheckRecord
       }
       if (defined($arec)){ # further checks are only needed, if appl found
          my $swinstvalid=1;
-         $swinstvalid=0 if ($rec->{lnksoftwaresystemid} eq ""); 
-         if ($rec->{runonclusts}){   # now do cluster checks
+         if ($rec->{runon} eq "2"){
+            $swinstvalid=0 if ($rec->{software} eq ""); 
+         }
+         else{
+            $swinstvalid=0 if ($rec->{lnksoftwaresystemid} eq ""); 
+         }
+printf STDERR ("fifi swinstvalid=$swinstvalid\n");
+         if ($rec->{runon} eq "2"){   # now do itcloudarea checks
+            if ($rec->{itcloudarea} eq ""){
+               push(@msg,"no cloudarea specified");
+            }
+            else{
+               my $c=getModuleObject($self->getParent->Config,
+                                     "itil::itcloudarea");
+               my $itcloudareaid=$rec->{itcloudareaid};
+               my $applid=$arec->{id};
+               $c->SetFilter({id=>\$itcloudareaid,applid=>\$applid});
+               my ($itcrec,$msg)=$c->getOnlyFirst(qw(id));
+
+               if (!defined($itcrec)){
+                  push(@msg,"application does not match application ".
+                            "in cloudarea");
+               }
+            }
+         }
+         if ($rec->{runon} eq "1"){   # now do cluster checks
             if ($rec->{itclusts} eq ""){
                push(@msg,"no cluster service specified");
             }
@@ -114,7 +138,7 @@ sub qcheckRecord
                }
             }
          }
-         else{                       # now do system checks
+         if ($rec->{runon} eq "0"){                       # now do system checks
             my $systemid=$rec->{systemid};
             my $sys=getModuleObject($self->getParent->Config,"itil::system");
             $sys->SetFilter({id=>\$systemid});
@@ -141,7 +165,8 @@ sub qcheckRecord
             }
          }
          if (!$rec->{isembedded}){
-            if ($swinstvalid){ # detail check of software-Installation
+            if ($rec->{runon} ne "2" && 
+                $swinstvalid){ # detail check of software-Installation
                my $swi=getModuleObject($self->getParent->Config,
                                        "itil::lnksoftware");
                $swi->SetFilter({id=>\$rec->{lnksoftwaresystemid}});

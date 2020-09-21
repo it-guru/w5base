@@ -27,4 +27,6 @@
    en=>"You receive this message only once - ".
        "that means no further reminders will be sent."
 },
-
+'invalid software version specified'=>{
+               de=>'ungültiger Software-Versionsausdruck'},
+'invalid software specified'=>{de=>'keine oder ungültige Software'},

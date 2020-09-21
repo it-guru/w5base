@@ -25,7 +25,8 @@ use kernel::Field;
 use kernel::CIStatusTools;
 use itil::appl;
 use itil::lib::Listedit;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools 
+        itil::lib::Listedit);
 
 sub new
 {
@@ -225,27 +226,22 @@ sub new
                 label         =>'comments for admin and connect',
                 dataobjattr   =>'swinstance.admcomments'),
 
-      new kernel::Field::TextDrop(
-                name          =>'system',
-                label         =>'System',
-                group         =>'systems',
-                explore       =>500,
-                vjointo       =>'itil::system',
-                vjoineditbase =>{'cistatusid'=>[2,3,4]},
-                vjoinon       =>['systemid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Interface(
-                name          =>'systemid',
-                selectfix     =>1,
-                dataobjattr   =>'swinstance.system'),
-
       new kernel::Field::Select(
                 name          =>'lnksoftwaresystem',
                 htmleditwidth =>'80%',
                 label         =>'Software-Installation',
                 group         =>'softwareinst',
                 allowempty    =>1,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $rec=$param{current};
+                   my $d=$rec->{runon};
+                   return(1) if ($d eq "0");
+                   return(1) if ($d eq "1");
+                   return(0);
+                },
                 vjoineditbase     =>sub{
                    my $self=shift;
                    my $current=shift;
@@ -284,6 +280,49 @@ sub new
                 vjointo       =>'itil::lnksoftware',
                 vjoinon       =>['lnksoftwaresystemid'=>'id'],
                 vjoindisp     =>'fullname'),
+                #dataobjattr   =>$self->SoftwareInstFullnameSql()),
+
+
+      new kernel::Field::TextDrop(
+                name          =>'software',
+                htmlwidth     =>'200px',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $rec=$param{current};
+                   my $d=$rec->{runon};
+                   return(1) if ($d eq "2");
+                   return(0);
+                },
+                label         =>'Software',
+                group         =>'softwareinst',
+                vjoineditbase =>{pclass=>\'MAIN',cistatusid=>[3,4]},
+                vjointo       =>'itil::software',
+                vjoinon       =>['softwareid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'softwareid',
+                label         =>'SoftwareID',
+                dataobjattr   =>'swinstance.software'),
+
+      new kernel::Field::Text(
+                name          =>'version',
+                htmlwidth     =>'50px',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   my $rec=$param{current};
+                   my $d=$rec->{runon};
+                   return(1) if ($d eq "2");
+                   return(0);
+                },
+                group         =>'softwareinst',
+                label         =>'Version',
+                dataobjattr   =>'swinstance.version'),
+
 
       new kernel::Field::Boolean(
                 name          =>'lnksoftwaresystemvalid',
@@ -291,7 +330,7 @@ sub new
                 readonly      =>1,
                 group         =>'softwareinst',
                 label         =>'is Software-Installation valid',
-                dataobjattr   =>'if(lnksoftwaresystem.id is not null,1,0)'),
+                dataobjattr   =>'if (lnksoftwaresystem.id is not null,1,0)'),
 
       new kernel::Field::Text(
                 name          =>'optionlist',
@@ -350,7 +389,9 @@ sub new
                 readonly      =>1,
                 label         =>'Version of installed software',
                 group         =>'softwareinst',
-                dataobjattr   =>'lnksoftwaresystem.version'),
+                dataobjattr   =>'if (swinstance.runonclusts=2,'.
+                                'swinstance.version,'.
+                                'lnksoftwaresystem.version)'),
 
       new kernel::Field::Interface(
                 name          =>'lnksoftwaresystemid',
@@ -529,12 +570,45 @@ sub new
                 group         =>'misc',
                 dataobjattr   =>'swinstance.custcostalloc'),
       
-      new kernel::Field::Boolean(
+      new kernel::Field::Link(  # down compat 0=system 1=clusterservice
                 name          =>'runonclusts',
                 selectfix     =>1,
+                readonly      =>1,
                 label         =>'run on Cluster Service',
-                group         =>'env',
+                group         =>'runon',
+                dataobjattr   =>'if (swinstance.runonclusts=1,1,0)'),
+
+      new kernel::Field::Select(  # down compat 0=system 1=clusterservice
+                name          =>'runon',
+                selectfix     =>1,
+                jsonchanged   =>\&getRunOnOnChangedScript,
+                jsoninit      =>\&getRunOnOnChangedScript,
+                label         =>'run on',
+                transprefix   =>'RUNON.',
+                default       =>'0',
+                value         =>['0',
+                                 '1',
+                                 '2'],
+                group         =>'runon',
                 dataobjattr   =>'swinstance.runonclusts'),
+
+      new kernel::Field::TextDrop(
+                name          =>'system',
+                label         =>'System',
+                #group         =>'systems',
+                group         =>'runon',
+                htmldetail    =>'NotEmptyOrEdit',
+                explore       =>500,
+                vjointo       =>'itil::system',
+                vjoineditbase =>{'cistatusid'=>[2,3,4]},
+                vjoinon       =>['systemid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Interface(
+                name          =>'systemid',
+                selectfix     =>1,
+                group         =>'runon',
+                dataobjattr   =>'swinstance.system'),
 
       new kernel::Field::Boolean(
                 name          =>'isembedded',
@@ -578,8 +652,9 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'itclusts',
-                group         =>'cluster',
+                group         =>'runon',
                 label         =>'Cluster Service',
+                htmldetail    =>'NotEmptyOrEdit',
                 explore       =>500,
                 vjointo       =>'itil::lnkitclustsvc',
                 vjoineditbase =>{'itclustcistatusid'=>[2,3,4]},
@@ -589,12 +664,30 @@ sub new
       new kernel::Field::Link(
                 name          =>'itclustsid',
                 selectfix     =>1,
+                group         =>'runon',
                 dataobjattr   =>'swinstance.itclusts'),
+
+      new kernel::Field::TextDrop(
+                name          =>'itcloudarea',
+                group         =>'runon',
+                htmldetail    =>'NotEmptyOrEdit',
+                label         =>'Cloudarea',
+                vjointo       =>'itil::itcloudarea',
+                vjoineditbase =>{'cistatusid'=>[4]},
+                vjoinon       =>['itcloudareaid'=>'id'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itcloudareaid',
+                selectfix     =>1,
+                group         =>'runon',
+                dataobjattr   =>'swinstance.itcloudarea'),
 
       new kernel::Field::SubList(
                 name          =>'swinstancerunnodes',
                 label         =>'posible instance run nodes/systems',
                 group         =>'swinstancerunnodes',
+                htmldetail    =>'NotEmpty',
                 vjointo       =>'itil::lnkswinstancesystem',
                 vjoinbase     =>{'systemcistatusid'=>"<=5"},
                 vjoinon       =>['id'=>'swinstanceid'],
@@ -796,6 +889,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'lnkswinstanceparam',
+                htmldetail    =>'NotEmpty',
                 searchable    =>0,
                 htmleditwidth =>'80%',
                 label         =>'Life Parameters',
@@ -1004,6 +1098,41 @@ sub calculateRelAppl
 }
 
 
+sub getRunOnOnChangedScript
+{
+   my $self=shift;
+
+   my $d=<<EOF;
+
+var runon=document.forms[0].elements['Formated_runon'];
+var system=document.forms[0].elements['Formated_system'];
+var itclusts=document.forms[0].elements['Formated_itclusts'];
+var itcloudarea=document.forms[0].elements['Formated_itcloudarea'];
+
+if (runon){
+   var v=runon.options[runon.selectedIndex].value;
+   if (v=="0"){
+      system.disabled=false;
+      itclusts.disabled=true;
+      itcloudarea.disabled=true;
+   }
+   else if (v=="1"){
+      system.disabled=true;
+      itclusts.disabled=false;
+      itcloudarea.disabled=true;
+   }
+   else if (v=="2"){
+      system.disabled=true;
+      itclusts.disabled=true;
+      itcloudarea.disabled=false;
+   }
+}
+EOF
+
+   return($d)
+}
+
+
 sub getPosibleInstanceTypes
 {
    my $self=shift;
@@ -1061,7 +1190,9 @@ sub getSqlFrom
           "left outer join system ".
           "on swinstance.system=system.id ".
           "left outer join software ".
-          "on lnksoftwaresystem.software=software.id ".
+          "on if (swinstance.runonclusts=2,".
+                  "swinstance.software,".
+                  "lnksoftwaresystem.software)=software.id ".
           "left outer join producer ".
           "on software.producer=producer.id ".
 
@@ -1172,6 +1303,10 @@ sub Validate
          }
       }
    }
+   if (effVal($oldrec,$newrec,"softwareid") ne ""){
+      return(undef) if (!$self->validateSoftwareVersion($oldrec,$newrec));
+   }
+
    if (effChanged($oldrec,$newrec,"techrelstring") ||
        effChanged($oldrec,$newrec,"techproductstring") ||
        (defined($newrec) && exists($newrec->{techrelstring})) ||
@@ -1335,19 +1470,47 @@ sub Validate
       }
    }
    ########################################################################
-   if (defined($oldrec) &&
-       effChanged($oldrec,$newrec,"runonclusts") &&
-       !($oldrec->{runonclusts} eq "" && $newrec->{runonclusts} eq "0") ){
-      $newrec->{lnksoftwaresystemid}=undef;
-      $newrec->{itclustsid}=undef;
-      $newrec->{systemid}=undef;
+
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"runon")){
+      my $runon=effVal($oldrec,$newrec,"runon");
+      if ($runon eq "0"){
+         $newrec->{itclustsid}=undef;
+         $newrec->{itcloudareaid}=undef;
+         $newrec->{softwareid}=undef;
+         $newrec->{version}=undef;
+      }
+      if ($runon eq "1"){
+         $newrec->{lnksoftwaresystemid}=undef;
+         $newrec->{systemid}=undef;
+         $newrec->{itcloudareaid}=undef;
+         $newrec->{softwareid}=undef;
+         $newrec->{version}=undef;
+      }
+      if ($runon eq "2"){
+         $newrec->{itclustsid}=undef;
+         $newrec->{lnksoftwaresystemid}=undef;
+         $newrec->{systemid}=undef;
+         $newrec->{softwareid}=undef;
+         $newrec->{version}=undef;
+      }
    }
-   if (defined($newrec->{itclustsid}) &&
-       defined($newrec->{systemid})){
-      $newrec->{lnksoftwaresystemid}=undef;
-      $newrec->{itclustsid}=undef;
-      $newrec->{systemid}=undef;
-   }
+
+ 
+
+
+   #if (defined($oldrec) &&
+   #    effChanged($oldrec,$newrec,"runonclusts") &&
+   #    !($oldrec->{runonclusts} eq "" && $newrec->{runonclusts} eq "0") ){
+   #   $newrec->{lnksoftwaresystemid}=undef;
+   #   $newrec->{itclustsid}=undef;
+   #   $newrec->{systemid}=undef;
+   #}
+   #if (defined($newrec->{itclustsid}) &&
+   #    defined($newrec->{systemid})){
+   #   $newrec->{lnksoftwaresystemid}=undef;
+   #   $newrec->{itclustsid}=undef;
+   #   $newrec->{systemid}=undef;
+   #}
   
    ########################################################################
    if (exists($newrec->{swport})){
@@ -1394,12 +1557,12 @@ sub Validate
    }
 
 
-   if (!effVal($oldrec,$newrec,"runonclusts")){
+   if (effVal($oldrec,$newrec,"runon") eq "0"){
       if (effVal($oldrec,$newrec,"itclustsid") ne ""){
          $newrec->{itclustsid}=undef;
       }
    }
-   else{ # validate service app
+   if (effVal($oldrec,$newrec,"runon") eq "1"){
       if (exists($newrec->{itclustsid})){
          if ((my $clustsid=effVal($oldrec,$newrec,"itclustsid")) ne ""){ 
             my $c=getModuleObject($self->Config,"itil::lnkitclustsvcappl");
@@ -1408,6 +1571,21 @@ sub Validate
             my ($rec,$msg)=$c->getOnlyFirst(qw(applid));
             if (!defined($rec)){
                $self->LastMsg(ERROR,"cluster service application and instance ".
+                                    "application does not match");
+               return(undef);
+            }
+         }
+      }
+   }
+   if (effVal($oldrec,$newrec,"runon") eq "2"){
+      if (exists($newrec->{itcloudareaid})){
+         if ((my $cloudareaid=effVal($oldrec,$newrec,"itcloudareaid")) ne ""){ 
+            my $c=getModuleObject($self->Config,"itil::itcloudarea");
+            my $applid=effVal($oldrec,$newrec,"applid");
+            $c->SetFilter({id=>\$cloudareaid,applid=>\$applid});
+            my ($rec,$msg)=$c->getOnlyFirst(qw(applid));
+            if (!defined($rec)){
+               $self->LastMsg(ERROR,"cloudarea application and instance ".
                                     "application does not match");
                return(undef);
             }
@@ -1528,13 +1706,15 @@ sub isViewValid
 
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc monisla env history control
-              relations swinstancerules swinstancerunnodes
+              relations swinstancerules swinstancerunnodes runon
               softwareinst contacts attachments source swinstanceparam qc);
-   if (defined($rec) && $rec->{'runonclusts'}){
-      push(@all,"cluster");
-   }
-   else{
-      push(@all,"systems");
+   if (defined($rec)){
+      if ($rec->{'runon'} eq "0"){
+         push(@all,"systems");
+      }
+      if ($rec->{'runon'} eq "1"){
+         push(@all,"cluster");
+      }
    }
    if ($rec->{isembedded}){
       @all=grep(!/^softwareinst$/,@all);
@@ -1553,7 +1733,7 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default adm systems contacts ssl env monisla misc 
-                       softwareinst relations
+                       softwareinst relations runon
                        attachments cluster control sec);
    if (!defined($rec)){
       return(@databossedit);
@@ -1602,7 +1782,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default adm sec env monisla misc cluster 
+   return(qw(header default adm runon env monisla sec misc cluster 
              systems swinstancerunnodes softwareinst contacts swinstanceparam ssl 
              control swinstancerules attachments relations source));
 }
