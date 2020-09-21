@@ -81,9 +81,9 @@ create table lnkcanvas (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   primary key(id),unique(canvasid,ictoid,vouid),
-  -- unique(vouid),
+  # unique(vouid),
   UNIQUE KEY `srcsys` (srcsys,srcid),
-  -- FOREIGN KEY fk_vou (vouid) REFERENCES vou (id) ON DELETE CASCADE,
+  # FOREIGN KEY fk_vou (vouid) REFERENCES vou (id) ON DELETE CASCADE,
   FOREIGN KEY fk_canvas (canvasid) REFERENCES canvas (id) ON DELETE CASCADE,
   key(lastqcheck)
 ) ENGINE=INNODB;
