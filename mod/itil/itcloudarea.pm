@@ -179,6 +179,19 @@ sub new
                 vjoinon       =>['id'=>'itcloudareaid'],
                 vjoindisp     =>['name','systemid','cistatus']),
 
+      new kernel::Field::SubList(
+                name          =>'swinstances',
+                label         =>'software instances',
+                group         =>'swinstances',
+                forwardSearch =>1,
+                readonly      =>1,
+                htmllimit     =>'50',
+                htmldetail    =>'NotEmpty',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjointo       =>'itil::swinstance',
+                vjoinon       =>['id'=>'itcloudareaid'],
+                vjoindisp     =>['fullname','cistatus']),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',

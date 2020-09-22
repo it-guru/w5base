@@ -110,6 +110,7 @@ sub new
                 name          =>'rawswnature',
                 group         =>'env',
                 explore       =>200,
+                uploadable    =>0,
                 label         =>'raw Instance type',
                 dataobjattr   =>'swinstance.swnature'),
 
@@ -125,6 +126,7 @@ sub new
 
       new kernel::Field::Interface(
                 name          =>'applid',
+                uploadable    =>0,
                 label         =>'ApplicationID',
                 dataobjattr   =>'swinstance.appl'),
 
@@ -597,7 +599,18 @@ sub new
                 label         =>'System',
                 #group         =>'systems',
                 group         =>'runon',
-                htmldetail    =>'NotEmptyOrEdit',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   return(1) if (exists($param{currentfieldgroup}) &&
+                                 $param{currentfieldgroup} eq "runon");
+                   if (defined($param{current})){
+                      my $d=$param{current}->{runon};
+                      return(0) if ($d ne "0");
+                   }
+                   return(1);
+                },
                 explore       =>500,
                 vjointo       =>'itil::system',
                 vjoineditbase =>{'cistatusid'=>[2,3,4]},
@@ -654,7 +667,18 @@ sub new
                 name          =>'itclusts',
                 group         =>'runon',
                 label         =>'Cluster Service',
-                htmldetail    =>'NotEmptyOrEdit',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   return(1) if (exists($param{currentfieldgroup}) &&
+                                 $param{currentfieldgroup} eq "runon");
+                   if (defined($param{current})){
+                      my $d=$param{current}->{runon};
+                      return(0) if ($d ne "1");
+                   }
+                   return(1);
+                },
                 explore       =>500,
                 vjointo       =>'itil::lnkitclustsvc',
                 vjoineditbase =>{'itclustcistatusid'=>[2,3,4]},
@@ -670,7 +694,18 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'itcloudarea',
                 group         =>'runon',
-                htmldetail    =>'NotEmptyOrEdit',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   return(1) if (exists($param{currentfieldgroup}) &&
+                                 $param{currentfieldgroup} eq "runon");
+                   if (defined($param{current})){
+                      my $d=$param{current}->{runon};
+                      return(0) if ($d ne "2");
+                   }
+                   return(1);
+                },
                 label         =>'Cloudarea',
                 vjointo       =>'itil::itcloudarea',
                 vjoineditbase =>{'cistatusid'=>[4]},
@@ -923,11 +958,13 @@ sub new
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
+                uploadable    =>0,
                 dataobjattr   =>"swinstance.modifydate"),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
+                uploadable    =>0,
                 label         =>'secondary sync key',
                 dataobjattr   =>"lpad(swinstance.id,35,'0')"),
 
@@ -1492,6 +1529,14 @@ sub Validate
          $newrec->{systemid}=undef;
          $newrec->{softwareid}=undef;
          $newrec->{version}=undef;
+      }
+      if (effVal($oldrec,$newrec,"techrelstring") ne ""){
+         $newrec->{techrelstring};
+         $newrec->{techdataupdate}=undef;
+      }
+      if (effVal($oldrec,$newrec,"techproductstring") ne ""){
+         $newrec->{techproductstring};
+         $newrec->{techdataupdate}=undef;
       }
    }
 

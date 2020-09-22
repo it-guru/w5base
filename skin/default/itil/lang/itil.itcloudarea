@@ -3,6 +3,7 @@
 'fieldgroup.inm'=>{de=>'Incident Management',en=>'Incident Management'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
+'software instances'=>{de=>'Software Instanzen'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'full qualified cloud area'=>{de=>'vollqualifiziere Cloud Area'},
 'cloud area name'=>{de=>'Cloud Area Name'},
