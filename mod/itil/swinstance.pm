@@ -572,7 +572,7 @@ sub new
                 group         =>'misc',
                 dataobjattr   =>'swinstance.custcostalloc'),
       
-      new kernel::Field::Link(  # down compat 0=system 1=clusterservice
+      new kernel::Field::Interface(  # down compat 0=system 1=clusterservice
                 name          =>'runonclusts',
                 selectfix     =>1,
                 readonly      =>1,
