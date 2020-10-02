@@ -78,7 +78,7 @@ sub getPosibleTargets
             my %add=(TasteOS_MachineID=>$newid);
             #printf STDERR ("fifi insNewTSOSmac $newid\n");
             
-printf STDERR ("fifi insert new MachineID=$newid\n");
+#printf STDERR ("fifi insert new MachineID=$newid\n");
             $opladdobj->ValidatedInsertRecord({
                systemid=>$lrec->{systemid},
                applgrpid=>$lrec->{applgrpid},
@@ -89,7 +89,7 @@ printf STDERR ("fifi insert new MachineID=$newid\n");
             #printf STDERR ("fifi insNewTSOSmac update $newid in id=".$ladd->{$lrec->{systemid}}->{id}."\n");
             my %add=%{$ladd->{$lrec->{systemid}}->{additional}};
             $add{TasteOS_MachineID}=$newid;
-printf STDERR ("fifi update new MachineID=$newid\n");
+#printf STDERR ("fifi update new MachineID=$newid\n");
             $opladdobj->ValidatedUpdateRecord(
                $ladd->{$lrec->{systemid}},
                {additional=>\%add},
@@ -108,7 +108,7 @@ printf STDERR ("fifi update new MachineID=$newid\n");
       my $nrec=shift;
 
       my $newid=$tsossys->ValidatedInsertRecord($nrec);
-      printf STDERR ("create new SystemID=$newid\n");
+#      printf STDERR ("create new SystemID=$newid\n");
       if ($newid ne ""){
          my %add=%{$rec->{additional}};
          $add{TasteOS_SystemID}=$newid;
@@ -206,6 +206,7 @@ sub qcheckRecord
 
 
    my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
+   my $tsossysacl=getModuleObject($dataobj->Config,"TASTEOS::tsossystemacl");
    my $tsosmac=getModuleObject($dataobj->Config,"TASTEOS::tsosmachine");
    #printf STDERR ("rec=%s\n",Dumper($rec));
 
@@ -312,8 +313,19 @@ sub qcheckRecord
          }
 
       }
-      my @email=map({$_->{email}} values(%contact));
-      printf STDERR ("set acl of $TSOSsystemid to %s\n",join(",",@email));
+      my @email=sort(map({$_->{email}} values(%contact)));
+      msg(INFO,sprintf("set acl of TasteOS system $TSOSsystemid to %s\n",
+            join(",",@email)));
+      if ($#email!=-1){
+         foreach my $email (@email){
+            my $bk=$tsossysacl->ValidatedInsertRecord({
+               systemid=>$TSOSsystemid,
+               email=>$email,
+               readwrite=>1
+            });
+            msg(INFO,"insert of $email = $bk");
+         }
+      }
    }
 
 
