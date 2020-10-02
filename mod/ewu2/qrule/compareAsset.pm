@@ -95,7 +95,9 @@ sub qcheckRecord
    # Level 0
    #
    if ($rec->{srcid} ne ""){   # pruefen ob ASSETID von ewu2
-      $par->SetFilter({id=>\$rec->{srcid}});
+      my $ewu2id=$rec->{srcid};
+      $ewu2id=~s/\[[0-9]+\]$//;
+      $par->SetFilter({id=>\$ewu2id});
       ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
       if (!defined($parrec)){
