@@ -66,7 +66,12 @@ sub new
                 value         =>['RELDEPEND','RELDIST'],
                 translation   =>'itil::lnkswinstanceswinstance',
                 dataobjattr   =>'lnkswinstanceswinstance.conmode'),
-                                   
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                dataobjattr   =>'lnkswinstanceswinstance.comments'),
+
       new kernel::Field::Link(
                 name          =>'fromswi',
                 label         =>'from Instance ID',
@@ -137,6 +142,13 @@ sub new
 }
 
 
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
 
 
 
