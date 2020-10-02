@@ -4,6 +4,7 @@
 'network mask'=>{de=>'Netzmaske'},
 'network address'=>{de=>'Netzadresse'},
 'Customer'=>{de=>'Kunde'},
+'CustomerId'=>{de=>'KundeId'},
 'IP-Networks'=>{de=>'IP-Netzwerke'},
 'IP-Network count'=>{de=>'IP-Netzwerke Anzahl'},
 'Contact E-Mail'=>{de=>'Kontakt E-Mail'},

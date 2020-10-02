@@ -61,6 +61,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'subnet',
                 label         =>'Subnet',
+                htmldetail    =>'NotEmpty',
                 vjointo       =>'tsnoah::ipnet',
                 vjoinon       =>['subnetid'=>'id'],
                 vjoindisp     =>'fullname'),
@@ -116,6 +117,16 @@ sub getSqlFrom
 
    return($from);
 }
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 
 

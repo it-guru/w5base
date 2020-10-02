@@ -6,5 +6,5 @@
 'Systems'=>{de=>'Systeme'},
 'Network range'=>{de=>'Netzbereich'},
 'Contact E-Mail'=>{de=>'Kontakt E-Mail'},
-
-
+'Customer'=>{de=>'Kunde'},
+'CustomerId'=>{de=>'KundeId'},

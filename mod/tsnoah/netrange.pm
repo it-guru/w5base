@@ -61,10 +61,15 @@ sub new
                 label         =>'Contact E-Mail',
                 dataobjattr   =>'lower(netz.saconansprechpartner)'),
 
+      new kernel::Field::Interface(
+                name          =>'customerid',
+                label         =>'CustomerId',
+                dataobjattr   =>'netz.kunde'),
+
       new kernel::Field::Text(
                 name          =>'customer',
                 label         =>'Customer',
-                dataobjattr   =>'netz.kunde'),
+                dataobjattr   =>'netz.kundename'),
 
 
       new kernel::Field::SubList(
@@ -114,6 +119,16 @@ sub getSqlFrom
 
    return($from);
 }
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 
 

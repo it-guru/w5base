@@ -63,6 +63,16 @@ sub new
                 weblinkon     =>['netid'=>'id'],
                 dataobjattr   =>'netz.netzname'),
 
+      new kernel::Field::Interface(
+                name          =>'customerid',
+                label         =>'CustomerId',
+                dataobjattr   =>'ipnet.kunde'),
+
+      new kernel::Field::Text(
+                name          =>'customer',
+                label         =>'Customer',
+                dataobjattr   =>'ipnet.kundename'),
+
       new kernel::Field::Email(
                 name          =>'email',
                 label         =>'Contact E-Mail',
@@ -132,6 +142,16 @@ sub getSqlFrom
 
    return($from);
 }
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 
 

@@ -98,6 +98,13 @@ sub getSqlFrom   # hier muﬂ dann noch die DARWIN_INTERFACE Tabelle mit eingebund
 }
 
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
 
 sub getDetailBlockPriority
 {
