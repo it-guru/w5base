@@ -84,6 +84,16 @@ sub new
                 name          =>'systemid',
                 dataobjattr   =>'ipaddress.device_id'),
 
+      new kernel::Field::Interface(
+                name          =>'customerid',
+                label         =>'CustomerId',
+                dataobjattr   =>'ipaddress.kunde'),
+
+      new kernel::Field::Text(
+                name          =>'customer',
+                label         =>'Customer',
+                dataobjattr   =>'ipaddress.kundename'),
+
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
