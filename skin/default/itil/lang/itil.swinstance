@@ -91,3 +91,4 @@
 'RUNON.0'=>{de=>'logisches System',en=>'logical system'},
 'RUNON.1'=>{de=>'Cluster-Service',en=>'cluster-service'},
 'RUNON.2'=>{de=>'Cloudarea',en=>'Cloudarea'},
+'cloudarea application and instance application does not match'=>{de=>'Anwendung der CloudArea stimmt nicht mit der Anwendung in der Software-Instanz überein'},

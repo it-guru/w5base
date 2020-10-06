@@ -1312,6 +1312,55 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"runon")){
+      my $runon=effVal($oldrec,$newrec,"runon");
+      if ($runon eq "0"){
+         $newrec->{itclustsid}=undef;
+         $newrec->{itcloudareaid}=undef;
+         $newrec->{softwareid}=undef;
+         $newrec->{version}=undef;
+      }
+      if ($runon eq "1"){
+         $newrec->{lnksoftwaresystemid}=undef;
+         $newrec->{systemid}=undef;
+         $newrec->{itcloudareaid}=undef;
+         $newrec->{softwareid}=undef;
+         $newrec->{version}=undef;
+      }
+      if ($runon eq "2"){
+         $newrec->{itclustsid}=undef;
+         $newrec->{lnksoftwaresystemid}=undef;
+         $newrec->{systemid}=undef;
+         $newrec->{softwareid}=undef;
+         $newrec->{version}=undef;
+      }
+      if (effVal($oldrec,$newrec,"techrelstring") ne ""){
+         $newrec->{techrelstring};
+         $newrec->{techdataupdate}=undef;
+      }
+      if (effVal($oldrec,$newrec,"techproductstring") ne ""){
+         $newrec->{techproductstring};
+         $newrec->{techdataupdate}=undef;
+      }
+   }
+
+   # safe cleanup for hard deleted references
+   if ($oldrec->{"systemid"} ne "" &&
+       $oldrec->{"system"} eq "" &&
+       !exists($newrec->{systemid})){
+      $newrec->{systemid}=undef;
+   }
+   if ($oldrec->{"lnksoftwaresystemid"} ne "" &&
+       $oldrec->{"lnksoftwaresystem"} eq "" &&
+       !exists($newrec->{lnksoftwaresystemid})){
+      $newrec->{lnksoftwaresystemid}=undef;
+   }
+   if ($oldrec->{"itcloudareaid"} ne "" &&
+       $oldrec->{"itcloudarea"} eq "" &&
+       !exists($newrec->{itcloudareaid})){
+      $newrec->{itcloudareaid}=undef;
+   }
+ 
    foreach my $v (qw(autoname runtimeusername intallusername configdirpath)){ 
       
       if (exists($newrec->{$v})){
@@ -1364,28 +1413,38 @@ sub Validate
    if ($cistatusid<6){ # validation process for swnature handling
       my $swnature=trim(effVal($oldrec,$newrec,"swnature"));
       my @posible=("Other");
-      if (effChanged($oldrec,$newrec,"lnksoftwaresystemid")){
+      if (effChanged($oldrec,$newrec,"lnksoftwaresystemid") ||
+          effChanged($oldrec,$newrec,"softwareid")){
+         my $softwareid;
+
          my $lnksoftwaresystem=$newrec->{lnksoftwaresystemid};
          if ($lnksoftwaresystem ne ""){
-            my $lnksoftware=getModuleObject($self->Config(),"itil::lnksoftware");
+            my $lnksoftware=getModuleObject($self->Config(),
+                                            "itil::lnksoftware");
             $lnksoftware->SetFilter({id=>\$lnksoftwaresystem});
             my ($swirec)=$lnksoftware->getOnlyFirst(qw(softwareid));
             if (defined($swirec) && $swirec->{softwareid} ne ""){
-               my $software=getModuleObject($self->Config(),"itil::software");
-               $software->SetFilter({id=>\$swirec->{softwareid}});
-               my ($swrec)=$software->getOnlyFirst(qw(instanceid));
-               if (defined($swrec)){
-                  my @k=$self->getPosibleInstanceTypes($swrec->{instanceid});
-                  @posible=();
-                  while(my $k=shift(@k)){
-                     push(@posible,$k);
-                     my $label=shift(@k);
-                  }
-                  if ($swnature eq "Other" && $#posible>0){
-                     $swnature="";
-                  }
-               }   
+               $softwareid=$swirec->{softwareid};
             }
+         }
+         else{
+            $softwareid=effVal($oldrec,$newrec,"softwareid");
+         }
+         if (defined($softwareid) && $softwareid ne ""){
+            my $software=getModuleObject($self->Config(),"itil::software");
+            $software->SetFilter({id=>\$softwareid});
+            my ($swrec)=$software->getOnlyFirst(qw(instanceid));
+            if (defined($swrec)){
+               my @k=$self->getPosibleInstanceTypes($swrec->{instanceid});
+               @posible=();
+               while(my $k=shift(@k)){
+                  push(@posible,$k);
+                  my $label=shift(@k);
+               }
+               if ($swnature eq "Other" && $#posible>0){
+                  $swnature="";
+               }
+            }   
          }
       }
       else{
@@ -1508,39 +1567,6 @@ sub Validate
    }
    ########################################################################
 
-   if (!defined($oldrec) || effChanged($oldrec,$newrec,"runon")){
-      my $runon=effVal($oldrec,$newrec,"runon");
-      if ($runon eq "0"){
-         $newrec->{itclustsid}=undef;
-         $newrec->{itcloudareaid}=undef;
-         $newrec->{softwareid}=undef;
-         $newrec->{version}=undef;
-      }
-      if ($runon eq "1"){
-         $newrec->{lnksoftwaresystemid}=undef;
-         $newrec->{systemid}=undef;
-         $newrec->{itcloudareaid}=undef;
-         $newrec->{softwareid}=undef;
-         $newrec->{version}=undef;
-      }
-      if ($runon eq "2"){
-         $newrec->{itclustsid}=undef;
-         $newrec->{lnksoftwaresystemid}=undef;
-         $newrec->{systemid}=undef;
-         $newrec->{softwareid}=undef;
-         $newrec->{version}=undef;
-      }
-      if (effVal($oldrec,$newrec,"techrelstring") ne ""){
-         $newrec->{techrelstring};
-         $newrec->{techdataupdate}=undef;
-      }
-      if (effVal($oldrec,$newrec,"techproductstring") ne ""){
-         $newrec->{techproductstring};
-         $newrec->{techdataupdate}=undef;
-      }
-   }
-
- 
 
 
    #if (defined($oldrec) &&
@@ -1827,8 +1853,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default adm runon env monisla sec misc cluster 
-             systems swinstancerunnodes softwareinst contacts swinstanceparam ssl 
+   return(qw(header default adm runon softwareinst env monisla sec misc cluster 
+             systems swinstancerunnodes contacts swinstanceparam ssl 
              control swinstancerules attachments relations source));
 }
 
