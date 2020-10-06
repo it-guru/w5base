@@ -66,12 +66,17 @@ sub new
                 selectfix     =>1,
                 dataobjattr   =>'vou.name'),
 
-      new kernel::Field::Text(
-                name          =>'code',
-                label         =>'Code',
-                htmldetail    =>'NotEmpty',
-                readonly      =>1,
-                dataobjattr   =>'vou.code'),
+      #new kernel::Field::Text(
+      #          name          =>'code',
+      #          label         =>'Code',
+      #          htmldetail    =>'NotEmpty',
+      #          readonly      =>1,
+      #          dataobjattr   =>'vou.code'),
+      #
+      #  removed to get at long term a table type change from myisam
+      #  to innodb
+      #
+      #
 
       new kernel::Field::Text(
                 name          =>'rampupid',
@@ -330,6 +335,17 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'vou.comments'),
 
+      new kernel::Field::SubList(
+                name          =>'subvous',
+                label         =>'sub units',
+                htmlwidth     =>'300px',
+                group         =>'subvous',
+                vjointo       =>'TS::subvou',
+                vjoinon       =>['id'=>'vouid'],
+                vjoininhash   =>['name','id'],
+                vjoindisp     =>['name','reprgrp']),
+
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -410,7 +426,7 @@ sub new
          'local'
       ]
    };
-   $self->setDefaultView(qw(shortname name cistatus code cdate mdate));
+   $self->setDefaultView(qw(shortname name cistatus cdate mdate));
    $self->setWorktable("vou");
    $self->{CI_Handling}={
       uniquename=>"shortname",
@@ -444,7 +460,8 @@ sub SecureValidate
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default vouattr canvas contacts appl comments source));
+   return(qw(header default vouattr subvous 
+             canvas contacts appl comments source));
 }
 
 
@@ -675,7 +692,101 @@ sub syncToGroups
    else{
       die("vou hard error while update on $fullname");
    }
+
+
    if ($grpid ne "" && $grpid>1){
+      # read current sub-Units
+
+      if (1){ # Sync of subvous
+         $grp->ResetFilter();
+         $grp->SetFilter({parentid=>\$grpid});
+         my @l=$grp->getHashList(qw(fullname name srcsys srcid cistatusid
+                                    grpid is_orggroup parent parentid));
+
+         my @dellist;
+         my @updlist;
+         my @inslist;
+
+         foreach my $sub (@{$oldrec->{subvous}}){
+            my $fnd;
+            foreach my $cgrp (@l){
+               if ($cgrp->{name} eq $sub->{name} ||
+                   ($cgrp->{srcsys} eq "TS::subvou" &&
+                    $cgrp->{srcid} eq $sub->{id})){
+                  $fnd=$cgrp;
+               }
+            }
+            if (defined($fnd)){
+               my $upd={};
+               if ($fnd->{cistatusid} ne "4"){
+                  $upd->{cistatusid}=4; 
+               }
+               my $cname=$fnd->{name};
+               $cname=~s/\[\d+\]$//;
+               if ($cname ne $sub->{name}){
+                  $upd->{name}=$sub->{name};
+               }
+               if ($fnd->{srcid} ne $sub->{id}){
+                  $upd->{srcid}=$sub->{id};
+               }
+               if ($fnd->{srcsys} ne "TS::subvou"){
+                  $upd->{srcsys}="TS::subvou";
+               }
+               if (keys(%$upd)){
+                  push(@updlist,[$fnd,$upd]);
+               }
+            }
+            else{
+               push(@inslist,$sub);
+            }
+         }
+         foreach my $cgrp (@l){
+            my $fnd;
+            if ($cgrp->{cistatusid} ne "6"){
+               foreach my $sub (@{$oldrec->{subvous}}){
+                  if ($cgrp->{srcsys} eq "TS::subvou" &&
+                      $cgrp->{srcid} eq $sub->{id}){
+                     $fnd=$cgrp;
+                  }
+               }
+               if (!defined($fnd)){
+                  push(@dellist,$cgrp);
+               }
+            }
+         }
+
+         # Inserts ....
+         foreach my $r (@inslist){
+            my $subgrpid=$grp->ValidatedInsertRecord({
+               name=>$r->{name},
+               cistatusid=>4,
+               parentid=>$grpid,
+               is_orggroup=>1,
+               srcsys=>"TS::subvou",
+               srcid=>$r->{id},
+               srcload=>NowStamp("en")
+            });
+            msg(INFO,"subgroup $r->{name} created with id=$subgrpid");
+         }
+
+         # Updates ....
+         foreach my $r (@updlist){
+            my $oldrec=$r->[0];
+            my $upd=$r->[1];
+            $upd->{srcload}=NowStamp("en");
+            $grp->ValidatedUpdateRecord($oldrec,$upd,
+                                        {grpid=>\$oldrec->{grpid}});
+         }
+
+         # Deletes ....
+         foreach my $r (@dellist){
+            $grp->ValidatedUpdateRecord($r,{cistatusid=>6},
+                                        {grpid=>\$r->{grpid}});
+         }
+      }
+
+
+
       my %orgadmin;
       foreach my $crec (@{$oldrec->{contacts}}){
          if ($crec->{target} eq "base::user"){
@@ -776,7 +887,7 @@ sub isWriteValid
 
 
    if (in_array(\@l,"ALL")){
-      @l=("default","vouattr","comments","canvas","contacts");
+      @l=("default","vouattr","comments","canvas","contacts","subvous");
    }
 
    return(@l);

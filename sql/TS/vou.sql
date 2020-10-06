@@ -87,3 +87,21 @@ create table lnkcanvas (
   FOREIGN KEY fk_canvas (canvasid) REFERENCES canvas (id) ON DELETE CASCADE,
   key(lastqcheck)
 ) ENGINE=INNODB;
+create table subvou (
+  id         bigint(20) not null,
+  vou        bigint(20) not null,
+  name        varchar(40) not null,
+  additional  longtext    default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+ # FOREIGN KEY fk_vou (vou) REFERENCES vou (id) ON DELETE CASCADE,
+  primary key(id), unique(vou,name),
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=INNODB;

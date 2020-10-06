@@ -1,0 +1,4 @@
+'TS::subvou'=>{de=>'virtuelle Unter-Organisationseinheit',en=>'virtuel sub organisational unit'},
+'invalid sub orgunit name specified'=>{de=>'ungültiger Untereinheiten-Name'},
+'no write access to selected virtual org unit'=>{de=>'kein Schreibzugriff auf die gewählte virutelle Orgeinheit'},
+'representing group'=>{de=>'repräsentierende Gruppe'},
