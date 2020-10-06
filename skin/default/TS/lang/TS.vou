@@ -21,3 +21,4 @@
 'invalid Ramp-Up ID specified'=>{de=>'ungültige Ramp-Up ID angegeben'},
 'invalid format of CanvasID'=>{de=>'ungültiges Format der CanvasID'},
 'operated applications'=>{de=>'betriebene Anwendungen'},
+'sub units'=>{de=>'virtuelle Untereinheiten',en=>'vitual Sub-Units'},
