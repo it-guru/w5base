@@ -659,33 +659,6 @@ sub isWriteValid
 }
 
 
-sub UpdateParentMdate
-{
-   my $self=shift;
-   my $parentobj=shift;
-   my $refid=shift;
-
-   if ($parentobj ne "" && $refid ne ""){
-      my $p=getModuleObject($self->Config,$parentobj);
-      my $mdate;
-      if (defined($p)){
-         $mdate=$p->getField("mdate");
-      }
-      if (defined($p) && defined($mdate)){
-         my $idname=$p->IdField->Name();
-         my %flt=($idname=>\$refid);
-         $p->SetFilter(\%flt);
-         my @l=$p->getHashList(qw(ALL));
-         if ($#l==0){
-            my $now=NowStamp("en");
-            #msg(INFO,"lnkcontact parent mdate update to $now");
-            $p->ValidatedUpdateRecord($l[0],{mdate=>$now},\%flt);
-         }
-      }
-   }
-
-}
-
 
 sub FinishWrite
 {
