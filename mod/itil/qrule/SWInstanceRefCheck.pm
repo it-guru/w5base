@@ -101,7 +101,6 @@ sub qcheckRecord
          else{
             $swinstvalid=0 if ($rec->{lnksoftwaresystemid} eq ""); 
          }
-printf STDERR ("fifi swinstvalid=$swinstvalid\n");
          if ($rec->{runon} eq "2"){   # now do itcloudarea checks
             if ($rec->{itcloudarea} eq ""){
                push(@msg,"no cloudarea specified");
@@ -112,11 +111,16 @@ printf STDERR ("fifi swinstvalid=$swinstvalid\n");
                my $itcloudareaid=$rec->{itcloudareaid};
                my $applid=$arec->{id};
                $c->SetFilter({id=>\$itcloudareaid,applid=>\$applid});
-               my ($itcrec,$msg)=$c->getOnlyFirst(qw(id));
+               my ($itcrec,$msg)=$c->getOnlyFirst(qw(id cistatusid));
 
                if (!defined($itcrec)){
                   push(@msg,"application does not match application ".
                             "in cloudarea");
+               }
+               else{
+                  if ($itcrec->{cistatusid}>5 || $itcrec->{cistatusid}<3){
+                     push(@msg,"referenced cloudarea is not active");
+                  }
                }
             }
          }

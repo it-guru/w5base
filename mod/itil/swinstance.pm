@@ -1345,17 +1345,20 @@ sub Validate
    }
 
    # safe cleanup for hard deleted references
-   if ($oldrec->{"systemid"} ne "" &&
+   if (defined($oldrec) && 
+       $oldrec->{"systemid"} ne "" &&
        $oldrec->{"system"} eq "" &&
        !exists($newrec->{systemid})){
       $newrec->{systemid}=undef;
    }
-   if ($oldrec->{"lnksoftwaresystemid"} ne "" &&
+   if (defined($oldrec) && 
+       $oldrec->{"lnksoftwaresystemid"} ne "" &&
        $oldrec->{"lnksoftwaresystem"} eq "" &&
        !exists($newrec->{lnksoftwaresystemid})){
       $newrec->{lnksoftwaresystemid}=undef;
    }
-   if ($oldrec->{"itcloudareaid"} ne "" &&
+   if (defined($oldrec) && 
+       $oldrec->{"itcloudareaid"} ne "" &&
        $oldrec->{"itcloudarea"} eq "" &&
        !exists($newrec->{itcloudareaid})){
       $newrec->{itcloudareaid}=undef;
@@ -1539,6 +1542,7 @@ sub Validate
          return(0);
       }
    }
+
 
    ########################################################################
    # standard security handling
