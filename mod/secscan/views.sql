@@ -58,7 +58,7 @@ select "W5I_secscan__findingbase".id,
        "W5I_secscan__finding_of".modifydate
 from "W5I_secscan__findingbase"
      left outer join "W5I_secscan__finding_of"
-        on "W5I_secscan__findingbase".id=
+        on "W5I_secscan__findingbase".keyid=
            "W5I_secscan__finding_of".refid;
 
 
