@@ -92,8 +92,12 @@ sub LoadNewFindings
    my $lastid;
    my %flt=(isdel=>\'0');;
    if ($queryparam ne "FORCEALL"){    #analyse lastSuccessRun
+      #%flt=( 
+      #   findcdate=>">$startstamp",
+      #   isdel=>\'0'
+      #);
       %flt=( 
-         findcdate=>">$startstamp",
+         hstate=>"[EMPTY]",
          isdel=>\'0'
       );
       if (defined($firstrec)){

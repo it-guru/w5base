@@ -57,7 +57,8 @@ create or replace view "W5I_secscan__findingbase" as
    from "W5FTPGW1"."w5secscan_ShareData"
       join "W5FTPGW1"."w5secscan_ComputerIP"
          on "w5secscan_ComputerIP"."C01_NetComputer"=
-            "w5secscan_ShareData"."C03_HostName"
+            "w5secscan_ShareData"."C03_HostName" and
+            "w5secscan_ComputerIP"."W5_isdel"=0
 union
    select  'Once-' || "w5secscan_OneShot"."W5_id"             as id,
            "w5secscan_OneShot"."W5_isdel"                     as isdel,
