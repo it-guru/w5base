@@ -295,7 +295,8 @@ sub getDynamicFields
                                   default       =>'INANALYSE',
                                   value         =>['INANALYSE',
                                                    'CLOSEDRESOLVED',
-                                                   'CLOSEDCNTEXIST'
+                                                   'CLOSEDCNTEXIST',
+                                                   'CLOSEDLAPSED'
                                                   ],
                                   container     =>'headref'),
 
@@ -604,6 +605,9 @@ sub isAuthorized
       if ($self->isCurrentWorkspace($rec)){
          return(1);
       }
+      if ($self->IsMemberOf("w5base.secscan","RMember","up")){
+         return(1);
+      }
       if ($self->IsMemberOf("admin")){
          return(1);
       }
@@ -818,6 +822,7 @@ sub nativProcess
                     step=>$nextstep,
                     fwdtargetid=>undef,
                     fwdtarget=>undef,
+                    secfindingstate=>'CLOSEDLAPSED',
                     closedate=>NowStamp("en"),
                     fwddebtarget=>undef,
                     fwddebtargetid=>undef};
@@ -843,7 +848,8 @@ sub nativProcess
          msg(ERROR,"seltsame reactivate Operation auf ".
                    "sec Workflow $WfRec->{id}");
       }
-      elsif ($WfRec->{secfindingstate} eq "CLOSEDRESOLVED"){
+      elsif ($WfRec->{secfindingstate} eq "CLOSEDRESOLVED" ||
+             $WfRec->{secfindingstate} eq "CLOSEDLAPSED"){
          if ($self->getParent->getParent->Action->StoreRecord(
              $WfRec->{id},"wfreactivate",
              {translation=>'secscan::workflow::FindingHndl'},"",undef)){

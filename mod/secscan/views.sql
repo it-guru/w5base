@@ -23,7 +23,7 @@ from "W5FTPGW1"."w5secscan_ShareData"
 
 create table "W5I_secscan__finding_of" (
    refid               varchar2(80) not null,
-   comments            varchar2(4000),
+   comments            varchar2(4000),execptionperm varchar2(4000),
    wfhandeled          number(*,0) default '0',
    wfref               varchar2(256),
    respemail           varchar2(128),

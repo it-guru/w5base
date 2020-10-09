@@ -77,4 +77,5 @@ be treated with maximum priority.
 'INANALYSE'=>{de=>'in analyse',en=>'in analyse'},
 'CLOSEDRESOLVED'=>{de=>'geschlossen und beseitigt',en=>'closed and resolved'},
 'CLOSEDCNTEXIST'=>{de=>'geschlossen und fortbestehend',en=>'closed and existend'},
+'CLOSEDLAPSED'=>{de=>'geschlossen und hinfällig',en=>'closed and lapsed'},
 

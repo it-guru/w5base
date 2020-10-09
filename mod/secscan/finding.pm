@@ -153,6 +153,7 @@ select "W5I_secscan__findingbase".id,
        "W5I_secscan__findingbase".srcid,
        "W5I_secscan__finding_of".refid of_id,
        "W5I_secscan__finding_of".comments,
+       "W5I_secscan__finding_of".execptionperm,
        decode("W5I_secscan__finding_of".wfhandeled,
               NULL,'0',"W5I_secscan__finding_of".wfhandeled) wfhandeled,
        "W5I_secscan__finding_of".wfref,
@@ -358,6 +359,13 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'comments'),
 
+      new kernel::Field::Textarea(
+                name          =>'execptionperm',
+                group         =>'exception',
+                selectfix     =>1,
+                label         =>'exectition permission',
+                dataobjattr   =>'execptionperm'),
+
       new kernel::Field::Boolean(
                 name          =>'wfhandeled',
                 group         =>'wfhandling',
@@ -552,7 +560,8 @@ sub getSqlFrom
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default recup wfhandling handling handlingsource source));
+   return( qw(header default recup wfhandling exception 
+              handling handlingsource source));
 }
 
 
@@ -632,9 +641,13 @@ sub isViewValid
    if ($self->IsMemberOf(["admin",
                           "w5base.secscan.read",
                           "w5base.secscan.write"])){
-      my @l=qw(source handlingsource default header recup);
+      my @l=qw(source handlingsource default header recup history);
+      if ($rec->{execptionperm} ne ""){
+         push(@l,"exception");
+      }
       if ($rec->{wfheadid} ne ""){
          push(@l,"wfhandling");
+         push(@l,"exception");
       }
       else{
          if ($rec->{hstate} ne ""){
@@ -655,7 +668,7 @@ sub isWriteValid
 
    if ($self->IsMemberOf(["admin",
                           "w5base.secscan.write"])){
-      return("handling");
+      return("handling","exception");
    }
    return(undef);
 }

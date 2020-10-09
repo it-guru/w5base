@@ -105,7 +105,8 @@ sub LoadNewFindings
             $datastream->SetFilter({id=>\$lastid,findcdate=>\$laststamp});
             my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
             if (!defined($lastrec)){
-               msg(WARN,"record with id '$lastid' has been deleted or changed - using date only");
+               msg(WARN,"record with id '$lastid' ".
+                        "has been deleted or changed - using date only");
                $lastid=undef;
             }
             %flt=( 
@@ -187,11 +188,24 @@ sub LoadNewFindings
    if ($queryparam ne "FORCEALL"){
       my $dataop=$datastream->Clone();
       $datastream->ResetFilter();
-      $datastream->SetFilter({
-         wfhandeled=>\'1',
-         findmdate=>'<now-3d',
-         isdel=>\'1'
-      });
+      my @flt=({
+                  wfhandeled=>\'1',
+                  findmdate=>'<now-3d',
+                  isdel=>\'1'
+               },
+               {
+                  wfhandeled=>\'1',
+                  mdate=>'>now-12h',
+                  isdel=>\'0',
+                  execptionperm=>"![EMPTY]"
+               },
+
+      );
+
+
+
+
+      $datastream->SetFilter(\@flt);
       $datastream->SetCurrentView(@datastreamview);
       $datastream->SetCurrentOrder("+findcdate","+id");
       my ($rec,$msg)=$datastream->getFirst();
@@ -238,11 +252,11 @@ sub analyseRecord
    msg(INFO,"  wfhandeled:$rec->{wfhandeled}");
    msg(INFO,"  isdel:     $rec->{isdel}");
 
-   if ($rec->{isdel} eq "1"){
+   if ($rec->{isdel} eq "1" || $rec->{execptionperm} ne ""){
       if ($rec->{wfhandeled} eq "1"){
          my $dataop=$dataobj->Clone();
          my $srcsys="secscan::finding";
-         my $srcid=$rec->{id};
+         my $srcid=$rec->{sectokenid};
          my $srckey=$srcsys."::".$srcid;  # because length of srcid :-[
 
          my $wfop=$self->{wf}->Clone(); 
@@ -313,7 +327,7 @@ sub analyseRecord
    #  Now we have a reponsibleid and we can start a workflow
    # 
    my ($WfRec,$msg);
-   if (defined($reponsibleid)){
+   if ($rec->{execptionperm} eq "" && defined($reponsibleid)){
       msg(INFO,"start handling for reponsibleid $reponsibleid");
       my @srckey;
       my $srcsys="secscan::finding";
@@ -396,6 +410,11 @@ sub analyseRecord
    my $dataop=$dataobj->Clone();
    $dataop->BackendSessionName("cloned$$"); # needed because oracle gets problems with getNext
    my $upd={};
+   if ($rec->{execptionperm} ne ""){
+      if (!$rec->{hstate}){
+         $upd->{hstate}="AUTOANALYSED";
+      }
+   }
    if (defined($WfRec)){
       msg(INFO,"start handling for existing workflow");
       if (!$rec->{wfhandeled}){
