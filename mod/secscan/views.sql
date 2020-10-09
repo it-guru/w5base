@@ -66,4 +66,36 @@ grant select on "W5I_secscan__finding" to W5I;
 create or replace synonym W5I.secscan__finding for "W5I_secscan__finding";
 
 
+CREATE OR REPLACE PROCEDURE secscan_cleanup
+   AUTHID CURRENT_USER IS
+begin
+   delete from "W5FTPGW1"."w5secscan_ShareData" 
+   where "W5_isdel"='1' and "W5_mdate"<current_date-180;
+   -- overflow cleanup
+   delete from "W5I_secscan__finding_of" 
+   where "W5I_secscan__finding_of".refid in (
+      select "W5I_secscan__finding_of".refid
+      from "W5I_secscan__finding_of" 
+         left outer join "W5I_secscan__findingbase" 
+           on "W5I_secscan__finding_of".refid="W5I_secscan__findingbase".id
+      where "W5I_secscan__findingbase".id is null
+);
+end;
+/
+
+
+BEGIN
+   DBMS_SCHEDULER.CREATE_JOB (
+      job_name             => 'secscan_cleanup_job',
+      job_type             => 'PLSQL_BLOCK',
+      job_action           => 'begin secscan_cleanup; end;',
+      start_date           => SYSTIMESTAMP,
+      repeat_interval      => 'FREQ=DAILY; BYDAY=MON,TUE,WED,THU,FRI,SAT,SUN',
+      end_date             => NULL,
+      enabled              => TRUE,
+      comments             => 'taeglicher cleanup for secscans');
+END;
+/
+
+
 
