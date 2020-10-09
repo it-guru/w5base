@@ -850,7 +850,7 @@ sub parseSSL
       my $inissuer=0;
       my %issuer;
       $results=~s/\r\n/\n/g;
-      my @results=split("\n",$results);
+      my @results=grep(!/^\s*$/,split("\n",$results));
       while(my $line=shift(@results)){
          if (my ($n)=$line=~m/^\(([0-9]{1,2})\)/){
             $certno=$n;
