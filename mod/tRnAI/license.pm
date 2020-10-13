@@ -42,6 +42,8 @@ sub new
                 group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'tRnAI_license.id'),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
@@ -64,7 +66,13 @@ sub new
                 dayonly       =>1,
                 dataobjattr   =>'tRnAI_license.expdate'),
 
-                                                  
+      new kernel::Field::Date(
+                name          =>'expnotify1',
+                label         =>'Expiration Notify',
+                htmldetail    =>0,
+                selectfix     =>1,
+                dataobjattr   =>'tRnAI_license.expnotify1'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
@@ -187,6 +195,12 @@ sub Validate
    }
    if (trim($fname) ne trim($fullname)){
       $newrec->{fullname}=trim($fname);
+   }
+
+   if (effChanged($oldrec,$newrec,"expdate")){
+      if (defined($oldrec) && $oldrec->{expnotify1} ne ""){
+         $newrec->{expnotify1}=undef;
+      }
    }
 
 

@@ -131,7 +131,7 @@ create table tRnAI_license(
   ponum      varchar(40),
   plmnum     varchar(40),
   units      int(20),
-  expdate    datetime,
+  expdate    datetime,expnotify1 datetime default NULL,
   additional longtext    default NULL,
   comments   longtext     default NULL,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',

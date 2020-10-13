@@ -6,3 +6,4 @@
 'Purchase Order Number'=>{de=>'Bestellnummer'},
 'PLM Ticket Number'=>{de=>'PLM Ticket Nummer'},
 'Expiration Date'=>{de=>'Verfallsdatum'},
+'Expiration Notify'=>{de=>'Verfallsbenachrichtigung'},
