@@ -2250,21 +2250,6 @@ sub getRecordImageUrl
    return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
 }
 
-#sub getRecordWatermarkUrl
-#{
-#   my $self=shift;
-#   my $rec=shift;
-#   if ($rec->{secstate} eq "vsnfd"){
-#      my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#      return("../../../public/itil/load/HtmlDetail.watermark.vsnfd.jpg?".
-#             $cgi->query_string());
-#   }
-#   return(undef);
-#}
-
-
-
-
 sub getSqlFrom
 {
    my $self=shift;
@@ -2328,7 +2313,8 @@ sub addApplicationSecureFilter
          if ($self->getField($ns.'mandatorid')){
             push(@$addflt,{$ns.'mandatorid'=>\@mandators});
          }
-         foreach my $fld (qw(databossid semid sem2id tsmid tsm2id opmid opm2id delmgrid delmgr2id)){
+         foreach my $fld (qw(databossid semid sem2id tsmid tsm2id 
+                             opmid opm2id delmgrid delmgr2id)){
             if ($self->getField($ns.$fld)){
                push(@$addflt,{$ns.$fld=>\$userid});
             }
@@ -2365,21 +2351,6 @@ sub SelfAsParentObject    # this method is needed because existing derevations
    return("itil::appl");
 }
          
-
-#sub SecureValidate
-#{
-#   my $self=shift;
-##   my $oldrec=shift;
-##   my $newrec=shift;
-##
-##   my $DataACLcheck=$self->SecureValidateCheckDataACL($oldrec,$newrec);
-##
-##   if (!$DataACLcheck){
-##      return($DataACLcheck);
-##   }
-#   return(kernel::DataObj::SecureValidate(@_));
-#}
-
 
 sub prepareToWasted
 {
@@ -2736,44 +2707,6 @@ sub HandleInfoAboSubscribe
    }
 }
 
-
-#sub getHtmlDetailPages
-#{
-#   my $self=shift;
-#   my ($p,$rec)=@_;
-#
-#   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
-#   if (defined($rec)){
-#      push(@l,"OPInfo"=>$self->T("OperatorInfo"));
-#   }
-#   return(@l);
-#}
-
-
-#sub getHtmlDetailPageContent
-#{
-#   my $self=shift;
-#   my ($p,$rec)=@_;
-#
-#   my $page;
-#   my $idname=$self->IdField->Name();
-#   my $idval=$rec->{$idname};
-#
-#   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "OPInfo");
-#
-#   if ($p eq "OPInfo"){
-#      Query->Param("$idname"=>$idval);
-#      $idval="NONE" if ($idval eq "");
-#
-#      my $q=new kernel::cgi({});
-#      $q->Param("$idname"=>$idval);
-#      my $urlparam=$q->QueryString();
-#      $page.="<iframe class=HtmlDetailPage name=HtmlDetailPage ".
-#            "src=\"OPInfo?$urlparam\"></iframe>";
-#   }
-#   $page.=$self->HtmlPersistentVariables($idname);
-#   return($page);
-#}
 
 sub getValidWebFunctions
 {
