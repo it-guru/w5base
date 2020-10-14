@@ -178,6 +178,10 @@ sub getStatSelectionBox
       {
          cistatusid=>'3 4 5',
          opm2id=>\$userid
+      },
+      {
+         cistatusid=>'3 4 5',
+         secapplmgr2id=>\$userid
       }
    );
 

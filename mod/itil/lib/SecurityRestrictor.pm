@@ -44,6 +44,7 @@ sub getSecurityRestrictedAllowedSystemIDs
    my @flt=();
    push(@flt,{cistatusid=>[3,4,5],databossid=>\$userid});
    push(@flt,{cistatusid=>[3,4,5],applmgrid=>\$userid});
+   push(@flt,{cistatusid=>[3,4,5],secapplmgr2id=>\$userid});
    if ($seclevel<20){
       push(@flt,{cistatusid=>[3,4,5],semid=>\$userid});
       push(@flt,{cistatusid=>[3,4,5],sem2id=>\$userid});

@@ -1821,6 +1821,11 @@ sub new
                 dataobjattr   =>'appl.realeditor'),
 
       new kernel::Field::Link(
+                name          =>'secapplmgr2id',
+                noselect      =>'1',
+                dataobjattr   =>'lnkapplmgr2.targetid'),
+
+      new kernel::Field::Link(
                 name          =>'sectarget',
                 noselect      =>'1',
                 dataobjattr   =>'lnkcontact.target'),
@@ -2270,6 +2275,11 @@ sub getSqlFrom
    my $from="$worktable left outer join lnkcontact ".
             "on lnkcontact.parentobj='$selfasparent' ".
             "and $worktable.id=lnkcontact.refid ".
+            "left outer join lnkcontact as lnkapplmgr2 ".
+            "on (lnkapplmgr2.parentobj='$selfasparent' ".
+            "and $worktable.id=lnkapplmgr2.refid ".
+            "and lnkapplmgr2.croles like '%roles=_applmgr2_=roles%' ".
+            "and lnkapplmgr2.target='base::user') ".
             "left outer join appladv on (appl.id=appladv.appl and ".
             "appladv.isactive=1) ".
             "left outer join itcrmappl on appl.id=itcrmappl.id ".
