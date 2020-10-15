@@ -45,8 +45,8 @@ sub LoadNewFindings
    my $user=getModuleObject($self->Config,"base::user");
 
    my @datastreamview=qw(id hstate hostname ipaddr isdel itemrawdesc 
-                         ofid name mdate startdate enddate
-                         wfheadid wfref wfhandeled  hstate
+                         ofid name mdate startdate enddate findmdate
+                         wfheadid wfref wfhandeled  hstate execptionperm
                          secitem sectokenid sectreadrules spec 
                          srcid srcsys respemail);
    # NICHT ALL verwenden, da die recup* Felder die Abfrage extrem langsam
@@ -357,9 +357,10 @@ sub analyseRecord
                $newrec->{secfindingaltreponsibleid}=
                   [sort(keys(%altreponsibleid))];
             }
-            if ($wfop->nativProcess('wfreactivate',$newrec,$WfRec->{id})){
-               msg(INFO,"ok - it was reactivated $WfRec->{id}");
-            }
+            msg(WARN,"debug wfreactivate for wfhead $WfRec->{id} needed");
+            #if ($wfop->nativProcess('wfreactivate',$newrec,$WfRec->{id})){
+            #   msg(INFO,"ok - it was reactivated $WfRec->{id}");
+            #}
          }
          elsif($WfRec->{step} eq "secscan::workflow::FindingHndl::main"){
             msg(INFO,"need to reassign $WfRec->{id}");
@@ -372,9 +373,10 @@ sub analyseRecord
                $newrec->{secfindingaltreponsibleid}=
                   [sort(keys(%altreponsibleid))];
             }
-            if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
-               msg(INFO,"ok - it was reassigned $WfRec->{id}");
-            }
+            msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed");
+            #if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
+            #   msg(INFO,"ok - it was reassigned $WfRec->{id}");
+            #}
 
          }
       }
@@ -398,7 +400,9 @@ sub analyseRecord
             }
 
             if (keys(%altreponsibleid)){
-               $newrec->{secfindingaltreponsibleid}=[sort(keys(%altreponsibleid))];
+               $newrec->{secfindingaltreponsibleid}=[
+                  sort(keys(%altreponsibleid))
+               ];
             }
             # sectreadrules handling!
 
@@ -450,6 +454,9 @@ sub analyseRecord
       }
    }
    if (keys(%$upd)){
+      if ($rec->{mdate} ne ""){
+         $upd->{mdate}=$rec->{mdate};  # don't change mdate in  of table
+      }
       if (!$dataop->ValidatedUpdateRecord($rec,$upd,{id=>\$rec->{id}})){
          msg(ERROR,"ValidatedUpdateRecord failed on upd");
          msg(ERROR,"rec=".Dumper($rec));
