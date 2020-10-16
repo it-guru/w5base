@@ -97,6 +97,7 @@ sub LoadNewFindings
       #   isdel=>\'0'
       #);
       %flt=( 
+         sectokenid=>'B2AC4CD49142F15BE1E20804E1438EA246792B36D991FBF3F32CCE1870AA4DD7', 
          hstate=>"[EMPTY]",
          isdel=>\'0'
       );
@@ -193,11 +194,13 @@ sub LoadNewFindings
       my $dataop=$datastream->Clone();
       $datastream->ResetFilter();
       my @flt=({
+         sectokenid=>'B2AC4CD49142F15BE1E20804E1438EA246792B36D991FBF3F32CCE1870AA4DD7', 
                   wfhandeled=>\'1',
                   findmdate=>'<now-3d',
                   isdel=>\'1'
                },
                {
+         sectokenid=>'B2AC4CD49142F15BE1E20804E1438EA246792B36D991FBF3F32CCE1870AA4DD7', 
                   wfhandeled=>\'1',
                   mdate=>'>now-12h',
                   isdel=>\'0',
@@ -358,9 +361,9 @@ sub analyseRecord
                   [sort(keys(%altreponsibleid))];
             }
             msg(WARN,"debug wfreactivate for wfhead $WfRec->{id} needed");
-            #if ($wfop->nativProcess('wfreactivate',$newrec,$WfRec->{id})){
-            #   msg(INFO,"ok - it was reactivated $WfRec->{id}");
-            #}
+            if ($wfop->nativProcess('wfreactivate',$newrec,$WfRec->{id})){
+               msg(INFO,"ok - it was reactivated $WfRec->{id}");
+            }
          }
          elsif($WfRec->{step} eq "secscan::workflow::FindingHndl::main"){
             msg(INFO,"need to reassign $WfRec->{id}");
@@ -374,9 +377,9 @@ sub analyseRecord
                   [sort(keys(%altreponsibleid))];
             }
             msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed");
-            #if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
-            #   msg(INFO,"ok - it was reassigned $WfRec->{id}");
-            #}
+            if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
+               msg(INFO,"ok - it was reassigned $WfRec->{id}");
+            }
 
          }
       }
