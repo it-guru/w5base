@@ -82,7 +82,17 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
 
-   if ($rec->{srcsys} eq "" || lc($rec->{srcsys}) eq "w5base"){
+
+   if ($rec->{name}=~m/^T2[A-Z][0-9]{7}$/ &&
+       $rec->{costcentertype} eq 'costcenter'){
+      return(undef,{qmsg=>'TS Slowakia costcenter detected'});
+   }
+
+
+
+   if ($rec->{srcsys} eq "" || 
+       lc($rec->{srcsys}) eq "w5base" ||
+       lc($rec->{srcsys}) eq "w5basev1"){
       $par=getModuleObject($self->getParent->Config(),"tssapp01::psp");
       $par->SetFilter({name=>\$rec->{name}});
       ($parrec)=$par->getOnlyFirst(qw(ALL));
@@ -99,6 +109,12 @@ sub qcheckRecord
              $forcedupd->{srcload}=NowStamp("en");
              $forcedupd->{srcsys}=$par->Self();
           }
+          else{
+             my $msg="can't validate costobject against SAPP01";
+             push(@qmsg,$msg);
+             push(@dataissue,$msg);
+             $errorlevel=3 if ($errorlevel<3);
+          }
       }
    }
    else{
@@ -112,6 +128,9 @@ sub qcheckRecord
             push(@qmsg,$msg);
             push(@dataissue,$msg);
             $errorlevel=3 if ($errorlevel<3);
+         }
+         else{
+            $forcedupd->{srcload}=NowStamp("en");
          }
       }
    }
