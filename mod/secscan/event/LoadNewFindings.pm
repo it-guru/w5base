@@ -366,21 +366,21 @@ sub analyseRecord
             }
          }
          elsif($WfRec->{step} eq "secscan::workflow::FindingHndl::main"){
-            msg(INFO,"need to reassign $WfRec->{id}");
-            my $wfop=$self->{wf}->Clone(); 
-            my $newrec={
-                  secfindingreponsibleid=>$reponsibleid,
-                  detaildescription=>$rec->{detailspec} 
-            };
-            if (keys(%altreponsibleid)){
-               $newrec->{secfindingaltreponsibleid}=
-                  [sort(keys(%altreponsibleid))];
+            if ($WfRec->{secfindingreponsibleid} ne $reponsibleid){
+               my $wfop=$self->{wf}->Clone(); 
+               my $newrec={
+                     secfindingreponsibleid=>$reponsibleid,
+                     detaildescription=>$rec->{detailspec} 
+               };
+               if (keys(%altreponsibleid)){
+                  $newrec->{secfindingaltreponsibleid}=
+                     [sort(keys(%altreponsibleid))];
+               }
+               msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed");
+               if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
+                  msg(INFO,"ok - it was reassigned $WfRec->{id}");
+               }
             }
-            msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed");
-            if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
-               msg(INFO,"ok - it was reassigned $WfRec->{id}");
-            }
-
          }
       }
       if (!defined($WfRec)){
