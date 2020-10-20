@@ -273,7 +273,8 @@ sub analyseRecord
             step=>"!secscan::workflow::FindingHndl::finish"
          });
          foreach my $wfrec ($self->{wf}->getHashList(qw(id))){
-            msg(INFO,"cleanup workflow id=$wfrec->{id}");
+            msg(WARN,"cleanup workflow id=$wfrec->{id}");
+            msg(WARN,"rec=".Dumper($rec));
             if ($wfop->nativProcess('wfforceobsolete',{},$wfrec->{id})){
                $dataop->ValidatedUpdateRecord($rec,{
                   wfhandeled=>'0',
@@ -377,6 +378,7 @@ sub analyseRecord
                      [sort(keys(%altreponsibleid))];
                }
                msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed");
+               msg(WARN,"rec=".Dumper($rec));
                if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
                   msg(INFO,"ok - it was reassigned $WfRec->{id}");
                }
