@@ -80,7 +80,7 @@ sub new
                 name          =>'acinmassingmentgroup',
                 label         =>'Incident Assignmentgroup',
                 vjoineditbase =>{isinmassign=>\'1'},
-                group         =>'inmchm',
+                group         =>'tsinmchm',
                 AllowEmpty    =>1,
                 vjointo       =>\'tsgrpmgmt::grp',
                 vjoinon       =>['acinmassignmentgroupid'=>'id'],
@@ -96,7 +96,7 @@ sub new
                 name          =>'scapprgroup',
                 label         =>'Change Approvergroup',
                 vjoineditbase =>{ischmapprov=>\'1'},
-                group         =>'inmchm',
+                group         =>'tsinmchm',
                 AllowEmpty    =>1,
                 vjointo       =>\'tsgrpmgmt::grp',
                 vjoinon       =>['scapprgroupid'=>'id'],
@@ -467,10 +467,13 @@ sub isViewValid
          if (in_array(\@l,"default")){
             push(@l,"amrel");
          }
+         @l=grep(!/^inmchm$/,@l);
       }
       else{
-         if (in_array(\@l,"default")){
-            push(@l,"inmchm");
+         if (lc($rec->{adminteam}) ne "extern"){
+            if (in_array(\@l,"default")){
+               push(@l,"tsinmchm");
+            }
          }
       }
    }
@@ -486,13 +489,13 @@ sub isWriteValid
    if (defined($rec)){
       if ($rec->{srcsys} ne "AssetManager"){
          if (in_array(\@l,"default")){
-            push(@l,"inmchm");
+            push(@l,"tsinmchm");
          }
       }
    }
    else{
-      push(@l,"inmchm");  # allow generell on Upload of new records
-   }                      # write on inmchm - not good -> but needed.
+      push(@l,"tsinmchm");  # allow generell on Upload of new records
+   }                      # write on tsinmchm - not good -> but needed.
    return(@l);
 }
 
@@ -504,7 +507,7 @@ sub getDetailBlockPriority
    for(my $c=0;$c<=$#l;$c++){
       $inserti=$c+1 if ($l[$c] eq "default");
    }
-   splice(@l,$inserti,$#l-$inserti,("inmchm",@l[$inserti..($#l+-1)]));
+   splice(@l,$inserti,$#l-$inserti,("tsinmchm",@l[$inserti..($#l+-1)]));
    splice(@l,$inserti,$#l-$inserti,("amrel",@l[$inserti..($#l+-1)]));
    return(@l);
 }

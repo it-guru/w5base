@@ -4,6 +4,7 @@
 'fieldgroup.sysiface'=>{de=>'System-Interface',en=>'System-Interface'},
 'fieldgroup.upd'=>{de=>'OS Update/Upgrade Möglichkeiten',en=>'OS Update/Upgrade posibilities'},
 'fieldgroup.physys'=>{de=>'physikalische Systemdaten',en=>'physical Systemdata'},
+'fieldgroup.inmchm'=>{de=>'Incident/Change-Kontakte',en=>'Incident/Change contacts'},
 'fieldgroup.opmode'=>{de=>'Betriebsart',en=>'Operation mode'},
 'fieldgroup.location'=>{de=>'Standort',en=>'Location'},
 'fieldgroup.systemclass'=>{de=>'Systemklassifizierung',en=>'Systemclass'},
@@ -127,3 +128,5 @@
 'functional Alias'=>{de=>'funktioneller Alias'},
 'functional alias must be a FQDN'=>{de=>'funktioneller Alias muss ein FQDN sein'},
 'invalid characters in functional alias'=>{de=>'unzulässige Zeichen im funktionellen Alias'},
+'Incident-Ticket contact email'=>{de=>'Incident-Ticket Kontakt E-Mail'},
+'Change-Ticket contact email'=>{de=>'Change-Ticket Kontakt E-Mail'},

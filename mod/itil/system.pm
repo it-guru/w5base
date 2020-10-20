@@ -468,6 +468,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'adminteamid',
+                selectfix     =>1,
                 dataobjattr   =>'system.admteam'),
 
       new kernel::Field::Text(
@@ -818,6 +819,22 @@ sub new
                 htmlnowrap    =>1,
                 label         =>'System OS analysed state',
                 onRawValue    =>\&itil::lib::Listedit::calcSoftwareState),
+
+      new kernel::Field::Email(
+                name          =>'inmcontact',
+                AllowEmpty    =>1,
+                group         =>'inmchm',
+                label         =>'Incident-Ticket contact email',
+                dataobjattr   =>'system.inmcontact'),
+
+      new kernel::Field::Email(
+                name          =>'chmcontact',
+                AllowEmpty    =>1,
+                group         =>'inmchm',
+                label         =>'Change-Ticket contact email',
+                dataobjattr   =>'system.chmcontact'),
+
+
      new kernel::Field::Htmlarea(
                 name          =>'osanalysetodo',
                 readonly      =>1,
@@ -2184,6 +2201,7 @@ sub isViewValid
    return("header","default","systemclass") if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(header default swinstances 
+              inmchm
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses sysiface phonenumbers sec applications
               location source customer history upd relperson
@@ -2231,6 +2249,7 @@ sub isWriteValid
 
    my @databossedit=qw(default software admin logsys contacts 
                        monisla misc opmode upd  
+                       inmchm
                        physys ipaddresses sysiface relperson
                        phonenumbers sec cluster autodisc
                        attachments control systemclass interview);
@@ -2244,7 +2263,7 @@ sub isWriteValid
    if (!defined($rec)){
       return("default","physys","admin","monisla","misc","cluster",
              "opmode","control","systemclass","sec","logsys","vhost",
-             "upd");
+             "upd","inmchm");
    }
    else{
       if ($rec->{databossid}==$userid){
@@ -2396,7 +2415,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default relperson admin phonenumbers logsys location 
+          qw(header default relperson admin inmchm 
+             phonenumbers logsys location 
              vhost physys systemclass cluster
              opmode sec applications customer software 
              swinstances sysiface ipaddresses

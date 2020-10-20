@@ -1047,6 +1047,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'businessteamid',
+                selectfix     =>1,
                 dataobjattr   =>'appl.businessteam'),
 
       new kernel::Field::SubList(
@@ -1522,6 +1523,20 @@ sub new
                 label         =>'temporary exeptions in use times',
                 htmlheight    =>40,
                 dataobjattr   =>'appl.tempexeptusetime'),
+
+      new kernel::Field::Email(
+                name          =>'inmcontact',
+                AllowEmpty    =>1,
+                group         =>'inmchm',
+                label         =>'Incident-Ticket contact email',
+                dataobjattr   =>'appl.inmcontact'),
+
+      new kernel::Field::Email(
+                name          =>'chmcontact',
+                AllowEmpty    =>1,
+                group         =>'inmchm',
+                label         =>'Change-Ticket contact email',
+                dataobjattr   =>'appl.chmcontact'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',

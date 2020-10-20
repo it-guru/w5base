@@ -873,8 +873,11 @@ sub isViewValid
    my $rec=shift;
    my @l=$self->SUPER::isViewValid($rec,@_);
 
-   if (in_array(\@l,"inmchm")){
-      push(@l,"chm","inm");
+   if (lc($rec->{businessteam}) ne "extern"){
+      if (in_array(\@l,"inmchm")){
+         @l=grep(!/^inmchm$/,@l);
+         push(@l,"chm","inm");
+      }
    }
    return(@l);
 }
