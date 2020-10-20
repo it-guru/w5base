@@ -20,7 +20,7 @@ NONE
 [en:]
 
 Checks if in field 'Change Approvergroup technical' 
-strict one valid Change Approvergroup is entered. 
+one or more valid Change Approvergroup are entered. 
 
 Enter the Approvergroup which is to be used for Changes on this application 
 from the technical point of view. Generally, it is the Approvergroup of the 
@@ -38,8 +38,8 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 [de:]
 
-Prüft, ob im Feld 'Change Approvergroup technisch' genau eine gültige 
-Change Approvergroup eingetragen ist.
+Prüft, ob im Feld 'Change Approvergroup technisch' eine oder mehrere gültige 
+Change Approvergroup eingetragen sind.
 
 Wählen Sie hier die Approvergroup, die bei Changes für diese Anwendung 
 aus technischer Sicht verwendet werden muss. Dies ist in der Regel 
@@ -115,14 +115,14 @@ sub qcheckRecord
          }
       }
    }
-   if ($fnd>1){
-      $exitcode=3 if ($exitcode<3);
-      my $msg='there is more than one '.
-              'technical change approvergroup defined';
-      push(@{$desc->{qmsg}},$msg);
-      push(@{$desc->{dataissue}},$msg);
-      return($exitcode,$desc);
-   }
+   #if ($fnd>1){
+   #   $exitcode=3 if ($exitcode<3);
+   #   my $msg='there is more than one '.
+   #           'technical change approvergroup defined';
+   #   push(@{$desc->{qmsg}},$msg);
+   #   push(@{$desc->{dataissue}},$msg);
+   #   return($exitcode,$desc);
+   #}
    if ($rec->{cdate} ne ""){
       my $now=NowStamp("en");
       my $d=CalcDateDuration($rec->{cdate},$now,"GMT");
