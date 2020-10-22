@@ -244,7 +244,8 @@ sub getNotifyDestinations
                   cistatusid=>[4],
                   toapplcistatus=>[3,4,5]}];
       $aa->SetFilter($aaflt);
-      foreach my $aarec ($aa->getHashList(qw(toapplid contype))){
+      foreach my $aarec ($aa->getHashList(qw(toapplid contype 
+                                             gwapplid gwappl2id))){
          next if ($mode eq "critical" &&
                   ($aarec->{contype}==4 ||
                    $aarec->{contype}==5 ||
@@ -256,6 +257,42 @@ sub getNotifyDestinations
             push(@ifid,$aarec->{toapplid});
          }
       }
+      #######################################################################
+      # gateway application handling
+      my $aagwflt=[
+         {
+             gwapplid=>$applid,
+             cistatusid=>[4],
+             toapplcistatus=>[3,4,5],
+             fromapplcistatus=>[3,4,5]
+         },
+         {
+             gwappl2id=>$applid,
+             cistatusid=>[4],
+             toapplcistatus=>[3,4,5],
+             fromapplcistatus=>[3,4,5]
+         }
+      ];
+      $aa->ResetFilter();
+      $aa->SetFilter($aagwflt);
+      foreach my $aarec ($aa->getHashList(qw(toapplid fromapplid contype 
+                                             gwapplid gwappl2id))){
+         next if ($mode eq "critical" &&
+                  ($aarec->{contype}==4 ||
+                   $aarec->{contype}==5 ||
+                   $aarec->{contype}==3));   # uncritical  communications
+         # if mode=all, no filter on contype 3,4,5 is done, which
+         # meens ALL interface applications of the direct affected
+         # applications are used as "relevant applications".
+         if (!in_array($applid,$aarec->{toapplid})){
+            push(@ifid,$aarec->{toapplid});
+         }
+         if (!in_array($applid,$aarec->{fromapplid})){
+            push(@ifid,$aarec->{fromapplid});
+         }
+      }
+      #######################################################################
+
 
       # interface appls with critical interface
       # to prim. affected applications on its side
