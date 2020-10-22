@@ -85,7 +85,7 @@ sub qcheckRecord
 
    if ($rec->{name}=~m/^T2[A-Z][0-9]{7}$/ &&
        $rec->{costcentertype} eq 'costcenter'){
-      return(undef,{qmsg=>'TS Slowakia costcenter detected'});
+      return(undef,{qmsg=>'TS Slovakia costcenter detected'});
    }
 
 
