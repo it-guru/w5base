@@ -240,6 +240,7 @@ sub new
                    my %param=@_;
                    my $rec=$param{current};
                    my $d=$rec->{runon};
+                   return(1) if ($mode eq "ViewEditor"); # damit upload geht
                    return(1) if ($d eq "0");
                    return(1) if ($d eq "1");
                    return(0);
