@@ -338,6 +338,20 @@ sub ItemSummary
 }
 
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   my @l=$self->SUPER::isViewValid($rec,@_);
+
+   my @remove=qw(custcontracts supcontracts accountnumbers licenses);
+   my $rregex="^(".join("|",@remove).")\$";
+   @l=grep(!/$rregex/,@l);
+   return(@l);
+}
+
+
+
 
 
 
