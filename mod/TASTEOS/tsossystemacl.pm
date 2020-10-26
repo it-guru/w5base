@@ -191,7 +191,6 @@ sub InsertRecord
 
    delete($new{systemId});
 
-#printf STDERR ("fifi 01\n");
 
    my $d=$self->CollectREST(
       dbname=>'TASTEOS',
@@ -203,7 +202,6 @@ sub InsertRecord
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
          my $dataobjurl=$baseurl.$dbclass;
-#printf STDERR ("PUT $dataobjurl\n");
          return($dataobjurl);
       },
       headers=>sub{
@@ -214,7 +212,6 @@ sub InsertRecord
                  %new,
                  'Content-Type','application/json'];
          my %h=@$h;
-#printf STDERR ("RequestHeader=%s\n",Dumper(\%h));
          return($h);
       },
       preprocess=>sub{   # create a valid JSON response
@@ -222,12 +219,24 @@ sub InsertRecord
          my $d=shift;
          my $code=shift;
          my $message=shift;
-#print STDERR Dumper(\$d);
          my $resp="{\"lastmsg\":\"OK\"}";
          return($resp);
-      }
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "400"){  # 400 means, email is not in whitelist
+            return({lastmsg=>'OK'},"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data TSOS response");
+         return(undef);
+      },
    );
-#printf STDERR ("fifi 02 %s\n",Dumper($d));
    $self->LastMsg(INFO,$d->{lastmsg});
    return($d->{lastmsg});
 }
