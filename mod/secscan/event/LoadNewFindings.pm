@@ -97,7 +97,6 @@ sub LoadNewFindings
       #   isdel=>\'0'
       #);
       %flt=( 
-         sectokenid=>'B2AC4CD49142F15BE1E20804E1438EA246792B36D991FBF3F32CCE1870AA4DD7', 
          hstate=>"[EMPTY]",
          isdel=>\'0'
       );
@@ -193,24 +192,18 @@ sub LoadNewFindings
    if ($queryparam ne "FORCEALL"){
       my $dataop=$datastream->Clone();
       $datastream->ResetFilter();
-      my @flt=({
-         sectokenid=>'B2AC4CD49142F15BE1E20804E1438EA246792B36D991FBF3F32CCE1870AA4DD7', 
-                  wfhandeled=>\'1',
-                  findmdate=>'<now-3d',
-                  isdel=>\'1'
-               },
-               {
-         sectokenid=>'B2AC4CD49142F15BE1E20804E1438EA246792B36D991FBF3F32CCE1870AA4DD7', 
-                  wfhandeled=>\'1',
-                  mdate=>'>now-12h',
-                  isdel=>\'0',
-                  execptionperm=>"![EMPTY]"
-               },
-
+      my @flt=(
+         {
+            wfhandeled=>\'1',
+            isdel=>\'1'
+         },
+         {
+            wfhandeled=>\'1',
+            isdel=>\'0',
+            mdate=>'>now-12h',
+            execptionperm=>"![EMPTY]"
+         },
       );
-
-
-
 
       $datastream->SetFilter(\@flt);
       $datastream->SetCurrentView(@datastreamview);
