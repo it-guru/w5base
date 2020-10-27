@@ -239,7 +239,7 @@ sub UpdateRecord
    my %upd=();
    foreach my $k (keys(%$newrec)){
       my $dstk=$k;
-   #   $dstk="icto" if ($dstk eq "ictoNumber");
+      $dstk="icto" if ($dstk eq "ictoNumber");
       $upd{$dstk}=$newrec->{$k};
    }
 
@@ -256,6 +256,7 @@ sub UpdateRecord
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
          my $dataobjurl=$baseurl.$dbclass;
+         #printf STDERR ("url=$dataobjurl\n");
          return($dataobjurl);
       },
       content=>sub{

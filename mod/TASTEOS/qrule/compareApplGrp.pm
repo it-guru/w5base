@@ -116,7 +116,7 @@ sub getPosibleTargets
             $rec,{additional=>\%add},
             {id=>$rec->{id}}
          );
-         printf STDERR ("update system $rec->{id} bk=$bk\n");
+         #printf STDERR ("update system $rec->{id} bk=$bk\n");
       }
       return($newid);
    }
@@ -318,12 +318,14 @@ sub qcheckRecord
             join(",",@email)));
       if ($#email!=-1){
          foreach my $email (@email){
-            my $bk=$tsossysacl->ValidatedInsertRecord({
-               systemid=>$TSOSsystemid,
-               email=>$email,
-               readwrite=>1
-            });
-            msg(INFO,"insert of $email = $bk");
+            if ($email ne ""){
+               my $bk=$tsossysacl->ValidatedInsertRecord({
+                  systemid=>$TSOSsystemid,
+                  email=>$email,
+                  readwrite=>1
+               });
+               msg(INFO,"insert of $email = $bk");
+            }
          }
       }
    }
