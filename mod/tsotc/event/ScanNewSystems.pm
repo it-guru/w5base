@@ -219,7 +219,7 @@ sub analyseRecord
 
    msg(INFO,"PROCESS: $rec->{id} $rec->{cdate} name='$rec->{name}'");
 
-   if (!($rec->{name}=~m/^[a-z0-9_-]{2,63}$/)){
+   if (!($rec->{name}=~m/^[a-z0-9_-\s]{2,63}$/)){
       msg(ERROR,"skip OTC Systemname $rec->{name} - invalid systemname");
       return();
    }

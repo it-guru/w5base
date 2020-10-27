@@ -128,6 +128,7 @@ sub qcheckRecord
          }
          else{
             if ($rec->{srcsys} eq "OTC"){
+               $parrec->{name}=~s/\s/_/g;
                if (defined($parrec->{name})){
                   $parrec->{name}=lc($parrec->{name});
                   $parrec->{name}=~s/\..*$//; # remove posible Domain part 

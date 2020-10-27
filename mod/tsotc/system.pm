@@ -56,6 +56,7 @@ sub new
                    my $current=shift;
                    my $name=$current->{name};
                    $name=~s/[^a-z0-9_-]/_/g;
+                   $name=~s/\s/_/g;
                    $name=TextShorter($current->{name},40);
 
                    return(lc($name."__".base36($current->{cdateunixtimstamp})));
@@ -606,6 +607,8 @@ sub Import
                   osrelease=>'other',
                   allowifupdate=>1,
                   cistatusid=>4};
+
+      $newrec->{name}=~s/\s/_/g;
 
       my $user=getModuleObject($self->Config,"base::user");
       if ($self->isDataInputFromUserFrontend()){
