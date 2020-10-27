@@ -822,6 +822,13 @@ sub orderSearchMaskFields
 }
 
 
+sub SelfAsParentObject    # this method is needed because existing derevations
+{
+   return("itil::lnkapplappl");
+}
+
+
+
 sub getSqlFrom
 {
    my $self=shift;

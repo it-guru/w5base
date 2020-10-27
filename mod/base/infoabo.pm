@@ -1053,10 +1053,10 @@ sub LoadTargets
       foreach my $rec ($self->getHashList(qw(userid email id 
                                              usercistatusid
                                              active))){
+         @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
          next if ($rec->{usercistatusid} eq ""); # ensure entries 
                                         # are filtered, if the
                                         # contact entry has NOT been deleted
-         @{$userlist}=grep(!/^$rec->{userid}$/,@{$userlist}); 
          if ($rec->{email} ne ""){
             my $requested=$rec->{active};
             if (defined($ml) && exists($ml->{mode}->{$$mode}) &&
