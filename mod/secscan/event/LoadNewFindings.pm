@@ -371,7 +371,7 @@ sub analyseRecord
                      [sort(keys(%altreponsibleid))];
                }
                msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed");
-               msg(WARN,"rec=".Dumper($rec));
+               #msg(WARN,"rec=".Dumper($rec));
                if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
                   msg(INFO,"ok - it was reassigned $WfRec->{id}");
                }
