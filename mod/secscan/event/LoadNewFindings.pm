@@ -121,6 +121,10 @@ sub LoadNewFindings
       }
    }
 
+  # $flt{sectokenid}=
+  #      '578549447F31DA283E41159DB595E575E4CF9566395CD656CD4940C30B518E4E';
+
+
    if (1){ # process new records
       my $skiplevel=0;
       my $recno=0;
@@ -193,10 +197,11 @@ sub LoadNewFindings
       my $dataop=$datastream->Clone();
       $datastream->ResetFilter();
       my @flt=(
-         {
-            wfhandeled=>\'1',
-            isdel=>\'1'
-         },
+       #  {
+       #     wfhandeled=>\'1',
+       #     isdel=>\'1',
+  secto#kenid=>'578549447F31DA283E41159DB595E575E4CF9566395CD656CD4940C30B518E4E'
+       #  },
          {
             wfhandeled=>\'1',
             isdel=>\'0',
