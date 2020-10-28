@@ -200,7 +200,7 @@ sub LoadNewFindings
        #  {
        #     wfhandeled=>\'1',
        #     isdel=>\'1',
-  secto#kenid=>'578549447F31DA283E41159DB595E575E4CF9566395CD656CD4940C30B518E4E'
+  #sectokenid=>'578549447F31DA283E41159DB595E575E4CF9566395CD656CD4940C30B518E4E'
        #  },
          {
             wfhandeled=>\'1',
