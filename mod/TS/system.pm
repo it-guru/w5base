@@ -473,6 +473,7 @@ sub isViewValid
          if (lc($rec->{adminteam}) ne "extern"){
             if (in_array(\@l,"default")){
                push(@l,"tsinmchm");
+               @l=grep(!/^inmchm$/,@l);
             }
          }
       }
