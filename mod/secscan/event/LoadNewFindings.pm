@@ -191,7 +191,7 @@ sub LoadNewFindings
                return({exitcode=>1,msg=>$msg});
             }
             if ($queryparam ne "FORCEALL"){
-               if ($recno>50){  # limit record-handing in one pass
+               if ($recno>500){  # limit record-handing in one pass
                   last;
                } 
             } 
