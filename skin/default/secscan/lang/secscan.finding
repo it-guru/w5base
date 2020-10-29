@@ -12,3 +12,4 @@
 'fieldgroup.handlingsource'=>{de=>'Behandlung - Metadaten',en=>'handling - metadata'},
 'current Workflow result'=>{de=>'aktuelles Workflow Ergebnis'},
 'exectition permission'=>{de=>'Ausnahme-Genehmigung'},
+'Security Token is not marked as deleted'=>{de=>'Security Token ist nicht als gelöscht markiert'},

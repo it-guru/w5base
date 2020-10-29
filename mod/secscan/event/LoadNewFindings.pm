@@ -47,7 +47,7 @@ sub LoadNewFindings
    my @datastreamview=qw(id hstate hostname ipaddr isdel itemrawdesc 
                          ofid name mdate startdate enddate findmdate
                          wfheadid wfref wfhandeled  hstate execptionperm
-                         secitem sectokenid sectreadrules spec 
+                         secitem sectokenid sectreadrules spec sectokenisnotdel
                          srcid srcsys respemail);
    # NICHT ALL verwenden, da die recup* Felder die Abfrage extrem langsam
    # machen würden
@@ -91,35 +91,40 @@ sub LoadNewFindings
    my $laststamp;
    my $lastid;
    my %flt=(isdel=>\'0');;
-   if ($queryparam ne "FORCEALL"){    #analyse lastSuccessRun
-      #%flt=( 
-      #   findcdate=>">$startstamp",
-      #   isdel=>\'0'
-      #);
-      %flt=( 
-         hstate=>"[EMPTY]",
-         isdel=>\'0'
-      );
-      if (defined($firstrec)){
-         my $lastmsg=$firstrec->{exitmsg};
-         if (($laststamp,$lastid)=
-             $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
-            $exitmsg=$lastmsg;
-            $datastream->ResetFilter();
-            $datastream->SetFilter({id=>\$lastid,findcdate=>\$laststamp});
-            my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
-            if (!defined($lastrec)){
-               msg(WARN,"record with id '$lastid' ".
-                        "has been deleted or changed - using date only");
-               $lastid=undef;
-            }
-            %flt=( 
-               findcdate=>">=\"$laststamp GMT\"",
-               isdel=>\'0'
-            );
-         }
-      }
-   }
+   #if ($queryparam ne "FORCEALL"){    #analyse lastSuccessRun
+   #   #%flt=( 
+   #   #   findcdate=>">$startstamp",
+   #   #   isdel=>\'0'
+   #   #);
+   #   %flt=( 
+   #      hstate=>"[EMPTY]",
+   #      isdel=>\'0'
+   #   );
+   #   if (defined($firstrec)){
+   #      my $lastmsg=$firstrec->{exitmsg};
+   #      if (($laststamp,$lastid)=
+   #          $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
+   #         $exitmsg=$lastmsg;
+   #         $datastream->ResetFilter();
+   #         $datastream->SetFilter({id=>\$lastid,findcdate=>\$laststamp});
+   #         my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
+   #         if (!defined($lastrec)){
+   #            msg(WARN,"record with id '$lastid' ".
+   #                     "has been deleted or changed - using date only");
+   #            $lastid=undef;
+   #         }
+   #         %flt=( 
+   #            findcdate=>">=\"$laststamp GMT\"",
+   #            isdel=>\'0'
+   #         );
+   #      }
+   #   }
+   #}
+
+   %flt=(  # sollte besser sein
+      hstate=>"[EMPTY]",
+      isdel=>\'0'
+   );
 
   # $flt{sectokenid}=
   #      '578549447F31DA283E41159DB595E575E4CF9566395CD656CD4940C30B518E4E';
@@ -197,11 +202,12 @@ sub LoadNewFindings
       my $dataop=$datastream->Clone();
       $datastream->ResetFilter();
       my @flt=(
-       #  {
-       #     wfhandeled=>\'1',
-       #     isdel=>\'1',
-  #sectokenid=>'578549447F31DA283E41159DB595E575E4CF9566395CD656CD4940C30B518E4E'
-       #  },
+         {
+            wfhandeled=>\'1',
+            isdel=>\'1',
+            sectokenisnotdel=>'[EMPTY]'
+ #sectokenid=>'578549447F31DA283E41159DB595E575E4CF9566395CD656CD4940C30B518E4E'
+         },
          {
             wfhandeled=>\'1',
             isdel=>\'0',

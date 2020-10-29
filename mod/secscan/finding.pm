@@ -141,6 +141,7 @@ select "W5I_secscan__findingbase".id,
        "W5I_secscan__findingbase".keyid,
        "W5I_secscan__findingbase".isdel,
        "W5I_secscan__findingbase".sectoken,
+       sectokendel.isdel          sectokenisnotdel,
        "W5I_secscan__findingbase".secitem,
        "W5I_secscan__findingbase".sectreadrules,
        "W5I_secscan__findingbase".fndscandate,
@@ -166,7 +167,11 @@ select "W5I_secscan__findingbase".id,
 from "W5I_secscan__findingbase"
      left outer join "W5I_secscan__finding_of"
         on "W5I_secscan__findingbase".keyid=
-           "W5I_secscan__finding_of".refid;
+           "W5I_secscan__finding_of".refid
+     left outer join (select distinct isdel,sectoken 
+                      from "W5I_secscan__findingbase") sectokendel
+        on "W5I_secscan__findingbase".sectoken=
+           sectokendel.sectoken and sectokendel.isdel='0';
 
 
 grant select on "W5I_secscan__finding" to W5I;
@@ -495,6 +500,15 @@ sub new
                 group         =>'source',
                 readonly      =>1,
                 dataobjattr   =>'keyid'),
+
+      new kernel::Field::Boolean(
+                name          =>'sectokenisnotdel',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                allowempty    =>'1',
+                label         =>'Security Token is not marked as deleted',
+                dataobjattr   =>'sectokenisnotdel'),
+
 
       new kernel::Field::Text(
                 name          =>'srcsys',
