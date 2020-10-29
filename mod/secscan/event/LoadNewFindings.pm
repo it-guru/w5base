@@ -375,7 +375,7 @@ sub analyseRecord
                   $newrec->{secfindingaltreponsibleid}=
                      [sort(keys(%altreponsibleid))];
                }
-               msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed");
+               msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed - $reponsibleid secfindingreponsibleid=".$WfRec->{secfindingreponsibleid});
                #msg(WARN,"rec=".Dumper($rec));
                if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
                   msg(INFO,"ok - it was reassigned $WfRec->{id}");
