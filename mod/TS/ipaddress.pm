@@ -184,7 +184,8 @@ sub doAnalyse
             # now we try to find the correct networks
             my @netmask=qw(0 0 0 0);
             my @network=qw(0 0 0 0);
-            my @flt;
+            my @ipnetflt;
+            my @netareaflt;
             foreach my $ipaddr (split(/[\s;]+/,$ipflt)){
                 my @okt=split(/\./,$ipaddr);
                 for(my $o=0;$o<=3;$o++){
@@ -197,16 +198,20 @@ sub doAnalyse
                          $network[$n]=$okt[$n]&$netmask[$n];
                       }
                       my $network=join(".",@network);
-                      push(@flt,{
+                      push(@ipnetflt,{
                          name=>\$network,
                          subnetmask=>\$netmask 
+                      });
+                      push(@netareaflt,{
+                         netaddr=>\$network,
+                         netmask=>\$netmask 
                       });
                    }
                 }
             }
-            if ($#flt!=-1){
+            if ($#ipnetflt!=-1){
                my $noa=getModuleObject($self->Config,"tsnoah::ipnet");
-               $noa->SetFilter(\@flt);
+               $noa->SetFilter(\@ipnetflt);
                my @l=$noa->getHashList(qw(fullname name subnetmask
                                           urlofcurrentrec email));
                my $email;
@@ -224,6 +229,29 @@ sub doAnalyse
                      "(".$_->{subnetmask}.")\n".
                      $_->{urlofcurrentrec};
                   } @l));
+               }
+               else{
+                  my $narea=getModuleObject($self->Config,"tsnoah::netrange");
+
+
+                  $narea->SetFilter(\@netareaflt);
+                  my @l=$narea->getHashList(qw(name name netmask netaddr
+                                             urlofcurrentrec email));
+                  if ($#l!=-1){
+                     foreach my $noahnet (@l){
+                        if ($email eq "" && $noahnet->{email} ne ""){
+                           $email=$noahnet->{email};
+                        }
+                     }
+                     if ($newcomments ne ""){
+                        $newcomments.="\n\n";
+                     }
+                     $newcomments.="NOAH IP-Netarea:\n".join("\n\n",map({
+                        $_->{name}."\n".$_->{netaddr}." ".
+                        "(".$_->{subnetmask}.")\n".
+                        $_->{urlofcurrentrec};
+                     } @l));
+                  }
                }
                if ($email ne ""){
                   my $flt={emails=>\$email};
