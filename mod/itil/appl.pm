@@ -184,7 +184,8 @@ sub new
                                  'shortdesc'],
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
                                  'systemid','id','reltyp','shortdesc',
-                                 'assetassetname','assetid']),
+                                 'assetassetname','assetid',
+                                 'srcsys','srcid']),
       new kernel::Field::Group(
                 name          =>'itsemteam',
                 htmldetail    =>sub{

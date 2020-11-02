@@ -38,4 +38,8 @@
 'RTO.3'=>{de=>'3 (168h)'                 ,en=>'3 (168h)'},
 'RTO.4'=>{de=>'4 (>168h)'                ,en=>'4 (>168h)'},
 'Change approver groups'=>{de=>'Change-Approver Gruppen'},
-'(operational)'=>{de=>'(betrieblich)'}
+'(operational)'=>{de=>'(betrieblich)'},
+'Cloud-Usage'=>{de=>'Cloud-Verwendung'},
+'CLOUDUSAGE.NONE'=>{de=>'keine',en=>'none'},
+'CLOUDUSAGE.FULL'=>{de=>'vollständig',en=>'full'},
+'CLOUDUSAGE.HYBRID'=>{de=>'hybrid',en=>'hybrid'}

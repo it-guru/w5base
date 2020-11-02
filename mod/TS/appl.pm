@@ -145,6 +145,45 @@ sub new
                 dataobjattr   =>'appl.ciamapplid'),
 
       new kernel::Field::Select(
+                name          =>'cloudusage',
+                label         =>'Cloud-Usage',
+                group         =>'technical',
+                searchable    =>0,
+                depend        =>['itcloudareas','systems'],
+                transprefix   =>'CLOUDUSAGE.',
+                onRawValue    =>sub{
+                                my $self=shift;
+                                my $current=shift;
+                                my $d=undef;
+                                my $fo=$self->getParent->getField(
+                                                    "itcloudareas",$current);
+                                my $cloudareas=$fo->RawValue($current);
+                                my $fo=$self->getParent->getField(
+                                                    "systems",$current);
+                                my $systems=$fo->RawValue($current);
+                                if (!defined($cloudareas) ||
+                                    ref($cloudareas) ne "ARRAY" ||
+                                    $#{$cloudareas}==-1){
+                                   $d="NONE";
+                                }
+                                else{
+                                   $d="FULL";
+                                   my $foundNoneCloud=0;
+                                   foreach my $sysrec (@{$systems}){
+                                      if (!in_array([qw(OTC AWS TPrivCloud)],
+                                                    $sysrec->{srcsys})){
+                                         $foundNoneCloud++;
+                                      }
+                                   }
+                                   if ($foundNoneCloud){
+                                      $d="HYBRID";
+                                   }
+                                }
+                                return($d);
+                              },
+                htmldetail    =>0),
+
+      new kernel::Field::Select(
                 name          =>'controlcenter',
                 group         =>'monisla',
                 label         =>'responsible ControlCenter',
