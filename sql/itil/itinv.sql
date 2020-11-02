@@ -1781,3 +1781,30 @@ create table addlnkapplgrpsystem (
 ) ENGINE=INNODB;
 alter table appl add respmethod varchar(40) default 'ROLEBASED';
 alter table swinstance add software bigint(20) default NULL,add version varchar(30) default NULL,add ipaddress bigint(20) default NULL;
+create table lnkadditionalci (
+  id           bigint(20) NOT NULL,
+  appl         bigint(20),
+  system       bigint(20),
+  swinstance   bigint(20),
+  name         varchar(40), ciusage varchar(40),
+  target       varchar(80),
+  targetid     varchar(80),
+  comments     longtext default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(80) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  KEY appl (appl),
+  KEY system (system),
+  KEY swinstance (swinstance),
+  FOREIGN KEY fk_system (system) REFERENCES system (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_appl   (appl)   REFERENCES appl (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_swinstace (swinstance) REFERENCES swinstance (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

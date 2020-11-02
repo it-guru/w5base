@@ -540,6 +540,15 @@ sub new
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['name']),
 
+      new kernel::Field::SubList(
+                name          =>'addcis',
+                label         =>'additional used Config-Items',
+                group         =>'addcis',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'itil::lnkadditionalci',
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['name','ciusage']),
+
       new kernel::Field::Text(
                 name          =>'businessteambossid',
                 group         =>'technical',
@@ -2531,7 +2540,8 @@ sub isViewValid
               finance interfaces licenses monisla sodrgroup qc external itsem
               mutimes   individualAttr
               misc opmgmt phonenumbers services businessservices 
-              soclustgroup socomments source swinstances systems applurl
+              soclustgroup socomments source swinstances systems applurl 
+              addcis
               technical workflowbasedata header inmchm interview efforts
               functional);
 
@@ -2697,7 +2707,7 @@ sub getDetailBlockPriority
              customer custcontracts supcontracts
              contacts phonenumbers 
              interfaces systems itcloudareas 
-             swinstances services businessservices applurl
+             swinstances services businessservices applurl addcis
              monisla 
              mutimes misc attachments individualAttr control 
              sodrgroup soclustgroup socomments accountnumbers licenses 

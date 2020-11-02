@@ -1294,6 +1294,15 @@ sub new
                 group         =>'contacts'),
 
       new kernel::Field::SubList(
+                name          =>'addcis',
+                label         =>'additional used Config-Items',
+                htmldetail    =>'NotEmpty',
+                group         =>'addcis',
+                vjointo       =>'itil::lnkadditionalci',
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>['name','ciusage']),
+
+      new kernel::Field::SubList(
                 name          =>'applicationteams',
                 label         =>'Application business teams',
                 group         =>'applications',
@@ -2201,7 +2210,7 @@ sub isViewValid
    return("header","default","systemclass") if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(header default swinstances 
-              inmchm
+              inmchm addcis
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses sysiface phonenumbers sec applications
               location source customer history upd relperson
@@ -2420,7 +2429,7 @@ sub getDetailBlockPriority
              vhost physys systemclass cluster
              opmode sec applications customer software 
              swinstances sysiface ipaddresses
-             contacts monisla misc upd 
+             contacts addcis monisla misc upd 
              attachments individualAttr control source));
 }
 
