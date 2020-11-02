@@ -598,6 +598,7 @@ sub root
    my @fp=split(/[\/]/,$fp);
    my $rootpath=Query->Param("RootPath");
    $rootpath=quoteHtml($rootpath);
+   
    $fp=~s/\//./g;
    $fp=~s/"/./g;
    if ($fp ne ""){
@@ -995,6 +996,9 @@ sub msel
    my $rootpath=Query->Param("RootPath");
    $rootpath=~s/</&lt;/g;
    $rootpath=~s/>/&gt;/g;
+   $rootpath=~s/\s//g;
+   $rootpath=~s/'//g;
+   $rootpath=~s/"/&quote;/g;
    $fp=~s/\//./g;
    $fp=~s/"/./g;
 
