@@ -77,7 +77,7 @@ begin
       select "W5I_secscan__finding_of".refid
       from "W5I_secscan__finding_of" 
          left outer join "W5I_secscan__findingbase" 
-           on "W5I_secscan__finding_of".refid="W5I_secscan__findingbase".id
+           on "W5I_secscan__finding_of".refid="W5I_secscan__findingbase".keyid
       where "W5I_secscan__findingbase".id is null
 );
 end;
