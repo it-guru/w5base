@@ -68,6 +68,14 @@ sub getControlRecord
              targetlabel  =>'fullname',
              baseflt      =>{}
            },
+           locationdataboss=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'base::location',
+             target       =>'databoss',
+             idfield      =>'databossid',
+             targetlabel  =>'name',
+             baseflt      =>{cistatusid=>'1 2 3 4 5'}
+           },
            usercontact=>{
              replaceoptype=>'base::user',
              dataobj      =>'base::lnkcontact',
