@@ -164,6 +164,12 @@ sub new
                 group         =>"location",
                 dataobjattr   =>'"slotno"'),
 
+      new kernel::Field::Text(
+                name          =>'nature',
+                htmldetail    =>'NotEmpty',
+                label         =>'Nature',
+                dataobjattr   =>'"assetnature"'),
+
       new kernel::Field::Import( $self,
                 weblinkto     =>\'tsacinv::model',
                 vjointo       =>\'tsacinv::model',
