@@ -104,6 +104,20 @@ sub DataCollector
  
          return($headers);
       },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "401"){  # 401 bedeutet nicht gefunden
+            return([],"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data TSOS response");
+         return(undef);
+      },
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
@@ -239,7 +253,7 @@ sub UpdateRecord
    my %upd=();
    foreach my $k (keys(%$newrec)){
       my $dstk=$k;
-      $dstk="icto" if ($dstk eq "ictoNumber");
+      $dstk="systemNumber" if ($dstk eq "ictoNumber");
       $upd{$dstk}=$newrec->{$k};
    }
 
