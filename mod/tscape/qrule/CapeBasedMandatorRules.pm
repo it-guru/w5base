@@ -141,6 +141,9 @@ sub qcheckRecord
          if (defined($ictor) && $ictor->{organisation} ne ""){
             $grp=$ictor->{orgareaid};
          }
+         if ($ictor->{orgarea}=~m/\.DTIT\.DigitalHub\./i){ # seems a hub
+            $grp="200"; # map all TelIT Hubs to Mandator TelekomIT group
+         }
          if ($grp ne ""){
             my $m=getModuleObject($dataobj->Config,"base::mandator");
             $m->SetFilter({grpid=>\$grp,cistatusid=>['3','4','5']});
