@@ -888,6 +888,7 @@ sub new
                 name          =>'applgrp',
                 label         =>'Applicationgroup',
                 readonly      =>'1',
+                htmldetail    =>'NotEmpty',
                 group         =>'customer',
                 weblinkto     =>'itil::applgrp',
                 weblinkon     =>['applgrpid'=>'id'],
@@ -898,6 +899,20 @@ sub new
                 readonly      =>'1',
                 group         =>'customer',
                 dataobjattr   =>'lnkapplgrpappl.applgrp'),
+
+      new kernel::Field::Group(
+                name          =>'responseorg',
+                readonly      =>'1',
+                htmldetail    =>'NotEmpty',
+                group         =>'customer',
+                label         =>'responsible Organisation',
+                vjoinon       =>'responseorgid'),
+
+      new kernel::Field::Interface(
+                name          =>'responseorgid',
+                readonly      =>'1',
+                group         =>'customer',
+                dataobjattr   =>"applgrp.responseorg"),
 
       new kernel::Field::Text(
                 name          =>'mgmtitemgroup',

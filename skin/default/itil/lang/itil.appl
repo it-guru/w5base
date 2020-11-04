@@ -221,3 +221,4 @@
 'Deputy Technical Responsible'=>{de=>'technisch verantwortlicherer Vertreter'},
 'Operational Responsible'=>{de=>'operativ Verantwortlicher'},
 'Deputy Operational Responsible'=>{de=>'operativ verantwortlicherer Vertreter'},
+'responsible Organisation'=>{de=>"verantwortlicher Organisationsbereich"},
