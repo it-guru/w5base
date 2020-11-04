@@ -55,7 +55,8 @@ sub CapeICTOimport
    }
    if (0){  # reduce data for debugging
       foreach my $i (keys(%icto)){
-         if (!in_array([$i],[qw(icto-4175 icto-2054 xicto-4380)])){
+         if (!in_array([$i],[qw(icto-4175 icto-2054 xicto-4380
+                                icto-13741 icto-17962)])){
             delete($icto{$i});
          }
       }
@@ -113,7 +114,7 @@ sub CapeICTOimport
          $responseorgid=$grpid;
       }
 
-      my @idl=$agrp->ValidatedInsertOrUpdateRecord({
+      my $newrec={
             cistatusid=>$cistatusid,
             name=>$shortname,
             fullname=>$irec->{fullname},
@@ -124,7 +125,12 @@ sub CapeICTOimport
             srcid=>$irec->{archapplid},
             srcsys=>$iname,
             srcload=>$start
-         },
+      };
+      if ($cistatusid>5){
+         delete($newrec->{name}); # update of name makes no sense, if rec is del
+      }
+
+      my @idl=$agrp->ValidatedInsertOrUpdateRecord($newrec,
          {srcsys=>\$iname,srcid=>\$irec->{archapplid}}
       );
       if ($#idl==0){
