@@ -207,7 +207,7 @@ sub analyseRecord
              }
           }
           if (defined($MachineID)){
-             printf STDERR ("process machineid=$MachineID\n");
+             msg(INFO,"process machineid=$MachineID");
              my $scandata=$rec->{filecontent};
              $scandata=~s/^\s*#\s+Uuid:\s+.*$/# Uuid: $MachineID/m;
              my ($d,$code,$message)=$dataobj->CollectREST(
