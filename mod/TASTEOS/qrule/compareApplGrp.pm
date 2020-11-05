@@ -200,10 +200,25 @@ sub qcheckRecord
       systemid=>\@systemid
    });
    my $opladdobj=$laddobj->Clone();
-   $laddobj->SetCurrentView(qw(systemid applgrpid additional id));
+   $laddobj->SetCurrentView(qw(systemid system applgrpid applgrp 
+                               additional id));
    my $ladd=$laddobj->getHashIndexed(qw(systemid));
-   #printf STDERR ("addl=%s\n",Dumper($ladd));
 
+   foreach my $systemid (keys(%{$ladd->{systemid}})){
+       my $TSOSmachineid;
+       if (exists($ladd->{systemid}->{$systemid})){
+          $TSOSmachineid=$ladd->{systemid}->{$systemid}->{additional}->{TasteOS_MachineID}->[0];
+       }
+       if ($TSOSmachineid ne ""){
+          $ladd->{TasteOS_MachineID}->{$TSOSmachineid}=
+             $ladd->{systemid}->{$systemid};
+       }
+   }
+
+
+
+
+   printf STDERR ("addl=%s\n",Dumper($ladd));
 
    my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
    my $tsossysacl=getModuleObject($dataobj->Config,"TASTEOS::tsossystemacl");
@@ -274,8 +289,26 @@ sub qcheckRecord
    else{
       my $bk=$tsossys->ValidatedUpdateRecord(
          {},$tsossysrec,
-         {id=>$TSOSsystemid
-      });
+      {id=>$TSOSsystemid});
+      $tsossys->ResetFilter();
+      $tsossys->SetFilter({id=>$TSOSsystemid});
+      my ($srec,$msg)=$tsossys->getOnlyFirst(qw(ALL));
+
+      if (defined($srec)){
+         my @delList;
+         foreach my $mrec (@{$srec->{machines}}){
+            if (!exists($ladd->{TasteOS_MachineID}->{$mrec->{id}})){
+               push(@delList,$mrec->{id});
+            }
+         }
+         printf STDERR "delList=".Dumper(\@delList);
+         foreach my $machineid (@delList){
+            $tsosmac->ResetFilter();
+            $tsosmac->ValidatedDeleteRecord({id=>$machineid});
+         }
+      }
+
+
    }
    #printf STDERR ("fifi upd TSOSsystemid=$TSOSsystemid\n");
 
@@ -313,6 +346,17 @@ sub qcheckRecord
          }
 
       }
+
+
+
+
+
+
+
+
+
+
+
       my @email=sort(map({$_->{email}} values(%contact)));
       msg(INFO,sprintf("set acl of TasteOS system $TSOSsystemid to %s\n",
             join(",",@email)));
@@ -330,6 +374,14 @@ sub qcheckRecord
       }
    }
 
+
+   $tsossys->ResetFilter();
+   $tsossys->SetFilter({name=>'!"Default System"',ictoNumber=>\""});
+   my @l=$tsossys->getHashList(qw(ALL));
+   foreach my $delsys (@l){
+       $tsossys->ResetFilter();
+       $tsossys->ValidatedDeleteRecord({id=>$delsys->{id}});
+   }
 
    $tsossys->ResetFilter();
    $tsossys->SetFilter({name=>\"Default System",ictoNumber=>\""});

@@ -69,6 +69,7 @@ sub new
                 types         =>['txt'],
                 filename      =>'filename',
                 searchable    =>0,
+                sqlorder      =>'none',
                 uploadable    =>0,
                 allowempty    =>0,
                 allowdirect   =>1,
@@ -119,17 +120,18 @@ sub getSqlFrom
    my $mode=shift;
    my @flt=@_;
    my $from=
-          "(select ".
-          "FILE_ID,".
-          "decode(rank() over (partition by system_id||'-'||file_name ".
-          "order by mod_date desc),1,1,0) latest ".
-          "from DARWIN_FILES ".
-          ") DF join ".
-          "DARWIN_FILES on DF.FILE_ID=DARWIN_FILES.FILE_ID and DF.latest='1' ".
+         # "(select ".
+         # "FILE_ID,".
+         # "decode(rank() over (partition by system_id||'-'||file_name ".
+         # "order by mod_date desc),1,1,0) latest ".
+         # "from DARWIN_FILES ".
+         # ") DF join ".
+         # "DARWIN_FILES on DF.FILE_ID=DARWIN_FILES.FILE_ID and DF.latest='1' ".
+          "DARWIN_FILES ".
           "JOIN DARWIN_TBL_ASSET_DATA on ".
-          "DARWIN_FILES.SYSTEM_ID=DARWIN_TBL_ASSET_DATA.SYSTEM_ID ".
-          "LEFT OUTER JOIN DARWIN_SYSTEM_STATUS on ".
-          "DARWIN_TBL_ASSET_DATA.SYSTEM_ID=DARWIN_SYSTEM_STATUS.SYSTEM_ID";
+          "DARWIN_FILES.SYSTEM_ID=DARWIN_TBL_ASSET_DATA.SYSTEM_ID ";
+#          "LEFT OUTER JOIN DARWIN_SYSTEM_STATUS on ".
+#          "DARWIN_TBL_ASSET_DATA.SYSTEM_ID=DARWIN_SYSTEM_STATUS.SYSTEM_ID";
 
    return($from);
 }
