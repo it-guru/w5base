@@ -262,7 +262,7 @@ sub analyseRecord
 
    #print Dumper($rec);
 
-   return(0); 
+   return(1); 
 }
 
 
