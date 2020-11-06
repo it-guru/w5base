@@ -490,14 +490,6 @@ sub new
                 },
                 dataobjattr   =>'ipaddress.addresstyp'),
 
-#      new kernel::Field::Select(
-#                name          =>'isjobserverpartner',
-#                transprefix   =>'boolean.',
-#                htmleditwidth =>'30%',
-#                label         =>'JobServer Partner',
-#                value         =>[0,1],
-#                dataobjattr   =>'ipaddress.is_controllpartner'),
-
       new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',

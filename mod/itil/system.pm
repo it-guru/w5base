@@ -1326,11 +1326,11 @@ sub new
                 label         =>'allow automatic updates by interfaces',
                 dataobjattr   =>'system.allowifupdate'),
 
-      new kernel::Field::Text(
-                name          =>'ccproxy',
-                group         =>'control',
-                label         =>'JobServer Proxy Command',
-                dataobjattr   =>'system.ccproxy'),
+      #new kernel::Field::Text(
+      #          name          =>'ccproxy',
+      #          group         =>'control',
+      #          label         =>'JobServer Proxy Command',
+      #          dataobjattr   =>'system.ccproxy'),
 
       new kernel::Field::Text(
                 name          =>'mon1url',
