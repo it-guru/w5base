@@ -93,7 +93,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'vou',
                 htmlwidth     =>'100px',
-                label         =>'virutal Org-Unit',
+                label         =>'virtual Org-Unit',
                 htmlwidth     =>'160px',
                 vjointo       =>'TS::vou',
                 vjoinon       =>['vouid'=>'id'],

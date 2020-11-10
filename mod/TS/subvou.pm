@@ -55,7 +55,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'vou',
                 htmlwidth     =>'100px',
-                label         =>'parent virutal Org-Unit',
+                label         =>'parent virtual Org-Unit',
                 htmlwidth     =>'160px',
                 readonly      =>sub{
                    my $self=shift;

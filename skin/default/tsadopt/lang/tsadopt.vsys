@@ -1,4 +1,4 @@
-'tsadopt::vsys'=>{de=>'virutalisiertes System',en=>'virutalized system'},
+'tsadopt::vsys'=>{de=>'virtualisiertes System',en=>'virtualized system'},
 'operating system type'=>{de=>'Betriebssystemtyp'},
 'operating system'=>{de=>'Betriebssystem'},
 'slices'=>{de=>'Slices'},
