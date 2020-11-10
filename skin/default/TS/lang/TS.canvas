@@ -1,7 +1,7 @@
 'TS::canvas'=>{de=>'Canvas Objekt',en=>'Canvas Object'},
 'fieldgroup.comments'=>{de=>'Bemerkungen',en=>'Comments'},
 'fieldgroup.appl'=>{de=>'betriebene Anwendungen',en=>'operated applications'},
-'fieldgroup.ictorelations'=>{de=>'Zuorndungen',en=>'Relations'},
+'fieldgroup.ictorelations'=>{de=>'Zuordnungen',en=>'Relations'},
 'representing group'=>{de=>'repräsentierende Gruppe'},
 'Fullname'=>{de=>'vollständiger Name'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
