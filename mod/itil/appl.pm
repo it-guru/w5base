@@ -1030,6 +1030,24 @@ sub new
                 dataobjattr   =>'if (appladv.itnormodel is null,'.
                                 '0,appladv.itnormodel)'),
 
+
+      new kernel::Field::Boolean(
+                name          =>'processingpersdata',
+                label         =>'processing of person related data',
+                group         =>'customer',
+                searchable    =>0,
+                translation   =>'itil::appladv',
+                htmldetail    =>0,
+                vjointo       =>'itil::appladv',
+                vjoinon       =>['appladvid'=>'id'],
+                vjoindisp     =>'processingpersdata'),
+
+      new kernel::Field::Link(
+                name          =>'appladvid',
+                group         =>'customer',
+                label         =>'ApplAdvID',
+                dataobjattr   =>'appladv.id'),
+
       new kernel::Field::Select(
                 name          =>'avgusercount',
                 group         =>'functional',
