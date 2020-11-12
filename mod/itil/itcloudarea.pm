@@ -426,10 +426,31 @@ sub Validate
       }
    }
    my $applid=effVal($oldrec,$newrec,"applid");
+   $applid=~s/[^0-9]//g;
    if ($applid eq ""){
       $self->LastMsg(ERROR,"no valid application specified");
       return(0);
    }
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"applid")){
+      if ($applid ne ""){
+         my $o=getModuleObject($self->Config,"itil::appl");
+         $o->SetFilter({id=>\$applid});
+         my ($orec,$msg)=$o->getOnlyFirst(qw(cistatusid));
+         if (!defined($orec)){
+            $self->LastMsg(ERROR,"invalid applid specified");
+            return(0);
+         }
+         if ($orec->{cistatusid} ne "2" &&
+             $orec->{cistatusid} ne "3" &&
+             $orec->{cistatusid} ne "4"){
+            $self->LastMsg(ERROR,
+                  "specified application is no in acceptable CI-State");
+            return(0);
+         }
+      }
+   }
+
+
    my $name=effVal($oldrec,$newrec,"name");
    if ($name eq "" || haveSpecialChar($name)){
       $self->LastMsg(ERROR,"invalid cloud area name");
