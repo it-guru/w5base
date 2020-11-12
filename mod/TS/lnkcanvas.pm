@@ -252,6 +252,14 @@ sub Validate
       }
    }
 
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"canvasid")){
+      my $canvasid=effVal($oldrec,$newrec,"canvasid");
+      if (!$self->isWriteOnCanvasValid($canvasid,"ictorelations")){
+         $self->LastMsg(ERROR,"no write access to specified canvas object");
+         return(0);
+      }
+   }
+
 
 
 
