@@ -243,6 +243,26 @@ sub Init
                       "itil::lnkswinstancecontact",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.cloud",
+                      "itil::itcloud",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.cloud.new",
+                      "itil::itcloud",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.cloud.area",
+                      "itil::itcloudarea",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.cloud.area.new",
+                      "itil::itcloudarea",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
+
+
    $self->RegisterObj("itts.kern",
                       "tmpl/welcome");
    
