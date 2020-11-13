@@ -34,7 +34,7 @@ sub LoadNewAuditTasteOSFiles
    my $firstDayRange=35;
    my $firstDayRange=45;
    my $maxDeltaDayRange="15";
-   my $blockSize=10;
+   my $blockSize=100;
 
    my $StreamDataobj="tsAuditSrv::auditfile";
 

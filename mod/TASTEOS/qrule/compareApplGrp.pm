@@ -195,10 +195,8 @@ sub qcheckRecord
    #printf STDERR ("systemid=%s\n",join(",",@systemid));
 
    my $laddobj=getModuleObject($dataobj->Config,"itil::addlnkapplgrpsystem");
-   $laddobj->SetFilter({
-      applgrpid=>\$rec->{id},
-      systemid=>\@systemid
-   });
+   $laddobj->SetFilter({ applgrpid=>\$rec->{id} });
+     # systemid=>\@systemid
    my $opladdobj=$laddobj->Clone();
    $laddobj->SetCurrentView(qw(systemid system applgrpid applgrp 
                                additional id));
@@ -206,19 +204,36 @@ sub qcheckRecord
 
    foreach my $systemid (keys(%{$ladd->{systemid}})){
        my $TSOSmachineid;
-       if (exists($ladd->{systemid}->{$systemid})){
-          $TSOSmachineid=$ladd->{systemid}->{$systemid}->{additional}->{TasteOS_MachineID}->[0];
+       if (in_array(\@systemid,$systemid)){
+          if (exists($ladd->{systemid}->{$systemid})){
+             $TSOSmachineid=$ladd->{systemid}->{$systemid}->{additional}->{TasteOS_MachineID}->[0];
+          }
+          if ($TSOSmachineid ne ""){
+             $ladd->{TasteOS_MachineID}->{$TSOSmachineid}=
+                $ladd->{systemid}->{$systemid};
+          }
        }
-       if ($TSOSmachineid ne ""){
-          $ladd->{TasteOS_MachineID}->{$TSOSmachineid}=
-             $ladd->{systemid}->{$systemid};
+       else{
+          printf STDERR ("needs to delete $systemid\n");
+          my $oldrec=$ladd->{systemid}->{$systemid};
+          if (exists($oldrec->{additional}->{TasteOS_MachineID})){
+             my %add=%{$oldrec->{additional}};
+             delete($add{TasteOS_MachineID});
+             my $opladdobj=$laddobj->Clone();
+             $opladdobj->ValidatedUpdateRecord(
+                $oldrec,
+                {additional=>\%add},
+                {id=>\$oldrec->{id}}
+             );
+          }
+          delete($ladd->{systemid}->{$systemid});
        }
    }
 
 
 
 
-   printf STDERR ("addl=%s\n",Dumper($ladd));
+  # printf STDERR ("addl=%s\n",Dumper($ladd));
 
    my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
    my $tsossysacl=getModuleObject($dataobj->Config,"TASTEOS::tsossystemacl");
