@@ -340,6 +340,7 @@ sub ProcessLine
                   }
                   $targetval=$linkfield->RawValue($rec);
                }
+printf STDERR ("fifi field=$fieldname weblinkto=$weblinkto targetval=$targetval\n");
                if (defined($targetval) && $targetval ne ""){
                   my $detailx=$self->getParent->getParent->DetailX();
                   my $detaily=$self->getParent->getParent->DetailY();

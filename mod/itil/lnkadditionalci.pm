@@ -52,7 +52,7 @@ sub new
                                   if ($current->{target} ne "" &&
                                       $current->{targetid} ne ""){
                                      return($current->{target},
-                                            ['id'=>$current->{targetid}]);
+                                            ['targetid'=>'id']);
                                   }
                                   return("none",undef);
                                 },
@@ -189,7 +189,7 @@ sub getSqlFrom
               null system,
               swinstance.id swinstance,
               swinstance.fullname name,
-              'RESOURCE' ciusage,
+              swinstancerule.ruletype ciusage,
               null comments,
               'itil::swinstance' target,
               swinstancerule.swinstance targetid,
