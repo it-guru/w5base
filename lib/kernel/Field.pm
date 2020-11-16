@@ -409,6 +409,11 @@ sub Uploadable
       }
    }
    return(0) if (!$self->UiVisible("ViewEditor"));
+   if (defined($self->{onRawValue})){
+      if (ref($self->{onRawValue}) eq "CODE"){ # calc fields could not uploaded
+         return(0);
+      }
+   }
    return(0) if ($self->readonly);
    return(0) if ($self->{name} eq "srcid");
    return(0) if ($self->{name} eq "srcsys");

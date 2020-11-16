@@ -1009,6 +1009,7 @@ sub new
                 name          =>'itnormodel',
                 group         =>'customer',
                 label         =>'NOR Model to use',
+                readonly      =>1,
                 searchable    =>sub{
                    my $self=shift;
                    my $current=shift;
