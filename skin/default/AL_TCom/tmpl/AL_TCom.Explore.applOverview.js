@@ -12,7 +12,7 @@ define(["datadumper","jquery.flot","jquery.flot.pie"],function (Dumper){
    ClassAppletLib[applet].class.prototype.showSummary=function(o,id,isum){
       var d={};
 
-      var baseTags=new Array('dataquality','hardware','system','software',
+      var baseTags=new Array('dataquality','system','software',
                              'hpsaswp','osroadmap','interview');
       for(tpos=0;tpos<baseTags.length;tpos++){
          var tag=baseTags[tpos];
@@ -35,24 +35,6 @@ define(["datadumper","jquery.flot","jquery.flot.pie"],function (Dumper){
                   d[tag].cnt.warn++;
                }
                else if (isum[tag].record[c].dataissuestate.match(/but OK$/)){
-                  d[tag].cnt.commented++;
-               }
-               else{
-                  d[tag].cnt.fail++;
-               }
-            }
-         }
-         if (tag=='hardware'){
-            d[tag].label="Hardware-Refresh";
-            for(c=0;c<isum.hardware.record.length;c++){
-               d[tag].cnt.total+=1;
-               if (isum[tag].record[c].assetrefreshstate=="OK"){
-                  d[tag].cnt.ok++;
-               }
-               else if (isum[tag].record[c].assetrefreshstate=="WARN"){
-                  d[tag].cnt.warn++;
-               }
-               else if (isum[tag].record[c].assetrefreshstate.match(/but OK$/)){
                   d[tag].cnt.commented++;
                }
                else{

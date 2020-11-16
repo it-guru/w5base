@@ -1073,24 +1073,13 @@ sub processRecord
       if (keys(%assetid)){
          my $o=$app->getPersistentModuleObject("itil::asset");
          $o->SetFilter({id=>[keys(%assetid)]});
-         my @l=$o->getHashList(qw(id name srcsys srcid  refreshstate acqumode
-                                  assetrefreshstate age dataissuestate));
+         my @l=$o->getHashList(qw(id name srcsys srcid  acqumode
+                                  age dataissuestate));
          for(my $c=0;$c<=$#l;$c++){
             $assetid{$l[$c]->{id}}->{acqumode}=
                $l[$c]->{acqumode};
 
-            my $refreshstate=$l[$c]->{refreshstate};
             my $age=$l[$c]->{age};
-            {  # detect Serverfarm Assets with no relevant Hardare-Refresh
-               my @productline=keys($assetid{$l[$c]->{id}}->{productline});
-               @productline=grep(!/^(ITSF-.*|DBaaS)$/,@productline);
-               if ($#productline==-1){
-                  $refreshstate="blue";
-                  $age="";
-               }
-            }
-
-            $assetid{$l[$c]->{id}}->{refreshstate}=$refreshstate;
             $assetid{$l[$c]->{id}}->{age}=$age;
 
             if (exists($l[$c]->{dataissuestate}->{id})){
@@ -1284,12 +1273,7 @@ sub processRecord
          $l.=$assetid{$aid}->{assetid}.";";
          $l.=$assetid{$aid}->{dataissue}.";";
          $l.=$assetid{$aid}->{acqumode}.";";
-         $l.=$assetid{$aid}->{refreshstate}.";";
-         my $refreshstate=$assetid{$aid}->{refreshstate};
-         $refreshstate=~s/\s.*$//;
-         if (in_array([keys(%colors)],$refreshstate)){
-            $appkpi->{'RMO.Asset.age.'.$refreshstate}++;
-         }
+         $l.=";"; # refreshstate wurde entfernt
          $l.=$assetid{$aid}->{age}.";";
          $self->getParent->storeStatVar("Application",
                                         [$rec->{name}],

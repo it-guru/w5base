@@ -568,46 +568,46 @@ sub new
                 label         =>'Refresh notification 2',
                 dataobjattr   =>'asset.refreshinfo2'),
 
-     new kernel::Field::Text(
-                name          =>'refreshstate',
-                group         =>'upd',
-                htmldetail    =>0,
-                searchable    =>1,
-                label         =>'Hardware refresh light',
-                dataobjattr   =>getSQLrefreshstateCommand()),
+#     new kernel::Field::Text(
+#                name          =>'refreshstate',
+#                group         =>'upd',
+#                htmldetail    =>0,
+#                searchable    =>1,
+#                label         =>'Hardware refresh light',
+#                dataobjattr   =>getSQLrefreshstateCommand()),
 
-     new kernel::Field::Text(
-                name          =>'assetrefreshstate',
-                group         =>'upd',
-                htmldetail    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                label         =>'Hardware refresh state',
-                depend        =>['deprstart','denyupdvalidto','refreshstate'],
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $fo=$self->getParent->getField("refreshstate");
-                   my $f=$fo->RawValue($current);
-                   $f=~s/\s.*$//;
-                   my $s="FAIL";
-                   if ($f eq "green"){
-                      $s="OK"
-                   }
-                   elsif ($f eq "yellow"){
-                      $s="WARN"
-                   }
-                   elsif ($f eq "lightgreen"){
-                      $s="WARN but OK"
-                   }
-                   elsif ($f eq "red"){
-                      $s="FAIL"
-                   }
-                   elsif ($f eq "blue"){
-                      $s="FAIL but OK"
-                   }
-                   return($s);
-                }),
+#     new kernel::Field::Text(
+#                name          =>'assetrefreshstate',
+#                group         =>'upd',
+#                htmldetail    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                label         =>'Hardware refresh state',
+#                depend        =>['deprstart','denyupdvalidto','refreshstate'],
+#                onRawValue    =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $fo=$self->getParent->getField("refreshstate");
+#                   my $f=$fo->RawValue($current);
+#                   $f=~s/\s.*$//;
+#                   my $s="FAIL";
+#                   if ($f eq "green"){
+#                      $s="OK"
+#                   }
+#                   elsif ($f eq "yellow"){
+#                      $s="WARN"
+#                   }
+#                   elsif ($f eq "lightgreen"){
+#                      $s="WARN but OK"
+#                   }
+#                   elsif ($f eq "red"){
+#                      $s="FAIL"
+#                   }
+#                   elsif ($f eq "blue"){
+#                      $s="FAIL but OK"
+#                   }
+#                   return($s);
+#                }),
                 
 
      new kernel::Field::Date(
@@ -829,53 +829,53 @@ sub new
    return($self);
 }
 
-sub getSQLrefreshstateCommand
-{
-   my $shortterm="INTERVAL 36 MONTH";
-   my $longterm="INTERVAL 60 MONTH";
-   my $d=<<EOF;
-
-if (if (asset.acquMode='PURCHASE',asset.deprstart,asset.acquStart) is not null,
-   if (asset.refreshpland is not null and asset.refreshpland>sysdate(),
-      'green => refreshplaned is set',
-   /*ELSE no refresh planed is set*/
-      if (asset.denyupdvalidto is not null and asset.denyupd>0,
-         if (date_add(asset.denyupdvalidto,INTERVAL -1 MONTH)<sysdate(),
-            'yellow',
-         /*ELSE Begruendungsendezeitpunkt liegt ausreichend in der Zukunft*/
-            if (length(asset.denyupdcomments)>10,
-               'blue =>comment exists and is valid',
-            /*ELSE kein Begründungstext vorhanden*/
-               'red => 5 years and no comments'
-            )
-         ),
-      /*ELSE kein Begruendungsendezeitpunkt*/
-         if (date_add(if (asset.acquMode='PURCHASE',
-                        asset.deprstart,asset.acquStart),${longterm})<sysdate(),
-            'red => 5 years',
-         /*ELSE*/
-            if (date_add(if (asset.acquMode='PURCHASE',
-                     asset.deprstart,asset.acquStart),${shortterm})<sysdate(),
-               if (length(asset.denyupdcomments)>10,
-                  'lightgreen',
-               /*ELSE Bemerkung nicht vorhanden*/
-                  'yellow => 3 years and no comments'
-               ),
-            /*ELSE*/
-               'green'
-            )
-         )
-      )
-   ),
-/*ELSE Start nicht gesetzt*/
-   'yellow => no start date'
-)
-
-
-EOF
-
-   return($d);
-}
+#sub getSQLrefreshstateCommand
+#{
+#   my $shortterm="INTERVAL 36 MONTH";
+#   my $longterm="INTERVAL 60 MONTH";
+#   my $d=<<EOF;
+#
+#if (if (asset.acquMode='PURCHASE',asset.deprstart,asset.acquStart) is not null,
+#   if (asset.refreshpland is not null and asset.refreshpland>sysdate(),
+#      'green => refreshplaned is set',
+#   /*ELSE no refresh planed is set*/
+#      if (asset.denyupdvalidto is not null and asset.denyupd>0,
+#         if (date_add(asset.denyupdvalidto,INTERVAL -1 MONTH)<sysdate(),
+#            'yellow',
+#         /*ELSE Begruendungsendezeitpunkt liegt ausreichend in der Zukunft*/
+#            if (length(asset.denyupdcomments)>10,
+#               'blue =>comment exists and is valid',
+#            /*ELSE kein Begründungstext vorhanden*/
+#               'red => 5 years and no comments'
+#            )
+#         ),
+#      /*ELSE kein Begruendungsendezeitpunkt*/
+#         if (date_add(if (asset.acquMode='PURCHASE',
+#                        asset.deprstart,asset.acquStart),${longterm})<sysdate(),
+#            'red => 5 years',
+#         /*ELSE*/
+#            if (date_add(if (asset.acquMode='PURCHASE',
+#                     asset.deprstart,asset.acquStart),${shortterm})<sysdate(),
+#               if (length(asset.denyupdcomments)>10,
+#                  'lightgreen',
+#               /*ELSE Bemerkung nicht vorhanden*/
+#                  'yellow => 3 years and no comments'
+#               ),
+#            /*ELSE*/
+#               'green'
+#            )
+#         )
+#      )
+#   ),
+#/*ELSE Start nicht gesetzt*/
+#   'yellow => no start date'
+#)
+#
+#
+#EOF
+#
+#   return($d);
+#}
 
 sub hideOnBundle{
    my $self=shift;

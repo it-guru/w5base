@@ -214,7 +214,6 @@ sub ItemSummary
                      cistatusid=>"!6"});
       my @assets=$o->getHashList(qw(name denyupd denyupdcomments refreshpland
                                     dataissuestate age acqumode 
-                                    assetrefreshstate
                                     urlofcurrentrec));
       return(0) if (!$o->Ping());
       for(my $c=0;$c<=$#assets;$c++){
