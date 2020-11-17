@@ -28,13 +28,20 @@ use kernel::Event;
 sub LoadNewAuditTasteOSFiles
 {
    my $self=shift;
-   my $queryparam=shift;
+   my %param=@_;
+
 
 
    my $firstDayRange=35;
    my $firstDayRange=45;
    my $maxDeltaDayRange="15";
    my $blockSize=100;
+
+   if (exists($param{blockSize}) &&
+       ($param{blockSize}=~m/^[0-9]+$/)){
+      $blockSize=$param{blockSize};
+   }
+   msg(DEBUG,"using blockSize=$blockSize");
 
    my $StreamDataobj="tsAuditSrv::auditfile";
 
@@ -79,7 +86,7 @@ sub LoadNewAuditTasteOSFiles
    my $laststamp;
    my $lastid;
    my %flt=(mdate=>'>now-1d');;
-   if ($queryparam ne "FORCEALL"){    #analyse lastSuccessRun
+   if ($param{FORCEALL} ne "1"){    #analyse lastSuccessRun
       %flt=( 
          mdate=>">$startstamp"
       );
