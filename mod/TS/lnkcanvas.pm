@@ -252,6 +252,17 @@ sub Validate
       }
    }
 
+
+   return(1);
+}
+
+
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
    if (!defined($oldrec) || effChanged($oldrec,$newrec,"canvasid")){
       my $canvasid=effVal($oldrec,$newrec,"canvasid");
       if (!$self->isWriteOnCanvasValid($canvasid,"ictorelations")){
@@ -259,32 +270,8 @@ sub Validate
          return(0);
       }
    }
-
-
-
-
-#   if (effVal($oldrec,$newrec,"systemid")==0){
-#      $self->LastMsg(ERROR,"invalid system specified");
-#      return(undef);
-#   }
-#   if (effVal($oldrec,$newrec,"jobid")==0){
-#      $self->LastMsg(ERROR,"invalid systemjob specified");
-#      return(undef);
-#   }
    return(1);
 }
-
-
-#sub SecureValidate
-#{
-#   my $self=shift;
-#   my $oldrec=shift;
-#   my $newrec=shift;
-#
-#   print STDERR ("SecureValidate:newrec=%s\n",Dumper($newrec));
-#
-#   return(1);
-#}
 
 
 
