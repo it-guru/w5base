@@ -252,27 +252,18 @@ sub Validate
       }
    }
 
-
-   return(1);
-}
-
-
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   if (!defined($oldrec) || effChanged($oldrec,$newrec,"canvasid")){
-      my $canvasid=effVal($oldrec,$newrec,"canvasid");
-      if (!$self->isWriteOnCanvasValid($canvasid,"ictorelations")){
-         $self->LastMsg(ERROR,"no write access to specified canvas object");
-         return(0);
+   if ($self->isDataInputFromUserFrontend()){
+      if (!defined($oldrec) || effChanged($oldrec,$newrec,"canvasid")){
+         my $canvasid=effVal($oldrec,$newrec,"canvasid");
+         if (!$self->isWriteOnCanvasValid($canvasid,"ictorelations")){
+            $self->LastMsg(ERROR,"no write access to specified canvas object");
+            return(0);
+         }
       }
    }
+
    return(1);
 }
-
 
 
 
