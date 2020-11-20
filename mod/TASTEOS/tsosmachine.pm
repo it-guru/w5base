@@ -139,7 +139,9 @@ sub DataCollector
    my $query=$self->decodeFilter2Query4TASTEOS($filter);
    my $systemid=$query->{systemid};
 
-   my $dbclass="icto/machine-metadata";
+   $systemid=~s/[\.\/]//g;
+
+   my $dbclass="systems/$systemid/machines";
    my $requesttoken=$systemid;
 
    if ($query->{id} ne ""){  # change op, if machine id is direct addressed
@@ -156,7 +158,6 @@ sub DataCollector
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         $baseurl=~s/v1/v0/g if ($dbclass=~m/machine-metadata$/);
          my $dataobjurl=$baseurl.$dbclass;
          return($dataobjurl);
       },
