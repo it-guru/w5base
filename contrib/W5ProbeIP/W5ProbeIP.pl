@@ -486,14 +486,14 @@ sub do_SSLCERT
       $step++;
       push(@{$r->{sslcert}->{log}},
           sprintf("Step${step}: try to connect to %s:%s TLSv12",$host,$port));
-      $sock = IO::Socket::SSL->new(
+      eval('$sock = IO::Socket::SSL->new(
          PeerAddr=>"$host:$port",
-         SSL_version=>'TLSv12',
-         SSL_verify_mode=>'SSL_VERIFY_PEER',
+         SSL_verify_mode=>SSL_VERIFY_PEER,
          Timeout=>5,
+         SSL_version=>"TLSv12",
          SSL_verify_callback=>\&preConnectReadServerCerts,
          SSL_session_cache_size=>0
-      );
+      );');
       if ($@ ne ""){
          printf STDERR ("W5ProbeIP IO::Socket::SSL->new step${step} = $@\n");
       }
