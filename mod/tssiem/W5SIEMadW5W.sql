@@ -53,6 +53,8 @@ create table "W5SIEM_secent" (
    severity             NUMBER(2,0) not null,
    port                 NUMBER(20,0),
    ssl                  VARCHAR(10),
+   cvss_basescore       NUMBER(3,1),
+   cvss_scorestr        VARCHAR(20),
    first_detect         DATE,
    last_detect          DATE,
    vendor_reference     VARCHAR2(4000),
