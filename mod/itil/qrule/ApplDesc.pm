@@ -89,7 +89,9 @@ sub qcheckRecord
    my $desc={qmsg=>[],solvtip=>[]};
    return($exitcode,$desc) if ($rec->{cistatusid}!=4 
                                && $rec->{cistatusid}!=3);
-   return($exitcode,$desc) if ($rec->{allowifupdate}==1); # bei auto updates
+   return($exitcode,$desc) if ($rec->{allowifupdate}==1 &&
+                               (lc($rec->{srcsys}) ne "w5base")); 
+                                     # bei auto updates
                                      # kann der 
                                      # databoss keine
                                      # verantwortung für die beschreibung haben
