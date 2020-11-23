@@ -627,12 +627,12 @@ sub new
                 vjoinon       =>['tsmid'=>'userid'],
                 vjoindisp     =>'posix'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'tsmid',
                 group         =>'technical',
                 dataobjattr   =>'appl.tsm'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'opmid',
                 group         =>'opmgmt',
                 dataobjattr   =>'appl.opm'),
@@ -855,12 +855,12 @@ sub new
                 vjoinon       =>['tsm2id'=>'userid'],
                 vjoindisp     =>'posix'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'tsm2id',
                 group         =>'technical',
                 dataobjattr   =>'appl.tsm2'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'opm2id',
                 group         =>'opmgmt',
                 dataobjattr   =>'appl.opm2'),
