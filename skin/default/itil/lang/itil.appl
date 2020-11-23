@@ -222,5 +222,5 @@
 'Operational Responsible'=>{de=>'operativ Verantwortlicher'},
 'Deputy Operational Responsible'=>{de=>'operativ verantwortlicherer Vertreter'},
 'responsible Organisation'=>{de=>"verantwortlicher Organisationsbereich"},
-'specified application is no in acceptable CI-State'=>{de=>'angegbene Anwendung is nicht in einem zulässigen CI-Status'},
+'specified application is no in acceptable CI-State'=>{de=>'angegebene Anwendung is nicht in einem zulässigen CI-Status'},
 'invalid applid specified'=>{de=>'ungültige applid angegeben'},
