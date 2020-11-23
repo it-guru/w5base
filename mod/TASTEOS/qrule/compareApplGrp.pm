@@ -214,7 +214,7 @@ sub qcheckRecord
           }
        }
        else{
-          printf STDERR ("needs to delete $systemid\n");
+          #printf STDERR ("needs to delete $systemid\n");
           my $oldrec=$ladd->{systemid}->{$systemid};
           if (exists($oldrec->{additional}->{TasteOS_MachineID})){
              my %add=%{$oldrec->{additional}};
@@ -316,7 +316,7 @@ sub qcheckRecord
                push(@delList,$mrec->{id});
             }
          }
-         printf STDERR "delList=".Dumper(\@delList);
+         #printf STDERR "delList=".Dumper(\@delList);
          foreach my $machineid (@delList){
             $tsosmac->ResetFilter();
             $tsosmac->ValidatedDeleteRecord({id=>$machineid});
