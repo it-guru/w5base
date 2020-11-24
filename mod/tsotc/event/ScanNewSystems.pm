@@ -31,7 +31,35 @@ sub Init
 
 
    $self->RegisterEvent("ScanNewSystems","ScanNewSystems",timeout=>600);
-   $self->RegisterEvent("OTCScan","ScanNewSystems",timeout=>600);
+   $self->RegisterEvent("validateSystemCompleteness","validateSystemCompleteness",timeout=>600);
+}
+
+
+sub validateSystemCompleteness
+{
+   my $self=shift;
+   my $StreamDataobj="tsotc::system";
+   my $datastream=getModuleObject($self->Config,$StreamDataobj);
+   my $sys=getModuleObject($self->Config,"itil::system");
+   my @datastreamview=qw(cdate name id);
+   my @l=$datastream->getHashList(@datastreamview);
+   my $misscnt=0;
+
+   foreach my $otcsysrec (@l){
+      $sys->ResetFilter();
+      $sys->SetFilter({srcid=>\$otcsysrec->{id},srcsys=>\'OTC'});
+      my ($chkrec,$msg)=$sys->getOnlyFirst(qw(id));
+      if (!defined($chkrec)){
+         msg(INFO,"system ".$otcsysrec->{name}." with id=".$otcsysrec->{id}.
+                  " missed");
+         $self->ScanNewSystems("ID",$otcsysrec->{id});
+         $misscnt++;
+      }
+   }
+   if ($misscnt==0){
+      return({exitcode=>0,exitmsg=>'ok'});
+   }
+   return({exitcode=>1,exitmsg=>'misscnt='.$misscnt});
 }
 
 
@@ -49,8 +77,15 @@ sub ScanNewSystems
    my @datastreamview=qw(name cdate id contactemail 
                          availability_zone);
    if ($queryparam ne ""){
-      msg(INFO,"try to import name='$queryparam'");
-      $datastream->SetFilter({name=>$queryparam});
+      if ($queryparam eq "ID"){
+         $queryparam=shift;
+         msg(INFO,"try to import id='$queryparam'");
+         $datastream->SetFilter({id=>$queryparam});
+      }
+      else{
+         msg(INFO,"try to import name='$queryparam'");
+         $datastream->SetFilter({name=>$queryparam});
+      }
       my @l=$datastream->getHashList(@datastreamview);
       my $cnt=0;
       foreach my $rec (@l){
