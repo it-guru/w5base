@@ -684,7 +684,7 @@ sub Import
          }
          $newrec->{mandatorid}=$m[0];
       }
-      if (!exists($newrec->{mandatorid})){
+      if (!exists($newrec->{mandatorid}) || $newrec->{mandatorid} eq ""){
          if (defined($w5applrec) && $w5applrec->{mandatorid} ne ""){
             $newrec->{mandatorid}=$w5applrec->{mandatorid};
          }
@@ -694,7 +694,7 @@ sub Import
       if ($newrec->{mandatorid} eq ""){
          $self->LastMsg(ERROR,"can't get mandator for import of ".
                         "OTC System $sysrec->{name}");
-         msg(ERROR,sprintf("w5applrec=%s",Dumper($w5applrec)));
+         #msg(ERROR,sprintf("w5applrec=%s",Dumper($w5applrec)));
          return();
       }
       if (defined($w5applrec)){
