@@ -31,7 +31,7 @@ sub Init
 
 
    $self->RegisterEvent("ScanNewSystems","ScanNewSystems",timeout=>600);
-   $self->RegisterEvent("validateSystemCompleteness","validateSystemCompleteness",timeout=>600);
+   $self->RegisterEvent("validateSystemCompleteness","validateSystemCompleteness",timeout=>1800);
 }
 
 
