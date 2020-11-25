@@ -645,15 +645,16 @@ sub ciphertests
    my $timeout=2;
 	foreach my $hk (sort keys %hash) {
 		#if ($verbose > 1) { print "Attempting connection to $host:$port using $_[0] $hk...\n"; }
-		my $sslsocket = IO::Socket::SSL->new(
+                my $sslsocket;
+		eval(' $sslsocket = IO::Socket::SSL->new(
 			PeerAddr => $host,
 			PeerPort => $port,
-			Proto => 'tcp',
+			Proto => "tcp",
 			SSL_verify_mode => SSL_VERIFY_NONE,
 			Timeout => $timeout, 
 			SSL_version => $sversion, 
 			SSL_cipher_list => $hk
-		);
+		);');
 		if ($sslsocket) {
          push(@{$r->{sslciphers}->{enabled}},"$sversion:".$hk);
 		$sslsocket->close();
@@ -672,7 +673,7 @@ sub do_SSLCIPHERS
 
    $r->{operation}->{SSLCIPHERS}=1;
 
-   eval('use IO::Socket::SSL;');
+   eval('use IO::Socket::SSL qw(SSL_VERIFY_NONE);');
    eval('use Net::SSLeay;');
    eval('use IO::Socket::INET;');
    eval('use IO::Socket::INET6;');
@@ -684,12 +685,14 @@ sub do_SSLCIPHERS
       $r->{sslciphers}->{exitcode}=199;
       return;
    }
-   my $sock = IO::Socket::SSL->new(   # first try a simple SSL Connect
+   my $sock;
+   eval('
+      $sock = IO::Socket::SSL->new(   # first try a simple SSL Connect
       PeerAddr=>"$host:$port",
-      SSL_verify_mode=>'SSL_VERIFY_NONE',
+      SSL_verify_mode=>SSL_VERIFY_NONE,
       Timeout=>3,
       SSL_session_cache_size=>0
-   );
+   );');
    if (defined($sock)){
       close($sock);
       $r->{sslciphers}->{sslconnect}=1;
@@ -1251,38 +1254,6 @@ sub unsupported{
 	}
 }
 
-
-# Subroutine to run cipher connection tests
-sub ciphertests {
-	$success = 0;
-	$fail = 0;
-	$sversion = $_[0];
-	$hashref = $_[1];
-	%hash = %$hashref;
-	#if ( ($_[0] eq 'SSLv2') && (Net::SSLeay::SSLeay() >= 0x10000000) ) { $sversion = 'SSLv23' } # different SSL2 version string for openssl > 1.0
-	if (not $grep) { print "Checking for Supported $_[0] Ciphers on $host:$port...\n"; }
-	if (($_[0] =~ m/SSLv2/) && $verbose) { rPrint('If all SSLv2 ciphers are unexpectedly disabled see the help to confirm SSLv2 checks are supported') }
-	foreach $hk (sort keys %hash) {
-		if ($verbose > 1) { print "Attempting connection to $host:$port using $_[0] $hk...\n"; }
-		$sslsocket = IO::Socket::SSL->new(
-			PeerAddr => $host,
-			PeerPort => $port,
-			Proto => 'tcp',
-			SSL_verify_mode => $vcert,
-			Timeout => $timeout, 
-			SSL_version => $sversion, 
-			SSL_cipher_list => $hk
-		);
-		if ($sslsocket) {
-			checkcompliance($hk, $hash{$hk}, $_[0], $sslsocket);  
-			$sslsocket->close();
-		} else {
-			unsupported($hk, $hash{$hk}, $_[0]);
-		}
-    
-	}
-
-}
 
 
 if ( ($friendlydetected) && (! $nohelp)){
