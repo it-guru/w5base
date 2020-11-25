@@ -1268,7 +1268,7 @@ sub ciphertests {
 			PeerAddr => $host,
 			PeerPort => $port,
 			Proto => 'tcp',
-			SSL_verify_mode => $vcert,
+			SSL_verify_mode => SSL_VERIFY_NONE,
 			Timeout => $timeout, 
 			SSL_version => $sversion, 
 			SSL_cipher_list => $hk
