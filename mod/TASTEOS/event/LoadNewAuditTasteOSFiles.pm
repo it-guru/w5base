@@ -48,6 +48,7 @@ sub LoadNewAuditTasteOSFiles
 
    my $joblog=getModuleObject($self->Config,"base::joblog");
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
+   return({}) if ($datastream->isSuspended());
 
    $self->{sys}=getModuleObject($self->Config,"itil::system");
    $self->{addsys}=getModuleObject($self->Config,"itil::addlnkapplgrpsystem");
