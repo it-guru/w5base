@@ -165,7 +165,6 @@ sub finalizeNotifyParam
 
    if ($rec->{itfarm} eq ""){
       $notifyparam->{emailto}=[$self->getApplmgrUserIds($rec)];
-      $notifyparam->{emailcc}=[12855121480002]; # Günther F. 
    }
 }
 
