@@ -82,6 +82,33 @@ sub isHardwareRefreshCheckNeeded
 }
 
 
+sub calcDeadline
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+
+   my $deprstart=$rec->{deprstart}; 
+   my $deadline;
+   if ($deprstart ne ""){
+      $deadline=$self->getParent->ExpandTimeExpression($deprstart."+60M");
+   }
+   my $eohs=$rec->{eohs};
+   if ($eohs ne ""){
+      if ($deadline eq ""){
+         $deadline=$eohs;
+      }
+      else{
+         my $d=CalcDateDuration($deadline,$eohs,"GMT");
+         if ($d->{days}<0){
+            $deadline=$eohs;
+         }
+      }
+   }
+   return($deadline);
+}
+
+
 sub qcheckRecord
 {
    my $self=shift;
@@ -97,15 +124,14 @@ sub qcheckRecord
    my $errorlevel=0;
 
    if (!$self->isHardwareRefreshCheckNeeded($rec)){
-      return(0,undef);
+      return(undef,undef);
    }
 
-   my $deprstart=$rec->{deprstart}; 
+   my $deadline=$self->calcDeadline($dataobj,$rec);
    my $denyupd=$rec->{denyupd}; 
    my $denyupdvalidto=$rec->{denyupdvalidto}; 
    my $now=NowStamp("en");
-   if ($deprstart ne ""){  # nur wenn Abschreibungsbeginn eingetragen!
-      my $deadline=$self->getParent->ExpandTimeExpression($deprstart."+60M");
+   if ($deadline ne ""){  # nur wenn Abschreibungsbeginn eingetragen!
       my $refreshdate=$deadline;
       my $to_deadline=CalcDateDuration($now,$deadline,"GMT");
       if ($denyupd){ # falls Refreshes nicht gewollt/zulässig

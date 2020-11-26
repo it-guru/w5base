@@ -112,6 +112,9 @@ sub isHardwareRefreshCheckNeeded
    return(0) if ($deprstart lt "2011-06-30 00:00:00");
    #######################################################################
 
+   # Serverfarm Assets are special handled
+   return(0) if ($rec->{itfarm} ne "");
+
 
    # check against "CLASSIC" system type
    my $o=getModuleObject($self->getParent->Config,"tsacinv::system");
@@ -145,12 +148,6 @@ sub isHardwareRefreshCheckNeeded
          }
       }
    }
-#   Das mit den SAP Hierarchien läuft nach der OFI Umstellung nicht mehr 
-#   100 % sauber.
-#   if (!(grep(/^9TS_ES\.9DTIT\./,@saphier) ||  # kann keine SAPHIER festgestellt
-#        ($#saphier==-1))){    # werden oder liegt sie in der TelIT, dann checken
-#      return(0);
-#   }
    #######################################################################
 
 
