@@ -89,3 +89,4 @@
 'Slot number'=>{de=>'Steckplatznummer'},
 'CI-State change not allowed while existing logical systems'=>{de=>'CI-Status-Änderung nicht erlaubt, solange logische Systeme existieren'},
 'CI-State change not allowed while existing active logical systems'=>{de=>'CI-Status-Änderung nicht erlaubt, solange aktive logische Systeme existieren'},
+'end of hardware support'=>{de=>'Ende des Hardware-Supports'},

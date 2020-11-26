@@ -320,6 +320,27 @@ sub qcheckRecord
                                    mode=>'day');
                   }
                }
+               if ($parrec->{eohs} ne ""){
+                  my $d=CalcDateDuration(NowStamp("en"),$parrec->{eohs});
+                  if ($d->{days}<3660){           # date should not be more
+                     $self->IfComp($dataobj,      # then 10Y in the future
+                                   $rec,"eohs",
+                                   $parrec,"eohs",
+                                   $autocorrect,$forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'day');
+                  }
+                  else{
+                     if ($rec->{eohs} ne ""){       # clear posible invalid
+                        $forcedupd->{eohs}=undef;   # eohs entries
+                     }
+                  }
+               }
+               else{
+                  if ($rec->{eohs} ne ""){
+                     $forcedupd->{eohs}=undef;
+                  }
+               }
 
                $self->IfComp($dataobj,
                              $rec,"corecount",

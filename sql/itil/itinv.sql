@@ -1808,3 +1808,4 @@ create table lnkadditionalci (
   FOREIGN KEY fk_swinstace (swinstance) REFERENCES swinstance (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table asset add eohsd datetime default NULL;

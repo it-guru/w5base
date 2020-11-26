@@ -480,16 +480,13 @@ sub new
                                 "datediff(sysdate(),asset.deprstart),".
                                 "datediff(sysdate(),asset.acquStart))"),
 
-#     new kernel::Field::Select(
-#                name          =>'denyupd',
-#                group         =>'upd',
-#                depend        =>['deprstart'],
-#                jsonchanged   =>\&getOnChangedScript,
-#                jsoninit      =>\&getOnChangedScript,
-#                label         =>'it is posible to refresh hardware',
-#                value         =>[0,5,10,20,25,28,30,35,38,40,99],
-#                transprefix   =>'DENUPD.',
-#                dataobjattr   =>'asset.denyupd'),
+      new kernel::Field::Date(
+                name          =>'eohs',
+                group         =>'financeco',
+                htmldetail    =>'NotEmpty',
+                dayonly       =>1,
+                label         =>'end of hardware support',
+                dataobjattr   =>'asset.eohsd'),
 
       new kernel::Field::Select(
                 name          =>'denyupselect',
