@@ -101,11 +101,27 @@ sub qcheckRecord
             $appl->ResetFilter();
             $appl->SetFilter({id=>\$crec->{applid}});
             my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid));
-            if (!defined($arec) || $arec->{cistatusid}>5){
+            if (!defined($arec)){
                my $msg="invalid application in CloudArea: ".$crec->{fullname};
                push(@qmsg,$msg);
                push(@dataissue,$msg);
                $errorlevel=3 if ($errorlevel<3);
+            }
+            else{
+               if ($arec->{cistatusid}>5){
+                  my $msg="invalid application in CloudArea: ".
+                          $crec->{fullname};
+                  push(@qmsg,$msg);
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
+               if ($arec->{cistatusid}<3){
+                  my $msg="application not active or available in CloudArea: ".
+                          $crec->{fullname};
+                  push(@qmsg,$msg);
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
          else{

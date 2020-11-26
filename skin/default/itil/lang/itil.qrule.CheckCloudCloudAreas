@@ -1,4 +1,5 @@
 'itil::qrule::CheckCloudCloudAreas'=>{de=>'Prüfung der CloudAreas in einer Cloud',en=>'Check of CloudAreas in a Cloud'},
 'CloudArea has not been activated'=>{de=>'CloudArea wurde nicht aktiviert'},
 'invalid application in CloudArea'=>{de=>'ungültige Anwendung in CloudArea'},
-'missing application in CloudArea'=>{de=>'fehlende Anwendungszuordnung in CloudArea'}
+'missing application in CloudArea'=>{de=>'fehlende Anwendungszuordnung in CloudArea'},
+'application not active or available in CloudArea'=>{de=>'Anwendung nicht aktiv oder verfügbar in CloudArea'},
