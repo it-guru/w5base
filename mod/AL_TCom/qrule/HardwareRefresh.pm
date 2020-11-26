@@ -32,8 +32,8 @@ Therefore it applies  for/to:
 
 A DataIssue is generated when RefreshData - 6 months has been reached.
 
-If the system is provided by a serverfarm, no notification to the
-applicationmanager is done.
+If the system is provided by a serverfarm, this QRule is
+deactivated.
 
 Further information or contacts can be found at ...
 https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
@@ -55,7 +55,7 @@ Somit gilt:
 Ein DataIssue wird erzeugt, wenn RefreshData - 6 Monate erreicht ist.
 
 Handelt es sich um ein System, das über eine Serverfarm bereitgestellt
-wird, erfolgt keine Benachrichtigung an den ApplicationManager.
+wird, deaktivert sich diese QRule.
 
 Weitere Infos bzw. Ansprechpartner finden Sie unter ...
 https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
@@ -96,6 +96,16 @@ sub new
    return($self);
 }
 
+sub checkServerfarmConsideration
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(1) if ($rec->{itfarm} ne "");
+
+   return(0);
+}
+
 sub isHardwareRefreshCheckNeeded
 {
    my $self=shift;
@@ -113,7 +123,7 @@ sub isHardwareRefreshCheckNeeded
    #######################################################################
 
    # Serverfarm Assets are special handled
-   return(0) if ($rec->{itfarm} ne "");
+   return(0) if ($self->checkServerfarmConsideration($rec));
 
 
    # check against "CLASSIC" system type

@@ -110,6 +110,15 @@ sub new
                 vjoinon       =>['id'=>'assetid'],
                 vjoindisp     =>'itfarm'),
 
+      new kernel::Field::Interface(
+                name          =>'itfarmid',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'ServerfarmID',
+                vjointo       =>'itil::lnkitfarmasset',
+                vjoinon       =>['id'=>'assetid'],
+                vjoindisp     =>'itfarmid'),
+
       new kernel::Field::Mandator(),
 
       new kernel::Field::Link(
@@ -1234,6 +1243,15 @@ sub Validate
          $newrec->{refreshpland}=undef;
       }
    }
+   if (effChanged($oldrec,$newrec,"eohs")){  # reset refreshinfo if eohs changed
+      foreach my $var (qw(refreshinfo3 refreshinfo2 refreshinfo1)){
+         my $cur=effVal($oldrec,$newrec,$var);
+         if ($cur ne ""){
+            $newrec->{$var}=undef;
+         }
+      }
+   }
+
 
    if ($oldrec->{class} eq "BUNDLE"){
       foreach my $fld (qw(room place rack slotno)){

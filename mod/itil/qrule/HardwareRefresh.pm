@@ -82,7 +82,7 @@ sub isHardwareRefreshCheckNeeded
 }
 
 
-sub calcDeadline
+sub getDefaultDeadline
 {
    my $self=shift;
    my $dataobj=shift;
@@ -93,6 +93,28 @@ sub calcDeadline
    if ($deprstart ne ""){
       $deadline=$self->getParent->ExpandTimeExpression($deprstart."+60M");
    }
+   return($deadline);
+}
+
+
+sub allowDataIssueWorkflowCreation
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(1);
+}
+
+
+
+
+sub calcDeadline
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+
+   my $deadline=$self->getDefaultDeadline($dataobj,$rec);
    my $eohs=$rec->{eohs};
    if ($eohs ne ""){
       if ($deadline eq ""){
@@ -296,9 +318,14 @@ sub qcheckRecord
 
       if (defined($to_refresh) && $to_refresh->{days}<-30){
          my $msg="hardware is out of date - refresh is necessary";
-         push(@dataissue,$msg);
          push(@qmsg,$msg);
-         $errorlevel=3 if ($errorlevel<3);
+         if ($self->allowDataIssueWorkflowCreation($rec)){
+            push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
+         }
+         else{
+            $errorlevel=2 if ($errorlevel<2);
+         }
       }
    }
    my @result=$self->HandleQRuleResults("None",
