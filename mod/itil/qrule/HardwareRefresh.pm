@@ -131,6 +131,23 @@ sub calcDeadline
 }
 
 
+sub localNotifyAuthorizedContacts
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+   my $newrec=shift;
+   my $notifyparam=shift;
+   my $notifycontrol=shift;
+   my $f=shift;
+
+   printf STDERR ("fifi NotifyWriteAuthorizedContacts\n");
+   $dataobj->NotifyWriteAuthorizedContacts(
+             $rec,$newrec,$notifyparam,$notifycontrol,$f
+   );
+}
+
+
 sub qcheckRecord
 {
    my $self=shift;
@@ -177,16 +194,16 @@ sub qcheckRecord
 
       my $to_refresh=CalcDateDuration($now,$refreshdate,"GMT");
 
-      if ($rec->{refreshinfo3} eq ""  &&      # info 3 level Ende-10 Monate
-          defined($to_refresh) && $to_refresh->{days}<300){
-         my $late="" if ($to_deadline->{days}<300-30);
-         $late="less then" if ($to_deadline->{days}<300-30);
+      if ($rec->{refreshinfo3} eq ""  &&      # info 3 level Ende-12 Monate
+          defined($to_refresh) && $to_refresh->{days}<360){
+         my $late="" if ($to_deadline->{days}<360-30);
+         $late="less then" if ($to_deadline->{days}<360-30);
          my $newrec={refreshinfo3=>NowStamp("en")};
          $newrec->{refreshinfo1}=NowStamp("en") if ($rec->{refreshinfo1} eq "");
          $newrec->{refreshinfo2}=NowStamp("en") if ($rec->{refreshinfo2} eq "");
          $self->finalizeNotifyParam($rec,\%notifyparam,"refreshinfo3");
          if ($dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}})){
-            $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
+            $self->localNotifyAuthorizedContacts($dataobj,$rec,$newrec,
                \%notifyparam, $notifycontrol,
                sub{
                   my $self=shift;
@@ -196,7 +213,7 @@ sub qcheckRecord
                   my $lang=$dataobj->Lang();
                   my $refreshstr=$dataobj->ExpandTimeExpression($refreshdate,
                                                                 $lang."day");
-                  my $m="24";
+                  my $m="12";
                   if ($late ne ""){
                      $m=$self->T($late)." ".$m;
                   }
@@ -231,7 +248,7 @@ sub qcheckRecord
          $newrec->{refreshinfo1}=NowStamp("en") if ($rec->{refreshinfo1} eq "");
          $self->finalizeNotifyParam($rec,\%notifyparam,"refreshinfo2");
          if ($dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}})){
-            $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
+            $self->localNotifyAuthorizedContacts($dataobj,$rec,$newrec,
                \%notifyparam,
                $notifycontrol,
                sub{
@@ -277,7 +294,7 @@ sub qcheckRecord
          my $newrec={refreshinfo1=>NowStamp("en")};
          $self->finalizeNotifyParam($rec,\%notifyparam,"refreshinfo1");
          if ($dataobj->ValidatedUpdateRecord($rec,$newrec,{id=>\$rec->{id}})){
-            $dataobj->NotifyWriteAuthorizedContacts($rec,$newrec,
+            $self->localNotifyAuthorizedContacts($dataobj,$rec,$newrec,
                \%notifyparam,
                $notifycontrol,
                sub{

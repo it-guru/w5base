@@ -115,8 +115,6 @@ sub getDefaultDeadline
 }
 
 
-
-
 sub allowDataIssueWorkflowCreation
 {
    my $self=shift;
@@ -141,6 +139,28 @@ sub getFarmUserIds
    return(@farmuids);
 }
 
+sub localNotifyAuthorizedContacts
+{
+   my $self=shift;
+   my $dataobj=shift;
+   my $rec=shift;
+   my $newrec=shift;
+   my $notifyparam=shift;
+   my $notifycontrol=shift;
+   my $f=shift;
+
+   my $farmid=$rec->{itfarmid};
+   if ($farmid ne ""){
+      my $itfarm=getModuleObject($self->getParent->Config,"itil::itfarm");
+      $itfarm->SetFilter({id=>\$farmid});
+      my ($farmrec,$msg)=$itfarm->getOnlyFirst(qw(ALL));
+      if (defined($farmrec)){
+         $itfarm->NotifyWriteAuthorizedContacts(
+               $farmrec,{},$notifyparam,$notifycontrol,$f
+         );
+      }
+   }
+}
 
 
 sub finalizeNotifyParam
@@ -150,9 +170,6 @@ sub finalizeNotifyParam
    my $notifyparam=shift;
    my $mode=shift;
 
-   if ($rec->{itfarm} ne ""){
-      $notifyparam->{emailto}=[$self->getFarmUserIds($rec)];
-   }
 }
 
 
