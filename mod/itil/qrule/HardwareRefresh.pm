@@ -225,7 +225,7 @@ sub qcheckRecord
                      $applications=join(", ", @{$applications});
                   }
                   my $text=$dataobj->getParsedTemplate(
-                               $notifycontrol->{useTemplate},
+                               $notifycontrol->{useTemplate}.".refreshinfo3",
                                {
                                   skinbase=>$notifycontrol->{useSkinBase},
                                   static=>{
@@ -271,7 +271,7 @@ sub qcheckRecord
                      $applications=join(", ", @{$applications});
                   }
                   my $text=$dataobj->getParsedTemplate(
-                               $notifycontrol->{useTemplate},
+                               $notifycontrol->{useTemplate}.".refreshinfo2",
                                {
                                   skinbase=>$notifycontrol->{useSkinBase},
                                   static=>{
@@ -317,7 +317,7 @@ sub qcheckRecord
                      $applications=join(", ", @{$applications});
                   }
                   my $text=$dataobj->getParsedTemplate(
-                               $notifycontrol->{useTemplate},
+                               $notifycontrol->{useTemplate}.".refreshinfo1",
                                {
                                   skinbase=>$notifycontrol->{useSkinBase},
                                   static=>{
