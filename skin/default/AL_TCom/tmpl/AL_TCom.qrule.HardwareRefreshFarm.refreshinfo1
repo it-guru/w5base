@@ -1,15 +1,6 @@
-Dear databoss respectively application manager,
+Dear ServerFarm-databoss,
 
-the hardware %NAME% needs to be refreshed until %REFRESH%. 
-
-Please make sure, that all necessary steps should be taken to renew the asset.  The following link will take you to necessary information on how to proceed.  
-
-
-If there are reasons in opposed to this, please document this in the hardware record (link see below).
-https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
-
-
-In other way, ensure all needed steps for a hardware refresh are done.
+The hardware %NAME%  must be replaced by <b>%REFRESH%</b> according to the hardware refresh process.
 
 Relevant systems: %SYSTEMS%
 
