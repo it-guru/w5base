@@ -1,0 +1,6 @@
+'itil::qrule::CloudAreaCount'=>{
+   de=>'Prüfung auf vorhandenen CloudAreas Zuordnungen',
+   en=>'Check on existing CloudArea relations'
+},
+'missing cloudarea relations'=>{de=>'fehlende CloudArea Zuordnungen'},
+'cloudarea relations are not allowed in current CI-Status'=>{de=>'CloudArea Zuordnungen sind im aktuellen CI-Status unzulässig'},
