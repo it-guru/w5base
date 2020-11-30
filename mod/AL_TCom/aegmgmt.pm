@@ -121,15 +121,26 @@ sub new
                 vjointo       =>'itil::appl',
                 vjoinon       =>['id'=>'id'],
                 group         =>"default",
-                fields        =>['mgmtitemgroup']),
+                readonly      =>1,
+                dontrename    =>1,
+                fields        =>['mgmtitemgroup',"mandator","mandatorid"]),
 
       new kernel::Field::Text(
                 name          =>'aegsolution',
                 label         =>'Solution',
+                htmldetail    =>'NotEmpty',
                 readonly      =>1,
                 dataobjattr   =>"if (mandator.name regexp 'TelekomIT.*',".
-                                "replace(mandator.name,'TelekomIT ',''),".
-                                "'NONE')"),
+                                "replace(replace(mandator.name,'TelekomIT',''),'_',''),".
+                                "NULL)"),
+
+      new kernel::Field::Import($self,
+                vjointo       =>'itil::appl',
+                vjoinon       =>['id'=>'id'],
+                group         =>"default",
+                readonly      =>1,
+                dontrename    =>1,
+                fields        =>['responseorgid','responseorg']),
 
       new kernel::Field::Contact(
                 name          =>'leadinmmgr',
