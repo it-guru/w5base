@@ -1,0 +1,184 @@
+﻿<html>
+<head>
+
+<!-- Dieses JavaScript muss eingebunden werden! - Es ist dabei nicht
+     relevant von welcher W5Base-URL es geladen wird. Die eigentliche
+     Data-Site wird durch das W5Base-Config-Objekt (initiW5Base) definiert
+     und auch der User-Logon wird erst abgefragt, wenn mit diesem ConfigObjekt
+     dann die erste Abfrage mit findRecord druchgefuehrt wird.
+-->
+<script language="JavaScript" 
+        src="https://darwin.telekom.de/darwin/public/base/load/J5Base.js">
+</script>
+
+
+<style>   <!-- diese Styles sind nur zu optischen Zwecken vorhanden -->
+table,th,td{
+   border: 1px solid black;
+   border-collapse: collapse;
+   padding:2px;
+}
+p,xmp{
+   padding:0px;
+   margin:0px;
+}
+</style>
+
+<body>
+
+<script language="JavaScript">
+var W5Base;   // das solte global definiert werden! Damit ist es dann in
+              // alle Methoden immer gleich.
+
+//
+// Diese Mehtode initialisiert das globale "W5Base" Config-Objekt. Das
+// abspeichern der base-Url in document.w5baseurl ist nicht zwingend
+// notwendig - ich finds aber "schoen", da es dann zur weiteren 
+// Verwendung im document Objekt bereitgesteht.
+//
+function initW5Base(){
+   document.w5baseurl=$('#siteurl').val(); // aktuell gewaehlte Site einstellen
+   W5Base=null;
+   if (W5Base==null){        // das Objekt koennte man auch "wiederverwenden",
+      W5Base=createConfig({  // wenn man in der Programmaske nicht die URL
+         useUTF8:true,       // frei waehlen koennte
+         mode:'auth',
+         transfer:'JSON'
+      },document.w5baseurl);
+   }
+}
+
+function analyzeApplgrp(d){
+   console.log(d);
+   $("#loading").remove();
+   $("#out").append("<p style='margin-left:10px'>got "+d.length+" rec:</p>");
+   var str = JSON.stringify(d,null,2);
+   $("#out").append("<xmp style='margin-left:15px'>"+str+"</xmp><br>");
+   if (d.length==1){
+      $("#out").append("<p style='margin-left:10px;margin-bottom:5px'>"+
+                 "<b>Found: TasteOS SystemID="+d[0].TasteOS_SystemID+"</b></p");
+   }
+   else{
+      $("#out").append("<p><i>ERROR: got unexpected result</i></p>");
+   }
+}
+
+function analyzeAppl(d){
+   console.log(d);
+   $("#loading").remove();
+   $("#out").append("<p style='margin-left:10px'>got "+d.length+" rec:</p>");
+   var str = JSON.stringify(d,null,2);
+   $("#out").append("<xmp style='margin-left:15px'>"+str+"</xmp><br>");
+   if (d.length==1 && d[0].awsid!=""){
+      $("#out").append("<p style='margin-left:10px;margin-bottom:5px'>"+
+                       "<b>Found: ApplicationManager="+d[0].applmgr+"</b></p");
+      var applgrpid=d[0].applgrpid;
+      $("#out").append("<div id=loading>...</div>");
+      var o=getModuleObject(W5Base,"TS::applgrp");
+      var view="name,id,TasteOS_SystemID";
+      o.SetFilter({id:applgrpid});
+      $("#out").append("<p>-&gt; Query ("+view+") "+
+                       "on <b>TS::applgrp</b> "+
+                       "with id="+applgrpid+"</p>");
+      o.findRecord(view,analyzeApplgrp);
+   }
+   else{
+      $("#out").append("<p><i>ERROR: got unexpected result</i></p>");
+   }
+}
+
+function analyzeCloudArea(d){
+   console.log(d);
+   $("#loading").remove();
+   $("#out").append("<p style='margin-left:10px'>got "+d.length+" rec:</p>");
+   var str = JSON.stringify(d,null,2);
+   $("#out").append("<xmp style='margin-left:15px'>"+str+"</xmp><br>");
+   if (d.length==1 && d[0].applid){
+      var applid=d[0].applid;
+      $("#out").append("<div id=loading>...</div>");
+      var o=getModuleObject(W5Base,"TS::appl");
+      var view="applmgr,ictono,applgrp,applgrpid,acinmassingmentgroup";
+      o.SetFilter({id:applid});
+      $("#out").append("<p>-&gt; Query ("+view+") "+
+                       "on <b>TS::appl</b> "+
+                       "with id="+applid+"</p>");
+      o.findRecord(view,analyzeAppl);
+   }
+   else{
+      $("#out").append("<p><i>ERROR: got unexpected result</i></p>");
+   }
+}
+
+
+
+function runQuery(){
+   initW5Base();     // sicherstellen, dass das W5Base Config-Objekt existiert
+
+   var awsaccountid=$('#awsid').val();
+
+   var o=getModuleObject(W5Base,"TS::itcloudarea");
+   var view="fullname,applid";
+   o.SetFilter({srcid:awsaccountid,cloud:'AWS'});
+   $("#out").html("");
+   $("#out").append("<p>-&gt; Query ("+view+") "+
+                    "on <b>TS::itcloudarea</b> "+
+                    "with cloud=AWS and srcid="+awsaccountid+"</p>");
+   $("#out").append("<div id=loading>...</div>");
+   o.findRecord(view,analyzeCloudArea);
+}
+
+
+//
+// Initialisierung der Frontend Form
+//
+$(document).ready(function(){
+   $("#do").click(runQuery);
+});
+
+</script>
+
+
+<!-- Formular fuer die Steuerung des Mini-Progs -->
+
+<table border=1 style="width:30%;min-width:600px">
+<tr>  <!-- Zeile 1 -->
+   <td colspan=2><b>Query ApplicationManager or TasteOS SystemID by AWS Account</b></td>
+</tr>
+
+<tr>
+   <td valign=top width=110>W5Base-Site:</td>
+   <td><select id=siteurl style="width:100%">
+       <option>https://darwin.telekom.de/darwin</option>
+       <option>https://w5base-testenv.telekom.de/darwin</option>
+       <option>https://w5base-devnull.telekom.de/darwin</option>
+       </select>
+   </td>
+</tr>
+
+<tr>
+   <td valign=top width=120>AWS AccountID:</td>
+   <td>
+      <input type=text id=awsid value="091109527397" style="width:100%">
+   </td>
+</tr>
+
+<tr>
+   <td colspan=2 align=center>
+     <input type=button id=do value="run query chain">
+   </td>
+</tr>
+
+</table>
+<!-- ***************************************** -->
+
+<div style="width:100%;
+            height:300px;
+            overflow:auto;border: 1px solid black;
+            margin-top:10px;" id=out>  
+   <!-- Das ist einfach nur das Ausgabe-div -->
+</div>
+
+
+
+</body>
+</html>

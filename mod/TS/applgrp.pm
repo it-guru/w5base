@@ -1,6 +1,6 @@
-package AL_TCom::applgrp;
+package TS::applgrp;
 #  W5Base Framework
-#  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2020  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,14 +20,23 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use TS::applgrp;
-@ISA=qw(TS::applgrp);
+use itil::applgrp;
+@ISA=qw(itil::applgrp);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
+
+   $self->AddFields(
+      new kernel::Field::Interface(
+                name          =>'TasteOS_SystemID',
+                label         =>'TasteOS SystemID',
+                container     =>'additional')
+   );
+
 
    return($self);
 }
