@@ -63,6 +63,12 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'DARWIN_FILES.FILE_NAME'),
 
+      new kernel::Field::Number(
+                name          =>'filelength',
+                label         =>'File length',
+                precision     =>0,
+                dataobjattr   =>'dbms_lob.getlength(DARWIN_FILES.FILE_DATA)'),
+
      new kernel::Field::File(
                 name          =>'filecontent',
                 label         =>'File Content',
@@ -109,7 +115,7 @@ sub new
    $self->BackendSessionName("tsAuditServer_LongRead"); 
 
    $self->setWorktable("DARWIN_FILES");
-   $self->setDefaultView(qw(systemid systemname fullname mdate));
+   $self->setDefaultView(qw(mdate systemid systemname fullname filelength));
    return($self);
 }
 
