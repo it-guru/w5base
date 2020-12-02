@@ -29,7 +29,7 @@ Somit gilt:
 
  RefreshData = DeadLine oder denyupdvalidto falls denyupdvalidto gültig ist.
 
-Ein DataIssue wird erzeugt, wenn RefreshData überschritten wird.
+Ein DataIssue wird erzeugt, wenn RefreshData+30Tage überschritten wird.
 
 
 

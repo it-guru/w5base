@@ -18,17 +18,12 @@ NONE
 
 [en:]
 
-This QualityRule is effective if the start of depreciation is 
-after 2011-06-30.
-
 The refresh quality rule is focused on the fact that the 
 hardware asset is to be in use 84 months at the maximum. 
 The counting is based on the start date of depreciation/amortization. 
 Therefore it applies  for/to:
 
   DeadLine = start of depreciation + 84 months
-
-  RefreshData = DeadLine or denyupdvalidto if denyupdvalidto is valid.
 
 A DataIssue are not generated, because responsibility of ServerFarm 
 managers.
@@ -38,9 +33,6 @@ https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
 
 [de:]
 
-Diese QualityRule greift, wenn der Abschreibungsbeginn 
-nach dem 30.06.2011 liegt.
-
 Die Refresh QualityRule ist darauf ausgerichtet, dass ein 
 Hardware-Asset max. 84 Monate im Einsatz sein darf. Die Berechnung
 erfolgt auf Basis des Abschreibungsbeginns.
@@ -48,7 +40,9 @@ Somit gilt:
 
  DeadLine = Abschreibungsbeginn + 84 Monate
 
- RefreshData = DeadLine oder denyupdvalidto falls denyupdvalidto gültig ist.
+ DeadLine = "Ende des Hardware-Support" falls "Ende des Hardware-Support" näher in der Zukunft als DeadLine
+
+DataIssue wird nicht erzeugt, da für ServerFarm Assets die Verantwortlichen der ServerFarm zuständig sind.
 
 Weitere Infos bzw. Ansprechpartner finden Sie unter ...
 https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001

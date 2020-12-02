@@ -18,9 +18,6 @@ NONE
 
 [en:]
 
-This QualityRule is effective if the start of depreciation is 
-after 2011-06-30.
-
 The refresh quality rule is focused on the fact that the 
 hardware asset is to be in use 60 months at the maximum. 
 The counting is based on the start date of depreciation/amortization. 
@@ -28,9 +25,13 @@ Therefore it applies  for/to:
 
   DeadLine = start of depreciation + 60 months
 
-  RefreshData = DeadLine or denyupdvalidto if denyupdvalidto is valid.
+  DeadLine="end of Hardware-Support" if "end of Hardware-Support" is closer in the future as DeadLine
 
-A DataIssue is generated when RefreshData - 6 months has been reached.
+  RefreshDate = DeadLine or denyupdvalidto if denyupdvalidto is valid.
+
+  
+
+A DataIssue is generated when RefreshDate + 30 days has been exceeded.
 
 If the system is provided by a serverfarm, this QRule is
 deactivated.
@@ -40,9 +41,6 @@ https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
 
 [de:]
 
-Diese QualityRule greift, wenn der Abschreibungsbeginn 
-nach dem 30.06.2011 liegt.
-
 Die Refresh QualityRule ist darauf ausgerichtet, dass ein 
 Hardware-Asset max. 60 Monate im Einsatz sein darf. Die Berechnung
 erfolgt auf Basis des Abschreibungsbeginns.
@@ -50,9 +48,12 @@ Somit gilt:
 
  DeadLine = Abschreibungsbeginn + 60 Monate
 
- RefreshData = DeadLine oder denyupdvalidto falls denyupdvalidto gültig ist.
+ DeadLine="Ende des Hardware-Support" falls "Ende des Hardware-Support" näher in der Zukunft als DeadLine
 
-Ein DataIssue wird erzeugt, wenn RefreshData - 6 Monate erreicht ist.
+ RefreshDate = DeadLine oder denyupdvalidto falls denyupdvalidto gültig ist.
+
+
+Ein DataIssue wird erzeugt, wenn RefreshDate + 30 Tage überschritten wird.
 
 Handelt es sich um ein System, das über eine Serverfarm bereitgestellt
 wird, deaktivert sich diese QRule.
@@ -118,8 +119,6 @@ sub isHardwareRefreshCheckNeeded
 
    return(0) if ($deprstart eq "");
 
-   # check against start date
-   return(0) if ($deprstart lt "2011-06-30 00:00:00");
    #######################################################################
 
    # Serverfarm Assets are special handled
