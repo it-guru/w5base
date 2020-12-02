@@ -529,6 +529,10 @@ sub Validate
    }
    if ($uri->{error}) {
       $self->LastMsg(ERROR,$uri->{error});
+      printf STDERR ("DEBUG: itil::lnkapplurl::Validate\nnew=%s\n",
+                     Dumper($newrec));
+      printf STDERR ("DEBUG: itil::lnkapplurl::Validate\nold=%s\n",
+                     Dumper($oldrec));
       return(undef);
    }
    if (effVal($oldrec,$newrec,"hostname") ne $uri->{host}){
