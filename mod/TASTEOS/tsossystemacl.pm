@@ -149,7 +149,7 @@ sub InsertRecord
          my $content=shift;
          my $reqtrace=shift;
 
-         if ($code eq "400"){  # 400 means, email is not in whitelist
+         if ($code eq "409"){  # 409 means, email is not in whitelist
             return({lastmsg=>'OK'},"200");
          }
          msg(ERROR,$reqtrace);
