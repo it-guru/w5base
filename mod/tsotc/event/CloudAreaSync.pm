@@ -128,7 +128,7 @@ sub CloudAreaSync
    $itcloudobj->SetFilter({
       name=>[keys(%itcloud)]
    });
-   $itcloudobj->SetCurrentView(qw(name id databossid cistatusid));
+   $itcloudobj->SetCurrentView(qw(name id databossid cistatusid contacts));
    my $itcloud=$itcloudobj->getHashIndexed("id","name");
 
    foreach my $cloudname (sort(keys(%itcloud))){
@@ -139,6 +139,7 @@ sub CloudAreaSync
 
    # load all relevant itcloudarea records
    my $itcloudareaobj=getModuleObject($self->Config,"itil::itcloudarea");
+   my $applobj=getModuleObject($self->Config,"itil::appl");
 
    $itcloudareaobj->SetFilter({
       cloud=>[keys(%itcloud)],
@@ -169,8 +170,15 @@ sub CloudAreaSync
       }
       if (!defined($currec)){
          if (exists($itcloud->{name}->{$a->{itcloud}})){
+            my @err;
             if ($a->{appl} ne ""){
-               if (length($a->{name})<70 && length($a->{name})>1){
+               $applobj->ResetFilter();
+               $applobj->SetFilter({id=>\$a->{applid}});
+               my ($achkrec,$msg)=$applobj->getOnlyFirst(qw(id cistatusid));
+               if (defined($achkrec) &&
+                   $achkrec->{cistatusid}>1 &&
+                   $achkrec->{cistatusid}<5 &&
+                   length($a->{name})<70 && length($a->{name})>1){
                   my $newrec={
                      cloud=>$a->{itcloud},
                      name=>$a->{name},
@@ -186,13 +194,26 @@ sub CloudAreaSync
                   $inscnt++;
                }
                else{
-                   msg(ERROR,"invalid area name at $fullname for ".
-                             $itcloud->{name}->{$a->{itcloud}}->{databossid});
+                   push(@err,
+                        "ERROR: invalid area name or releated application ".
+                        "at CloudArea $fullname");
                }
             }
             else{
-             # msg(ERROR,"missing valid application W5BaseID in $fullname for ".
-             #           $itcloud->{name}->{$a->{itcloud}}->{databossid});
+              # push(@err,"ERROR: missing valid application ".
+              #           "W5BaseID in $fullname");
+            }
+            if ($#err!=-1){
+               my %notifyParam=();
+               $itcloudobj->NotifyWriteAuthorizedContacts(
+                            $itcloud->{name}->{$a->{itcloud}},{},
+                            \%notifyParam,{},sub{
+                  my ($subject,$ntext);
+                  my $subject="ERROR: CloudArea Sync";
+                  my $tmpl=join("\n",@err);
+                  return($subject,$tmpl);
+               });
+               @err=();
             }
          }
       }
