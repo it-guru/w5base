@@ -88,9 +88,12 @@ sub checkServerfarmConsideration
    my $self=shift;
    my $rec=shift;
 
-   return(0) if ($rec->{itfarm} ne "");
+   return(1) if ($rec->{itfarm}=~m/x86/i);
+   return(1) if ($rec->{itfarm}=~m/NGSSM/i);
+   return(1) if ($rec->{itfarm}=~m/DBaaS/i);
+   return(1) if ($rec->{itfarm} eq "");
 
-   return(1);
+   return(0);
 }
 
 

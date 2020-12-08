@@ -27,6 +27,8 @@ Therefore it applies  for/to:
 
   DeadLine="end of Hardware-Support" if "end of Hardware-Support" is closer in the future as DeadLine
 
+  denyupdvalidto = datefield: "Upgrade/Refresh reject valid to"
+
   RefreshDate = DeadLine or denyupdvalidto if denyupdvalidto is valid.
 
   
@@ -49,6 +51,8 @@ Somit gilt:
  DeadLine = Abschreibungsbeginn + 60 Monate
 
  DeadLine="Ende des Hardware-Support" falls "Ende des Hardware-Support" näher in der Zukunft als DeadLine
+
+ denyupdvalidto = Datumsfeld: "Ausschlußbegründung gültig bis"
 
  RefreshDate = DeadLine oder denyupdvalidto falls denyupdvalidto gültig ist.
 
