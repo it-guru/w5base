@@ -141,7 +141,6 @@ sub localNotifyAuthorizedContacts
    my $notifycontrol=shift;
    my $f=shift;
 
-   printf STDERR ("fifi NotifyWriteAuthorizedContacts\n");
    $dataobj->NotifyWriteAuthorizedContacts(
              $rec,$newrec,$notifyparam,$notifycontrol,$f
    );
