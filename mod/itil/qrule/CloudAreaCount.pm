@@ -6,9 +6,9 @@ package itil::qrule::CloudAreaCount;
 
 =head3 PURPOSE
 
-The quality rule checks if there CloudAreas in a Cloud.
+The quality rule checks if there are CloudAreas in a Cloud.
 If the Cloud is in State "available in project" or "installed/active", the
-Cloud needs at last one CloudArea. In outer cases, no CloudAreas are
+Cloud needs at least one CloudArea. In other cases, no CloudAreas are
 allowed and a DataIssue will be created.
 
 =head3 IMPORTS
@@ -20,14 +20,14 @@ NONE
 [en:]
 
 If the Cloud is in State "available in project" or "installed/active", the
-Cloud needs at last one CloudArea. In outer cases, no CloudAreas are
+Cloud needs at least one CloudArea. In other cases, no CloudAreas are
 allowed and a DataIssue will be created.
 
 [de:]
 
 Eine Cloud im CI-Status "verfügbar/in Projektierung" oder "installiert/aktiv"
 muss min. eine CloudArea aufweisen. In allen anderen CI-Status, sind keine
-CloudArea Zuordnungen zulässt. In diesen Fällen wird dann ein DataIssue
+CloudArea Zuordnungen zugelassen. In diesen Fällen wird dann ein DataIssue
 erstellt.
 
 
