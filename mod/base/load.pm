@@ -60,6 +60,18 @@ sub Run
                               title=>$title,
                               js=>['toolbox.js','jquery.js','jquery.ui.js'],
                               body=>1,form=>1);
+      print("<script language='JavaScript'>");
+      print("addEvent(document,'keydown',function(e){");
+      print("e=e || window.event;");
+      print("if (e.keyCode==27){");
+      print("   if (window.parent && parent.hidePopWin){");
+      print("      parent.hidePopWin(false);");
+      print("      return(false);");
+      print("   }");
+      print("}");
+      print("return(true);");
+      print("});");
+      print("</script>");
       my $translation=$self->SkinBase();
       $translation.="::template.messages";
       print $self->getParsedTemplate($func,{translation=>$translation,
