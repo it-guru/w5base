@@ -184,10 +184,23 @@ sub Main
    }
    print(Query->Header(%h)); 
    print $self->HtmlHeader(style=>'default.css',
-                           title=>$self->T($self->Self()));
+                           title=>$self->T($self->Self()),
+                           onload=>'initOnLoad();');
    print $self->HtmlBottom(body=>1,form=>1);
    print <<EOF;
 <script language="JavaScript">
+function initOnLoad()
+{
+   var o=document.getElementById("setnewuser");
+   if (o){
+      o.select();
+      o.focus();
+   }
+   var o=document.getElementById("ResetBotton");
+   if (o){  // falls ResetButton da ist
+      o.focus();
+   }
+}
 function SetNewAcc(o)
 {
    var dst=document.getElementById("setnewuser");
@@ -259,6 +272,7 @@ EOF
 </tr>
 <tr >
 <td nowrap align=center valign=center><input type=button 
+                  id=ResetBotton
                   onclick=doResetAccount()
                   value="$resetlabel $ENV{REAL_REMOTE_USER}"
                   style="width:80%;height:40px"></td>
