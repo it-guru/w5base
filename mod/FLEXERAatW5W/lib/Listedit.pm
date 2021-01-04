@@ -64,6 +64,7 @@ sub initSqlWhere
                               )],
           "RMember","up") ){
          $where="(BEACONID is null ".
+                "or BEACONID='DEU0360DTIT' ".
                 "or BEACONID='DEU0360DEVLAB' ".
                 "or BEACONID='DEU0360WSICTS')";
       }
