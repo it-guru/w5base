@@ -77,8 +77,8 @@ sub new
                 uivisible     =>0,
                 dataobjattr   =>"if (asset.kwords<>'',".
                                 "concat(asset.name,' - ',".
-                                "if (length(asset.kwords)>15,".
-                                "concat(substr(asset.kwords,1,15),'...'),".
+                                "if (length(asset.kwords)>40,".
+                                "concat(substr(asset.kwords,1,40),'...'),".
                                 "asset.kwords)),asset.name)"),
 
       new kernel::Field::Text(
