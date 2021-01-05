@@ -162,15 +162,38 @@ sub qcheckRecord
          my $grpid=$grp->{grpid};
          my $refid=$rec->{$vjoinon->[0]};
          if ($refid ne ""){
-            my $cid=$lnkobj->ValidatedInsertRecord({
-               $vjoinon->[1]=>$refid,
-               targetid=>$grp->{grpid},
-               target=>"base::grp",
-               roles=>['write'],
-               parentobj=>$parentobj
+            $lnkobj->ResetFilter();
+            $lnkobj->SetFilter({
+               targetid=>\$grp->{grpid},
+               target=>\"base::grp",
+               $vjoinon->[1]=>\$refid,
+               parentobj=>\$parentobj
             });
-            if ($cid){
-               return(0,{qmsg=>['group automaticly added: '.$grp->{group}]});
+            my ($oldrec,$msg)=$lnkobj->getOnlyFirst(qw(ALL));
+            if (defined($oldrec)){
+               my $roles=$oldrec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if (!in_array($roles,"write")){
+                  push(@$roles,"write");
+                  my $cid=$lnkobj->ValidatedUpdateRecord($oldrec,{
+                     roles=>$roles,
+                  },{id=>$oldrec->{id}});
+                  if ($cid){
+                     return(0,{qmsg=>['group automaticly updated: '.$grp->{group}]});
+                  }
+               }
+            }
+            else{
+               my $cid=$lnkobj->ValidatedInsertRecord({
+                  $vjoinon->[1]=>$refid,
+                  targetid=>$grp->{grpid},
+                  target=>"base::grp",
+                  roles=>['write'],
+                  parentobj=>$parentobj
+               });
+               if ($cid){
+                  return(0,{qmsg=>['group automaticly added: '.$grp->{group}]});
+               }
             }
          }
          

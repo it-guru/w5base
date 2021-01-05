@@ -1,4 +1,5 @@
 'base::qrule::ContactRights'=>{de=>'Prüfung zusätzlicher Schreibberechtigungen',en=>'check on additional write rights'},
 'group automaticly added'=>{de=>'Gruppe automatisch hinzugefügt'},
+'group automaticly updated'=>{de=>'Gruppe automatisch aktualisiert'},
 'no additional contacts with role write registered'=>{de=>'keine zusätzlichen Kontakte mit Rolle "schreiben" registriert'},
 'no databoss registered'=>{de=>'kein Datenverantwortlicher registriert'},
