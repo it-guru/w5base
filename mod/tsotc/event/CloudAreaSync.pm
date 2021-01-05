@@ -64,7 +64,7 @@ sub CloudAreaSync
    foreach my $appansrec ($appans->getHashList(qw(
                            name fullname cluster id applid appl supportid
                            lastmondate))){
-       $itcloud{$appansrec->{cluster}}++;
+       $itcloud{lc($appansrec->{cluster})}++;
        my $fullname=$appansrec->{cluster}.".".$appansrec->{name};
        my %carec=(
           itcloud=>$appansrec->{cluster},
@@ -78,6 +78,9 @@ sub CloudAreaSync
           lastmondate=>$appansrec->{lastmondate}
        );
        push(@a,\%carec);
+   }
+   if ($#a==-1){
+      die("no appagile namespaces found - this seems to be a DB Bug");
    }
 
    $otcpro->SetFilter({
@@ -126,10 +129,11 @@ sub CloudAreaSync
 
    # load all relevant itcloud records
    $itcloudobj->SetFilter({
-      name=>[keys(%itcloud)]
+      name=>join(" ",sort(keys(%itcloud)))
    });
    $itcloudobj->SetCurrentView(qw(name id databossid cistatusid contacts));
    my $itcloud=$itcloudobj->getHashIndexed("id","name");
+
 
    foreach my $cloudname (sort(keys(%itcloud))){
       if (!exists($itcloud->{name}->{$cloudname})){
@@ -141,8 +145,9 @@ sub CloudAreaSync
    my $itcloudareaobj=getModuleObject($self->Config,"itil::itcloudarea");
    my $applobj=getModuleObject($self->Config,"itil::appl");
 
+   $itcloudareaobj->ResetFilter();
    $itcloudareaobj->SetFilter({
-      cloud=>[keys(%itcloud)],
+      cloud=>join(" ",sort(keys(%itcloud))),
    });
    $itcloudareaobj->SetCurrentView(qw(ALL));
    my $itcloudarea=$itcloudareaobj->getHashIndexed("id","fullname","name");
@@ -150,13 +155,23 @@ sub CloudAreaSync
    #print Dumper(\%itcloud);
    #print Dumper($itcloud);
    #print Dumper($itcloudarea);
+   my $caref={};
 
    foreach my $a (@a){
-      last if ($inscnt>9);
+      last if ($inscnt>50);
       my $fullname=$a->{fullname};
       my $currec;
+      my @ifullname=grep(/^\Q$fullname\E$/i,keys(%{$itcloudarea->{fullname}}));
+      if ($#ifullname>0){
+         msg(ERROR,"not unique cloudare fullname problem for $fullname");
+         next;
+      }
+      if ($#ifullname==0){
+         $fullname=$ifullname[0];
+      }
       if (exists($itcloudarea->{fullname}->{$fullname})){
          $currec=$itcloudarea->{fullname}->{$fullname};
+         $caref->{$currec->{id}}=$a;
       }
       if (defined($a->{srcid}) && defined($a->{srcsys}) &&
           !defined($currec)){
@@ -169,6 +184,18 @@ sub CloudAreaSync
          }
       }
       if (!defined($currec)){
+         my $cloudname=$a->{itcloud};
+         my @icloudname=grep(/^\Q$cloudname\E$/i,keys(%{$itcloud->{name}}));
+         if ($#icloudname>0){
+            msg(ERROR,"not unique cloud name problem for $cloudname");
+            next;
+         }
+         if ($#icloudname==0){
+            if ($a->{itcloud} ne $icloudname[0]){
+               $a->{itcloud}=$icloudname[0];
+            }
+         }
+
          if (exists($itcloud->{name}->{$a->{itcloud}})){
             my @err;
             if ($a->{appl} ne ""){
@@ -266,6 +293,19 @@ sub CloudAreaSync
          else{
             msg(ERROR,"invalid lastmondate in ".Dumper($a));
          }
+      }
+   }
+   if (keys(%$caref)){  # cleanup only if min. one ref found
+      foreach my $carec (values(%{$itcloudarea->{id}})){
+          next if ($carec->{cistatusid}>=6);  # check only entries in active state
+          next if (!($carec->{srcsys}=~m/^tsotc::/)); # check only from this mod
+          if (!exists($caref->{$carec->{id}})){  # seems not exists anymore
+             $itcloudareaobj->ValidatedUpdateRecord(
+                $carec,{cistatusid=>6},{
+                   id=>$carec->{id}
+                }
+             );
+          }
       }
    }
    
