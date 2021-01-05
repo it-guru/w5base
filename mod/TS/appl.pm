@@ -343,6 +343,9 @@ sub addDesasterRecoveryClassFields
                                  '5',
                                  '6',
                                  '7',
+                                 '11',
+                                 '14',
+                                 '18'
                                 ],
                 htmleditwidth =>'280px',
                 dataobjattr   =>'appl.disasterrecclass'),
@@ -355,21 +358,24 @@ sub addDesasterRecoveryClassFields
                 transprefix   =>'RTO.',
                 value         =>['',
                                  '0',
-                                 '1',
-                                 '2',
-                                 '3',
-                                 '4'],
+                                 '10',
+                                 '20',
+                                 '30',
+                                 '40'],
                 dataobjattr   =>
                                 'if (appl.disasterrecclass=\'\',NULL,'.
                                 'if (appl.disasterrecclass=0,0,'.
-                                'if (appl.disasterrecclass=1,4,'.
-                                'if (appl.disasterrecclass=2,3,'.
-                                'if (appl.disasterrecclass=3,2,'.
-                                'if (appl.disasterrecclass=4,1,'.
-                                'if (appl.disasterrecclass=5,1,'.
-                                'if (appl.disasterrecclass=6,1,'.
-                                'if (appl.disasterrecclass=7,1,'.
-                                'NULL)))))))))'),
+                                'if (appl.disasterrecclass=1,40,'.
+                                'if (appl.disasterrecclass=2,30,'.
+                                'if (appl.disasterrecclass=3,20,'.
+                                'if (appl.disasterrecclass=4,10,'.
+                                'if (appl.disasterrecclass=5,10,'.
+                                'if (appl.disasterrecclass=6,10,'.
+                                'if (appl.disasterrecclass=7,10,'.
+                                'if (appl.disasterrecclass=11,10,'.
+                                'if (appl.disasterrecclass=14,10,'.
+                                'if (appl.disasterrecclass=18,10,'.
+                                'NULL))))))))))))'),
 
       new kernel::Field::Select(
                 name          =>'rpolevel',
@@ -379,22 +385,26 @@ sub addDesasterRecoveryClassFields
                 transprefix   =>'RPO.',
                 value         =>['',
                                  '0',
-                                 '1',
-                                 '2',
-                                 '3',
-                                 '4',
-                                 '5'],
+                                 '10',
+                                 '20',
+                                 '25',
+                                 '30',
+                                 '40',
+                                 '50'],
                 dataobjattr   =>
                                 'if (appl.disasterrecclass=\'\',NULL,'.
                                 'if (appl.disasterrecclass=0,0,'.
-                                'if (appl.disasterrecclass=1,3,'.
-                                'if (appl.disasterrecclass=2,3,'.
-                                'if (appl.disasterrecclass=3,3,'.
-                                'if (appl.disasterrecclass=4,2,'.
-                                'if (appl.disasterrecclass=5,2,'.
-                                'if (appl.disasterrecclass=6,2,'.
-                                'if (appl.disasterrecclass=7,2,'.
-                                'NULL)))))))))'),
+                                'if (appl.disasterrecclass=1,30,'.
+                                'if (appl.disasterrecclass=2,30,'.
+                                'if (appl.disasterrecclass=3,30,'.
+                                'if (appl.disasterrecclass=4,20,'.
+                                'if (appl.disasterrecclass=5,20,'.
+                                'if (appl.disasterrecclass=6,20,'.
+                                'if (appl.disasterrecclass=7,20,'.
+                                'if (appl.disasterrecclass=11,30,'.
+                                'if (appl.disasterrecclass=14,20,'.
+                                'if (appl.disasterrecclass=18,25,'.
+                                'NULL))))))))))))'),
 
       new kernel::Field::Text(
                 name          =>'drc',

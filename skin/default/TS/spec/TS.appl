@@ -59,13 +59,13 @@ the release at "FMB SD-PQIT-NC".
 '},
 'rtolevel'=>{
    de=>'
-Der Wert besteht aus RTO Level (0 bis 4) und der RTO Zeit in Stunden. Die Beschreibung steht in "<a target=_blank href=https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457>SCM Dokument myMDS 85025</a>".
+Der Wert besteht aus RTO Level (0 bis 40) und der RTO Zeit in Stunden. Die Beschreibung steht in "<a target=_blank href=https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457>SCM Dokument myMDS 85025</a>".
 ', en=>'
-The value consists of RTO level (0 to 4) and the RTO time in hours. The description is in "<a target=_blank href=https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457>SCM Dokument myMDS 85025</a>".
+The value consists of RTO level (0 to 40) and the RTO time in hours. The description is in "<a target=_blank href=https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457>SCM Dokument myMDS 85025</a>".
 '},
 'rpolevel'=>{
    de=>'
-Der Wert besteht aus RPO Level (0 bis 5) und der RPO Zeit in Stunden. Die Beschreibung steht in "<a target=_blank href=https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457>SCM Dokument myMDS 85025</a>".
+Der Wert besteht aus RPO Level (0 bis 50) und der RPO Zeit in Stunden. Die Beschreibung steht in "<a target=_blank href=https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457>SCM Dokument myMDS 85025</a>".
 ', en=>'
 The value consists of RPO level (0 to 5) and the RPO time in hours. The description is in "<a target=_blank href=https://mydms.telekom.de/mydms/Start.do?spx=LTDOC769292555015225065061457>SCM Dokument myMDS 85025</a>".
 '},
