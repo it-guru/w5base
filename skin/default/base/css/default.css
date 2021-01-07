@@ -4,6 +4,8 @@
       background-color: #FFFFFF;
    }
 }
+a:focus {outline: blue solid 2px;}
+
 iframe.HtmlDetailPage{
    width:100%;
    height:100%;

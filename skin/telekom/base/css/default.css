@@ -27,6 +27,8 @@ span.OPMODE{
    color:darkblue;
 }
 
+a:focus {border-bottom-style:solid;border-color: white;border-width:1px}
+a:focus img {background: white;}
 
 a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
    background-color: transparent;
