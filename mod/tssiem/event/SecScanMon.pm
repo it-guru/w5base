@@ -189,6 +189,11 @@ sub analyseRecord
 
    msg(INFO,"PROCESS: $rec->{id} $rec->{sdate} icto='$rec->{ictono}'");
 
+   if ($rec->{ictono} eq ""){
+      msg(ERROR,"found secscan with no ictono at $rec->{id} - abbort read");
+      exit(1); 
+   }
+
    $res->{new}->{$rec->{ictono}}->{$rec->{urlofcurrentrec}}={
       name=>$rec->{name}
    };
