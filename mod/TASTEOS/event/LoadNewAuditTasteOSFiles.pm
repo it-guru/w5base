@@ -36,12 +36,12 @@ sub LoadNewAuditTasteOSFiles
    my $firstDayRange=45;
    my $maxDeltaDayRange="15";
    my $blockSize=100;
+   my $res={};
 
    if (exists($param{blockSize}) &&
        ($param{blockSize}=~m/^[0-9]+$/)){
       $blockSize=$param{blockSize};
    }
-   msg(DEBUG,"using blockSize=$blockSize");
 
    my $StreamDataobj="tsAuditSrv::auditfile";
 
@@ -57,6 +57,27 @@ sub LoadNewAuditTasteOSFiles
 
    my @datastreamview=qw(mdate fullname systemid);
    my @datastreamview=qw(mdate fullname systemid filecontent);
+
+
+   if ($_[0]=~m/^[0-9]{2,10}$/){
+      my $fileid=$_[0];
+      msg(DEBUG,"Debug process only file requested with id=$fileid");
+      $datastream->ResetFilter();
+      $datastream->SetFilter({id=>\$fileid});
+      my ($chkrec,$msg)=$datastream->getOnlyFirst(@datastreamview);
+      if (!defined($chkrec)){
+         return({exitcode=>1,exitmsg=>'Record $fileid not found'});
+      }
+      if ($self->analyseRecord($datastream,$chkrec,$res)){
+         return({exitcode=>0,exitmsg=>'DEBUG ok'});
+      }
+      return({exitcode=>1,exitmsg=>'DEBUG fail'});
+   }
+
+
+
+   msg(DEBUG,"using blockSize=$blockSize");
+
 
    my $eventlabel='IncStreamAnalyse::'.$datastream->Self;
    my $method=(caller(0))[3];
@@ -79,7 +100,6 @@ sub LoadNewAuditTasteOSFiles
    my $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
    msg(DEBUG,"jobid=$jobid");
 
-   my $res={};
 
    my $lastSuccessRun;
    my $startstamp="now-${firstDayRange}d";        # intial scan over 14 days
@@ -248,6 +268,11 @@ sub analyseRecord
                                 "not found in TasteOS");
                       return([],"200");
                    }
+                   if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+                      msg(ERROR,"PUT pkg_taste.txt($rec->{id} ".
+                                "for $rec->{systemid} returns $code");
+                      msg(ERROR,"$content");
+                   }
                    return(undef);
                 },
 
@@ -259,12 +284,8 @@ sub analyseRecord
                            'Content-Type','text/plain']);
                 }
              );
-#printf STDERR ("result=%s\n",Dumper(\$d));
           }
-
       }
-
-
    }
 
 
