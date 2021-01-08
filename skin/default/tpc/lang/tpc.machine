@@ -1,0 +1,4 @@
+'tpc::machine'=>{
+   de=>'TelekomPrivateCloud: Maschine',
+   en=>'TelekomPrivateCloud: Machine'
+}
