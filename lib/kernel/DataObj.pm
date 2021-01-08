@@ -4973,10 +4973,11 @@ sub GetRESTCredentials
 
    $p{dbconnect}=$self->Config->Param('DATAOBJCONNECT');
    $p{dbpass}=$self->Config->Param('DATAOBJPASS');
+   $p{dbuser}=$self->Config->Param('DATAOBJUSER');  # user is optional
 
-   foreach my $v (qw(dbconnect dbpass)){
+   foreach my $v (qw(dbconnect dbpass dbuser)){
       if ((ref($p{$v}) ne "HASH" || !defined($p{$v}->{$dbname})) &&
-          $v ne "dbschema"){
+          $v ne "dbuser"){
          my $msg=sprintf("Connect(%s): essential information '%s' missing",
                     $dbname,$v);
          $self->LastMsg(ERROR,$msg);
@@ -4986,7 +4987,7 @@ sub GetRESTCredentials
          $p{$v}=$p{$v}->{$dbname};
       }
    }
-   return($p{dbconnect},$p{dbpass});
+   return($p{dbconnect},$p{dbpass},$p{dbuser});
 }
 
 
@@ -5024,6 +5025,7 @@ sub DoRESTcall
    eval('
       use JSON;
       use LWP::UserAgent;
+      #$ua=new LWP::UserAgent(env_proxy=>0,ssl_opts =>{verify_hostname=>0});
       $ua=new LWP::UserAgent(env_proxy=>0);
    ');
    if ($@ ne ""){
@@ -5149,23 +5151,23 @@ sub CollectREST
    if (!exists($c->{"RESTCallResult.$token"}) || 
        $c->{"RESTCallResult.$token"}->{t}<time()-$cachetime){
       my $dbname=$p{dbname};
-      my ($baseurl,$apikey)=$self->GetRESTCredentials($dbname);
+      my ($baseurl,$apikey,$apiuser)=$self->GetRESTCredentials($dbname);
       if (!defined($baseurl) || !defined($apikey)){
          return(undef);
       }
-      my $dataobjurl=&{$p{url}}($self,$baseurl,$apikey);
+      my $dataobjurl=&{$p{url}}($self,$baseurl,$apikey,$apiuser);
       if (!defined($dataobjurl)){
          $self->LastMsg(ERROR,"no REST URL can be created");
          return(undef);
       }
       my $Headers=[];
       if ($p{headers}){
-         $Headers=&{$p{headers}}($self,$baseurl,$apikey);
+         $Headers=&{$p{headers}}($self,$baseurl,$apikey,$apiuser);
       }
 
       my $Content;
       if ($p{content}){
-         $Content=&{$p{content}}($self,$baseurl,$apikey)
+         $Content=&{$p{content}}($self,$baseurl,$apikey,$apiuser)
       }
       $p{method}="GET" if (!exists($p{method}));
       $p{format}="JSON" if (!exists($p{format}));
