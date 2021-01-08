@@ -1249,14 +1249,15 @@ sub SendXmlToAM_appl
                       }
                   };
                   if ($rec->{applid} ne ""){
-                     $acftprec->{CI_APPL_REL}->{Application}=uc($rec->{applid});
+                    #$acftprec->{CI_APPL_REL}->{Application}=uc($rec->{applid});
+                     $acftprec->{CI_APPL_REL}->{Code}=uc($rec->{applid});
                   }    
                   if ($lnk->{systemsystemid} ne ""){
                      $acftprec->{CI_APPL_REL}->{Portfolio}=
                             uc($lnk->{systemsystemid});
                      $ciapplrel{"$acftprec->{CI_APPL_REL}->{Portfolio}".
                                 "-".
-                                $acftprec->{CI_APPL_REL}->{Application}}++;
+                                $acftprec->{CI_APPL_REL}->{Code}}++;
                   }
 
                   $acftprec->{CI_APPL_REL}->{Usage}=$w52ac{$SysU};
