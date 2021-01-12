@@ -100,13 +100,13 @@ sub Initialize
    return(0);
 }
 
-sub initSearchQuery
-{
-   my $self=shift;
-   if (!defined(Query->Param("search_scandate"))){
-     Query->Param("search_scandate"=>">now-7d");
-   }
-}
+#sub initSearchQuery
+#{
+#   my $self=shift;
+#   if (!defined(Query->Param("search_scandate"))){
+#     Query->Param("search_scandate"=>">now-7d");
+#   }
+#}
 
 
 

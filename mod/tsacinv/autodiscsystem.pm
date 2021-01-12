@@ -111,7 +111,8 @@ sub new
                 vjointo       =>'tsacinv::autodiscipaddress',
                 vjoinon       =>['systemdiscoveryid'=>'systemautodiscid'],
                 vjoindisp     =>['address','physicaladdress'],
-                vjoinbase     =>{scandate=>">now-7d"}),
+               # vjoinbase     =>{scandate=>">now-7d"}
+                ),
 
       new kernel::Field::SubList(
                 name          =>'softwareinstallations',
