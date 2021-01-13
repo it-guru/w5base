@@ -43,16 +43,39 @@ sub isSubstValid
    my $realuser=shift;
    my $substuser=shift;
 
+   my @userrecview=qw(userid);
+   if (!$self->IsMemberOf("admin") &&
+       $self->IsMemberOf("support")){
+      push(@userrecview,"groups");  # for support members, the group membership
+   }                                # of target user is relevant
+
    my $user=getModuleObject($self->Config,"base::user");  # this operation
    $user->SetFilter({accounts=>\$substuser});             # is only done, if
-   my ($userrec,$msg)=$user->getOnlyFirst(qw(userid));    # the current user
+   my ($userrec,$msg)=$user->getOnlyFirst(@userrecview);  # the current user
    return() if (!defined($userrec));                      # is in mask mode
 
    my $isadmin=0;
    if ($ENV{REAL_REMOTE_USER} eq $substuser || 
-       $self->IsMemberOf("admin") ||
-       $self->IsMemberOf("support")){
+       $self->IsMemberOf("admin")){
       $isadmin=1;
+   }
+   if (!$isadmin){
+      if ($ENV{REAL_REMOTE_USER} eq $substuser || 
+          $self->IsMemberOf("support")){
+         $isadmin=1;
+         my $groups=[];
+         if (ref($userrec->{groups}) eq "ARRAY"){
+            $groups=$userrec->{groups};
+         }
+         $groups=[map({$_->{group}} @$groups)]; 
+         # mask on target Users from support to admin, testadmin or support
+         # ist not allowed
+         if (in_array($groups,[qw(admin testadmin support)])){
+            msg(WARN,"ilegal try usermask request ".
+                     "from $realuser to $substuser");
+            $isadmin=0;
+         }
+      }
    }
    if ($isadmin){
       return({usersubstid=>'admin',srcaccount=>$substuser});

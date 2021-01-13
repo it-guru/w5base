@@ -368,7 +368,7 @@ sub InitRequest
          $ENV{REMOTE_USER}=$substuser;
       }
       else{
-         msg(ERROR,"illegal request to mask $ENV{REAL_REMOTE_USER} as %s in %s",
+         msg(ERROR,"ilegal request to mask $ENV{REAL_REMOTE_USER} as %s in %s",
                    $substuser,$self->Self);
       }
    }
