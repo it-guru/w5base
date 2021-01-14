@@ -261,7 +261,11 @@ sub Validate
    }
    if (exists($newrec->{applid})){
       my $o=$self->Clone();
-      $o->SetFilter({applid=>\$newrec->{applid}});
+      my $flt={applid=>\$newrec->{applid}};
+      if (defined($oldrec)){
+         $flt->{id}="!".$oldrec->{id};
+      }
+      $o->SetFilter($flt);
       $o->SetCurrentView(qw(applgrpid applgrp));
       my $l=$o->getHashIndexed(qw(applgrpid));
       my $curapplgrpid=effVal($oldrec,$newrec,"applgrpid");

@@ -55,7 +55,7 @@ sub CapeICTOimport
    }
    if (0){  # reduce data for debugging
       foreach my $i (keys(%icto)){
-         if (!in_array([$i],[qw(icto-4175 icto-2054 xicto-4380
+         if (!in_array([$i],[qw(icto-4340 icto-4488
                                 icto-13741 icto-17962)])){
             delete($icto{$i});
          }
@@ -143,7 +143,7 @@ sub CapeICTOimport
                   srcsys=>$iname,
                   srcload=>$start
                },
-               {srcsys=>\$iname,srcid=>\$lid}
+               {srcsys=>\$iname,applid=>\$applid}
             );
          }
       }
