@@ -105,11 +105,22 @@ sub CapeCanvasHubimport
          srcload=>NowStamp("en")
       };
 
+      $lnkcanv->ResetFilter();
+      $lnkcanv->SetFilter({ictoid=>\$newrec->{ictoid}});
+      my @l=$lnkcanv->getHashList(qw(ALL));
+      if ($#l>0){
+         msg(WARN,"something went wron - somebody has ass manuell entries");
+         msg(WARN,"to lnkcanvas for ICTO $newrec->{ictoid}");
+         foreach my $oldrec (@l){
+            $lnkcanv->ValidatedDeleteRecord($oldrec,{id=>\$oldrec->{id}});
+         }
+      }
+      $lnkcanv->ResetFilter();
       $lnkcanv->ValidatedInsertOrUpdateRecord($newrec,{
-         ictoid=>\$newrec->{ictoid},
-         vouid=>\$newrec->{vouid},
-         canvasid=>\$newrec->{canvasid}
+         ictoid=>\$newrec->{ictoid}
       });
+      # manuell erstellte Einträge werden gelöscht bzw. überschrieben 
+      # da Cape aktuell als Master angesehen werden soll
    }
    $lnkcanv->BulkDeleteRecord({'srcload'=>"<\"$start\"",srcsys=>\$iname});
    return({exitcode=>0});

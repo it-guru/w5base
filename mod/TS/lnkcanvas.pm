@@ -229,7 +229,7 @@ sub Validate
          $flt->{id}="!".$oldrec->{id};
       }
       $o->SetFilter($flt);
-      my @l=$o->getHashList(qw(canvasid fraction id vouid));
+      my @l=$o->getHashList(qw(canvasid fraction id vouid ictono srcsys));
       my $curictovouid;
       my $fraction=0;
       foreach my $r (@l){
