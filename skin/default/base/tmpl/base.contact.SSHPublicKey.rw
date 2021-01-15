@@ -8,7 +8,7 @@ SSH1 Key:
           style="width:100%;height:100px">%ssh1publickey%</textarea>
 </td></tr>
 <tr><td>
-OpenSSH DSA SSH2 Key:
+OpenSSH SSH2 Key:
 <textarea name=ssh2publickey wrap=off
           style="width:100%;height:100px">%ssh2publickey%</textarea>
 </td></tr>

@@ -1452,7 +1452,7 @@ sub Validate
             if (!($sshkey=~m/^\s*$/)){
                $sshkey=~s/^\s*//;
                $sshkey=~s/\s*$//;
-               if ($sshkey=~m/^ssh-(dss|rsa)\s+\S{100,600}/){
+               if ($sshkey=~m/^ssh-(dss|rsa|ed25519|dsa)\s+\S{50,600}/){
                   $k{$sshkey}=1;
                }
                else{
@@ -1461,7 +1461,7 @@ sub Validate
             }
          }
          if ($fail){
-            $self->LastMsg(ERROR,"invalid ssh-dss SSH2 key format");
+            $self->LastMsg(ERROR,"invalid SSH2 key format");
             return(undef);
          }
          else{
