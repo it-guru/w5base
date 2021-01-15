@@ -7,3 +7,7 @@
 'Message text'=>{de=>'Nachrichtentext'},
 'no subject specified'=>{de=>'kein Betreff angegeben'},
 'no message text specified'=>{de=>'kein Nachrichtentext angegeben'},
+'SMS activate'=>{de=>'SMS aktivieren'},
+'error in base data request'=>{
+  de=>'Fehler in der Basisdatenabfrage'
+}

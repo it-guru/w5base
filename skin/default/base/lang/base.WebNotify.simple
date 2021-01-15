@@ -1,9 +1,14 @@
 'base::WebNotify::simple'=>{en=>'Simple E-Mail message to W5Base contact',
                             de=>'Einfache E-Mail Nachricht an W5Base Kontakt'},
-'INFOTEXT'=>{de=>'Die Nachricht wird an angegebenen Kontakte versandt. Es ist der "vollqulifizierte Name" zu verwenden. Die Kontakte müssen Semikolon seperiert sein.',
+'INFOTEXT'=>{de=>'Die Nachricht wird an angegebene Kontakte versandt. Es ist der "vollqualifizierte Name" zu verwenden. Die Kontakte müssen Semikolon seperiert sein.',
              en=>'The message will be send to the specified contacts. You have tu use the full qualified name. The specified contacts must be seperated by semicolon.'},
 'Please specify target contacts'=>{de=>'Bitte geben Sie die gewünschten Kontakte an'},
 'Message subject'=>{de=>'Betreff'},
 'Message text'=>{de=>'Nachrichtentext'},
 'no subject specified'=>{de=>'kein Betreff angegeben'},
 'no message text specified'=>{de=>'kein Nachrichtentext angegeben'},
+'SMS activate'=>{de=>'SMS aktivieren'},
+'error in base data request'=>{
+  de=>'Fehler in der Basisdatenabfrage'
+}
+

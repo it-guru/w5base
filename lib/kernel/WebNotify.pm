@@ -156,7 +156,7 @@ sub Result
             $p{emailtemplate}=$data->{messageLayout};
          }
          $wfa->Notify("",$data->{messageSubject},$data->{messageText},%p);
-         $self->LastMsg(OK,"your message has been successfuly sended");
+         $self->LastMsg(OK,"your message has been successfully sent");
       }
       $self->sendResultFromLastMsg();
    }
@@ -197,6 +197,8 @@ sub getDefaultOptionLine
    }
    $sms.=">";
 
+   my $smsact=$self->getParent->T("SMS activate",$self->Self);
+
    $bb.="<table width=220 border=0 ".
         "style='background-color:silver;padding-left:5px;padding-right:5px;".
         "padding-top:2px;padding-bottom:2px' ".
@@ -206,7 +208,7 @@ sub getDefaultOptionLine
    $bb.="<td nowrap>$sl</td>";
    $bb.="</tr>";
    $bb.="<tr>";
-   $bb.="<td nowrap>SMS akivieren:</td>";
+   $bb.="<td nowrap>$smsact:</td>";
    $bb.="<td nowrap>$sms</td>";
    $bb.="</tr>";
    $bb.="</table>";
