@@ -1,3 +1,5 @@
+a:focus {outline: gray solid 1px;}
+
 div.detailframe{
    width:99%;
    border-style:solid;
@@ -363,13 +365,24 @@ span.readonlyinput{
    color:gray;
 }
 
-span.detailfunctions, a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
+button.detailfunctions {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  /*optional*/
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button.detailfunctions, a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
             font-family:Arial,Adobe Helvetica,Helvetica;
+            font-size:12px;
             text-decoration:none;
             color:#353534;
             cursor: pointer;
             cursor: hand;
           }
+
 
 a.HtmlDetailIndex:link, a.HtmlDetailIndex:visited, a.HtmlDetailIndex:active {
             font-family:Arial,Adobe Helvetica,Helvetica;

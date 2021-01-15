@@ -84,7 +84,8 @@ sub FormatedDetail
                              $m=~s/>/&gt;/g;
                              my $ml=$_;
                              $ml=~s/"/&quote;/g;
-                            "<a class=emaillink href=\"mailto:$ml\">$m</a>"
+                            "<a class=emaillink tabindex=-1 ".
+                            "href=\"mailto:$ml\">$m</a>"
                            } @{$d})));
    }
    return($self->SUPER::FormatedDetail($current,$mode));

@@ -91,7 +91,7 @@ sub ProcessHead
    $d.="<div id=HtmlDetail style=\"$newstyle\"><div style=\"padding:5px\">";
    $d.="<div class='printbacktotop'>".
        "<div class='backtotop' id=BackToTop>".
-       "<a href='#index'>".
+       "<a href='#index' title=\"Jumpt to top\">".
        "<img border=0 src='../../base/load/backtotop.gif' width=20 height=20>".
        "</a></div></div>";
    $d.=$self->{fieldsPageHeader};
@@ -106,6 +106,7 @@ function DetailInit()  // used from asyncron sub data to restore position in
 {                      // page
    document.body.scrollTop=$scrolly;
    startFixBackToTop();
+   setFocusOnForm();
    return;
 }
 EOF
@@ -115,6 +116,7 @@ EOF
 function DetailInit()  // used from asyncron sub data to restore position in
 {                      // page
    startFixBackToTop();
+   setFocusOnForm();
    return;
 }
 EOF
@@ -168,6 +170,19 @@ function onResize()
    }
    window.setTimeout(onNew,1);
 
+}
+
+function setFocusOnForm()
+{
+   if (document.forms && document.forms[0].elements){
+      for (var i=0;i<document.forms[0].elements.length;i++){
+          var e=document.forms[0].elements[i];
+          if (e.id!="save"){
+             e.focus();
+             break;
+          }
+      }
+   }
 }
 addEvent(window, "load",   onNew);
 addEvent(window, "resize", onResize);
@@ -433,7 +448,8 @@ EOF
                   $targeturl="../../../public/$s/ById/$id";
                }
             }
-            $ByIdLinkStart="<a id=toplineimage target=_blank title=\"".
+            $ByIdLinkStart="<a tabindex=-1 ".
+                           "id=toplineimage target=_blank title=\"".
             $self->getParent->getParent->T("use this link to reference this ".
             "record (f.e. in mail)")."\" href=\"$targeturl\">";
             $ByIdLinkEnd="</a>";
@@ -1030,19 +1046,31 @@ sub MkFunc
    my $js=shift;
    my $name=shift;
 
-   return("<span class=$class onclick=$js>".
-     $self->getParent->getParent->T($name,"kernel::Output::HtmlDetail")."</span>");
+   my $label=$self->getParent->getParent->T($name,"kernel::Output::HtmlDetail");
+   $label=~s/"/&quote;/g;
+   $label=~s/'/&quote;/g;
+
+   my $id=$name;
+   $id=~s/[^a-z]//ig;
+
+   return("<button id=\"$id\" type=button class=$class onclick=$js>".
+          $label."</button>");
 }
 
 sub DetailFunctions
 {
+   my $self=shift;
+
    my $back="&nbsp;";
    if ($#_!=-1){
       $back="&bull; ".join(" &bull; ",@_)." &bull;";
    }
+   my $label=$self->getParent->getParent->T("jump to top",
+             "kernel::Output::HtmlDetail");
    $back="<div class=detailfunctions>".
          "<span style=\"\">".
-         "<a class=HtmlDetailIndex style=\"cursor:n-resize\" href=\"#index\">".
+         "<a class=HtmlDetailIndex style=\"cursor:n-resize\" ".
+         " title=\"$label\" href=\"#index\">".
          "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</a></span>".
          $back."</div>";
    return($back);
@@ -1107,7 +1135,7 @@ sub findtemplvar
             }
          }
       }
-      return(DetailFunctions(@func));
+      return($self->DetailFunctions(@func));
    }
 
    return($self->SUPER::findtemplvar(@_));   

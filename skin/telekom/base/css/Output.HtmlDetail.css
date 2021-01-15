@@ -1,5 +1,8 @@
 @import url("Output.HtmlDetail.css?SKIN=default");
 
+a:focus {outline: #b90b64 solid 1px;}
+
+
 div.detailtopline{
    background:#d6006e;
    background-image:linear-gradient(135deg, #d6006e 5%, #b90b64 80%);
@@ -34,7 +37,7 @@ div.detailheadline{
    background-color:#BA1168;
 }
 
-span.detailfunctions, a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
+button.detailfunctions, a.detailfunctions:link, a.detailfunctions:visited, a.detailfunctions:active {
      color:white;
      font-weight:400;
 }

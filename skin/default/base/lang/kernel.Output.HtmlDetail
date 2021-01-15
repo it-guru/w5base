@@ -10,3 +10,4 @@
 'finish edit'       => {de=>'bearbeiten beenden'},
 'Condition to:'     => {de=>'Stand:'},
 'continue save with comments'=>{de=>'speichern mit Kommentaren fortsetzen'},
+'jump to top'=>{de=>'nach oben springen'},
