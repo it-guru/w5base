@@ -1809,3 +1809,4 @@ create table lnkadditionalci (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table asset add eohsd datetime default NULL;
+alter table lnkadditionalci add accessurl bigint(20),add FOREIGN KEY fk_accessurl (accessurl) REFERENCES accessurl (id) ON DELETE CASCADE;

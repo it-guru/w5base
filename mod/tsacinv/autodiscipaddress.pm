@@ -42,7 +42,7 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'DiscoveryID',
-                dataobjattr   =>'"id"'),
+                dataobjattr   =>'autodiscipaddress."id"'),
 
       new kernel::Field::Text(
                 name          =>'address',
@@ -60,24 +60,30 @@ sub new
                 label         =>'Systemname',
                 vjointo       =>'tsacinv::autodiscsystem',
                 vjoinon       =>['systemautodiscid'=>'systemdiscoveryid'],
-                vjoindisp     =>'systemname'),
+                vjoindisp     =>'systemname',
+                dataobjattr   =>'autodiscsystem."systemname"'),
+
+      new kernel::Field::Text(
+                name          =>'usage',
+                label         =>'Usage',
+                dataobjattr   =>'autodiscsystem."usage"'),
 
       new kernel::Field::Text(
                 name          =>'systemautodiscid',
                 label         =>'System DiscoveryID',
-                dataobjattr   =>'"systemautodiscid"'),
+                dataobjattr   =>'autodiscipaddress."systemautodiscid"'),
 
       new kernel::Field::Date(
                 name          =>'scandate',
                 group         =>'source',
                 label         =>'Scandate',
-                dataobjattr   =>'"scandate"'),
+                dataobjattr   =>'autodiscipaddress."scandate"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'"srcsys"'),
+                dataobjattr   =>'autodiscipaddress."srcsys"'),
 
 
    );
@@ -107,6 +113,16 @@ sub Initialize
 #     Query->Param("search_scandate"=>">now-7d");
 #   }
 #}
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="autodiscipaddress join autodiscsystem ".
+            " on autodiscipaddress.\"systemautodiscid\"=".
+            "autodiscsystem.\"systemdiscoveryid\" ";
+   return($from);
+}
+
 
 
 

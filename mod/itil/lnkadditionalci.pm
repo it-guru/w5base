@@ -72,6 +72,11 @@ sub new
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
+                name          =>'applid',
+                label         =>'Link to applid',
+                dataobjattr   =>'addci.appl'),
+
+      new kernel::Field::Link(
                 name          =>'target',
                 selectfix     =>1,
                 label         =>'target object',
@@ -82,11 +87,6 @@ sub new
                 selectfix     =>1,
                 label         =>'target objectid',
                 dataobjattr   =>'addci.targetid'),
-
-      new kernel::Field::Link(
-                name          =>'applid',
-                label         =>'Link to applid',
-                dataobjattr   =>'addci.appl'),
 
       new kernel::Field::TextDrop(
                 name          =>'system',
@@ -100,6 +100,19 @@ sub new
                 name          =>'systemid',
                 label         =>'Link to systemid',
                 dataobjattr   =>'addci.system'),
+
+      new kernel::Field::TextDrop(
+                name          =>'accessurl',
+                htmlwidth     =>'100px',
+                label         =>'AccessURL',
+                vjointo       =>'itil::accessurl',
+                vjoinon       =>['accessurlid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'accessurlid',
+                label         =>'Link to accessurlid',
+                dataobjattr   =>'addci.accessurl'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',

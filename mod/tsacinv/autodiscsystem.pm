@@ -63,6 +63,11 @@ sub new
                 dataobjattr   =>'"model"'),
 
       new kernel::Field::Text(
+                name          =>'usage',
+                label         =>'Usage',
+                dataobjattr   =>'"usage"'),
+
+      new kernel::Field::Text(
                 name          =>'osrelease',
                 label         =>'OS-Release',
                 dataobjattr   =>'"osrelease"'),

@@ -433,6 +433,15 @@ sub new
                 label         =>'CustomerID',
                 dataobjattr   =>'appl.customer'),
 
+      new kernel::Field::SubList(
+                name          =>'addcis',
+                label         =>'additional used Config-Items',
+                group         =>'addcis',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'itil::lnkadditionalci',
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>['name','ciusage']),
+
       new kernel::Field::Link(
                 name          =>'applid',
                 label         =>'ApplID',
@@ -673,7 +682,7 @@ sub isViewValid
    return("header","default","class") if (!defined($rec));
 
    my @l=qw(header default history class applinfo urlinfo 
-            source history);
+            source history addcis);
 
    if ($rec->{do_sslcertcheck}){
       push(@l,"ssl");
