@@ -37,6 +37,7 @@ sub new
                 name          =>'id',
                 label         =>'LinkID',
                 searchable    =>0,
+                group         =>'source',
                 dataobjattr   =>'addci.id'),
                                                  
       new kernel::Field::Text(
@@ -67,6 +68,7 @@ sub new
                 name          =>'appl',
                 htmlwidth     =>'100px',
                 label         =>'Application',
+                htmldetail    =>'NotEmpty',
                 vjointo       =>'itil::appl',
                 vjoinon       =>['applid'=>'id'],
                 vjoindisp     =>'name'),
@@ -92,6 +94,7 @@ sub new
                 name          =>'system',
                 htmlwidth     =>'100px',
                 label         =>'System',
+                htmldetail    =>'NotEmpty',
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
                 vjoindisp     =>'name'),
@@ -105,7 +108,8 @@ sub new
                 name          =>'accessurl',
                 htmlwidth     =>'100px',
                 label         =>'AccessURL',
-                vjointo       =>'itil::accessurl',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'itil::lnkapplurl',
                 vjoinon       =>['accessurlid'=>'id'],
                 vjoindisp     =>'name'),
 
@@ -191,7 +195,7 @@ sub getSqlFrom
 
    my $from="
       (select id,
-             appl,system,swinstance,name,ciusage,comments,
+             appl,system,accessurl,swinstance,name,ciusage,comments,
              target,targetid,
              createdate,modifydate,createuser,modifyuser,editor,realeditor,
              srcsys,srcid,srcload
@@ -200,6 +204,7 @@ sub getSqlFrom
        select null id,
               appl.id appl,
               null system,
+              null accessurl,
               swinstance.id swinstance,
               swinstance.fullname name,
               swinstancerule.ruletype ciusage,
@@ -260,6 +265,14 @@ sub getDetailBlockPriority
    return(qw(header default misc link source));
 }
 
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
 
 
 

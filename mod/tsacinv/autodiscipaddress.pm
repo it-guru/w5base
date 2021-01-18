@@ -55,18 +55,23 @@ sub new
                 label         =>'physical Address',
                 dataobjattr   =>'"physicaladdress"'),
 
+      new kernel::Field::Text(
+                name          =>'systemid',
+                label         =>'SystemID',
+                dataobjattr   =>'"systemid"'),
+
       new kernel::Field::TextDrop(
                 name          =>'systemname',
                 label         =>'Systemname',
                 vjointo       =>'tsacinv::autodiscsystem',
                 vjoinon       =>['systemautodiscid'=>'systemdiscoveryid'],
-                vjoindisp     =>'systemname',
-                dataobjattr   =>'autodiscsystem."systemname"'),
+                vjoindisp     =>'systemname'),
+                #dataobjattr   =>'autodiscipaddress."systemname"'),
 
       new kernel::Field::Text(
                 name          =>'usage',
                 label         =>'Usage',
-                dataobjattr   =>'autodiscsystem."usage"'),
+                dataobjattr   =>'autodiscipaddress."usage"'),
 
       new kernel::Field::Text(
                 name          =>'systemautodiscid',
@@ -90,7 +95,8 @@ sub new
    $self->{use_distinct}=0;
    $self->setWorktable("autodiscipaddress");
 
-   $self->setDefaultView(qw(address scandate));
+   $self->setDefaultView(qw(systemid systemname usage address physicaladdress 
+                            scandate));
    return($self);
 }
 
@@ -114,14 +120,14 @@ sub Initialize
 #   }
 #}
 
-sub getSqlFrom
-{
-   my $self=shift;
-   my $from="autodiscipaddress join autodiscsystem ".
-            " on autodiscipaddress.\"systemautodiscid\"=".
-            "autodiscsystem.\"systemdiscoveryid\" ";
-   return($from);
-}
+#sub getSqlFrom
+#{
+#   my $self=shift;
+#   my $from="autodiscipaddress join autodiscsystem ".
+#            " on autodiscipaddress.\"systemautodiscid\"=".
+#            "autodiscsystem.\"systemdiscoveryid\" ";
+#   return($from);
+#}
 
 
 

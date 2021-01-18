@@ -14,11 +14,11 @@ NONE
 
 =head3 HINTS
 
-no english hints avalilable
+Find additional Config-Items by search in AssetManager
 
 [de:]
 
-keine Hinweise vorhanden 
+Ermittlung zusätzlicher Config-Items über AssetManager
 
 =cut
 #######################################################################
@@ -82,10 +82,80 @@ sub qcheckRecord
       if (!$aip->Ping()){
          return(undef);
       }
-      $aip->SetFilter({address=>\@ipl});
-      my @l=$aip->getHashList(qw(ALL));
-      
-      print STDERR Dumper(\@l);
+      $aip->SetFilter({address=>\@ipl,usage=>\'LOADBALANCER'});
+      my @cis=$aip->getHashList(qw(ALL));
+      my $srcsys=$aip->SelfAsParentObject();
+
+      my $acis=getModuleObject($dataobj->Config,"itil::lnkadditionalci");
+      $acis->SetFilter({accessurlid=>\$rec->{id}});
+      my @acis=$acis->getHashList(qw(ALL));
+
+      my @opList;
+
+      #printf STDERR ("cis=%s\n",Dumper(\@cis));
+      #printf STDERR ("acis=%s\n",Dumper(\@acis));
+
+      my $res=OpAnalyse(
+         sub{  # comperator 
+            my ($a,$b)=@_;   # a=lnkadditionalci b=aus AM
+            my $eq;
+            if ($a->{srcsys} eq $srcsys &&
+                $a->{srcid} eq $b->{id}){
+               $eq=0;
+              # eq=0 = Satz gefunden und es wird ein Update gemacht
+              # eq=1 = alles super - kein Update notwendig
+              #
+              # # da srcload geschrieben werden muss, mach ich immer eq=0
+              # $eq=1 if ($a->{ciusage} eq "LOADBALANCER" &&
+              #           $a->{srcsys} eq $srcsys &&
+              #           $a->{srcid} eq $b->{id} &&
+              #           $a->{name} eq $b->{systemname}.
+              #              " (".$b->{systemid}.")");
+            }
+            return($eq);
+         },
+         sub{  # oprec generator
+            my ($mode,$oldrec,$newrec,%p)=@_;
+            if ($mode eq "insert" || $mode eq "update"){
+               my $oprec={
+                  OP=>$mode,
+                  MSG=>"$mode  $newrec->{systemname} ".
+                       "in W5Base",
+                  DATAOBJ=>'itil::lnkadditionalci',
+                  DATA=>{
+                     name   =>$newrec->{systemname}.
+                              " (".$newrec->{systemid}.")",
+                     ciusage=>"LOADBALANCER",
+                     srcload   =>NowStamp("en"),
+                     srcsys    =>$srcsys,
+                     srcid     =>$newrec->{id},
+                     accessurlid=>$rec->{id}
+                  }
+               };
+               if ($mode eq "update"){
+                  $oprec->{IDENTIFYBY}=$oldrec->{id};
+               }
+               return($oprec);
+            }
+            elsif ($mode eq "delete"){
+               my $id=$oldrec->{networkid};
+               return({OP=>$mode,
+                       MSG=>"delete ip $oldrec->{name} ".
+                            "from W5Base",
+                       DATAOBJ=>'itil::lnkadditionalci',
+                       IDENTIFYBY=>$oldrec->{id},
+                       });
+            }
+            return(undef);
+         },
+         \@acis,\@cis,\@opList,
+         refid=>$rec->{id}
+      );
+
+      #printf STDERR ("fifi opList=%s\n",Dumper(\@opList));
+      if (!$res){
+         my $opres=ProcessOpList($self->getParent,\@opList);
+      }
    }
 
 

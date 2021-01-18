@@ -8,6 +8,8 @@
 'fieldgroup.lastipaddresses'=>{de=>'letzte bekannte IP-Adressen',en=>'last known IP addresses'},
 'fieldgroup.urlinfo'=>{de=>'URL-Daten',en=>'URL-Data'},
 'fieldgroup.ssl'=>{de=>'SSL Zertifikats-Prüfsystem',en=>'SSL Verification'},
+'fieldgroup.addcis'=>{de=>'zusätzlich verwendete Config-Items',en=>'additional used Config-Items'},
+'additional used Config-Items'=>{de=>'zusätzlich verwendetes Config-Items'},
 'Accessed by endusers (Application Frontend)'=>{de=>'Zugriff durch End-User (Anwendungs-Frontend)'},
 'Accessed by interface applications'=>{de=>'Zugriff durch Schnittstellenanwendungen'},
 'only for internal communication in application'=>{de=>'Zugriff nur durch interne Prozesse innerhalb der Anwendung'},

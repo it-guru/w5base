@@ -439,7 +439,7 @@ sub new
                 group         =>'addcis',
                 htmldetail    =>'NotEmpty',
                 vjointo       =>'itil::lnkadditionalci',
-                vjoinon       =>['id'=>'applid'],
+                vjoinon       =>['id'=>'accessurlid'],
                 vjoindisp     =>['name','ciusage']),
 
       new kernel::Field::Link(
@@ -669,7 +669,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default class applinfo urlinfo ssl lastipaddresses source));
+          qw(header default class applinfo urlinfo ssl 
+             lastipaddresses addcis source));
 }
 
 
