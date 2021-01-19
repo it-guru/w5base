@@ -1157,16 +1157,17 @@ sub _FancyLinks
    my $link=shift;
    my $prefix=shift;
    my $name=shift;
-   my $res="<a href=\"$link\" target=_blank>$link</a>".$prefix;
+   my $res="<a href=\"$link\" tabindex=-1 target=_blank>$link</a>".$prefix;
    if ($name ne ""){
-      $res="<a href=\"$link\" title=\"$link\" target=_blank>$name</a>".$prefix;
+      $res="<a href=\"$link\" tabindex=-1 title=\"$link\" ".
+           "target=_blank>$name</a>".$prefix;
    }
    else{
       if (length($link)>55){
          my $title=$link;
          my $slink=TextShorter($link,55,"URL");
          $title=~s/^.*?://g;
-         $res="<a href=\"$link\" target=_blank title=\"$title\">".
+         $res="<a href=\"$link\" tabindex=-1 target=_blank title=\"$title\">".
               "$slink</a>".$prefix;
       }
    }
