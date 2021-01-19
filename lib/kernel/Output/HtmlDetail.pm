@@ -91,7 +91,7 @@ sub ProcessHead
    $d.="<div id=HtmlDetail style=\"$newstyle\"><div style=\"padding:5px\">";
    $d.="<div class='printbacktotop'>".
        "<div class='backtotop' id=BackToTop>".
-       "<a href='#index' title=\"Jumpt to top\">".
+       "<a href='#index' tabindex=-1 title=\"Jumpt to top\">".
        "<img border=0 src='../../base/load/backtotop.gif' width=20 height=20>".
        "</a></div></div>";
    $d.=$self->{fieldsPageHeader};
@@ -1069,7 +1069,7 @@ sub DetailFunctions
              "kernel::Output::HtmlDetail");
    $back="<div class=detailfunctions>".
          "<span style=\"\">".
-         "<a class=HtmlDetailIndex style=\"cursor:n-resize\" ".
+         "<a class=HtmlDetailIndex tabindex=-1 style=\"cursor:n-resize\" ".
          " title=\"$label\" href=\"#index\">".
          "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</a></span>".
          $back."</div>";
