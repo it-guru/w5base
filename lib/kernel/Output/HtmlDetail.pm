@@ -104,9 +104,9 @@ sub ProcessHead
       $d.=<<EOF;
 function DetailInit()  // used from asyncron sub data to restore position in
 {                      // page
+   setFocusOnForm();
    document.body.scrollTop=$scrolly;
    startFixBackToTop();
-   setFocusOnForm();
    return;
 }
 EOF
@@ -115,8 +115,8 @@ EOF
       $d.=<<EOF;
 function DetailInit()  // used from asyncron sub data to restore position in
 {                      // page
-   startFixBackToTop();
    setFocusOnForm();
+   startFixBackToTop();
    return;
 }
 EOF
