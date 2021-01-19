@@ -5,4 +5,8 @@ div.searchframe{
 div.buttonframe{
    border-radius:3px;
 }
+input[type=button]:focus {
+   outline-color: #b90b64;
+}
+
 

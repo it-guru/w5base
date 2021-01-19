@@ -162,6 +162,9 @@ div.button{
    margin:2px;
    float:right;
 }
+input[type=button]:focus {
+   outline-color: blue;
+}
 div.viewselect{
    font-size:11px;
    text-align:center;

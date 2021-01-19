@@ -419,7 +419,7 @@ sub getAppTitleBar
    my $prefix=$param{prefix};
 
    my $user=$ENV{REMOTE_USER};
-   my $onclick=" id=LoggedInAs onclick=\"UserMask();\" ";
+   my $onclick=" id=LoggedInAs onclick=\"return(UserMask());\" ";
    if ($ENV{REMOTE_USER} ne $ENV{REAL_REMOTE_USER} &&
        $ENV{REMOTE_USER} ne "anonymous"){
       $user.=" (".$self->T("authenticated as")." ".$ENV{REAL_REMOTE_USER}.")";
@@ -448,11 +448,9 @@ sub getAppTitleBar
                  "<a class=TitleBarLink target=_top ".
                  "href='$directLink'>".
                  "%s</a>&nbsp;</div></td>".
-                 "<td align=right nowrap><div $onclick ".
-                 "style=\"margin:0;padding:0;padding-right:5px;".
-                 "margin-left:10px;\">%s</div>".
-                 "</td></tr>",$param{title},
-                                    $self->T("Logged in as")." ".$user);
+                 "<td align=right nowrap>".
+                 "<a href=\"\" target=_blank $onclick>%s</a>".
+                 "</td></tr>",$param{title},$self->T("Logged in as")." ".$user);
    $d=<<EOF;
 <table id=TitleBar width=100% height=15 border=0 cellspacing=0 cellpadding=0>
 $titlebar
@@ -478,6 +476,7 @@ function RestartApp(retVal,isbreak)
 function UserMask()
 {
    showPopWin('$prefix../../base/usermask/Main',500,200,RestartApp);
+   return(false);
 }
 function ModuleObjectInfo()
 {

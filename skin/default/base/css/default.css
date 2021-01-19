@@ -4,7 +4,9 @@
       background-color: #FFFFFF;
    }
 }
-a:focus {outline: blue solid 2px;}
+a:focus {border-bottom-style:solid;border-color: silver;border-width:1px}
+a:focus img {background: silver;}
+
 
 iframe.HtmlDetailPage{
    width:100%;
@@ -220,9 +222,28 @@ a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
 	font-weight: bold;
    text-decoration:none;
 }
+a:focus.TitleBarLink {
+   outline:none;
+	color: gray;
+}
+
 #LoggedInAs{
 	cursor: pointer;
+	background-color: transparent!important;
+   border: none;
+   padding: 0!important;
+   text-decoration: none;
+	color: #ffffff;
+	font-weight: bold;
+   cursor: pointer;
 }
+#LoggedInAs:focus {
+   text-decoration: none;
+	color: gray;
+   outline:none;
+   border: none;
+}
+
 #ModuleObjectInfo{
 	cursor: pointer;
 }

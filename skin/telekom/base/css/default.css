@@ -34,6 +34,11 @@ a:link.TitleBarLink, a:visited.TitleBarLink, a:active.TitleBarLink {
    background-color: transparent;
    color: white;
 }
+a:focus.TitleBarLink {
+   outline:none;
+   color: gray;
+}
+
 
 .SelectedItem {
    background-color:#b90b64;

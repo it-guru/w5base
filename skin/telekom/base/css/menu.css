@@ -1,2 +1,3 @@
 @import url("menu.css?SKIN=default");
 a:focus {outline: #b90b64 solid 1px;}
+a:focus img {background: transparent;}
