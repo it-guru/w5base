@@ -400,7 +400,12 @@ sub Validate
 
       # Name
       my ($cn)=grep({$_->type() eq 'CN'} @$iobjs);
-      $newrec->{name}=$cn->value().' - '.$newrec->{serialno};
+      if (defined($cn)){
+         $newrec->{name}=$cn->value().' - '.$newrec->{serialno};
+      }
+      else{
+         $newrec->{name}="Common Nameless - ".$newrec->{serialno};
+      }
 
       # "Alternative Name" analyse
       my $alternativeNames;
