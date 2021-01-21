@@ -271,6 +271,12 @@ sub new
                 dataobjattr   =>'"isProtectedNetworkDevice"'),
 
       new kernel::Field::Boolean(
+                name          =>'isapplreldisallowed',
+                label         =>'is application relation disallowed',
+                group         =>'form',
+                dataobjattr   =>'"isApplRelDisallowed"'),
+
+      new kernel::Field::Boolean(
                 name          =>'soxrelevant',
                 label         =>'SOX relevant',
                 group         =>'form',
