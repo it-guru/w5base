@@ -643,7 +643,7 @@ sub syncToGroups
    $leader=$leaderitid if ($leaderitid ne "");
 
    my $basegrpname=effVal($oldrec,$newrec,"responsibleorg");
-   my $parentgrp=$basegrpname.".DigitalHub";
+   my $parentgrp=$basegrpname.".Hub";
    my $fullname=$parentgrp.".".$shortname;
 
    my $grp=$self->getPersistentModuleObject("w5grp","base::grp");
