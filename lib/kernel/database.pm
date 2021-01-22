@@ -379,8 +379,10 @@ sub execute
        if ($self->{sth}->execute(@bind_values)){
           return($self->{sth});
        }
-       printf STDERR ("ERROR: execute='%s'\n",$statement);
-       printf STDERR ("ERROR database::execute '%s'\n",$DBI::errstr);
+       if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
+          printf STDERR ("ERROR: execute='%s'\n",$statement);
+          printf STDERR ("ERROR database::execute '%s'\n",$DBI::errstr);
+       }
    }
    return(undef);
 }

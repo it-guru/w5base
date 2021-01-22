@@ -466,71 +466,89 @@ sub getFirst
    my @fieldlist=$self->getFieldList();
    my @attr=();
 
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
-
-
-   if (!defined($self->{LDAP})){
-      $self->{isInitalized}=0;
-      my $msg=$self->T("no LDAP connection or invalid LDAP handle");
-      if ($self->isSuspended()){
-         $msg=$self->T("LDAP connection temporary suspended");
-      }
-      $self->LastMsg(ERROR,$msg);
-      return(undef,msg(ERROR,$msg));
-   }
-
-   my $baselimit=$self->Limit();
-   $self->Context->{CurrentLimit}=$baselimit if ($baselimit>0);
+   my ($sth,$mesg);
+   my $baselimit;
+   my $base;
+   my @attr;
    my $t0=[gettimeofday()];
-
-
-   my @view=$self->getCurrentView();
-
-   foreach my $fullfieldname (@view){
-      my ($container,$fieldname)=(undef,$fullfieldname);
-      if ($fullfieldname=~m/^\S+\.\S+$/){
-         ($container,$fieldname)=split(/\./,$fullfieldname);
+   for(my $try=1;$try<3;$try++){
+      if ($try>1){
+         msg(INFO,"LDAP Initialize - $self - $try try");
       }
-      my $field=$self->getField($fieldname);
-      if (defined($field->{depend})){
-         if (ref($field->{depend}) ne "ARRAY"){
-            $field->{depend}=[$field->{depend}];
+      $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+     
+      if (!defined($self->{LDAP})){
+         $self->{isInitalized}=0;
+         my $msg=$self->T("no LDAP connection or invalid LDAP handle");
+         if ($self->isSuspended()){
+            $msg=$self->T("LDAP connection temporary suspended");
          }
-         foreach my $field (@{$field->{depend}}){
-            push(@view,$field) if (!grep(/^$field$/,@view));
+         $self->LastMsg(ERROR,$msg);
+         return(undef,msg(ERROR,$msg));
+      }
+     
+      my $baselimit=$self->Limit();
+      $self->Context->{CurrentLimit}=$baselimit if ($baselimit>0);
+     
+     
+      my @view=$self->getCurrentView();
+     
+      foreach my $fullfieldname (@view){
+         my ($container,$fieldname)=(undef,$fullfieldname);
+         if ($fullfieldname=~m/^\S+\.\S+$/){
+            ($container,$fieldname)=split(/\./,$fullfieldname);
+         }
+         my $field=$self->getField($fieldname);
+         if (defined($field->{depend})){
+            if (ref($field->{depend}) ne "ARRAY"){
+               $field->{depend}=[$field->{depend}];
+            }
+            foreach my $field (@{$field->{depend}}){
+               push(@view,$field) if (!grep(/^$field$/,@view));
+            }
          }
       }
-   }
-
-   my @attrview=@view;
-   my $idfield=$self->IdField();
-   if (defined($idfield)){
-      my $idname=$self->IdField->Name();
-
-      if (!grep(/^$idname$/,@attrview)){ # unique id
-         push(@attrview,$idname);        # should always
-      }                              # be selected
-   }
-
-
-
-
-
-   #printf STDERR ("fifi --------- %s\n",join(",",@attrview));
-   foreach my $field (@attrview){
-      my $fobj=$self->getField($field);
-      next if (!defined($fobj));
-      if (defined($fobj->{dataobjattr})){
-         push(@attr,$fobj->{dataobjattr});
+     
+      my @attrview=@view;
+      my $idfield=$self->IdField();
+      if (defined($idfield)){
+         my $idname=$self->IdField->Name();
+     
+         if (!grep(/^$idname$/,@attrview)){ # unique id
+            push(@attrview,$idname);        # should always
+         }                              # be selected
       }
-   }
+     
+      #printf STDERR ("fifi --------- %s\n",join(",",@attrview));
+      foreach my $field (@attrview){
+         my $fobj=$self->getField($field);
+         next if (!defined($fobj));
+         if (defined($fobj->{dataobjattr})){
+            push(@attr,$fobj->{dataobjattr});
+         }
+      }
+     
+      my $ldapfilter=$self->getLdapFilter();
+      my $base=$self->getBase;
 
-
-   my $ldapfilter=$self->getLdapFilter();
-   my $base=$self->getBase;
-   my ($sth,$mesg)=$self->{LDAP}->execute(filter=>latin1($ldapfilter)->utf8,
+      ($sth,$mesg)=$self->{LDAP}->execute(filter=>latin1($ldapfilter)->utf8,
                                           base=>$base,
                                           attrs=>\@attr);
+      if (!defined($sth) &&
+          ($mesg=~m/ldap-search:Can't contact LDAP server/)){
+         delete($self->{LDAP});
+         $self->{isInitalized}=0;
+      }
+      else{
+         last;
+      }
+   }
+
+
+
+
+
+
    my $t=tv_interval($t0,[gettimeofday()]);
    my $p=$self->Self();
    my $msg=sprintf("time=%0.4fsec;mod=$p",$t);
