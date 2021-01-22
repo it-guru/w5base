@@ -198,9 +198,10 @@ sub qcheckRecord
                     sub{  # comperator 
                        my ($a,$b)=@_;
                        my $eq;
-                       if ($a->{itservid} eq $b->{serviceid} ||
-                           (!defined($a->{itservid}) &&
-                            lc($a->{name}) eq lc($b->{name}))){
+                       # Primärer Vergleich darf NUR auf den Namen erfolgen,
+                       # da es ansonsten zu Key-Fehlern kommt, wenn dem gleichen
+                       # Namen eine neue ClusterPackageID "verpasst" wurde.
+                       if (lc($a->{name}) eq lc($b->{name})){
                           $eq=0;
                           $eq=1 if ($a->{comments} eq $b->{usage} &&
                                     lc($a->{name}) eq lc($b->{name}) &&
