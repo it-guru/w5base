@@ -302,6 +302,7 @@ sub new
    );
    $self->{use_distinct}=1;
    $self->{workflowlink}={ };
+   $self->{PhoneLnkUsage}=\&PhoneUsage;
 
    $self->{workflowlink}->{workflowtyp}=[qw(base::workflow::DataIssue
                                             base::workflow::mailsend)];
@@ -679,6 +680,28 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
    return($htmlresult);
 
 }
+
+
+
+sub PhoneUsage
+{
+   my $self=shift;
+   my $current=shift;
+   my @codes=qw(phoneRB phoneSUP phoneINM phoneOTH);
+   my @l;
+   foreach my $code (@codes){
+      if ($code eq $self->T($code)){
+         push(@l,$code,$self->T($code,$self->SelfAsParentObject()));
+      }
+      else{
+         push(@l,$code,$self->T($code));
+      }
+   }
+   return(@l);
+
+}
+
+
 
 
 

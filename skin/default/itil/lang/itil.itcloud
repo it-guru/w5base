@@ -12,4 +12,7 @@
 'cloud is not active'=>{de=>'angegebene Cloud ist nicht aktiv'},
 'Description'=>{de=>'Beschreibung'},
 'fieldgroup.servicemodels'=>{de=>'mögliche Service-Modelle',en=>'Possible service models'},
-
+'phoneRB'=>   {de=>'Rufbereitschaft'   ,en=>'Call on duty'},
+'phoneSUP'=>  {de=>'Support'           ,en=>'support'},
+'phoneINM'=>  {de=>'Incidentmanagement',en=>'incident management'},
+'phoneOTH'=>  {de=>'Sonstiges'         ,en=>'other'},

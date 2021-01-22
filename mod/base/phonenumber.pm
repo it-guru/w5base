@@ -197,7 +197,7 @@ sub Validate
    if (!defined($phonenumber) || $phonenumber eq "" ||
        !($phonenumber=~m/^[+-\/0-9 ]{4,40}$/)){
       $self->LastMsg(ERROR,
-             sprintf($self->T("invalid phone number '%s'"),$phonenumber));
+             sprintf($self->T("invalid phone number")." '%s'",$phonenumber));
       return(0);
    }
    if ($self->isParentWriteValid($parentobj,$refid)){
