@@ -48,6 +48,7 @@ sub new
                 label         =>'Projects',
                 group         =>'projects',
                 vjointo       =>\'tsotc::project',
+                vjoinbase     =>{"lastmondate"=>">now-14d"},
                 vjoinon       =>['id'=>'domainid'],
                 vjoindisp     =>['name']),
 
