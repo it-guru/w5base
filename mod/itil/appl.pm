@@ -2292,7 +2292,7 @@ sub PhoneUsage
 {
    my $self=shift;
    my $current=shift;
-   my @codes=qw(phoneRB phoneMVD phoneMISC phoneDEV);
+   my @codes=qw(phoneRB phoneMVD phoneMISC phoneDEV phoneSUP);
    my @l;
    foreach my $code (@codes){
       push(@l,$code,$self->T($code));

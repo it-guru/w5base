@@ -94,6 +94,7 @@
 "invalid application name '\%s' specified"=>{de=>"ungültiger Anwendungsname '\%s' angegeben"},
 'phoneRB'=>{de=>'Rufbereitschaft',en=>'Call on duty'},
 'phoneMVD'=>{de=>'Manager vom Dienst',en=>'manager on duty'},
+'phoneSUP'=>{de=>'Support',en=>'Support'},
 'phoneMISC'=>{de=>'Sonstiges',en=>'misc'},
 'phoneDEV'=>{de=>'Entwickler',en=>'Developer'},
 'daily_modified_appldiary'=>{de=>'tgl. Betriebstagebuch Report',
