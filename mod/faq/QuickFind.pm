@@ -143,7 +143,8 @@ sub anyQuestions
                        "../../faq/article/ById/".$rec->{faqid}); 
          $n=~s/^\d+[\s\.]*//;
          printf("<tr><td class=\"$class\">".
-                "<div class=\"$class\" onclick=\"%s\">%s</div></td></tr>",
+                "<button class=\"selBtn $class\" onclick=\"%s\">%s</button>".
+                "</td></tr>",
                 $link,$n);
          
          $cnt++;

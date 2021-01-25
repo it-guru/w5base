@@ -15,10 +15,26 @@ td:hover {
 }
 div{
    padding:5px;
+  text-align:left;
 }
 .normal{
    background-color:#7d9ba0;
 }
 .dimgray{
    background-color:dimgray;
+}
+.selBtn{
+ background: none!important;
+  border: none;
+  width:100%;
+  text-align:left;
+  padding: 0!important;
+  /*optional*/
+  text-decoration: none;
+  padding:5px;
+  cursor: pointer;
+}
+.selBtn:focus {
+  outline: 2px solid silver;
+  outline-offset:5px;
 }
