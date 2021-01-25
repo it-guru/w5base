@@ -4,7 +4,7 @@
 'Shortname'=>{de=>'Kurzbezeichnung'},
 'fullname'=>{de=>'ICTO Objektbezeichnung',en=>'ICTO Objectname'},
 'OrgAreaID'=>{de=>'OrganisationsbereichID'},
-'mapped OrgArea'=>{de=>'zugeordneter Org-Bereich'},
+'mapped W5Base-OrgArea'=>{de=>'zugeordneter W5Base-Org-Bereich'},
 'fieldgroup.roles'=>{de=>'Rollen',en=>'Roles'},
 'fieldgroup.appl'=>{de=>'W5Base Anwendungszuordnung',
                     en=>'W5Base Applicationrelation'},
@@ -12,4 +12,4 @@
                     en=>'Applicationversions'},
 
 'all reference Costcenters'=>{de=>'alle referenzierten Kontierungsobjekte'},
-'responsible DigitalHub/ServiceHub'=>{de=>'verantwortlicher DigitalHub/ServiceHub'},
+'planned DigitalHub/ServiceHub'=>{de=>'geplanter DigitalHub/ServiceHub'},

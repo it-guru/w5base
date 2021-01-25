@@ -75,7 +75,7 @@ sub new
       new kernel::Field::Group(
                 name          =>'orgarea',
                 readonly      =>1,
-                label         =>'mapped OrgArea',
+                label         =>'mapped W5Base-OrgArea',
                 vjoinon       =>'orgareaid'),
 
       new kernel::Field::Link(
@@ -102,8 +102,25 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'respvorg',
-                label         =>'responsible DigitalHub/ServiceHub',
-                htmldetail    =>'NotEmpty',
+                depend        =>['organisation'],
+                label         =>'planned DigitalHub/ServiceHub',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+
+                   if ($mode eq "ViewEditor"){
+                      return(1);
+                   }
+                   if (defined($param{current})){
+                      my $rec=$param{current};
+                      if ($rec->{respvorg} ne "" &&
+                          $rec->{respvorg} ne $rec->{organisation}){
+                         return(1);
+                      }
+                   }
+                   return(0);
+                },
                 dataobjattr   =>'HUB'),
 
 
