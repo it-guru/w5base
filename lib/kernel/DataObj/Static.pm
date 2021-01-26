@@ -96,8 +96,14 @@ sub getFirst
    my $self=shift;
    $self->{'Pointer'}=undef;
 
-
    $self->{CurrentData}=$self->data($self->{FilterSet});
+   if (defined($self->{CurrentData}) && ref($self->{CurrentData}) eq "ARRAY" &&
+       $self->{InternExternRemapping}>0){
+      my @l=map({$self->remapExtern2Intern($_)} @{$self->{CurrentData}});
+      $self->{CurrentData}=\@l;
+   }
+
+
 
    return(undef,"DataCollectError") if (!defined($self->{CurrentData}) || 
                                         ref($self->{CurrentData}) ne "ARRAY"); 
@@ -335,6 +341,33 @@ sub CheckFilter
    return(1);
 }
 
+sub remapExtern2Intern
+{
+   my $self=shift;
+   my $rec=shift;
+   my %int;
+
+   if ($self->{InternExternRemapping}>0){
+      my @fieldlist=$self->getFieldList();
+      foreach my $field (@fieldlist){
+         my $fo=$self->getField($field);
+         if (defined($fo)){
+            my $fieldname=$field;
+            if (exists($fo->{dataobjattr})){
+               $fieldname=$fo->{dataobjattr};
+            }
+            if (exists($rec->{$fieldname})){
+               $int{$field}=$rec->{$fieldname};
+            }
+         }
+      }
+   }
+   else{
+      return($rec);
+   }
+   return(\%int); 
+}
+
 
 
 
@@ -360,7 +393,8 @@ sub TIEHASH
    my $type=shift;
    my $parent=shift;
    my $rec=shift;
-   return(bless({Parent=>$parent,Rec=>$rec},$type));
+
+   return(bless({ Parent=>$parent, Rec=>$rec, },$type));
 }
 
 sub FIRSTKEY

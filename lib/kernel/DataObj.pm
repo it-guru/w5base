@@ -36,6 +36,7 @@ sub new
    $self->{use_distinct}=1 if (!exists($self->{use_distinct}));
    $self->{use_dirtyread}=0 if (!exists($self->{use_dirtyread}));
    $self->{dontSendRemoteEvent}=1 if (!exists($self->{dontSendRemoteEvent}));
+   $self->{InternExternRemapping}=0;
    
    return($self);
 }
@@ -3289,7 +3290,9 @@ sub AddFields
       my $name=$obj->Name;
       next if (defined($self->{'Field'}->{$name}));
       $self->{'Field'}->{$name}=$obj;
-
+      if (exists($obj->{dataobjattr}) && $name ne $obj->{dataobjattr}){
+         $self->{InternExternRemapping}++;
+      }
       my $inserted=0;
       if (defined($param{'insertafter'})){
          my @match=($param{'insertafter'});
