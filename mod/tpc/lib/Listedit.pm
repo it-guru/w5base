@@ -23,6 +23,7 @@ use kernel::App::Web;
 use kernel::DataObj::Static;
 use kernel::Field;
 use kernel::Field::TextURL;
+use Text::ParseWords;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
 
 sub new
@@ -31,6 +32,26 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
    return($self);
+}
+
+sub ExternInternTimestampReformat
+{
+   my $self=shift;
+   my $rec=shift;
+   my $name=shift;
+
+   if (exists($rec->{$name})){
+      if (my ($Y,$M,$D,$h,$m,$s)=$rec->{$name}=~
+              m/^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\..*Z){0,1}$/){
+         $rec->{$name}=sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+                               $Y,$M,$D,$h,$m,$s);
+      }
+      if (my ($Y,$M,$D)=$rec->{$name}=~
+              m/^(\d+)-(\d+)-(\d+)$/){
+         $rec->{$name}=sprintf("%04d-%02d-%02d 12:00:00",
+                               $Y,$M,$D);
+      }
+   }
 }
 
 sub getVRealizeAuthorizationToken
@@ -103,21 +124,165 @@ sub getVRealizeAuthorizationToken
 }
 
 
+sub caseHandler
+{
+   my $self=shift;
+   my $fobj=shift;
+   my $var=shift;
+   my $exp=shift;
+
+   if ($fobj->{ignorecase}){
+      $var="tolower($var)";
+      $exp=lc($exp);
+   }
+   if ($fobj->{uppersearch}){
+      $exp=uc($exp);
+   }
+   if ($fobj->{lowersearch}){
+      $exp=lc($exp);
+   }
+   
+
+
+   return($var,$exp);
+}
+
+
 
 
 sub decodeFilter2Query4vRealize
 {
    my $self=shift;
+   my $dbclass=shift;
+   my $idfield=shift;
    my $filter=shift;
+   my $const={}; # for constances witch are derevided from query
+   my $requesttoken="SEARCH.".time();
+   my $query="";
+   my %qparam;
 
-   my $query={};
+   if (ref($filter) eq "HASH"){
 
-   foreach my $fn (keys(%$filter)){
-      $query->{$fn}=$filter->{$fn};
-      $query->{$fn}=${$query->{$fn}} if (ref($query->{$fn}) eq "SCALAR");
-      $query->{$fn}=join(" ",@{$query->{$fn}}) if (ref($query->{$fn}) eq "ARRAY");
+# &&          # ODATA Filters are verry simple!
+#       keys(%$filter)==1 &&
+#       exists($filter->{FILTER}) &&
+#       ref($filter->{FILTER}) eq "ARRAY" &&
+#       $#{$filter->{FILTER}}==0 &&
+#       ref($filter->{FILTER}->[0]) eq "HASH"){
+      my @andLst=();
+      foreach my $filtername (keys(%{$filter})){
+         my $f=$filter->{$filtername}->[0];
+         # ODATA Filter translation
+        
+         foreach my $fn (keys(%{$f})){
+            my $fld=$self->getField($fn);
+            if (defined($fld)){
+               if ($fn eq $idfield){  # Id Field handling
+                  my $id; 
+                  if (ref($f->{$fn}) eq "ARRAY" &&
+                      $#{$f->{$fn}}==0){
+                     $id=$f->{$fn}->[0];
+                  }
+                  elsif (ref($f->{$fn}) eq "SCALAR"){
+                     $id=${$f->{$fn}};
+                  }
+                  else{
+                     if (!($f->{$fn}=~m/[ *?]/)){
+                        $id=$f->{$fn};
+                     }
+                  }
+                  $const->{$fn}=$id;
+                  if ($dbclass=~m/\{$idfield\}/){
+                     $dbclass=~s/\{$idfield\}/$id/g;
+                  }
+                  else{
+                     $dbclass=$dbclass."/".$id;
+                  }
+                  $requesttoken=$dbclass;
+               }
+               else{   # "normal" field handling
+                  my @orLst;
+                  my $fieldname=$fn;
+                  if (exists($fld->{dataobjattr})){
+                     $fieldname=$fld->{dataobjattr};
+                  }
+                  my $fstr=$f->{$fn};
+                  if (ref($fstr) eq "SCALAR"){
+                     my @l=($$fstr);
+                     $fstr=\@l;
+                  }
+                  if (ref($fstr) eq "ARRAY"){
+                     foreach my $word (@$fstr){
+                        my $exp="'".$word."'";
+                        my ($v,$e)=$self->caseHandler($fld,$fieldname,$exp);
+                        push(@orLst,"$v eq $e");
+                     }
+                  }
+                  else{
+                     if ($fld->{ODATA_constFilter}){
+                        my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
+                        $qparam{$fieldname}=join(",",@words);
+                     }
+                     else{
+                        my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
+                        for(my $c=0;$c<=$#words;$c++){
+                           if ($words[$c] eq "AND" || $words[$c] eq "OR"){
+                              $self->LastMsg("no ODATA support for AND or OR");
+                              return(undef);
+                           }
+                           if ($words[$c]=~m/'/){
+                              $self->LastMsg("no ODATA support for single quotes");
+                              return(undef);
+                           }
+        
+                           if ($words[$c]=~m/^\*[^*]+\*$/){
+                              $words[$c]=~s/\*$//;
+                              $words[$c]=~s/^\*//;
+                              my $exp="'".$words[$c]."'";
+                              my ($v,$e)=$self->caseHandler($fld,$fieldname,$exp);
+                              push(@orLst,"substringof($e,$v)");
+                           }
+                           elsif ($words[$c]=~m/^[^*]+\*$/){
+                              $words[$c]=~s/\*$//;
+                              my $exp="'".$words[$c]."'";
+                              my ($v,$e)=$self->caseHandler($fld,$fieldname,$exp);
+                              push(@orLst,"startswith($v,$e)");
+                           }
+                           else{
+                              my $exp="'".$words[$c]."'";
+                              my ($v,$e)=$self->caseHandler($fld,$fieldname,$exp);
+                              push(@orLst,"$v eq $e");
+                           }
+                        }
+                     }
+                  }
+                  if ($#orLst!=-1){
+                     push(@andLst,"(".join(" or ",@orLst).")");
+                  }
+               }
+            }
+         }
+      }
+      if ($#andLst!=-1){
+         $qparam{'$filter'}=join(" and ",@andLst);
+      }
    }
-   return($query);
+   else{
+      printf STDERR ("invalid Filterset in $self:%s\n",Dumper($filter));
+      $self->LastMsg(ERROR,"invalid filterset for vRealize query");
+      return(undef);
+   }
+   if ($dbclass=~m/\{[^{}]+\}/){
+      $self->LastMsg(ERROR,"missing constant query parameter");
+      return(undef);
+   }
+   my $qstr=kernel::cgi::Hash2QueryString(%qparam);
+   if ($qstr ne ""){
+      $dbclass.="?".$qstr;
+      $requesttoken=$dbclass;
+   }
+   
+   return($dbclass,$requesttoken,$const);
 }
 
 
