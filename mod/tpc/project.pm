@@ -33,28 +33,53 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(     
             name              =>'id',
-            searchable        =>1,
+            group             =>'source',
             htmldetail        =>'NotEmpty',
             label             =>'ProjectID'),
 
       new kernel::Field::Text(     
             name              =>'name',
-            searchable        =>1,
+            ignorecase        =>1,
             label             =>'Name'),
 
+      new kernel::Field::TextDrop(     
+            name              =>'appl',
+            searchable        =>0,
+            vjointo           =>'itil::appl',
+            vjoinon           =>['applid'=>'id'],
+            searchable        =>0,
+            vjoindisp         =>'name',
+            label             =>'W5Base Application'),
+
       new kernel::Field::Text(     
+            name              =>'applid',
+            searchable        =>0,
+            vjointo           =>'tpc::projecttag',
+            vjoinon           =>['id'=>'projectid'],
+            vjoinbase         =>{'key'=>'W5BaseID'},
+            vjoindisp         =>'value',
+            label             =>'Application W5BaseID'),
+
+      new kernel::Field::SubList(
+                name          =>'tags',
+                label         =>'Tags',
+                searchable    =>0,
+                group         =>'tags',
+                vjointo       =>'tpc::projecttag',
+                vjoinon       =>['id'=>'projectid'],
+                vjoindisp     =>['key','value']),
+
+      new kernel::Field::Interface(     
             name              =>'orgId',
-            searchable        =>1,
             label             =>'orgId'),
 
       new kernel::Field::Textarea(     
             name              =>'description',
             searchable        =>1,
             label             =>'Description'),
-
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name));
+   $self->setDefaultView(qw(id name mdate));
    return($self);
 }
 
@@ -66,18 +91,10 @@ sub DataCollector
 
    my $Authorization=$self->getVRealizeAuthorizationToken();
 
-   my $filter=$filterset->{FILTER}->[0];
-   my $query=$self->decodeFilter2Query4vRealize($filter);
-
-   my $dbclass="projects";
-#
-   my $requesttoken="SEARCH.".time();
-
-   if ($query->{id} ne ""){  # change op, if machine id is direct addressed
-      $dbclass="projects/$query->{id}";
-      $requesttoken=$query->{id};
-   }
-
+   my ($dbclass,$requesttoken)=$self->decodeFilter2Query4vRealize(
+      "projects","id",
+      $filterset
+   );
    my $d=$self->CollectREST(
       dbname=>'TPC',
       requesttoken=>$requesttoken,
@@ -108,10 +125,6 @@ sub DataCollector
          if (ref($data) ne "ARRAY"){
             $data=[$data];
          }
-        # foreach my $rec (@$data){
-        #    $rec->{ictoNumber}=$rec->{systemNumber};
-        #    delete($rec->{systemNumber});
-        # }
          return($data);
       }
    );
@@ -148,9 +161,13 @@ sub isUploadValid
    return(0);
 }
 
-
-
-
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default tags source));
+}
 
 #sub getRecordImageUrl
 #{

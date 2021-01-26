@@ -46,6 +46,15 @@ sub Init
                       "tpc::machine",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.tpc.kernel",
+                      "tmpl/welcome",
+                      prio=>9999,
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.tpc.kernel.depl",
+                      "tpc::deployment",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

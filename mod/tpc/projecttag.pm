@@ -1,4 +1,4 @@
-package tpc::machine;
+package tpc::projecttag;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -31,63 +31,23 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Id(     
-            name              =>'id',
-            searchable        =>1,
-            group             =>'source',
-            htmldetail        =>'NotEmpty',
-            label             =>'MachineID'),
-
-      new kernel::Field::Text(     
-            name              =>'name',
-            searchable        =>1,
-            label             =>'Name'),
-
-      new kernel::Field::Text(     
-            name              =>'orgId',
-            searchable        =>1,
-            label             =>'orgId'),
-
-      new kernel::Field::Text(     
-            name              =>'projectId',
+      new kernel::Field::Text(
+            name              =>'projectid',
             searchable        =>1,
             label             =>'projectId'),
 
       new kernel::Field::Text(     
-            name              =>'project',
-            vjointo           =>'tpc::project',
-            vjoinon           =>['projectId'=>'id'],
-            vjoindisp         =>'name',
-            label             =>'Project'),
+            name              =>'key',
+            searchable        =>1,
+            label             =>'Name'),
 
       new kernel::Field::Text(     
-            name              =>'address',
-            searchable        =>1,
-            label             =>'IP-Address'),
-
-      new kernel::Field::Textarea(     
-            name              =>'description',
-            searchable        =>1,
-            label             =>'Description'),
-
-      new kernel::Field::CDate(
-                name          =>'cdate',
-                group         =>'source',
-                label         =>'Creation-Date',
-                dayonly       =>1,
-                searchable        =>0,  # das tut noch nicht
-                dataobjattr   =>'createdAt'),
-
-      new kernel::Field::MDate(
-                name          =>'mdate',
-                group         =>'source',
-                label         =>'Modification-Date',
-                dayonly       =>1,
-                searchable        =>0,  # das tut noch nicht
-                dataobjattr   =>'updatedAt'),
+            name              =>'value',
+            searchable        =>0,
+            label             =>'Value'),
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name));
+   $self->setDefaultView(qw(key value));
    return($self);
 }
 
@@ -99,10 +59,13 @@ sub DataCollector
 
    my $Authorization=$self->getVRealizeAuthorizationToken();
 
-   my ($dbclass,$requesttoken)=$self->decodeFilter2Query4vRealize(
-      "machines","id",
+
+   my ($dbclass,$requesttoken,$const)=$self->decodeFilter2Query4vRealize(
+      "projects/{projectid}/resource-metadata","projectid",
       $filterset
    );
+   return(undef) if (!defined($dbclass));
+
    my $d=$self->CollectREST(
       dbname=>'TPC',
       requesttoken=>$requesttoken,
@@ -111,7 +74,7 @@ sub DataCollector
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl."iaas/".$dbclass;
+         my $dataobjurl=$baseurl."iaas/api/".$dbclass;
          return($dataobjurl);
       },
 
@@ -127,15 +90,16 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         if (ref($data) eq "HASH" && exists($data->{content})){
-            $data=$data->{content};
+         if (ref($data) eq "HASH" && exists($data->{tags})){
+            $data=$data->{tags};
          }
          if (ref($data) ne "ARRAY"){
-            $data=[$data];
+            $data=[];
          }
          map({
-             $self->ExternInternTimestampReformat($_,"createdAt");
-             $self->ExternInternTimestampReformat($_,"updatedAt");
+            foreach my $k (%$const){
+               $_->{$k}=$const->{$k};
+            }
          } @$data);
          return($data);
       }

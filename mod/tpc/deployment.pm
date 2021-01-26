@@ -1,4 +1,4 @@
-package tpc::machine;
+package tpc::deployment;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -33,61 +33,49 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(     
             name              =>'id',
-            searchable        =>1,
             group             =>'source',
             htmldetail        =>'NotEmpty',
-            label             =>'MachineID'),
+            label             =>'DeploymentID'),
 
       new kernel::Field::Text(     
-            name              =>'name',
-            searchable        =>1,
-            label             =>'Name'),
+            name              =>'opname',
+            dataobjattr       =>'name',
+            ignorecase        =>1,
+            label             =>'Operation label'),
 
       new kernel::Field::Text(     
-            name              =>'orgId',
-            searchable        =>1,
-            label             =>'orgId'),
+            name              =>'status',
+            ODATA_constFilter =>'1',
+            uppersearch       =>1,
+            label             =>'Status'),
 
-      new kernel::Field::Text(     
+      new kernel::Field::Interface(
             name              =>'projectId',
-            searchable        =>1,
             label             =>'projectId'),
 
-      new kernel::Field::Text(     
+      new kernel::Field::Container(
+            name              =>'inputs',
+            searchable        =>1,
+            uivisible         =>1,
+            label             =>'Inputs'),
+
+      new kernel::Field::Text(
             name              =>'project',
             vjointo           =>'tpc::project',
             vjoinon           =>['projectId'=>'id'],
             vjoindisp         =>'name',
             label             =>'Project'),
 
-      new kernel::Field::Text(     
-            name              =>'address',
-            searchable        =>1,
-            label             =>'IP-Address'),
+      new kernel::Field::CDate(     
+            name              =>'cdate',
+            dataobjattr       =>'createdAt',
+            group             =>'source',
+            searchable        =>0,  # das tut noch nicht
+            label             =>'Creation-Date'),
 
-      new kernel::Field::Textarea(     
-            name              =>'description',
-            searchable        =>1,
-            label             =>'Description'),
-
-      new kernel::Field::CDate(
-                name          =>'cdate',
-                group         =>'source',
-                label         =>'Creation-Date',
-                dayonly       =>1,
-                searchable        =>0,  # das tut noch nicht
-                dataobjattr   =>'createdAt'),
-
-      new kernel::Field::MDate(
-                name          =>'mdate',
-                group         =>'source',
-                label         =>'Modification-Date',
-                dayonly       =>1,
-                searchable        =>0,  # das tut noch nicht
-                dataobjattr   =>'updatedAt'),
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name));
+   $self->setDefaultView(qw(id opname status cdate));
    return($self);
 }
 
@@ -99,10 +87,15 @@ sub DataCollector
 
    my $Authorization=$self->getVRealizeAuthorizationToken();
 
+
    my ($dbclass,$requesttoken)=$self->decodeFilter2Query4vRealize(
-      "machines","id",
+      "deployments","id",
       $filterset
    );
+   return(undef) if (!defined($dbclass));
+
+   my $requesttoken="SEARCH.".time();
+
    my $d=$self->CollectREST(
       dbname=>'TPC',
       requesttoken=>$requesttoken,
@@ -111,7 +104,7 @@ sub DataCollector
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl."iaas/".$dbclass;
+         my $dataobjurl=$baseurl."deployment/api/".$dbclass;
          return($dataobjurl);
       },
 
@@ -135,8 +128,11 @@ sub DataCollector
          }
          map({
              $self->ExternInternTimestampReformat($_,"createdAt");
-             $self->ExternInternTimestampReformat($_,"updatedAt");
          } @$data);
+        # foreach my $rec (@$data){
+        #    $rec->{ictoNumber}=$rec->{systemNumber};
+        #    delete($rec->{systemNumber});
+        # }
          return($data);
       }
    );
