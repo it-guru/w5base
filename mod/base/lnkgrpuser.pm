@@ -47,6 +47,7 @@ sub new
       $roles->{userrole}=$self->{lnkgrpuserrole};
       $roles->{multisize}=7;
       $roles->{searchable}=0;
+      $roles->{uploadable}=1;
       $roles->{onRawValue}=
          sub {
             my $self=shift;
