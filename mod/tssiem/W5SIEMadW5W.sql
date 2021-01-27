@@ -19,6 +19,8 @@ create table "W5SIEM_secscan" (
    pdfstddelta_level  INT,
    creationdate       DATE not null,
    importdate         DATE,
+   networkid          NUMBER(*,0) default null,
+   networkname        VARCHAR2(40) default null,
    rcvdate            DATE,
    constraint W5SIEM_secscan_pk primary key (ref)
 );
