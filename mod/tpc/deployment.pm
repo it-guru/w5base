@@ -50,7 +50,8 @@ sub new
             label             =>'Status'),
 
       new kernel::Field::Interface(
-            name              =>'projectId',
+            name              =>'projectid',
+            dataobjattr       =>'projectId',
             label             =>'projectId'),
 
       new kernel::Field::Container(
@@ -62,20 +63,20 @@ sub new
       new kernel::Field::Text(
             name              =>'project',
             vjointo           =>'tpc::project',
-            vjoinon           =>['projectId'=>'id'],
+            vjoinon           =>['projectid'=>'id'],
             vjoindisp         =>'name',
             label             =>'Project'),
 
       new kernel::Field::CDate(     
             name              =>'cdate',
             dataobjattr       =>'createdAt',
+            sqlorder          =>'desc',
             group             =>'source',
-            searchable        =>0,  # das tut noch nicht
             label             =>'Creation-Date'),
 
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id opname status cdate));
+   $self->setDefaultView(qw(cdate id opname status project));
    return($self);
 }
 
@@ -128,6 +129,13 @@ sub DataCollector
          }
          map({
              $self->ExternInternTimestampReformat($_,"createdAt");
+             if (exists($_->{inputs}) && ref($_->{inputs}) eq "HASH"){
+                foreach my $k (keys(%{$_->{inputs}})){
+                   if ($k=~m/pass/i){
+                      $_->{inputs}->{$k}="***";
+                   }
+                }
+             }
          } @$data);
         # foreach my $rec (@$data){
         #    $rec->{ictoNumber}=$rec->{systemNumber};
@@ -136,6 +144,7 @@ sub DataCollector
          return($data);
       }
    );
+#print STDERR Dumper($d);
 
    return($d);
 }
