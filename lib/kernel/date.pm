@@ -152,6 +152,9 @@ sub Date_to_String
    elsif ($lang eq "SOAP"){
       $d=sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",$Y,$M,$D,$h,$m,$s);
    }
+   elsif ($lang eq "EDM"){
+      $d=sprintf("%04d-%02d-%02dT%02d:%02d:%02d",$Y,$M,$D,$h,$m,$s);
+   }
    elsif ($lang eq "ICS"){
       $d=sprintf("%04d%02d%02dT%02d%02d%02dZ",$Y,$M,$D,$h,$m,$s);
    }
