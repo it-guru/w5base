@@ -325,7 +325,8 @@ sub decodeFilter2Query4vRealize
       return(undef);
    }
 
-   if ($self->{_LimitStart}==0 && $self->{_Limit}>0){
+   if ($self->{_LimitStart}==0 && $self->{_Limit}>0 &&
+       !($self->{_UseSoftLimit})){
       $qparam{'$top'}=$self->{_Limit};
       if ($self->{_LimitStart}>0){
          $qparam{'$skip'}=$self->{_LimitStart};
