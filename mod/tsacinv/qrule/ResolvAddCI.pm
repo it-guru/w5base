@@ -65,6 +65,8 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+   my $checksession=shift;
+   my $autocorrect=$checksession->{autocorrect};
 
    my $exitcode=0;
    my $desc={qmsg=>[],solvtip=>[]};
@@ -100,7 +102,7 @@ sub qcheckRecord
             my ($a,$b)=@_;   # a=lnkadditionalci b=aus AM
             my $eq;
             if ($a->{srcsys} eq $srcsys &&
-                $a->{srcid} eq $b->{id}){
+                $a->{name} eq $b->{systemname}." (".$b->{systemid}.")"){
                $eq=0;
               # eq=0 = Satz gefunden und es wird ein Update gemacht
               # eq=1 = alles super - kein Update notwendig
@@ -135,10 +137,16 @@ sub qcheckRecord
                if ($mode eq "update"){
                   $oprec->{IDENTIFYBY}=$oldrec->{id};
                }
+               if ($mode eq "insert"){
+                  $checksession->{EssentialsChangedCnt}++;
+                  push(@{$desc->{qmsg}},"add: ".$oprec->{DATA}->{name});
+               }
                return($oprec);
             }
             elsif ($mode eq "delete"){
-               my $id=$oldrec->{networkid};
+               my $id=$oldrec->{id};
+               push(@{$desc->{qmsg}},"remove: ".$oldrec->{name});
+               $checksession->{EssentialsChangedCnt}++;
                return({OP=>$mode,
                        MSG=>"delete ip $oldrec->{name} ".
                             "from W5Base",
