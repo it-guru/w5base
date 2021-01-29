@@ -242,6 +242,18 @@ sub Validate
 }
 
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(0) if ($rec->{id} eq "");
+   return(1) if ($self->IsMemberOf("admin"));
+   return(0);
+}
+
+
+
 sub isViewValid
 {
    my $self=shift;
