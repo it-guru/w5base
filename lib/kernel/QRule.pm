@@ -754,16 +754,25 @@ sub ProcessOpList
                $dataobj->SetFilter({$idname=>\$op->{IDENTIFYBY}});
                my ($oldrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
                my $changed=0;
+               my $srcloadonly=1;
                foreach my $k (keys(%{$op->{DATA}})){
                   if (trim($op->{DATA}->{$k}) ne trim($oldrec->{$k})){
                      msg(INFO,"update $k=$oldrec->{$k}");
+                     if ($k ne "srcload"){
+                        $srcloadonly=0;
+                     }
                      $changed++;
                   }
                }
                if ($changed){
+                  my %upd=%{$op->{DATA}};
+                  if ($srcloadonly){
+                     if (exists($oldrec->{mdate})){
+                        $upd{mdate}=$oldrec->{mdate};
+                     }
+                  }
                   my $id=$dataobj->ValidatedUpdateRecord(
-                     $oldrec,$op->{DATA},
-                     {$idname=>\$op->{IDENTIFYBY}}
+                     $oldrec,\%upd,{$idname=>\$op->{IDENTIFYBY}}
                   );
                   msg(INFO,"update id ok = $id");
                }
