@@ -1,0 +1,6 @@
+'itil::qrule::AgregateAddCI'=>{
+  de=>'Aggregation der zustätzlich verwendeten Config-Items',
+  en=>'Agregate additional config items'
+},
+'add'=>{de=>'hinzugefügt'},
+'remove'=>{de=>'entfernt'},
