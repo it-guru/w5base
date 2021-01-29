@@ -62,6 +62,9 @@ sub onRawValue
    my $d;
    if (defined($state) && ref($state->{rule}) eq "ARRAY"){
       foreach my $r (@{$state->{rule}}){
+         if (ref($r->{qmsg}) ne "ARRAY"){
+            $r->{qmsg}=[$r->{qmsg}];
+         }
          foreach my $qmsg (@{$r->{qmsg}}){
             $d.="\n" if ($d ne "");
             $d.=$qmsg;
