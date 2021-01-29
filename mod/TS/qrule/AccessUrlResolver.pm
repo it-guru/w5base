@@ -67,6 +67,9 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+   my $checksession=shift;
+   my $autocorrect=$checksession->{autocorrect};
+
 
    my $exitcode=0;
    my $desc={qmsg=>[],solvtip=>[]};
@@ -152,6 +155,14 @@ sub qcheckRecord
 
 
    my $lastip=getModuleObject($self->getParent->Config,"itil::lnkapplurlip");
+
+   $lastip->ResetFilter();
+   $lastip->SetFilter({lnkapplurlid=>\$rec->{id}});
+   my @oldl=$lastip->getHashList(qw(id));
+
+
+
+   $lastip->ResetFilter();
    my $srcload=NowStamp("en");
    foreach my $ip (@ipl){
       $lastip->ValidatedInsertOrUpdateRecord({
@@ -166,6 +177,10 @@ sub qcheckRecord
    $lastip->ResetFilter();
    $lastip->SetFilter({lnkapplurlid=>\$rec->{id}});
    my @l=$lastip->getHashList(qw(id));
+
+   if ($#l!=$#oldl){
+      $checksession->{EssentialsChangedCnt}++;
+   }
 
    if ($#l==-1){
       $exitcode=3 if ($exitcode<3);
