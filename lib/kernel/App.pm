@@ -1167,7 +1167,8 @@ sub Lang
 {
    my $self=shift;
 
-   if (defined($ENV{HTTP_FORCE_LANGUAGE})){
+   if (defined($ENV{HTTP_FORCE_LANGUAGE}) && 
+       $ENV{HTTP_FORCE_LANGUAGE} ne ""){
       return($ENV{HTTP_FORCE_LANGUAGE});
    }
    my @languages=LangTable();
