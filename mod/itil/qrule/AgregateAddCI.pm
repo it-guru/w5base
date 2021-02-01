@@ -135,7 +135,6 @@ sub qcheckRecord
                DATA=>{
                   name   =>$newrec->{name},
                   ciusage=>$newrec->{ciusage},
-                  srcsys    =>$srcsys,
                   srcid     =>undef,
                   applid    =>$rec->{id}
                }
@@ -145,12 +144,14 @@ sub qcheckRecord
             }
             if ($mode eq "insert"){
                $checksession->{EssentialsChangedCnt}++;
+               $oprec->{DATA}->{srcsys}=$srcsys;
                push(@{$desc->{qmsg}},"add: ".$oprec->{DATA}->{name});
             }
             return($oprec);
          }
          elsif ($mode eq "delete"){
             my $id=$oldrec->{id};
+            return() if ($id eq "");
             push(@{$desc->{qmsg}},"remove: ".$oldrec->{name});
             $checksession->{EssentialsChangedCnt}++;
             return({OP=>$mode,
