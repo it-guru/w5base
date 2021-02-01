@@ -80,23 +80,6 @@ sub new
                 selectfix     =>1,
                 dataobjattr   =>'subvou.name'),
 
-      #new kernel::Field::Text(
-      #          name          =>'fullname',
-      #          label         =>'Fullname',
-      #          htmldetail    =>0,
-      #          dataobjattr   =>"concat(".
-      #                          "subvou.shortname,".
-      #                          "if (subvou.name<>'','-',''),".
-      #                          "subvou.name".
-      #                          ")"),
-
-      #new kernel::Field::Textarea(
-      #          name          =>'comments',
-      #          group         =>'comments',
-      #          label         =>'Comments',
-      #          dataobjattr   =>'subvou.comments'),
-
-
       new kernel::Field::TextDrop(
                 name          =>'reprgrp',
                 readonly      =>1,
@@ -106,7 +89,6 @@ sub new
                 vjoinbase     =>{srcsys=>[$self->SelfAsParentObject()]},
                 vjoinon       =>['id'=>'srcid'],
                 vjoindisp     =>'fullname'),
-
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -188,9 +170,6 @@ sub getDetailBlockPriority
 }
 
 
-
-
-
 sub SecureValidate
 {
    my $self=shift;
@@ -218,11 +197,14 @@ sub Validate
    if (!defined($oldrec) || defined($newrec->{name})){
       my $newshortname=$newrec->{name};
       $newshortname=~s/\[\d+\]$//;
+      if (length($newshortname)>12){
+         $self->LastMsg(ERROR,"Name too long (max. 12 characters)");
+         return(0);
+      }
       if ($newshortname=~m/^\s*$/ || 
           !($newshortname=~m/^[a-z0-9_-]+$/i) ||
-          ($newshortname=~m/^[0-9-]/i) ||
-          length($newshortname)>12){
-         $self->LastMsg(ERROR,"invalid sub orgunit name specified");
+          ($newshortname=~m/^[0-9-]/i)) {
+         $self->LastMsg(ERROR,"invalid Sub-Unit name (invalid characters)");
          return(0);
       }
    }

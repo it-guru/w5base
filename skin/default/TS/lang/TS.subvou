@@ -2,3 +2,5 @@
 'invalid sub orgunit name specified'=>{de=>'ungültiger Untereinheiten-Name'},
 'no write access to selected virtual org unit'=>{de=>'kein Schreibzugriff auf die gewählte virutelle Orgeinheit'},
 'representing group'=>{de=>'repräsentierende Gruppe'},
+'Name too long (max. 12 characters)'=>{de=>'Name zu lang (max. 12 Zeichen)'},
+'invalid Sub-Unit name (invalid characters)'=>{de=>'ungültiger Untereinheiten-Name (ungültige Zeichen)'},
