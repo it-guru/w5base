@@ -90,7 +90,7 @@
 'itts.proc.canvas'=>{de=>'Canvas Objekt',en=>'Canvas Object'},
 'itts.proc.canvas.relation'=>{de=>'Zuordnung',en=>'relation'},
 'itts.proc.canvas.new'=>{de=>'Neueingabe',en=>'New'},
-'itts.proc.vou'=>{de=>'virtuelle Org-Einheit',en=>'virtuel Org-Unit'},
+'itts.proc.vou'=>{de=>'virt. Org-Einheit',en=>'virt. Org-Unit'},
 'itts.proc.vou.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.qmgmt.tsinterview'=>{de=>'Deutsche Telekom CI-Interview',
                              en=>'Deutsche Telekom CI-Interview'},
