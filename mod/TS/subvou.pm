@@ -175,6 +175,7 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $wrgroups=shift;
 
    if (!defined($oldrec)){
       my $vouid=$newrec->{vouid};
@@ -183,7 +184,9 @@ sub SecureValidate
          return(0);
       }
    }
-   return(1);
+printf STDERR ("SecureValidate newrec=%s\n",Dumper($newrec));
+
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
 
@@ -194,6 +197,7 @@ sub Validate
    my $newrec=shift;
    my $comprec=shift;
 
+printf STDERR ("Validate newrec=%s\n",Dumper($newrec));
    if (!defined($oldrec) || defined($newrec->{name})){
       my $newshortname=$newrec->{name};
       $newshortname=~s/\[\d+\]$//;
