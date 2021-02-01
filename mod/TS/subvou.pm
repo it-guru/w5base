@@ -184,7 +184,6 @@ sub SecureValidate
          return(0);
       }
    }
-printf STDERR ("SecureValidate newrec=%s\n",Dumper($newrec));
 
    return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }

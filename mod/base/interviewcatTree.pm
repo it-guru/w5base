@@ -135,9 +135,9 @@ EOF
       return($from);
    }
    if ($mode ne ""){
-      $self->LastMsg(ERROR,"not supported query");
+      $self->LastMsg(ERROR,"not supported query mode=".$mode);
    }
-   return(undef);
+   return("interviewcat");
 }
 
 sub getSqlOrder

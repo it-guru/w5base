@@ -252,15 +252,6 @@ sub Validate
    return(1);
 }
 
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   return(1);
-}
-
 sub isWriteValid
 {
    my $self=shift;

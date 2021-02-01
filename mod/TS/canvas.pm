@@ -255,18 +255,18 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $wrgroups=shift;
 
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
-   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
+   return($self->SUPER::SecureValidate($oldrec,$newrec));
 }
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default canvasattr canvas ictorelations contacts comments source));
+   return(qw(header default canvasattr canvas 
+             ictorelations contacts comments source));
 }
 
 

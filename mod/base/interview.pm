@@ -531,7 +531,6 @@ sub SecureValidate
          $newrec->{contactid}=$userid;
       }
    }
-
    return(1);
 }
 

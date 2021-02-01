@@ -292,13 +292,6 @@ sub Validate
    return(1);
 }
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
-
-
-
 sub isViewValid
 {
    my $self=shift;

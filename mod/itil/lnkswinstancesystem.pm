@@ -317,12 +317,6 @@ sub isViewValid
 }
 
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
-
-
 sub initSearchQuery
 {
    my $self=shift;

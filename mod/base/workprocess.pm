@@ -184,18 +184,6 @@ sub getRecordImageUrl
 
 
 
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   return(1);
-}
-
-
-
-
 sub Validate
 {
    my $self=shift;

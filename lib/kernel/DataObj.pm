@@ -1064,6 +1064,18 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
+   if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+      msg(INFO,"default SecureValidate in $self called");
+   }
+   return(1);
+}
+
+sub SecureValidateFieldAccess
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
    my $wrgroups=shift;
    #msg(INFO,"SecureValidate in $self");
    if (!defined($oldrec) && defined($newrec)){
@@ -1941,7 +1953,7 @@ sub SecureValidatedInsertRecord
    $self->isDataInputFromUserFrontend(1);
    my @groups=$self->isWriteValid();
    if ($#groups>-1 && defined($groups[0])){
-      if ($self->SecureValidate(undef,$newrec,\@groups)){
+      if ($self->SecureValidateFieldAccess(undef,$newrec,\@groups)){
          return($self->ValidatedInsertRecord($newrec));
       }
       if ($self->LastMsg()==0){
@@ -2054,6 +2066,17 @@ sub ValidatedInsertRecordTransactionless
    else{
       $self->NormalizeByIOMap("preWrite",$newrec);
       if ($newrec=$self->validateFields(undef,$newrec)){
+         # check, if call is Secure
+         if (in_array([map({(caller($_))[3];} (2..10))],
+              'kernel::DataObj::SecureValidatedInsertRecord')){
+            if (!$self->SecureValidate(undef,$newrec)){
+               if ($self->LastMsg()==0){
+                  $self->LastMsg(ERROR,"ValidatedInsertRecord: ".
+                                 "unknown error in ${self}::SecureValidate()");
+               }
+               return(undef);
+            }
+         }
          if ($self->Validate(undef,$newrec)){
             $self->finishWriteRequestHash(undef,$newrec);
             my $bak=$self->InsertRecord($newrec);
@@ -2109,7 +2132,7 @@ sub SecureValidatedUpdateRecord
    }
    my @groups=$self->isWriteValid($oldrec);
    if (($#groups>-1 && defined($groups[0])) || $wrok){
-      if ($self->SecureValidate($oldrec,$newrec,\@groups)){
+      if ($self->SecureValidateFieldAccess($oldrec,$newrec,\@groups)){
          return($self->ValidatedUpdateRecord($oldrec,$newrec,@filter));
       }
       if ($self->LastMsg()==0){
@@ -2626,6 +2649,16 @@ sub ValidatedUpdateRecordTransactionless
       }
       #######################################################################
       if (my $validatednewrec=$self->validateFields($oldrec,$newrec,\%comprec)){
+         if (in_array([map({(caller($_))[3];} (2..10))],
+              'kernel::DataObj::SecureValidatedUpdateRecord')){
+            if (!$self->SecureValidate($oldrec,$validatednewrec)){
+               if ($self->LastMsg()==0){
+                  $self->LastMsg(ERROR,"ValidatedInsertRecord: ".
+                                 "unknown error in ${self}::SecureValidate()");
+               }
+               return(undef);
+            }
+         }
          if ($self->Validate($oldrec,$validatednewrec,\%comprec)){
             $self->finishWriteRequestHash($oldrec,$validatednewrec);
             if (keys(%{$validatednewrec})==0){

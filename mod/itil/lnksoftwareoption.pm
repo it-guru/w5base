@@ -145,12 +145,11 @@ sub getSqlFrom
    return($from);
 }
 
-sub SecureValidate   # needed to allow updates in SubList Edit mode
+sub SecureValidate    # needed to allow updates in SubList Edit mode
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $wrgroups=shift;
 
    if (defined($oldrec)){ 
       delete($newrec->{software});
@@ -158,7 +157,7 @@ sub SecureValidate   # needed to allow updates in SubList Edit mode
       delete($newrec->{parentid});
    }
 
-   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
+   return($self->SUPER::SecureValidate($oldrec,$newrec));
 }
 
 

@@ -2007,7 +2007,6 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $org=shift;
 
    if (!defined($oldrec)){
       if (effVal($oldrec,$newrec,"mandatorid") eq ""){
@@ -2016,7 +2015,7 @@ sub SecureValidate
       }
    }
 
-   return($self->SUPER::SecureValidate($oldrec,$newrec,$org));
+   return($self->SUPER::SecureValidate($oldrec,$newrec));
 }
 
 sub FinishWrite

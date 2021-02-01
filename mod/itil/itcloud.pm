@@ -343,15 +343,6 @@ sub getSqlFrom
    return($from);
 }
 
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   return(1);
-}
-
 
 sub initSearchQuery
 {
@@ -361,10 +352,6 @@ sub initSearchQuery
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
 }
-
-
-
-
 
 
 sub SecureSetFilter

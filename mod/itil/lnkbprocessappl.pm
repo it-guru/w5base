@@ -287,13 +287,6 @@ sub isViewValid
 }
 
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
-
-
-
 sub isWriteValid
 {
    my $self=shift;

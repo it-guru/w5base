@@ -356,55 +356,6 @@ sub getSqlFrom
 }
 
 
-#sub SecureSetFilter
-#{
-#   my $self=shift;
-#   my @flt=@_;
-#
-#   if (!$self->isDirectFilter(@flt) &&
-#       !$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
-#                          "RMember")){
-#      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-#      push(@flt,[
-#                 {mandatorid=>\@mandators},
-#                ]);
-#   }
-#   return($self->SetFilter(@flt));
-#}
-
-
-
-
-
-
-#sub Validate
-#{
-#   my $self=shift;
-#   my $oldrec=shift;
-#   my $newrec=shift;
-#   my $origrec=shift;
-#
-#   if ((!defined($oldrec) && !defined($newrec->{applid})) ||
-#       (defined($newrec->{applid}) && $newrec->{applid}==0)){
-#      $self->LastMsg(ERROR,"invalid application specified");
-#      return(undef);
-#   }
-#   if ((!defined($oldrec) && !defined($newrec->{systemid})) ||
-#       (defined($newrec->{systemid}) && $newrec->{systemid}==0)){
-#      $self->LastMsg(ERROR,"invalid systemid specified");
-#      return(undef);
-#   }
-#   my $applid=effVal($oldrec,$newrec,"applid");
-#
-#   if ($self->isDataInputFromUserFrontend()){
-#      if (!$self->isWriteOnApplValid($applid,"systems")){
-#         $self->LastMsg(ERROR,"no access");
-#         return(undef);
-#      }
-#   }
-#   return(1);
-#}
-
 
 sub isViewValid
 {
@@ -413,10 +364,6 @@ sub isViewValid
    return("ALL");
 }
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
 
 sub SelfAsParentObject    # this method is needed because existing derevations
 {

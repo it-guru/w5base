@@ -268,6 +268,17 @@ sub initSearchQuery
 }
 
 
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   return(1);
+}
+
+
+
 sub SecureSetFilter
 {
    my $self=shift;

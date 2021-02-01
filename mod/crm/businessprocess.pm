@@ -607,12 +607,6 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
-
-
 
 sub getSqlFrom
 {

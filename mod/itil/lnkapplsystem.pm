@@ -1134,11 +1134,6 @@ sub isViewValid
    return("ALL");
 }
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
-
 sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("itil::lnkapplsystem");

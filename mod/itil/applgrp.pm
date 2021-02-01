@@ -287,12 +287,6 @@ sub getSqlFrom
    return($from);
 }
 
-sub SecureValidate
-{
-   return(kernel::DataObj::SecureValidate(@_));
-}
-
-
 
 sub initSearchQuery
 {

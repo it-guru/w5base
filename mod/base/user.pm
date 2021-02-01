@@ -1153,7 +1153,6 @@ sub SecureValidate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $wrgroups=shift;
 
    my $userid=$self->getCurrentUserId();
    my $usertyp=effVal($oldrec,$newrec,"usertyp");
@@ -1190,7 +1189,7 @@ sub SecureValidate
          return(0);
       }
    }
-   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
+   return($self->SUPER::SecureValidate($oldrec,$newrec));
 }
 
 sub postQualityCheckRecord

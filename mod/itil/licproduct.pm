@@ -224,7 +224,6 @@ sub isQualityCheckValid
 }
 
 
-
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -232,22 +231,18 @@ sub getRecordImageUrl
    return("../../../public/itil/load/licproduct.jpg?".$cgi->query_string());
 }
 
+
 sub SecureValidate
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $wrgroups=shift;
 
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
-   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
+   return($self->SUPER::SecureValidate($oldrec,$newrec));
 }
-
-
-
-
 
 
 sub Validate
