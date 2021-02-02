@@ -44,6 +44,11 @@ sub new
             label             =>'Name'),
 
       new kernel::Field::Text(     
+            name              =>'',
+            searchable        =>1,
+            label             =>'Online-State'),
+
+      new kernel::Field::Text(     
             name              =>'orgId',
             searchable        =>1,
             label             =>'orgId'),

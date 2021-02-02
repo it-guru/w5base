@@ -129,6 +129,8 @@ sub DataCollector
       }
    );
 
+   #printf STDERR ("p=%s\n",Dumper($d)) if (ref($d) eq "ARRAY" && $#{$d}==0);
+
    return($d);
 }
 
