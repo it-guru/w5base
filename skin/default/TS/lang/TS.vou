@@ -3,7 +3,7 @@
 'fieldgroup.canvas'=>{de=>'Canvas',en=>'Canvas'},
 'fieldgroup.subvous'=>{de=>'virtuelle Untereinheiten',en=>'virtual Sub-Units'},
 'fieldgroup.appl'=>{de=>'betriebene Anwendungen',en=>'operated applications'},
-'fieldgroup.vouattr'=>{de=>'Organisationseinheit Atribute',en=>'organisational attributes'},
+'fieldgroup.vouattr'=>{de=>'Organisationseinheit Attribute',en=>'organisational attributes'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
 'representing group'=>{de=>'repräsentierende Gruppe'},
 'Fullname'=>{de=>'vollständiger Name'},
