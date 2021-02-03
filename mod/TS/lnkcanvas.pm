@@ -46,7 +46,7 @@ sub new
                                                  
       new kernel::Field::TextDrop(
                 name          =>'canvas',
-                htmlwidth     =>'100px',
+                htmlwidth     =>'360px',
                 label         =>'Canvas Object',
                 vjointo       =>'TS::canvas',
                 vjoinon       =>['canvasid'=>'id'],
