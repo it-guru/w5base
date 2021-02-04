@@ -190,6 +190,9 @@ sub qcheckRecord
                }
 
                if ($nameok){
+                  if (($parrec->{name}=~m/\s/) || length($parrec->{name})>60){
+                     $parrec->{name}=$parrec->{altname};
+                  }
                   $self->IfComp($dataobj,
                                 $rec,"name",
                                 $parrec,"name",
@@ -246,8 +249,23 @@ sub qcheckRecord
                           "itil::network");
                   $net->SetCurrentView(qw(id name));
                   my $netarea=$net->getHashIndexed("name");
+                  my $cndatagnetworkid;
+                  #############################################################
+                  {  # DTAG Intranet id detection
+                     my @cndatagnetworknames=(
+                          'Corporate Network DTAG (CNDTAG)', # zukünftig!
+                          'Deutsche Telekom HitNet',
+                          'Insel-Netz/Kunden-LAN');
+                     foreach my $netname (@cndatagnetworknames){
+                        if (exists($netarea->{name}->{$netname})){
+                           $cndatagnetworkid=$netarea->{name}->{$netname}->{id};
+                           last;
+                        }
+                     }
+                  }
+                  #############################################################
+       
                   my @opList;
-
                   #
                   # %cleanOTCIPlist is neassasary, because multiple IP-Addresses
                   # can be in one networkcard record
@@ -395,21 +413,19 @@ sub qcheckRecord
                                       cistatusid   =>$newrec->{cistatusid},
                                       srcsys       =>'OTC',
                                       type         =>$type,
-                                      networkid    =>$networkid,
                                       comments     =>$newrec->{comments},
                                       itcloudareaid=>$newrec->{itcloudareaid},
                                       ifname       =>$newrec->{ifname},
                                       systemid     =>$p{refid}
                                      }
                                    };
+                                   if ($mode eq "insert"){
+                                      $oprec->{DATA}->{networkid}=$networkid;
+                                   }
                                    return($oprec);
                                 }
                                 elsif ($mode eq "delete"){
                                    my $networkid=$oldrec->{networkid};
-                                   if ($networkid ne $p{netarea}->{name}->
-                                       {'Insel-Netz/Kunden-LAN'}->{id}){
-                                      return();
-                                   }
                                    return({OP=>$mode,
                                            MSG=>"delete ip $oldrec->{name} ".
                                                "from W5Base",
@@ -424,7 +440,55 @@ sub qcheckRecord
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
                   }
-
+                  my @otcip=map({$_->{name}} @{$parrec->{ipaddresses}});
+                  my %otcip;
+                  foreach my $ip (@otcip){
+                     $otcip{$ip}={};
+                     if ($ip=~m/^10\./){   # OTC hangs only in CNDTAG
+                        $otcip{$ip}->{networkid}=$cndatagnetworkid;
+                     }
+                  }
+                  my $iip=getModuleObject($self->getParent->Config(),
+                                          "tsotc::inipaddress");
+                  $iip->SetFilter({name=>\@otcip});
+                  foreach my $iiprec ($iip->getHashList(qw(name))){
+                     my $ip=$iiprec->{name};
+                     if (exists($otcip{$ip})){
+                        $otcip{$ip}->{networkid}=
+                           $netarea->{name}->{'Internet'}->{id};
+                     }
+                  }
+                  {
+                     my $ip=getModuleObject($self->getParent->Config(),
+                                             "itil::ipaddress");
+                     $ip->SetFilter({name=>[keys(%otcip)],cistatusid=>"<6"});
+                     $ip->SetCurrentView(qw(id name systemid networkid));
+                     my $curiplist=$ip->getHashIndexed("id");
+                     foreach my $curip (values(%{$curiplist->{id}})){
+                        if ($curip->{systemid} ne $rec->{id}){
+                           delete($otcip{$curip->{name}}); #ip already by other
+                        }
+                        elsif ($curip->{networkid} eq 
+                               $otcip{$curip->{name}}->{networkid}){
+                           delete($otcip{$curip->{name}}); #networkid passt
+                        }
+                        else{
+                           $otcip{$curip->{name}}->{id}=$curip->{id};
+                           $otcip{$curip->{name}}->{name}=$curip->{name};
+                        }
+                     }
+                     # process networkarea switches
+                     foreach my $ipupd (keys(%otcip)){
+                        $ip->ValidatedUpdateRecord(
+                           $curiplist->{id}->{$otcip{$ipupd}->{id}},
+                           {
+                              networkid=>$otcip{$ipupd}->{networkid}
+                           },
+                           {id=>\$otcip{$ipupd}->{id}}
+                        );
+                     }
+                     
+                  }
 
                   my @cleanOTCIflist=values(%cleanOTCIflist);
                   @opList=();
@@ -481,6 +545,15 @@ sub qcheckRecord
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
                   }
+
+
+
+
+
+
+
+
+
                }
             }
             if (!($parrec->{availability_zone}=~m/^eu[0-9a-z-]{3,10}$/)){

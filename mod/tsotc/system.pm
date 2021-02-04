@@ -133,7 +133,7 @@ sub new
                 group         =>'ipaddresses',
                 vjointo       =>\'tsotc::ipaddress',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name',"hwaddr","itcloudareaid"]),
+                vjoindisp     =>['name',"hwaddr"]),
 
       new kernel::Field::Text(
                 name          =>'cdateunixtimstamp',
@@ -734,6 +734,9 @@ sub Import
          $sys->SetFilter({name=>\$newname});
          my ($chkrec)=$sys->getOnlyFirst(qw(id name));
          if (defined($chkrec)){
+            $newrec->{name}=$sysrec->{altname};
+         }
+         if (($newrec->{name}=~m/\s/) || length($newrec->{name})>60){
             $newrec->{name}=$sysrec->{altname};
          }
       }
