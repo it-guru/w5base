@@ -2,6 +2,7 @@
 'fieldgroup.comments'=>{de=>'Bemerkungen',en=>'Comments'},
 'fieldgroup.canvas'=>{de=>'Canvas',en=>'Canvas'},
 'fieldgroup.subvous'=>{de=>'virtuelle Untereinheiten',en=>'virtual Sub-Units'},
+'fieldgroup.respappl'=>{de=>'verantwortete Anwendungen',en=>'responsible applications'},
 'fieldgroup.appl'=>{de=>'betriebene Anwendungen',en=>'operated applications'},
 'fieldgroup.vouattr'=>{de=>'Organisationseinheit Attribute',en=>'organisational attributes'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
@@ -22,3 +23,5 @@
 'invalid format of CanvasID'=>{de=>'ungültiges Format der CanvasID'},
 'operated applications'=>{de=>'betriebene Anwendungen'},
 'sub units'=>{de=>'virtuelle Untereinheiten',en=>'virtual Sub-Units'},
+'responsible applications'=>{de=>'verantwortete Anwendungen'},
+'Canvas relations'=>{de=>'Canvas Zuordnungen'},

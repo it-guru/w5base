@@ -266,9 +266,23 @@ sub new
                 group         =>'contacts'),
 
       new kernel::Field::SubList(
+                name          =>'respapplications',
+                label         =>'responsible applications',
+                htmlwidth     =>'300px',
+                htmldetail    =>'NotEmpty',
+                group         =>'respappl',
+                readonly      =>1,
+                htmllimit     =>100,
+                vjointo       =>'itil::appl',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjoinon       =>['reprgrp'=>'responseorg'],
+                vjoindisp     =>['name','cistatus','businessteam']),
+
+      new kernel::Field::SubList(
                 name          =>'applications',
                 label         =>'operated applications',
                 htmlwidth     =>'300px',
+                htmldetail    =>'NotEmpty',
                 group         =>'appl',
                 readonly      =>1,
                 searchable    =>0,
@@ -427,7 +441,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default vouattr subvous 
-             canvas contacts appl comments source));
+             canvas contacts respappl appl comments source));
 }
 
 
