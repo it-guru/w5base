@@ -134,7 +134,7 @@ sub HandleCIStatusModification
       foreach my $primarykey (@primarykey){
          if (defined($newrec->{$primarykey})){
             my $found=0;
-            for(my $c=0;$c<=100;$c++){
+            for(my $c=0;$c<=1000;$c++){
                my $chkname=$newrec->{$primarykey};
                $chkname=~s/\[\d+\]$//;
                $chkname.="[$c]";

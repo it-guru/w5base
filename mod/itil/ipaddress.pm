@@ -48,7 +48,7 @@ sub new
       new kernel::Field::Interface(
                 name          =>'fullname',
                 depend        =>['name'],
-                label         =>'IP-Address',
+                label         =>'IP-Address Interface',
                 searchable    =>0,
                 onRawValue    =>sub{   # compress IPV6 Adresses
                    my $self=shift;
@@ -272,11 +272,13 @@ sub new
                 },
                 dataobjattr   =>'(select '.
                    'if (system.id is not null,if (system.cistatus<6,1,0),'.
-                   'if (lnkitclustsvc.id is not null,1,0)) '.
+                   'if (lnkitclustsvc.id is not null,1, '.
+                   'if (itcloudarea.id is not null,if (itcloudarea.cistatus<6,1,0),0))) '.
                    ' from ipaddress as ip '.
                    'left outer join system on system.id=ip.system '.
                    'left outer join lnkitclustsvc on '.
                          'lnkitclustsvc.id=ip.lnkitclustsvc '.
+                   'left outer join itcloudarea on itcloudarea.id=ip.itcloudarea '.
                    'where ip.id=ipaddress.id limit 1)'),
 
       new kernel::Field::Text(
