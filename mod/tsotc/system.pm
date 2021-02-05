@@ -365,7 +365,7 @@ sub Import
    $self->SetFilter($flt);
    my @l=$self->getHashList(qw(name altname 
                                cdate id contactemail availability_zone
-                               projectid));
+                               projectid ipaddresses));
    if ($#l==-1){
       $self->LastMsg(ERROR,"Systemname not found in OTC");
       return(undef);
@@ -425,8 +425,9 @@ sub Import
          }
       }
    }
+   my $w5sysrecmodified=0;
    my $sys=getModuleObject($self->Config,"TS::system");
-
+   $sys->ResetFilter();
    $sys->SetFilter({srcsys=>\'OTC',srcid=>\$sysrec->{id}});
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
    if (!defined($w5sysrec)){
@@ -434,43 +435,100 @@ sub Import
       $sys->SetFilter($flt);
       ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
    }
+   #printf STDERR ("fifi 01 $w5sysrec\n");die();
+
+
+   if (!defined($w5sysrec)){   # srcid update kandidaten (schneller Redeploy)
+      my @flt;
+
+      push(@flt,{
+        name=>\$sysrec->{name},
+        srcsys=>\'OTC',
+        srcid=>'!'.$sysrec->{id}
+      });
+      foreach my $iprec (@{$sysrec->{ipaddresses}}){
+         push(@flt,{
+            ipaddresses=>\$iprec->{name},
+            srcsys=>\'OTC',
+            srcid=>'!'.$sysrec->{id}
+         });
+      }
+
+
+      $sys->SetFilter(\@flt);
+      my @redepl=$sys->getHashList(qw(mdate cistatusid name 
+                                      srcid srcsys applications));
+
+      msg(INFO,"invantar check for OTC-SystemID: $sysrec->{id}");
+      foreach my $osys (@redepl){   # find best matching redepl candidate
+         my $applok=0;
+         msg(INFO,"check OTC-SystemID: $osys->{srcid} from inventar");
+         if ($osys->{srcid} eq $sysrec->{id}){
+            msg(ERROR,"OTC-SystemID: $osys->{srcid} already in inventar");
+            # dieser Punkt dürfte nie erreicht werden, da ja oben bereits
+            # eine u.U. passende w5sysrec gesucht wurde.
+            last;
+         }
+         my $ageok=1;
+         if ($osys->{cistatusid} ne "4"){  # prüfen, ob das Teil nicht schon
+                                           # ewig alt ist
+            my $d=CalcDateDuration($osys->{mdate},NowStamp("en"));
+            print Dumper($d);die();
+         }
+         foreach my $appl (@{$osys->{applications}}){
+            if ($appl->{applid} eq $w5applrec->{id}){
+               $applok++;
+            }
+         }
+         my $sysallowed=0;
+         if ($ageok && $applok){
+            $self->ResetFilter();
+            $self->SetFilter({id=>\$osys->{srcid}});
+            msg(INFO,"check exist of OTC-SystemID: $osys->{srcid}");
+            my ($chkrec,$msg)=$self->getOnlyFirst(qw(id));
+            if (!defined($chkrec)){
+               msg(INFO,"OTC-SystemID: $osys->{srcid} does not exists anymore");
+               $sysallowed++;
+            }
+         }
+         if ($applok && $sysallowed && $ageok){
+            $sys->ResetFilter();
+            $sys->SetFilter({id=>\$osys->{id}});
+            my ($oldrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+            if (defined($oldrec)){
+               if ($sys->ValidatedUpdateRecord($oldrec,{
+                       srcid=>$sysrec->{id},srcsys=>'OTC',
+                       cistatusid=>4
+                   },{id=>\$oldrec->{id}})) {
+                  $sys->ResetFilter();
+                  $sys->SetFilter({id=>\$osys->{id}});
+                  ($w5sysrec)=$sys->getOnlyFirst(qw(ALL));
+                  $w5sysrecmodified++;
+               }
+               last;
+            }
+         }
+      } 
+   }
+
    my $identifyby;
    if (defined($w5sysrec)){
       if (uc($w5sysrec->{srcsys}) eq "OTC"){
-         if ($w5sysrec->{cistatusid} ne "4" &&
-             $w5sysrec->{srcid} eq $sysrec->{id}){ # das Teil war schon mal da
-            # das bekommen wir später geregelt     # und scheint nur im
-         }                                         # falschen Status
-         else{
-            my $msg=sprintf(
-                       $self->T("Systemname '%s' already imported in W5Base"),
-                       $w5sysrec->{name});
-            if ($w5sysrec->{srcid} ne "" &&
-                $sysrec->{id} ne "" &&
-                $w5sysrec->{srcid} ne $sysrec->{id}){
-               my $qc=getModuleObject($self->Config,"base::qrule");
-               $qc->setParent($sys);
-               $qc->nativQualityCheck($sys->getQualityCheckCompat($w5sysrec),
-                                      $w5sysrec);
-               $sys->ResetFilter();
-               $sys->SetFilter($flt);
-               my ($w5sysrec2)=$sys->getOnlyFirst(qw(ALL));
-               if (defined($w5sysrec2)){
-                  $msg=sprintf(
-                          $self->T("Systemname '%s' already imported with ".
-                                   "different ids '%s' - '%s'"),
-                          $w5sysrec->{name},$w5sysrec->{srcid},$sysrec->{id});
-               }
-               else{
-                  $msg=undef;
-                  $w5sysrec=undef;
-               }
-            }
-            if (defined($msg)){
-               $self->LastMsg(ERROR,$msg);
-               return(undef);
-            }
+         my $msg=sprintf($self->T("Systemname '%s' already imported in W5Base"),
+                         $w5sysrec->{name});
+         if ($w5sysrec->{cistatusid} ne "4" || $w5sysrecmodified){
+            my %checksession;
+            my $qc=getModuleObject($self->Config,"base::qrule");
+            $qc->setParent($sys);
+            $checksession{autocorrect}=$w5sysrec->{allowifupdate};
+            $checksession{autocorrect}=1; # force import with autocorrect
+            $qc->nativQualityCheck(
+                 $sys->getQualityCheckCompat($w5sysrec),$w5sysrec,
+                               \%checksession);
+            return($w5sysrec->{id});
          }
+         $self->LastMsg(ERROR,$msg);
+         return(undef);
       }
    }
    if (defined($w5sysrec)){

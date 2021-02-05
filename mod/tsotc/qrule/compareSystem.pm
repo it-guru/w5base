@@ -127,6 +127,7 @@ sub qcheckRecord
                'set system CI-Status to disposed of waste due missing on OTC');
          }
          else{
+
             if ($rec->{srcsys} eq "OTC"){
                $parrec->{name}=~s/\s/_/g;
                if (defined($parrec->{name})){
