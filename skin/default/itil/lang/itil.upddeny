@@ -34,8 +34,8 @@
    en=>'No - because of retirement/due to upcoming refresh/object is in order process'
 },
 'UpdateDeny(40)'=>{
-   de=>'Nein, weil momentan das Budget fehlt',
-   en=>'No - there is no budget'
+   de=>'Nein, da keine Budgetfreigabe vorhanden',
+   en=>'No - as there is no budget release'
 },
 'UpdateDeny(50)'=>{
    de=>'Nein, weil momentan die Ressourcen fehlen',

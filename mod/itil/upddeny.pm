@@ -52,7 +52,7 @@ sub new
       # 35 fällt weg
       # 38 fällt weg
       {id=>38 }, # Nein, Retirement
-      #{id=>40 }, # Nein, fehlendes Budget
+      {id=>40 }, # Nein, fehlendes Budget
       #{id=>50 }, # Nein, fehlende Resourcen
       {id=>60 }, # Nein, fehlende oder negative Testergebnisse
       {id=>70 }, # Nein, hohes Risiko
