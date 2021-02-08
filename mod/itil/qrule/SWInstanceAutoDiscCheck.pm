@@ -94,26 +94,30 @@ sub qcheckRecord
    if ($rec->{techdataupdate} ne ""){
       my $d=CalcDateDuration($rec->{techdataupdate},NowStamp("en"));
       if (defined($d)){
-         if ($rec->{techrelstring} ne ""){    # check version string
-            if ($rec->{techrelstring} ne $rec->{softwareinstversion}){
-               my $msg=sprintf(
-                    $self->T("version in software installation '%s' ".
-                             "does not match version from autodiscovery '%s'"),
-                    $rec->{softwareinstversion},$rec->{techrelstring});
-               push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+         if ($rec->{softwareinstversion} ne ""){ # if softwareins is related
+            if ($rec->{techrelstring} ne ""){    # check version string
+               if ($rec->{techrelstring} ne $rec->{softwareinstversion}){
+                  my $msg=sprintf(
+                       $self->T("version in software installation '%s' ".
+                              "does not match version from autodiscovery '%s'"),
+                       $rec->{softwareinstversion},$rec->{techrelstring});
+                  push(@qmsg,$msg);
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
-         if ($rec->{techproductstring} ne ""){    # check product string
-            if ($rec->{techproductstring} ne $rec->{softwareinstname}){
-               my $msg=sprintf(
-                    $self->T("software product in installation '%s' ".
-                             "does not match product from autodiscovery '%s'"),
-                    $rec->{softwareinstname},$rec->{techproductstring});
-               push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+         if ($rec->{softwareinstname} ne ""){
+            if ($rec->{techproductstring} ne ""){    # check product string
+               if ($rec->{techproductstring} ne $rec->{softwareinstname}){
+                  my $msg=sprintf(
+                       $self->T("software product in installation '%s' ".
+                              "does not match product from autodiscovery '%s'"),
+                       $rec->{softwareinstname},$rec->{techproductstring});
+                  push(@qmsg,$msg);
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
       }
