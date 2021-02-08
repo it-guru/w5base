@@ -115,10 +115,12 @@ sub CapeCanvasHubimport
             $lnkcanv->ValidatedDeleteRecord($oldrec,{id=>\$oldrec->{id}});
          }
       }
-      $lnkcanv->ResetFilter();
-      $lnkcanv->ValidatedInsertOrUpdateRecord($newrec,{
-         ictoid=>\$newrec->{ictoid}
-      });
+      if ($canvasid ne ""){
+         $lnkcanv->ResetFilter();
+         $lnkcanv->ValidatedInsertOrUpdateRecord($newrec,{
+            ictoid=>\$newrec->{ictoid}
+         });
+      }
       # manuell erstellte Einträge werden gelöscht bzw. überschrieben 
       # da Cape aktuell als Master angesehen werden soll
    }
