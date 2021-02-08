@@ -74,8 +74,6 @@ sub new
                 label         =>'DeviceID',
                 dataobjattr   =>SELpref.'probsummarym1.logical_name'),
 
-
-
      new kernel::Field::Text(
                 name          =>'dstobj',
                 group         =>'amdst',
@@ -92,6 +90,21 @@ sub new
                 vjoinon       =>['deviceid'=>'deviceid'],
                 vjoindisp     =>'fullname',
                 dataobjattr   =>SELpref.'probsummarym1.tsi_ci_name'),
+
+      new kernel::Field::Text(
+                name          =>'affectedserviceid',
+                label         =>'AffectedServiceID',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>SELpref.'probsummarym1.tsi_as_logical_name'),
+
+      new kernel::Field::Text(
+                name          =>'servicename',
+                label         =>'AffectedServiceName',
+                vjointo       =>'tssm::dev',
+                htmldetail    =>'NotEmpty',
+                vjoinon       =>['affectedserviceid'=>'deviceid'],
+                vjoindisp     =>'fullname',
+                dataobjattr   =>SELpref.'probsummarym1.tsi_as_name'),
 
      new kernel::Field::MultiDst (
                 name          =>'dstamname',
