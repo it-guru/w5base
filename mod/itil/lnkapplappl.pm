@@ -267,7 +267,7 @@ sub new
                 label         =>'Interface-Agreement-Document',
                 searchable    =>0,
                 uploadable    =>0,
-                types         =>['pdf','xls','doc'],
+                types         =>['pdf','xlsx','docx','pptx'],
                 mimetype      =>'ifagreementdoctype',
                 filename      =>'ifagreementdocname',
                 uploaddate    =>'ifagreementdocdate',
