@@ -473,7 +473,9 @@ sub Import
          if ($osys->{cistatusid} ne "4"){  # prüfen, ob das Teil nicht schon
                                            # ewig alt ist
             my $d=CalcDateDuration($osys->{mdate},NowStamp("en"));
-            print Dumper($d);die();
+            if (defined($d) && $d->{days}>7){
+               next; # das Teil ist schon zu alt, um es wieder zu aktivieren
+            }
          }
          foreach my $appl (@{$osys->{applications}}){
             if ($appl->{applid} eq $w5applrec->{id}){
