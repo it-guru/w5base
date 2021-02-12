@@ -22,6 +22,13 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::Static;
 use kernel::Field;
+
+use Paws;
+use Paws::Credential;
+use Paws::Credential::Explicit;
+use Paws::Credential::AssumeRole;
+use Paws::Net::LWPCaller;
+
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
 
 sub new
@@ -58,7 +65,7 @@ sub checkMinimalFilter4AWS
    my $field=$fields[0];
 
    if (!exists($filter->{$field}) ||
-       !($filter->{$field}=~m/^\d{3,20}$/)){
+       !($filter->{$field}=~m/^\S{3,20}$/)){
       $self->LastMsg(ERROR,"mandatary filter not specifed");
       print STDERR Dumper($filter);
       return(undef);
