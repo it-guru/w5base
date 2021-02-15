@@ -2,7 +2,8 @@
 create table "W5SIEM_secscan" (
    ref                VARCHAR2(32) not null,
    id                 VARCHAR2(32) not null,
-   ictoid             VARCHAR2(20) not null,
+   ictoid             VARCHAR2(20) default null,
+   w5baseid_appl      NUMBER(*,0) default null,
    type               VARCHAR2(32) not null,
    title              VARCHAR2(128) not null,
    user_login         VARCHAR(32) not null,
