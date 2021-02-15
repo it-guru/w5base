@@ -232,7 +232,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'seg',
                 group         =>'vouattr',
-                label         =>'Segemente/Tribe',
+                label         =>'Segmente/Tribe',
                 dataobjattr   =>'vou.segment'),
 
       new kernel::Field::Contact(
