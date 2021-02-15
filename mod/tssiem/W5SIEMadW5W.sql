@@ -23,7 +23,9 @@ create table "W5SIEM_secscan" (
    networkid          NUMBER(*,0) default null,
    networkname        VARCHAR2(40) default null,
    rcvdate            DATE,
-   constraint W5SIEM_secscan_pk primary key (ref)
+   constraint W5SIEM_secscan_pk primary key (ref),
+   constraint "W5SIEM_secscan_CHK" 
+      CHECK (NVL2(ictoid,1,0)+NVL2(w5baseid_appl,1,0) >= 1)
 );
 grant select on "W5SIEM_secscan" to W5I;
 grant select,insert,update,delete on "W5SIEM_secscan" to W5SIEM;
