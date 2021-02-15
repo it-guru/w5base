@@ -56,10 +56,21 @@ sub getPerspectiveDecodeSQL
    my $self=shift;
    my $pref=shift;
 
+   my $pCreate="reverse(".
+                  "replace(".
+                    "regexp_substr(".
+                       "reverse(${pref}title),'_[^_]+_',1),'_',''".
+                  ")".
+               ")";
+
+   my $pDecoded="decode($pCreate,".           # fixup for buggy namings
+                "'vLAN','SharedVLAN',".
+                "'vFWI','SharedVLAN',".
+                "$pCreate)";
    my $PerspectiveDecode="case ".
-                         "when ${pref}title like '%_vFWI_%' ".
-                         "then 'SharedVLAN' ".
-                         "else 'CNDTAG' ".
+                         "when $pDecoded like 'ICTO-%' ".  #ganz alte Convention
+                         "then 'CNDTAG' ".
+                         "else $pDecoded ".
                          "end";
    return($PerspectiveDecode);
 }

@@ -121,6 +121,11 @@ sub new
                 dataobjattr   =>$self->getMsgTrackingFlagSQL()),
 
       new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Title',
+                dataobjattr   =>"W5SIEM_secent.title"),
+
+      new kernel::Field::Text(
                 name          =>'qid',
                 htmltablesort =>'Number',
                 selectfix     =>1,
@@ -132,12 +137,20 @@ sub new
       # Zert.Detail hat.
 
       new kernel::Field::Text(
-                name          =>'name',
-                label         =>'Title',
-                dataobjattr   =>"W5SIEM_secent.title"),
+                name          =>'cvssbasescore',
+                htmldetail    =>'NotEmpty',
+                label         =>'CVSS base score',
+                dataobjattr   =>"W5SIEM_secent.cvss_basescore"),
+
+      new kernel::Field::Text(
+                name          =>'cvssscorestr',
+                htmldetail    =>'NotEmpty',
+                label         =>'CVSS score',
+                dataobjattr   =>"W5SIEM_secent.cvss_scorestr"),
 
       new kernel::Field::Text(
                 name          =>'vuln_status',
+                htmldetail    =>'NotEmpty',
                 label         =>'Vuln Status',
                 dataobjattr   =>"W5SIEM_secent.vuln_status"),
 

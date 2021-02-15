@@ -6,7 +6,7 @@
 'is latest'=>{de=>'ist aktuell'},
 'is Message Tracking active'=>{de=>'ist Message Tracking aktiv'},
 'is duplicate'=>{de=>'ist doppelt'},
-'perspective'=>{de=>'Perspective'},
+'perspective'=>{de=>'Perspektive'},
 'expected PRM title'=>{de=>'erwarteter PRM Titel'},
 'desired SM9 ApplicationID'=>{de=>'gewünschte SM9 ApplicationID'},
 'desired SM9 Application CI'=>{de=>'gewünschtes SM9 Application CI'},

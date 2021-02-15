@@ -9,5 +9,5 @@ en=>'Qualys: Security Scan'},
 'Scan date'=>{de=>'Scan-Datum'},
 'Scan type'=>{de=>'Scan-Typ'},
 'SecEnt count'=>{de=>'SecEnt Anzahl'},
-'perspective'=>{de=>'Perspective'},
+'perspective'=>{de=>'Perspektive'},
 
