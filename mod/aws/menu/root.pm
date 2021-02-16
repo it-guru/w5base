@@ -46,6 +46,16 @@ sub Init
                       "aws::system",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.AWS.kern",
+                      "tmpl/welcome",
+                      prio=>9999,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.AWS.kern.region",
+                      "aws::region",
+                      defaultacl=>['valid_user']);
+
+
    return($self);
 }
 
