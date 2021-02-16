@@ -796,20 +796,22 @@ sub Validate
    #######################################################################
    # unique IP-Handling
    $newrec->{'uniqueflag'}=1;
-   my $networkid=effVal($oldrec,$newrec,"networkid");
-   if ($networkid eq ""){
-      $self->LastMsg(ERROR,"no network specified");
-      return(0);
-   }
-   my $n=getModuleObject($self->Config,"itil::network");
-   $n->SetFilter({id=>\$networkid,cistatusid=>[3,4]});
-   my ($nrec,$msg)=$n->getOnlyFirst(qw(uniquearea));
-   if (!defined($nrec)){
-      $self->LastMsg(ERROR,"no networkid specified");
-      return(0);
-   }
-   if (!$nrec->{uniquearea}){
-      $newrec->{'uniqueflag'}=undef;
+   if (!defined($oldrec) || exists($newrec->{networkid})){
+      my $networkid=effVal($oldrec,$newrec,"networkid");
+      if ($networkid eq ""){
+         $self->LastMsg(ERROR,"no network specified");
+         return(0);
+      }
+      my $n=getModuleObject($self->Config,"itil::network");
+      $n->SetFilter({id=>\$networkid,cistatusid=>[3,4]});
+      my ($nrec,$msg)=$n->getOnlyFirst(qw(uniquearea));
+      if (!defined($nrec)){
+         $self->LastMsg(ERROR,"no networkid specified");
+         return(0);
+      }
+      if (!$nrec->{uniquearea}){
+         $newrec->{'uniqueflag'}=undef;
+      }
    }
 
 
