@@ -428,7 +428,7 @@ sub getPostibleRoleValues
    my @opt;
    my $parentobj;
 
-   if (!defined($current) && !defined($newrec)){
+   if (!defined($current) && defined($newrec)){
       if (exists($app->{secparentobj})){
          $parentobj=$app->{secparentobj}
       }
@@ -443,6 +443,11 @@ sub getPostibleRoleValues
       if ($parentobj eq ""){
          $parentobj=Query->Param("parentobj");  # bei Neueingabe über SubList
       }
+   }
+   if ($parentobj eq ""){
+      msg(ERROR,"internal application error - no paarentobj detected");
+      msg(ERROR,"write request:".Dumper($newrec));
+      return(undef);
    }
 
    foreach my $obj (values(%{$app->{lnkcontact}})){
@@ -538,7 +543,8 @@ sub Validate
    $p->SetFilter(\%flt);
    my @l=$p->getHashList(qw(ALL));
    if ($#l!=0){
-      $self->LastMsg(ERROR,"invalid refid '$refid' in parent object '$parentobj'");
+      $self->LastMsg(ERROR,
+                     "invalid refid '$refid' in parent object '$parentobj'");
       return(0);
    }
 
@@ -556,34 +562,6 @@ sub Validate
          $rnew=join(",",sort(@{$rnew}));
       }
    }
-
-#   my $expiration=effVal($oldrec,$newrec,"expiration");
-#   my $curalert=effVal($oldrec,$newrec,"alertstate");
-#   my $dur=CalcDateDuration($expiration,NowStamp('en'));
-#   my $newalert="";
-#
-#   if ($expiration ne ""){
-#      if ($dur->{totalseconds}>=0) {
-#         $newalert="red";
-#      } elsif ($dur->{days}>-21) {
-#         $newalert="orange";
-#      } elsif ($dur->{days}>-28) {
-#         $newalert="yellow";
-#      }
-#      else{
-#         $newalert="";
-#      }
-#   }
-#   else{
-#      $newalert="";
-#   }
-#
-#   if ((defined($oldrec) && $oldrec->{alertstate} ne $newalert) ||
-#       !defined($oldrec)){
-#      $newrec->{alertstate}=$newalert;
-#   }
-
-
 
 
    if (defined($oldrec) &&
