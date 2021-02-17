@@ -36,7 +36,7 @@ else{
    msg(DEBUG,"create of ModuleObject $swinstance ok");
 }
 
-my $id=12085266470002;
+my $id=14964058790001;
 
 
 
@@ -47,10 +47,29 @@ my $id=12085266470002;
 if (my $id=$swinstance->storeRecord({comments=>'ok'.time(),
                                      lnksoftwaresystemid=>13191944420001},$id)){
    msg(INFO,"ok it result=$id");
-   exit(0);
 }
 $swinstance->dieOnERROR();
-exit(1);
+
+
+
+my $objectname="itil::lnkswinstancecontact";
+my $lnkcswi=getModuleObject($Config,$objectname);
+if (!defined($lnkcswi)){
+   msg(ERROR,"can't load object $objectname");exit(2);
+}
+else{
+   msg(DEBUG,"create of contact ModuleObject $lnkcswi ok");
+}
+
+if (my $id=$lnkcswi->storeRecord({roles=>['write','read'],
+                                 refid=>$id,
+                                 targetname=>"admin"})){
+   msg(INFO,"add ok it result=$id");
+}
+$lnkcswi->dieOnERROR();
+
+
+exit(0);
 
 #######################################################################
 sub Help

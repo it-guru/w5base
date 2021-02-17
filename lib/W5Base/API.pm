@@ -786,7 +786,13 @@ sub dieOnERROR
    my $self=shift;
    if ($self->LastMsg()){
       foreach my $msg ($self->LastMsg()){
-         printf STDERR ("%s\n",$msg);
+         if (ref($msg) eq "ARRAY" ||
+             ref($msg) eq "ArrayOfStringItems"){
+            printf STDERR ("%s\n",join("\n",@$msg));
+         }
+         else{
+            printf STDERR ("%s\n",$msg);
+         }
       }
       $self->{exitcode}=-1 if ($self->{exitcode}==0);
       exit($self->{exitcode});
