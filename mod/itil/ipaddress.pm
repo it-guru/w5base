@@ -800,6 +800,7 @@ sub Validate
       my $networkid=effVal($oldrec,$newrec,"networkid");
       if ($networkid eq ""){
          $self->LastMsg(ERROR,"no network specified");
+         printf STDERR ("DEBUG: newrec=%s\n",Dumper($newrec));
          return(0);
       }
       my $n=getModuleObject($self->Config,"itil::network");
