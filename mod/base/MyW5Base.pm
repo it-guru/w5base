@@ -44,15 +44,15 @@ sub getWelcomeQueryTemplate
    my $l1=$self->T("monitor my workflows");
    my $l2=$self->T("my current jobs");
    my $l3=$self->T("start a new workflow");
-   my $mywf  ="<a href=\"../MyW5Base/Main?".
+   my $mywf  ="<a tabindex=12 href=\"../MyW5Base/Main?".
               "MyW5BaseSUBMOD=base::MyW5Base::mywf\">".
               "<img border=0 src=\"../../base/load/MyW5Base-MyWf.jpg\">".
               "</a>";
-   my $myjobs="<a href=\"../MyW5Base/Main?".
+   my $myjobs="<a tabindex=11 href=\"../MyW5Base/Main?".
               "MyW5BaseSUBMOD=base::MyW5Base::wfmyjobs\">".
               "<img border=0 src=\"../../base/load/MyW5Base-MyJobs.jpg\">".
               "</a>";
-   my $newwf ="<a href=\"../workflow/New\">".
+   my $newwf ="<a tabindex=10 href=\"../workflow/New\">".
               "<img border=0 src=\"../../base/load/MyW5Base-NewWf.jpg\">".
               "</a>";
    my $newstext=$self->getNews();

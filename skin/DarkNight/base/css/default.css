@@ -3,6 +3,10 @@ body{
     background: black;
     color:white;
 }
+
+a:focus {outline: 1px solid red;}
+a:focus img {outline: 2px solid red;}
+
 .TitleBar{
    background-color:gray;
    color: black;

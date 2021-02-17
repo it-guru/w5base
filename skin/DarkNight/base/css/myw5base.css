@@ -1,0 +1,28 @@
+@import url("myw5base.css?SKIN=default");
+
+a:link.bookmark,a:visited.bookmark,a:active.bookmark{
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:white;
+}
+
+a:link.news,a:visited.news,a:active.news{
+            font-family:Arial,Adobe Helvetica,Helvetica;
+            text-decoration:none;
+            color:white;
+}
+
+
+tr.newsline1{
+   cursor:default;
+   background:gray;
+   color:white;
+}
+tr.newsline2{
+   background:#3d3d3d;
+   cursor:default;
+   color:white;
+}
+
+
+
