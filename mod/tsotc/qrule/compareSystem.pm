@@ -249,21 +249,31 @@ sub qcheckRecord
                if ($autocorrect){
                   my $net=getModuleObject($self->getParent->Config(),
                           "itil::network");
-                  $net->SetCurrentView(qw(id name));
-                  my $netarea=$net->getHashIndexed("name");
-                  my $cndatagnetworkid;
-                  #############################################################
-                  {  # DTAG Intranet id detection
-                     my @cndatagnetworknames=(
-                          'Corporate Network DTAG (CNDTAG)', # zukünftig!
-                          'Deutsche Telekom HitNet',
-                          'Insel-Netz/Kunden-LAN');
-                     foreach my $netname (@cndatagnetworknames){
-                        if (exists($netarea->{name}->{$netname})){
-                           $cndatagnetworkid=$netarea->{name}->{$netname}->{id};
-                           last;
-                        }
-                     }
+
+                  my $cndatagnetworkid=$net->findNetworkAreaId({
+                        addDefaultIsland=>1
+                     },
+                     'Corporate Network DTAG (CNDTAG)', # zukünftig!
+                     'Deutsche Telekom HitNet',
+                  );
+                  if (!$cndatagnetworkid){
+                     msg(ERROR,"can not find HitNet networkid in $self");
+                  }
+
+                  my $islandnetworkid=$net->findNetworkAreaId({
+                     addDefaultIsland=>1
+                  });
+                  if (!$islandnetworkid){
+                     msg(ERROR,"can not find island networkid in $self");
+                  }
+
+                  my $internetnetworkid=$net->findNetworkAreaId({
+                        addDefaultIsland=>1
+                     },
+                     'Internet',
+                  );
+                  if (!$internetnetworkid){
+                     msg(ERROR,"can not find internet networkid in $self");
                   }
                   #############################################################
        
@@ -385,8 +395,7 @@ sub qcheckRecord
                                       return(); # do not insert 
                                                 # already unconfigured ip's
                                    }
-                                   my $networkid=$p{netarea}->{name}->
-                                               {'Insel-Netz/Kunden-LAN'}->{id};
+                                   my $networkid=$islandnetworkid;
                                    my $identifyby=undef;
                                    if ($mode eq "update"){
                                       $identifyby=$oldrec->{id};
@@ -438,14 +447,16 @@ sub qcheckRecord
                                 return(undef);
                              },
                              $rec->{ipaddresses},\@cleanOTCIPlist,\@opList,
-                             refid=>$rec->{id},netarea=>$netarea);
+                             refid=>$rec->{id});
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
                   }
+
+                  # Zielnetzwerke festlegen und prüfen ob frei
                   my @otcip=map({$_->{name}} @{$parrec->{ipaddresses}});
                   my %otcip;
                   foreach my $ip (@otcip){
-                     $otcip{$ip}={};
+                     $otcip{$ip}={networkid=>$islandnetworkid};
                      if ($ip=~m/^10\./){   # OTC hangs only in CNDTAG
                         $otcip{$ip}->{networkid}=$cndatagnetworkid;
                      }
@@ -456,8 +467,7 @@ sub qcheckRecord
                   foreach my $iiprec ($iip->getHashList(qw(name))){
                      my $ip=$iiprec->{name};
                      if (exists($otcip{$ip})){
-                        $otcip{$ip}->{networkid}=
-                           $netarea->{name}->{'Internet'}->{id};
+                        $otcip{$ip}->{networkid}=$internetnetworkid;
                      }
                   }
                   {

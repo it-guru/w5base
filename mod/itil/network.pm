@@ -315,6 +315,36 @@ sub HandleInfoAboSubscribe
    }
 }
 
+sub findNetworkAreaId
+{
+   my $self=shift;
+   my $param=shift;
+   my @expression=@_;
+
+
+   $self->ResetFilter();
+   $self->ResetFilter();
+   my @netlist=$self->getHashList(qw(name id));
+
+   for(my $loop=0;$loop<=1;$loop++){
+      foreach my $exp (@expression){
+         foreach my $netrec (@netlist){
+            if ($exp eq $netrec->{name}){
+               return($netrec->{id});
+            }
+         }
+      }
+      if ($param->{addDefaultIsland}){
+         push(@expression,"Island-Net/Customer-LAN");
+         push(@expression,"Insel-Netz/Kunden-LAN");
+      }
+   }
+
+
+   return(undef);
+}
+
+
 
 
 
