@@ -579,6 +579,22 @@ sub calcBaseApplicationExpertGroup
                 label=>$self->getParent->T("Canvas Owner",'TS::appl'),
                 sublabel=>$self->getParent->T("(operational)",'TS::appl')
             },
+            'opcanvasownerit'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Canvas Owner IT",'TS::appl'),
+                sublabel=>$self->getParent->T("(operational)",'TS::appl')
+            },
+            'opbusinessowner'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("Business Owner",'TS::appl'),
+                sublabel=>$self->getParent->T("(operational)",'TS::appl')
+            },
             'opbusinessownerit'=>{
                 userid=>[],
                 email=>[],
@@ -677,6 +693,16 @@ sub calcBaseApplicationExpertGroup
             }
          }
 
+         my $canvasowneritid=$vourec->{canvasowneritid};
+         if (ref($canvasowneritid) ne "ARRAY"){
+            $canvasowneritid=[$canvasowneritid];
+         }
+         foreach my $uid (@{$canvasowneritid}){
+            if ($uid ne ""){
+               push(@{$a{opcanvasownerit}->{userid}},$uid);
+            }
+         }
+
          my $leaderitid=$vourec->{leaderitid};
          if (ref($leaderitid) ne "ARRAY"){
             $leaderitid=[$leaderitid];
@@ -686,6 +712,18 @@ sub calcBaseApplicationExpertGroup
                push(@{$a{opbusinessownerit}->{userid}},$uid);
             }
          }
+
+         my $leaderid=$vourec->{leaderid};
+         if (ref($leaderid) ne "ARRAY"){
+            $leaderid=[$leaderid];
+         }
+         foreach my $uid (@{$leaderid}){
+            if ($uid ne ""){
+               push(@{$a{opbusinessowner}->{userid}},$uid);
+            }
+         }
+
+
       }
    }
 
