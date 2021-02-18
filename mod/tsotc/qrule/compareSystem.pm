@@ -118,7 +118,8 @@ sub qcheckRecord
       $forcedupd->{cistatusid}=4;
    }
    if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
-       $rec->{cistatusid}==5){
+       $rec->{cistatusid}==5 ||
+       (exists($forcedupd->{cistatusid}) && $forcedupd->{cistatusid}==4)){
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "OTC"){
          if (!defined($parrec)){
             return(undef,undef) if (!$par->Ping());
