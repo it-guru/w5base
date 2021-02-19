@@ -1095,8 +1095,67 @@ sub getDetailBlockPriority
    return(qw(header default relatedto dnsaliases ipnets further source));
 }
 
+sub switchSystemIpToNetarea
+{
+   my $self=shift;
 
+   my $netIpDst=shift;
+   my $refid=shift;
+   my $netarea=shift;
+   my $qmsg=shift;
 
+   my $islandid=$netarea->{ISLAND};
+
+   foreach my $ip (keys(%$netIpDst)){
+      if (exists($netIpDst->{$ip}->{NetareaTag})){
+         $netIpDst->{$ip}->{networkid}=
+              $netarea->{$netIpDst->{$ip}->{NetareaTag}};
+         if (!exists(
+              $netarea->{$netIpDst->{$ip}->{NetareaTag}})){
+            push(@$qmsg,"invalid netarea switch tag ".
+                        "'$netIpDst->{$ip}->{NetareaTag} in ip=$ip");
+         }
+         delete($netIpDst->{$ip}->{NetareaTag});
+      }
+      if ($netIpDst->{$ip}->{networkid} eq ""){
+         msg(ERROR,"invalid networkid while SwitchToTargetNet on IP $ip");
+         delete($netIpDst->{$ip});
+      }
+   }
+   if (keys(%$netIpDst)){
+      $self->ResetFilter();
+      $self->SetFilter({ name=>[keys(%$netIpDst)], cistatusid=>"<6" });
+      $self->SetCurrentView(qw(id name systemid networkid));
+      my $curiplist=$self->getHashIndexed("id");
+      foreach my $curip (values(%{$curiplist->{id}})){
+         if (exists($netIpDst->{$curip->{name}})){
+            if ($curip->{systemid} ne $refid){
+               if ($curip->{networkid} ne $islandid){
+                  delete($netIpDst->{$curip->{name}});
+                  push(@$qmsg,"can not assign network area to $curip");
+               }  # switch is not posibile, becaus IP already
+            }     # assigend
+            elsif ($curip->{networkid} eq
+                   $netIpDst->{$curip->{name}}->{networkid}){
+               delete($netIpDst->{$curip->{name}}); 
+            }     # ip is already in correct network
+            else{
+               $netIpDst->{$curip->{name}}->{id}=$curip->{id};
+               $netIpDst->{$curip->{name}}->{name}=$curip->{name};
+            }
+         }
+      }
+      # process networkarea switches
+      foreach my $ipupd (keys(%$netIpDst)){
+         next if (!exists($netIpDst->{$ipupd}->{id}));
+         $self->ValidatedUpdateRecord(
+            $curiplist->{id}->{$netIpDst->{$ipupd}->{id}},
+            { networkid=>$netIpDst->{$ipupd}->{networkid} },
+            {id=>\$netIpDst->{$ipupd}->{id}}
+         );
+      }
+   }
+}
 
 
 

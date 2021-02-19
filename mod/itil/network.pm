@@ -321,14 +321,20 @@ sub findNetworkAreaId
    my $param=shift;
    my @expression=@_;
 
+   if (!exists($self->{findNetworkAreaCache}) ||
+       $self->{findNetworkAreaCache}->{time}<time()-10){
 
-   $self->ResetFilter();
-   $self->ResetFilter();
-   my @netlist=$self->getHashList(qw(name id));
-
+      $self->ResetFilter();
+      my @netlist=$self->getHashList(qw(name id));
+      my $r={
+         time=>time(),
+         netlist=>\@netlist
+      };
+      $self->{findNetworkAreaCache}=$r;
+   }
    for(my $loop=0;$loop<=1;$loop++){
       foreach my $exp (@expression){
-         foreach my $netrec (@netlist){
+         foreach my $netrec (@{$self->{findNetworkAreaCache}->{netlist}}){
             if ($exp eq $netrec->{name}){
                return($netrec->{id});
             }

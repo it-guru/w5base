@@ -248,33 +248,9 @@ sub qcheckRecord
                }
                if ($autocorrect){
                   my $net=getModuleObject($self->getParent->Config(),
-                          "itil::network");
+                          "TS::network");
+                  my $netarea=$net->getTaggedNetworkAreaId();
 
-                  my $cndatagnetworkid=$net->findNetworkAreaId({
-                        addDefaultIsland=>1
-                     },
-                     'Corporate Network DTAG (CNDTAG)', # zukünftig!
-                     'Deutsche Telekom HitNet',
-                  );
-                  if (!$cndatagnetworkid){
-                     msg(ERROR,"can not find HitNet networkid in $self");
-                  }
-
-                  my $islandnetworkid=$net->findNetworkAreaId({
-                     addDefaultIsland=>1
-                  });
-                  if (!$islandnetworkid){
-                     msg(ERROR,"can not find island networkid in $self");
-                  }
-
-                  my $internetnetworkid=$net->findNetworkAreaId({
-                        addDefaultIsland=>1
-                     },
-                     'Internet',
-                  );
-                  if (!$internetnetworkid){
-                     msg(ERROR,"can not find internet networkid in $self");
-                  }
                   #############################################################
        
                   my @opList;
@@ -395,7 +371,7 @@ sub qcheckRecord
                                       return(); # do not insert 
                                                 # already unconfigured ip's
                                    }
-                                   my $networkid=$islandnetworkid;
+                                   my $networkid=$netarea->{ISLAND};
                                    my $identifyby=undef;
                                    if ($mode eq "update"){
                                       $identifyby=$oldrec->{id};
@@ -456,9 +432,9 @@ sub qcheckRecord
                   my @otcip=map({$_->{name}} @{$parrec->{ipaddresses}});
                   my %otcip;
                   foreach my $ip (@otcip){
-                     $otcip{$ip}={networkid=>$islandnetworkid};
+                     $otcip{$ip}={networkid=>$netarea->{ISLAND}};
                      if ($ip=~m/^10\./){   # OTC hangs only in CNDTAG
-                        $otcip{$ip}->{networkid}=$cndatagnetworkid;
+                        $otcip{$ip}->{NetareaTag}='CNDTAG';
                      }
                   }
                   my $iip=getModuleObject($self->getParent->Config(),
@@ -467,44 +443,14 @@ sub qcheckRecord
                   foreach my $iiprec ($iip->getHashList(qw(name))){
                      my $ip=$iiprec->{name};
                      if (exists($otcip{$ip})){
-                        $otcip{$ip}->{networkid}=$internetnetworkid;
+                        $otcip{$ip}->{NetareaTag}='INTERNET';
                      }
                   }
-                  {  # prüfen der IPs auf Netzwerk-Kolisionen
-                     my $ip=getModuleObject($self->getParent->Config(),
-                                             "itil::ipaddress");
-                     $ip->SetFilter({name=>[keys(%otcip)],cistatusid=>"<6"});
-                     $ip->SetCurrentView(qw(id name systemid networkid));
-                     my $curiplist=$ip->getHashIndexed("id");
-                     foreach my $curip (values(%{$curiplist->{id}})){
-                        if (exists($otcip{$curip->{name}})){ # noch nicht gelö.
-                           if ($curip->{systemid} ne $rec->{id}){
-                              if ($curip->{networkid} ne $islandnetworkid){
-                                 delete($otcip{$curip->{name}}); 
-                              }
-                           }
-                           elsif ($curip->{networkid} eq 
-                                  $otcip{$curip->{name}}->{networkid}){
-                              delete($otcip{$curip->{name}}); #networkid passt
-                           }
-                           else{
-                              $otcip{$curip->{name}}->{id}=$curip->{id};
-                              $otcip{$curip->{name}}->{name}=$curip->{name};
-                           }
-                        }
-                     }
-                     # process networkarea switches
-                     foreach my $ipupd (keys(%otcip)){
-                        $ip->ValidatedUpdateRecord(
-                           $curiplist->{id}->{$otcip{$ipupd}->{id}},
-                           {
-                              networkid=>$otcip{$ipupd}->{networkid}
-                           },
-                           {id=>\$otcip{$ipupd}->{id}}
-                        );
-                     }
-                     
-                  }
+                  my $ip=getModuleObject($self->getParent->Config(),
+                                                "itil::ipaddress");
+                  $ip->switchSystemIpToNetarea(
+                     \%otcip,$rec->{id},$netarea,\@qmsg
+                  );
 
                   my @cleanOTCIflist=values(%cleanOTCIflist);
                   @opList=();
