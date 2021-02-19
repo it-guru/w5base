@@ -55,9 +55,8 @@ sub new
                    my $self=shift;
                    my $current=shift;
                    my $name=$current->{name};
+                   $name=TextShorter($name,40);
                    $name=~s/[^a-z0-9_-]/_/g;
-                   $name=~s/\s/_/g;
-                   $name=TextShorter($current->{name},40);
 
                    return(lc($name."__".base36($current->{cdateunixtimstamp})));
                 }),
