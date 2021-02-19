@@ -601,142 +601,194 @@ sub qcheckRecord
                                 \@qmsg,\@dataissue,\$errorlevel,
                                 mode=>'leftouterlink');
                }
-               if ($rec->{allowifupdate}){
-                  my $net=getModuleObject($self->getParent->Config(),"itil::network");
-                  $net->SetCurrentView(qw(id name));
-                  my $netarea=$net->getHashIndexed("name");
-                  my @opList;
+               $parrec->{consoleip}="";
 
-                  #
-                  # %cleanAmIPlist is neassasary, because multiple IP-Addresses
-                  # can be in one networkcard record
-                  #
-                  my %cleanAmIPlist;
-                  foreach my $amiprec (@{$parrec->{ipaddresses}}){
-                     my $mappedCIStatus=5;
-                     if (lc($amiprec->{status}) eq "unconfigured"){
-                        $mappedCIStatus=6;
+               #############################################################
+               my $net=getModuleObject($self->getParent->Config(),
+                       "TS::network");
+               my $netarea=$net->getTaggedNetworkAreaId();
+               #############################################################
+
+               my @opList;
+               my %netIpDst;
+
+               #
+               # %cleanAmIPlist is neassasary, because multiple IP-Addresses
+               # can be in one networkcard record
+               #
+               my %cleanAmIPlist;
+               foreach my $amiprec (@{$parrec->{ipaddresses}}){
+                  my $isconsole=0;
+                  my $mappedCIStatus=5;
+                  if (lc($amiprec->{status}) eq "unconfigured"){
+                     $mappedCIStatus=6;
+                  }
+                  if (lc($amiprec->{status}) eq "out of service"){
+                     $mappedCIStatus=6;
+                  }
+                  elsif (lc($amiprec->{status}) eq "configured"){
+                     $mappedCIStatus=4;
+                  }
+                  if ($amiprec->{type}=~m/^IP-REMOTE CONSOLE/i){
+                     $isconsole++;
+                  }
+                  my @ip;
+
+
+                  if ($amiprec->{ipv4address} ne ""){
+                     if ($amiprec->{ipv4address}=~
+                         m/^\d{1,3}(\.\d{1,3}){3,3}$/){
+                        push(@ip,$amiprec->{ipv4address});
                      }
-                     if (lc($amiprec->{status}) eq "out of service"){
-                        $mappedCIStatus=6;
+                     else{
+                        msg(WARN,"ignoring IPv4 invalid ".
+                                 "'$amiprec->{ipv4address}' ".
+                                 "for $parrec->{systemid}");
                      }
-                     elsif (lc($amiprec->{status}) eq "configured"){
-                        $mappedCIStatus=4;
+                  }
+                  if ($amiprec->{ipv6address} ne ""){
+                     if ($amiprec->{ipv6address}=~
+                         m/^[a-f0-9]{1,4}(:[a-f0-9]{0,4}){3,7}$/){
+                        push(@ip,$amiprec->{ipv6address});
                      }
-                     if ($amiprec->{ipv4address} ne ""){
-                        if ($amiprec->{ipv4address}=~
-                            m/^\d{1,3}(\.\d{1,3}){3,3}$/){
-                           $cleanAmIPlist{$amiprec->{ipv4address}}={
+                     else{
+                        msg(INFO,"ignoring invalid IPv6 ".
+                                 "'$amiprec->{ipv6address}' ".
+                                 "for $parrec->{systemid}");
+                     }
+                  }
+                  foreach my $ip (@ip){
+                     if ($isconsole){
+                        if ($mappedCIStatus==4){
+                           $parrec->{consoleip}=$ip;
+                        }
+                     }
+                     else{
+                        if ( ($ip=~m/^127\./)      ||
+                             ($ip=~m/^0\./)        ||
+                             ($ip=~m/^255\.0\./)   ||
+                             ($ip=~m/^224\.0\./)){
+                           msg(INFO,"ignore ip $ip on IP-Sync");
+                        } 
+                        else{
+                           $cleanAmIPlist{$ip}={
                               cistatusid=>$mappedCIStatus,
-                              ipaddress=>$amiprec->{ipv4address},
+                              ipaddress=>$ip,
                               description=>$amiprec->{description}
                            };
-                        }
-                        else{
-                           msg(WARN,"ignoring IPv4 invalid ".
-                                    "'$amiprec->{ipv4address}' ".
-                                    "for $parrec->{systemid}");
-                        }
-                     }
-                     if ($amiprec->{ipv6address} ne ""){
-                        if ($amiprec->{ipv6address}=~
-                            m/^[a-f0-9]{1,4}(:[a-f0-9]{0,4}){3,7}$/){
-                           $cleanAmIPlist{$amiprec->{ipv6address}}={
-                              cistatusid=>$mappedCIStatus,
-                              ipaddress=>$amiprec->{ipv6address},
-                              description=>$amiprec->{description}
-                           };
-                        }
-                        else{
-                           msg(INFO,"ignoring invalid IPv6 ".
-                                    "'$amiprec->{ipv6address}' ".
-                                    "for $parrec->{systemid}");
+                           $netIpDst{$ip}->{NetareaTag}='ISLAND';
+                           if ($amiprec->{type}=~m/backup/i){
+                              $netIpDst{$ip}->{NetareaTag}='TSIBACKUPLAN';
+                           }
+                           elsif ($amiprec->{type}=~m/admin/i){
+                              $netIpDst{$ip}->{NetareaTag}='TSIADMINLAN';
+                           }
+                           elsif ($amiprec->{type}=~m/monitoring/i){
+                              if ($ip=~m/^10\./){
+                                 $netIpDst{$ip}->{NetareaTag}='CNDTAG';
+                              }
+                              else{
+                                 $netIpDst{$ip}->{NetareaTag}='TSIADMINLAN';
+                              }
+                           }
+                           if (($amiprec->{type}=~m/customer/i) &&
+                               ($ip=~m/^10\./)){
+                              $netIpDst{$ip}->{NetareaTag}='CNDTAG';
+                           }
                         }
                      }
                   }
-                  my @cleanAmIPlist=values(%cleanAmIPlist);
+               }
+               my @cleanAmIPlist=values(%cleanAmIPlist);
+               $self->IfComp($dataobj,
+                             $rec,"consoleip",
+                             $parrec,"consoleip",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'string');
 
-                  my $res=OpAnalyse(
-                             sub{  # comperator 
-                                my ($a,$b)=@_;
-                                my $eq;
-                                if ($a->{name} eq $b->{ipaddress}){
-                                   $eq=0;
-                                   $eq=1 if ($a->{comments} eq $b->{description} &&
-                                             $a->{srcsys} eq "AMCDS" &&
-                                             $a->{cistatusid} eq $b->{cistatusid});
-                                }
-                                return($eq);
-                             },
-                             sub{  # oprec generator
-                                my ($mode,$oldrec,$newrec,%p)=@_;
-                                if ($mode eq "insert" || $mode eq "update"){
-                                   if ($mode eq "insert" && $newrec->{cistatusid} eq "6"){
-                                      return(); # do not insert already unconfigured ip's
-                                   }
-                                   my $networkid=$p{netarea}->{name}->
-                                                 {'Insel-Netz/Kunden-LAN'}->{id};
-                                   my $identifyby=undef;
-                                   if ($mode eq "update"){
-                                      $identifyby=$oldrec->{id};
-                                   }
-                                   if ($newrec->{ipaddress}=~m/^\s*$/){
-                                      $mode="nop";
-                                   }
-                                   my $type="1";   # secondary
-                                   # Customer Interface can not be marked
-                                   # as primary interface, because in some
-                                   # cases multiple customer interfaces
-                                   # exists in AssetManager Rotz.
-                                   #
-                                   #if (lc(trim($newrec->{description})) eq
-                                   #    "customer"){
-                                   #   $type="0"; # Customer Interface is prim
-                                   #}
-                                   return({OP=>$mode,
-                                           MSG=>"$mode ip $newrec->{ipaddress} ".
-                                                "in W5Base",
-                                           IDENTIFYBY=>$identifyby,
-                                           DATAOBJ=>'itil::ipaddress',
-                                           DATA=>{
-                                              name      =>$newrec->{ipaddress},
-                                              cistatusid=>$newrec->{cistatusid},
-                                              srcsys    =>'AMCDS',
-                                              type      =>$type,
-                                              networkid =>$networkid,
-                                              comments  =>$newrec->{description},
-                                              systemid  =>$p{refid}
-                                              }
-                                           });
-                                }
-                                elsif ($mode eq "delete"){
-                                   my $networkid=$oldrec->{networkid};
-                                   if ($networkid ne $p{netarea}->{name}->
-                                             {'Insel-Netz/Kunden-LAN'}->{id}){
-                                      my $msg=$self->T('can not automatic '.
-                                                       'delete ip %s '.
-                                                       'because network area '.
-                                                       'has been changed');
-                                      $msg=sprintf($msg,$oldrec->{name});
-   
-                                      push(@qmsg,$msg);
-                                      return();
-                                   }
-                                   return({OP=>$mode,
-                                           MSG=>"delete ip $oldrec->{name} ".
-                                                "from W5Base",
-                                           DATAOBJ=>'itil::ipaddress',
-                                           IDENTIFYBY=>$oldrec->{id},
-                                           });
-                                }
-                                return(undef);
-                             },
-                             $rec->{ipaddresses},\@cleanAmIPlist,\@opList,
-                             refid=>$rec->{id},netarea=>$netarea);
+               my $res=OpAnalyse(
+                   sub{  # comperator 
+                      my ($a,$b)=@_;
+                      my $eq;
+                      if ($a->{name} eq $b->{ipaddress}){
+                         $eq=0;
+                         $eq=1 if ($a->{comments} eq $b->{description} &&
+                                   $a->{srcsys} eq "AMCDS" &&
+                                   $a->{cistatusid} eq $b->{cistatusid});
+                      }
+                      return($eq);
+                   },
+                   sub{  # oprec generator
+                      my ($mode,$oldrec,$newrec,%p)=@_;
+                      if ($mode eq "insert" || $mode eq "update"){
+                         if ($mode eq "insert" && 
+                             $newrec->{cistatusid} eq "6"){
+                            return(); 
+                               # do not insert already unconfigured ip's
+                         }
+                         my $networkid=$netarea->{ISLAND};
+                         my $identifyby=undef;
+                         if ($mode eq "update"){
+                            $identifyby=$oldrec->{id};
+                         }
+                         if ($newrec->{ipaddress}=~m/^\s*$/){
+                            $mode="nop";
+                         }
+                         my $type="1";   # secondary
+                         my $oprec={OP=>$mode,
+                                 MSG=>"$mode ip $newrec->{ipaddress} ".
+                                      "in W5Base",
+                                 IDENTIFYBY=>$identifyby,
+                                 DATAOBJ=>'itil::ipaddress',
+                                 DATA=>{
+                                    name      =>$newrec->{ipaddress},
+                                    cistatusid=>$newrec->{cistatusid},
+                                    type      =>$type,
+                                    comments  =>$newrec->{description},
+                                    systemid  =>$p{refid}
+                                    }
+                                 };
+                          if ($mode eq "insert"){
+                             $oprec->{DATA}->{srcsys}="AMCDS";
+                             $oprec->{DATA}->{networkid}=
+                                $netarea->{ISLAND};
+                          } 
+                          return($oprec);
+                      }
+                      elsif ($mode eq "delete"){
+                         my $srcsys=$oldrec->{srcsys};
+                         return({OP=>$mode,
+                                 MSG=>"delete ip $oldrec->{name} ".
+                                      "from W5Base",
+                                 DATAOBJ=>'itil::ipaddress',
+                                 IDENTIFYBY=>$oldrec->{id},
+                                 });
+                      }
+                      return(undef);
+                   },
+                   $rec->{ipaddresses},\@cleanAmIPlist,\@opList,
+                   refid=>$rec->{id}
+               );
+               if ($autocorrect){
                   if (!$res){
                      my $opres=ProcessOpList($self->getParent,\@opList);
                   }
                }
+               else{
+                  if ($#opList!=-1){
+                     my $msg="IP-Adresses not in sync";
+                     $errorlevel=3 if ($errorlevel<3);
+                     push(@dataissue,$msg);
+                     push(@qmsg,$msg);
+                     push(@qmsg,map({"ToDo: ".$_->{MSG}} @opList));
+                  }
+               }
+               my $ip=getModuleObject($self->getParent->Config(),
+                                             "itil::ipaddress");
+               $ip->switchSystemIpToNetarea(
+                  \%netIpDst,$rec->{id},$netarea,\@qmsg
+               );
             }
 
             if ($rec->{mandator} eq "Extern" && $rec->{allowifupdate}){

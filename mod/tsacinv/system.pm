@@ -557,7 +557,7 @@ sub new
                 vjoinbase     =>{deleted=>'0'},
                 vjoindisp     =>[qw(fullname status description type)],
                 vjoininhash   =>[qw(ipaddress ipv4address ipv6address 
-                                    description dnsname status)]),
+                                    description dnsname status type)]),
 
       new kernel::Field::SubList(
                 name          =>'applications',
