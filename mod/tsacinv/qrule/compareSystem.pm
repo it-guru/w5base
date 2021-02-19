@@ -615,7 +615,7 @@ sub qcheckRecord
                   foreach my $amiprec (@{$parrec->{ipaddresses}}){
                      my $mappedCIStatus=5;
                      if (lc($amiprec->{status}) eq "unconfigured"){
-                        $mappedCIStatus=5;
+                        $mappedCIStatus=6;
                      }
                      if (lc($amiprec->{status}) eq "out of service"){
                         $mappedCIStatus=6;
