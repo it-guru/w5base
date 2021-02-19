@@ -470,23 +470,27 @@ sub qcheckRecord
                         $otcip{$ip}->{networkid}=$internetnetworkid;
                      }
                   }
-                  {
+                  {  # prüfen der IPs auf Netzwerk-Kolisionen
                      my $ip=getModuleObject($self->getParent->Config(),
                                              "itil::ipaddress");
                      $ip->SetFilter({name=>[keys(%otcip)],cistatusid=>"<6"});
                      $ip->SetCurrentView(qw(id name systemid networkid));
                      my $curiplist=$ip->getHashIndexed("id");
                      foreach my $curip (values(%{$curiplist->{id}})){
-                        if ($curip->{systemid} ne $rec->{id}){
-                           delete($otcip{$curip->{name}}); #ip already by other
-                        }
-                        elsif ($curip->{networkid} eq 
-                               $otcip{$curip->{name}}->{networkid}){
-                           delete($otcip{$curip->{name}}); #networkid passt
-                        }
-                        else{
-                           $otcip{$curip->{name}}->{id}=$curip->{id};
-                           $otcip{$curip->{name}}->{name}=$curip->{name};
+                        if (exists($otcip{$curip->{name}})){ # noch nicht gelö.
+                           if ($curip->{systemid} ne $rec->{id}){
+                              if ($curip->{networkid} ne $islandnetworkid){
+                                 delete($otcip{$curip->{name}}); 
+                              }
+                           }
+                           elsif ($curip->{networkid} eq 
+                                  $otcip{$curip->{name}}->{networkid}){
+                              delete($otcip{$curip->{name}}); #networkid passt
+                           }
+                           else{
+                              $otcip{$curip->{name}}->{id}=$curip->{id};
+                              $otcip{$curip->{name}}->{name}=$curip->{name};
+                           }
                         }
                      }
                      # process networkarea switches
