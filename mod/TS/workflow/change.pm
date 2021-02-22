@@ -301,6 +301,9 @@ sub notifyValid
 
    my $phase=$WfRec->{additional}{ServiceManagerPhase}[0];
 
+   if ($phase=~m/^40/ && ($mode eq 'all')) {
+      return(1) if ($self->isChangeManager($WfRec));
+   }
    if ($phase=~m/^30/ &&
        ($mode eq 'all' || $mode eq 'confirm')) {
       return(1) if ($self->isChangeManager($WfRec));
