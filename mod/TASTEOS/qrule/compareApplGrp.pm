@@ -329,7 +329,8 @@ sub qcheckRecord
 
 
 
-   if ($TSOSsystemid ne ""){
+   if ($TSOSsystemid ne "" &&
+       in_array($rec->{applgrpid},["ICTO-20324"])){
       foreach my $lrec (@l){
          my $TSOSmachineid;
          if (exists($ladd->{systemid}->{$lrec->{systemid}})){
