@@ -329,8 +329,8 @@ sub qcheckRecord
 
 
 
-   if ($TSOSsystemid ne "" &&
-       in_array($rec->{applgrpid},["ICTO-20324"])){
+   if ($TSOSsystemid ne ""){
+       
       foreach my $lrec (@l){
          my $TSOSmachineid;
          if (exists($ladd->{systemid}->{$lrec->{systemid}})){
@@ -372,19 +372,21 @@ sub qcheckRecord
 
 
 
+      if (in_array($rec->{applgrpid},["ICTO-20324"])){
 
-      my @email=sort(map({$_->{email}} values(%contact)));
-      msg(INFO,sprintf("set acl of TasteOS system $TSOSsystemid to %s\n",
-            join(",",@email)));
-      if ($#email!=-1){
-         foreach my $email (@email){
-            if ($email ne ""){
-               my $bk=$tsossysacl->ValidatedInsertRecord({
-                  systemid=>$TSOSsystemid,
-                  email=>$email,
-                  readwrite=>1
-               });
-               msg(INFO,"insert of $email = $bk");
+         my @email=sort(map({$_->{email}} values(%contact)));
+         msg(INFO,sprintf("set acl of TasteOS system $TSOSsystemid to %s\n",
+               join(",",@email)));
+         if ($#email!=-1){
+            foreach my $email (@email){
+               if ($email ne ""){
+                  my $bk=$tsossysacl->ValidatedInsertRecord({
+                     systemid=>$TSOSsystemid,
+                     email=>$email,
+                     readwrite=>1
+                  });
+                  msg(INFO,"insert of $email = $bk");
+               }
             }
          }
       }
