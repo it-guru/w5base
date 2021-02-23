@@ -88,6 +88,7 @@ sub FormatedDetail
             my $absdelta=abs($delta);
             my $baseabsdelta=abs($delta);
             my @blks=();
+
             if ($dayoffset==0){
                if (!$self->{dayonly}){
                   if ($lang eq "de"){
@@ -357,8 +358,8 @@ sub getFrontendTimeString
             my ($Y1,$M1,$D1,$h1,$m1,$s1)=Localtime($usertimezone,$time);
             my ($Y2,$M2,$D2,$h2,$m2,$s2)=Localtime($usertimezone,time());
             my ($time1,$time2);
-            eval('$time1=Mktime($usertimezone,$Y1,$M1,$D1,$h1,$m1,$s1);');
-            eval('$time2=Mktime($usertimezone,$Y2,$M2,$D2,$h2,$m2,$s2);');
+            eval('$time1=Mktime($usertimezone,$Y1,$M1,$D1,0,0,0);');
+            eval('$time2=Mktime($usertimezone,$Y2,$M2,$D2,0,0,0);');
             my $floatdoffset=($time2-$time1)/86400;
             if ("$Y1,$M1,$D1" eq "$Y2,$M2,$D2"){
                $dayoffset=0;
