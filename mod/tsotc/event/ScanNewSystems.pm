@@ -98,9 +98,6 @@ sub ScanNewSystems
       if ($cnt){
          return({exitcode=>0,exitmsg=>'ok'});
       }
-      else{
-         msg(ERROR,"no import done");
-      }
       return({exitcode=>1,exitmsg=>'fail'});
    }
    my $firstDayRange=1000;
