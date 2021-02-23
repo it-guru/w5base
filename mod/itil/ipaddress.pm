@@ -1132,7 +1132,7 @@ sub switchSystemIpToNetarea
             if ($curip->{systemid} ne $refid){
                if ($curip->{networkid} ne $islandid){
                   delete($netIpDst->{$curip->{name}});
-                  push(@$qmsg,"can not assign network area to $curip");
+                  push(@$qmsg,"can not assign network area to $curip->{name}");
                }  # switch is not posibile, becaus IP already
             }     # assigend
             elsif ($curip->{networkid} eq

@@ -751,8 +751,7 @@ sub qcheckRecord
                                  };
                           if ($mode eq "insert"){
                              $oprec->{DATA}->{srcsys}="AMCDS";
-                             $oprec->{DATA}->{networkid}=
-                                $netarea->{ISLAND};
+                             $oprec->{DATA}->{networkid}=$netarea->{ISLAND};
                           } 
                           return($oprec);
                       }
