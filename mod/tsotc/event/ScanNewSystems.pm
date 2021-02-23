@@ -256,10 +256,10 @@ sub analyseRecord
 
    msg(INFO,"PROCESS: $rec->{id} $rec->{cdate} name='$rec->{name}'");
 
-   if (!($rec->{name}=~m/^[a-z0-9_-\s]{2,63}$/)){
-      msg(ERROR,"skip OTC Systemname $rec->{name} - invalid systemname");
-      return();
-   }
+   #if (!($rec->{name}=~m/^[a-z0-9_-\s]{2,63}$/)){
+   #   msg(ERROR,"skip OTC Systemname $rec->{name} - invalid systemname");
+   #   return();
+   #}
 
    my $sys=$self->getPersistentModuleObject("W5BaseOTCSys","tsotc::system");
    my $w5sys=$self->getPersistentModuleObject("W5BaseSys","itil::system");
