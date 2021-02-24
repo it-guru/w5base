@@ -795,8 +795,8 @@ sub Validate
 
    #######################################################################
    # unique IP-Handling
-   $newrec->{'uniqueflag'}=1;
    if (!defined($oldrec) || exists($newrec->{networkid})){
+      $newrec->{'uniqueflag'}=1;
       my $networkid=effVal($oldrec,$newrec,"networkid");
       if ($networkid eq ""){
          $self->LastMsg(ERROR,"no network specified");
