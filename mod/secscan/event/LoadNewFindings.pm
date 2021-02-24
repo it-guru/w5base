@@ -223,7 +223,7 @@ sub LoadNewFindings
 
       if (defined($rec)){
          do{
-            msg(INFO,"cleanup finding id=$rec->{id}");
+            #msg(INFO,"cleanup finding id=$rec->{id}");
             $self->analyseRecord($datastream,$rec,$res);
             ($rec,$msg)=$datastream->getNext();
             if (defined($msg)){
@@ -277,7 +277,7 @@ sub analyseRecord
             step=>"!secscan::workflow::FindingHndl::finish"
          });
          foreach my $wfrec ($self->{wf}->getHashList(qw(id))){
-            msg(WARN,"cleanup workflow id=$wfrec->{id} isdel=$rec->{isdel}");
+            #msg(WARN,"cleanup workflow id=$wfrec->{id} isdel=$rec->{isdel}");
             #msg(WARN,"rec=".Dumper($rec));
             if ($wfop->nativProcess('wfforceobsolete',{},$wfrec->{id})){
                $dataop->ValidatedUpdateRecord($rec,{
