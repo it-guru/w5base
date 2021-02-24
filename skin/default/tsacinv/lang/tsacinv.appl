@@ -42,3 +42,4 @@
 'is generic only'=>{de=>'nur als Kerndatensatz vorhanden'},
 'add shared network systems'=>{de=>'Netzwerksysteme hinzufügen'},
 'add systems'=>{de=>'logische Systeme hinzufügen'},
+'Product/Component'=>{de=>'Produkt/Komponente'},
