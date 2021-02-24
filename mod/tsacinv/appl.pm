@@ -362,6 +362,13 @@ sub new
                 dataobjattr   =>'"version"'),
 
       new kernel::Field::Text(
+                name          =>'prodcomp',
+                label         =>'Product/Component',
+                group         =>'default',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'"prodcomp"'),
+
+      new kernel::Field::Text(
                 name          =>'issoxappl',
                 group         =>'control',
                 htmleditwidth =>'30%',
@@ -522,6 +529,9 @@ sub initSearchQuery
 
    if (!defined(Query->Param("search_deleted"))){
      Query->Param("search_deleted"=>$self->T("no"));
+   }
+   if (!defined(Query->Param("search_status"))){
+     Query->Param("search_status"=>'!"out of operation"');
    }
 }
 
