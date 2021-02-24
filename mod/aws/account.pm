@@ -20,7 +20,6 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use aws::lib::Listedit;
 use JSON;
 @ISA=qw(aws::lib::Listedit);
 
