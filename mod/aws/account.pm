@@ -21,7 +21,12 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field;
 use JSON;
-@ISA=qw(aws::lib::Listedit);
+#use aws::lib::Listedit;
+#@ISA=qw(aws::lib::Listedit);
+
+use kernel::DataObj::Static;
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
+
 
 sub new
 {
