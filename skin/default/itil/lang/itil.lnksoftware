@@ -2,6 +2,7 @@
                       en=>'Softwareinstallation'},
 'fieldgroup.default'=>{de=>'Softwareinstallation',en=>'Softwareinstallation'},
 'fieldgroup.link'=>{de=>'CI-Relationen',en=>'CI-Relations'},
+'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
 'fieldgroup.instdetail'=>{de=>'Installationsdetails',en=>'installation details'},
 'fieldgroup.lic'=>{de=>'Lizenzierung der Installation',en=>'licensing of installation'},
 'fieldgroup.useableby'=>{de=>'nutzbar durch',en=>'usable by'},
@@ -62,4 +63,4 @@
 'AutoDiscovery Relation'=>{de=>'AutoDiscovery Zuordnung'},
 'installation with selected software already exists at specified installpath'=>{de=>'Installation mit der ausgewählten Software existiert bereits im angegebenen Installationsverzeichnis'},
 'main installation'=>{de=>'Haupt-Softwareinstallation'},
-
+'Software instances'=>{de=>'Software-Instanzen'},

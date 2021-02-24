@@ -221,3 +221,4 @@
 'responsible Organisation'=>{de=>"verantwortlicher Organisationsbereich"},
 'specified application is no in acceptable CI-State'=>{de=>'angegebene Anwendung is nicht in einem zulässigen CI-Status'},
 'invalid applid specified'=>{de=>'ungültige applid angegeben'},
+'Software instances'=>{de=>'Software-Instanzen'},

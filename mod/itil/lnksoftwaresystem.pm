@@ -241,7 +241,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header 
-             default instdetail lic useableby options misc link releaseinfos 
+             default instdetail lic useableby options 
+             swinstances misc link releaseinfos 
              upd source));
 }
 

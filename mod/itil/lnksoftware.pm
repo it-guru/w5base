@@ -466,7 +466,20 @@ sub new
                 vjointo       =>'itil::lnksoftwareoption',
                 vjoinon       =>['id'=>'parentid'],
                 vjoindisp     =>['software']),
-                                                   
+
+      new kernel::Field::SubList(
+                name          =>'swinstances',
+                label         =>'Software instances',
+                htmldetail    =>'NotEmpty',
+                group         =>'swinstances',
+                vjointo       =>'itil::swinstance',
+                vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjoinon       =>['id'=>'lnksoftwaresystemid'],
+                vjoindisp     =>['fullname','appl'],
+                vjoininhash   =>['fullname','swnature','is_dbs','applid',
+                                 'is_mw','cistatusid','id',
+                                 'systemid','itclustsid']),
+
       new kernel::Field::Link(
                 name          =>'softwareid',
                 label         =>'SoftwareID',
@@ -1352,7 +1365,8 @@ sub FinishWrite
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default instdetail lic options useableby misc link 
+   return(qw(header default instdetail lic options useableby 
+             swinstances misc link 
              releaseinfos softsetvalidation
              upd source));
 }
