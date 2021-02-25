@@ -1,0 +1,4 @@
+'aws::qrule::syncAccount'=>{
+  de=>'AWS Account sync',
+  en=>'AWS Account sync'
+},

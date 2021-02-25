@@ -33,15 +33,31 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
+      new kernel::Field::Id(       name       =>'idpath',
+                                   htmlwidth  =>'150',
+                                   searchable =>0,
+                                   label      =>'AWS-IdPath'),
       new kernel::Field::Text(     name       =>'id',
                                    htmlwidth  =>'150',
-                                   label      =>'AWS-SystemID'),
+                                   label      =>'EC2-InstanceID'),
       new kernel::Field::Text(     name       =>'name',
                                    label      =>'Name'),
       new kernel::Field::Text(    name       =>'ipaddress',
                                   searchable =>0,
                                   label      =>'private IP-Address',
                                   dataobjattr=>'private_ip_address'),
+      new kernel::Field::Container(name       =>'interfaces',
+                                   uivisible  =>1,
+                                   label      =>'Interfaces'),
+      new kernel::Field::Text(    name       =>'cpucount',
+                                  searchable =>0,
+                                  label      =>'CPU-Count'),
+      new kernel::Field::Text(    name       =>'memory',
+                                  searchable =>0,
+                                  label      =>'Memory'),
+      new kernel::Field::Text(    name       =>'type',
+                                  searchable =>0,
+                                  label      =>'Instance type'),
       new kernel::Field::Text(    name       =>'accountid',
                                   label      =>'AWS-AccountID'),
       new kernel::Field::Text(    name       =>'region',
@@ -63,15 +79,42 @@ sub DataCollector
    my $self=shift;
    my $filterset=shift;
 
+   my @view=$self->GetCurrentView();
+
+
    my @result;
 
    return(undef) if (!$self->genericSimpleFilterCheck4AWS($filterset));
    my $filter=$filterset->{FILTER}->[0];
 
-   return(undef) if (!$self->checkMinimalFilter4AWS($filter,"accountid"));
-   return(undef) if (!$self->checkMinimalFilter4AWS($filter,"region"));
-
    my $query=$self->decodeFilter2Query4AWS($filter);
+   if (exists($query->{idpath})){
+      if (my ($id,$accountid,$region)=
+          $query->{idpath}=~m/^(i-\S+)\@([0-9]+)\@(\S+)$/){
+         if (exists($query->{id}) && 
+             $query->{id} ne ""  &&
+             $query->{id} ne $id){
+            return([]);
+         }
+         $query->{id}=$id;
+         if (exists($query->{accountid}) && 
+             $query->{accountid} ne ""  &&
+             $query->{accountid} ne $accountid){
+            return([]);
+         }
+         $query->{accountid}=$accountid;
+         if (exists($query->{region}) && 
+             $query->{region} ne "" &&
+             $query->{region} ne $region){
+            return([]);
+         }
+         $query->{region}=$region;
+      }
+      else{
+         return([]);
+      }
+   }
+
 
    if (!exists($query->{accountid}) ||
        !($query->{accountid}=~m/^\d{3,20}$/)){
@@ -126,9 +169,15 @@ sub DataCollector
    my $blk=0;
    my $NextToken;
    do{
-      my %param=(MaxResults=>20);
+      my %param=();
       if ($NextToken ne ""){
          $param{NextToken}=$NextToken;
+      }
+      if (exists($query->{id}) && $query->{id} ne ""){
+         $param{InstanceIds}=[$query->{id}];
+      }
+      else{
+         $param{MaxResults}=20;
       }
       my $InstanceItr=$ec2->DescribeInstances(%param);
       foreach my $res (@{$InstanceItr->Reservations()}){
@@ -141,15 +190,67 @@ sub DataCollector
             foreach my $tag (@{$instance->Tags()}){
                $tag{$tag->Key()}=$tag->Value(); 
             }
-            push(@result,{
+            my $rec={
                 id=>$instance->{InstanceId},
+                type=>$instance->{InstanceType},
                 accountid=>$AWSAccount,
                 region=>$AWSRegion,
                 name=>$tag{Name},
                 tags=>\%tag,
                 private_ip_address=>$instance->{PrivateIpAddress},
-                cdate=>$cdate
-            });
+                cdate=>$cdate,
+                idpath=>$instance->{InstanceId}.'@'.
+                        $AWSAccount.'@'.
+                        $AWSRegion,
+            };
+            if (in_array(\@view,"cpucount")){
+               my $cpucount;
+               my $CpuOptions=$instance->CpuOptions();
+               if ($CpuOptions){
+                  my $n=$CpuOptions->CoreCount();
+                  $cpucount+=$n;
+               }
+               $rec->{cpucount}=$cpucount;
+            }
+            if (in_array(\@view,"interfaces")){
+               my %ifs;
+               foreach my $if (@{$instance->NetworkInterfaces()}){
+                  my %ifrec;
+                  my @v6=@{$if->Ipv6Addresses()};
+                  if ($#v6!=-1){
+                     msg(WARN,
+                         "ipv6 handling not yet implemented in aws::system");
+                  }
+                  my @ips;
+                  foreach my $iprec (@{$if->PrivateIpAddresses()}){
+                     if ($iprec->Primary()){
+                        $ifrec{primaryIp}=$iprec->PrivateIpAddress();
+                     }
+                     push(@ips,$iprec->PrivateIpAddress()." (".
+                               $iprec->PrivateDnsName().")");
+                  }
+                  $ifrec{ipaddresses}=join(", ",@ips);
+                  $ifrec{mac}=$if->MacAddress();
+                 
+                  $ifs{$if->NetworkInterfaceId()}=\%ifrec;
+               }
+               $rec->{interfaces}=\%ifs;
+            }
+            if (in_array(\@view,"memory")){
+               my $mem;
+               my $type=$instance->{InstanceType};
+               if ($type ne ""){
+                  my $types=$ec2->DescribeInstanceTypes(
+                    InstanceTypes=>[$type],
+                  );
+                  foreach my $t (@{$types->InstanceTypes()}){
+                     my $MemoryInfo=$t->MemoryInfo()->SizeInMiB();
+                     $mem=$MemoryInfo;
+                  }
+               }
+               $rec->{memory}=$mem;
+            }
+            push(@result,$rec);
          }
       }
       $NextToken=$InstanceItr->NextToken();
@@ -186,14 +287,11 @@ sub getValidWebFunctions
 sub ImportSystem
 {
    my $self=shift;
-printf STDERR ("fifi 01\n");
    my $importname=trim(Query->Param("importname"));
    if (Query->Param("DOIT")){
-printf STDERR ("fifi 02\n");
       if ($self->Import({importname=>$importname})){
          Query->Delete("importname");
          $self->LastMsg(OK,"system has been successfuly imported");
-printf STDERR ("fifi 03\n");
       }
       Query->Delete("DOIT");
    }
@@ -220,7 +318,7 @@ sub Import
    my ($ec2id,$accountid,$region);
    if ($param->{importname} ne ""){
       $importname=$param->{importname};
-printf STDERR ("fifi importname=$importname\n");
+      msg(INFO,"start Import in aws::system with importname $importname");
       if (($ec2id,$accountid,$region)=$importname
               =~m/^(\S+)\@([0-9]+)\@(\S+)$/){
          $flt={
@@ -259,7 +357,6 @@ printf STDERR ("fifi importname=$importname\n");
    my $w5cloudarearec;
    foreach my $cloudarea (@{$cloudrec->{cloudareas}}){
       if ($cloudarea->{srcid} eq $accountid){
-printf STDERR ("cloudarea=%s\n",Dumper($cloudarea));
          $accountok++;
          $w5cloudarearec=$cloudarea;
       }

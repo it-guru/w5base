@@ -83,8 +83,12 @@ sub decodeFilter2Query4AWS
 
    foreach my $fn (keys(%$filter)){
       $query->{$fn}=$filter->{$fn};
-      $query->{$fn}=${$query->{$fn}} if (ref($query->{$fn}) eq "SCALAR");
-      $query->{$fn}=join(" ",@$query->{$fn}) if (ref($query->{$fn}) eq "ARRAY");
+      if (ref($query->{$fn}) eq "SCALAR"){
+         $query->{$fn}=${$query->{$fn}};
+      }
+      if (ref($query->{$fn}) eq "ARRAY"){
+         $query->{$fn}=join(" ",@{$query->{$fn}});
+      }
    }
    return($query);
 }
