@@ -301,6 +301,13 @@ sub new
                 label         =>'W5Base Cloud ID',
                 dataobjattr   =>'qitcloudarea.itcloud'),
 
+      new kernel::Field::IssueState(),
+      new kernel::Field::QualityText(),
+      new kernel::Field::QualityState(),
+      new kernel::Field::QualityOk(),
+      new kernel::Field::QualityLastDate(
+                dataobjattr   =>'qitcloudarea.lastqcheck'),
+      new kernel::Field::QualityResponseArea()
    );
    $self->{history}={
       insert=>[
@@ -358,15 +365,6 @@ sub getSqlFrom
             "left outer join appl ".
             "on qitcloudarea.appl=appl.id";
    return($from);
-}
-
-
-
-sub isQualityCheckValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(0);
 }
 
 
