@@ -100,7 +100,6 @@ sub qcheckRecord
       $arec=$appl->getHashIndexed("id");
    }
    foreach my $p (@plst){
-      printf STDERR ("check $p->{fullname}\n");
       if ($p->{applid} eq ""){
          my $msg="missing application in project: ".$p->{fullname}.
                     " (".$p->{id}.")";
