@@ -16,7 +16,6 @@ package aws::system;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-
 use strict;
 use vars qw(@ISA);
 use kernel;
@@ -24,6 +23,10 @@ use kernel::Field;
 use kernel::cgi;
 use aws::lib::Listedit;
 use Data::Printer;
+use Try::Tiny;
+use Paws::Exception;
+use Scalar::Util(qw(blessed));
+
 @ISA=qw(aws::lib::Listedit);
 
 sub new
@@ -150,114 +153,122 @@ sub DataCollector
    if ($probeipproxy ne ""){
       $ua->proxy(['https'],$probeipproxy);
    }
+   my $e;
+   try {
+      Paws->default_config->caller(new Paws::Net::LWPCaller(ua=>$ua));
+      my $baseCred=Paws::Credential::Explicit->new(
+            access_key=>$awsuser,
+            secret_key=>$awspass
+      );
 
+      my $stscred=Paws::Credential::AssumeRole->new(
+        sts=>Paws->service('STS', credentials=>$baseCred,region=>$AWSRegion),
+        Name=>'W5Base',DurationSeconds=>900,
+        RoleSessionName => 'SACMConfigAccess',
+        RoleArn => 'arn:aws:iam::'.$AWSAccount.':'.$awsconnect
+      );
 
-   Paws->default_config->caller(new Paws::Net::LWPCaller(ua=>$ua));
-   my $baseCred=Paws::Credential::Explicit->new(
-         access_key=>$awsuser,
-         secret_key=>$awspass
-   );
-
-   my $stscred=Paws::Credential::AssumeRole->new(
-     sts=>Paws->service('STS', credentials=>$baseCred,region=>$AWSRegion),
-     Name=>'W5Base',DurationSeconds=>900,
-     RoleSessionName => 'SACMConfigAccess',
-     RoleArn => 'arn:aws:iam::'.$AWSAccount.':'.$awsconnect
-   );
-
-   my $ec2=Paws->service('EC2',credentials=>$stscred,region =>$AWSRegion);
-   my $blk=0;
-   my $NextToken;
-   do{
-      my %param=();
-      if ($NextToken ne ""){
-         $param{NextToken}=$NextToken;
-      }
-      if (exists($query->{id}) && $query->{id} ne ""){
-         $param{InstanceIds}=[$query->{id}];
-      }
-      else{
-         $param{MaxResults}=20;
-      }
-      my $InstanceItr=$ec2->DescribeInstances(%param);
-      foreach my $res (@{$InstanceItr->Reservations()}){
-         foreach my $instance (@{$res->Instances}){
-            #p $instance;
-            #printf STDERR ("Account: $AWSAccount Intance:%s\n",$instance->{InstanceId});
-            my $cdate=$instance->{LaunchTime};
-            $cdate=~s/^(\S+)T(\S+).000Z$/$1 $2/;
-            my %tag;
-            foreach my $tag (@{$instance->Tags()}){
-               $tag{$tag->Key()}=$tag->Value(); 
-            }
-            my $rec={
-                id=>$instance->{InstanceId},
-                type=>$instance->{InstanceType},
-                accountid=>$AWSAccount,
-                region=>$AWSRegion,
-                name=>$tag{Name},
-                tags=>\%tag,
-                private_ip_address=>$instance->{PrivateIpAddress},
-                cdate=>$cdate,
-                idpath=>$instance->{InstanceId}.'@'.
-                        $AWSAccount.'@'.
-                        $AWSRegion,
-            };
-            if (in_array(\@view,"cpucount")){
-               my $cpucount;
-               my $CpuOptions=$instance->CpuOptions();
-               if ($CpuOptions){
-                  my $n=$CpuOptions->CoreCount();
-                  $cpucount+=$n;
-               }
-               $rec->{cpucount}=$cpucount;
-            }
-            if (in_array(\@view,"interfaces")){
-               my %ifs;
-               foreach my $if (@{$instance->NetworkInterfaces()}){
-                  my %ifrec;
-                  my @v6=@{$if->Ipv6Addresses()};
-                  if ($#v6!=-1){
-                     msg(WARN,
-                         "ipv6 handling not yet implemented in aws::system");
-                  }
-                  my @ips;
-                  foreach my $iprec (@{$if->PrivateIpAddresses()}){
-                     if ($iprec->Primary()){
-                        $ifrec{primaryIp}=$iprec->PrivateIpAddress();
-                     }
-                     push(@ips,$iprec->PrivateIpAddress()." (".
-                               $iprec->PrivateDnsName().")");
-                  }
-                  $ifrec{ipaddresses}=join(", ",@ips);
-                  $ifrec{mac}=$if->MacAddress();
-                 
-                  $ifs{$if->NetworkInterfaceId()}=\%ifrec;
-               }
-               $rec->{interfaces}=\%ifs;
-            }
-            if (in_array(\@view,"memory")){
-               my $mem;
-               my $type=$instance->{InstanceType};
-               if ($type ne ""){
-                  my $types=$ec2->DescribeInstanceTypes(
-                    InstanceTypes=>[$type],
-                  );
-                  foreach my $t (@{$types->InstanceTypes()}){
-                     my $MemoryInfo=$t->MemoryInfo()->SizeInMiB();
-                     $mem=$MemoryInfo;
-                  }
-               }
-               $rec->{memory}=$mem;
-            }
-            push(@result,$rec);
+      my $ec2=Paws->service('EC2',credentials=>$stscred,region =>$AWSRegion);
+      my $blk=0;
+      my $NextToken;
+      do{
+         my %param=();
+         if ($NextToken ne ""){
+            $param{NextToken}=$NextToken;
          }
+         if (exists($query->{id}) && $query->{id} ne ""){
+            $param{InstanceIds}=[$query->{id}];
+         }
+         else{
+            $param{MaxResults}=20;
+         }
+         my $InstanceItr=$ec2->DescribeInstances(%param);
+         if ($InstanceItr){
+            foreach my $res (@{$InstanceItr->Reservations()}){
+               foreach my $instance (@{$res->Instances}){
+                  #p $instance;
+                  #printf STDERR ("Account: $AWSAccount Intance:%s\n",$instance->{InstanceId});
+                  my $cdate=$instance->{LaunchTime};
+                  $cdate=~s/^(\S+)T(\S+).000Z$/$1 $2/;
+                  my %tag;
+                  foreach my $tag (@{$instance->Tags()}){
+                     $tag{$tag->Key()}=$tag->Value(); 
+                  }
+                  my $rec={
+                      id=>$instance->{InstanceId},
+                      type=>$instance->{InstanceType},
+                      accountid=>$AWSAccount,
+                      region=>$AWSRegion,
+                      name=>$tag{Name},
+                      tags=>\%tag,
+                      private_ip_address=>$instance->{PrivateIpAddress},
+                      cdate=>$cdate,
+                      idpath=>$instance->{InstanceId}.'@'.
+                              $AWSAccount.'@'.
+                              $AWSRegion,
+                  };
+                  if (in_array(\@view,"cpucount")){
+                     my $cpucount;
+                     my $CpuOptions=$instance->CpuOptions();
+                     if ($CpuOptions){
+                        my $n=$CpuOptions->CoreCount();
+                        $cpucount+=$n;
+                     }
+                     $rec->{cpucount}=$cpucount;
+                  }
+                  if (in_array(\@view,"interfaces")){
+                     my %ifs;
+                     foreach my $if (@{$instance->NetworkInterfaces()}){
+                        my %ifrec;
+                        my @v6=@{$if->Ipv6Addresses()};
+                        if ($#v6!=-1){
+                           msg(WARN,
+                               "ipv6 handling not yet implemented in aws::system");
+                        }
+                        my @ips;
+                        foreach my $iprec (@{$if->PrivateIpAddresses()}){
+                           if ($iprec->Primary()){
+                              $ifrec{primaryIp}=$iprec->PrivateIpAddress();
+                           }
+                           push(@ips,$iprec->PrivateIpAddress()." (".
+                                     $iprec->PrivateDnsName().")");
+                        }
+                        $ifrec{ipaddresses}=join(", ",@ips);
+                        $ifrec{mac}=$if->MacAddress();
+                       
+                        $ifs{$if->NetworkInterfaceId()}=\%ifrec;
+                     }
+                     $rec->{interfaces}=\%ifs;
+                  }
+                  if (in_array(\@view,"memory")){
+                     my $mem;
+                     my $type=$instance->{InstanceType};
+                     if ($type ne ""){
+                        my $types=$ec2->DescribeInstanceTypes(
+                          InstanceTypes=>[$type],
+                        );
+                        foreach my $t (@{$types->InstanceTypes()}){
+                           my $MemoryInfo=$t->MemoryInfo()->SizeInMiB();
+                           $mem=$MemoryInfo;
+                        }
+                     }
+                     $rec->{memory}=$mem;
+                  }
+                  push(@result,$rec);
+               }
+            }
+            $NextToken=$InstanceItr->NextToken();
+         }
+         $blk++;
+      }while($NextToken ne "");
+   }
+   catch {
+      my $eclass=blessed($_);
+      if ($eclass eq "Paws::Exception"){
+         $self->LastMsg(ERROR,"(".$_->code.") :".$_->message);
       }
-      $NextToken=$InstanceItr->NextToken();
-      $blk++;
-   }while($NextToken ne "");
-
-
+   };
+   return(undef) if ($self->LastMsg());
    return(\@result);
 }
 
