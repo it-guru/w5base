@@ -2058,6 +2058,9 @@ sub Import
    my ($func,$p)=$self->extractFunctionPath();
    my $rootpath=Query->Param("RootPath");
 
+
+printf STDERR ("fifi rootpath=$rootpath\n");
+
    my $title=$self->T("Config-Item Import Handler for logical Systems ...");
 
    my $startcmd="document.getElementById('MainStartup').style.display='block';";
@@ -2069,15 +2072,15 @@ sub Import
                            title=>$title,
                            onload=>$startcmd,
                            prefix=>$rootpath,
+                           submodal=>1,
                            js=>['toolbox.js','subModal.js','kernel.App.Web.js'],
                            body=>1,form=>1);
-   print $self->HtmlSubModalDiv();
    print("<div id=MainStartup style='display:none'>".
          "<table id=MainTable ".
          "style=\"border-collapse:collapse;width:100%;height:100%\" ".
          "border=0 cellspacing=0 cellpadding=0>");
-   print("<table width=\"100%\" height=\"100%\" border=0 ".
-         "cellspacing=0 cellpadding=0>");
+  # print("<table width=\"100%\" height=\"100%\" border=0 ".
+  #       "cellspacing=0 cellpadding=0>");
    my $AppDirectLink=$func;
    if ($p ne ""){
       $AppDirectLink=".".$p;
@@ -2088,7 +2091,7 @@ sub Import
                                 AppDirectLink=>$AppDirectLink,
                                 prefix=>$rootpath,
                                 noModuleObjectInfo=>1));
-   print("<tr><td valign=top>");
+   print("<tr height=1%><td valign=top>");
    $p=~s/\///g;
    if ($p eq ""){
       print("<table border=0 cellpadding=5 cellspacing=5>");
@@ -2111,7 +2114,8 @@ sub Import
       my $path=$iobj->getImportToolPath($self,$self->SelfAsParentObject());
       my $iframe="<iframe class=result id=result ".
                  "name=\"Result\" src=\"../../../$path\"></iframe>";
-      printf("<div style=\"margin:10px\"><b>%s:</b></div>$iframe",
+      printf("<div style=\"margin:10px\"><b>%s:</b></div></td>".
+             "<tr><td>$iframe",
             $iobj->getSelector($self,$self->SelfAsParentObject()));
    }
    print("</td></tr>");
@@ -2518,6 +2522,93 @@ sub jsExploreFormatLabelMethod
 {
    my $self=shift;
    return("newlabel=newlabel.replace(' - ','\\n');");
+}
+
+
+
+sub initialImportFillup
+{
+   my $self=shift;
+   my $id=shift;
+   my $curdataboss=shift;
+   my $w5applrec=shift;
+
+   if (defined($w5applrec)){
+      { # create application relation
+         my $lnkapplsys=getModuleObject($self->Config,"itil::lnkapplsystem");
+         my $DataInputState=$lnkapplsys->isDataInputFromUserFrontend();
+         $lnkapplsys->isDataInputFromUserFrontend(0); # process as sys mode
+         $lnkapplsys->SetFilter({
+            systemid=>\$id,
+            applid=>\$w5applrec->{id}
+         });
+         my ($lnkrec)=$lnkapplsys->getOnlyFirst(qw(ALL));
+         if (!defined($lnkrec)){
+            $lnkapplsys->ValidatedInsertRecord({
+               systemid=>$id,
+               applid=>$w5applrec->{id}
+            });
+         }
+         $lnkapplsys->isDataInputFromUserFrontend($DataInputState);
+      }
+      { # add addition write contacts
+        my %addwr=();
+        foreach my $fld (qw(tsmid tsm2id opmid opm2id applmgrid 
+                            databossid contacts)){
+           if ($fld eq "contacts"){
+              foreach my $crec (@{$w5applrec->{contacts}}){
+                 my $roles=$crec->{roles};
+                 $roles=[$roles] if (ref($roles) ne "ARRAY");
+                 if (in_array($roles,"write") &&
+                     $crec->{targetid} ne ""){
+                    $addwr{$crec->{target}}->{$crec->{targetid}}++;
+                 }
+              } 
+           }
+           else{
+              if ($w5applrec->{$fld} ne "" && 
+                  $w5applrec->{$fld} ne $curdataboss){
+                 $addwr{'base::user'}->{$w5applrec->{$fld}}++;
+              }
+           }
+        }
+        my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
+        $lnkcontact->SetFilter({
+           refid=>\$id,
+           parentobj=>[$self->SelfAsParentObject()],
+        });
+        my @cur=$lnkcontact->getHashList(qw(ALL));
+        $lnkcontact->ResetFilter();
+        foreach my $ctype (keys(%addwr)){
+           foreach my $contactid (keys(%{$addwr{$ctype}})){
+              my @old=grep({
+                 $_->{target} eq $ctype && $_->{targetid} eq $contactid
+              } @cur);
+              if ($#old==-1){
+                 $lnkcontact->ValidatedInsertRecord({
+                    target=>$ctype,
+                    targetid=>$contactid,
+                    roles=>['write'],
+                    refid=>$id,
+                    comments=>"inherited by application",
+                    parentobj=>$self->SelfAsParentObject()
+                 });   
+              }
+              else{
+                 my @curroles=$old[0]->{roles};
+                 if (ref($curroles[0]) eq "ARRAY"){
+                    @curroles=@{$curroles[0]};
+                 }
+                 if (!in_array(\@curroles,"write")){
+                    $lnkcontact->ValidatedUpdateRecord($old[0],{
+                       roles=>[@curroles,'write'],
+                    },{id=>\$old[0]->{id}});   
+                 }
+              }
+           }
+        }
+     }
+  }
 }
 
 

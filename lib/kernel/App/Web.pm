@@ -1637,7 +1637,15 @@ EOF
       $d.=">";
    }
    if ($param{submodal}){
-      $d.=$self->HtmlSubModalDiv();
+      my %p=();
+      if (exists($param{prefix})){
+         $p{prefix}=$param{prefix};
+      }
+      if (exists($param{base})){
+         $p{base}=$param{base};
+      }
+
+      $d.=$self->HtmlSubModalDiv(%p);
    }
 
    if ($param{form}){
