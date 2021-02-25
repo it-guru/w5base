@@ -151,7 +151,7 @@ sub ScanNewSystems
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
             $exitmsg=$lastmsg;
             %flt=( 
-               cdate=>">=\"$laststamp GMT-30m\" AND <now-5m"
+               cdate=>">=\"$laststamp GMT-30m\""
             );
          }
       }
