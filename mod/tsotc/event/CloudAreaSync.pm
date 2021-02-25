@@ -30,6 +30,7 @@ sub Init
    my $self=shift;
 
 
+   $self->RegisterEvent("OTC_CloudAreaSync","CloudAreaSync",timeout=>600);
    $self->RegisterEvent("CloudAreaSync","CloudAreaSync",timeout=>600);
 }
 
