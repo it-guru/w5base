@@ -52,10 +52,16 @@ use strict;
 use FindBin ;
 use CGI;
 use FCGI;
+use Scalar::Util;
 eval('use Proc::ProcessTable;');  # try to load Proc::ProcessTabel if exists
 
 
-*CORE::GLOBAL::die = sub { require Carp; Carp::confess };
+*CORE::GLOBAL::die = sub {
+   if (Scalar::Util::blessed($_[0])){
+      CORE::die(@_); 
+   }
+   require Carp; Carp::confess 
+};
 
 
 #######################################################################

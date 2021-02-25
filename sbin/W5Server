@@ -17,10 +17,16 @@ use IO::Select;
 use File::Temp qw(tempfile);
 use POSIX;
 use Fcntl;
+use Scalar::Util;
 
 @ISA=qw(RPC::Smart::Server kernel::App);
 
-*CORE::GLOBAL::die = sub { require Carp; Carp::confess };
+*CORE::GLOBAL::die = sub {
+   if (Scalar::Util::blessed($_[0])){
+      CORE::die(@_);
+   }
+   require Carp; Carp::confess
+};
 
 #
 # This is the primary call to the W5Server. With this method all

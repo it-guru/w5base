@@ -18,7 +18,16 @@
 #
 use strict;
 use FindBin ;
-*CORE::GLOBAL::die = sub { require Carp; Carp::confess };
+use Scalar::Util;
+
+
+*CORE::GLOBAL::die = sub {
+   if (Scalar::Util::blessed($_[0])){
+      CORE::die(@_);
+   }
+   require Carp; Carp::confess
+};
+
 $W5V2::OperationContext="WebFrontend";
 $W5V2::InvalidateGroupCache=0;
 $W5V2::HistoryComments=undef;
