@@ -455,7 +455,7 @@ sub Import
 
 
       $sys->SetFilter(\@flt);
-      my @redepl=$sys->getHashList(qw(mdate cistatusid name 
+      my @redepl=$sys->getHashList(qw(mdate cistatusid name id
                                       srcid srcsys applications));
 
       msg(INFO,"invantar check for OTC-SystemID: $sysrec->{id}");
@@ -493,13 +493,35 @@ sub Import
             }
          }
          if ($applok && $sysallowed && $ageok){
+            if ($osys->{cistatusid}>5){
+               my $oldname=$osys->{name};
+               $oldname=~s/\[.*$//; # remove del unique number
+               if ($osys->{name} ne $oldname){
+                  $sys->ResetFilter();
+                  $sys->SetFilter({name=>\$oldname,id=>'!'.$osys->{id}});
+                  my ($chkrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+                  if (defined($chkrec)){  # not good! - The systemname seems
+                                          # to have changed his function
+                     printf STDERR ("WARN: reuse with function change ".
+                                    "of systemname %s detected while OTC ".
+                                    "import of %s\n",$oldname,$sysrec->{id});
+                     next;
+                  }
+               }
+            }
             $sys->ResetFilter();
             $sys->SetFilter({id=>\$osys->{id}});
             my ($oldrec,$msg)=$sys->getOnlyFirst(qw(ALL));
             if (defined($oldrec)){
-               if ($sys->ValidatedUpdateRecord($oldrec,{
-                       srcid=>$sysrec->{id},srcsys=>'OTC'
-                   },{id=>\$oldrec->{id}})) {
+               my $updrec={
+                  srcid=>$sysrec->{id},
+                  srcsys=>'OTC'
+               };
+               if ($oldrec->{cistatusid} ne "4"){
+                  $updrec->{cistatusid}="4";
+               }
+               if ($sys->ValidatedUpdateRecord($oldrec,$updrec,
+                   {id=>\$oldrec->{id}})) {
                   $sys->ResetFilter();
                   $sys->SetFilter({id=>\$osys->{id}});
                   ($w5sysrec)=$sys->getOnlyFirst(qw(ALL));
