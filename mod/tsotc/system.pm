@@ -498,8 +498,7 @@ sub Import
             my ($oldrec,$msg)=$sys->getOnlyFirst(qw(ALL));
             if (defined($oldrec)){
                if ($sys->ValidatedUpdateRecord($oldrec,{
-                       srcid=>$sysrec->{id},srcsys=>'OTC',
-                       cistatusid=>4
+                       srcid=>$sysrec->{id},srcsys=>'OTC'
                    },{id=>\$oldrec->{id}})) {
                   $sys->ResetFilter();
                   $sys->SetFilter({id=>\$osys->{id}});
