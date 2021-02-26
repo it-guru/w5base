@@ -275,6 +275,21 @@ sub new
                 htmllimit     =>100,
                 vjointo       =>'itil::appl',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
+                vjoinonfinish =>sub{
+                   my $self=shift;
+                   my $flt=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   if (ref($flt) eq "HASH"){
+                      if (exists($flt->{responseorg})){
+                         if ($flt->{responseorg} eq ""){
+                            $flt->{responseorg}="[undefined]";
+                         }
+                      }
+                   }
+                   return($flt);
+                },
                 vjoinon       =>['reprgrp'=>'responseorg'],
                 vjoindisp     =>['name','cistatus','businessteam']),
 
@@ -298,10 +313,14 @@ sub new
                    my $mode=shift;
 
                    if (ref($flt) eq "HASH"){
-                      if (exists($flt->{businessteam}) &&
-                          $flt->{businessteam} ne ""){
-                         $flt->{businessteam}=$flt->{businessteam}." ".
-                                              $flt->{businessteam}.".*";
+                      if (exists($flt->{businessteam})){
+                         if ($flt->{businessteam} ne ""){
+                            $flt->{businessteam}=$flt->{businessteam}." ".
+                                                 $flt->{businessteam}.".*";
+                         }
+                         else{
+                            $flt->{businessteam}="[undefined]";
+                         }
                       }
                    }
                    return($flt);
@@ -558,6 +577,11 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
    return("default") if (!defined($rec));
+   if ($rec->{cistatusid}<3){
+      return("default","header","history","vouattr","canvas",
+             "contacts","comments","source");
+   }
+
    return("ALL");
 }
 
