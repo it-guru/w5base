@@ -2070,7 +2070,7 @@ sub ValidatedInsertRecordTransactionless
       $self->NormalizeByIOMap("preWrite",$newrec);
       if ($newrec=$self->validateFields(undef,$newrec)){
          # check, if call is Secure
-         if (in_array([map({(caller($_))[3];} (2..10))],
+         if (in_array([map({(caller($_))[3];} (2..5))],
               'kernel::DataObj::SecureValidatedInsertRecord')){
             if (!$self->SecureValidate(undef,$newrec)){
                if ($self->LastMsg()==0){
@@ -2652,7 +2652,7 @@ sub ValidatedUpdateRecordTransactionless
       }
       #######################################################################
       if (my $validatednewrec=$self->validateFields($oldrec,$newrec,\%comprec)){
-         if (in_array([map({(caller($_))[3];} (2..10))],
+         if (in_array([map({(caller($_))[3];} (2..5))],
               'kernel::DataObj::SecureValidatedUpdateRecord')){
             if (!$self->SecureValidate($oldrec,$validatednewrec)){
                if ($self->LastMsg()==0){

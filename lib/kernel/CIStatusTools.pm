@@ -225,7 +225,7 @@ sub HandleCIStatus
             if (!$self->isActivator($oldrec,$newrec,%param)){
                $self->LastMsg(ERROR,"you are not authorized to set ".
                                     "this state, please set state ".
-                                    "to \"requested\"");
+                                    "to \"on order\"");
                return(0);
             }
          }
