@@ -108,6 +108,7 @@ sub new
    $self->{_permitted}->{valign}=1;
    $self->{_permitted}->{htmlhalfwidth}=1; # halbe breite in HtmlDetail
    $self->{_permitted}->{nowrap}=1;     # kein automatischer Zeilenumbruch
+   $self->{_permitted}->{maxlength}=1;  # Zeichen Anzahl Eingabe limit
    $self->{_permitted}->{htmlwidth}=1;  # Breite in der HTML Ausgabe (Spalten)
    $self->{_permitted}->{xlswidth}=1;   # Breite in der XLS Ausgabe (Spalten)
    $self->{_permitted}->{xlscolor}=1;   # Farbe der Spalte in XLS Ausgabe
@@ -318,8 +319,13 @@ sub getSimpleInputField
    if ($unit ne ""){
       $unit="<td nowrap><span style=\"white-space: nowrap;\">$unit</span></td>";
    }
+   my $maxlength=$self->maxlength;
+   my $maxlengthcode=""; 
+   if ($maxlength ne ""  && ($maxlength=~m/^[0-9]+$/)){
+      $maxlengthcode="maxlength=\"$maxlength\"";
+   }
    my $inputfield="<input type=\"text\" id=\"$name\" value=\"$value\" ".
-                  "name=\"Formated_$name\" class=\"finput\">";
+                  "name=\"Formated_$name\" $maxlengthcode class=\"finput\">";
    if (ref($self->{getHtmlImputCode}) eq "CODE"){
       $inputfield=&{$self->{getHtmlImputCode}}($self,$value,$readonly);
    }
