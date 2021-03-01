@@ -55,6 +55,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'shortname',
                 label         =>'Shortname',
+                maxlength     =>'12',
                 size          =>'12',
                 htmlwidth     =>'80',
                 htmleditwidth =>'80',
@@ -342,8 +343,8 @@ sub new
                 group         =>'subvous',
                 vjointo       =>'TS::subvou',
                 vjoinon       =>['id'=>'vouid'],
-                vjoininhash   =>['name','id'],
-                vjoindisp     =>['name','reprgrp']),
+                vjoininhash   =>['name','id','description'],
+                vjoindisp     =>['name','description','reprgrp']),
 
 
       new kernel::Field::Text(
@@ -705,6 +706,7 @@ sub syncToGroups
          $grp->ResetFilter();
          $grp->SetFilter({parentid=>\$grpid});
          my @l=$grp->getHashList(qw(fullname name srcsys srcid cistatusid
+                                    description 
                                     grpid is_orggroup parent parentid));
 
          my @dellist;
@@ -729,6 +731,9 @@ sub syncToGroups
                $cname=~s/\[\d+\]$//;
                if ($cname ne $sub->{name}){
                   $upd->{name}=$sub->{name};
+               }
+               if ($fnd->{description} ne $sub->{description}){
+                  $upd->{description}=$sub->{description};
                }
                if ($fnd->{srcid} ne $sub->{id}){
                   $upd->{srcid}=$sub->{id};

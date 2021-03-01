@@ -105,3 +105,4 @@ create table subvou (
   primary key(id), unique(vou,name),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
+alter table subvou add description varchar(128);

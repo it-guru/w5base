@@ -4,3 +4,4 @@
 'representing group'=>{de=>'repräsentierende Gruppe'},
 'Name too long (max. 12 characters)'=>{de=>'Name zu lang (max. 12 Zeichen)'},
 'invalid Sub-Unit name (invalid characters)'=>{de=>'ungültiger Untereinheiten-Name (ungültige Zeichen)'},
+'Description'=>{de=>'Beschreibung'},

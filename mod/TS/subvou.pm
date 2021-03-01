@@ -77,8 +77,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
+                maxlength     =>'12',
                 selectfix     =>1,
                 dataobjattr   =>'subvou.name'),
+
+      new kernel::Field::Text(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'subvou.description'),
 
       new kernel::Field::TextDrop(
                 name          =>'reprgrp',
@@ -196,7 +202,6 @@ sub Validate
    my $newrec=shift;
    my $comprec=shift;
 
-printf STDERR ("Validate newrec=%s\n",Dumper($newrec));
    if (!defined($oldrec) || defined($newrec->{name})){
       my $newshortname=$newrec->{name};
       $newshortname=~s/\[\d+\]$//;
