@@ -140,6 +140,9 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
 
    if (my $cistatusid=$self->getField("cistatusid")){
       $flt[0]->{cistatusid}=[1,2,3,4,5];
+      if (my $cdate=$self->getField("cdate")){ # prevent qcheck at night 
+         $flt[0]->{cdate}="<now-1h";           # on fresh created elements
+      }
       if (my $mdate=$self->getField("mdate")){
          $flt[1]->{cistatusid}=[6];
          $flt[1]->{mdate}=">now-28d";
