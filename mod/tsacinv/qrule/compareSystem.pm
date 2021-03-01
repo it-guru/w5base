@@ -617,6 +617,7 @@ sub qcheckRecord
                # can be in one networkcard record
                #
                my %cleanAmIPlist;
+               my $consfound=0;
                foreach my $amiprec (@{$parrec->{ipaddresses}}){
                   my $isconsole=0;
                   my $mappedCIStatus=5;
@@ -660,7 +661,15 @@ sub qcheckRecord
                   foreach my $ip (@ip){
                      if ($isconsole){
                         if ($mappedCIStatus==4){
-                           $parrec->{consoleip}=$ip;
+                           if ($consfound){
+                              my $msg="ignoring multiple console ip: ".
+                                       $ip;
+                              push(@qmsg,$msg);
+                           }
+                           else{
+                              $parrec->{consoleip}=$ip;
+                           }
+                           $consfound++;
                         }
                      }
                      else{
@@ -677,6 +686,18 @@ sub qcheckRecord
                               description=>$amiprec->{description}
                            };
                            $netIpDst{$ip}->{NetareaTag}='ISLAND';
+                           #################################################
+                           # Default-Mappings by IP-Networks
+                           #
+                           if ($ip=~m/^10\./){   
+                              $netIpDst{$ip}->{NetareaTag}='CNDTAG';
+                           }
+                           if ($ip=~m/^6\./){   
+                              $netIpDst{$ip}->{NetareaTag}='TSIADMINLAN';
+                           }
+                           #################################################
+                           # High Prio Mappings by IP-Type
+                           #
                            if ($amiprec->{type}=~m/backup/i){
                               $netIpDst{$ip}->{NetareaTag}='TSIBACKUPLAN';
                            }

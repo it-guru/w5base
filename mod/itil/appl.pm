@@ -2577,7 +2577,7 @@ sub isViewValid
               misc opmgmt phonenumbers services businessservices 
               soclustgroup socomments source swinstances systems applurl 
               addcis
-              technical workflowbasedata header inmchm interview efforts
+              technical workflowbasedata header inmchm inm chm interview efforts
               functional);
 
    return(@all);
