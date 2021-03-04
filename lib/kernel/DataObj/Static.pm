@@ -103,10 +103,11 @@ sub getFirst
       $self->{CurrentData}=\@l;
    }
 
-
-
-   return(undef,"DataCollectError") if (!defined($self->{CurrentData}) || 
-                                        ref($self->{CurrentData}) ne "ARRAY"); 
+   if (!defined($self->{CurrentData}) || ref($self->{CurrentData}) ne "ARRAY"){
+      my @lastmsg=$self->LastMsg();
+      return(undef,@lastmsg) if ($#lastmsg!=-1);
+      return(undef,"DataCollectError");
+   }
 
 #
 #   ## hier muss bei Gelegenheit mal ein Order Verfahren rein!
