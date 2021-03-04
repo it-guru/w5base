@@ -1,0 +1,18 @@
+The search field '<b>%label%</b>' is a search field which only
+supports constant search. There are no posibility for OR or AND
+lists or wildcard interpreation.
+
+<script language="JavaScript">
+function SendData(t)
+{
+   if (parent){
+      parent.document.forms[0].elements['%field%'].value=t;
+   }
+   parent.hidePopWin(false);
+}
+</script>
+<style>
+body,html{
+  padding:5px;
+}
+</style>

@@ -1486,6 +1486,12 @@ sub getFieldHelpUrl
          $type=$self->{FieldHelp};
       }
    }
+   if (exists($self->{FieldHelpType}) && $self->{FieldHelpType} ne ""){
+      $type=$self->{FieldHelpType};
+   }
+   if ($type eq "GenericConstant"){
+      return("../../base/load/tmpl/FieldHelp.GenericConstant");
+   }
    if ($type=~m/Date$/){
       return("../../base/load/tmpl/FieldHelp.Date");
    }
