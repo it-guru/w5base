@@ -33,43 +33,86 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Id(       name       =>'idpath',
-                                   htmlwidth  =>'150',
-                                   searchable =>0,
-                                   label      =>'AWS-IdPath'),
-      new kernel::Field::Text(     name       =>'id',
-                                   htmlwidth  =>'150',
-                                   label      =>'EC2-InstanceID'),
-      new kernel::Field::Text(     name       =>'name',
-                                   label      =>'Name'),
-      new kernel::Field::Text(    name       =>'ipaddress',
-                                  searchable =>0,
-                                  label      =>'private IP-Address',
-                                  dataobjattr=>'private_ip_address'),
-      new kernel::Field::Container(name       =>'interfaces',
-                                   uivisible  =>1,
-                                   label      =>'Interfaces'),
-      new kernel::Field::Text(    name       =>'cpucount',
-                                  searchable =>0,
-                                  label      =>'CPU-Count'),
-      new kernel::Field::Text(    name       =>'memory',
-                                  searchable =>0,
-                                  label      =>'Memory'),
-      new kernel::Field::Text(    name       =>'type',
-                                  searchable =>0,
-                                  label      =>'Instance type'),
-      new kernel::Field::Text(    name       =>'accountid',
-                                  label      =>'AWS-AccountID'),
-      new kernel::Field::Text(    name       =>'region',
-                                  label      =>'AWS-Region'),
-      new kernel::Field::Date(    name       =>'cdate',
-                                  label      =>'Creation-Date'),
-      new kernel::Field::Container(name       =>'tags',
-                                   uivisible  =>1,
-                                   label      =>'Tags')
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
+
+      new kernel::Field::RecordUrl(),
+
+      new kernel::Field::Id(
+                name          =>'idpath',
+                htmlwidth     =>'150',
+                searchable    =>0,
+                group         =>'source',
+                label         =>'AWS-IdPath'),
+
+      new kernel::Field::Text(
+                name          =>'id',
+                htmlwidth     =>'150',
+                label         =>'EC2-InstanceID'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Name'),
+
+      new kernel::Field::Text(
+                name          =>'accountid',
+                label         =>'AWS-AccountID'),
+
+      new kernel::Field::Text(
+                name          =>'region',
+                selectsearch  =>sub{
+                   my $self=shift;
+                   return("eu-central-1");
+                },
+                label         =>'AWS-Region'),
+
+      new kernel::Field::Text(
+                name          =>'ipaddress',
+                searchable    =>0,
+                group         =>"ipaddresses",
+                label         =>'private IP-Address',
+                dataobjattr   =>'private_ip_address'),
+
+      new kernel::Field::Container(
+                name          =>'interfaces',
+                uivisible     =>1,
+                group         =>"ipaddresses",
+                searchable    =>0,
+                label         =>'Interfaces'),
+
+      new kernel::Field::Text(
+                name          =>'cpucount',
+                searchable    =>0,
+                label         =>'CPU-Count'),
+
+      new kernel::Field::Text(
+                name          =>'memory',
+                searchable    =>0,
+                label         =>'Memory'),
+
+      new kernel::Field::Text(
+                name          =>'type',
+                searchable    =>0,
+                label         =>'Instance type'),
+
+      new kernel::Field::Container(
+                name          =>'tags',
+                searchable    =>0,
+                group         =>'tags',
+                uivisible     =>1,
+                label         =>'Tags'),
+
+      new kernel::Field::Date(
+                name          =>'cdate',
+                searchable    =>0,
+                group         =>'source',
+                label         =>'Creation-Date'),
+
    );
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id ipaddress accountid cdate));
@@ -83,91 +126,22 @@ sub DataCollector
    my $filterset=shift;
 
    my @view=$self->GetCurrentView();
-
-
    my @result;
 
    return(undef) if (!$self->genericSimpleFilterCheck4AWS($filterset));
    my $filter=$filterset->{FILTER}->[0];
 
-   my $query=$self->decodeFilter2Query4AWS($filter);
-   if (exists($query->{idpath})){
-      if (my ($id,$accountid,$region)=
-          $query->{idpath}=~m/^(i-\S+)\@([0-9]+)\@(\S+)$/){
-         if (exists($query->{id}) && 
-             $query->{id} ne ""  &&
-             $query->{id} ne $id){
-            return([]);
-         }
-         $query->{id}=$id;
-         if (exists($query->{accountid}) && 
-             $query->{accountid} ne ""  &&
-             $query->{accountid} ne $accountid){
-            return([]);
-         }
-         $query->{accountid}=$accountid;
-         if (exists($query->{region}) && 
-             $query->{region} ne "" &&
-             $query->{region} ne $region){
-            return([]);
-         }
-         $query->{region}=$region;
-      }
-      else{
-         return([]);
-      }
-   }
-
-
-   if (!exists($query->{accountid}) ||
-       !($query->{accountid}=~m/^\d{3,20}$/)){
-      $self->LastMsg(ERROR,"mandatary accountid filter not specifed");
-      #print STDERR Dumper($query);
-      return(undef);
-   }
-   if (!exists($query->{region}) ||
-       !($query->{region}=~m/^\S{3,20}$/)){
-      $self->LastMsg(ERROR,"mandatary region filter not specifed");
-      #print STDERR Dumper($query);
-      return(undef);
+   my $query=$self->decodeFilter2Query4AWS("EC2.instanceid",$filter);
+   if (!defined($query)){
+      return(undef) if ($self->LastMsg());
+      return([]);
    }
    my $AWSAccount=$query->{accountid};
    my $AWSRegion=$query->{region};
 
-   my ($awsconnect,$awspass,$awsuser)=$self->GetRESTCredentials("aws");
-
-
-   my $ua;
-   eval('
-      use LWP::UserAgent;
-      #$ua=new LWP::UserAgent(env_proxy=>0,ssl_opts =>{verify_hostname=>0});
-      $ua=new LWP::UserAgent(env_proxy=>0,timeout=>60);
-      push(@{$ua->requests_redirectable},"POST");
-   ');
-   if ($@ ne ""){
-      $self->LastMsg(ERROR,"fail to create UserAgent for DoRESTcall");
-      return(undef);
-   }
-   $ua->protocols_allowed( ['https','connect'] );
-   my $probeipproxy=$self->Config->Param("http_proxy");
-   if ($probeipproxy ne ""){
-      $ua->proxy(['https'],$probeipproxy);
-   }
-   my $e;
+   my @errStack;
    try {
-      Paws->default_config->caller(new Paws::Net::LWPCaller(ua=>$ua));
-      my $baseCred=Paws::Credential::Explicit->new(
-            access_key=>$awsuser,
-            secret_key=>$awspass
-      );
-
-      my $stscred=Paws::Credential::AssumeRole->new(
-        sts=>Paws->service('STS', credentials=>$baseCred,region=>$AWSRegion),
-        Name=>'W5Base',DurationSeconds=>900,
-        RoleSessionName => 'SACMConfigAccess',
-        RoleArn => 'arn:aws:iam::'.$AWSAccount.':'.$awsconnect
-      );
-
+      my $stscred=$self->GetCred4AWS($AWSAccount,$AWSRegion);
       my $ec2=Paws->service('EC2',credentials=>$stscred,region =>$AWSRegion);
       my $blk=0;
       my $NextToken;
@@ -187,7 +161,6 @@ sub DataCollector
             foreach my $res (@{$InstanceItr->Reservations()}){
                foreach my $instance (@{$res->Instances}){
                   #p $instance;
-                  #printf STDERR ("Account: $AWSAccount Intance:%s\n",$instance->{InstanceId});
                   my $cdate=$instance->{LaunchTime};
                   $cdate=~s/^(\S+)T(\S+).000Z$/$1 $2/;
                   my %tag;
@@ -223,7 +196,7 @@ sub DataCollector
                         my @v6=@{$if->Ipv6Addresses()};
                         if ($#v6!=-1){
                            msg(WARN,
-                               "ipv6 handling not yet implemented in aws::system");
+                             "ipv6 handling not yet implemented in aws::system");
                         }
                         my @ips;
                         foreach my $iprec (@{$if->PrivateIpAddresses()}){
@@ -265,10 +238,16 @@ sub DataCollector
    catch {
       my $eclass=blessed($_);
       if ($eclass eq "Paws::Exception"){
-         $self->LastMsg(ERROR,"(".$_->code.") :".$_->message);
+         push(@errStack,"(".$_->code.") :".$_->message);
+      }
+      else{
+         push(@errStack,$_);
       }
    };
-   return(undef) if ($self->LastMsg());
+   if ($#errStack!=-1){
+      $self->LastMsg(ERROR,@errStack);
+      return(undef);
+   }
    return(\@result);
 }
 
@@ -280,9 +259,9 @@ sub initSearchQuery
    if (!defined(Query->Param("search_accountid"))){
      Query->Param("search_accountid"=>'238834862221');
    }
-   if (!defined(Query->Param("search_region"))){
-     Query->Param("search_region"=>'eu-central-1');
-   }
+#   if (!defined(Query->Param("search_region"))){
+#     Query->Param("search_region"=>'eu-central-1');
+#   }
 }
 
 
@@ -293,6 +272,18 @@ sub getValidWebFunctions
    return($self->SUPER::getValidWebFunctions(),
           qw(ImportSystem));
 }
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","ipaddresses","tags",
+          "source");
+}
+
+
 
 
 sub ImportSystem
@@ -376,7 +367,6 @@ sub Import
       $self->LastMsg(ERROR,"AWS-AccountID %s not found in CloudAreas",$accountid);
       return(undef);
    }
-
    $self->ResetFilter();
    $self->SetFilter($flt);
    my @l=$self->getHashList(qw(id name));
@@ -424,84 +414,90 @@ sub Import
 
 
 
-   #printf STDERR ("fifi 01 $w5sysrec\n");die();
-
-
    if (!defined($w5sysrec)){   # srcid update kandidaten (schneller Redeploy)
       my @flt;
+      if ($sysrec->{id}=~m/^i-(\S{5,20})$/){
+         push(@flt,{                       # manuell erfasstes i- Instanz
+           name=>$sysrec->{id},
+           srcsys=>'w5base ""'
+         });
+      }
 
-      if ($sysrec->{name} ne ""){
+
+      if ($sysrec->{name} ne "" && ($sysrec->{name}=~m/^[a-z0-9_-]{5,40}$/)){
          push(@flt,{
-           name=>\$sysrec->{name},
+           name=>$sysrec->{name},
            srcsys=>\'AWS',
            srcid=>'!'.$syssrcid
          });
       }
       if ($sysrec->{ipaddress} ne ""){
          push(@flt,{
-            ipaddresses=>\$sysrec->{ipaddress},
+            ipaddresses=>$sysrec->{ipaddress},
             srcsys=>\'AWS',
             srcid=>'!'.$syssrcid
          });
       }
 
 
-#      $sys->SetFilter(\@flt);
-#      my @redepl=$sys->getHashList(qw(mdate cistatusid name 
-#                                      srcid srcsys applications));
-#
-#      msg(INFO,"invantar check for AWS-SystemID: $sysrec->{id}");
-#      foreach my $osys (@redepl){   # find best matching redepl candidate
-#         my $applok=0;
-#         msg(INFO,"check AWS-SystemID: $osys->{srcid} from inventar");
-#         if ($osys->{srcid} eq $sysrec->{id}){
-#            msg(ERROR,"AWS-SystemID: $osys->{srcid} already in inventar");
-#            # dieser Punkt dürfte nie erreicht werden, da ja oben bereits
-#            # eine u.U. passende w5sysrec gesucht wurde.
-#            last;
-#         }
-#         my $ageok=1;
-#         if ($osys->{cistatusid} ne "4"){  # prüfen, ob das Teil nicht schon
-#                                           # ewig alt ist
-#            my $d=CalcDateDuration($osys->{mdate},NowStamp("en"));
-#            if (defined($d) && $d->{days}>7){
-#               next; # das Teil ist schon zu alt, um es wieder zu aktivieren
-#            }
-#         }
-#         foreach my $appl (@{$osys->{applications}}){
-#            if ($appl->{applid} eq $w5applrec->{id}){
-#               $applok++;
-#            }
-#         }
-#         my $sysallowed=0;
-#         if ($ageok && $applok){
-#            $self->ResetFilter();
-#            $self->SetFilter({id=>\$osys->{srcid}});
-#            msg(INFO,"check exist of AWS-SystemID: $osys->{srcid}");
-#            my ($chkrec,$msg)=$self->getOnlyFirst(qw(id));
-#            if (!defined($chkrec)){
-#               msg(INFO,"AWS-SystemID: $osys->{srcid} does not exists anymore");
-#               $sysallowed++;
-#            }
-#         }
-#         if ($applok && $sysallowed && $ageok){
-#            $sys->ResetFilter();
-#            $sys->SetFilter({id=>\$osys->{id}});
-#            my ($oldrec,$msg)=$sys->getOnlyFirst(qw(ALL));
-#            if (defined($oldrec)){
-#               if ($sys->ValidatedUpdateRecord($oldrec,{
-#                       srcid=>$sysrec->{id},srcsys=>'AWS',
-#                       cistatusid=>4
-#                   },{id=>\$oldrec->{id}})) {
-#                  $sys->ResetFilter();
-#                  $sys->SetFilter({id=>\$osys->{id}});
-#                  ($w5sysrec)=$sys->getOnlyFirst(qw(ALL));
-#                  $w5sysrecmodified++;
-#               }
-#               last;
-#            }
-#         }
-#      } 
+      $sys->SetFilter(\@flt);
+      my @redepl=$sys->getHashList(qw(mdate cistatusid name 
+                                      srcid srcsys applications));
+
+      my $nredepl=$#redepl+1;
+      msg(INFO,"invantar check for AWS-SystemID: $syssrcid ".
+               "on $nredepl candidates");
+      foreach my $osys (@redepl){   # find best matching redepl candidate
+         my $applok=0;
+         msg(INFO,"check AWS-SystemID: $osys->{srcid} from inventar");
+         if ($osys->{srcid} eq $syssrcid){
+            msg(ERROR,"AWS-SystemID: $osys->{srcid} already in inventar");
+            # dieser Punkt dürfte nie erreicht werden, da ja oben bereits
+            # eine u.U. passende w5sysrec gesucht wurde.
+            last;
+         }
+         my $ageok=1;
+         if ($osys->{cistatusid} ne "4"){  # prüfen, ob das Teil nicht schon
+                                           # ewig alt ist
+            my $d=CalcDateDuration($osys->{mdate},NowStamp("en"));
+            if (defined($d) && $d->{days}>7){
+               next; # das Teil ist schon zu alt, um es wieder zu aktivieren
+            }
+         }
+         foreach my $appl (@{$osys->{applications}}){
+            if ($appl->{applid} eq $w5applrec->{id}){
+               $applok++;
+            }
+         }
+         my $sysallowed=0;
+         if ($ageok && $applok){
+            $self->ResetFilter();
+            $self->SetFilter({id=>\$osys->{srcid}});
+            msg(INFO,"check exist of AWS-SystemID: $osys->{srcid}");
+            my ($chkrec,$msg)=$self->getOnlyFirst(qw(id));
+            if (!defined($chkrec)){
+               msg(INFO,"AWS-SystemID: $osys->{srcid} does not exists anymore");
+               $sysallowed++;
+            }
+         }
+         if ($applok && $sysallowed && $ageok){
+            $sys->ResetFilter();
+            $sys->SetFilter({id=>\$osys->{id}});
+            my ($oldrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+            if (defined($oldrec)){
+               if ($sys->ValidatedUpdateRecord($oldrec,{
+                       srcid=>$syssrcid,srcsys=>'AWS',
+                       cistatusid=>4
+                   },{id=>\$oldrec->{id}})) {
+                  $sys->ResetFilter();
+                  $sys->SetFilter({id=>\$osys->{id}});
+                  ($w5sysrec)=$sys->getOnlyFirst(qw(ALL));
+                  $w5sysrecmodified++;
+               }
+               last;
+            }
+         }
+      } 
    }
 
    my $identifyby;
@@ -778,18 +774,18 @@ sub Import
             $newrec->{iscbreakdown}=1;
          }
       }
-      {
-         my $newname=$newrec->{name};
-         $sys->ResetFilter();
-         $sys->SetFilter({name=>\$newname});
-         my ($chkrec)=$sys->getOnlyFirst(qw(id name));
-         if (defined($chkrec)){
-            $newrec->{name}=$sysrec->{altname};
-         }
-         if (($newrec->{name}=~m/\s/) || length($newrec->{name})>60){
-            $newrec->{name}=$sysrec->{altname};
-         }
-      }
+     # {
+     #    my $newname=$newrec->{name};
+     #    $sys->ResetFilter();
+     #    $sys->SetFilter({name=>\$newname});
+     #    my ($chkrec)=$sys->getOnlyFirst(qw(id name));
+     #    if (defined($chkrec)){
+     #       $newrec->{name}=$sysrec->{altname};
+     #    }
+     #    if (($newrec->{name}=~m/\s/) || length($newrec->{name})>60){
+     #       $newrec->{name}=$sysrec->{altname};
+     #    }
+     # }
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){

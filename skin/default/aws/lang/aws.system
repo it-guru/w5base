@@ -1,2 +1,4 @@
 'aws::system'=>{de=>'AWS EC2',en=>'AWS EC2'},
 'mandatary accountid filter not specifed'=>{de=>'zwingender AccountID Filter nicht angegeben'},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Adresses'},

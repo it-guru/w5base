@@ -77,6 +77,7 @@ sub checkMinimalFilter4AWS
 sub decodeFilter2Query4AWS
 {
    my $self=shift;
+   my $keyhandling=shift;
    my $filter=shift;
 
    my $query={};
@@ -90,7 +91,94 @@ sub decodeFilter2Query4AWS
          $query->{$fn}=join(" ",@{$query->{$fn}});
       }
    }
+
+
+   if (exists($query->{idpath})){
+      if (my ($id,$accountid,$region)=
+          $query->{idpath}=~m/^(i-\S+)\@([0-9]+)\@(\S+)$/){
+         if (exists($query->{id}) && 
+             $query->{id} ne ""  &&
+             $query->{id} ne $id){
+            # query parameters combination can't get a valid result
+            return(undef);
+         }
+         $query->{id}=$id;
+         if (exists($query->{accountid}) && 
+             $query->{accountid} ne ""  &&
+             $query->{accountid} ne $accountid){
+            # query parameters combination can't get a valid result
+            return(undef);
+         }
+         $query->{accountid}=$accountid;
+         if (exists($query->{region}) && 
+             $query->{region} ne "" &&
+             $query->{region} ne $region){
+            # query parameters combination can't get a valid result
+            return(undef);
+         }
+         $query->{region}=$region;
+      }
+      else{
+         return(undef);
+      }
+   }
+
+   if (!exists($query->{accountid}) ||
+       !($query->{accountid}=~m/^\d{3,20}$/)){
+      $self->LastMsg(ERROR,'mandatary search parameter missing: %s',"accountid");
+      #print STDERR Dumper($query);
+      return(undef);
+   }
+   if (!exists($query->{region}) ||
+       !($query->{region}=~m/^\S{10,20}$/)){
+      $self->LastMsg(ERROR,'mandatary search parameter missing: %s',"region");
+      #print STDERR Dumper($query);
+      return(undef);
+   }
+
    return($query);
+}
+
+
+sub GetCred4AWS
+{
+   my $self=shift;
+   my $AWSAccount=shift;   # if STS 
+   my $AWSRegion=shift;   # if STS 
+
+   my ($awsconnect,$awspass,$awsuser)=$self->GetRESTCredentials("aws");
+
+   my $ua;
+   eval('
+      use LWP::UserAgent;
+      #$ua=new LWP::UserAgent(env_proxy=>0,ssl_opts =>{verify_hostname=>0});
+      $ua=new LWP::UserAgent(env_proxy=>0,timeout=>60);
+      push(@{$ua->requests_redirectable},"POST");
+   ');
+   if ($@ ne ""){
+      $self->LastMsg(ERROR,"fail to create UserAgent for DoRESTcall");
+      return(undef);
+   }
+   $ua->protocols_allowed( ['https','connect'] );
+   my $probeipproxy=$self->Config->Param("http_proxy");
+   if ($probeipproxy ne ""){
+      $ua->proxy(['https'],$probeipproxy);
+   }
+   Paws->default_config->caller(new Paws::Net::LWPCaller(ua=>$ua));
+   my $baseCred=Paws::Credential::Explicit->new(
+         access_key=>$awsuser,
+         secret_key=>$awspass
+   );
+
+   my $stscred=Paws::Credential::AssumeRole->new(
+     sts=>Paws->service('STS', credentials=>$baseCred,region=>$AWSRegion),
+     Name=>'W5Base',DurationSeconds=>900,
+     RoleSessionName => 'SACMConfigAccess',
+     RoleArn => 'arn:aws:iam::'.$AWSAccount.':'.$awsconnect
+   );
+
+   return($stscred);
+
 }
 
 

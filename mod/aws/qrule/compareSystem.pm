@@ -84,11 +84,11 @@ sub qcheckRecord
 
    return(undef,undef) if ($rec->{srcsys} ne "AWS");
 
+
    my ($awsid,$awsacccountid,$awsregion)=$rec->{srcid}=~m/^(\S+)\@([0-9]+)\@(\S+)$/;
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),"aws::system");
    return(undef,undef) if (!$par->Ping());
-
 
    #
    # Level 1
@@ -96,12 +96,13 @@ sub qcheckRecord
    if (!defined($parrec)){      # pruefen ob wir bereits nach AWS geschrieben
       # try to find parrec by srcsys and srcid
       $par->ResetFilter();
-      $par->SetFilter({
+      my $flt={
          id=>$awsid,
          accountid=>$awsacccountid,
          region=>$awsregion
-      });
-      ($parrec)=$par->getOnlyFirst(qw(ALL));
+      };
+      $par->SetFilter($flt);
+      ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
    }
 
    #
