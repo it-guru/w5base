@@ -712,8 +712,23 @@ sub Init
 
    $self->RegisterObj("itu",
                       "tmpl/welcome.itu",
-                      prio=>1000,
+                      prio=>9000,
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.ims",
+                      "tmpl/welcome.itu",
+                      prio=>10,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cloud",
+                      "tmpl/welcome.itu",
+                      prio=>20,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.sec",
+                      "tmpl/welcome.itu",
+                      prio=>30,
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("bsm",
                       "tmpl/welcome",
