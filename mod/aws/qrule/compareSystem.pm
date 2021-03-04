@@ -180,28 +180,29 @@ sub qcheckRecord
                              mode=>'leftouterlinkmissok',
                              iomapped=>$par);
                my $w5itcloudarea;
-               #if ($parrec->{projectid} ne ""){
-               #   msg(INFO,"try to add cloudarea to system ".$rec->{name});
-               #   my $cloudarea=getModuleObject($self->getParent->Config,
-               #                                 "itil::itcloudarea");
-               #   $cloudarea->SetFilter({srcsys=>\'tsotc::project',
-               #                          srcid=>\$parrec->{projectid}
-               #   });
-               #   my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
-               #   if (defined($w5cloudarearec)){
-               #      $w5itcloudarea=$w5cloudarearec;
-               #      if ($w5cloudarearec->{cistatusid} eq "4" &&
-               #          $w5cloudarearec->{applid} ne ""){
-               #         if ($rec->{itcloudareaid} ne $w5cloudarearec->{id}){
-               #            $forcedupd->{itcloudareaid}= $w5cloudarearec->{id};
-               #         }
-               #      }
-               #   }
-               #   else{
-               #      msg(ERROR,"found AWS System $rec->{name} ".
-               #                "on invalid cloudarea");
-               #   }
-               #}
+               if ($parrec->{accountid} ne ""){
+                  msg(INFO,"try to add cloudarea to system ".$rec->{name});
+                  my $cloudarea=getModuleObject($self->getParent->Config,
+                                                "itil::itcloudarea");
+                  $cloudarea->SetFilter({cloud=>'AWS',
+                                         srcid=>$parrec->{accountid}
+                  });
+                  my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+                  if (defined($w5cloudarearec)){
+                     $w5itcloudarea=$w5cloudarearec;
+                     if ($w5cloudarearec->{cistatusid} eq "4" &&
+                         $w5cloudarearec->{applid} ne ""){
+                        if ($rec->{itcloudareaid} ne $w5cloudarearec->{id}){
+                           $forcedupd->{itcloudareaid}= $w5cloudarearec->{id};
+                        }
+                     }
+                  }
+                  else{
+                     msg(ERROR,"found AWS System $rec->{name} ".
+                               "on invalid cloudarea");
+                     die();
+                  }
+               }
                if ($autocorrect){
                   my $net=getModuleObject($self->getParent->Config(),
                           "TS::network");
@@ -209,269 +210,157 @@ sub qcheckRecord
 
                   #############################################################
        
-#                  my @opList;
-#                  #
-#                  # %cleanAWSIPlist is neassasary, because multiple IP-Addresses
-#                  # can be in one networkcard record
-#                  #
-#                  my %cleanAWSIPlist;
-#                  my %cleanAWSIflist;
-#
-#                  my $cloudareaid;
-#                  if (defined($w5itcloudarea)){
-#                     $cloudareaid=$w5itcloudarea->{id};
-#                  }
-#
-#                  # dynamic assign Interface names - if none given
-#                  my %ifnum;
-#                  my $ifnum=0;
-#                  my $ifnamepattern='eth%d';
-#
-#                  # 1st get all already assigend ifnames to macs
-#                  foreach my $ifrec (@{$rec->{sysiface}}){
-#                     $ifnum{$ifrec->{name}}=$ifrec->{mac};
-#                  }
-#                  # 2nd remove invalid ifnames from current ip-List in w5base
-#                  foreach my $iprec (@{$rec->{ipaddresses}}){
-#                     if ($iprec->{ifname} ne "" && 
-#                         !exists($ifnum{$iprec->{ifname}})){
-#                        $iprec->{ifname}="";
-#                     }
-#                  }
-#                  # 3d load ifnames to otcipaddresses for already assigned
-#                  #    macs to ifnames
-#                  foreach my $otciprec (@{$parrec->{ipaddresses}}){
-#                     foreach my $ifname (keys(%ifnum)){
-#                        if ($otciprec->{hwaddr} eq $ifnum{$ifname}){
-#                           $otciprec->{ifname}=$ifname; 
-#                        }
-#                     }
-#                  }
-#                  # create ifnames on AWS records, if nothing is already
-#                  # assigned
-#
-#                  for(my $i=0;$i<=$#{$parrec->{ipaddresses}};$i++){
-#                     my $otciprec=$parrec->{ipaddresses}->[$i];
-#                     if ($otciprec->{ifname} eq ""){
-#                        my $ifname;
-#                        for(my $ii=0;$ii<=$#{$parrec->{ipaddresses}};$ii++){
-#                           if ($parrec->{ipaddresses}->[$ii]->{hwaddr} ne "" &&
-#                               $otciprec->{hwaddr} eq 
-#                               $parrec->{ipaddresses}->[$ii]->{hwaddr}){
-#                              $ifname=$parrec->{ipaddresses}->[$ii]->{ifname};
-#                              last;
-#                           }
-#                        }
-# 
-#                        if ($ifname eq ""){
-#                           do{
-#                              $ifname=sprintf($ifnamepattern,$ifnum);
-#                              $ifnum++;
-#                           }while(exists($ifnum{$ifname}));
-#                           $ifnum{$ifname}++;
-#                        }
-#                        $otciprec->{ifname}=$ifname; 
-#                     }
-#                  }
-#                  
-#                  foreach my $otciprec (@{$parrec->{ipaddresses}}){
-#                     my $mappedCIStatus=4;
-#                     if ($otciprec->{name} ne ""){
-#                        if ($otciprec->{name}=~
-#                            m/^\d{1,3}(\.\d{1,3}){3,3}$/){
-#                           $cleanAWSIPlist{$otciprec->{name}}={
-#                              cistatusid=>$mappedCIStatus,
-#                              ipaddress=>$otciprec->{name},
-#                              itcloudareaid=>$cloudareaid,
-#                              ifname=>$otciprec->{ifname},
-#                              comments=>trim($otciprec->{comments})
-#                           };
-#                           if ($otciprec->{hwaddr} ne ""){
-#                              $cleanAWSIflist{$otciprec->{ifname}}={
-#                                 name=>$otciprec->{ifname},
-#                                 mac=>$otciprec->{hwaddr}
-#                              };
-#                           }
-#                        }
-#                        else{
-#                           msg(WARN,"ignoring IPv4 invalid ".
-#                                    "'$otciprec->{name}' ".
-#                                    "for $parrec->{id}");
-#                        }
-#                     }
-#                  }
-#                  my @cleanAWSIPlist=values(%cleanAWSIPlist);
-#
-#                  my $res=OpAnalyse(
-#                             sub{  # comperator 
-#                                my ($a,$b)=@_;
-#                                my $eq;
-#                                if ($a->{name} eq $b->{ipaddress}){
-#                                  $eq=0;
-#                                  if ($a->{srcsys} eq "AWS" &&
-#                                      $a->{cistatusid} eq $b->{cistatusid}  &&
-#                                      $a->{ifname} eq $b->{ifname} &&
-#                                      $b->{itcloudareaid} eq 
-#                                      $a->{itcloudareaid} && 
-#                                      $a->{comments} eq $b->{comments}){
-#                                     $eq=1;
-#                                  }
-#                                }
-#                                return($eq);
-#                             },
-#                             sub{  # oprec generator
-#                                my ($mode,$oldrec,$newrec,%p)=@_;
-#                                if ($mode eq "insert" || $mode eq "update"){
-#                                   if ($mode eq "insert" && 
-#                                       $newrec->{cistatusid} eq "6"){
-#                                      return(); # do not insert 
-#                                                # already unconfigured ip's
-#                                   }
-#                                   my $networkid=$netarea->{ISLAND};
-#                                   my $identifyby=undef;
-#                                   if ($mode eq "update"){
-#                                      $identifyby=$oldrec->{id};
-#                                   }
-#                                   if ($newrec->{ipaddress}=~m/^\s*$/){
-#                                      $mode="nop";
-#                                   }
-#                                   my $type="1";   # secondary
-#                                   # Customer Interface can not be marked
-#                                   # as primary interface, because in some
-#                                   # cases multiple customer interfaces
-#                                   # exists in AWS Rotz.
-#                                   #
-#                                   #if (lc(trim($newrec->{description})) eq
-#                                   #    "customer"){
-#                                   #   $type="0"; # Customer Interface is prim
-#                                   #}
-#                                   my $oprec={
-#                                     OP=>$mode,
-#                                     MSG=>"$mode ip $newrec->{ipaddress} ".
-#                                          "in W5Base",
-#                                     IDENTIFYBY=>$identifyby,
-#                                     DATAOBJ=>'itil::ipaddress',
-#                                     DATA=>{
-#                                      name         =>$newrec->{ipaddress},
-#                                      cistatusid   =>$newrec->{cistatusid},
-#                                      srcsys       =>'AWS',
-#                                      type         =>$type,
-#                                      comments     =>$newrec->{comments},
-#                                      itcloudareaid=>$newrec->{itcloudareaid},
-#                                      ifname       =>$newrec->{ifname},
-#                                      systemid     =>$p{refid}
-#                                     }
-#                                   };
-#                                   if ($mode eq "insert"){
-#                                      $oprec->{DATA}->{networkid}=$networkid;
-#                                   }
-#                                   return($oprec);
-#                                }
-#                                elsif ($mode eq "delete"){
-#                                   my $networkid=$oldrec->{networkid};
-#                                   return({OP=>$mode,
-#                                           MSG=>"delete ip $oldrec->{name} ".
-#                                               "from W5Base",
-#                                           DATAOBJ=>'itil::ipaddress',
-#                                           IDENTIFYBY=>$oldrec->{id},
-#                                           });
-#                                }
-#                                return(undef);
-#                             },
-#                             $rec->{ipaddresses},\@cleanAWSIPlist,\@opList,
-#                             refid=>$rec->{id});
-#                  if (!$res){
-#                     my $opres=ProcessOpList($self->getParent,\@opList);
-#                  }
-#
-#                  # Zielnetzwerke festlegen und prüfen ob frei
-#                  my @otcip=map({$_->{name}} @{$parrec->{ipaddresses}});
-#                  my %otcip;
-#                  foreach my $ip (@otcip){
-#                     $otcip{$ip}={networkid=>$netarea->{ISLAND}};
-#                     if ($ip=~m/^10\./){   # AWS hangs only in CNDTAG
-#                        $otcip{$ip}->{NetareaTag}='CNDTAG';
-#                     }
-#                  }
-#                  my $iip=getModuleObject($self->getParent->Config(),
-#                                          "tsotc::inipaddress");
-#                  $iip->SetFilter({name=>\@otcip});
-#                  foreach my $iiprec ($iip->getHashList(qw(name))){
-#                     my $ip=$iiprec->{name};
-#                     if (exists($otcip{$ip})){
-#                        $otcip{$ip}->{NetareaTag}='INTERNET';
-#                     }
-#                  }
-#                  my $ip=getModuleObject($self->getParent->Config(),
-#                                                "itil::ipaddress");
-#                  $ip->switchSystemIpToNetarea(
-#                     \%otcip,$rec->{id},$netarea,\@qmsg
-#                  );
-#
-#                  my @cleanAWSIflist=values(%cleanAWSIflist);
-#                  @opList=();
-#                  my $res=OpAnalyse(
-#                             sub{  # comperator 
-#                                my ($a,$b)=@_;
-#                                my $eq;
-#                                if ($a->{name} eq $b->{name}){
-#                                   $eq=0;
-#                                   $eq=1 if ( $a->{mac} eq $b->{mac});
-#                                }
-#                                return($eq);
-#                             },
-#                             sub{  # oprec generator
-#                                my ($mode,$oldrec,$newrec,%p)=@_;
-#                                if ($mode eq "insert" || $mode eq "update"){
-#                                   #if ($mode eq "insert" && 
-#                                   #    $newrec->{cistatusid} eq "6"){
-#                                   #   return(); # do not insert 
-#                                   #             # already unconfigured ip's
-#                                   #}
-#                                   my $identifyby=undef;
-#                                   if ($mode eq "update"){
-#                                      $identifyby=$oldrec->{id};
-#                                   }
-#                                   if ($newrec->{name}=~m/^\s*$/){
-#                                      $mode="nop";
-#                                   }
-#                                   return({OP=>$mode,
-#                                           MSG=>"$mode if $newrec->{name} ".
-#                                                "in W5Base",
-#                                           IDENTIFYBY=>$identifyby,
-#                                           DATAOBJ=>'itil::sysiface',
-#                                           DATA=>{
-#                                              name      =>$newrec->{name},
-#                                              mac       =>$newrec->{mac},
-#                                              srcsys    =>'AWS',
-#                                              systemid  =>$p{refid}
-#                                              }
-#                                           });
-#                                }
-#                                elsif ($mode eq "delete"){
-#                                   return({OP=>$mode,
-#                                           MSG=>"delete if $oldrec->{name} ".
-#                                               "from W5Base",
-#                                           DATAOBJ=>'itil::sysiface',
-#                                           IDENTIFYBY=>$oldrec->{id},
-#                                           });
-#                                }
-#                                return(undef);
-#                             },
-#                             $rec->{sysiface},\@cleanAWSIflist,\@opList,
-#                             refid=>$rec->{id});
-#                  if (!$res){
-#                     my $opres=ProcessOpList($self->getParent,\@opList);
-#                  }
-#
-#
-#
-#
-#
-#
-#
-#
-#
+                  my @opList;
+                  my %cleanAWSIflist;
+                  for(my $i=0;$i<=$#{$parrec->{ipaddresses}};$i++){
+                     my $otciprec=$parrec->{ipaddresses}->[$i];
+                     if ($otciprec->{ifname} ne ""){
+                        $cleanAWSIflist{$otciprec->{ifname}}={
+                           mac=>$otciprec->{mac},
+                           name=>$otciprec->{ifname}
+                        };
+                     }
+                  }
+                  my @cleanAWSIPlist=@{$parrec->{ipaddresses}};
+
+                  my $res=OpAnalyse(
+                             sub{  # comperator 
+                                my ($a,$b)=@_;
+                                my $eq;
+                                if ($a->{name} eq $b->{name}){
+                                  $eq=0;
+                                  if ($a->{srcsys} eq "AWS" &&
+                                      $a->{ifname} eq $b->{ifname} &&
+                                      $a->{dnsname} eq $b->{dnsname} &&
+                                      $a->{itcloudareaid} eq 
+                                                 $w5itcloudarea->{id} &&
+                                      $a->{cistatusid} eq "4"){
+                                     $eq=1;
+                                  }
+                                  else{
+                                  }
+                                }
+                                return($eq);
+                             },
+                             sub{  # oprec generator
+                                my ($mode,$oldrec,$newrec,%p)=@_;
+                                if ($mode eq "insert" || $mode eq "update"){
+                                   my $networkid=$netarea->{ISLAND};
+                                   my $identifyby=undef;
+                                   if ($mode eq "update"){
+                                      $identifyby=$oldrec->{id};
+                                   }
+                                   my $type="1";   # secondary
+                                   my $oprec={
+                                     OP=>$mode,
+                                     MSG=>"$mode ip $newrec->{ipaddress} ".
+                                          "in W5Base",
+                                     IDENTIFYBY=>$identifyby,
+                                     DATAOBJ=>'itil::ipaddress',
+                                     DATA=>{
+                                      name         =>$newrec->{name},
+                                      cistatusid   =>"4",
+                                      srcsys       =>'AWS',
+                                      type         =>$type,
+                                      ifname       =>$newrec->{ifname},
+                                      dnsname      =>$newrec->{dnsname},
+                                      itcloudareaid=>$w5itcloudarea->{id},
+                                      systemid     =>$p{refid}
+                                     }
+                                   };
+                                   if ($mode eq "insert"){
+                                      $oprec->{DATA}->{networkid}=$networkid;
+                                   }
+                                   return($oprec);
+                                }
+                                elsif ($mode eq "delete"){
+                                   my $networkid=$oldrec->{networkid};
+                                   return({OP=>$mode,
+                                           MSG=>"delete ip $oldrec->{name} ".
+                                               "from W5Base",
+                                           DATAOBJ=>'itil::ipaddress',
+                                           IDENTIFYBY=>$oldrec->{id},
+                                           });
+                                }
+                                return(undef);
+                             },
+                             $rec->{ipaddresses},\@cleanAWSIPlist,\@opList,
+                             refid=>$rec->{id});
+                  #printf STDERR Dumper(\@opList);
+                  if (!$res){
+                     my $opres=ProcessOpList($self->getParent,\@opList);
+                  }
+
+                  # Zielnetzwerke festlegen und prüfen ob frei
+                  my @otcip=map({$_->{name}} @{$parrec->{ipaddresses}});
+                  my %otcip;
+                  foreach my $iprec (@{$parrec->{ipaddresses}}){
+                     push(@otcip,$iprec->{name});
+                     $otcip{$iprec->{name}}={networkid=>$netarea->{ISLAND}};
+                     $otcip{$iprec->{name}}->{NetareaTag}=$iprec->{netareatag};
+                  }
+                  my $ip=getModuleObject($self->getParent->Config(),
+                                                "itil::ipaddress");
+                  $ip->switchSystemIpToNetarea(
+                     \%otcip,$rec->{id},$netarea,\@qmsg
+                  );
+
+                  my @cleanAWSIflist=values(%cleanAWSIflist);
+                  @opList=();
+                  my $res=OpAnalyse(
+                             sub{  # comperator 
+                                my ($a,$b)=@_;
+                                my $eq;
+                                if ($a->{name} eq $b->{name}){
+                                   $eq=0;
+                                   $eq=1 if ( $a->{mac} eq $b->{mac});
+                                }
+                                return($eq);
+                             },
+                             sub{  # oprec generator
+                                my ($mode,$oldrec,$newrec,%p)=@_;
+                                if ($mode eq "insert" || $mode eq "update"){
+                                   #if ($mode eq "insert" && 
+                                   #    $newrec->{cistatusid} eq "6"){
+                                   #   return(); # do not insert 
+                                   #             # already unconfigured ip's
+                                   #}
+                                   my $identifyby=undef;
+                                   if ($mode eq "update"){
+                                      $identifyby=$oldrec->{id};
+                                   }
+                                   if ($newrec->{name}=~m/^\s*$/){
+                                      $mode="nop";
+                                   }
+                                   return({OP=>$mode,
+                                           MSG=>"$mode if $newrec->{name} ".
+                                                "in W5Base",
+                                           IDENTIFYBY=>$identifyby,
+                                           DATAOBJ=>'itil::sysiface',
+                                           DATA=>{
+                                              name      =>$newrec->{name},
+                                              mac       =>$newrec->{mac},
+                                              srcsys    =>'AWS',
+                                              systemid  =>$p{refid}
+                                              }
+                                           });
+                                }
+                                elsif ($mode eq "delete"){
+                                   return({OP=>$mode,
+                                           MSG=>"delete if $oldrec->{name} ".
+                                               "from W5Base",
+                                           DATAOBJ=>'itil::sysiface',
+                                           IDENTIFYBY=>$oldrec->{id},
+                                           });
+                                }
+                                return(undef);
+                             },
+                             $rec->{sysiface},\@cleanAWSIflist,\@opList,
+                             refid=>$rec->{id});
+                  if (!$res){
+                     my $opres=ProcessOpList($self->getParent,\@opList);
+                  }
+
                }
             }
 

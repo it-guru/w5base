@@ -47,6 +47,7 @@ sub new
                 name          =>'idpath',
                 htmlwidth     =>'150',
                 searchable    =>0,
+                FieldHelpType =>'GenericConstant',
                 group         =>'source',
                 label         =>'AWS-IdPath'),
 
@@ -61,6 +62,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'accountid',
+                FieldHelpType =>'GenericConstant',
                 label         =>'AWS-AccountID'),
 
       new kernel::Field::Text(
@@ -69,21 +71,17 @@ sub new
                    my $self=shift;
                    return("eu-central-1");
                 },
+                FieldHelpType =>'GenericConstant',
                 label         =>'AWS-Region'),
 
-      new kernel::Field::Text(
-                name          =>'ipaddress',
+      new kernel::Field::SubList(
+                name          =>'ipaddresses',
+                label         =>'IP-Adresses',
+                group         =>'ipaddresses',
                 searchable    =>0,
-                group         =>"ipaddresses",
-                label         =>'private IP-Address',
-                dataobjattr   =>'private_ip_address'),
-
-      new kernel::Field::Container(
-                name          =>'interfaces',
-                uivisible     =>1,
-                group         =>"ipaddresses",
-                searchable    =>0,
-                label         =>'Interfaces'),
+                vjointo       =>'aws::ipaddress',
+                vjoinon       =>['idpath'=>'idpath'],
+                vjoindisp     =>['name','netareatag','dnsname','ifname','mac']),
 
       new kernel::Field::Text(
                 name          =>'cpucount',
@@ -174,7 +172,6 @@ sub DataCollector
                       region=>$AWSRegion,
                       name=>$tag{Name},
                       tags=>\%tag,
-                      private_ip_address=>$instance->{PrivateIpAddress},
                       cdate=>$cdate,
                       idpath=>$instance->{InstanceId}.'@'.
                               $AWSAccount.'@'.
@@ -188,30 +185,6 @@ sub DataCollector
                         $cpucount+=$n;
                      }
                      $rec->{cpucount}=$cpucount;
-                  }
-                  if (in_array(\@view,"interfaces")){
-                     my %ifs;
-                     foreach my $if (@{$instance->NetworkInterfaces()}){
-                        my %ifrec;
-                        my @v6=@{$if->Ipv6Addresses()};
-                        if ($#v6!=-1){
-                           msg(WARN,
-                             "ipv6 handling not yet implemented in aws::system");
-                        }
-                        my @ips;
-                        foreach my $iprec (@{$if->PrivateIpAddresses()}){
-                           if ($iprec->Primary()){
-                              $ifrec{primaryIp}=$iprec->PrivateIpAddress();
-                           }
-                           push(@ips,$iprec->PrivateIpAddress()." (".
-                                     $iprec->PrivateDnsName().")");
-                        }
-                        $ifrec{ipaddresses}=join(", ",@ips);
-                        $ifrec{mac}=$if->MacAddress();
-                       
-                        $ifs{$if->NetworkInterfaceId()}=\%ifrec;
-                     }
-                     $rec->{interfaces}=\%ifs;
                   }
                   if (in_array(\@view,"memory")){
                      my $mem;

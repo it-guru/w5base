@@ -23,6 +23,8 @@ use kernel::App::Web;
 use kernel::DataObj::Static;
 use kernel::Field;
 
+use Data::Printer;
+
 use Paws;
 use Paws::Credential;
 use Paws::Credential::Explicit;
@@ -154,6 +156,7 @@ sub GetCred4AWS
       #$ua=new LWP::UserAgent(env_proxy=>0,ssl_opts =>{verify_hostname=>0});
       $ua=new LWP::UserAgent(env_proxy=>0,timeout=>60);
       push(@{$ua->requests_redirectable},"POST");
+      push(@{$ua->requests_redirectable},"GET");
    ');
    if ($@ ne ""){
       $self->LastMsg(ERROR,"fail to create UserAgent for DoRESTcall");
@@ -175,6 +178,12 @@ sub GetCred4AWS
      Name=>'W5Base',DurationSeconds=>900,
      RoleSessionName => 'SACMConfigAccess',
      RoleArn => 'arn:aws:iam::'.$AWSAccount.':'.$awsconnect
+   );
+   my $access_key=$stscred->access_key();
+   my $secret_key=$stscred->secret_key();
+   my $stsBaseCred=Paws::Credential::Explicit->new(
+         access_key=>$access_key,
+         secret_key=>$secret_key
    );
 
    return($stscred);
