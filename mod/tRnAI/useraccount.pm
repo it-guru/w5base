@@ -40,7 +40,9 @@ sub new
                 group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'tRnAI_useraccount.id'),
-                                                  
+
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'AD-Account',
@@ -64,6 +66,25 @@ sub new
                 name          =>'expdate',
                 label         =>'SC Expireing Date',
                 dataobjattr   =>'tRnAI_useraccount.expdate'),
+
+      new kernel::Field::Date(
+                name          =>'expnotify1',
+                label         =>'Expiration Notify',
+                htmldetail    =>0,
+                selectfix     =>1,
+                dataobjattr   =>'tRnAI_useraccount.expnotify1'),
+
+      new kernel::Field::Date(
+                name          =>'exitdate',
+                label         =>'Exit Date',
+                dataobjattr   =>'tRnAI_useraccount.exitdate'),
+
+      new kernel::Field::Date(
+                name          =>'exitnotify1',
+                label         =>'Exit Notify',
+                htmldetail    =>0,
+                selectfix     =>1,
+                dataobjattr   =>'tRnAI_useraccount.exitnotify1'),
 
       new kernel::Field::Date(
                 name          =>'birthdate',
@@ -191,6 +212,19 @@ sub Validate
       }
 
    }
+
+   if (effChanged($oldrec,$newrec,"expdate")){
+      if (defined($oldrec) && $oldrec->{expnotify1} ne ""){
+         $newrec->{expnotify1}=undef;
+      }
+   }
+
+   if (effChanged($oldrec,$newrec,"exitdate")){
+      if (defined($oldrec) && $oldrec->{exitnotify1} ne ""){
+         $newrec->{exitnotify1}=undef;
+      }
+   }
+
    return(1);
 }
 

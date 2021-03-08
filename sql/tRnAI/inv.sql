@@ -160,3 +160,5 @@ create table tRnAI_lnkinstlic(
   FOREIGN KEY (instance) REFERENCES tRnAI_instance (id) ON DELETE CASCADE,
   FOREIGN KEY (license)  REFERENCES tRnAI_license (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table  tRnAI_useraccount add exitdate datetime default NULL,add exitnotify1 datetime default NULL;
+alter table  tRnAI_useraccount add expnotify1 datetime default NULL;

@@ -3,3 +3,6 @@
 'SC Expireing Date'=>{de=>'SC Verfallsdatum'},
 'date of birth'=>{de=>'Geburtsdatum'},
 'SAP personal number'=>{de=>'SAP-Personalnummer'},
+'Expiration Notify'=>{de=>'SC Verfalls-Benachrichtigung'},
+'Exit Notify'=>{de=>'Austritts-Benachrichtigung'},
+'Exit Date'=>{de=>'Austrittsdatum'},
