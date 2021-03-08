@@ -91,7 +91,7 @@ sub new
                 subeditmsk    =>'subedit.software',
                 vjointo       =>'itil::lnksoftwaresoftwareset',
                 vjoinon       =>['id'=>'softwaresetid'],
-                vjoindisp     =>['fullname',"comparator",'version'],
+                vjoindisp     =>['fullname',"comparator",'versionexp'],
                 vjoininhash   =>['fullname','softwareid','version','startwith',
                                  'releasekey','comparator']),
 

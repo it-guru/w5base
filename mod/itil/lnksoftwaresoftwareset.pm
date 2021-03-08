@@ -77,6 +77,23 @@ sub new
                 label         =>'Version',
                 dataobjattr   =>'lnksoftwaresoftwareset.version'),
 
+      new kernel::Field::Htmlarea(
+                name          =>'versionexp',
+                htmlwidth     =>'50px',
+                htmldetail    =>0,
+                searchable    =>0,
+                depend        =>[qw(version startwith)],
+                label         =>'Version Expr.',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $d=$current->{version};
+                   if ($current->{startwith} ne ""){
+                      $d="<b>(".$current->{startwith}.")</b> ".$d;
+                   }
+                   return($d);
+                }),
+
       new kernel::Field::Text(
                 name          =>'startwith',
                 htmlwidth     =>'60px',

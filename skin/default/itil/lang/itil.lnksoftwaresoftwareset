@@ -9,3 +9,4 @@
 'only if Start with'=>{de=>'nur falls Version beginnt mit'},
 'fieldgroup.releaseinfos'=>{de=>'Versionsinformationen',en=>'Releaseinformations'},
 'fieldgroup.softwareset'=>{de=>'SoftwareSet',en=>'SoftwareSet'},
+'Version Expr.'=>{de=>'Versionsausdr.'},
