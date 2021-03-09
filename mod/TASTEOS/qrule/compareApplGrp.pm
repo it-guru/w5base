@@ -363,17 +363,7 @@ sub qcheckRecord
 
       }
 
-
-
-
-
-
-
-
-
-
-      if (in_array($rec->{applgrpid},["ICTO-20324"])){
-
+      if (1 || in_array($rec->{applgrpid},["ICTO-20324"])){
          my @email=sort(map({$_->{email}} values(%contact)));
          msg(INFO,sprintf("set acl of TasteOS system $TSOSsystemid to %s\n",
                join(",",@email)));
