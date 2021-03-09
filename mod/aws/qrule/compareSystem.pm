@@ -142,6 +142,9 @@ sub qcheckRecord
                if (length($sysname)>40){
                   $sysname=substr($sysname,40);
                }
+               if ($sysname eq ""){
+                  $sysname=$parrec->{id};
+               }
              
                if ($rec->{name} ne $sysname){
                   $dataobj->ResetFilter();
