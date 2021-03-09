@@ -1,4 +1,4 @@
-'itu.AWS'=>{de=>'AWS',en=>'AWS'},
-'itu.AWS.system'=>{de=>'EC2',en=>'EC2'},
-'itu.AWS.account'=>{de=>'Account',en=>'Account'},
-'itu.AWS.kern'=>{de=>'Stammdaten',en=>'Kernel'},
+'itu.cloud.AWS'=>{de=>'AWS',en=>'AWS'},
+'itu.cloud.AWS.system'=>{de=>'EC2',en=>'EC2'},
+'itu.cloud.AWS.account'=>{de=>'Account',en=>'Account'},
+'itu.cloud.AWS.kern'=>{de=>'Stammdaten',en=>'Kernel'},

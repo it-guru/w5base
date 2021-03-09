@@ -97,7 +97,7 @@ sub decodeFilter2Query4AWS
 
    if (exists($query->{idpath})){
       if (my ($id,$accountid,$region)=
-          $query->{idpath}=~m/^(i-\S+)\@([0-9]+)\@(\S+)$/){
+          $query->{idpath}=~m/^([a-z]{1,3}-[a-z0-9]{15,20})\@([0-9]+)\@(\S+)$/){
          if (exists($query->{id}) && 
              $query->{id} ne ""  &&
              $query->{id} ne $id){

@@ -46,7 +46,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'idpath',
                 group         =>'source',
-                label         =>'AWS-IdPath'),
+                label         =>'AWS-EC2-IdPath'),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -73,23 +73,35 @@ sub new
                 label         =>'NetArea Tag'),
 
       new kernel::Field::Text(
+                name          =>'vpcid',
+                label         =>'VpcId'),
+
+      new kernel::Field::Text(
+                name          =>'vpcidpath',
+                label         =>'VpcId Path'),
+
+      new kernel::Field::Text(
                 name          =>'id',
                 htmldetail    =>0,
                 searchable    =>0,
-                label         =>'EC2-InstanceID'),
+                label         =>'NetworkInterfaceID'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'accountid',
+                FieldHelpType =>'GenericConstant',
                 label         =>'AWS-AccountID'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
                 name          =>'region',
+                selectsearch  =>sub{
+                   my $self=shift;
+                   return("eu-central-1");
+                },
+                FieldHelpType =>'GenericConstant',
                 label         =>'AWS-Region'),
-
-
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name dnsname));
+   $self->setDefaultView(qw(id name dnsname vpcid));
    return($self);
 }
 
@@ -128,6 +140,7 @@ sub DataCollector
                #p $instance;
                my %rec=(
                    id=>$instance->{InstanceId},
+                   accountid=>$AWSAccount,
                    region=>$AWSRegion,
                    idpath=>$instance->{InstanceId}.'@'.
                            $AWSAccount.'@'.
@@ -149,6 +162,10 @@ sub DataCollector
                      $rec->{dnsname}=$iprec->PrivateDnsName();
                      $rec->{isprimary}=0;
                      $rec->{ifname}=$if->NetworkInterfaceId();
+                     $rec->{vpcid}=$if->VpcId();
+                     $rec->{vpcidpath}=$rec->{vpcid}.'@'.
+                                       $AWSAccount.'@'.
+                                       $AWSRegion;
                      $rec->{mac}=$if->MacAddress();
                      $rec->{netareatag}="ISLAND";
                      if (($rec->{name}=~m/^100\./)||
@@ -186,6 +203,21 @@ sub DataCollector
    if ($#errStack!=-1){
       $self->LastMsg(ERROR,@errStack);
       return(undef);
+   }
+   my $ip=getModuleObject($self->Config,"itil::ipaddress");
+   foreach my $rec (@result){
+      my $o=$ip->IpDecode($rec->{name});
+      if ($ip->isIpInNet($rec->{name},qw(
+            10.91.48.0/20
+            10.175.0.0/17
+            10.125.4.0/22
+            10.125.64.0/18
+
+            10.91.128.0/18
+            10.175.128.0/17
+            10.125.8.0/22 ))){
+         $rec->{netareatag}="CNDTAG";
+      }
    }
    return(\@result);
 }

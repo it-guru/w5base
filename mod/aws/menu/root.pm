@@ -34,24 +34,28 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("itu.AWS",
+   $self->RegisterObj("itu.cloud.AWS",
                       "tmpl/welcome",
-                      defaultacl=>['admin']);
+                      defaultacl=>['admin','support']);
    
-   $self->RegisterObj("itu.AWS.account",
+   $self->RegisterObj("itu.cloud.AWS.account",
                       "aws::account",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.AWS.system",
+   $self->RegisterObj("itu.cloud.AWS.system",
                       "aws::system",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.AWS.kern",
+   $self->RegisterObj("itu.cloud.AWS.VPC",
+                      "aws::VPC",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cloud.AWS.kern",
                       "tmpl/welcome",
                       prio=>9999,
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.AWS.kern.region",
+   $self->RegisterObj("itu.cloud.AWS.kern.region",
                       "aws::region",
                       defaultacl=>['valid_user']);
 
