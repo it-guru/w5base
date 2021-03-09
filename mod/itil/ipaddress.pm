@@ -684,6 +684,95 @@ sub prepareToWasted
 }
 
 
+sub isIpInNet
+{
+   my $self=shift;
+   my $ip=shift;
+   my @networks=@_;
+
+   my $iobj=$self->IpDecode($ip);
+
+   foreach my $net (@networks){
+       my $nobj=$self->IpDecode($net);
+       if ($nobj->{prefix6}){
+          my $nbase2=substr($nobj->{base2},0,$nobj->{prefix6});
+          my $ibase2=substr($iobj->{base2},0,$nobj->{prefix6});
+          if ($nbase2 eq $ibase2){
+             return(1);
+          }
+       }
+   }
+   return(0);
+}
+
+
+sub IpDecode
+{
+   my $self=shift;
+   my $ip=shift;
+   my %param=@_;
+   my %d;
+   if (!exists($param{IPv4})){
+      $param{IPv4}=1;
+   }
+   if (!exists($param{IPv6})){
+      $param{IPv6}=1;
+   }
+   if (!exists($param{prefix})){
+      $param{prefix}=1;
+   }
+   $d{input}=$ip;
+
+   if ($param{prefix}){
+      if (my ($prefix)=$ip=~m/\/([0-9]+)$/){
+         $ip=~s/\/[0-9]+$//;
+         $d{prefix}=$prefix;
+      }
+   }
+   my $ip6str;
+   if ($param{IPv4}){
+      if (my ($o1,$o2,$o3,$o4)=$ip=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/){
+         $d{format}="IPv4";
+         $d{ip}=sprintf('%d.%d.%d.%d',$o1,$o2,$o3,$o4);
+         $ip6str="0000:0000:0000:0000:0000:ffff:".
+                 unpack("H2",pack('C',$o1)).
+                 unpack("H2",pack('C',$o2)).":".
+                 unpack("H2",pack('C',$o3)).
+                 unpack("H2",pack('C',$o4));
+         if ($d{prefix}){
+            $d{prefix4}=$d{prefix};
+            $d{prefix6}=$d{prefix}+(16*6);
+         }
+      }
+   }
+   if ($param{IPv6}){
+      if ($ip=~m/:/){
+         my @unformat;
+         foreach my $okt (split(/:/,$ip)){
+            push(@unformat,sprintf("%04x",hex($okt)));
+         }
+         my $name=lc(join(":",@unformat));
+         $ip6str=$name;
+         $d{ip}=$ip6str;
+         if ($d{prefix}){
+            $d{prefix4}=$d{prefix};
+            $d{prefix6}=$d{prefix};
+         }
+      }
+   }
+   if ($ip6str ne ""){
+      $d{ip6str}=$ip6str;
+      my $binkey6;
+      foreach my $okt (split(/:/,$ip6str)){
+         $binkey6.=unpack("B16",pack("H4",$okt));
+      }
+      $d{base2}=$binkey6;
+   }
+
+   return(\%d);
+}
+
+
 
 
 
