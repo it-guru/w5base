@@ -1,4 +1,4 @@
-package aws::VPC;
+package aws::Subnet;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -58,7 +58,28 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'name',
+                htmlwidth     =>'200',
                 label         =>'Name'),
+
+      new kernel::Field::Text(
+                name          =>'ipnet',
+                label         =>'IP-Net'),
+
+      new kernel::Field::Text(
+                name          =>'netareatag',
+                label         =>'NetArea Tag'),
+
+      new kernel::Field::Text(
+                name          =>'vpcid',
+                label         =>'VpcId'),
+
+      new kernel::Field::Link(
+                name          =>'vpcidpath',
+                label         =>'VpcIdPath'),
+
+      new kernel::Field::Text(
+                name          =>'ownerid',
+                label         =>'OwnerId'),
 
       new kernel::Field::Text(
                 name          =>'accountid',
@@ -74,15 +95,6 @@ sub new
                 FieldHelpType =>'GenericConstant',
                 label         =>'AWS-Region'),
 
-      new kernel::Field::SubList(
-                name          =>'subnets',
-                label         =>'SubNets',
-                group         =>'subnets',
-                searchable    =>0,
-                vjointo       =>'aws::Subnet',
-                vjoinon       =>['idpath'=>'vpcidpath'],
-                vjoindisp     =>['name','ipnet','ownerid','netareatag']),
-
       new kernel::Field::Container(
                 name          =>'tags',
                 searchable    =>0,
@@ -92,7 +104,7 @@ sub new
 
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name accountid cdate));
+   $self->setDefaultView(qw(id name ipnet ownerid vpcid));
    return($self);
 }
 
@@ -108,13 +120,15 @@ sub DataCollector
    return(undef) if (!$self->genericSimpleFilterCheck4AWS($filterset));
    my $filter=$filterset->{FILTER}->[0];
 
-   my $query=$self->decodeFilter2Query4AWS("VPC",$filter);
+   my $query=$self->decodeFilter2Query4AWS("Subnet",$filter);
    if (!defined($query)){
       return(undef) if ($self->LastMsg());
       return([]);
    }
    my $AWSAccount=$query->{accountid};
    my $AWSRegion=$query->{region};
+
+   my $ip=getModuleObject($self->Config,"itil::ipaddress");
 
    my @errStack;
    try {
@@ -131,30 +145,52 @@ sub DataCollector
             $param{NextToken}=$NextToken;
          }
          if (exists($query->{id}) && $query->{id} ne ""){
-            $param{VpcIds}=[$query->{id}];
+            $param{SubnetIds}=[$query->{id}];
          }
          else{
             $param{MaxResults}=20;
          }
-         my $objItr=$obj->DescribeVpcs(%param);
+         my $objItr=$obj->DescribeSubnets(%param);
          if ($objItr){
-            my $Vpcs=$objItr->Vpcs();
-            if ($Vpcs){
-               foreach my $vpc (@$Vpcs){
+            my $Subnets=$objItr->Subnets();
+            if ($Subnets){
+               foreach my $subnet (@$Subnets){
                   my %tag;
-                  foreach my $tag (@{$vpc->Tags()}){
+                  foreach my $tag (@{$subnet->Tags()}){
                      $tag{$tag->Key()}=$tag->Value();
                   }
                   my $rec={
-                      id=>$vpc->{VpcId},
+                      id=>$subnet->{SubnetId},
                       accountid=>$AWSAccount,
+                      ipnet=>$subnet->CidrBlock(),
+                      vpcid=>$subnet->VpcId(),
+                      vpcidpath=>$subnet->VpcId().'@'.
+                              $AWSAccount.'@'.
+                              $AWSRegion,
+                      ownerid=>$subnet->OwnerId(),
                       region=>$AWSRegion,
                       name=>$tag{Name},
                       tags=>\%tag,
-                      idpath=>$vpc->{VpcId}.'@'.
+                      idpath=>$subnet->{SubnetId}.'@'.
                               $AWSAccount.'@'.
                               $AWSRegion,
                   };
+
+                  #########################################################
+                  # netarea tag depend from $rec->{ipnet} and $rec->{ownerid}
+                  if ($rec->{ownerid} eq "487587716831"){
+                     $rec->{netareatag}="ISLAND";
+                     if (($rec->{ipnet}=~m/^100\./)||
+                         ($rec->{ipnet}=~m/^172\./)){
+                        $rec->{netareatag}="AWSINTERN";
+                     }
+                     my $o=$ip->IpDecode($rec->{ipnet});
+                     if ($ip->isIpInNet($rec->{ipnet},
+                         $self->getIntranetworks())){
+                        $rec->{netareatag}="CNDTAG";
+                     }
+                  }
+                  #########################################################
                   push(@result,$rec);
                }
             }
@@ -196,8 +232,24 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","subnets","tags",
+   return("header","default","ipaddresses","tags",
           "source");
+}
+
+
+sub getIntranetworks
+{
+   my $self=shift;
+   my @l=qw(
+            10.91.48.0/20
+            10.175.0.0/17
+            10.125.4.0/22
+            10.125.64.0/18
+
+            10.91.128.0/18
+            10.175.128.0/17
+            10.125.8.0/22 );
+   return(@l);
 }
 
 

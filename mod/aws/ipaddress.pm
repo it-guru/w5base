@@ -125,6 +125,9 @@ sub DataCollector
    my $AWSAccount=$query->{accountid};
    my $AWSRegion=$query->{region};
 
+   my $ip=getModuleObject($self->Config,"itil::ipaddress");
+   my $subnets=getModuleObject($self->Config,"aws::Subnet");
+
    my @errStack;
    try {
       my $stscred=$self->GetCred4AWS($AWSAccount,$AWSRegion);
@@ -147,6 +150,7 @@ sub DataCollector
                            $AWSRegion,
                );
                my %ifs;
+               my %vpcpath;
                foreach my $if (@{$instance->NetworkInterfaces()}){
                   #p $if;
                   my %ifrec;
@@ -166,18 +170,50 @@ sub DataCollector
                      $rec->{vpcidpath}=$rec->{vpcid}.'@'.
                                        $AWSAccount.'@'.
                                        $AWSRegion;
+                     $vpcpath{$rec->{vpcidpath}}++;
                      $rec->{mac}=$if->MacAddress();
+                     #########################################################
+                     # netarea tag depend from $rec->{name}
                      $rec->{netareatag}="ISLAND";
-                     if (($rec->{name}=~m/^100\./)||
-                         ($rec->{name}=~m/^172\./)){
-                        $rec->{netareatag}="AWSINTERN";
-                     }
+                   #  if (($rec->{name}=~m/^100\./)||
+                   #      ($rec->{name}=~m/^172\./)){
+                   #     $rec->{netareatag}="AWSINTERN";
+                   #  }
+                   #  my $o=$ip->IpDecode($rec->{name});
+                   #  if ($ip->isIpInNet($rec->{name},
+                   #      $subnets->getIntranetworks())){
+                   #     $rec->{netareatag}="CNDTAG";
+                   #  }
+                     #########################################################
                      if ($iprec->Primary()){
                         $rec->{isprimary}=1;
                      }
                      push(@result,$rec);
                   }
                }
+               if (keys(%vpcpath)){
+                  foreach my $vpc (keys(%vpcpath)){
+                     my $vo=$self->getPersistentModuleObject("VPC","aws::VPC");
+                     $vo->SetFilter({idpath=>$vpc});
+                     my ($vpcrec,$msg)=$vo->getOnlyFirst(qw(id subnets));
+                     $vpcpath{$vpc}=$vpcrec;
+                  }
+               }
+               foreach my $rec (@result){
+                  if ($rec->{vpcidpath} ne "" &&
+                      exists($vpcpath{$rec->{vpcidpath}}) &&
+                      ref($vpcpath{$rec->{vpcidpath}}) eq "HASH"){
+                     foreach my $subnet (
+                             @{$vpcpath{$rec->{vpcidpath}}->{subnets}}){
+                        if ($ip->isIpInNet($rec->{name},$subnet->{ipnet})){
+                           if ($subnet->{netareatag} ne ""){
+                              $rec->{netareatag}=$subnet->{netareatag};
+                           }
+                        }
+                     }
+                  }
+               }
+
                my $publicip=$instance->PublicIpAddress();
                if ($publicip ne ""){
                   my $rec={%rec};
@@ -204,21 +240,6 @@ sub DataCollector
       $self->LastMsg(ERROR,@errStack);
       return(undef);
    }
-   my $ip=getModuleObject($self->Config,"itil::ipaddress");
-   foreach my $rec (@result){
-      my $o=$ip->IpDecode($rec->{name});
-      if ($ip->isIpInNet($rec->{name},qw(
-            10.91.48.0/20
-            10.175.0.0/17
-            10.125.4.0/22
-            10.125.64.0/18
-
-            10.91.128.0/18
-            10.175.128.0/17
-            10.125.8.0/22 ))){
-         $rec->{netareatag}="CNDTAG";
-      }
-   }
    return(\@result);
 }
 
@@ -229,8 +250,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","ipaddresses","tags",
-          "source");
+   return("header","default","ipaddresses","tags", "source");
 }
 
 

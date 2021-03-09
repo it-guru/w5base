@@ -98,6 +98,14 @@ sub new
                 searchable    =>0,
                 label         =>'Instance type'),
 
+      new kernel::Field::Text(
+                name          =>'vpcid',
+                label         =>'VpcId'),
+
+      new kernel::Field::Link(
+                name          =>'vpcidpath',
+                label         =>'VpcIdPath'),
+
       new kernel::Field::Container(
                 name          =>'tags',
                 searchable    =>0,
@@ -113,7 +121,7 @@ sub new
 
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id ipaddress accountid cdate));
+   $self->setDefaultView(qw(id ipaddress accountid vpcid cdate));
    return($self);
 }
 
@@ -159,6 +167,7 @@ sub DataCollector
             foreach my $res (@{$InstanceItr->Reservations()}){
                foreach my $instance (@{$res->Instances}){
                   #p $instance;
+                  msg(INFO,"load instance $instance->{InstanceId}");
                   my $cdate=$instance->{LaunchTime};
                   $cdate=~s/^(\S+)T(\S+).000Z$/$1 $2/;
                   my %tag;
@@ -177,6 +186,13 @@ sub DataCollector
                               $AWSAccount.'@'.
                               $AWSRegion,
                   };
+                  my $vpcid=$instance->VpcId();
+                  if ($vpcid ne ""){
+                     $rec->{vpcid}=$vpcid;
+                     $rec->{vpcidpath}=$vpcid.'@'.
+                              $AWSAccount.'@'.
+                              $AWSRegion;
+                  }
                   if (in_array(\@view,"cpucount")){
                      my $cpucount;
                      my $CpuOptions=$instance->CpuOptions();

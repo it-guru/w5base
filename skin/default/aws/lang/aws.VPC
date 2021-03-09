@@ -1,3 +1,4 @@
 'aws::VPC'=>{de=>'AWS VPC VirtualPrivateCloud',en=>'AWS VPC VirtualPrivateCloud'},
 'mandatary accountid filter not specifed'=>{de=>'zwingender AccountID Filter nicht angegeben'},
+'fieldgroup.subnets'=>{de=>'Subnets',en=>'Subnets'},
 'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},

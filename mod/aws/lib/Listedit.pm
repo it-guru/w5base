@@ -94,34 +94,38 @@ sub decodeFilter2Query4AWS
       }
    }
 
-
-   if (exists($query->{idpath})){
-      if (my ($id,$accountid,$region)=
-          $query->{idpath}=~m/^([a-z]{1,3}-[a-z0-9]{15,20})\@([0-9]+)\@(\S+)$/){
-         if (exists($query->{id}) && 
-             $query->{id} ne ""  &&
-             $query->{id} ne $id){
-            # query parameters combination can't get a valid result
-            return(undef);
+   foreach my $qvar (keys(%$query)){
+      if (my ($qvarpref)=$qvar=~m/^(\S*)idpath$/){
+         if (exists($query->{$qvarpref.'idpath'})){
+            if (my ($id,$accountid,$region)=
+                $query->{$qvarpref.'idpath'}
+                =~m/^([a-z]{1,6}-[a-z0-9]{15,20})\@([0-9]+)\@(\S+)$/){
+               if (exists($query->{$qvarpref.'id'}) && 
+                   $query->{$qvarpref.'id'} ne ""  &&
+                   $query->{$qvarpref.'id'} ne $id){
+                  # query parameters combination can't get a valid result
+                  return(undef);
+               }
+               $query->{$qvarpref.'id'}=$id;
+               if (exists($query->{'accountid'}) && 
+                   $query->{'accountid'} ne ""  &&
+                   $query->{'accountid'} ne $accountid){
+                  # query parameters combination can't get a valid result
+                  return(undef);
+               }
+               $query->{'accountid'}=$accountid;
+               if (exists($query->{region}) && 
+                   $query->{region} ne "" &&
+                   $query->{region} ne $region){
+                  # query parameters combination can't get a valid result
+                  return(undef);
+               }
+               $query->{region}=$region;
+            }
+            else{
+               return(undef);
+            }
          }
-         $query->{id}=$id;
-         if (exists($query->{accountid}) && 
-             $query->{accountid} ne ""  &&
-             $query->{accountid} ne $accountid){
-            # query parameters combination can't get a valid result
-            return(undef);
-         }
-         $query->{accountid}=$accountid;
-         if (exists($query->{region}) && 
-             $query->{region} ne "" &&
-             $query->{region} ne $region){
-            # query parameters combination can't get a valid result
-            return(undef);
-         }
-         $query->{region}=$region;
-      }
-      else{
-         return(undef);
       }
    }
 
