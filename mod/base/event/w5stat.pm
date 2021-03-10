@@ -39,9 +39,24 @@ sub Init
 
    $self->RegisterEvent("w5stat","w5stat",timeout=>7200);
    $self->RegisterEvent("w5statrecreate","w5statrecreate",timeout=>7200);
+   $self->RegisterEvent("w5stattrace","w5stattrace",timeout=>7200);
    $self->RegisterEvent("w5statsend","w5statsend");
    return(1);
 }
+
+
+sub w5stattrace
+{
+   my $self=shift;
+   my $statstream=shift;
+   my $module=shift;
+   my $dstrange=shift;
+
+   return($self->w5statrecreate($statstream,$module,$dstrange));
+}
+
+
+
 
 sub w5statrecreate
 {
@@ -77,13 +92,21 @@ sub w5statrecreate
          exitmsg=>'can not communicate to w5server',
       });
    }
-
+   ############################################################
+   # check on trace                                           #
+   ############################################################
+   if ((caller(1))[3] eq "base::event::w5stat::w5stattrace"){
+      $stat->setTraceFile("/tmp/w5stattrace.txt");
+   }
+   ############################################################
 
    foreach my $dstrange (@dstrange){
+      $stat->Trace("start dstrange $dstrange");
       msg(INFO,"call recreateStats for Module '$module' in ".
                "dstrange '$dstrange'");
       $stat->recreateStats($statstream,"w5stat",$module,$dstrange);
    }
+   $stat->Trace("start loadLateModifies");
    $stat->loadLateModifies($statstream,\@dstrange);
 
    return({exitcode=>0});

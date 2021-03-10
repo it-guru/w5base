@@ -739,6 +739,8 @@ sub processRecord
 
    if ($module eq "tsAPR::appl"){
       msg(INFO,"APR Processs $rec->{name}");
+      $self->getParent->Trace("");
+      $self->getParent->Trace("Processing: ".$rec->{name});
       #print STDERR Dumper($rec);
       my %systemid=();
       my @systemid=();
@@ -825,6 +827,7 @@ sub processRecord
                                                    softwareinstrelstate
                                                    softwareinstrelmsg
                                                    itclustsvc system
+                                                   swinstances
                                                    denyupd))){
                #print Dumper($swirec);
                my $instrating="";
@@ -857,17 +860,31 @@ sub processRecord
                if ($swirec->{itclustsvc} ne ""){
                   $locatedat=$swirec->{itclustsvc};
                }
-               $swinst{$swirec->{id}}={
-                   id=>$swirec->{id},
-                   dataobj=>$swinstdataobj,
-                   refid=>$refid,
-                   instrating=>$instrating,
-                   fullname=>$swirec->{fullname},
-                   ratingmsg=>$softwareinstrelmsg,
-                   denyupd=>$swirec->{denyupd},
-                   locatedat=>$locatedat,
-                   software=>$swirec->{software}
-               };
+               my $doCountIt=1;
+               if (ref($swirec->{swinstances}) eq "ARRAY"){
+                  if ($#{$swirec->{swinstances}}!=-1){
+                     $doCountIt=0;
+                     SWICHK: foreach my $swirec (@{$swirec->{swinstances}}){
+                        if ($swirec->{applid} eq $rec->{id}){
+                           $doCountIt=1;
+                           last SWICHK;
+                        }
+                     }
+                  }
+               }
+               if ($doCountIt){
+                  $swinst{$swirec->{id}}={
+                      id=>$swirec->{id},
+                      dataobj=>$swinstdataobj,
+                      refid=>$refid,
+                      instrating=>$instrating,
+                      fullname=>$swirec->{fullname},
+                      ratingmsg=>$softwareinstrelmsg,
+                      denyupd=>$swirec->{denyupd},
+                      locatedat=>$locatedat,
+                      software=>$swirec->{software}
+                  };
+               }
             }
          }
       }
@@ -889,7 +906,10 @@ sub processRecord
             push(@repOrg,$grec->{fullname});
          }
       }
-
+      $self->getParent->Trace("Count Application $name on ...");
+      foreach my $t (@repOrg){
+         $self->getParent->Trace(" -> $t");
+      }
 
       my %colors=@{$self->{Colors}};
       foreach my $color (keys(%colors)){
@@ -997,6 +1017,10 @@ sub processRecord
             $swinst{$swiid}->{denyupd},
             $swinst{$swiid}->{software}
          )."\n";
+         if ($swinst{$swiid}->{ratingmsg} ne ""){
+            $self->getParent->Trace("SWINST: ".$swinst{$swiid}->{fullname}."=>".
+                                    $ratingcolor);
+         }
          $self->getParent->storeStatVar("Application",
                                         [$rec->{name}],
                                         {nosplit=>1,

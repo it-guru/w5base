@@ -29,6 +29,7 @@ use DateTime::Span;
 use DateTime::SpanSet;
 use kernel::MenuTree;
 use POSIX qw(floor);
+use IO::File;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::FlashChart);
 
 sub new
@@ -494,6 +495,14 @@ sub _storeStats
                       dstrange=>$dstrangestamp,
                       nameid=>$nameid,
                       fullname=>$name};
+         $self->Trace("Store w5stat-Record:");
+         $self->Trace(" dstrange: ".$statrec->{dstrange});
+         $self->Trace(" fullname: ".$statrec->{fullname});
+         $self->Trace(" sgroup  : ".$statrec->{sgroup});
+         foreach my $k (sort(keys(%{$statrec->{stats}}))){
+            next if (ref($statrec->{stats}->{$k}));
+            $self->Trace("   stat($k) = $statrec->{stats}->{$k}");
+         }
          my $flt={sgroup=>\$statrec->{sgroup},
                   dstrange=>\$dstrangestamp,
                   statstream=>\$statstream,
@@ -527,6 +536,46 @@ sub processRecord
       }
    }
 }
+
+sub setTraceFile
+{
+   my $self=shift;
+   my $filename=shift;
+   if ($filename ne ""){
+      $self->{TRACEFILE}=$filename;
+   }
+   else{
+      delete($self->{TRACEFILE});
+   }
+}
+
+sub Trace
+{
+   my $self=shift;
+   my $text=shift;
+
+   if ($self->{TRACEFILE}){
+      if (!exists($self->{TRACEFILE_fh})){
+         my $fh=new IO::File();
+         if (! -f $self->{TRACEFILE}){
+            if ($fh->open(">".$self->{TRACEFILE})){
+               $fh->autoflush();
+               $self->{TRACEFILE_fh}=$fh;
+            }
+         }
+         else{
+            if ($fh->open(">>".$self->{TRACEFILE})){
+               $fh->autoflush();
+               $self->{TRACEFILE_fh}=$fh;
+            }
+         }
+      }
+      my $FH=$self->{TRACEFILE_fh};
+      $text=~s/\n/\r\n/gs;
+      printf $FH ("%-10s %s\r\n",$text);
+   }
+}
+
 
 sub storeStatVar
 {
@@ -564,6 +613,7 @@ sub storeStatVar
                   $self->{stats}->{$group}->{$key}->{$var}=$val[0];
                }
                if (lc($method) eq "count"){
+                  $self->Trace("$group:$key $var +=$val[0]");
                   $self->{stats}->{$group}->{$key}->{$var}+=$val[0];
                }
                if (lc($method) eq "gavg"){
