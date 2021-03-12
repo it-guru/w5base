@@ -461,7 +461,7 @@ sub Import
          my $sysallowed=0;
          if ($ageok && $applok){
             $self->ResetFilter();
-            $self->SetFilter({id=>\$osys->{srcid}});
+            $self->SetFilter({idpath=>\$osys->{srcid}});
             msg(INFO,"check exist of AWS-SystemID: $osys->{srcid}");
             my ($chkrec,$msg)=$self->getOnlyFirst(qw(id));
             if (!defined($chkrec)){

@@ -150,7 +150,10 @@ sub qcheckRecord
                   $dataobj->ResetFilter();
                   $dataobj->SetFilter({name=>\$sysname,id=>"!".$rec->{id}});
                   my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
-                  if (!defined($chkrec)){
+                  if (defined($chkrec)){
+                     $parrec->{name}=$parrec->{id};
+                  }
+                  else{
                      $parrec->{name}=$sysname;
                   }
                   $self->IfComp($dataobj,

@@ -123,6 +123,8 @@ sub decodeFilter2Query4AWS
                $query->{region}=$region;
             }
             else{
+               printf STDERR ("decodeFilter2Query4AWS: invalid idpath ".
+                              "$qvar : %s\n",Dumper($query));
                return(undef);
             }
          }
@@ -132,13 +134,16 @@ sub decodeFilter2Query4AWS
    if (!exists($query->{accountid}) ||
        !($query->{accountid}=~m/^\d{3,20}$/)){
       $self->LastMsg(ERROR,'mandatary search parameter missing: %s',"accountid");
-      #print STDERR Dumper($query);
+      printf STDERR ("decodeFilter2Query4AWS: missing accountid:".
+                     " %s\n",Dumper($query));
+      Stacktrace(1);
       return(undef);
    }
    if (!exists($query->{region}) ||
        !($query->{region}=~m/^\S{10,20}$/)){
       $self->LastMsg(ERROR,'mandatary search parameter missing: %s',"region");
-      #print STDERR Dumper($query);
+      printf STDERR ("decodeFilter2Query4AWS: missing region:".
+                     " %s\n",Dumper($query));
       return(undef);
    }
 
