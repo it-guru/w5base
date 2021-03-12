@@ -74,6 +74,19 @@ sub FineProcess
    #
    my $swi=$app->getPersistentModuleObject("W5BaseInst","TS::swinstance");
 
+
+   my %prodcomp=();
+   foreach my $k (sort(keys(%{$store->{child}}))){
+      print Dumper($store->{child}->{$k});
+      if ($store->{child}->{$k}->{prodcomp} ne ""){
+         $prodcomp{$store->{child}->{$k}->{prodcomp}}++;
+      }
+   }
+   msg(INFO,"prodcomp mapping check:");
+   foreach my $prodcomp (sort(keys(%prodcomp))){
+      printf STDERR ("'%s' = \n",$prodcomp);
+   }
+exit(1);
    foreach my $k (sort(keys(%{$store->{child}}))){
       my $rec=$store->{child}->{$k};
       my $refcnt=$rec->{cnt};
@@ -138,7 +151,8 @@ sub FineProcess
                   if ($swi->ValidatedUpdateRecord($oldrec,
                         $soll{$oldrec->{name}."-".$oldrec->{addname}},
                       {id=>\$oldrec->{id}})){
-                     $soll{$oldrec->{name}."-".$oldrec->{addname}}=$oldrec->{id};
+                     $soll{$oldrec->{name}."-".$oldrec->{addname}}=
+                         $oldrec->{id};
                   }
                }
             }
@@ -149,8 +163,8 @@ sub FineProcess
                $soll{$k}=$swiid;
             }
          }
-         msg(INFO,"software instance handled by w5baseid ".join(",",values(%soll)));
-
+         msg(INFO,"software instance handled by w5baseid ".
+                  join(",",values(%soll)));
       }
    }
 }
@@ -183,7 +197,10 @@ sub ProcessRecord
    $amappl->SetFilter({
       applid=>\$rec->{child_applid},
       deleted=>0,
-      status=>'!"out of operation"'
+      status=>'!"out of operation"',
+      assignmentgroup=>'TIT.TSI.INT.AO.CO05 '.
+                       'TIT.TSI.INT.AO.CO06 '.
+                       'TIT.TSI.INT.AO.CO07'
    });
    my ($amapplrec,$msg)=$amappl->getOnlyFirst(qw(ALL));
 
@@ -222,7 +239,8 @@ sub ProcessRecord
          parent=>{
          },
          iassignment=>$amapplrec->{iassignmentgroup},
-         assignment=>$amapplrec->{assignmentgroup}
+         assignment=>$amapplrec->{assignmentgroup},
+         prodcomp=>$amapplrec->{prodcomp}
       };
    }
    $store->{child}->{$rec->{child}}->{cnt}++;
