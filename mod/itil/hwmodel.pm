@@ -130,6 +130,18 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'hwmodel.modifydate'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"hwmodel.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(hwmodel.id,35,'0')"),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
