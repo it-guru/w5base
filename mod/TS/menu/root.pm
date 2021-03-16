@@ -261,7 +261,9 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-
+   $self->RegisterObj("itts.applgrp",
+                      "itil::applgrp",
+                      defaultacl=>['valid_user']);
 
    $self->RegisterObj("itts.kern",
                       "tmpl/welcome");
