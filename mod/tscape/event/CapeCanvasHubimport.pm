@@ -68,16 +68,19 @@ sub CapeCanvasHubimport
 
    my $iname=$i->Self();
    $i->SetFilter({status=>'"!Retired"'});
-   foreach my $irec ($i->getHashList(qw(archapplid id respvorg canvas))){
+   foreach my $irec ($i->getHashList(qw(archapplid 
+                                        id 
+                                        respvorg  orgarea organisation
+                                        canvas))){
       next if ($irec->{canvas}=~m/^C99 /); # No Canvas dummy records
       next if ($irec->{canvas} eq "");
       $c++;
       my $icto=$irec->{archapplid};
       my $ictoid=$irec->{id};
       my ($canvasidstr)=$irec->{canvas}=~m/^(C[0-9]{1,3})\s+/;
-      my ($hubshort)=$irec->{respvorg}=~m/^E-HUB-[0-9]+\s+(\S{2,4})\s+/;
+      my ($hubshort)=$irec->{organisation}=~m/^E-HUB-[0-9]+\s+(\S{2,4})\s+/;
       if ($hubshort eq ""){
-         ($hubshort)=$irec->{respvorg}=~m/^(\S{3})\s+/;
+         ($hubshort)=$irec->{organisation}=~m/^(\S{3})\s+/;
       }
       my $vouid;
       if (exists($v->{shortname}->{$hubshort})){
@@ -88,14 +91,13 @@ sub CapeCanvasHubimport
          $canvasid=$canvas->{canvasid}->{$canvasidstr}->{id};
       }
       
-
-      #printf STDERR (
-      #    "%03d %-8s %-8s %-3s hub=%-3s vou=%s canvas=%s\n",
-      #    $c,$icto,$ictoid,$canvasidstr,$hubshort,$vouid,$canvasid
-      #);
-
-
-      #printf STDERR ("rec[$c]=%s\n",Dumper($irec));
+      if (0){
+         printf STDERR (
+             "%03d %-8s %-8s %-3s hub=%-3s vou=%s canvas=%s\n",
+             $c,$icto,$ictoid,$canvasidstr,$hubshort,$vouid,$canvasid
+         );
+         printf STDERR ("rec[$c]=%s\n",Dumper($irec));
+      }
 
       my $newrec={
          ictoid=>$ictoid,
