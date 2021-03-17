@@ -1207,7 +1207,7 @@ sub new
                 vjoinon       =>['itclustid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'itclustid',
                 dataobjattr   =>'system.clusterid'),
 
