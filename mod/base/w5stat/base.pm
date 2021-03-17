@@ -164,7 +164,8 @@ sub getStatSelectionBox
                                 ]);
          @statnamelst=$app->getHashList(qw(fullname id));
          if ($#statnamelst==-1){   # seems to be the first day in month
-            msg(INFO,"w5stat/base: seems to be the first day in month");
+            #msg(INFO,"w5stat/base: ".
+            #         "seems to be the first day in month for grp=@idl");
             $app->ResetFilter();
             $app->SecureSetFilter([
                                     {dstrange=>\$altdstrange,sgroup=>\'Group',
