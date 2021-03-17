@@ -994,6 +994,56 @@ sub LoadStatSet
 }
 
 
+   sub getLabelString
+   {
+      my $histid=shift;
+      my $M1=shift;
+      my $Y1=shift;
+      my $curM=shift;
+      my $curY=shift;
+      my $KWyear=shift;
+      my $KWweek=shift;
+      my $k=sprintf("%04d%02d",$Y1,$M1);
+      my $style="";
+      my $cw;
+
+      if ($M1==$curM && $Y1==$curY){
+         $style="border-color:black;border-width:1px;border-style:solid";
+         my ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$curY,$curM,1,0,0,-30);
+         for(my $w=0;$w<10;$w++){
+            my $wstyle;
+            ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$sY,$sM,$sD,0,0,7);
+            my ($week,$year)=Week_of_Year($sY,$sM,$sD);
+            if ($week==$KWweek && $year==$KWyear){
+               $wstyle=$style;
+            }
+            $cw.=" - " if ($cw ne "");
+            my $tag=sprintf("%04dKW%02d",$year,$week);
+            my $frond=sprintf("KW%02d",$week);
+            if (defined($histid->{$tag})){
+               $cw.="<a class=sublink style=\"$wstyle\" ".
+                    "href=javascript:refreshTag($histid->{$tag})>$frond</a>";
+            }
+            else{
+               $cw.="<font color=silver>$frond</font>";
+            }
+         }
+      }
+      my $ms;
+      if (defined($histid->{$k})){
+         $ms=sprintf("<td align=center style=\"$style\">".
+                 "<a class=sublink href=javascript:refreshTag($histid->{$k})>".
+                 "%02d/%4d</a></td>",$M1,$Y1);
+      }
+      else{
+         $ms=sprintf("<td align=center><font color=silver>%02d/%4d</font></td>",
+                     $M1,$Y1);
+      }
+      return($ms,$cw);
+      
+   }
+
+
 sub Presenter
 {
    my $self=shift;
@@ -1209,54 +1259,6 @@ EOF
    
    my $mstr="";
    my $cstr="";
-   sub getLabelString
-   {
-      my $histid=shift;
-      my $M1=shift;
-      my $Y1=shift;
-      my $curM=shift;
-      my $curY=shift;
-      my $KWyear=shift;
-      my $KWweek=shift;
-      my $k=sprintf("%04d%02d",$Y1,$M1);
-      my $style="";
-      my $cw;
-
-      if ($M1==$curM && $Y1==$curY){
-         $style="border-color:black;border-width:1px;border-style:solid";
-         my ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$curY,$curM,1,0,0,-30);
-         for(my $w=0;$w<10;$w++){
-            my $wstyle;
-            ($sY,$sM,$sD)=Add_Delta_YMD("GMT",$sY,$sM,$sD,0,0,7);
-            my ($week,$year)=Week_of_Year($sY,$sM,$sD);
-            if ($week==$KWweek && $year==$KWyear){
-               $wstyle=$style;
-            }
-            $cw.=" - " if ($cw ne "");
-            my $tag=sprintf("%04dKW%02d",$year,$week);
-            my $frond=sprintf("KW%02d",$week);
-            if (defined($histid->{$tag})){
-               $cw.="<a class=sublink style=\"$wstyle\" ".
-                    "href=javascript:refreshTag($histid->{$tag})>$frond</a>";
-            }
-            else{
-               $cw.="<font color=silver>$frond</font>";
-            }
-         }
-      }
-      my $ms;
-      if (defined($histid->{$k})){
-         $ms=sprintf("<td align=center style=\"$style\">".
-                 "<a class=sublink href=javascript:refreshTag($histid->{$k})>".
-                 "%02d/%4d</a></td>",$M1,$Y1);
-      }
-      else{
-         $ms=sprintf("<td align=center><font color=silver>%02d/%4d</font></td>",
-                     $M1,$Y1);
-      }
-      return($ms,$cw);
-      
-   }
    if (defined($primrec)){
       if (ref($hist) eq "HASH" && ref($hist->{area}) eq "ARRAY"){
          foreach my $h (@{$hist->{area}}){
