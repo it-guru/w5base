@@ -169,7 +169,7 @@ sub getStatSelectionBox
                                     {dstrange=>\$altdstrange,sgroup=>\'Group',
                                      nameid=>\@idl},
                                    ]);
-            @statnamelst=$self->getHashList(qw(fullname id));
+            @statnamelst=$app->getHashList(qw(fullname id));
          }
          foreach my $r (sort({$a->{fullname} cmp $b->{fullname}} @statnamelst)){
              if (!exists($selbox->{'Group:'.$r->{fullname}})){
