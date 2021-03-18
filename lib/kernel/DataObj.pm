@@ -5013,10 +5013,11 @@ sub GetRESTCredentials
    $p{dbconnect}=$self->Config->Param('DATAOBJCONNECT');
    $p{dbpass}=$self->Config->Param('DATAOBJPASS');
    $p{dbuser}=$self->Config->Param('DATAOBJUSER');  # user is optional
+   $p{dbbase}=$self->Config->Param('DATAOBJBASE');  # base is optional
 
-   foreach my $v (qw(dbconnect dbpass dbuser)){
+   foreach my $v (qw(dbconnect dbpass dbuser dbbase)){
       if ((ref($p{$v}) ne "HASH" || !defined($p{$v}->{$dbname})) &&
-          $v ne "dbuser"){
+          $v ne "dbuser" && $v ne "dbbase"){
          my $msg=sprintf("Connect(%s): essential information '%s' missing",
                     $dbname,$v);
          $self->LastMsg(ERROR,$msg);
@@ -5026,7 +5027,7 @@ sub GetRESTCredentials
          $p{$v}=$p{$v}->{$dbname};
       }
    }
-   return($p{dbconnect},$p{dbpass},$p{dbuser});
+   return($p{dbconnect},$p{dbpass},$p{dbuser},$p{dbbase});
 }
 
 
