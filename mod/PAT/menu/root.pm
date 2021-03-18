@@ -60,6 +60,24 @@ sub Init
                       "PAT::masterappl",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.PAT.source",
+                      "tmpl/welcome",
+                      prio=>9999,
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("Tools.PAT.source.List",
+                      "PAT::srcList",
+                      prio=>10,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.PAT.source.BusinessSeg",
+                      "PAT::srcBusinessSeg",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.PAT.source.SubProcess",
+                      "PAT::srcSubProcess",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 
