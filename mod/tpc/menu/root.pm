@@ -35,23 +35,38 @@ sub Init
    my $self=shift;
 
    $self->RegisterObj("itu.tpc",
+                      ">itu.cloud.tpc");
+   
+   $self->RegisterObj("itu.tpc.project",
+                      ">itu.cloud.tpc.project");
+
+   $self->RegisterObj("itu.tpc.machine",
+                      ">itu.cloud.tpc.machine");
+
+   $self->RegisterObj("itu.tpc.kernel",
+                      ">itu.cloud.tpc.kernel");
+
+   $self->RegisterObj("itu.tpc.kernel.depl",
+                      ">itu.tpc.kernel.depl");
+
+   $self->RegisterObj("itu.cloud.tpc",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("itu.tpc.project",
+   $self->RegisterObj("itu.cloud.tpc.project",
                       "tpc::project",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tpc.machine",
+   $self->RegisterObj("itu.cloud.tpc.machine",
                       "tpc::machine",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tpc.kernel",
+   $self->RegisterObj("itu.cloud.tpc.kernel",
                       "tmpl/welcome",
                       prio=>9999,
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itu.tpc.kernel.depl",
+   $self->RegisterObj("itu.cloud.tpc.kernel.depl",
                       "tpc::deployment",
                       defaultacl=>['valid_user']);
 
