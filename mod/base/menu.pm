@@ -1015,6 +1015,18 @@ sub msel
    my $wintitle="";
    if (defined($mt->{fullname}->{$fp})){
       my $m=$mt->{fullname}->{$fp};
+      if (defined($m->{target}) && ($m->{target}=~m/^>\S+$/)){
+         my $redirect=$m->{target};
+         $redirect=~s/^>//;
+         $redirect=~s/\./\//g;
+         my $currenturl=$ENV{SCRIPT_URI};
+         if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+            $currenturl=~s/^http:/https:/;
+         }
+         $currenturl=~s/\/menu\/msel\/.*$/\/menu\/msel\/$redirect/;
+         $self->HtmlGoto($currenturl);
+         return();
+      }
       my @msub;
       my @mname;
       foreach my $subm (split(/\./,$fp)){
@@ -1184,6 +1196,9 @@ sub MenuTab
    my $userskin=Query->Cookie("W5SKIN");              # ensure cache reset
    $skinparam="?SKIN=$userskin" if ($userskin ne ""); # on skin switch!
 
+   my $dd=$self->_getMenuEntryFinalList($active,"normal");
+
+   printf STDERR ("dd=%s\n",Dumper($dd));
    
    $d.=kernel::MenuTree::BuildHtmlTree(
                      tree=>$self->_getMenuEntryFinalList($active,"normal"),
@@ -1204,14 +1219,17 @@ sub _getMenuEntryFinalList
    my @mlist=();
    # Pass 1 Basis-Liste zusammenstellen
    foreach my $srcrec (values(%{$mt->{menuid}})){
-      if (!defined($srcrec->{parent}) && $srcrec->{fullname} ne ""){
-         my %clone=%{$srcrec};
-         push(@mlist,\%clone);
+      if (!($srcrec->{target}=~m/^>/)){
+         if (!defined($srcrec->{parent}) && $srcrec->{fullname} ne ""){
+            my %clone=%{$srcrec};
+            push(@mlist,\%clone);
+         }
       }
    }
    # Pass 2 unsichtbare Menüs herausfiltern
    my @modmlist=();
    foreach my $m (@mlist){
+      next if ($m->{target}=~m/^>/);
       next if ($m->{fullname}=~m/\$$/);
       if (grep(/^(read|write)$/,$self->getMenuAcl($ENV{REMOTE_USER},$m))){
          $self->processSubs($mt,$m,$active,$mode);
@@ -1237,7 +1255,10 @@ sub processSubs
    foreach my $mid (@{$m->{subid}}){
       if ((substr($active,0,length($m->{fullname})+1) eq $m->{fullname}.'.' ||
           $active eq $m->{fullname}) || $mode eq "mobile"){
+         next if ($m->{target}=~m/^>/);
+         next if ($mt->{menuid}->{$mid}->{target}=~m/^>/);
          my %clone=%{$mt->{menuid}->{$mid}};
+         
          if ($#{$clone{acls}}==-1 || 
              grep(/^(read|write)$/,$self->getCurrentAclModes($ENV{REMOTE_USER},
                                                      $clone{acls}))){

@@ -63,6 +63,9 @@ sub RegisterObj
    if (defined($param{param})){
       $rec{param}=$param{param};
    }
+   if (!defined($param{func})){
+      $rec{func}='';
+   }
    if (defined($param{translation})){
       $rec{translation}=$param{translation};
    }
@@ -128,6 +131,7 @@ sub RegisterObj
           $rec{func} ne $mc->{fullname}->{$name}->{func} ||
           $rec{param} ne $mc->{fullname}->{$name}->{param} ||
           ($mc->{fullname}->{$name}->{target} eq "" && $rec{tranlation} ne "")){
+printf STDERR ("r=%s\n",Dumper(\%rec));
          my $oldstate=$p->isDataInputFromUserFrontend();
          $p->isDataInputFromUserFrontend(0);
          if ($p->ValidatedUpdateRecord(
