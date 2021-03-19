@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import requests,json,urllib
 from requests_ntlm import HttpNtlmAuth
 import shutil
@@ -92,8 +92,8 @@ def main(argv):
    try:
       opts, args = getopt.getopt(argv,"b:s:",["baseurl=","site="])
    except getopt.GetoptError:
-      print 'SharepointAPIJSONProxy.py ' + \
-            '--baseurl=<url> --site=<site> --method=<method>'
+      print('SharepointAPIJSONProxy.py ' + \
+            '--baseurl=<url> --site=<site> --method=<method>')
       sys.exit(2)
    for opt, arg in opts:
       if opt in ("-s", "--site"):
