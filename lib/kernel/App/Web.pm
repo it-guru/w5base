@@ -617,6 +617,9 @@ sub GTCverification
                                              {userid=>\$userid})){
                msg(INFO,"activation of user account $userid ok");
                my $currenturl=$ENV{SCRIPT_URI};
+               if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+                  $currenturl=~s/^http:/https:/;
+               }
                $currenturl=~
                   s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
                $self->HtmlGoto($currenturl);
