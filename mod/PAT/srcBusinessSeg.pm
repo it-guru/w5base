@@ -54,6 +54,22 @@ sub new
                 name          =>'organisation',
                 label         =>'Organisation'),
 
+      new kernel::Field::Text(
+                name          =>'orgshort',
+                label         =>'Orgshort'),
+
+      new kernel::Field::Text(
+                name          =>'sopt',
+                label         =>'S-OPT'),
+
+      new kernel::Field::Text(
+                name          =>'bseg',
+                label         =>'Business-Segement'),
+
+      new kernel::Field::Text(
+                name          =>'bsegopt',
+                label         =>'Business-Segement OPT'),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 searchable    =>0,
@@ -99,6 +115,10 @@ sub reformatExternal
       $rec->{id}=$raw->{Id};
       $rec->{title}=$raw->{Title};
       $rec->{organisation}=$raw->{Gesellschaft};
+      $rec->{orgshort}=$raw->{"Gesellschaft_K_x00fc_rzel"};
+      $rec->{sopt}=$raw->{"S_x002d_OPT"};
+      $rec->{bseg}=$raw->{"Gesch_x00e4_ftssegment"};
+      $rec->{bsegopt}=$raw->{"Gesch_x00e4_ftssegment_OPT"};
       $rec->{cdate}=$self->ExpandTimeExpression($raw->{Created},"en","GMT");
       $rec->{mdate}=$self->ExpandTimeExpression($raw->{Modified},"en","GMT");
       push(@result,$rec);

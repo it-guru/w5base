@@ -1,0 +1,10 @@
+'PAT::businessseg'=>{
+ 'de'=>'PAT: Geschäftssegment',
+ 'en'=>'PAT: Business-Segment'
+},
+'Sub-Processes'=>{en=>'Sub-Processes'},
+'fieldgroup.subprocesses'=>{de=>'Teilprocesse',en=>'Sub-Processes'},
+'Shortname'=>{de=>'Kürzel'},
+'Business-Segment'=>{de=>'Geschäftssegment'},
+'Business-Segment OPT'=>{de=>'Geschäftssegment OPT'},
+'Organisation Shortname'=>{de=>'Organisation Kürzel'},

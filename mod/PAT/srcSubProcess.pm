@@ -46,6 +46,11 @@ sub new
                 label         =>'ID'),
 
       new kernel::Field::Text(
+                name          =>'srcBusinessSegId',
+                htmlwidth     =>'150',
+                label         =>'srcBusinessSegId'),
+
+      new kernel::Field::Text(
                 name          =>'title',
                 htmlwidth     =>'150',
                 label         =>'Title'),
@@ -71,7 +76,7 @@ sub new
                 label         =>'Modification-Date'),
 
    );
-   $self->setDefaultView(qw(title subarea subprocess mdate cdate));
+   $self->setDefaultView(qw(srcBusinessSegId title subarea subprocess mdate cdate));
    return($self);
 }
 
@@ -89,7 +94,8 @@ sub getShellParameterList
    my $self=shift;
    my $filterset=shift;
 
-   return("Web/Lists(guid'93d415f2-711f-48f8-b8a1-edd59b1d7631')/Items");
+   return("Web/Lists(guid'93d415f2-711f-48f8-b8a1-edd59b1d7631')/Items".
+          '?$top=1000');
 }
 
 
@@ -103,6 +109,7 @@ sub reformatExternal
    foreach my $raw (@{$d->{d}->{results}}){
       my $rec={};
       $rec->{id}=$raw->{Id};
+      $rec->{srcBusinessSegId}=$raw->{Gesch_x00e4_ftssegmentId};
       $rec->{title}=$raw->{Title};
       $rec->{subarea}=$raw->{Teilbereich};
       $rec->{subprocess}=$raw->{Teilprozess};

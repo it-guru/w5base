@@ -1,0 +1,7 @@
+'PAT::subprocess'=>{
+ 'de'=>'PAT: Teilprozess',
+ 'en'=>'PAT: Sub-Process'
+},
+'Shortname'=>{de=>'Kürzel'},
+'Sub-Process'=>{de=>'Teilprozess'},
+'Business-Segment'=>{de=>'Geschäftssegment'},

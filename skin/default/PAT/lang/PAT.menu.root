@@ -1,0 +1,8 @@
+'Tools.PAT.businessseg'=>{de=>'Geschäftssegment',en=>'Business-Segment'},
+'Tools.PAT.businessseg.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.PAT.subprocess'=>{de=>'Teilprozess',en=>'Sub-Process'},
+'Tools.PAT.subprocess.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.PAT.ictname'=>{de=>'ICT-Name',en=>'ICT-Name'},
+'Tools.PAT.ictname.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.PAT.source'=>{de=>'Datenquelle',en=>'Data-Source'},
+

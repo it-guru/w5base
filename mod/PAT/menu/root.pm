@@ -56,8 +56,8 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("Tools.PAT.masterappl",
-                      "PAT::masterappl",
+   $self->RegisterObj("Tools.PAT.ictname",
+                      "PAT::ictname",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("Tools.PAT.source",
