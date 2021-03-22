@@ -1198,8 +1198,6 @@ sub MenuTab
 
    my $dd=$self->_getMenuEntryFinalList($active,"normal");
 
-   printf STDERR ("dd=%s\n",Dumper($dd));
-   
    $d.=kernel::MenuTree::BuildHtmlTree(
                      tree=>$self->_getMenuEntryFinalList($active,"normal"),
                      hrefclass=>'menulink',
