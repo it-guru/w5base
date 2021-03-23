@@ -39,6 +39,11 @@ sub new
             label              =>'MachineID'),
 
       new kernel::Field::Text(     
+            name               =>'machineNumber',
+            searchable         =>0,
+            label              =>'Machine Number'),
+
+      new kernel::Field::Text(     
             name               =>'systemid',
             searchable         =>1,
             readonly      =>sub{

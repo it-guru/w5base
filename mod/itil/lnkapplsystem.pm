@@ -93,6 +93,22 @@ sub new
                 group         =>'systeminfo',
                 dataobjattr   =>'system.systemid'),
 
+      new kernel::Field::Text(
+                name          =>'systemsrcsys',
+                label         =>'System Source-System',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'systeminfo',
+                dataobjattr   =>'system.srcsys'),
+
+      new kernel::Field::Text(
+                name          =>'systemsrcid',
+                label         =>'System Source-Id',
+                htmldetail    =>0,
+                readonly      =>1,
+                group         =>'systeminfo',
+                dataobjattr   =>'system.srcid'),
+
       new kernel::Field::TextDrop(
                 name          =>'systemconumber',
                 htmlwidth     =>'100px',

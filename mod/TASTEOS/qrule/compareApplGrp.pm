@@ -177,7 +177,8 @@ sub qcheckRecord
       applcistatusid=>[4]
    });
 
-   my @l=$lobj->getHashList(qw(systemid applgrpid id));
+   my @l=$lobj->getHashList(qw(systemid applgrpid id 
+                               systemsystemid systemsrcsys systemsrcid));
    my %ul;
    foreach my $lrec (@l){
       $ul{$lrec->{applgrpid}."-".$lrec->{systemid}}=$lrec;
@@ -238,6 +239,7 @@ sub qcheckRecord
    my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
    my $tsossysacl=getModuleObject($dataobj->Config,"TASTEOS::tsossystemacl");
    my $tsosmac=getModuleObject($dataobj->Config,"TASTEOS::tsosmachine");
+   my $w5sys=getModuleObject($dataobj->Config,"itil::system");
    #printf STDERR ("rec=%s\n",Dumper($rec));
 
 
@@ -245,7 +247,7 @@ sub qcheckRecord
    $tsossys->SetFilter({ictoNumber=>$rec->{applgrpid}});
    $tsossys->SetCurrentView(qw(id ictoNumber machines));
    my $curSys=$tsossys->getHashIndexed(qw(ictoNumber));
-#printf STDERR ("curSys getHashIndexed=%s\n",Dumper($curSys));
+   #printf STDERR ("curSys getHashIndexed=%s\n",Dumper($curSys));
 
 
    my $dd=Dumper($rec->{additional});
@@ -326,7 +328,7 @@ sub qcheckRecord
 
    }
    #printf STDERR ("fifi upd TSOSsystemid=$TSOSsystemid\n");
-
+   #printf STDERR ("l=%s\n",Dumper(\@l));
 
 
    if ($TSOSsystemid ne ""){
@@ -340,6 +342,19 @@ sub qcheckRecord
             name=>$lrec->{system},
             systemid=>$TSOSsystemid
          };
+         my $machineNumber;
+         if ($lrec->{systemsrcsys} eq "AssetManager" &&
+             $lrec->{systemsystemid} ne ""){
+            $machineNumber=$lrec->{systemsystemid};
+         }
+         else{
+            if ($lrec->{systemsrcid} ne ""){
+               $machineNumber=$lrec->{systemsrcid};
+            }
+         }
+         if ($machineNumber){
+            $tsosmacrec->{machineNumber}=$machineNumber;
+         }
 
          $tsosmac->ResetFilter();
          $tsosmac->SetFilter({id=>$TSOSmachineid});
