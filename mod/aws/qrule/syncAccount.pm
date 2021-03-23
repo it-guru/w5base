@@ -86,95 +86,99 @@ sub qcheckRecord
    $app->SetFilter({id=>\$rec->{applid}});
    my ($arec)=$app->getOnlyFirst(qw(id cistatusid));
 
-   return(undef,undef) if (!defined($arec));
-
-   return(undef,undef) if ($arec->{cistatusid} ne "4");
+   if (!defined($arec)){
+      push(@qmsg,"invalid application reference");
+   }
+   else{
+      if ($arec->{cistatusid} ne "4"){
+          push(@qmsg,"invalid CI-State for application");
+      }
+   }
+  
+   { 
+      my $chk=getModuleObject($self->getParent->Config(),"aws::account");
+      $chk->SetFilter({accountid=>$awsaccountid});
+      my @acc=$chk->getHashList(qw(accountid));
+      if ($#acc==-1){
+         push(@qmsg,"AWS account invalid or not accessable");
+      }
+   }
    
-   
 
 
+   if ($#qmsg==-1){
+      my $par=getModuleObject($self->getParent->Config(),"aws::system");
 
-   my $par=getModuleObject($self->getParent->Config(),"aws::system");
+      $par->SetFilter({accountid=>$awsaccountid,region=>$awsregion});
 
-   $par->SetFilter({accountid=>$awsaccountid,region=>$awsregion});
+      my @l=$par->getHashList(qw(id cdate));
 
-   my @l=$par->getHashList(qw(id cdate));
+      my @id;
+      my %srcid;
+      foreach my $irec (@l){
+         push(@id,$irec->{id});
+         $srcid{$irec->{id}.'@'.$awsaccountid.'@'.$awsregion}={
+            cdate=>$irec->{cdate}
+         };
+      }
+      my $sys=getModuleObject($self->getParent->Config(),"itil::system");
 
-   my @id;
-   my %srcid;
-   foreach my $irec (@l){
-      push(@id,$irec->{id});
-      $srcid{$irec->{id}.'@'.$awsaccountid.'@'.$awsregion}={
-         cdate=>$irec->{cdate}
-      };
-   }
-   my $sys=getModuleObject($self->getParent->Config(),"itil::system");
+      $sys->SetFilter([
+         {
+            srcid=>[keys(%srcid)]
+         },
+         {
+            srcid=>"i-*".'@'..$awsaccountid.'@'.$awsregion,
+            cistatusid=>"<6"
+         }]
+      );
+      my @cursys=$sys->getHashList(qw(id srcid cistatusid));
 
-   $sys->SetFilter([
-      {
-         srcid=>[keys(%srcid)]
-      },
-      {
-         srcid=>"i-*".'@'..$awsaccountid.'@'.$awsregion,
-         cistatusid=>"<6"
-      }]
-   );
-   my @cursys=$sys->getHashList(qw(id srcid cistatusid));
+      my @delsys;
+      my @inssys;
+      my @updsys;
 
-   my @delsys;
-   my @inssys;
-   my @updsys;
-
-   foreach my $sysrec (@cursys){
-      my $srcid=$sysrec->{srcid};
-      if (exists($srcid{$srcid})){
-         if ($sysrec->{cistatusid} ne "4"){
-            $srcid{$srcid}->{op}="upd";
+      foreach my $sysrec (@cursys){
+         my $srcid=$sysrec->{srcid};
+         if (exists($srcid{$srcid})){
+            if ($sysrec->{cistatusid} ne "4"){
+               $srcid{$srcid}->{op}="upd";
+            }
+            else{
+               $srcid{$srcid}->{op}="ok";
+            }
          }
-         else{
-            $srcid{$srcid}->{op}="ok";
+      }
+      foreach my $sysrec (@cursys){
+         my $srcid=$sysrec->{srcid};
+         if (!exists($srcid{$srcid}->{op})){
+            push(@delsys,$srcid);
+         }
+      }
+      foreach my $srcid (keys(%srcid)){
+         if (!exists($srcid{$srcid}->{op})){
+            push(@inssys,$srcid);
+         }
+         elsif($srcid{$srcid}->{op} eq "upd"){
+            push(@updsys,$srcid);
+         }
+      }
+
+      $par->ResetFilter();
+      foreach my $srcid (@inssys){
+         push(@qmsg,"import $srcid");
+         $par->Import({importname=>$srcid});
+      }
+      if (keys(%srcid) &&   # ensure, restcall get at least one result
+          $#delsys!=-1){
+         $sys->ResetFilter();
+         $sys->SetFilter(srcid=>\@delsys);
+         my $op=$sys->Clone();
+         foreach my $rec ($sys->getHashList(qw(ALL))){
+            $op->ValidatedUpdateRecord($rec,{cistatusid=>6},{id=>\$rec->{id}});
          }
       }
    }
-   foreach my $sysrec (@cursys){
-      my $srcid=$sysrec->{srcid};
-      if (!exists($srcid{$srcid}->{op})){
-         push(@delsys,$srcid);
-      }
-   }
-   foreach my $srcid (keys(%srcid)){
-      if (!exists($srcid{$srcid}->{op})){
-         push(@inssys,$srcid);
-      }
-      elsif($srcid{$srcid}->{op} eq "upd"){
-         push(@updsys,$srcid);
-      }
-   }
-
-   $par->ResetFilter();
-   foreach my $srcid (@inssys){
-      push(@qmsg,"import $srcid");
-      $par->Import({importname=>$srcid});
-   }
-   if (keys(%srcid) &&   # ensure, restcall get at least one result
-       $#delsys!=-1){
-      $sys->ResetFilter();
-      $sys->SetFilter(srcid=>\@delsys);
-      my $op=$sys->Clone();
-      foreach my $rec ($sys->getHashList(qw(ALL))){
-         $op->ValidatedUpdateRecord($rec,{cistatusid=>6},{id=>\$rec->{id}});
-      }
-   }
-
-   #
-   # updsys muss noch behandelt werden!!!
-   #
-
-   #printf STDERR ("srcid=%s\n",Dumper(\%srcid));
-   #printf STDERR ("delsys=%s\n",Dumper(\@delsys));
-   #printf STDERR ("inssys=%s\n",Dumper(\@inssys));
-   #printf STDERR ("updsys=%s\n",Dumper(\@updsys));
-
 
    my @result=$self->HandleQRuleResults("AWS",
                  $dataobj,$rec,$checksession,

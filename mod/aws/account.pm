@@ -1,6 +1,6 @@
 package aws::account;
 #  W5Base Framework
-#  Copyright (C) 2020  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,148 +20,152 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Field;
-use JSON;
-#use aws::lib::Listedit;
-#@ISA=qw(aws::lib::Listedit);
+use kernel::cgi;
+use aws::lib::Listedit;
+use Data::Printer;
+use Try::Tiny;
+use Paws::Exception;
+use Scalar::Util(qw(blessed));
 
-use kernel::DataObj::Static;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
-
+@ISA=qw(aws::lib::Listedit);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=3;
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Id(     
-            name               =>'id',
-            searchable         =>1,
-            label              =>'AWS-AccountID'),
+      new kernel::Field::Text(
+                name          =>'accountid',
+                FieldHelpType =>'GenericConstant',
+                label         =>'AWS-AccountID'),
 
       new kernel::Field::Text(
-            name               =>'arn',
-            label              =>'ARN'),
+                name          =>'region',
+                selectsearch  =>sub{
+                   my $self=shift;
+                   return("us-east-1");
+                },
+                FieldHelpType =>'GenericConstant',
+                label         =>'AWS-Region'),
 
       new kernel::Field::Text(
-            name               =>'email',
-            label              =>'E-Mail'),
-
-      new kernel::Field::Text(  
-            name               =>'name',
-            label              =>'Account-Name'),
-
-      new kernel::Field::Text(
-            name               =>'status',
-            label              =>'Status'),
-
-      new kernel::Field::SubList(
-            name               =>'systems',
-            label              =>'Systems',
-            vjointo            =>\'aws::system',
-            vjoinon            =>['id'=>'accountid'],
-            vjoindisp          =>['id','ipaddress']),
+                name          =>'users',
+                searchable    =>0,
+                label         =>'Users'),
 
       new kernel::Field::Container(
-            name               =>'tags',
-            label              =>'Tags',
-            uivisible          =>1,
-            htmlDetail         =>1 )
+                name          =>'tags',
+                searchable    =>0,
+                group         =>'tags',
+                uivisible     =>1,
+                label         =>'Tags'),
+
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name email status));
+   $self->setDefaultView(qw(accountid region users));
    return($self);
 }
+
 
 sub DataCollector
 {
    my $self=shift;
+   my $filterset=shift;
 
-   my $dbclass="accounts";
+   my @view=$self->GetCurrentView();
+   my @result;
 
-   return($self->CollectREST(
-      dbname=>'aws',
-      cachetime=>600,
-      url=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl.$dbclass;
-         return($dataobjurl);
-      },
-      headers=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         return(['x-api-key'=>$apikey]);
-      },
-      success=>sub{  # DataReformaterOnSucces
-         my $self=shift;
-         my $data=shift;
-         if (ref($data) eq "HASH" && exists($data->{accounts}) && 
-             ref($data->{accounts}) eq "HASH"){
-            return([map({
-                      #######################################################
-                      # remap tags field to Container Strukture
-                      my $tags=$_->{tags};
-                      my %k;
-                      if (ref($tags) eq "ARRAY"){
-                         foreach my $l (@$tags){
-                            if ($l->{Key} ne ""){
-                               push(@{$k{$l->{Key}}},$l->{Value});
-                            }
-                         }
-                      }
-                      $_->{tags}=\%k;
-                      #######################################################
-                      $_;
-                   } values(%{$data->{accounts}}))]);
+   return(undef) if (!$self->genericSimpleFilterCheck4AWS($filterset));
+   my $filter=$filterset->{FILTER}->[0];
+
+   my $query=$self->decodeFilter2Query4AWS("Account",$filter);
+   if (!defined($query)){
+      return(undef) if ($self->LastMsg());
+      return([]);
+   }
+   my %AWSAccount;
+   foreach my $AWSAccount (split(/\s+/,$query->{accountid})){
+      $AWSAccount{$AWSAccount}++;
+   }
+   my @AWSAccount=sort(keys(%AWSAccount));
+   my $AWSRegion=$query->{region};
+
+   my @errStack;
+
+
+   my $AWSAccount=$query->{accountid};
+
+
+   foreach my $AWSAccount (@AWSAccount){
+      try {
+         my ($stscred,$ua)=$self->GetCred4AWS($AWSAccount,$AWSRegion);
+         my $obj=Paws->service('IAM',
+               credentials=>$stscred,
+               region =>$AWSRegion
+         );
+         my $blk=0;
+         my $NextToken;
+         do{
+            my %param=();
+            if ($NextToken ne ""){
+               $param{NextToken}=$NextToken;
+            }
+            my $objItr=$obj->GetAccountSummary(%param);
+            if ($objItr){
+               my %rec=(
+                  accountid=>$AWSAccount,
+                  region=>$AWSRegion
+               );
+               my $SummaryMap = $objItr->SummaryMap;
+               $rec{users}=$SummaryMap->{Users};
+               push(@result,\%rec);
+            }
+            $blk++;
+         }while($NextToken ne "");
+      }
+      catch {
+         my $eclass=blessed($_);
+         if ($eclass eq "Paws::Exception"){
+            if ($_->code ne "AccessDenied"){ # Account gibt es nicht mehr
+               push(@errStack,"(".$_->code.") :".$_->message);
+            }
          }
          else{
-            $self->LastMsg(ERROR,"unexpected data structure from REST call");
+            push(@errStack,$_);
          }
-         return(undef);
-      },
-      useproxy=>1
-   ));
+      };
+      last if ($#errStack!=-1);
+   }
+   if ($#errStack!=-1){
+      $self->LastMsg(ERROR,@errStack);
+      return(undef);
+   }
+   return(\@result);
 }
 
 
-sub getValidWebFunctions
-{
-   my ($self)=@_;
-   return(qw(TriggerEndpoint),$self->SUPER::getValidWebFunctions());
-}
 
-
-sub TriggerEndpoint
+sub initSearchQuery
 {
    my $self=shift;
-   my %param;
-
-   $param{charset}="UTF8";
-
-   my $q=Query->MultiVars();
-
-   delete($q->{MOD});
-   delete($q->{FUNC});
-   print $self->HttpHeader("application/javascript",%param);
-
-   my $json=new JSON;
-   $json->utf8(1);
-
-   my $d=$json->encode({
-      request=>$q,
-      exitcode=>0,
-      exitmsg=>'OK'
-   });
-   print $d;
-   return(0);
+   if (!defined(Query->Param("search_accountid"))){
+     Query->Param("search_accountid"=>'280962857063');
+   }
 }
 
 
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return("header","default","ipaddresses","tags",
+          "source");
+}
 
 
 

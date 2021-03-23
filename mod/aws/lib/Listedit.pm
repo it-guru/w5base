@@ -131,20 +131,40 @@ sub decodeFilter2Query4AWS
       }
    }
 
-   if (!exists($query->{accountid}) ||
-       !($query->{accountid}=~m/^\d{3,20}$/)){
-      $self->LastMsg(ERROR,'mandatary search parameter missing: %s',"accountid");
-      printf STDERR ("decodeFilter2Query4AWS: missing accountid:".
-                     " %s\n",Dumper($query));
-      Stacktrace(1);
-      return(undef);
+   if ($keyhandling eq "Account"){
+      if (!exists($query->{accountid}) ||
+          (trim($query->{accountid}) eq "")){
+         $self->LastMsg(ERROR,
+                        'mandatary search parameter missing: %s',"accountid");
+         return(undef);
+      }
    }
-   if (!exists($query->{region}) ||
-       !($query->{region}=~m/^\S{10,20}$/)){
-      $self->LastMsg(ERROR,'mandatary search parameter missing: %s',"region");
-      printf STDERR ("decodeFilter2Query4AWS: missing region:".
-                     " %s\n",Dumper($query));
-      return(undef);
+   else{
+      if (!exists($query->{accountid}) ||
+          !($query->{accountid}=~m/^\d{3,20}$/)){
+         $self->LastMsg(ERROR,
+                        'mandatary search parameter missing: %s',"accountid");
+         printf STDERR ("decodeFilter2Query4AWS: missing accountid:".
+                        " %s\n",Dumper($query));
+         Stacktrace(1);
+         return(undef);
+      }
+   }
+   if ($keyhandling eq "Account"){
+      if (!exists($query->{region}) ||
+          $query->{region} eq ""){
+         $query->{region}="us-east-1";
+      }
+   }
+   else{
+      if (!exists($query->{region}) ||
+          !($query->{region}=~m/^\S{8,20}$/)){
+         $self->LastMsg(ERROR,
+                        'mandatary search parameter missing: %s',"region");
+         printf STDERR ("decodeFilter2Query4AWS: missing region:".
+                        " %s\n",Dumper($query));
+         return(undef);
+      }
    }
 
    return($query);
