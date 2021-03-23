@@ -368,6 +368,7 @@ sub qcheckRecord
          }
          else{
             if ($mrec->{systemid} ne $tsosmacrec->{systemid} ||
+                $mrec->{machineNumber}  ne $tsosmacrec->{machineNumber} ||
                 $mrec->{name}     ne $tsosmacrec->{name}){
                my $bk=$tsosmac->ValidatedUpdateRecord(
                   {},$tsosmacrec,
