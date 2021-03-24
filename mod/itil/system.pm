@@ -1846,6 +1846,22 @@ sub jsExploreObjectMethods
 }
 
 
+sub ValidateSystemname
+{
+   my $self=shift;
+   my $name=shift;
+
+   my $purename=$name;
+   $purename=~s/\[[0-9]+\]\s*$//;
+   if (length($name)<3 ||length($purename)>63 || haveSpecialChar($name) ||
+       ($name=~m/^\d+$/)){  # only a number as system name ist not ok
+      return(0);
+   }
+   return(1);
+
+}
+
+
 
 sub Validate
 {
@@ -1862,10 +1878,7 @@ sub Validate
 
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   my $purename=$name;
-   $purename=~s/\[[0-9]+\]\s*$//;
-   if (length($name)<3 ||length($purename)>63 || haveSpecialChar($name) ||
-       ($name=~m/^\d+$/)){  # only a number as system name ist not ok
+   if (!$self->ValidateSystemname($name)){
       $self->LastMsg(ERROR,"invalid system name '%s' specified",$name);
       return(0);
    }

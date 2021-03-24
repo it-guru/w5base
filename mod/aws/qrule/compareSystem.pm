@@ -142,7 +142,8 @@ sub qcheckRecord
                if (length($sysname)>40){
                   $sysname=substr($sysname,40);
                }
-               if ($sysname eq ""){
+               if ($sysname eq "" || 
+                   (!($dataobj->ValidateSystemname($sysname)))){
                   $sysname=$parrec->{id};
                }
              
