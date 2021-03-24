@@ -124,7 +124,7 @@ sub reformatExternal
       push(@result,$rec);
    }
    if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-      print STDERR Dumper($d->{d}->{results}->[0]);
+#      print STDERR Dumper($d->{d}->{results}->[0]);
    }
    return(\@result);
 }

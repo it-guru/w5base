@@ -1,0 +1,9 @@
+'PAT::ictname'=>{
+ 'de'=>'PAT: ICT-Name',
+ 'en'=>'PAT: ICT-Name'
+},
+'fieldgroup.applications'=>{en=>'Applications',de=>'Anwendungen'},
+'fieldgroup.subprocessrefs'=>{en=>'Sub-Process references',de=>'Teilprozess-Referenzen'},
+'Sub-Process references'=>{de=>'Teilprozess-Referenzen'},
+'Applications'=>{de=>'Anwendungen'},
+

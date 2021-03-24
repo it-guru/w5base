@@ -30,6 +30,7 @@ sub PATDataLoad
    my $self=shift;
 
    $self->LoadsrcBusinessSeg();
+   $self->LoadsrcICTname();
    $self->LoadsrcSubProcess();
 
 
@@ -60,6 +61,8 @@ sub LoadsrcBusinessSeg
             sopt=>$rec->{sopt},
             orgshort=>$orgshort,
             orgname=>$rec->{organisation},
+            mdate=>$rec->{mdate},
+            cdate=>$rec->{cdate},
             srcload=>NowStamp("en"),
             srcsys=>$srcsys,
             srcid=>$rec->{id},
@@ -79,10 +82,11 @@ sub LoadsrcBusinessSeg
 sub LoadsrcSubProcess
 {
    my $self=shift;
-   print Dumper($self->{bseg});
+   #print Dumper($self->{bseg});
 
    my $o=getModuleObject($self->Config,"PAT::srcSubProcess");
    my $wobj=getModuleObject($self->Config,"PAT::subprocess");
+   my $wlobj=getModuleObject($self->Config,"PAT::lnksubprocessictname");
 
    $o->SetFilter({});
 
@@ -97,6 +101,8 @@ sub LoadsrcSubProcess
             name=>$rec->{title},
             title=>$rec->{subarea},
             businesssegid=>$bsid,
+            mdate=>$rec->{mdate},
+            cdate=>$rec->{cdate},
             srcload=>NowStamp("en"),
             srcsys=>$srcsys,
             srcid=>$rec->{id},
@@ -106,7 +112,69 @@ sub LoadsrcSubProcess
             srcid=>\$rec->{id}
          }
       );
+      if ($#id==0){
+         my %reclist;
+         foreach my $rellevel (qw(4 3 2 1)){
+            foreach my $id (@{$rec->{"r$rellevel"}}){
+               next if ($id eq "");
+               my $ictnameid=$self->{ictname}->{srcid}->{$id}->{id};
+               next if ($ictnameid eq "");
+               $reclist{$id}={
+                  ictnameid=>$ictnameid,
+                  subprocessid=>$id[0],
+                  rawrelevance=>$rellevel,
+                  srcid=>$id[0].'-'.$id,
+                  srcsys=>$srcsys
+               };
+            }
+         }
+         foreach my $relrec (values(%reclist)){
+            my @lid=$wlobj->ValidatedInsertOrUpdateRecord($relrec,
+               { srcsys=>\$relrec->{srcsys}, srcid=>\$relrec->{srcid} }
+            );
+         }
+      }
    }
+}
+
+
+sub LoadsrcICTname
+{
+   my $self=shift;
+
+   my $o=getModuleObject($self->Config,"PAT::srcICTname");
+   my $wobj=getModuleObject($self->Config,"PAT::ictname");
+
+   $o->SetFilter({});
+
+   my %ictname;
+
+   foreach my $rec ($o->getHashList(qw(ALL))){
+      #print Dumper($rec);
+      next if (exists($ictname{$rec->{title}}));
+      my $srcsys=$o->Self();
+
+      my @id=$wobj->ValidatedInsertOrUpdateRecord({
+            name=>$rec->{title},
+            ictoid=>$rec->{ictoid},
+            mdate=>$rec->{mdate},
+            cdate=>$rec->{cdate},
+            srcload=>NowStamp("en"),
+            srcsys=>$srcsys,
+            srcid=>$rec->{id},
+         },
+         {
+            srcsys=>\$srcsys,
+            srcid=>\$rec->{id}
+         }
+      );
+      if ($#id==0){
+         $ictname{$rec->{title}}++;
+      }
+   }
+   $wobj->ResetFilter();
+   $wobj->SetCurrentView(qw(srcid name title id));
+   $self->{ictname}=$wobj->getHashIndexed(qw(id srcid));
 }
 
 

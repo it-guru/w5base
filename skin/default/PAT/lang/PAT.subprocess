@@ -2,6 +2,9 @@
  'de'=>'PAT: Teilprozess',
  'en'=>'PAT: Sub-Process'
 },
+'fieldgroup.ictnames'=>{de=>'ICT-Namen',en=>'ICT-Names'},
+'ICT-Names'=>{de=>'ICT-Namen'},
 'Shortname'=>{de=>'Kürzel'},
 'Sub-Process'=>{de=>'Teilprozess'},
 'Business-Segment'=>{de=>'Geschäftssegment'},
+'relevant ICT-Names'=>{de=>'alle relevanten ICT-Namen'},
