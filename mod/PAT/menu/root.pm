@@ -56,8 +56,17 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.PAT.subprocess.lnkictname",
+                      "PAT::lnksubprocessictname",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.PAT.ictname",
                       "PAT::ictname",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.PAT.ictname.new",
+                      "PAT::ictname",
+                      func=>'New',
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("Tools.PAT.source",
@@ -76,6 +85,10 @@ sub Init
 
    $self->RegisterObj("Tools.PAT.source.SubProcess",
                       "PAT::srcSubProcess",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("Tools.PAT.source.ICTname",
+                      "PAT::srcICTname",
                       defaultacl=>['valid_user']);
 
    return($self);

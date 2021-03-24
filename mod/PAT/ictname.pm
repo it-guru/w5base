@@ -1,4 +1,4 @@
-package PAT::subprocess;
+package PAT::ictname;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -41,37 +41,24 @@ sub new
                 name          =>'id',
                 group         =>'source',
                 label         =>'W5BaseID',
-                dataobjattr   =>'PAT_subprocess.id'),
+                dataobjattr   =>'PAT_ictname.id'),
 
       new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
-                label         =>'Shortname',
-                dataobjattr   =>'PAT_subprocess.name'),
+                label         =>'ICT-Name',
+                dataobjattr   =>'PAT_ictname.name'),
 
       new kernel::Field::Text(
-                name          =>'title',
-                label         =>'Sub-Process',
-                dataobjattr   =>'PAT_subprocess.title'),
-
-      new kernel::Field::TextDrop(
-                name          =>'businessseg',
-                label         =>'Business-Segment',
-                vjointo       =>'PAT::businessseg',
-                vjoinon       =>['businesssegid'=>'id'],
-                vjoindisp     =>'fullname'),
-
-      new kernel::Field::Link(
-                name          =>'businesssegid',
-                label         =>'Business-SegmentID',
-                dataobjattr   =>'PAT_subprocess.businessseg'),
-
+                name          =>'ictoid',
+                label         =>'ICTO-ID',
+                dataobjattr   =>'PAT_ictname.ictoid'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
-                dataobjattr   =>'PAT_subprocess.comments'),
+                dataobjattr   =>'PAT_ictname.comments'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -79,91 +66,94 @@ sub new
                 uivisible     =>0,
                 uploadable    =>0,
                 label         =>'Sub-Process',
-                dataobjattr   =>"concat(PAT_subprocess.name,': ',".
-                                "PAT_subprocess.title)"),
-
+                dataobjattr   =>"concat(if (PAT_ictname.ictoid<>'',".
+                                "concat(PAT_ictname.ictoid,': '),''),".
+                                "PAT_ictname.name)"),
 
       new kernel::Field::SubList(
-                name          =>'ictnames',
-                label         =>'ICT-Names',
-                group         =>'ictnames',
-                subeditmsk    =>'subedit.ictnames',
-                vjointo       =>\'PAT::lnksubprocessictname',
-                vjoinon       =>['id'=>'subprocessid'],
-                vjoindisp     =>['relevance','ictname']),
-
-      new kernel::Field::Text(
-                name          =>'allictnames',
-                label         =>'relevant ICT-Names',
-                htmldetail    =>0,
+                name          =>'subprocessrefs',
+                label         =>'Sub-Process references',
+                group         =>'subprocessrefs',
                 readonly      =>1,
-                group         =>'ictnames',
+                htmldetail    =>'NotEmpty',
                 vjointo       =>\'PAT::lnksubprocessictname',
-                vjoinon       =>['id'=>'subprocessid'],
-                vjoindisp     =>'ictname'),
+                vjoinon       =>['id'=>'ictnameid'],
+                vjoindisp     =>['subprocess','relevance']),
+
+      new kernel::Field::SubList(
+                name          =>'applications',
+                label         =>'Applications',
+                group         =>'applications',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                vjointo       =>\'TS::appl',
+                vjoinbase     =>{cistatusid=>'3 4 5'},
+                vjoinon       =>['ictoid'=>'ictono'],
+                vjoindisp     =>['name','opmode']),
+
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 selectfix     =>1,
                 label         =>'Source-System',
-                dataobjattr   =>'PAT_subprocess.srcsys'),
+                dataobjattr   =>'PAT_ictname.srcsys'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
                 label         =>'Source-Id',
-                dataobjattr   =>'PAT_subprocess.srcid'),
+                dataobjattr   =>'PAT_ictname.srcid'),
 
       new kernel::Field::Date(
                 name          =>'srcload',
                 history       =>0,
                 group         =>'source',
                 label         =>'Source-Load',
-                dataobjattr   =>'PAT_subprocess.srcload'),
+                dataobjattr   =>'PAT_ictname.srcload'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Creation-Date',
-                dataobjattr   =>'PAT_subprocess.createdate'),
+                dataobjattr   =>'PAT_ictname.createdate'),
                                                   
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
-                dataobjattr   =>'PAT_subprocess.modifydate'),
+                dataobjattr   =>'PAT_ictname.modifydate'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
                 label         =>'Creator',
-                dataobjattr   =>'PAT_subprocess.createuser'),
+                dataobjattr   =>'PAT_ictname.createuser'),
 
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
                 label         =>'last Editor',
-                dataobjattr   =>'PAT_subprocess.modifyuser'),
+                dataobjattr   =>'PAT_ictname.modifyuser'),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
                 label         =>'Editor Account',
-                dataobjattr   =>'PAT_subprocess.editor'),
+                dataobjattr   =>'PAT_ictname.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 label         =>'real Editor Account',
-                dataobjattr   =>'PAT_subprocess.realeditor'),
+                dataobjattr   =>'PAT_ictname.realeditor'),
    
 
    );
-   $self->setDefaultView(qw(name title businessseg mdate));
-   $self->setWorktable("PAT_subprocess");
+   $self->setDefaultView(qw(name ictoid mdate));
+   $self->setWorktable("PAT_ictname");
    return($self);
 }
 
@@ -181,7 +171,8 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default 
-             ictnames 
+             subprocessrefs
+             applications 
              source));
 }
 
@@ -202,7 +193,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default ictnames);
+   my @wrgrp=qw(default);
 
    return(@wrgrp) if ($self->PAT::lib::Listedit::isWriteValid($rec));
    return(undef);
