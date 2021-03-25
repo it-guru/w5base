@@ -1031,15 +1031,17 @@ sub SetFilter
          $self->LastMsg("ERROR","invalid Filter request on $self");
          return(undef);
       }
+      if ((!exists($flt[0]->{systemid})) ||
+          !ref($flt[0]->{systemid})){   # exakt record references are not
+         my %f1=(%{$flt[0]});           # time filtered
+         $f1{status}='!"out of operation"';
 
-      my %f1=(%{$flt[0]});
-      $f1{status}='!"out of operation"';
+         my %f2=(%{$flt[0]});
+         $f2{status}='"out of operation"';
+         $f2{mdate}='>now-7d';
 
-      my %f2=(%{$flt[0]});
-      $f2{status}='"out of operation"';
-      $f2{mdate}='>now-7d';
-
-      @flt=([\%f1,\%f2]);
+         @flt=([\%f1,\%f2]);
+      }
    }
    #print STDERR Dumper(\@flt);
    #Stacktrace(1);
