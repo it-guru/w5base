@@ -10,3 +10,6 @@
 "overlap range '\%s'"=>{de=>"überlappender Zeitbereich '\%s'"},
 "range missmismatch '\%s'"=>{de=>"fehlerhafter Zeitbereich '\%s'"},
 'invalid tspan type'=>{de=>'ungültiger Zeitbereichstyp'},
+'mon-fri'=>{de=>'Mo-Fr'},
+'sat'=>{de=>'Sa'},
+'sun/HOL'=>{de=>'So/FT'},

@@ -75,7 +75,7 @@ sub Validate
 
    my $newval=$newrec->{$name};
    if (!ref($newval) && 
-       ($newval=~m/^0\(.*1\(.*2\(.*3\(.*4\(.*5\(.*6\(.*7\(.*\)$/)){
+       ($newval=~m/^0\(.*\)(\+[1-9]\(.*\)){0,6}$/)){
       my @deparse=();
       while(my ($t,$v)=$newval=~m/^\+{0,1}(\d)\(([^\)]*?)\)/){
          if ($t>=0 && $t<=7){
@@ -235,7 +235,8 @@ sub FormatedDetail
             if ($dayno!=7){
                $day="<b>$day</b>";
             }
-            $tab.="<tr><td width=\"1%\">$day</td><td with=\"$spanareawidth\">";
+            $tab.="<tr><td width=\"1%\" nowrap>".$day.
+                  "</td><td with=\"$spanareawidth\">";
             if ($mode ne "edit"){
                my @blks=();
                foreach my $b (split(/,/,$fval[$dayno])){
