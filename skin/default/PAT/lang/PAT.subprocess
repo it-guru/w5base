@@ -3,7 +3,11 @@
  'en'=>'PAT: Sub-Process'
 },
 'fieldgroup.ictnames'=>{de=>'ICT-Namen',en=>'ICT-Names'},
+'fieldgroup.times'=>{de=>'Zeit-Definitionen',en=>'Time-Definitions'},
 'ICT-Names'=>{de=>'ICT-Namen'},
+'Online-Time'=>{de=>'Online-Zeit'},
+'Core-Time'=>{de=>'Kernzeit'},
+'Use-Time'=>{de=>'Nutzungszeit'},
 'Shortname'=>{de=>'Kürzel'},
 'Sub-Process'=>{de=>'Teilprozess'},
 'Business-Segment'=>{de=>'Geschäftssegment'},
