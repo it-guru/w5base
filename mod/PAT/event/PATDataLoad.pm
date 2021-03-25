@@ -84,6 +84,11 @@ sub LoadsrcSubProcess
    my $self=shift;
    #print Dumper($self->{bseg});
 
+   my $to=getModuleObject($self->Config,"PAT::srcTimes");
+   $to->SetFilter({});
+   $to->SetCurrentView(qw(title id));
+   $self->{times}=$to->getHashIndexed(qw(id));
+
    my $o=getModuleObject($self->Config,"PAT::srcSubProcess");
    my $wobj=getModuleObject($self->Config,"PAT::subprocess");
    my $wlobj=getModuleObject($self->Config,"PAT::lnksubprocessictname");
@@ -97,12 +102,18 @@ sub LoadsrcSubProcess
 
       my $bsid=$self->{bseg}->{srcid}->{$rec->{srcBusinessSegId}}->{id};
 
+      my $onlinetime=$self->{times}->{id}->{$rec->{onlinetimeid}}->{title};
+      my $usetime=$self->{times}->{id}->{$rec->{usetimeid}}->{title};
+      my $coretime=$self->{times}->{id}->{$rec->{coretimeid}}->{title};
       my @id=$wobj->ValidatedInsertOrUpdateRecord({
             name=>$rec->{title},
             title=>$rec->{subarea},
             businesssegid=>$bsid,
             mdate=>$rec->{mdate},
             cdate=>$rec->{cdate},
+            onlinetime=>$onlinetime,
+            usetime=>$usetime,
+            coretime=>$coretime,
             srcload=>NowStamp("en"),
             srcsys=>$srcsys,
             srcid=>$rec->{id},

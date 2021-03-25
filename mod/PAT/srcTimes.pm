@@ -1,4 +1,4 @@
-package PAT::srcSubProcess;
+package PAT::srcTimes;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -46,52 +46,9 @@ sub new
                 label         =>'ID'),
 
       new kernel::Field::Text(
-                name          =>'srcBusinessSegId',
-                htmlwidth     =>'150',
-                label         =>'srcBusinessSegId'),
-
-      new kernel::Field::Text(
                 name          =>'title',
                 htmlwidth     =>'150',
                 label         =>'Title'),
-
-      new kernel::Field::Text(
-                name          =>'subarea',
-                htmlwidth     =>'150',
-                label         =>'Sub-Area'),
-
-      new kernel::Field::Text(
-                name          =>'subprocess',
-                htmlwidth     =>'150',
-                label         =>'Sub-Process'),
-
-      new kernel::Field::Text(
-                name          =>'r1',
-                label         =>'K1 Ids'),
-
-      new kernel::Field::Text(
-                name          =>'r2',
-                label         =>'K2 Ids'),
-
-      new kernel::Field::Text(
-                name          =>'r3',
-                label         =>'R3 Ids'),
-
-      new kernel::Field::Text(
-                name          =>'r4',
-                label         =>'R4 Ids'),
-
-      new kernel::Field::Text(
-                name          =>'onlinetimeid',
-                label         =>'OnlinezeitId'),
-
-      new kernel::Field::Text(
-                name          =>'usetimeid',
-                label         =>'NutzungszeitId'),
-
-      new kernel::Field::Text(
-                name          =>'coretimeid',
-                label         =>'KernzeitId'),
 
       new kernel::Field::Date(
                 name          =>'cdate',
@@ -104,7 +61,7 @@ sub new
                 label         =>'Modification-Date'),
 
    );
-   $self->setDefaultView(qw(srcBusinessSegId title subarea subprocess mdate cdate));
+   $self->setDefaultView(qw(id title count organisation mdate cdate));
    return($self);
 }
 
@@ -122,8 +79,7 @@ sub getShellParameterList
    my $self=shift;
    my $filterset=shift;
 
-   return("Web/Lists(guid'93d415f2-711f-48f8-b8a1-edd59b1d7631')/Items".
-          '?$top=1000');
+   return("Web/Lists(guid'd83a7456-ed7a-45a8-9dab-ae5a404df8ff')/Items");
 }
 
 
@@ -137,17 +93,30 @@ sub reformatExternal
    foreach my $raw (@{$d->{d}->{results}}){
       my $rec={};
       $rec->{id}=$raw->{Id};
-      $rec->{srcBusinessSegId}=$raw->{Gesch_x00e4_ftssegmentId};
-      $rec->{title}=$raw->{Title};
-      $rec->{subarea}=$raw->{Teilbereich};
-      $rec->{subprocess}=$raw->{Teilprozess};
-      $rec->{r1}=$raw->{Kernapplikationen_K1Id}->{results};
-      $rec->{r2}=$raw->{Kernapplikationen_K2Id}->{results};
-      $rec->{r3}=$raw->{Randapplikationen_R3Id}->{results};
-      $rec->{r4}=$raw->{Randapplikationen_R4Id}->{results};
-      $rec->{onlinetimeid}=$raw->{OnlinezeitId};
-      $rec->{usetimeid}=$raw->{NutzungszeitId};
-      $rec->{coretimeid}=$raw->{KernzeitId};
+      my @l=qw(Beginn_MoFr Ende_MoFr Beginn_Sa Ende_Sa Beginn_So Ende_So);
+      my @tblock;
+      my $c=0;
+      while(my $t1=shift(@l)){
+        my $t2=shift(@l);
+        my ($h1,$m1)=$raw->{$t1}=~m/T([0-9]{2}):([0-9]{2})/;
+        my ($h2,$m2)=$raw->{$t2}=~m/T([0-9]{2}):([0-9]{2})/;
+        $h1+=1;
+        $h2+=1;
+        $h1="00" if ($h1 eq "24");
+        $h2="00" if ($h2 eq "24");
+     
+        my $d1=sprintf("%02d:%02d",$h1,$m1);
+        my $d2=sprintf("%02d:%02d",$h2,$m2);
+        $d2="23:59" if ($d2 eq "00:00");
+
+        my $trange="$d1-$d2";
+
+        $trange="" if ($d1 eq $d2);
+
+        push(@tblock,"$c($trange)");
+        $c++;
+      }
+      $rec->{title}=join("+",@tblock);
       $rec->{cdate}=$self->ExpandTimeExpression($raw->{Created},"en","GMT");
       $rec->{mdate}=$self->ExpandTimeExpression($raw->{Modified},"en","GMT");
       push(@result,$rec);
@@ -157,6 +126,18 @@ sub reformatExternal
    }
    return(\@result);
 }
+
+
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+#   if (!defined(Query->Param("search_accountid"))){
+#     Query->Param("search_accountid"=>'280962857063');
+#   }
+}
+
 
 
 sub getDetailBlockPriority

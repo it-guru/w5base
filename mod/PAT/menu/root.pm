@@ -91,6 +91,10 @@ sub Init
                       "PAT::srcICTname",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.PAT.source.Times",
+                      "PAT::srcTimes",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

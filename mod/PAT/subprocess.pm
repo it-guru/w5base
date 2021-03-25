@@ -102,6 +102,30 @@ sub new
                 vjoinon       =>['id'=>'subprocessid'],
                 vjoindisp     =>'ictname'),
 
+      new kernel::Field::TimeSpans(
+                name          =>'onlinetime',
+                label         =>'Online-Time',
+                days          =>['mon-fri','sat','sun/HOL'],
+                tspandaymap   =>[1,1,1,0,0,0,0],
+                group         =>'times',
+                dataobjattr   =>'PAT_subprocess.onlinetime'),
+
+      new kernel::Field::TimeSpans(
+                name          =>'usetime',
+                label         =>'Use-Time',
+                days          =>['mon-fri','sat','sun/HOL'],
+                tspandaymap   =>[1,1,1,0,0,0,0],
+                group         =>'times',
+                dataobjattr   =>'PAT_subprocess.usetime'),
+
+      new kernel::Field::TimeSpans(
+                name          =>'coretime',
+                label         =>'Core-Time',
+                days          =>['mon-fri','sat','sun/HOL'],
+                tspandaymap   =>[1,1,1,0,0,0,0],
+                group         =>'times',
+                dataobjattr   =>'PAT_subprocess.coretime'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -182,6 +206,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default 
              ictnames 
+             times
              source));
 }
 
@@ -202,7 +227,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default ictnames);
+   my @wrgrp=qw(default ictnames times);
 
    return(@wrgrp) if ($self->PAT::lib::Listedit::isWriteValid($rec));
    return(undef);
