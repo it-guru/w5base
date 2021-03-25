@@ -125,6 +125,7 @@ sub decodeFilter2Query4AWS
             else{
                printf STDERR ("decodeFilter2Query4AWS: invalid idpath ".
                               "$qvar : %s\n",Dumper($query));
+               Stacktrace(1);
                return(undef);
             }
          }

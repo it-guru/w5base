@@ -2941,6 +2941,8 @@ sub getDeleteRecordFilter
    my $dropid=$oldrec->{$idname};
    if (!defined($dropid)){
       $self->LastMsg(ERROR,"can't delete record without unique id in $idname");
+      printf STDERR ("getDeleteRecordFilter:%s\n",Dumper($oldrec));
+      Stacktrace(1);
       return;
    }
    my @flt=({$self->IdField->Name()=>$dropid});

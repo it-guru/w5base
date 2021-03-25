@@ -158,6 +158,8 @@ sub DataCollector
                   if ($#v6!=-1){
                      msg(WARN,
                        "ipv6 handling not yet implemented in aws::ipaddress");
+                     print STDERR ("instanceid=$instance->{InstanceId} @v6\n");
+                     Stacktrace(1);
                   }
                   my @ips;
                   foreach my $iprec (@{$if->PrivateIpAddresses()}){
