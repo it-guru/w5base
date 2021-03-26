@@ -191,6 +191,15 @@ sub new
    
 
    );
+   $self->{history}={
+      delete=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ]
+   };
+
    $self->setDefaultView(qw(name title businessseg mdate));
    $self->setWorktable("PAT_subprocess");
    return($self);

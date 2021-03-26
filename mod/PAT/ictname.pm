@@ -152,6 +152,15 @@ sub new
    
 
    );
+   $self->{history}={
+      delete=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ]
+   };
+
    $self->setDefaultView(qw(name ictoid mdate));
    $self->setWorktable("PAT_ictname");
    return($self);
