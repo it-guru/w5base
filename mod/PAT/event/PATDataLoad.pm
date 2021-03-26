@@ -57,6 +57,7 @@ sub LoadsrcBusinessSeg
       my @id=$wobj->ValidatedInsertOrUpdateRecord({
             name=>$rec->{title},
             title=>$rec->{bseg},
+            comments=>$rec->{comments},
             bsegopt=>$bsegopt,
             sopt=>$rec->{sopt},
             orgshort=>$orgshort,
@@ -110,6 +111,8 @@ sub LoadsrcSubProcess
             title=>$rec->{subarea},
             businesssegid=>$bsid,
             mdate=>$rec->{mdate},
+            comments=>$rec->{comments},
+            description=>$rec->{description},
             cdate=>$rec->{cdate},
             onlinetime=>$onlinetime,
             usetime=>$usetime,
@@ -167,6 +170,7 @@ sub LoadsrcICTname
 
       my @id=$wobj->ValidatedInsertOrUpdateRecord({
             name=>$rec->{title},
+            comments=>$rec->{comments},
             ictoid=>$rec->{ictoid},
             mdate=>$rec->{mdate},
             cdate=>$rec->{cdate},

@@ -2,7 +2,7 @@
  'de'=>'PAT: Teilprozess',
  'en'=>'PAT: Sub-Process'
 },
-'fieldgroup.ictnames'=>{de=>'ICT-Namen',en=>'ICT-Names'},
+'fieldgroup.ictnames'=>{de=>'ICT-Namenszuordnungen',en=>'ICT-Name-Relations'},
 'fieldgroup.times'=>{de=>'Zeit-Definitionen',en=>'Time-Definitions'},
 'ICT-Names'=>{de=>'ICT-Namen'},
 'Online-Time'=>{de=>'Online-Zeit'},
@@ -10,5 +10,6 @@
 'Use-Time'=>{de=>'Nutzungszeit'},
 'Shortname'=>{de=>'Kürzel'},
 'Sub-Process'=>{de=>'Teilprozess'},
+'Description'=>{de=>'Beschreibung'},
 'Business-Segment'=>{de=>'Geschäftssegment'},
 'relevant ICT-Names'=>{de=>'alle relevanten ICT-Namen'},

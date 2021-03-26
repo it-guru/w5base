@@ -69,6 +69,11 @@ sub new
 
 
       new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>'PAT_subprocess.description'),
+
+      new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'PAT_subprocess.comments'),
@@ -90,7 +95,7 @@ sub new
                 subeditmsk    =>'subedit.ictnames',
                 vjointo       =>\'PAT::lnksubprocessictname',
                 vjoinon       =>['id'=>'subprocessid'],
-                vjoindisp     =>['relevance','ictname']),
+                vjoindisp     =>['relevance','ictname','cdate']),
 
       new kernel::Field::Text(
                 name          =>'allictnames',

@@ -93,6 +93,14 @@ sub new
                 name          =>'coretimeid',
                 label         =>'KernzeitId'),
 
+      new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Description'),
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments'),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 searchable    =>0,
@@ -139,6 +147,8 @@ sub reformatExternal
       $rec->{id}=$raw->{Id};
       $rec->{srcBusinessSegId}=$raw->{Gesch_x00e4_ftssegmentId};
       $rec->{title}=$raw->{Title};
+      $rec->{description}=$raw->{Beschreibung};
+      $rec->{comments}=$raw->{Anmerkungen};
       $rec->{subarea}=$raw->{Teilbereich};
       $rec->{subprocess}=$raw->{Teilprozess};
       $rec->{r1}=$raw->{Kernapplikationen_K1Id}->{results};

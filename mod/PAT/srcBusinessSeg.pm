@@ -70,6 +70,10 @@ sub new
                 name          =>'bsegopt',
                 label         =>'Business-Segement OPT'),
 
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments'),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 searchable    =>0,
@@ -115,6 +119,7 @@ sub reformatExternal
       $rec->{id}=$raw->{Id};
       $rec->{title}=$raw->{Title};
       $rec->{organisation}=$raw->{Gesellschaft};
+      $rec->{comments}=$raw->{Anmerkungen};
       $rec->{orgshort}=$raw->{"Gesellschaft_K_x00fc_rzel"};
       $rec->{sopt}=$raw->{"S_x002d_OPT"};
       $rec->{bseg}=$raw->{"Gesch_x00e4_ftssegment"};
