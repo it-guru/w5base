@@ -115,7 +115,7 @@ sub MultiOperationHeader
                                            opmode=>'MultiEdit');
    my @oktypes=qw(TextDrop Databoss Mandator Contact Group Number 
                   Textarea MultiDst IndividualAttr Currency
-                  Text Select Boolean Date);
+                  Text Select Boolean Date TimeSpans);
    foreach my $fo (@fieldlist){
       my $t=$fo->Type();
       if (in_array(\@oktypes,$t)){
