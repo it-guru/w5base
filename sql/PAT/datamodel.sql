@@ -33,7 +33,7 @@ create table PAT_subprocess(
   usetime         text,
   coretime        text,
    additional     longtext     default NULL,
-  comments    longtext     default NULL,
+  comments    longtext     default NULL,description longtext,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) default NULL,

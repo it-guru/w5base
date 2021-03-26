@@ -58,6 +58,10 @@ sub new
                 name          =>'basedataref',
                 label         =>'Base-Data Reference'),
 
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments'),
+
       new kernel::Field::Date(
                 name          =>'cdate',
                 searchable    =>0,
@@ -104,6 +108,7 @@ sub reformatExternal
       $rec->{id}=$raw->{Id};
       $rec->{title}=$raw->{Title};
       $rec->{ictoid}=$raw->{ICTO_x002d_ID};
+      $rec->{comments}=$raw->{Anmerkungen};
       $rec->{basedataref}=$raw->{Stammdatenreferenz};
       $rec->{cdate}=$self->ExpandTimeExpression($raw->{Created},"en","GMT");
       $rec->{mdate}=$self->ExpandTimeExpression($raw->{Modified},"en","GMT");
