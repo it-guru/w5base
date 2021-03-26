@@ -159,6 +159,15 @@ sub new
    
 
    );
+   $self->{history}={
+      delete=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ]
+   };
+
    $self->setDefaultView(qw(name title bsegopt sopt orgname orgshort mdate));
    $self->setWorktable("PAT_businessseg");
    return($self);
