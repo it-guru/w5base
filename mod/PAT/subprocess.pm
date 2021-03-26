@@ -131,6 +131,70 @@ sub new
                 group         =>'times',
                 dataobjattr   =>'PAT_subprocess.coretime'),
 
+      new kernel::Field::TimeSpans(
+                name          =>'ibicoretime',
+                label         =>'IBI Core-Time',
+                days          =>['mon-fri','sat','sun/HOL'],
+                tspandaymap   =>[1,1,1,0,0,0,0],
+                group         =>'ibitimes',
+                dataobjattr   =>'PAT_subprocess.ibi_coretime'),
+
+      new kernel::Field::Number(
+                name          =>'ibithcoretimemonfri',
+                label         =>'IBI Threashold Core-Time mon-fri',
+                precision     =>0,
+                unit          =>'min',
+                group         =>'ibitimes',
+                dataobjattr   =>'PAT_subprocess.ibi_th_coretime_monfri'),
+
+      new kernel::Field::Number(
+                name          =>'ibithcoretimesat',
+                label         =>'IBI Threashold Core-Time sat',
+                precision     =>0,
+                unit          =>'min',
+                group         =>'ibitimes',
+                dataobjattr   =>'PAT_subprocess.ibi_th_coretime_sat'),
+
+      new kernel::Field::Number(
+                name          =>'ibithcoretimesun',
+                label         =>'IBI Threashold Core-Time sun/HOL',
+                precision     =>0,
+                unit          =>'min',
+                group         =>'ibitimes',
+                dataobjattr   =>'PAT_subprocess.ibi_th_coretime_sun'),
+
+      new kernel::Field::TimeSpans(
+                name          =>'ibinonprodtime',
+                label         =>'IBI NonProd-Time',
+                days          =>['mon-fri','sat','sun/HOL'],
+                tspandaymap   =>[1,1,1,0,0,0,0],
+                group         =>'ibitimes',
+                dataobjattr   =>'PAT_subprocess.ibi_nonprodtime'),
+
+      new kernel::Field::Number(
+                name          =>'ibithnonprodtimemonfri',
+                label         =>'IBI Threashold NonProd-Time mon-fri',
+                precision     =>0,
+                unit          =>'min',
+                group         =>'ibitimes',
+                dataobjattr   =>'PAT_subprocess.ibi_th_nonprodtime_monfri'),
+
+      new kernel::Field::Number(
+                name          =>'ibithnonprodtimesat',
+                label         =>'IBI Threashold NonProd-Time sat',
+                precision     =>0,
+                unit          =>'min',
+                group         =>'ibitimes',
+                dataobjattr   =>'PAT_subprocess.ibi_th_nonprodtime_sat'),
+
+      new kernel::Field::Number(
+                name          =>'ibithnonprodtimesun',
+                label         =>'IBI Threashold NonProd-Time sun/HOL',
+                precision     =>0,
+                unit          =>'min',
+                group         =>'ibitimes',
+                dataobjattr   =>'PAT_subprocess.ibi_th_nonprodtime_sun'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
@@ -221,6 +285,7 @@ sub getDetailBlockPriority
    return(qw(header default 
              ictnames 
              times
+             ibitimes
              source));
 }
 
@@ -241,7 +306,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default ictnames times);
+   my @wrgrp=qw(default ictnames times ibitimes);
 
    return(@wrgrp) if ($self->PAT::lib::Listedit::isWriteValid($rec));
    return(undef);
