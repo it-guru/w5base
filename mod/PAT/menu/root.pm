@@ -95,6 +95,10 @@ sub Init
                       "PAT::srcTimes",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.PAT.source.Threshold",
+                      "PAT::srcThreshold",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

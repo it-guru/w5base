@@ -93,6 +93,22 @@ sub new
                 name          =>'coretimeid',
                 label         =>'KernzeitId'),
 
+      new kernel::Field::Text(
+                name          =>'ibicoretimeid',
+                label         =>'IBI KernzeitId'),
+
+      new kernel::Field::Text(
+                name          =>'ibinonprodtimeid',
+                label         =>'IBI NutzungszeitId'),
+
+      new kernel::Field::Text(
+                name          =>'ibithcoretimeid',
+                label         =>'IBI TH KernzeitId'),
+
+      new kernel::Field::Text(
+                name          =>'ibithnonprodtimeid',
+                label         =>'IBI TH NutzungszeitId'),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description'),
@@ -158,6 +174,10 @@ sub reformatExternal
       $rec->{onlinetimeid}=$raw->{OnlinezeitId};
       $rec->{usetimeid}=$raw->{NutzungszeitId};
       $rec->{coretimeid}=$raw->{KernzeitId};
+      $rec->{ibicoretimeid}=$raw->{Kernzeit_IBIId};
+      $rec->{ibinonprodtimeid}=$raw->{Nutzungszeit_IBIId};
+      $rec->{ibithcoretimeid}=$raw->{IBI_Schwelle_KernzeitId};
+      $rec->{ibithnonprodtimeid}=$raw->{IBI_Schwelle_NebenzeitId};
       $rec->{cdate}=$self->ExpandTimeExpression($raw->{Created},"en","GMT");
       $rec->{mdate}=$self->ExpandTimeExpression($raw->{Modified},"en","GMT");
       push(@result,$rec);
