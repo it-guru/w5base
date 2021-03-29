@@ -156,10 +156,21 @@ sub DataCollector
                   my %ifrec;
                   my @v6=@{$if->Ipv6Addresses()};
                   if ($#v6!=-1){
-                     msg(WARN,
-                       "ipv6 handling not yet implemented in aws::ipaddress");
-                     print STDERR ("instanceid=$instance->{InstanceId} @v6\n");
-                     Stacktrace(1);
+                     foreach my $v6rec (@v6){
+                        my $rec={%rec};
+                        my $ipv6=$v6rec->Ipv6Address();
+                        $rec->{name}=$ip->Ipv6Expand($ipv6);
+                        $rec->{isprimary}=0;
+                        $rec->{ifname}=$if->NetworkInterfaceId();
+                        $rec->{vpcid}=$if->VpcId();
+                        $rec->{vpcidpath}=$rec->{vpcid}.'@'.
+                                          $AWSAccount.'@'.
+                                          $AWSRegion;
+                        $vpcpath{$rec->{vpcidpath}}++;
+                        $rec->{mac}=$if->MacAddress();
+                        $rec->{netareatag}="ISLAND";
+                        push(@result,$rec);
+                     }
                   }
                   my @ips;
                   foreach my $iprec (@{$if->PrivateIpAddresses()}){
@@ -177,15 +188,6 @@ sub DataCollector
                      #########################################################
                      # netarea tag depend from $rec->{name}
                      $rec->{netareatag}="ISLAND";
-                   #  if (($rec->{name}=~m/^100\./)||
-                   #      ($rec->{name}=~m/^172\./)){
-                   #     $rec->{netareatag}="AWSINTERN";
-                   #  }
-                   #  my $o=$ip->IpDecode($rec->{name});
-                   #  if ($ip->isIpInNet($rec->{name},
-                   #      $subnets->getIntranetworks())){
-                   #     $rec->{netareatag}="CNDTAG";
-                   #  }
                      #########################################################
                      if ($iprec->Primary()){
                         $rec->{isprimary}=1;

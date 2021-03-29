@@ -706,6 +706,20 @@ sub isIpInNet
 }
 
 
+sub Ipv6Expand
+{
+   my $self=shift;
+   my $ip=shift;
+
+   my @unformat;
+   foreach my $okt (split(/:/,$ip)){
+      push(@unformat,sprintf("%04x",hex($okt)));
+   }
+   my $name=lc(join(":",@unformat));
+   return($name);
+}
+
+
 sub IpDecode
 {
    my $self=shift;
@@ -747,12 +761,7 @@ sub IpDecode
    }
    if ($param{IPv6}){
       if ($ip=~m/:/){
-         my @unformat;
-         foreach my $okt (split(/:/,$ip)){
-            push(@unformat,sprintf("%04x",hex($okt)));
-         }
-         my $name=lc(join(":",@unformat));
-         $ip6str=$name;
+         $ip6str=$self->Ipv6Expand($ip);
          $d{ip}=$ip6str;
          if ($d{prefix}){
             $d{prefix4}=$d{prefix};
