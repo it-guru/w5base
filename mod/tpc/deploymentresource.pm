@@ -1,4 +1,4 @@
-package tpc::project;
+package tpc::deploymentresource;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -31,65 +31,28 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Id(     
-            name              =>'id',
-            group             =>'source',
-            htmldetail        =>'NotEmpty',
-            label             =>'ProjectID'),
-
-      new kernel::Field::Text(     
-            name              =>'name',
-            ignorecase        =>1,
-            label             =>'Name'),
-
-      new kernel::Field::TextDrop(     
-            name              =>'appl',
-            searchable        =>0,
-            vjointo           =>'itil::appl',
-            vjoinon           =>['applid'=>'id'],
-            searchable        =>0,
-            vjoindisp         =>'name',
-            label             =>'W5Base Application'),
-
-      new kernel::Field::Text(     
-            name              =>'applid',
-            searchable        =>0,
-            vjointo           =>'tpc::projecttag',
-            vjoinon           =>['id'=>'projectid'],
-            vjoinbase         =>{'key'=>'W5BaseID'},
-            vjoindisp         =>'value',
-            label             =>'Application W5BaseID'),
-
-      new kernel::Field::SubList(
-                name          =>'tags',
-                label         =>'Tags',
-                searchable    =>0,
-                group         =>'tags',
-                vjointo       =>'tpc::projecttag',
-                vjoinon       =>['id'=>'projectid'],
-                vjoindisp     =>['key','value']),
-
-
-      new kernel::Field::SubList(
-                name          =>'machines',
-                label         =>'Machines',
-                searchable    =>0,
-                group         =>'machines',
-                vjointo       =>'tpc::machine',
-                vjoinon       =>['id'=>'projectId'],
-                vjoindisp     =>['name','id']),
-
-      new kernel::Field::Interface(     
-            name              =>'orgId',
-            label             =>'orgId'),
-
-      new kernel::Field::Textarea(     
-            name              =>'description',
+      new kernel::Field::Text(
+            name              =>'deploymentid',
             searchable        =>1,
-            label             =>'Description'),
+            label             =>'deploymentId'),
+
+      new kernel::Field::Text(
+            name              =>'name',
+            searchable        =>1,
+            label             =>'ResourceName'),
+
+      new kernel::Field::Text(
+            name              =>'id',
+            searchable        =>1,
+            label             =>'ResourceId'),
+
+      new kernel::Field::Text(
+            name              =>'type',
+            searchable        =>1,
+            label             =>'ResourceType'),
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name mdate));
+   $self->setDefaultView(qw(key value));
    return($self);
 }
 
@@ -101,10 +64,13 @@ sub DataCollector
 
    my $Authorization=$self->getVRealizeAuthorizationToken();
 
-   my ($dbclass,$requesttoken)=$self->decodeFilter2Query4vRealize(
-      "projects","id",
+
+   my ($dbclass,$requesttoken,$const)=$self->decodeFilter2Query4vRealize(
+      "deployments/{deploymentid}/resources","deploymentid",
       $filterset
    );
+   return(undef) if (!defined($dbclass));
+
    my $d=$self->CollectREST(
       dbname=>'TPC',
       requesttoken=>$requesttoken,
@@ -113,7 +79,7 @@ sub DataCollector
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl."iaas/".$dbclass;
+         my $dataobjurl=$baseurl."deployment/api/".$dbclass;
          return($dataobjurl);
       },
 
@@ -133,13 +99,17 @@ sub DataCollector
             $data=$data->{content};
          }
          if (ref($data) ne "ARRAY"){
-            $data=[$data];
+            $data=[];
          }
+         map({
+            foreach my $k (%$const){
+               $_->{$k}=$const->{$k};
+            }
+         } @$data);
          return($data);
       }
    );
-
-   #printf STDERR ("p=%s\n",Dumper($d)) if (ref($d) eq "ARRAY" && $#{$d}==0);
+   #printf STDERR ("d=%s\n",Dumper($d));
 
    return($d);
 }
@@ -173,13 +143,9 @@ sub isUploadValid
    return(0);
 }
 
-sub getDetailBlockPriority
-{
-   my $self=shift;
-   my $grp=shift;
-   my %param=@_;
-   return(qw(header default machines tags source));
-}
+
+
+
 
 #sub getRecordImageUrl
 #{

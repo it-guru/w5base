@@ -39,6 +39,7 @@ sub TPC_CloudAreaSync
    my %itcloud;
 
    my $pro=getModuleObject($self->Config,"tpc::project");
+   my $mach=getModuleObject($self->Config,"tpc::machine");
    my $dep=getModuleObject($self->Config,"tpc::deployment");
    my $itcloudobj=getModuleObject($self->Config,"itil::itcloud");
    my $appl=getModuleObject($self->Config,"itil::appl");
@@ -84,7 +85,7 @@ sub TPC_CloudAreaSync
    msg(DEBUG,"jobid=$jobid");
 
    my %flt=('status'=>'CREATE_SUCCESSFUL');
-   {    
+   if (1){    
       $flt{cdate}=">now-14d";
       if (defined($firstrec)){
          my $lastmsg=$firstrec->{exitmsg};
@@ -216,19 +217,26 @@ sub TPC_CloudAreaSync
 
    if (1){
       $dep->ResetFilter();
+      #$flt{cdate}='>="2021-03-23 12:53:21 GMT"';
+      #$flt{cdate}='>now-3d';
       $dep->SetFilter(\%flt);
       $dep->Limit(1000,0,0);
       $dep->SetCurrentOrder(qw(cdate id));
-      foreach my $deprec ($dep->getHashList(qw(ALL))){
-         if ($deprec->{id} eq $lastid){
-            msg(INFO,"skip $deprec->{cdate} with $deprec->{id}");
-            next;
-         }
+      my %machineid;
+      foreach my $deprec ($dep->getHashList(qw(opname cdate 
+                                               projectid resources))){
          $ncnt++;
          #msg(INFO,"$ncnt) op:".$deprec->{opname});
          #msg(INFO,"cdate:".$deprec->{cdate});
          #msg(INFO,"project:".$deprec->{projectid}."\n--\n");
-         # print STDERR Dumper($deprec);
+         my $resources=$deprec->{resources};
+         if (ref($resources) eq "ARRAY"){
+            foreach my $resrec (@$resources){
+               if ($resrec->{type}=~m/machine/i){
+                  $machineid{$resrec->{id}}++;
+               }
+            }
+         }
          #printf STDERR ("$deprec->{cdate} ".
          #               "TPC: $deprec->{opname} \@ $deprec->{project}\n");
          #
@@ -236,8 +244,12 @@ sub TPC_CloudAreaSync
          # dann muss system importiert werden bzw. aktualisiert werden.
          #
          #
-         $exitmsg="last:".$deprec->{cdate}." ".$deprec->{id};
-         last if ($ncnt>50);
+      }
+      foreach my $machineid (sort(keys(%machineid))){
+         $mach->ResetFilter();
+         $mach->SetFilter({id=>\$machineid});
+         my ($mrec,$msg)=$mach->getOnlyFirst(qw(id urlofcurrentrec name));
+         printf STDERR ("New TPC sys: %s\n",$mrec->{urlofcurrentrec});
       }
    }
 

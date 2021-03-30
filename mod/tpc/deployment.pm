@@ -67,6 +67,15 @@ sub new
             vjoindisp         =>'name',
             label             =>'Project'),
 
+      new kernel::Field::SubList(
+                name          =>'resources',
+                label         =>'Resources',
+                searchable    =>0,
+                group         =>'resources',
+                vjointo       =>'tpc::deploymentresource',
+                vjoinon       =>['id'=>'deploymentid'],
+                vjoindisp     =>['name','type','id']),
+
       new kernel::Field::CDate(     
             name              =>'cdate',
             dataobjattr       =>'createdAt',
@@ -96,7 +105,7 @@ sub DataCollector
    return(undef) if (!defined($dbclass));
 
    my $requesttoken="SEARCH.".time();
-
+   #printf STDERR ("dbclass=%s\n",$dbclass);
    my $d=$self->CollectREST(
       dbname=>'TPC',
       requesttoken=>$requesttoken,
@@ -137,17 +146,23 @@ sub DataCollector
                 }
              }
          } @$data);
-        # foreach my $rec (@$data){
-        #    $rec->{ictoNumber}=$rec->{systemNumber};
-        #    delete($rec->{systemNumber});
-        # }
          return($data);
       }
    );
-#print STDERR Dumper($d);
+   #print STDERR Dumper($d);
 
    return($d);
 }
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default resources source));
+}
+
+
 
 sub isViewValid
 {

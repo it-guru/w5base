@@ -31,22 +31,28 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
+      new kernel::Field::RecordUrl(),
+
+
       new kernel::Field::Id(     
             name              =>'id',
             searchable        =>1,
             group             =>'source',
             htmldetail        =>'NotEmpty',
+            htmlwidth         =>'150px',
+            align             =>'left',
             label             =>'MachineID'),
 
       new kernel::Field::Text(     
             name              =>'name',
             searchable        =>1,
+            htmlwidth         =>'200px',
             label             =>'Name'),
 
-      new kernel::Field::Text(     
-            name              =>'',
-            searchable        =>1,
-            label             =>'Online-State'),
+      #new kernel::Field::Text(     
+      #      name              =>'',
+      #      searchable        =>1,
+      #      label             =>'Online-State'),
 
       new kernel::Field::Text(     
             name              =>'orgId',

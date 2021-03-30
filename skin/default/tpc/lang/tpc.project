@@ -3,3 +3,4 @@
    en=>'TelekomPrivateCloud: Project'
 },
 'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'fieldgroup.machines'=>{de=>'Maschinen',en=>'Machines'},
