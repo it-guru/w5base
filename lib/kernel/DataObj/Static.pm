@@ -68,8 +68,10 @@ sub tieRec
 
    if (defined($self->{CurrentData}->[$self->{'Pointer'}])){
       my %rec;
-      tie(%rec,'kernel::DataObj::Static::rec',$self,
-          $self->{CurrentData}->[$self->{'Pointer'}]);
+      my $rec=$self->{CurrentData}->[$self->{'Pointer'}];
+      my $view=[$self->getFieldObjsByView([$self->getCurrentView()],
+                                          current=>$rec)];
+      tie(%rec,'kernel::DataObj::Static::rec',$self,$rec,$view);
       return(\%rec);
    }
    return(undef);
@@ -394,22 +396,31 @@ sub TIEHASH
    my $type=shift;
    my $parent=shift;
    my $rec=shift;
-
-   return(bless({ Parent=>$parent, Rec=>$rec, },$type));
+   my $view=shift;
+   my %HashView;
+   map({$HashView{$_->Name()}=$_} @{$view});
+   return(bless({ Parent=>$parent, Rec=>$rec, View=>\%HashView },$type));
 }
 
 sub FIRSTKEY
 {
    my $self=shift;
-   $self->{'keylist'}=[$self->getParent->Fields()];
+
+   my %k=();
+   map({$k{$_}=1;} keys(%{$self->{View}}));
+   $self->{'keylist'}=[keys(%k)];
+
    return(shift(@{$self->{'keylist'}}));
 }
+
+
 
 sub EXISTS
 {
    my $self=shift;
    my $key=shift;
-   return(grep(/^$key$/,$self->getParent->Fields()) ? 1:0);
+
+   return(grep(/^$key$/,keys(%{$self->{View}}),keys(%{$self->{Rec}})) ? 1:0);
 }
 
 sub NEXTKEY
