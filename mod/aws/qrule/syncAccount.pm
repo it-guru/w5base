@@ -90,7 +90,8 @@ sub qcheckRecord
       push(@qmsg,"invalid application reference");
    }
    else{
-      if ($arec->{cistatusid} ne "4"){
+      if ($arec->{cistatusid} ne "4" &&
+          $arec->{cistatusid} ne "3"){
           push(@qmsg,"invalid CI-State for application");
       }
    }
