@@ -43,6 +43,7 @@ sub TPC_CloudAreaSync
    my $dep=getModuleObject($self->Config,"tpc::deployment");
    my $itcloudobj=getModuleObject($self->Config,"itil::itcloud");
    my $appl=getModuleObject($self->Config,"itil::appl");
+   my $sys=getModuleObject($self->Config,"itil::system");
    my $itcloudarea=getModuleObject($self->Config,"itil::itcloudarea");
 
    if ($pro->isSuspended() ||
@@ -75,11 +76,11 @@ sub TPC_CloudAreaSync
    $joblog->Limit(1);
    my ($firstrec,$msg)=$joblog->getOnlyFirst(qw(ALL));
 
+
    my %jobrec=( name=>$method, event=>$eventlabel, pid=>$$);
    my $exitmsg="done";
    my $ncnt=0;
    my $laststamp;
-   my $lastid="undefined";
    my @msg;
    my $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
    msg(DEBUG,"jobid=$jobid");
@@ -89,13 +90,21 @@ sub TPC_CloudAreaSync
       $flt{cdate}=">now-14d";
       if (defined($firstrec)){
          my $lastmsg=$firstrec->{exitmsg};
-         if (($laststamp,$lastid)=
-             $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+)\s+(\S+)$/){
+         if (($laststamp)=
+             $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+)$/){
             $flt{cdate}=">=\"$laststamp GMT\"";
             $exitmsg=$lastmsg;
          }
       }
    }
+      $flt{cdate}=">now-14d";
+
+   if (1){
+      my $d=$joblog->ExpandTimeExpression("now-1h","en","GMT","GMT");
+      $exitmsg="last:$d";
+   }
+
+
    if (1){
       $pro->ResetFilter();
       $pro->SetFilter({});
@@ -174,6 +183,7 @@ sub TPC_CloudAreaSync
                      cistatusid  =>6
                   }
                };
+               return(undef) if ($oldrec->{cistatusid} eq "6");
                return($oprec);
             }
             return(undef);
@@ -217,8 +227,6 @@ sub TPC_CloudAreaSync
 
    if (1){
       $dep->ResetFilter();
-      #$flt{cdate}='>="2021-03-23 12:53:21 GMT"';
-      #$flt{cdate}='>now-3d';
       $dep->SetFilter(\%flt);
       $dep->Limit(1000,0,0);
       $dep->SetCurrentOrder(qw(cdate id));
@@ -237,19 +245,24 @@ sub TPC_CloudAreaSync
                }
             }
          }
-         #printf STDERR ("$deprec->{cdate} ".
-         #               "TPC: $deprec->{opname} \@ $deprec->{project}\n");
-         #
-         # Wenn das Deployment ein logisches System (machine) betrifft,
-         # dann muss system importiert werden bzw. aktualisiert werden.
-         #
-         #
       }
       foreach my $machineid (sort(keys(%machineid))){
          $mach->ResetFilter();
          $mach->SetFilter({id=>\$machineid});
          my ($mrec,$msg)=$mach->getOnlyFirst(qw(id urlofcurrentrec name));
-         printf STDERR ("New TPC sys: %s\n",$mrec->{urlofcurrentrec});
+         if (defined($mrec)){
+            $sys->ResetFilter();
+            $sys->SetFilter({srcsys=>\'TPC',srcid=>\$mrec->{id}});
+            my ($srec,$msg)=$sys->getOnlyFirst(qw(id cistatusid));
+            if (!defined($srec)){
+               # run import
+               printf STDERR ("New TPC sys: %s\n",$mrec->{urlofcurrentrec});
+               $mach->Import({importname=>$mrec->{id}});
+            }
+            else{
+               # initiate QualityCheck on sysrec
+            }
+         }
       }
    }
 
@@ -273,7 +286,7 @@ sub TPC_CloudAreaSync
       }
    }
 
-   #printf STDERR ("lastmsg:$exitmsg\n");
+   printf STDERR ("lastmsg:$exitmsg\n");
 
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
