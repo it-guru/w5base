@@ -435,12 +435,22 @@ sub qcheckRecord
                   $errorlevel=3 if ($errorlevel<3);
                }
                else{
-                  $self->IfComp($dataobj,
-                                $rec,"asset",
-                                {assetassetid=>$l[0]->{name}},"assetassetid",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'leftouterlink');
+                  if ($rec->{systemtype} ne "standard"){
+                     $self->IfComp($dataobj,
+                                   $rec,"systemtype",
+                                   {systemtype=>"standard"},"systemtype",
+                                   $autocorrect,$forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'string');
+                  }
+                  else{
+                     $self->IfComp($dataobj,
+                                   $rec,"asset",
+                                   {assetassetid=>$l[0]->{name}},"assetassetid",
+                                   $autocorrect,$forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'leftouterlink');
+                  }
                }
             }
          }
