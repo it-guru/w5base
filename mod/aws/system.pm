@@ -74,6 +74,16 @@ sub new
                 FieldHelpType =>'GenericConstant',
                 label         =>'AWS-Region'),
 
+      new kernel::Field::Text(
+                name          =>'azone',
+                searchable    =>0,
+                label         =>'Availability-Zone'),
+
+      new kernel::Field::Text(
+                name          =>'azoneid',
+                searchable    =>0,
+                label         =>'Availability-ZoneID'),
+
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
                 label         =>'IP-Adresses',
@@ -146,9 +156,20 @@ sub DataCollector
    my $AWSRegion=$query->{region};
 
    my @errStack;
+   my %avzone;
    try {
       my $stscred=$self->GetCred4AWS($AWSAccount,$AWSRegion);
       my $ec2=Paws->service('EC2',credentials=>$stscred,region =>$AWSRegion);
+
+      if (in_array(\@view,"azoneid")){
+         my $az=$ec2->DescribeAvailabilityZones();
+         foreach my $z (@{$az->AvailabilityZones()}){
+            $avzone{$z->ZoneName()}=$z->ZoneId();
+         }
+         if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+            msg(INFO,"AvailabilityZoneIds: ".join(", ",sort(values(%avzone))));
+         }
+      }
       my $blk=0;
       my $NextToken;
       do{
@@ -186,6 +207,18 @@ sub DataCollector
                               $AWSAccount.'@'.
                               $AWSRegion,
                   };
+                  if (in_array(\@view,"azone") ||
+                      in_array(\@view,"azoneid")){
+                     my $placement=$instance->Placement();
+                     if (defined($placement)){
+                        my $azone=$placement->AvailabilityZone();
+                        $rec->{azone}=$azone;
+                     }
+                     if (in_array(\@view,"azoneid")){
+                        $rec->{azoneid}=$avzone{$rec->{azone}};
+                     }
+                  }
+
                   my $vpcid=$instance->VpcId();
                   if ($vpcid ne ""){
                      $rec->{vpcid}=$vpcid;
@@ -227,7 +260,9 @@ sub DataCollector
    catch {
       my $eclass=blessed($_);
       if ($eclass eq "Paws::Exception"){
-         push(@errStack,"(".$_->code.") :".$_->message);
+         if ($_->code ne "InvalidInstanceID.NotFound"){ # no error - if EC2ID 
+            push(@errStack,"(".$_->code.") :".$_->message);  # not found
+         }
       }
       else{
          push(@errStack,$_);
@@ -446,8 +481,8 @@ sub Import
             last;
          }
          my $ageok=1;
-         if ($osys->{cistatusid} ne "4"){  # prüfen, ob das Teil nicht schon
-                                           # ewig alt ist
+         if ($osys->{cistatusid}>5){  # prüfen, ob das Teil nicht schon
+                                      # ewig alt ist und "veraltet/gelöscht"
             my $d=CalcDateDuration($osys->{mdate},NowStamp("en"));
             if (defined($d) && $d->{days}>7){
                next; # das Teil ist schon zu alt, um es wieder zu aktivieren
