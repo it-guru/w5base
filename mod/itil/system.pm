@@ -2628,6 +2628,321 @@ sub initialImportFillup
 
 
 
+sub QRuleSyncCloudSystem
+{
+   my $self=shift;
+   my $srcsystag=shift;
+   my $qrule=shift;
+   my $rec=shift;
+   my $par=shift;
+   my $parrec=shift;
+   my $autocorrect=shift;
+   my $forcedupd=shift;
+   my $qmsg=shift;
+   my $dataissue=shift;
+   my $errorlevel=shift;
+   my $wfrequest=shift;
+
+   #printf STDERR ("QRuleSyncCloudSystem:%s\n",Dumper($parrec));
+
+   if ($rec->{srcsys} eq $srcsystag){
+      my $sysnamelist=$parrec->{name};
+      $sysnamelist=[$sysnamelist] if (ref($sysnamelist) ne "ARRAY");
+      NAMECHK: foreach my $sysname (@$sysnamelist){
+         my $sysname=lc($sysname);
+         $sysname=~s/\s/_/g;
+         $sysname=~s/\..*$//; # remove posible Domain part 
+         if (length($sysname)>40){
+            $sysname=substr($sysname,40);
+         }
+         if ($self->ValidateSystemname($sysname)){
+            if ($rec->{name} ne $sysname){
+               $self->ResetFilter();
+               $self->SetFilter({name=>\$sysname,id=>"!".$rec->{id}});
+               my ($chkrec,$msg)=$self->getOnlyFirst(qw(id name));
+               if (defined($chkrec)){
+                  next NAMECHK;
+               }
+               $qrule->IfComp($self,
+                             $rec,"name",
+                             {name=>$sysname},"name",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             $qmsg,$dataissue,$errorlevel,
+                             mode=>'string');
+            }
+            last NAMECHK;
+         }
+      }
+      foreach my $var (qw(cpucount memory)){
+         if (exists($parrec->{$var})){
+            $qrule->IfComp($self,
+                          $rec,$var,
+                          $parrec,$var,
+                          $autocorrect,$forcedupd,$wfrequest,
+                          $qmsg,$dataissue,$errorlevel,
+                          mode=>'integer');
+         }
+      }
+      $qrule->IfComp($self,
+                    $rec,"osrelease",
+                    $parrec,"osrelease",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    $qmsg,$dataissue,$errorlevel,
+                    mode=>'leftouterlinkmissok',
+                    iomapped=>$par);
+
+      my $itcloudareaid=$parrec->{itcloudareaid};
+
+
+      #printf STDERR ("parrec ips=%s\n",Dumper($parrec->{ipaddresses}));
+      #printf STDERR ("rec ips=%s\n",Dumper($rec->{ipaddresses}));
+
+      my $netarea={};
+      my $net=getModuleObject($self->Config(),"TS::network");
+      if (defined($net)){
+         $netarea=$net->getTaggedNetworkAreaId();
+      }
+
+      my @opList;
+      my $res=kernel::QRule::OpAnalyse(
+                 sub{  # comperator 
+                    my ($a,$b)=@_;
+                    my $eq;
+                    if ($a->{name} eq $b->{name}){
+                      $eq=0;
+                      if ($a->{srcsys} eq $srcsystag &&
+                          $a->{ifname} eq $b->{ifname} &&
+                          $a->{dnsname} eq $b->{dnsname} &&
+                          $a->{itcloudareaid} eq $itcloudareaid &&
+                          $a->{cistatusid} eq "4"){
+                         $eq=1;
+                      }
+                      else{
+                      }
+                    }
+                    return($eq);
+                 },
+                 sub{  # oprec generator
+                    my ($mode,$oldrec,$newrec,%p)=@_;
+                    if ($mode eq "insert" || $mode eq "update"){
+                       my $networkid=$netarea->{ISLAND};
+                       my $identifyby=undef;
+                       if ($mode eq "update"){
+                          $identifyby=$oldrec->{id};
+                       }
+                       my $type="1";   # secondary
+                       my $oprec={
+                         OP=>$mode,
+                         MSG=>"$mode ip $newrec->{name} ".
+                              "in W5Base",
+                         IDENTIFYBY=>$identifyby,
+                         DATAOBJ=>'itil::ipaddress',
+                         DATA=>{
+                          name         =>$newrec->{name},
+                          cistatusid   =>"4",
+                          srcsys       =>$srcsystag,
+                          type         =>$type,
+                          itcloudareaid=>$itcloudareaid,
+                          systemid     =>$p{refid}
+                         }
+                       };
+                       if (exists($newrec->{dnsname})){
+                          $oprec->{DATA}->{dnsname}=$newrec->{dnsname};
+                       }
+                       if (exists($newrec->{ifname})){
+                          $oprec->{DATA}->{ifname}=$newrec->{ifname};
+                       }
+                       if ($mode eq "insert"){
+                          $oprec->{DATA}->{networkid}=$networkid;
+                       }
+                       return($oprec);
+                    }
+                    elsif ($mode eq "delete"){
+                       my $networkid=$oldrec->{networkid};
+                       return({OP=>$mode,
+                               MSG=>"delete ip $oldrec->{name} ".
+                                   "from W5Base",
+                               DATAOBJ=>'itil::ipaddress',
+                               IDENTIFYBY=>$oldrec->{id},
+                               });
+                    }
+                    return(undef);
+                 },
+                 $rec->{ipaddresses},$parrec->{ipaddresses},\@opList,
+                 refid=>$rec->{id});
+      if ($autocorrect){
+         if (!$res){
+            my $opres=kernel::QRule::ProcessOpList(
+                 $qrule->getParent,\@opList
+            );
+         }
+      }
+      else{
+         if ($#opList!=-1){
+            my $msg="IP-Adresses not in sync";
+            $$errorlevel=3 if ($$errorlevel<3);
+            push(@$dataissue,$msg);
+            push(@$qmsg,$msg);
+            push(@$qmsg,map({"ToDo: ".$_->{MSG}} @opList));
+         }
+      }
+
+      # Zielnetzwerke festlegen und prüfen ob frei
+      my %parip;
+      foreach my $iprec (@{$parrec->{ipaddresses}}){
+         $parip{$iprec->{name}}={networkid=>$netarea->{ISLAND}};
+         $parip{$iprec->{name}}->{NetareaTag}=$iprec->{netareatag};
+      }
+      my $ip=getModuleObject($self->Config(),"itil::ipaddress");
+      $ip->switchSystemIpToNetarea(\%parip,$rec->{id},$netarea,$qmsg);
+
+      @opList=();
+      my $res=kernel::QRule::OpAnalyse(
+                 sub{  # comperator 
+                    my ($a,$b)=@_;
+                    my $eq;
+                    if ($a->{name} eq $b->{name}){
+                       $eq=0;
+                       $eq=1 if ( $a->{mac} eq $b->{mac});
+                    }
+                    return($eq);
+                 },
+                 sub{  # oprec generator
+                    my ($mode,$oldrec,$newrec,%p)=@_;
+                    if ($mode eq "insert" || $mode eq "update"){
+                       #if ($mode eq "insert" && 
+                       #    $newrec->{cistatusid} eq "6"){
+                       #   return(); # do not insert 
+                       #             # already unconfigured ip's
+                       #}
+                       my $identifyby=undef;
+                       if ($mode eq "update"){
+                          $identifyby=$oldrec->{id};
+                       }
+                       if ($newrec->{name}=~m/^\s*$/){
+                          $mode="nop";
+                       }
+                       return({OP=>$mode,
+                               MSG=>"$mode if $newrec->{name} ".
+                                    "in W5Base",
+                               IDENTIFYBY=>$identifyby,
+                               DATAOBJ=>'itil::sysiface',
+                               DATA=>{
+                                  name      =>$newrec->{name},
+                                  mac       =>$newrec->{mac},
+                                  srcsys    =>'AWS',
+                                  systemid  =>$p{refid}
+                                  }
+                               });
+                    }
+                    elsif ($mode eq "delete"){
+                       return({OP=>$mode,
+                               MSG=>"delete if $oldrec->{name} ".
+                                   "from W5Base",
+                               DATAOBJ=>'itil::sysiface',
+                               IDENTIFYBY=>$oldrec->{id},
+                               });
+                    }
+                    return(undef);
+                 },
+                 $rec->{sysiface},$parrec->{sysiface},\@opList,
+                 refid=>$rec->{id});
+      if ($autocorrect){
+         if (!$res){
+            my $opres=kernel::QRule::ProcessOpList($qrule->getParent,\@opList);
+         }
+      }
+      else{
+         if ($#opList!=-1){
+            my $msg="Interfaces not in sync";
+            $$errorlevel=3 if ($$errorlevel<3);
+            push(@$dataissue,$msg);
+            push(@$qmsg,$msg);
+            push(@$qmsg,map({"ToDo: ".$_->{MSG}} @opList));
+         }
+      }
+      
+   }
+   if (exists($parrec->{availabilityZone})){
+      my $ass=getModuleObject($self->Config(),"itil::asset");
+      my $awslabel=$srcsystag.": Availability Zone";
+      my $k="$awslabel ".$parrec->{availabilityZone};
+      msg(INFO,"checking assetid for '$k'");
+      $ass->SetFilter({
+         kwords=>\$k,
+         cistatusid=>[4],
+         srcsys=>\'w5base'
+      }); 
+      my @l=$ass->getHashList(qw(id name fullname));
+      if ($#l==-1){
+         my $msg='can not identify availability zone asset from '.
+                 $srcsystag.' - please contact Cloud-Admins: '.
+                 $parrec->{availabilityZone};
+         push(@$qmsg,$msg);
+         push(@$dataissue,$msg);
+         $$errorlevel=3 if ($$errorlevel<3);
+
+         # try to notify
+         $ass->ResetFilter();
+         $ass->SetFilter({
+            kwords=>"\"$awslabel *\"",
+            cistatusid=>[4],
+            srcsys=>\'w5base'
+         }); 
+         my @l=$ass->getHashList(qw(id databossid));
+         my %uid;
+         foreach my $arec (@l){
+            if ($arec->{databossid} ne ""){
+               $uid{$arec->{databossid}}++;
+            }
+         }
+         if (keys(%uid)){
+            my $wfa=getModuleObject($ass->Config,
+                                    "base::workflowaction");
+            $wfa->Notify("ERROR",
+                  "missing '.$srcsystag.
+                  ' Asset for $parrec->{availabilityZone}",
+               "Ladies and Gentlemen,\n\n".
+               "Please create an asset record in it-inventory\n".
+               "for $srcsystag availability zone ".
+               "with '$k' in keywords.\n\n".
+               "(as already done, like for other availability zones)",
+               emailto=>[keys(%uid)],
+               emailbcc=>[
+                  11634953080001, # HV
+               ]
+            );
+         }
+      }
+      elsif ($#l>0){
+         my $msg='availability zone asset not unique from '.$srcsystag;
+         push(@$qmsg,$msg);
+         push(@$dataissue,$msg);
+         $$errorlevel=3 if ($$errorlevel<3);
+      }
+      else{
+         if ($rec->{systemtype} ne "standard"){
+            $qrule->IfComp($self,
+                          $rec,"systemtype",
+                          {systemtype=>"standard"},"systemtype",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          $qmsg,$dataissue,$errorlevel,
+                          mode=>'string');
+         }
+         else{
+            $qrule->IfComp($self,
+                          $rec,"asset",
+                          {assetassetid=>$l[0]->{name}},"assetassetid",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          $qmsg,$dataissue,$errorlevel,
+                          mode=>'leftouterlink');
+         }
+      }
+   }
+}
+
+
+
 
 
 

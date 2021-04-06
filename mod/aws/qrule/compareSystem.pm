@@ -134,325 +134,81 @@ sub qcheckRecord
                'set system CI-Status to disposed of waste due missing on AWS');
          }
          else{
+            my @sysname=();
+            my $sysname=lc($parrec->{name});
+            if ($sysname ne ""){
+               push(@sysname,$sysname);
+            }
+            push(@sysname,$parrec->{id});
 
-            if ($rec->{srcsys} eq "AWS"){
-               my $sysname=lc($parrec->{name});
-               $sysname=~s/\s/_/g;
-               $sysname=~s/\..*$//; # remove posible Domain part 
-               if (length($sysname)>40){
-                  $sysname=substr($sysname,40);
-               }
-               if ($sysname eq "" || 
-                   (!($dataobj->ValidateSystemname($sysname)))){
-                  $sysname=$parrec->{id};
-               }
-             
-               if ($rec->{name} ne $sysname){
-                  $dataobj->ResetFilter();
-                  $dataobj->SetFilter({name=>\$sysname,id=>"!".$rec->{id}});
-                  my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
-                  if (defined($chkrec)){
-                     $parrec->{name}=$parrec->{id};
-                  }
-                  else{
-                     $parrec->{name}=$sysname;
-                  }
-                  $self->IfComp($dataobj,
-                                $rec,"name",
-                                $parrec,"name",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'string');
-               }
-
-               $self->IfComp($dataobj,
-                             $rec,"cpucount",
-                             $parrec,"cpucount",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
-
-               $self->IfComp($dataobj,
-                             $rec,"memory",
-                             $parrec,"memory",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
-
-               $self->IfComp($dataobj,
-                             $rec,"osrelease",
-                             $parrec,"image_name",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlinkmissok',
-                             iomapped=>$par);
-               my $w5itcloudarea;
-               if ($parrec->{accountid} ne ""){
-                  msg(INFO,"try to add cloudarea to system ".$rec->{name});
-                  my $cloudarea=getModuleObject($self->getParent->Config,
-                                                "itil::itcloudarea");
-                  $cloudarea->SetFilter({cloud=>'AWS',
-                                         srcid=>$parrec->{accountid}
-                  });
-                  my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
-                  if (defined($w5cloudarearec)){
-                     $w5itcloudarea=$w5cloudarearec;
-                     if ($w5cloudarearec->{cistatusid} eq "4" &&
-                         $w5cloudarearec->{applid} ne ""){
-                        if ($rec->{itcloudareaid} ne $w5cloudarearec->{id}){
-                           $forcedupd->{itcloudareaid}= $w5cloudarearec->{id};
-                        }
-                     }
-                  }
-                  else{
-                     msg(ERROR,"found AWS System $rec->{name} ".
-                               "on invalid cloudarea");
-                     die();
-                  }
-               }
-               if ($autocorrect){
-                  my $net=getModuleObject($self->getParent->Config(),
-                          "TS::network");
-                  my $netarea=$net->getTaggedNetworkAreaId();
-
-                  #############################################################
-       
-                  my @opList;
-                  my %cleanAWSIflist;
-                  for(my $i=0;$i<=$#{$parrec->{ipaddresses}};$i++){
-                     my $otciprec=$parrec->{ipaddresses}->[$i];
-                     if ($otciprec->{ifname} ne ""){
-                        $cleanAWSIflist{$otciprec->{ifname}}={
-                           mac=>$otciprec->{mac},
-                           name=>$otciprec->{ifname}
-                        };
-                     }
-                  }
-                  my @cleanAWSIPlist=@{$parrec->{ipaddresses}};
-
-                  my $res=OpAnalyse(
-                             sub{  # comperator 
-                                my ($a,$b)=@_;
-                                my $eq;
-                                if ($a->{name} eq $b->{name}){
-                                  $eq=0;
-                                  if ($a->{srcsys} eq "AWS" &&
-                                      $a->{ifname} eq $b->{ifname} &&
-                                      $a->{dnsname} eq $b->{dnsname} &&
-                                      $a->{itcloudareaid} eq 
-                                                 $w5itcloudarea->{id} &&
-                                      $a->{cistatusid} eq "4"){
-                                     $eq=1;
-                                  }
-                                  else{
-                                  }
-                                }
-                                return($eq);
-                             },
-                             sub{  # oprec generator
-                                my ($mode,$oldrec,$newrec,%p)=@_;
-                                if ($mode eq "insert" || $mode eq "update"){
-                                   my $networkid=$netarea->{ISLAND};
-                                   my $identifyby=undef;
-                                   if ($mode eq "update"){
-                                      $identifyby=$oldrec->{id};
-                                   }
-                                   my $type="1";   # secondary
-                                   my $oprec={
-                                     OP=>$mode,
-                                     MSG=>"$mode ip $newrec->{ipaddress} ".
-                                          "in W5Base",
-                                     IDENTIFYBY=>$identifyby,
-                                     DATAOBJ=>'itil::ipaddress',
-                                     DATA=>{
-                                      name         =>$newrec->{name},
-                                      cistatusid   =>"4",
-                                      srcsys       =>'AWS',
-                                      type         =>$type,
-                                      ifname       =>$newrec->{ifname},
-                                      dnsname      =>$newrec->{dnsname},
-                                      itcloudareaid=>$w5itcloudarea->{id},
-                                      systemid     =>$p{refid}
-                                     }
-                                   };
-                                   if ($mode eq "insert"){
-                                      $oprec->{DATA}->{networkid}=$networkid;
-                                   }
-                                   return($oprec);
-                                }
-                                elsif ($mode eq "delete"){
-                                   my $networkid=$oldrec->{networkid};
-                                   return({OP=>$mode,
-                                           MSG=>"delete ip $oldrec->{name} ".
-                                               "from W5Base",
-                                           DATAOBJ=>'itil::ipaddress',
-                                           IDENTIFYBY=>$oldrec->{id},
-                                           });
-                                }
-                                return(undef);
-                             },
-                             $rec->{ipaddresses},\@cleanAWSIPlist,\@opList,
-                             refid=>$rec->{id});
-                  #printf STDERR Dumper(\@opList);
-                  if (!$res){
-                     my $opres=ProcessOpList($self->getParent,\@opList);
-                  }
-
-                  # Zielnetzwerke festlegen und prüfen ob frei
-                  my @otcip=map({$_->{name}} @{$parrec->{ipaddresses}});
-                  my %otcip;
-                  foreach my $iprec (@{$parrec->{ipaddresses}}){
-                     push(@otcip,$iprec->{name});
-                     $otcip{$iprec->{name}}={networkid=>$netarea->{ISLAND}};
-                     $otcip{$iprec->{name}}->{NetareaTag}=$iprec->{netareatag};
-                  }
-                  my $ip=getModuleObject($self->getParent->Config(),
-                                                "itil::ipaddress");
-                  $ip->switchSystemIpToNetarea(
-                     \%otcip,$rec->{id},$netarea,\@qmsg
-                  );
-
-                  my @cleanAWSIflist=values(%cleanAWSIflist);
-                  @opList=();
-                  my $res=OpAnalyse(
-                             sub{  # comperator 
-                                my ($a,$b)=@_;
-                                my $eq;
-                                if ($a->{name} eq $b->{name}){
-                                   $eq=0;
-                                   $eq=1 if ( $a->{mac} eq $b->{mac});
-                                }
-                                return($eq);
-                             },
-                             sub{  # oprec generator
-                                my ($mode,$oldrec,$newrec,%p)=@_;
-                                if ($mode eq "insert" || $mode eq "update"){
-                                   #if ($mode eq "insert" && 
-                                   #    $newrec->{cistatusid} eq "6"){
-                                   #   return(); # do not insert 
-                                   #             # already unconfigured ip's
-                                   #}
-                                   my $identifyby=undef;
-                                   if ($mode eq "update"){
-                                      $identifyby=$oldrec->{id};
-                                   }
-                                   if ($newrec->{name}=~m/^\s*$/){
-                                      $mode="nop";
-                                   }
-                                   return({OP=>$mode,
-                                           MSG=>"$mode if $newrec->{name} ".
-                                                "in W5Base",
-                                           IDENTIFYBY=>$identifyby,
-                                           DATAOBJ=>'itil::sysiface',
-                                           DATA=>{
-                                              name      =>$newrec->{name},
-                                              mac       =>$newrec->{mac},
-                                              srcsys    =>'AWS',
-                                              systemid  =>$p{refid}
-                                              }
-                                           });
-                                }
-                                elsif ($mode eq "delete"){
-                                   return({OP=>$mode,
-                                           MSG=>"delete if $oldrec->{name} ".
-                                               "from W5Base",
-                                           DATAOBJ=>'itil::sysiface',
-                                           IDENTIFYBY=>$oldrec->{id},
-                                           });
-                                }
-                                return(undef);
-                             },
-                             $rec->{sysiface},\@cleanAWSIflist,\@opList,
-                             refid=>$rec->{id});
-                  if (!$res){
-                     my $opres=ProcessOpList($self->getParent,\@opList);
-                  }
-
+            my %sysiface;
+            my %ipaddresses;
+            foreach my $iprec (@{$parrec->{ipaddresses}}){
+               $ipaddresses{$iprec->{name}}=$iprec;  # name ifname
+               if ($iprec->{ifname} ne ""){
+                  $sysiface{$iprec->{ifname}}={
+                     mac=>$iprec->{mac},
+                     name=>$iprec->{ifname}
+                  };
                }
             }
-            if (!($parrec->{azoneid}=~m/^eu/)){
+            my @sysiface;
+            my @ipaddresses;
+            @sysiface=sort({$a->{name} cmp $b->{name}} values(%sysiface));
+            @ipaddresses=sort({$a->{name} cmp $b->{name}} values(%ipaddresses));
+
+            my %syncData=(
+               id=>$parrec->{idpath},
+               name=>\@sysname,
+               cpucount=>$parrec->{cpucount},
+               memory=>$parrec->{memory},
+               osrelease=>$parrec->{image_name},
+               sysiface=>\@sysiface,
+               ipaddresses=>\@ipaddresses
+            );
+            if ($parrec->{azoneid}=~m/^eu/){
+               $syncData{availabilityZone}=$parrec->{azoneid};
+            }
+            else{
                my $msg='invalid availability zone from AWS: '.
                        $parrec->{azoneid};
                push(@qmsg,$msg);
                push(@dataissue,$msg);
                $errorlevel=3 if ($errorlevel<3);
             }
-            else{  # handling AssetID
-               my $ass=getModuleObject($self->getParent->Config(),
-                                       "itil::asset");
-               my $awslabel="AWS: Availability Zone";
-               my $k="$awslabel ".$parrec->{azoneid};
-               msg(INFO,"checking assetid for '$k'");
-               $ass->SetFilter({
-                  kwords=>\$k,
-                  cistatusid=>[4],
-                  srcsys=>\'w5base'
-               }); 
-               my @l=$ass->getHashList(qw(id name fullname));
-               if ($#l==-1){
-                  my $msg='can not identify availability zone asset from '.
-                          'AWS - please contact Cloud-Admins: '.
-                          $parrec->{azoneid};
-                  push(@qmsg,$msg);
-                  push(@dataissue,$msg);
-                  $errorlevel=3 if ($errorlevel<3);
 
-                  # try to notify
-                  $ass->ResetFilter();
-                  $ass->SetFilter({
-                     kwords=>"\"$awslabel *\"",
-                     cistatusid=>[4],
-                     srcsys=>\'w5base'
-                  }); 
-                  my @l=$ass->getHashList(qw(id databossid));
-                  my %uid;
-                  foreach my $arec (@l){
-                     if ($arec->{databossid} ne ""){
-                        $uid{$arec->{databossid}}++;
-                     }
+            my $w5itcloudarea;
+            if ($parrec->{accountid} ne ""){
+               my $cloudarea=getModuleObject(
+                  $self->getParent->Config,
+                  "itil::itcloudarea"
+               );
+               $cloudarea->SetFilter({
+                  cloud=>'AWS',
+                  srcid=>$parrec->{accountid}
+               });
+               my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+               if (defined($w5cloudarearec)){
+                  $w5itcloudarea=$w5cloudarearec;
+                  if ($w5cloudarearec->{cistatusid} eq "4" &&
+                      $w5cloudarearec->{applid} ne ""){
+                     $syncData{itcloudareaid}=$w5cloudarearec->{id}; 
                   }
-                  if (keys(%uid)){
-                     my $wfa=getModuleObject($ass->Config,
-                                             "base::workflowaction");
-                     $wfa->Notify("ERROR",
-                           "missing AWS Asset for $parrec->{azoneid}",
-                        "Ladies and Gentlemen,\n\n".
-                        "Please create an asset record in it-inventory\n".
-                        "for AWS availability zone ".
-                        "with '$k' in keywords.\n\n".
-                        "(as already done, like for other availability zones)",
-                        emailto=>[keys(%uid)],
-                        emailbcc=>[
-                           11634953080001, # HV
-                        ]
-                     );
-                  }
-               }
-               elsif ($#l>0){
-                  my $msg='availability zone asset not unique from AWS';
-                  push(@qmsg,$msg);
-                  push(@dataissue,$msg);
-                  $errorlevel=3 if ($errorlevel<3);
                }
                else{
-                  if ($rec->{systemtype} ne "standard"){
-                     $self->IfComp($dataobj,
-                                   $rec,"systemtype",
-                                   {systemtype=>"standard"},"systemtype",
-                                   $autocorrect,$forcedupd,$wfrequest,
-                                   \@qmsg,\@dataissue,\$errorlevel,
-                                   mode=>'string');
-                  }
-                  else{
-                     $self->IfComp($dataobj,
-                                   $rec,"asset",
-                                   {assetassetid=>$l[0]->{name}},"assetassetid",
-                                   $autocorrect,$forcedupd,$wfrequest,
-                                   \@qmsg,\@dataissue,\$errorlevel,
-                                   mode=>'leftouterlink');
-                  }
+                  msg(ERROR,"found AWS System $rec->{name} ".
+                            "on invalid cloudarea");
+                  die();
                }
             }
+
+
+            $dataobj->QRuleSyncCloudSystem("AWS",
+               $self,
+               $rec,$par,\%syncData,
+               $autocorrect,$forcedupd,
+               \@qmsg,\@dataissue,\$errorlevel,$wfrequest
+            );
          }
       }
    }
