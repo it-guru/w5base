@@ -77,6 +77,13 @@ sub new
                 label         =>'ProbeIP Proxy',
                 dataobjattr   =>'network.probeipproxy'),
 
+      new kernel::Field::Text(
+                name          =>'networktag',
+                label         =>'Network tag',
+                maxlength     =>20,
+                htmleditwidth =>'100px',
+                dataobjattr   =>'network.tagname'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
@@ -233,6 +240,11 @@ sub Validate
        $newrec->{name}=~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
+   }
+   if (exists($newrec->{networktag})){
+      $newrec->{networktag}=uc($newrec->{networktag});
+      $newrec->{networktag}=~s/[^a-z0-9]//gi;
+      $newrec->{networktag}=undef if ($newrec->{networktag} eq "");
    }
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
