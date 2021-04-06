@@ -32,53 +32,6 @@ sub new
    return($self);
 }
 
-sub getTaggedNetworkAreaId
-{
-   my $self=shift;
-   my %netarea=();
-
-
-   $netarea{CNDTAG}=$self->findNetworkAreaId({
-         addDefaultIsland=>1
-      },
-      'Corporate Network DTAG (CNDTAG)', # zukünftig!
-      'Deutsche Telekom HitNet',
-   );
-
-   $netarea{ISLAND}=$self->findNetworkAreaId({
-      addDefaultIsland=>1
-   });
-
-   $netarea{INTERNET}=$self->findNetworkAreaId({
-         addDefaultIsland=>1
-      },
-      'Internet',
-   );
-   $netarea{TSIADMINLAN}=$self->findNetworkAreaId({
-         addDefaultIsland=>1
-      },
-      'T-Systems Admin-LAN',
-   );
-   $netarea{TSIBACKUPLAN}=$self->findNetworkAreaId({
-         addDefaultIsland=>1
-      },
-      'T-Systems Datensicherungs/Backup LAN',
-   );
-   $netarea{TSISTORLAN}=$self->findNetworkAreaId({
-         addDefaultIsland=>1
-      },
-      'T-Systems Storage/NAS LAN',
-   );
-   $netarea{AWSINTERN}=$self->findNetworkAreaId({
-         addDefaultIsland=>1
-      },
-      'AWS Internal Networks',
-   );
-
-   return(\%netarea);
-}
-
-
 
 1;
 

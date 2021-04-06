@@ -362,6 +362,22 @@ sub findNetworkAreaId
    return(undef);
 }
 
+sub getTaggedNetworkAreaId
+{
+   my $self=shift;
+   my %netarea=();
+
+   $self->ResetFilter();
+   $self->SetFilter({cistatusid=>'4'});
+   $self->SetCurrentView(qw(name id networktag));
+   my $i=$self->getHashIndexed("networktag");
+
+   %netarea=%{$i->{"networktag"}};
+
+   return(\%netarea);
+}
+
+
 
 
 
