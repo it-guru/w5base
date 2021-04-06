@@ -1236,7 +1236,8 @@ sub new
                 subeditmsk    =>'subedit.system',
                 vjointo       =>'itil::sysiface',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name','mac']),
+                vjoindisp     =>['name','mac'],
+                vjoininhash   =>['id','name','mac']),
 
       new kernel::Field::Text(
                 name          =>'macadresses',
