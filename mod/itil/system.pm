@@ -2698,7 +2698,7 @@ sub QRuleSyncCloudSystem
       #printf STDERR ("rec ips=%s\n",Dumper($rec->{ipaddresses}));
 
       my $netarea={};
-      my $net=getModuleObject($self->Config(),"TS::network");
+      my $net=getModuleObject($self->Config(),"itil::network");
       if (defined($net)){
          $netarea=$net->getTaggedNetworkAreaId();
       }
