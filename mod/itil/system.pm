@@ -2649,16 +2649,19 @@ sub QRuleSyncCloudSystem
       my $sysnamelist=$parrec->{name};
       $sysnamelist=[$sysnamelist] if (ref($sysnamelist) ne "ARRAY");
       NAMECHK: foreach my $sysname (@$sysnamelist){
-         my $sysname=lc($sysname);
+         $sysname=lc($sysname);
+         if ($sysname=~m/^\S{5,32}\s/){  # Wenn der Name am Anfang steht und
+            $sysname=~s/\s.*//;          # mit Leerzeichen sepperiert noch ein
+         }                               # text, dann weg damit
          $sysname=~s/\s/_/g;
          $sysname=~s/\..*$//; # remove posible Domain part 
          if (length($sysname)>40){
-            $sysname=substr($sysname,40);
+            $sysname=substr($sysname,0,40);
          }
          if ($self->ValidateSystemname($sysname)){
             if ($rec->{name} ne $sysname){
                $self->ResetFilter();
-               $self->SetFilter({name=>\$sysname,id=>"!".$rec->{id}});
+               $self->SetFilter({name=>'"'.$sysname.'"',id=>"!".$rec->{id}});
                my ($chkrec,$msg)=$self->getOnlyFirst(qw(id name));
                if (defined($chkrec)){
                   next NAMECHK;
