@@ -372,7 +372,9 @@ sub getTaggedNetworkAreaId
    $self->SetCurrentView(qw(name id networktag));
    my $i=$self->getHashIndexed("networktag");
 
-   %netarea=%{$i->{"networktag"}};
+   foreach my $tag (keys(%{$i->{networktag}})){
+      $netarea{$tag}=$i->{networktag}->{$tag}->{id};
+   }
 
    return(\%netarea);
 }
