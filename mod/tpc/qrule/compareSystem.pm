@@ -128,108 +128,78 @@ sub qcheckRecord
                'set system CI-Status to disposed of waste due missing on TPC');
          }
          else{
+            my @sysname=();
+            my $sysname=lc($parrec->{name});
+            $sysname=~s/\s/_/g;
+            $sysname=~s/\..*$//;
 
-            if ($rec->{srcsys} eq "TPC"){
-               $parrec->{name}=~s/\s/_/g;
-               if (defined($parrec->{name})){
-                  $parrec->{name}=lc($parrec->{name});
-                  $parrec->{name}=~s/\..*$//; # remove posible Domain part 
-               }
-               my $nameok=1;
-               if ($parrec->{name} ne $rec->{name} &&
-                   ($parrec->{name}=~m/\s/)){
-                  $nameok=0;
-                  my $m='systemname with whitespace in TPC - '.
-                        'contact TPC Admin to fix this!';
-                  push(@qmsg,$m);
-                  push(@dataissue,$m);
-                  $errorlevel=3 if ($errorlevel<3);
-               }
-               if ($parrec->{name}=~m/\.\S{1,3}$/){
-                  $parrec->{name}=~s/\..*//;
-                  my $m='systemname with DNS Domain in TPC - '.
-                        'contact TPC Admin to fix this!';
-                  push(@qmsg,$m);
-                  push(@dataissue,$m);
-                  $errorlevel=3 if ($errorlevel<3);
-               }
-
-               if ($parrec->{name}=~m/^\s*$/){  # könnte notwendig werden!
-                  $nameok=0;
-                  push(@qmsg,'systemname from TPC not useable - '.
-                             'contact TPC Admin to fix this!');
-                  $errorlevel=3 if ($errorlevel<3);
-               }
-               if ($nameok){
-                  $dataobj->ResetFilter();
-                  $dataobj->SetFilter({name=>\$parrec->{name},
-                                       id=>"!".$rec->{id}});
-                  my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
-                  if (defined($chkrec)){
-                        $nameok=0;
-                        my $m='systemname from TPC is already in use '.
-                              'by an other system - '.
-                              'contact TPC Admin to make '.
-                              'the systemname unique!';
-                        push(@qmsg,$m);
-                        push(@dataissue,$m);
-                        $errorlevel=3 if ($errorlevel<3);
-                  }
-               }
-
-               if ($nameok){
-                  $self->IfComp($dataobj,
-                                $rec,"name",
-                                $parrec,"name",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'string');
-               }
-               $self->IfComp($dataobj,
-                             $rec,"cpucount",
-                             $parrec,"cpucount",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
-
-               $self->IfComp($dataobj,
-                             $rec,"memory",
-                             $parrec,"memory",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
-
-               $self->IfComp($dataobj,
-                             $rec,"osrelease",
-                             $parrec,"image_name",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlinkmissok',
-                             iomapped=>$par);
-               my $w5itcloudarea;
-               if ($parrec->{projectid} ne ""){
-                  msg(INFO,"try to add cloudarea to system ".$rec->{name});
-                  my $cloudarea=getModuleObject($self->getParent->Config,
-                                                "itil::itcloudarea");
-                  $cloudarea->SetFilter({srcsys=>\'tsotc::project',
-                                         srcid=>\$parrec->{projectid}
-                  });
-                  my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
-                  if (defined($w5cloudarearec)){
-                     $w5itcloudarea=$w5cloudarearec;
-                     if ($w5cloudarearec->{cistatusid} eq "4" &&
-                         $w5cloudarearec->{applid} ne ""){
-                        if ($rec->{itcloudareaid} ne $w5cloudarearec->{id}){
-                           $forcedupd->{itcloudareaid}= $w5cloudarearec->{id};
-                        }
-                     }
-                  }
-                  else{
-                     msg(ERROR,"found TPC System $rec->{name} ".
-                               "on invalid cloudarea");
-                  }
+            my $nameok=1;
+            if ($sysname ne $rec->{name} && ($sysname=~m/\s/)){
+               $nameok=0;
+               my $m='systemname with whitespace in TPC - '.
+                     'contact TPC Admin to fix this!';
+               push(@qmsg,$m);
+               push(@dataissue,$m);
+               $errorlevel=3 if ($errorlevel<3);
+            }
+            if ($nameok){
+               if ($sysname ne ""){
+                  push(@sysname,$sysname);
                }
             }
+            push(@sysname,$parrec->{id});
+
+            my %sysiface;
+            my %ipaddresses;
+            if ($parrec->{address} ne ""){
+               $ipaddresses{$parrec->{address}}={
+                  name=>$parrec->{address},
+                  netareatag=>'CNDTAG'
+               };
+            }
+
+
+            my @sysiface;
+            my @ipaddresses;
+            @ipaddresses=sort({$a->{name} cmp $b->{name}} values(%ipaddresses));
+
+
+            my %syncData=(
+               id=>$parrec->{id},
+               name=>\@sysname,
+               cpucount=>$parrec->{cpucount},
+               memory=>$parrec->{memory},
+               osrelease=>$parrec->{image_name},
+               ipaddresses=>\@ipaddresses
+            );
+
+            my $w5itcloudarea;
+            if ($parrec->{projectid} ne ""){
+               msg(INFO,"try to add cloudarea to system ".$rec->{name});
+               my $cloudarea=getModuleObject($self->getParent->Config,
+                                             "itil::itcloudarea");
+               $cloudarea->SetFilter({srcsys=>\'tsotc::project',
+                                      srcid=>\$parrec->{projectid}
+               });
+               my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+               if (defined($w5cloudarearec)){
+                  $w5itcloudarea=$w5cloudarearec;
+                  if ($w5cloudarearec->{cistatusid} eq "4" &&
+                      $w5cloudarearec->{applid} ne ""){
+                     $syncData{itcloudareaid}=$w5cloudarearec->{id}; 
+                  }
+               }
+               else{
+                  msg(ERROR,"found TPC System $rec->{name} ".
+                            "on invalid cloudarea");
+               }
+            }
+            $dataobj->QRuleSyncCloudSystem("TPC",
+               $self,
+               $rec,$par,\%syncData,
+               $autocorrect,$forcedupd,
+               \@qmsg,\@dataissue,\$errorlevel,$wfrequest
+            );
          }
       }
    }
