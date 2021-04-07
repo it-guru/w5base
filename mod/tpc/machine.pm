@@ -312,6 +312,12 @@ sub Import
       my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
       if (defined($w5cloudarearec)){
          $w5carec=$w5cloudarearec;
+         if ($w5cloudarearec->{cistatusid} ne "4"){
+            $self->LastMsg(ERROR,
+                           "cloudarea '%s' for  import of '%s' not active",
+                           $w5cloudarearec->{fullname},$param->{importname});
+            return(undef);
+         }
          if ($w5cloudarearec->{cistatusid} eq "4" &&
              $w5cloudarearec->{applid} ne ""){
             msg(INFO,"try to add appl ".$w5cloudarearec->{applid}.

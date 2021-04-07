@@ -97,7 +97,7 @@ sub TPC_CloudAreaSync
          }
       }
    }
-      $flt{cdate}=">now-14d";
+   #   $flt{cdate}=">now-14d";   # for DEBUG: Check last 14 days
 
    if (1){
       my $d=$joblog->ExpandTimeExpression("now-1h","en","GMT","GMT");
@@ -256,7 +256,6 @@ sub TPC_CloudAreaSync
             my ($srec,$msg)=$sys->getOnlyFirst(qw(id cistatusid));
             if (!defined($srec)){
                # run import
-               printf STDERR ("New TPC sys: %s\n",$mrec->{urlofcurrentrec});
                $mach->Import({importname=>$mrec->{id}});
             }
             else{
@@ -285,8 +284,6 @@ sub TPC_CloudAreaSync
          msg(ERROR,"invalid to find cloud $tpcname in cloud list");
       }
    }
-
-   printf STDERR ("lastmsg:$exitmsg\n");
 
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
