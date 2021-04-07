@@ -11,7 +11,7 @@ die <b>ID des Quellsystems</b>%idhelp%oder die <b>E-Mail-Adresse</b> spezifizier
 Wenn der Kontakt identifizert werden kann und noch nicht existiert, 
 dann wird dieser automatisch als "installiert/aktiv" erzeugt.</td>
 </tr>
-<tr><td width=1% nowrap>Name (E-Mail oder ID, max.5):</td>
+<tr><td width=1% nowrap>Name (E-Mail oder ID, max.30):</td>
 <td><input type=text class=finput name=importname value="%importname%"></td></tr>
 <tr>
 <td colspan=2 align=center><input name=DOIT type=submit value=" importieren "></td>

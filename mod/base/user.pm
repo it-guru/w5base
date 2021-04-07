@@ -2225,7 +2225,7 @@ sub getImportObjs
 sub ImportUser
 {
    my $self=shift;
-   my $maxCnt=5;
+   my $maxCnt=30;
    my $success=0;
    my %param=(quiet=>1);
 

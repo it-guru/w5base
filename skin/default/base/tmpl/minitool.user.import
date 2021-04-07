@@ -10,7 +10,7 @@ database. The user you want to import can be specified
 by <b>Source ID</b>%idhelp%or <b>E-Mail address</b>.<br>
 If the user can be found, it will be automatically created as an
 installed/active contact.</td></tr>
-<tr><td width=1% nowrap>Name (E-Mail or ID, max.5):</td>
+<tr><td width=1% nowrap>Name (E-Mail or ID, max.30):</td>
 <td><input type=text class=finput name=importname value="%importname%"></td></tr>
 <tr>
 <td colspan=2 align=center><input name=DOIT type=submit value=" import "></td>
