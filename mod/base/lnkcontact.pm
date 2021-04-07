@@ -428,17 +428,20 @@ sub getPostibleRoleValues
    my @opt;
    my $parentobj;
 
-   if (!defined($current) && defined($newrec)){
-      if (exists($app->{secparentobj})){
-         $parentobj=$app->{secparentobj}
-      }
-   }
    if (defined($current)){
       $parentobj=$current->{parentobj};
    }
    else{
-      if (defined($newrec) && exists($newrec->{parentobj})){
-         $parentobj=$newrec->{parentobj};
+      if (defined($newrec)){
+         if (exists($newrec->{parentobj})){
+            $parentobj=$newrec->{parentobj};
+         }
+         # wenn über die app secparent definiert,
+         # dann geht das vor!
+         if (exists($app->{secparentobj}) &&
+             $app->{secparentobj} ne ""){
+            $parentobj=$app->{secparentobj}
+         }
       }
       if ($parentobj eq ""){
          $parentobj=Query->Param("parentobj");  # bei Neueingabe über SubList

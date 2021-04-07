@@ -679,7 +679,23 @@ sub HandleSubListEdit
          "src=\"../../../public/base/load/toolbox.js\"></script>\n");
    print("<script language=JavaScript ".
          "src=\"../../../public/base/load/sortabletable.js\"></script>\n");
-   my $op=$self->ProcessDataModificationOP();
+
+   if (exists($param{forceparam}) && ref($param{forceparam}) eq "HASH"){
+      foreach my $v (keys(%{$param{forceparam}})){
+         Query->Param($v=>$param{forceparam}->{$v});
+      }
+   }                                          # die forceparam muessen vor
+                                              # UND nach der Modification
+   my $op=$self->ProcessDataModificationOP(); # geladen werden, damit diese
+                                              # in der Query zur Masken
+                                              # vorbelegung verfuegbar sind
+
+   if (exists($param{forceparam}) && ref($param{forceparam}) eq "HASH"){
+      foreach my $v (keys(%{$param{forceparam}})){
+         Query->Param($v=>$param{forceparam}->{$v});
+      }
+   }
+
    {
       # SubList Edit-Mask anzeigen
       my $id=Query->Param("CurrentIdToEdit");

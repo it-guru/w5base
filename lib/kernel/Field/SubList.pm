@@ -71,10 +71,6 @@ sub EditProcessor
 
    $dfield->vjoinobjInit();
    my %forceparam=$app->getForceParamForSubedit($id,$dfield);
-   foreach my $v (keys(%forceparam)){
-      Query->Param($v=>$forceparam{$v});
-   }
-
    #
    # this makes problems with findNearest if template is not in derivations
    #
@@ -86,9 +82,7 @@ sub EditProcessor
       $dataobjname=$self->{vjoinedit};
    }
    my $do=$self->getParent->getPersistentModuleObject($dataobjname);
-   $do->HandleSubListEdit(subeditmsk=>$dfield->{subeditmsk});
-
-
+   $do->HandleSubListEdit(subeditmsk=>$dfield->{subeditmsk},forceparam=>\%forceparam);
 
    $app->SetFilter({$app->IdField->Name()=>$id});
    $app->SetCurrentView($field);
