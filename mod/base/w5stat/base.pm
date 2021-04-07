@@ -853,7 +853,8 @@ sub processRecord
       if ($rec->{class} eq "base::workflow::DataIssue"){
          if ($rec->{stateid}!=5 && defined($rec->{responsiblegrp})){
 
-            foreach my $resp (@{$rec->{responsiblegrp}}){
+            {
+               my $resp=$rec->{responsiblegrp};
                $self->getParent->storeStatVar("Group",$resp,{},
                                               "base.DataIssue.open",1);
                $self->getParent->storeStatVar("Group",$resp,
@@ -939,7 +940,8 @@ sub processRecord
          }
 
 
-         foreach my $resp (@responsiblegrp){
+         {
+            my $resp=\@responsiblegrp;
             if ($rec->{stateid}!=5 && 
                 $rec->{class} eq "base::workflow::DataIssue"){ 
                if ($age>259200){ # 1/2 Jahr
