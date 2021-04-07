@@ -76,9 +76,6 @@ sub getPosibleTargets
       if ($newid ne ""){
          if (!exists($ladd->{$lrec->{systemid}})){
             my %add=(TasteOS_MachineID=>$newid);
-            #printf STDERR ("fifi insNewTSOSmac $newid\n");
-            
-#printf STDERR ("fifi insert new MachineID=$newid\n");
             $opladdobj->ValidatedInsertRecord({
                systemid=>$lrec->{systemid},
                applgrpid=>$lrec->{applgrpid},
@@ -86,10 +83,8 @@ sub getPosibleTargets
             });
          }
          else{
-            #printf STDERR ("fifi insNewTSOSmac update $newid in id=".$ladd->{$lrec->{systemid}}->{id}."\n");
             my %add=%{$ladd->{$lrec->{systemid}}->{additional}};
             $add{TasteOS_MachineID}=$newid;
-#printf STDERR ("fifi update new MachineID=$newid\n");
             $opladdobj->ValidatedUpdateRecord(
                $ladd->{$lrec->{systemid}},
                {additional=>\%add},
@@ -343,13 +338,12 @@ sub qcheckRecord
             systemid=>$TSOSsystemid
          };
          my $machineNumber;
-         if ($lrec->{systemsrcsys} eq "AssetManager" &&
-             $lrec->{systemsystemid} ne ""){
-            $machineNumber=$lrec->{systemsystemid};
-         }
-         else{
-            if ($lrec->{systemsrcid} ne ""){
-               $machineNumber=$lrec->{systemsrcid};
+
+         if ($lrec->{systemsrcid} ne ""){
+            $machineNumber=$lrec->{systemsrcid};
+            if ($lrec->{systemsrcsys} ne ""){
+               $machineNumber=$lrec->{systemsrcsys}.":".
+                              $machineNumber;
             }
          }
          if ($machineNumber){
@@ -363,6 +357,11 @@ sub qcheckRecord
             $TSOSmachineid=undef;
          }
          if ($TSOSmachineid eq ""){
+
+
+
+
+
             my $newid=insNewTSOSmac($dataobj, $tsosmac,$opladdobj,
                                     $rec,$tsosmacrec,$lrec,$ladd->{systemid});
          }
