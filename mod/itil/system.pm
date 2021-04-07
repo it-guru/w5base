@@ -2942,6 +2942,16 @@ sub QRuleSyncCloudSystem
          }
       }
    }
+   else{
+      if ($rec->{systemtype} ne "abstract"){   # Cloud kann keine Availability
+         $qrule->IfComp($self,                          # Zone liefern.
+                       $rec,"systemtype",
+                       {systemtype=>"abstract"},"systemtype",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       $qmsg,$dataissue,$errorlevel,
+                       mode=>'string');
+      }
+   }
 }
 
 
