@@ -1037,9 +1037,9 @@ sub HandleNewUser
             $user->SetCurrentView(qw(ALL));
             my ($urec,$msg)=$user->getFirst();
             if (!defined($urec)){  # now check, if email is in useremail set
+               $useremail->ResetFilter();
                $useremail->SetFilter({email=>$uarec->{requestemail}});
-               $useremail->SetCurrentView(qw(ALL));
-               ($uerec,$msg)=$useremail->getFirst();
+               ($uerec,$msg)=$useremail->getOnlyFirst(qw(ALL));
                if (defined($uerec)){
                   if ($uerec->{userid} eq ""){
                      $useremail->ValidatedDeleteRecord($uerec);
@@ -1047,15 +1047,21 @@ sub HandleNewUser
                   }
                   $user->ResetFilter();
                   $user->SetFilter({userid=>\$uerec->{userid}});
-                  $user->SetCurrentView(qw(ALL));
-                  ($urec,$msg)=$user->getFirst();
+                  ($urec,$msg)=$user->getOnlyFirst(qw(ALL));
                }
             }
             if (defined($urec)){
-               if (defined($uerec) && $uerec->{cistatusid}>4){ #marked addresses
+               if (defined($uerec) && 
+                   ($uerec->{cistatusid}>4 ||
+                    $uerec->{usertyp} eq "service" ||
+                    $uerec->{usertyp} eq "function")){ #marked addresses
                   print $self->HttpHeader("text/html");
+                  my $SCRIPT_URI=$ENV{SCRIPT_URI};
+                  if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+                     $SCRIPT_URI=~s/^http:/https:/;
+                  }
                   print $self->HtmlHeader(style=>['default.css','work.css'],
-                                       body=>1,form=>1,action=>$ENV{SCRIPT_URI},
+                                       body=>1,form=>1,action=>$SCRIPT_URI,
                                        refresh=>5,
                                        title=>'W5Base - account verification');
                   print $self->getParsedTemplate("tmpl/accountverificationdeny",
@@ -1123,11 +1129,15 @@ sub HandleNewUser
                }
                else{
                   print $self->HttpHeader("text/html");
+                  my $SCRIPT_URI=$ENV{SCRIPT_URI};
+                  if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+                     $SCRIPT_URI=~s/^http:/https:/;
+                  }
                   print $self->HtmlHeader(
                      style=>['default.css','work.css'],
                      body=>1,
                      form=>1,
-                     action=>$ENV{SCRIPT_URI},
+                     action=>$SCRIPT_URI,
                      title=>'W5Base - account verification'
                   );
                   print $self->getParsedTemplate("tmpl/accountverificationok",{
@@ -1166,10 +1176,34 @@ sub HandleNewUser
          ($uarec,$msg)=$ua->getFirst();
       }
       if (defined(Query->Param("save"))){
-         my $em=trim(Query->Param("email"));
+         my $em=lc(trim(Query->Param("email")));
          my $id;
          my $requestcode;
-         if (($em=~m/^\S+\@\S+$/)){
+         my $ok=1;
+         if (!($em=~m/^\S+\@\S+$/)){
+            $ok=0;
+            $self->LastMsg(ERROR,"looks not like an email address");
+         }
+         if ($ok){
+            my $user=getModuleObject($self->Config,"base::user");
+            $user->ResetFilter();
+            $user->SetFilter({emails=>\$em});
+            my ($chkrec,$msg)=$user->getOnlyFirst(qw(cistatusid usertyp));
+            if (defined($chkrec)){
+               if ($chkrec->{usertyp} eq "service"){
+                  $self->LastMsg(ERROR,"nice try, email belongs to a service");
+                  $ok=0; 
+               }
+               if ($ok){
+                  if ($chkrec->{cistatusid}>4){
+                     $self->LastMsg(ERROR,
+                     "nice try, email belongs to an deleted or locked contact");
+                     $ok=0; 
+                  }
+               }
+            }
+         }
+         if ($ok){
             if ($ua->ValidatedUpdateRecord($uarec,{requestemail=>$em},
                                            {account=>$ENV{REMOTE_USER}})){
                my $res;

@@ -40,3 +40,6 @@
 "You are sure, you will accept the completly GTC's and have understood all consequences?"=>{de=>'Sie sind sicher, dass Sie mit den AGBs einverstanden sind und alle Konsequenzen verstanden haben?'},
 "Without accepted GTC's, no access could be granted!"=>{de=>"Ohne die Bestätigung der AGBs kann kein Zugriff gewährt werden!"},
 "your client ip is rejected by ipacl"=>{de=>"Ihre Client-IP-Adresse wurde von der IP Zugriffsbeschränkung abgelehnt"},
+'looks not like an email address'=>{de=>'sieht nicht wie eine E-Mail Adresse aus'},
+'nice try, email belongs to a service'=>{de=>'netter Versuch, die E-Mail gehört zu einem Service-Kontakt'},
+'nice try, email belongs to an deleted or locked contact'=>{de=>'netter Versuch, die E-Mail gehört zu einem gelöschten oder gesperrten Kontakt'},
