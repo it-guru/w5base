@@ -128,468 +128,125 @@ sub qcheckRecord
                'set system CI-Status to disposed of waste due missing on OTC');
          }
          else{
+            my @sysname=();
+            my $sysname=lc($parrec->{name});
+            $sysname=~s/\s.*$//;
+            $sysname=~s/\..*$//;
+            $sysname=~s/[^a-z0-9_-]/_/g;
+            if ($sysname ne "" && length($sysname)>3){
+               push(@sysname,$sysname);
+            }
+            push(@sysname,$parrec->{altname});
+            push(@sysname,$parrec->{id});
 
-            if ($rec->{srcsys} eq "OTC"){
-               $parrec->{name}=~s/\s/_/g;
-               if (defined($parrec->{name})){
-                  $parrec->{name}=lc($parrec->{name});
-                  $parrec->{name}=~s/\..*$//; # remove posible Domain part 
+            my %sysiface;
+            my @sysiface;
+            my %parip;
+            my @parip;
+            for(my $ii=0;$ii<=$#{$parrec->{ipaddresses}};$ii++){
+               if ($parrec->{ipaddresses}->[$ii]->{hwaddr} ne ""){
+                  my $ifname=$parrec->{ipaddresses}->[$ii]->{hwaddr};
+                  $sysiface{$ifname}=$ifname;
                }
-               my $nameok=1;
-               if ($parrec->{name} ne $rec->{name} &&
-                   ($parrec->{name}=~m/\s/)){
-                  $nameok=0;
-                  my $m='systemname with whitespace in OTC - '.
-                        'contact OTC Admin to fix this!';
-                  push(@qmsg,$m);
-                  push(@dataissue,$m);
-                  $errorlevel=3 if ($errorlevel<3);
-               }
-               if ($parrec->{name}=~m/\.\S{1,3}$/){
-                  $parrec->{name}=~s/\..*//;
-                  my $m='systemname with DNS Domain in OTC - '.
-                        'contact OTC Admin to fix this!';
-                  push(@qmsg,$m);
-                  push(@dataissue,$m);
-                  $errorlevel=3 if ($errorlevel<3);
-               }
-
-               if ($parrec->{name}=~m/^\s*$/){  # könnte notwendig werden!
-                  $nameok=0;
-                  push(@qmsg,'systemname from OTC not useable - '.
-                             'contact OTC Admin to fix this!');
-                  $errorlevel=3 if ($errorlevel<3);
-               }
-               if ($nameok){
-                  $dataobj->ResetFilter();
-                  $dataobj->SetFilter({name=>\$parrec->{name},
-                                       id=>"!".$rec->{id}});
-                  my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
-                  if (defined($chkrec)){
-                     $dataobj->ResetFilter();
-                     $dataobj->SetFilter({name=>\$parrec->{altname},
-                                          id=>"!".$rec->{id}});
-                     my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
-                     if (!defined($chkrec)){
-                        $parrec->{name}=$parrec->{altname}; 
-                        push(@qmsg,"systemname is not unique - please ".
-                                   "change the systemname in OTC");
-                        push(@qmsg,"using alternate systemname with ".
-                                   "unique sufix");
-                        $errorlevel=2 if ($errorlevel<2);
-                     }
-                     else{
-                        $nameok=0;
-                        my $m='systemname from OTC is already in use '.
-                              'by an other system - '.
-                              'contact OTC Admin to make '.
-                              'the systemname unique!';
-                        push(@qmsg,$m);
-                        push(@dataissue,$m);
-                        $errorlevel=3 if ($errorlevel<3);
-                     }
-                  }
-               }
-
-               if ($nameok){
-                  if (($parrec->{name}=~m/\s/) || length($parrec->{name})>60){
-                     $parrec->{name}=$parrec->{altname};
-                  }
-                  $self->IfComp($dataobj,
-                                $rec,"name",
-                                $parrec,"name",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'string');
-               }
-               $self->IfComp($dataobj,
-                             $rec,"cpucount",
-                             $parrec,"cpucount",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
-
-               $self->IfComp($dataobj,
-                             $rec,"memory",
-                             $parrec,"memory",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
-
-               $self->IfComp($dataobj,
-                             $rec,"osrelease",
-                             $parrec,"image_name",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'leftouterlinkmissok',
-                             iomapped=>$par);
-               my $w5itcloudarea;
-               if ($parrec->{projectid} ne ""){
-                  msg(INFO,"try to add cloudarea to system ".$rec->{name});
-                  my $cloudarea=getModuleObject($self->getParent->Config,
-                                                "itil::itcloudarea");
-                  $cloudarea->SetFilter({srcsys=>\'tsotc::project',
-                                         srcid=>\$parrec->{projectid}
-                  });
-                  my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
-                  if (defined($w5cloudarearec)){
-                     $w5itcloudarea=$w5cloudarearec;
-                     if ($w5cloudarearec->{cistatusid} eq "4" &&
-                         $w5cloudarearec->{applid} ne ""){
-                        if ($rec->{itcloudareaid} ne $w5cloudarearec->{id}){
-                           $forcedupd->{itcloudareaid}= $w5cloudarearec->{id};
-                        }
-                     }
-                  }
-                  else{
-                     msg(ERROR,"found OTC System $rec->{name} ".
-                               "on invalid cloudarea");
-                  }
-               }
-               if ($autocorrect){
-                  my $net=getModuleObject($self->getParent->Config(),
-                          "TS::network");
-                  my $netarea=$net->getTaggedNetworkAreaId();
-
-                  #############################################################
-       
-                  my @opList;
-                  #
-                  # %cleanOTCIPlist is neassasary, because multiple IP-Addresses
-                  # can be in one networkcard record
-                  #
-                  my %cleanOTCIPlist;
-                  my %cleanOTCIflist;
-
-                  my $cloudareaid;
-                  if (defined($w5itcloudarea)){
-                     $cloudareaid=$w5itcloudarea->{id};
-                  }
-
-                  # dynamic assign Interface names - if none given
-                  my %ifnum;
-                  my $ifnum=0;
-                  my $ifnamepattern='eth%d';
-
-                  # 1st get all already assigend ifnames to macs
-                  foreach my $ifrec (@{$rec->{sysiface}}){
-                     $ifnum{$ifrec->{name}}=$ifrec->{mac};
-                  }
-                  # 2nd remove invalid ifnames from current ip-List in w5base
-                  foreach my $iprec (@{$rec->{ipaddresses}}){
-                     if ($iprec->{ifname} ne "" && 
-                         !exists($ifnum{$iprec->{ifname}})){
-                        $iprec->{ifname}="";
-                     }
-                  }
-                  # 3d load ifnames to otcipaddresses for already assigned
-                  #    macs to ifnames
-                  foreach my $otciprec (@{$parrec->{ipaddresses}}){
-                     foreach my $ifname (keys(%ifnum)){
-                        if ($otciprec->{hwaddr} eq $ifnum{$ifname}){
-                           $otciprec->{ifname}=$ifname; 
-                        }
-                     }
-                  }
-                  # create ifnames on OTC records, if nothing is already
-                  # assigned
-
-                  for(my $i=0;$i<=$#{$parrec->{ipaddresses}};$i++){
-                     my $otciprec=$parrec->{ipaddresses}->[$i];
-                     if ($otciprec->{ifname} eq ""){
-                        my $ifname;
-                        for(my $ii=0;$ii<=$#{$parrec->{ipaddresses}};$ii++){
-                           if ($parrec->{ipaddresses}->[$ii]->{hwaddr} ne "" &&
-                               $otciprec->{hwaddr} eq 
-                               $parrec->{ipaddresses}->[$ii]->{hwaddr}){
-                              $ifname=$parrec->{ipaddresses}->[$ii]->{ifname};
-                              last;
-                           }
-                        }
- 
-                        if ($ifname eq ""){
-                           do{
-                              $ifname=sprintf($ifnamepattern,$ifnum);
-                              $ifnum++;
-                           }while(exists($ifnum{$ifname}));
-                           $ifnum{$ifname}++;
-                        }
-                        $otciprec->{ifname}=$ifname; 
-                     }
-                  }
-                  
-                  foreach my $otciprec (@{$parrec->{ipaddresses}}){
-                     my $mappedCIStatus=4;
-                     if ($otciprec->{name} ne ""){
-                        if ($otciprec->{name}=~
-                            m/^\d{1,3}(\.\d{1,3}){3,3}$/){
-                           $cleanOTCIPlist{$otciprec->{name}}={
-                              cistatusid=>$mappedCIStatus,
-                              ipaddress=>$otciprec->{name},
-                              itcloudareaid=>$cloudareaid,
-                              ifname=>$otciprec->{ifname},
-                              comments=>trim($otciprec->{comments})
-                           };
-                           if ($otciprec->{hwaddr} ne ""){
-                              $cleanOTCIflist{$otciprec->{ifname}}={
-                                 name=>$otciprec->{ifname},
-                                 mac=>$otciprec->{hwaddr}
-                              };
-                           }
-                        }
-                        else{
-                           msg(WARN,"ignoring IPv4 invalid ".
-                                    "'$otciprec->{name}' ".
-                                    "for $parrec->{id}");
-                        }
-                     }
-                  }
-                  my @cleanOTCIPlist=values(%cleanOTCIPlist);
-
-                  my $res=OpAnalyse(
-                             sub{  # comperator 
-                                my ($a,$b)=@_;
-                                my $eq;
-                                if ($a->{name} eq $b->{ipaddress}){
-                                  $eq=0;
-                                  if ($a->{srcsys} eq "OTC" &&
-                                      $a->{cistatusid} eq $b->{cistatusid}  &&
-                                      $a->{ifname} eq $b->{ifname} &&
-                                      $b->{itcloudareaid} eq 
-                                      $a->{itcloudareaid} && 
-                                      $a->{comments} eq $b->{comments}){
-                                     $eq=1;
-                                  }
-                                }
-                                return($eq);
-                             },
-                             sub{  # oprec generator
-                                my ($mode,$oldrec,$newrec,%p)=@_;
-                                if ($mode eq "insert" || $mode eq "update"){
-                                   if ($mode eq "insert" && 
-                                       $newrec->{cistatusid} eq "6"){
-                                      return(); # do not insert 
-                                                # already unconfigured ip's
-                                   }
-                                   my $networkid=$netarea->{ISLAND};
-                                   my $identifyby=undef;
-                                   if ($mode eq "update"){
-                                      $identifyby=$oldrec->{id};
-                                   }
-                                   if ($newrec->{ipaddress}=~m/^\s*$/){
-                                      $mode="nop";
-                                   }
-                                   my $type="1";   # secondary
-                                   # Customer Interface can not be marked
-                                   # as primary interface, because in some
-                                   # cases multiple customer interfaces
-                                   # exists in OTC Rotz.
-                                   #
-                                   #if (lc(trim($newrec->{description})) eq
-                                   #    "customer"){
-                                   #   $type="0"; # Customer Interface is prim
-                                   #}
-                                   my $oprec={
-                                     OP=>$mode,
-                                     MSG=>"$mode ip $newrec->{ipaddress} ".
-                                          "in W5Base",
-                                     IDENTIFYBY=>$identifyby,
-                                     DATAOBJ=>'itil::ipaddress',
-                                     DATA=>{
-                                      name         =>$newrec->{ipaddress},
-                                      cistatusid   =>$newrec->{cistatusid},
-                                      srcsys       =>'OTC',
-                                      type         =>$type,
-                                      comments     =>$newrec->{comments},
-                                      itcloudareaid=>$newrec->{itcloudareaid},
-                                      ifname       =>$newrec->{ifname},
-                                      systemid     =>$p{refid}
-                                     }
-                                   };
-                                   if ($mode eq "insert"){
-                                      $oprec->{DATA}->{networkid}=$networkid;
-                                   }
-                                   return($oprec);
-                                }
-                                elsif ($mode eq "delete"){
-                                   my $networkid=$oldrec->{networkid};
-                                   return({OP=>$mode,
-                                           MSG=>"delete ip $oldrec->{name} ".
-                                               "from W5Base",
-                                           DATAOBJ=>'itil::ipaddress',
-                                           IDENTIFYBY=>$oldrec->{id},
-                                           });
-                                }
-                                return(undef);
-                             },
-                             $rec->{ipaddresses},\@cleanOTCIPlist,\@opList,
-                             refid=>$rec->{id});
-                  if (!$res){
-                     my $opres=ProcessOpList($self->getParent,\@opList);
-                  }
-
-                  # Zielnetzwerke festlegen und prüfen ob frei
-                  my @otcip=map({$_->{name}} @{$parrec->{ipaddresses}});
-                  my %otcip;
-                  foreach my $ip (@otcip){
-                     $otcip{$ip}={networkid=>$netarea->{ISLAND}};
-                     if ($ip=~m/^10\./){   # OTC hangs only in CNDTAG
-                        $otcip{$ip}->{NetareaTag}='CNDTAG';
-                     }
-                  }
-                  my $iip=getModuleObject($self->getParent->Config(),
-                                          "tsotc::inipaddress");
-                  $iip->SetFilter({name=>\@otcip});
-                  foreach my $iiprec ($iip->getHashList(qw(name))){
-                     my $ip=$iiprec->{name};
-                     if (exists($otcip{$ip})){
-                        $otcip{$ip}->{NetareaTag}='INTERNET';
-                     }
-                  }
-                  my $ip=getModuleObject($self->getParent->Config(),
-                                                "itil::ipaddress");
-                  $ip->switchSystemIpToNetarea(
-                     \%otcip,$rec->{id},$netarea,\@qmsg
-                  );
-
-                  my @cleanOTCIflist=values(%cleanOTCIflist);
-                  @opList=();
-                  my $res=OpAnalyse(
-                             sub{  # comperator 
-                                my ($a,$b)=@_;
-                                my $eq;
-                                if ($a->{name} eq $b->{name}){
-                                   $eq=0;
-                                   $eq=1 if ( $a->{mac} eq $b->{mac});
-                                }
-                                return($eq);
-                             },
-                             sub{  # oprec generator
-                                my ($mode,$oldrec,$newrec,%p)=@_;
-                                if ($mode eq "insert" || $mode eq "update"){
-                                   #if ($mode eq "insert" && 
-                                   #    $newrec->{cistatusid} eq "6"){
-                                   #   return(); # do not insert 
-                                   #             # already unconfigured ip's
-                                   #}
-                                   my $identifyby=undef;
-                                   if ($mode eq "update"){
-                                      $identifyby=$oldrec->{id};
-                                   }
-                                   if ($newrec->{name}=~m/^\s*$/){
-                                      $mode="nop";
-                                   }
-                                   return({OP=>$mode,
-                                           MSG=>"$mode if $newrec->{name} ".
-                                                "in W5Base",
-                                           IDENTIFYBY=>$identifyby,
-                                           DATAOBJ=>'itil::sysiface',
-                                           DATA=>{
-                                              name      =>$newrec->{name},
-                                              mac       =>$newrec->{mac},
-                                              srcsys    =>'OTC',
-                                              systemid  =>$p{refid}
-                                              }
-                                           });
-                                }
-                                elsif ($mode eq "delete"){
-                                   return({OP=>$mode,
-                                           MSG=>"delete if $oldrec->{name} ".
-                                               "from W5Base",
-                                           DATAOBJ=>'itil::sysiface',
-                                           IDENTIFYBY=>$oldrec->{id},
-                                           });
-                                }
-                                return(undef);
-                             },
-                             $rec->{sysiface},\@cleanOTCIflist,\@opList,
-                             refid=>$rec->{id});
-                  if (!$res){
-                     my $opres=ProcessOpList($self->getParent,\@opList);
-                  }
-
-
-
-
-
-
-
-
-
+               if ($parrec->{ipaddresses}->[$ii]->{name} ne ""){
+                  $parip{$parrec->{ipaddresses}->[$ii]->{name}}++;
                }
             }
+            @parip=sort(keys(%parip));
+            my $sysiface=0;
+            my $ifnamepattern='eth%d';
+            foreach my $hwaddr (sort(keys(%sysiface))){
+               my $ifname=sprintf($ifnamepattern,$sysiface);
+               $sysiface++;
+               $sysiface{$hwaddr}=$ifname;
+               push(@sysiface,{
+                  name=>$ifname,
+                  mac=>$hwaddr
+               });
+            }
+            my %internetip;
+            if ($#parip!=-1){
+               my $iip=getModuleObject($self->getParent->Config(),
+                                       "tsotc::inipaddress");
+               $iip->SetFilter({name=>\@parip});
+               foreach my $iiprec ($iip->getHashList(qw(name))){
+                  $internetip{$iiprec->{name}}++;
+               }
+            }
+
+            my @ipaddresses;            
+            foreach my $otciprec (@{$parrec->{ipaddresses}}){
+               my $ifname;
+               my $ip={
+                  name=>$otciprec->{name},
+                  netareatag=>"ISLAND"
+               };
+               if (exists($internetip{$otciprec->{name}})){
+                  $ip->{netareatag}="INTERNET";
+               }
+               if ($otciprec->{name}=~m/^10\./){
+                  $ip->{netareatag}="CNDTAG";
+               }
+               if ($otciprec->{hwaddr} ne "" && 
+                   exists($sysiface{$otciprec->{hwaddr}})){
+                  $ifname=$sysiface{$otciprec->{hwaddr}};
+               }
+               if ($ifname){
+                  $ip->{ifname}=$ifname;
+               }
+               push(@ipaddresses,$ip);
+            }
+
+            my %syncData=(
+               id=>$parrec->{idpath},
+               name=>\@sysname,
+               cpucount=>$parrec->{cpucount},
+               memory=>$parrec->{memory},
+               osrelease=>$parrec->{image_name},
+               sysiface=>\@sysiface,
+               ipaddresses=>\@ipaddresses
+            );
+
+            my $w5itcloudarea;
+            if ($parrec->{projectid} ne ""){
+               msg(INFO,"try to add cloudarea to system ".$rec->{name});
+               my $cloudarea=getModuleObject($self->getParent->Config,
+                                             "itil::itcloudarea");
+               $cloudarea->SetFilter({srcsys=>\'tsotc::project',
+                                      srcid=>\$parrec->{projectid}
+               });
+               my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+               if (defined($w5cloudarearec)){
+                  $w5itcloudarea=$w5cloudarearec;
+                  if ($w5cloudarearec->{cistatusid} eq "4" &&
+                      $w5cloudarearec->{applid} ne ""){
+                     $syncData{itcloudareaid}=$w5cloudarearec->{id};
+                  }
+               }
+               else{
+                  msg(ERROR,"found OTC System $rec->{name} ".
+                            "on invalid cloudarea");
+               }
+            }
+
             if (!($parrec->{availability_zone}=~m/^eu[0-9a-z-]{3,10}$/)){
                my $msg='invalid availability zone from OTC';
                push(@qmsg,$msg);
                push(@dataissue,$msg);
                $errorlevel=3 if ($errorlevel<3);
             }
-            else{  # handling AssetID
-               my $ass=getModuleObject($self->getParent->Config(),
-                                       "itil::asset");
-               my $otclabel="OTC: Availability Zone";
-               my $k="$otclabel ".$parrec->{availability_zone};
-               msg(INFO,"checking assetid for '$k'");
-               $ass->SetFilter({
-                  kwords=>\$k,
-                  cistatusid=>[4],
-                  srcsys=>\'w5base'
-               }); 
-               my @l=$ass->getHashList(qw(id name fullname));
-               if ($#l==-1){
-                  my $msg='can not identify availability zone asset from OTC';
-                  push(@qmsg,$msg);
-                  push(@dataissue,$msg);
-                  $errorlevel=3 if ($errorlevel<3);
-
-                  # try to notify
-                  $ass->ResetFilter();
-                  $ass->SetFilter({
-                     kwords=>"\"$otclabel *\"",
-                     cistatusid=>[4],
-                     srcsys=>\'w5base'
-                  }); 
-                  my @l=$ass->getHashList(qw(id databossid));
-                  my %uid;
-                  foreach my $arec (@l){
-                     if ($arec->{databossid} ne ""){
-                        $uid{$arec->{databossid}}++;
-                     }
-                  }
-                  if (keys(%uid)){
-                     my $wfa=getModuleObject($ass->Config,"base::workflowaction");
-                     $wfa->Notify("ERROR","missing OTC Asset for $parrec->{availability_zone}",
-                        "Ladies and Gentlemen,\n\n".
-                        "Please create an asset record in it-inventory\n".
-                        "for OTC availability zone ".
-                        "with '$k' in keywords.\n\n".
-                        "(as already done, like for other availability zones)",
-                        emailto=>[keys(%uid)],
-                        emailbcc=>[
-                           11634953080001, # HV
-                        ]
-                     );
-
-
-                  }
-               }
-               elsif ($#l>0){
-                  my $msg='availability zone asset not unique from OTC';
-                  push(@qmsg,$msg);
-                  push(@dataissue,$msg);
-                  $errorlevel=3 if ($errorlevel<3);
-               }
-               else{
-                  $self->IfComp($dataobj,
-                                $rec,"asset",
-                                {assetassetid=>$l[0]->{name}},"assetassetid",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'leftouterlink');
-               }
+            else{
+               $syncData{availabilityZone}=$parrec->{availability_zone}; 
             }
-         }
-      }
+
+            $dataobj->QRuleSyncCloudSystem("OTC",
+               $self,
+               $rec,$par,\%syncData,
+               $autocorrect,$forcedupd,
+               \@qmsg,\@dataissue,\$errorlevel,$wfrequest
+            );
+        }
+     }
    }
 
    if (keys(%$forcedupd)){
