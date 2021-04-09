@@ -182,9 +182,9 @@ sub DataCollector
             return([],"200");
          }
          msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TPC response");
+         $self->LastMsg(ERROR,"unexpected data TPC machine response");
          return(undef);
-      },
+      }
 
    );
    #printf STDERR ("rawdata=%s\n",Dumper($d));
