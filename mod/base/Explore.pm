@@ -35,7 +35,7 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main jsApplets jsLib));
+   return(qw(Main Start jsApplets jsLib));
 }
 
 
@@ -52,6 +52,27 @@ sub Main
    my $getAppTitleBar=$self->getAppTitleBar();
    my $BASE=$ENV{REQUEST_URI};
    $BASE=~s#/Explore/Main.*?$#/Explore/Main#;
+
+   my $opt={
+      static=>{
+         BASE=>$BASE
+      }
+   };
+
+   my $prog=$self->getParsedTemplate("tmpl/base.Explore.js",$opt);
+   utf8::encode($prog);
+   print($prog);
+}
+
+sub Start
+{
+   my ($self)=@_;
+
+   print $self->HttpHeader("text/html",charset=>'UTF-8');
+
+   my $getAppTitleBar=$self->getAppTitleBar();
+   my $BASE=$ENV{REQUEST_URI};
+   $BASE=~s#/Explore/Start.*?$#/Explore/Start#;
 
    my $opt={
       static=>{

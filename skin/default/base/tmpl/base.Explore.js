@@ -790,22 +790,29 @@ var W5ExploreClass=function(){
          this.mpathline = document.createElement('div');
          this.mpathline.id = 'mpath';
          $(this.mpathline).addClass("TitleBar");
-
+         var showMain=1;
+         if (document.location.href.match(/\/Start\//)){
+            showMain=0;
+         }
          var mfirst = document.createElement('div');
          mfirst.id='mpathfirst';
-         mfirst.title='ShowAll';
-         $(mfirst).css("cursor","pointer");
+         if (showMain){
+            mfirst.title='ShowAll';
+            $(mfirst).css("cursor","pointer");
+         }
          var app=this;
-         $(mfirst).click(function(){
-            if (app.hideControl.fullView()){
-               app.hideControl.fullView(0);
-            }
-            else{
-               app.hideControl.fullView(1);
-            }
-            app.LayoutMenuLayer();
-            app.showAppletList();
-         });
+         if (showMain){
+            $(mfirst).click(function(){
+               if (app.hideControl.fullView()){
+                  app.hideControl.fullView(0);
+               }
+               else{
+                  app.hideControl.fullView(1);
+               }
+               app.LayoutMenuLayer();
+               app.showAppletList();
+            });
+         }
          mfirst.innerHTML="\u2756";  // i in fullwindow with title mode
          this.mpathline.appendChild(mfirst);
 
@@ -832,11 +839,21 @@ var W5ExploreClass=function(){
    this.setMPath=function(){
       var app=this;
       var url=document.location.href;
+      var showMain=1;
+      if (url.match(/\/Start\//)){
+         showMain=0;
+      }
       url=url.replace(/\/Explore\/Main.*$/,"/Explore/Main");
+      url=url.replace(/\/Explore\/Start.*$/,"/Explore/Start");
 
       this.mpath.innerHTML = '';
       var m = document.createElement('li');
-      m.innerHTML="<a href='"+url+"' class=TitleBarLink>Explore</a>";
+      if (showMain){
+         m.innerHTML="<a href='"+url+"' class=TitleBarLink>Explore</a>";
+      }
+      else{
+         m.innerHTML="Explore";
+      }
       $(m).find("a").click(function(e){
          app.MainMenu(); 
          e.preventDefault();
@@ -851,20 +868,26 @@ var W5ExploreClass=function(){
             url+="/";
             url+=arguments[mi].mtag;
             var m = document.createElement('li');
-            m.innerHTML="<a href='"+url+"' class=TitleBarLink>"+
-                        arguments[mi].label+"</a>";
+            if (showMain){
+               m.innerHTML="<a href='"+url+"' class=TitleBarLink>"+
+                           arguments[mi].label+"</a>";
+            }
+            else{
+               m.innerHTML=arguments[mi].label;
+            }
             if (mi==0){
                appletname=arguments[mi].mtag;
-               $(m).find("a").click(function(e){
-                  app.LayoutMenuLayer();
-                  app.showAppletList();
-                  app.runApplet(appletname);
-                  e.preventDefault();
-               });
+               if (showMain){
+                  $(m).find("a").click(function(e){
+                     app.LayoutMenuLayer();
+                     app.showAppletList();
+                     app.runApplet(appletname);
+                     e.preventDefault();
+                  });
+               }
             }
             else{
                paramstack=arguments[mi].mtag.split('/');
-
 
                $(m).find("a").click(function(e){
                   app.runApplet(appletname,paramstack);
@@ -1433,7 +1456,9 @@ var W5ExploreClass=function(){
       this.LayoutMenuLayer();
       this.hideControl.loadHiddenApplets();
       if (runpath!=undefined){
-         app.showW5ExploreLogo("");
+         if (!document.location.href.match(/\/Start\//)){
+            app.showW5ExploreLogo("");
+         }
       }
       this.loadApplets().then(function(){
          if (runpath==undefined || runpath.length==0){
@@ -1445,8 +1470,12 @@ var W5ExploreClass=function(){
          }
          else{
             var applet=runpath.shift();
-            app.showW5ExploreLogo(applet);
-            $(".spinner").show();
+            console.log("URL:",document.location.href);
+            console.log("runpath:",runpath);
+            if (!document.location.href.match(/\/Start\//)){
+               app.showW5ExploreLogo(applet);
+               $(".spinner").show();
+            }
             app.loadAppletClass(applet).then(function(AppletClassPrototype){
                if (runpath.length==0){
                   app.runApplet(applet);
@@ -1481,6 +1510,7 @@ $(window).resize(function() {
 
 var runurl=document.location.href;
 runurl=runurl.replace(/^.*\/Explore\/Main[\/]{0,1}/,"");
+runurl=runurl.replace(/^.*\/Explore\/Start[\/]{0,1}/,"");
 runurl=runurl.replace(/\?.*$/,""); // remove query parameters
 var runpath=runurl.split("/").filter(function(e){if (e==""){return(false)}else{return(true)}});
 //console.log("runurl=",runurl,"runpath=",runpath,"n=",runpath.length);
