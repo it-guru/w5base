@@ -6,7 +6,7 @@ package tsotc::qrule::AppAgileURLvalidate;
 
 =head3 PURPOSE
 
-Syncronizes all URL in AppAgile namespaces with communication URLs
+Validates a URL in AppAgile namespaces with communication URLs
 on related application.
 
 =head3 IMPORTS
@@ -14,13 +14,14 @@ on related application.
 NONE
 
 =head3 HINTS
-No english hint
+Check if DNS-Path in AppAgile Namespace still exists
+and remove of URL, if it does'nt anymore.
 
 [de:]
 
-Alle aus den DNS-Pfaden am betreffenden AppAgile Namespace,
-werden mit den Kommunikations-URLs der dem Nameapces 
-zugeordneten Anwendung validatehronisiert.
+Prüfung, ob der DNS-Pfaden im AppAgile Namespace noch
+existiert und Entferung der URL, falls dies nicht mehr
+der Fall ist.
 
 =cut
 #######################################################################
@@ -75,11 +76,22 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
+   my $srcsys="tsotc::qrule::AppAgileURLsync";
 
-   my $now=NowStamp("en");
-   return(undef,undef);
+   return(undef,undef) if ($rec->{srcsys} ne $srcsys);
 
+   my $parobj=getModuleObject($dataobj->Config,"tsotc::appagileurl");
+   my ($chkid,$port)=$rec->{srcid}=~m/^([0-9]+):(.*)$/;
 
+   if ($chkid ne ""){
+      $parobj->SetFilter({id=>\$chkid});
+
+      my @l=$parobj->getHashList(qw(ALL));
+      if ($#l==-1){
+         push(@qmsg,"removing URL due missing DNS-Route in AppAgile");
+         $dataobj->ValidatedDeleteRecord($rec);
+      }
+   }
 
    my @result=$self->HandleQRuleResults("None",
                  $dataobj,$rec,$checksession,

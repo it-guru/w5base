@@ -98,6 +98,7 @@ sub qcheckRecord
 
 
    my %url;
+   my $srcsys=$self->Self();
 
    foreach my $urlrec (@l){
       my @suburl;
@@ -121,20 +122,22 @@ sub qcheckRecord
          $url{$suburl}={
             name=>$suburl->{name},
             applid=>$rec->{applid},
-            srcid=>$urlrec->{id}.":".$suburl->{port},
-            srcsys=>$self->Self()
-         };
-      }
+            srcid=>$urlrec->{id}.":".$suburl->{port},  # TODO! 
+            srcsys=>$srcsys                            # Problem, wenn eine
+         };                                            # Anwendung mehrere
+      }                                                # Areas hat!
    }
    my @url=sort({$a->{name} cmp $b->{name}} values(%url));
 
    my $itilurl=getModuleObject($dataobj->Config,"itil::lnkapplurl");
 
    $itilurl->SetFilter([{
-       name=>[map({$_->{name}} @url)],
+       name=>join(" ",map({'"'.$_->{name}.'"'} @url)),
+       applid=>[$rec->{applid}],
        networkid =>$netarea->{CNDTAG}
    },
    {
+       itcloudareaid=>$rec->{id},
        applid=>[$rec->{applid}]
    }]);
 
@@ -166,16 +169,19 @@ sub qcheckRecord
                        MSG=>"$mode url $newrec->{name} ",
                        DATAOBJ=>'itil::lnkapplurl',
                        DATA=>{
-                          name      =>$newrec->{name},
-                          networkid =>$netarea->{CNDTAG},
-                          applid    =>$newrec->{applid},
-                          srcid     =>$newrec->{srcid},
-                          srcsys    =>$newrec->{srcsys},
+                          name          =>$newrec->{name},
+                          networkid     =>$netarea->{CNDTAG},
+                          itcloudareaid =>$rec->{id},
+                          applid        =>$newrec->{applid},
+                          srcid         =>$newrec->{srcid},
+                          srcsys        =>$newrec->{srcsys},
                        }
                     };
                     if ($mode eq "update"){
-printf STDERR ("oldrec=%s\n",Dumper($oldrec));
                        $oprec->{IDENTIFYBY}=$oldrec->{id};
+                       if ($oldrec->{srcsys} ne $newrec->{srcsys}){
+                          $oprec->{DATA}->{is_onshproxy}=1;
+                       }
                     }
                     if ($mode eq "insert"){
                        $oprec->{DATA}->{is_userfrontend}=1;
@@ -184,6 +190,7 @@ printf STDERR ("oldrec=%s\n",Dumper($oldrec));
                     return($oprec);
                  }
                  elsif ($mode eq "delete"){
+                    return(undef) if ($oldrec->{srcsys} ne $srcsys);
                     return({OP=>$mode,
                             MSG=>"delete url $oldrec->{name} ",
                             DATAOBJ=>'itil::lnkapplurl',
@@ -196,12 +203,13 @@ printf STDERR ("oldrec=%s\n",Dumper($oldrec));
               refid=>$rec->{id});
    if (!$res){
       my $opres=ProcessOpList($self->getParent,\@opList);
+      push(@qmsg,map({$_->{MSG}} @opList));
    }
 
    #print STDERR Dumper($rec);
    #print STDERR Dumper(\@url);
    #print STDERR Dumper(\@curl);
-   print STDERR Dumper(\@opList);
+   #print STDERR Dumper(\@opList);
 
    my @result=$self->HandleQRuleResults("None",
                  $dataobj,$rec,$checksession,
