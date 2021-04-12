@@ -5104,6 +5104,23 @@ sub DoRESTcall
       my @p=@{$p{headers}};
       while(my $var=shift(@p)){
          my $val=shift(@p);
+         if (($var=~m/token/i) || 
+             ($var=~m/auth/i) || 
+             ($var=~m/passw/i) || 
+             ($var=~m/access/i)){
+            if (length($val)>22){
+               $val=substr($val,0,8)."...".substr($val,-8);
+            }
+            elsif (length($val)>18){
+               $val=substr($val,0,6)."...".substr($val,-6);
+            }
+            elsif (length($val)>10){
+               $val=substr($val,0,2)."...".substr($val,-2);
+            }
+            else{
+               $val=~s/[a-z0-9]/?/ig;
+            }
+         }
          $reqtrace.=$var.": ".$val."\n";
       }
 
