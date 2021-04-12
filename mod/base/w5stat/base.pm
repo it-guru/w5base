@@ -92,8 +92,8 @@ sub getStatSelectionBox
    my %grpids;
    map({$grpids{$_->{grpid}}++} $lnkrole->getHashList("grpid"));
    my $grp=getModuleObject($app->Config,"base::grp");
-   $grp->SetFilter([{grpid=>[keys(%grpids)]},
-                    {parentid=>[keys(%grpids)]}]);
+   $grp->SetFilter([{cistatusid=>[3,4,5],grpid=>[keys(%grpids)]},
+                    {cistatusid=>[3,4,5],parentid=>[keys(%grpids)]}]);
    map({$grpids{$_->{grpid}}++;
         $grpids{$_->{parentid}}++;} $grp->getHashList("grpid","parentid"));
    my @grpids=grep(!/^\s*$/,keys(%grpids));
