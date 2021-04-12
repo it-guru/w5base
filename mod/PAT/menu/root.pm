@@ -35,7 +35,7 @@ sub Init
    my $self=shift;
 
    $self->RegisterObj("Tools.PAT",
-                      "tmpl/welcome",
+                      "PAT::Explore::ibicalc",
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("Tools.PAT.businessseg",
