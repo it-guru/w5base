@@ -2804,10 +2804,13 @@ sub QRuleSyncCloudSystem
                  sub{  # comperator 
                     my ($a,$b)=@_;
                     my $eq;
-                    if ($a->{name} eq $b->{name}){
-                       $eq=0;
-                       $eq=1 if ( $a->{mac} eq $b->{mac});
+                    if ($a->{name}.":".$a->{mac} eq $b->{name}.":".$b->{mac}){
+                       $eq=1;
                     }
+                   # if ($a->{name} eq $b->{name}){
+                   #    $eq=0;
+                   #    $eq=1 if ( $a->{mac} eq $b->{mac});
+                   # }
                     return($eq);
                  },
                  sub{  # oprec generator
@@ -2833,7 +2836,7 @@ sub QRuleSyncCloudSystem
                                DATA=>{
                                   name      =>$newrec->{name},
                                   mac       =>$newrec->{mac},
-                                  srcsys    =>'AWS',
+                                  srcsys    =>$srcsystag,
                                   systemid  =>$p{refid}
                                   }
                                });
@@ -2850,6 +2853,7 @@ sub QRuleSyncCloudSystem
                  },
                  $rec->{sysiface},$parrec->{sysiface},\@opList,
                  refid=>$rec->{id});
+
       if ($autocorrect){
          if (!$res){
             my $opres=kernel::QRule::ProcessOpList($qrule->getParent,\@opList);
