@@ -1,0 +1,36 @@
+#analysedData{
+   margin:10px;
+   overflow-y:auto;
+}
+.PRMTicketAssiHeader{
+   margin:10px;
+   height:20px;
+}
+.ticket{
+   margin:5px;
+}
+.ticketval{
+   margin:5px;
+   margin-bottom:20px;
+   display:none;
+}
+.ticketheader{
+   font-size:large;
+   cursor:pointer;
+   background-color: #f0f0f0;
+   border-style:solid;
+   border-color:#e0e0e0;
+   border-width:1px;
+   padding:3px;
+
+}
+.ticketheader:hover{
+  background-color: #ffffff;
+  transition: background-color 0.4s;
+}
+xmp{
+   margin:0px;
+   padding:0px;
+
+}
+
