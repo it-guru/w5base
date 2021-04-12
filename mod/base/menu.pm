@@ -1165,10 +1165,13 @@ sub targetUrl
       $tr="base" if ($tr eq "");
       $target="../../$tr/load/$target";
    }
+   elsif ($target=~m/::Explore::/){
+      $target="../../base/Explore/Start/$target";
+   }
    elsif ($target=~m/^\/.*\/.*\?.*$/){
       $target="../../..$target";
    }
-   elsif ($target=~m/::/){
+   elsif (($target=~m/::/)){
       $target=~s/::/\//;
       $target="../../$target/".$m->{func};
    }
