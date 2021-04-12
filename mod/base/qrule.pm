@@ -603,7 +603,8 @@ sub nativQualityCheck
             # record does not exists after QualityCheck. This only can meen,
             # any qrule in check has delete the check-record (f.e. for 
             # cleanup
-            return();
+            last CIRCQC;
+           # return();
          }
          $rec=$reloadedRec;
       }
