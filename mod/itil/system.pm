@@ -1855,7 +1855,8 @@ sub ValidateSystemname
    my $purename=$name;
    $purename=~s/\[[0-9]+\]\s*$//;
    if (length($name)<3 ||length($purename)>63 || haveSpecialChar($name) ||
-       ($name=~m/^\d+$/)){  # only a number as system name ist not ok
+       ($name=~m/^\d+$/) || 
+       ($name=~m/[:,.+~^]/)){  # only a number as system name ist not ok
       return(0);
    }
    return(1);
@@ -1879,9 +1880,14 @@ sub Validate
 
 
    my $name=trim(effVal($oldrec,$newrec,"name"));
-   if (!$self->ValidateSystemname($name)){
-      $self->LastMsg(ERROR,"invalid system name '%s' specified",$name);
-      return(0);
+   if (effChanged($oldrec,$newrec,"name")){
+      if (effVal($oldrec,$newrec,"cistatusid")<6){  # temp hack, damit .HIST
+         $name=~s/\./_/g;                           # keine Fehler erzeugen
+      }
+      if (!$self->ValidateSystemname($name)){
+         $self->LastMsg(ERROR,"invalid system name '%s' specified",$name);
+         return(0);
+      }
    }
    $newrec->{name}=lc($name) if (exists($newrec->{name}) &&
                                  $newrec->{name} ne lc($name));
