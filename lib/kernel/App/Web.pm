@@ -1862,6 +1862,9 @@ sub findtemplvar
       $d.="&nbsp;</div>" if ($param[0] ne "RAW");
       return($d);
    }
+   elsif ($var eq "T"){
+      return($self->T(@param));
+   }
    elsif ($var eq "SUPPORTINFO"){
       my $u=getModuleObject($self->Config,"base::user");
       my $d="";
