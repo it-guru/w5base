@@ -1,19 +1,32 @@
-#analysedData{
-   margin:10px;
-   overflow-y:auto;
+.businesssegItem{
+  //border:1px solid black;
+  padding:1px;
+   cursor:pointer;
+  background-color: #e0e0e0;
+  margin:3px;
+  margin-left:10px;
+  margin-right:10px;
+  border-radius: 10px;
+  margin-bottom:5px;
 }
-.PRMTicketAssiHeader{
-   margin:10px;
-   height:20px;
+.hightLight{
+   color: #b90b64;
 }
-.ticket{
-   margin:5px;
+.businesssegLabel{
+  //border:1px solid black;
+  padding:5px;
+  padding-bottom:1px;
+  font-size: 1.1em
 }
-.ticketval{
-   margin:5px;
-   margin-bottom:20px;
-   display:none;
+.subprocessLabel{
+  padding:2px;
+  background-color: #f0f0f0;
+  margin-left:10px;
+  margin-right:20px;
+  margin-bottom:2px;
+  border-radius: 4px;
 }
+
 .ticketheader{
    font-size:large;
    cursor:pointer;
