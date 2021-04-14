@@ -60,7 +60,10 @@ sub initSqlWhere
                               )],
           "RMember") &&
           !$self->IsMemberOf([qw(
-                                 DTAG.GHQ.VTI.DTIT.E.E-DTO.E-DTOPL
+                              DTAG.GHQ.VTI.DTIT.IT.E-DTO.E-DTOPL
+                              DTAG.GHQ.VTI.DTIT.IT.IT-SC3.IT-SC3_CA.IT-SC3_Cai
+                              DTAG.GHQ.VTI.DTIT.IT.IT-SC3.IT-SC3_CA.IT-SC3_CAh
+                              DTAG.TSY.INT.DTIT_HU.E.HU-IT-3-CA.HU-IT-3-CAc
                               )],
           "RMember","up") ){
          $where="(BEACONID is null ".
