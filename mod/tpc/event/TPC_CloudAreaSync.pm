@@ -142,7 +142,9 @@ sub TPC_CloudAreaSync
                $eq=0;  # rec found - aber u.U. update notwendig
                my $aname=$a->{name};
                $aname=~s/\[.*\]$//;
-               if ($aname eq $b->{name} &&
+               my $bname=$b->{name};
+               $bname=~s/\s+/_/g;
+               if ($aname eq $bname &&
                    $a->{cistatusid}<6){
                   $eq=1;   # alles gleich - da braucht man nix machen
                }
@@ -152,11 +154,13 @@ sub TPC_CloudAreaSync
          sub{  # oprec generator
             my ($mode,$oldrec,$newrec,%p)=@_;
             if ($mode eq "insert" || $mode eq "update"){
+               my $name=$newrec->{name};
+               $name=~s/\s+/_/g;
                my $oprec={
                   OP=>$mode,
                   DATAOBJ=>'itil::itcloudarea',
                   DATA=>{
-                     name    =>$newrec->{name},
+                     name    =>$name,
                      applid  =>$newrec->{applid},
                      cloud   =>$tpcname,
                      srcsys  =>$tpccode,
