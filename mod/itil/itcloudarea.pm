@@ -445,7 +445,7 @@ sub Validate
 
    my $name=effVal($oldrec,$newrec,"name");
    if ($name eq "" || haveSpecialChar($name)){
-      $self->LastMsg(ERROR,"invalid cloud area name");
+      $self->LastMsg(ERROR,"invalid cloud area name '%s'",$name);
       return(0);
    }
 

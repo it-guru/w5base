@@ -15,7 +15,7 @@
 'CI-Status not allowed to set'=>{de=>'CI-Status ist nicht setzbar'},
 'Cloud Area description'=>{de=>'Cloud Area Beschreibung'},
 'cloud is not active'=>{de=>'Cloud ist nicht aktiv'},
-'invalid cloud area name'=>{de=>'ungültiger Cloud Area name'},
+"invalid cloud area name '%s'"=>{de=>"ungültiger Cloud Area name '%s'"},
 'user deactivation of Cloud-Area'=>{de=>'User Dekativierung der CloudArea'},
 'user activation of Cloud-Area'=>{de=>'User Aktivierung der CloudArea'},
 'New Cloud-Area'=>{de=>'Neue CloudArea'},
