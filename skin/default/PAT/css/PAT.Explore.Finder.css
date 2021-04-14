@@ -1,13 +1,44 @@
-.businesssegItem{
+.DetailWindow{
   //border:1px solid black;
   padding:1px;
-   cursor:pointer;
   background-color: #e0e0e0;
   margin:3px;
   margin-left:10px;
   margin-right:10px;
-  border-radius: 10px;
-  margin-bottom:5px;
+  border-radius: 8px;
+  margin-bottom:10px;
+  padding-bottom:5px;
+  height:100%;
+}
+.DetailTitle{
+  //border:1px solid black;
+  padding:5px;
+  margin:5px;
+  margin-left:10px;
+  margin-right:10px;
+  border-radius: 8px;
+  margin-bottom:15px;
+  height:2.7em;
+}
+.DetailFrame{
+  //border:1px solid black;
+  padding:5px;
+  margin:5px;
+  background-color: #f0f0f0;
+  margin-left:10px;
+  margin-right:10px;
+  overflow:auto;
+}
+.businesssegItem{
+  //border:1px solid black;
+  padding:1px;
+  background-color: #e0e0e0;
+  margin:3px;
+  margin-left:10px;
+  margin-right:10px;
+  border-radius: 8px;
+  margin-bottom:10px;
+  padding-bottom:5px;
 }
 .hightLight{
    color: #b90b64;
@@ -18,13 +49,19 @@
   padding-bottom:1px;
   font-size: 1.1em
 }
-.subprocessLabel{
+.subprocessitem{
   padding:2px;
+  cursor:pointer;
   background-color: #f0f0f0;
   margin-left:10px;
   margin-right:20px;
-  margin-bottom:2px;
-  border-radius: 4px;
+  margin-bottom:5px;
+  border-radius: 3px;
+}
+.subprocessLabel{
+}
+.subprocessICTnames{
+  font-size: 0.8em
 }
 
 .ticketheader{
@@ -41,9 +78,7 @@
   background-color: #ffffff;
   transition: background-color 0.4s;
 }
-xmp{
-   margin:0px;
-   padding:0px;
-
+#analysedData{
+  overflow:auto;
 }
 

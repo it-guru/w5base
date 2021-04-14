@@ -97,7 +97,8 @@ sub new
                 subeditmsk    =>'subedit.subprocesses',
                 vjointo       =>\'PAT::subprocess',
                 vjoinon       =>['id'=>'businesssegid'],
-                vjoindisp     =>['fullname']),
+                vjoindisp     =>['fullname'],
+                vjoininhash   =>['fullname','id']),
 
       new kernel::Field::Text(
                 name          =>'srcsys',

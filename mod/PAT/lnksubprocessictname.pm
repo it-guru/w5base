@@ -76,11 +76,19 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'ictname',
-                label         =>'ICT-Name',
+                label         =>'ICT-AliasName',
                 htmlwidth     =>'200',
                 vjointo       =>'PAT::ictname',
                 vjoinon       =>['ictnameid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'ictfullname',
+                label         =>'ICT-AliasName Fullname',
+                htmldetail    =>0,
+                vjointo       =>'PAT::ictname',
+                vjoinon       =>['ictnameid'=>'id'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Text(
                 name          =>'ictnameid',
