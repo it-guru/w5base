@@ -90,16 +90,17 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'ictnames',
-                label         =>'ICT-Names',
+                label         =>'ICT-AliasNames',
                 group         =>'ictnames',
                 subeditmsk    =>'subedit.ictnames',
                 vjointo       =>\'PAT::lnksubprocessictname',
                 vjoinon       =>['id'=>'subprocessid'],
-                vjoindisp     =>['relevance','ictname','cdate']),
+                vjoindisp     =>['relevance','ictname','cdate'],
+                vjoininhash   =>['relevance','ictname','cdate','ictfullname']),
 
       new kernel::Field::Text(
                 name          =>'allictnames',
-                label         =>'relevant ICT-Names',
+                label         =>'relevant ICT-AliasNames',
                 htmldetail    =>0,
                 readonly      =>1,
                 group         =>'ictnames',

@@ -2,8 +2,8 @@
 'Tools.PAT.businessseg.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.PAT.subprocess'=>{de=>'Teilprozess',en=>'Sub-Process'},
 'Tools.PAT.subprocess.new'=>{de=>'Neueingabe',en=>'New'},
-'Tools.PAT.subprocess.lnkictname'=>{de=>'ICT-Name Zuord.',en=>'ICT-Name rel.'},
-'Tools.PAT.ictname'=>{de=>'ICT-Name',en=>'ICT-Name'},
+'Tools.PAT.subprocess.lnkictname'=>{de=>'ICT-AliasName Zuord.',en=>'ICT-AliasName rel.'},
+'Tools.PAT.ictname'=>{de=>'ICT-AliasName',en=>'ICT-AliasName'},
 'Tools.PAT.ictname.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.PAT.source'=>{de=>'Datenquelle',en=>'Data-Source'},
 
