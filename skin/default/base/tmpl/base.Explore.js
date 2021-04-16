@@ -545,6 +545,7 @@ requirejs.config({
         'jquery.dataTables': '../auth/base/load/jquery.dataTables',
         ellipsis: '../public/base/load/jquery.ellipsis',
         datadumper: '../public/base/load/datadumper',
+        TimeSpans: '../public/base/load/TimeSpans',
         visjs: '../public/base/load/vis.min'
    },
    shim: {
