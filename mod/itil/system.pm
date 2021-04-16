@@ -2080,8 +2080,6 @@ sub Import
    my $rootpath=Query->Param("RootPath");
 
 
-printf STDERR ("fifi rootpath=$rootpath\n");
-
    my $title=$self->T("Config-Item Import Handler for logical Systems ...");
 
    my $startcmd="document.getElementById('MainStartup').style.display='block';";
