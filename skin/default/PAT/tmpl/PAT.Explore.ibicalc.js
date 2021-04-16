@@ -4,7 +4,7 @@ function hightLight(v,txt){
    txt=txt.replace(re,"<b><span class=hightLight>$1</span></b>");
    return(txt);
 }
-define(["datadumper"],function (){
+define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
    ClassAppletLib[applet].class=function(app){
       ClassApplet.call(this,app);
    };
@@ -29,8 +29,10 @@ define(["datadumper"],function (){
                     var w5obj=getModuleObject(cfg,'PAT::businessseg');
                     w5obj.SetFilter({
                     });
-                    w5obj.findRecord("name,urlofcurrentrec,title,"+
-                                     "subprocesses,id",function(data){
+                    w5obj.findRecord(
+                          "name,urlofcurrentrec,title,"+
+                          "subprocesses,id",
+                          function(data){
                        appletobj.data['businessseg']=new Object();
                        $.each(data,function(index,item){
                           appletobj.data['businessseg'][item.id]=item;
@@ -43,8 +45,20 @@ define(["datadumper"],function (){
                     var w5obj=getModuleObject(cfg,'PAT::subprocess');
                     w5obj.SetFilter({
                     });
-                    w5obj.findRecord("name,urlofcurrentrec,title,"+
-                                     "ictnames,id",function(data){
+                    w5obj.findRecord(
+                          "name,urlofcurrentrec,title,"+
+                          "onlinetime,"+
+                          "usetime,"+
+                          "coretime,"+
+                          "ibicoretime,"+
+                          "ibithcoretimemonfri,"+
+                          "ibithcoretimesat,"+
+                          "ibithcoretimesun,"+
+                          "ibinonprodtime,"+
+                          "ibithnonprodtimemonfri,"+
+                          "ibithnonprodtimesat,"+
+                          "ibithnonprodtimesun,"+
+                          "ictnames,id",function(data){
                        appletobj.data['subprocess']=new Object();
                        $.each(data,function(index,item){
                           appletobj.data['subprocess'][item.id]=item;
@@ -82,67 +96,167 @@ define(["datadumper"],function (){
          })
       )
    }
+
+   ClassAppletLib[applet].class.prototype.showBusinessSeg=function(item){
+      var appletobj=this;
+      var app=this.app;
+
+      var d="";
+
+      d+="<br>"+
+         "<hr>"+
+         "Subprocesses:<br>"+
+         "<hr>";
+
+      return({
+         title:"%T(PAT::businessseg,PAT::businessseg)%",
+         subtitle:item.name+": "+item.title,
+         d:d,
+         fine:function(win){
+         }
+      });
+
+
+   }
+   ClassAppletLib[applet].class.prototype.showSubProcess=function(item){
+      var appletobj=this;
+      var app=this.app;
+
+      var d="";
+      var onlinetime=new TimeSpans(item.onlinetime,{defaultType:'o'});
+      var usetime=new TimeSpans(item.usetime,{defaultType:'u'});
+      var coretime=new TimeSpans(item.coretime,{defaultType:'c'});
+      var optimes=new TimeSpans("",{
+          typeColor:{
+             'o':'#F180BA',
+             'u':'#E20074',
+             'c':'#A90057' 
+          },
+          dayLabel:{
+             '0':'%TRANSLATE(mon-fri,kernel::Field::TimeSpans)%',
+             '1':'%TRANSLATE(sat,kernel::Field::TimeSpans)%',
+             '2':'%TRANSLATE(sun/HOL,kernel::Field::TimeSpans)%'
+          }
+      });
+      optimes=optimes.overlay(onlinetime);
+      optimes=optimes.overlay(usetime);
+      optimes=optimes.overlay(coretime);
+
+      var onlinetime=new TimeSpans(item.onlinetime,{defaultType:'o'});
+      var usetime=new TimeSpans(item.usetime,{defaultType:'u'});
+      var coretime=new TimeSpans(item.coretime,{defaultType:'c'});
+      var optimes=new TimeSpans("",{
+          typeColor:{
+             'o':'#F180BA',
+             'u':'#E20074',
+             'c':'#A90057' 
+          },
+          dayLabel:{
+             '0':'%TRANSLATE(mon-fri,kernel::Field::TimeSpans)%',
+             '1':'%TRANSLATE(sat,kernel::Field::TimeSpans)%',
+             '2':'%TRANSLATE(sun/HOL,kernel::Field::TimeSpans)%'
+          }
+      });
+      optimes=optimes.overlay(onlinetime);
+      optimes=optimes.overlay(usetime);
+      optimes=optimes.overlay(coretime);
+
+      var ibinonprodtime=new TimeSpans(item.ibinonprodtime,{
+          defaultType:'B'
+      });
+      var ibicoretime=new TimeSpans(item.ibicoretime,{
+          defaultType:'C'
+      });
+      var ibitimes=new TimeSpans("",{
+          typeColor:{
+             'B':'#427BAB',
+             'C':'#315C80' 
+          },
+          dayLabel:{
+             '0':'%TRANSLATE(mon-fri,kernel::Field::TimeSpans)%',
+             '1':'%TRANSLATE(sat,kernel::Field::TimeSpans)%',
+             '2':'%TRANSLATE(sun/HOL,kernel::Field::TimeSpans)%'
+          }
+      });
+      ibitimes=ibitimes.overlay(ibinonprodtime);
+      ibitimes=ibitimes.overlay(ibicoretime);
+
+      d+="<br>"+
+         "<hr>"+
+         "Operations-Times:<br>"+
+         optimes.table()+"<br>"+
+         "onlinetime:"+item.onlinetime+"<br>"+
+         "usetime:"+item.usetime+"<br>"+
+         "coretime:"+item.coretime+"<br>"+
+         "<br>"+
+         "<hr>"+
+         "IBI-Times<br>"+
+         ibitimes.table()+"<br>"+
+         "ibithnonprodtimesat:"+item.ibinonprodtime+"<br>"+
+         "ibicoretime:"+item.ibicoretime+"<br>"+
+         "<hr>";
+
+      return({
+         title:"%T(PAT::subprocess,PAT::subprocess)%",
+         subtitle:item.name+": "+item.title,
+         d:d,
+         fine:function(win){
+         }
+      });
+
+   }
+   ClassAppletLib[applet].class.prototype.showICTOName=function(item){
+      return({
+         title:"%T(PAT::ictname,PAT::ictname)%",
+         subtitle:"showICTOName",
+         d:"showICTOName",
+         fine:function(win){
+         }
+      });
+   }
+
+
    ClassAppletLib[applet].class.prototype.showItem=function(dataobj,item){
       var appletobj=this;
       var app=this.app;
       $("#analysedData").hide();
       $("#Detail").show();
+      var ModalWin=$("#Detail").first();
+      var showdata=new Object();
+      console.log("ShowItem=",item,"as:",dataobj);
+      if (dataobj=="PAT::businessseg"){
+         showdata=this.showBusinessSeg(item,ModalWin);
+      }
+      else if (dataobj=="PAT::subprocess"){
+         showdata=this.showSubProcess(item,ModalWin);
+      }
+      else if (dataobj=="PAT::ictoname"){
+         showdata=this.showICTOName(item,ModalWin);
+      }
       var d="";
       d+="<div class=\"DetailWindow\">";
       d+="<div class=\"DetailTitle\">";
-      d+="<div style=\"height:2.7em;display:inline-block;float:left;overflow:hidden;width:90%\">Geschäftssegment:<br>"+item.name+"</div>";
-      d+="<div style=\"height:2.7em;display:inline-block;float:right;text-align:right;width:10%\">X</div>";
+      d+="<div style=\"height:2.2em;display:inline-block;"+
+         "float:left;overflow:hidden;width:90%\">"+
+         showdata.title+"<br>"+
+         "<b>"+showdata.subtitle+"</b></div>";
+      d+="<div style=\"height:2.2em;display:inline-block;"+
+         "float:right;text-align:right;width:10%;cursor:pointer\" "+
+         "id=\"close\"><b>X</b></div>";
       d+="<div style=\"float:none;\"></div>";
       d+="</div>";
       d+="<div id=DetailFrame class=\"DetailFrame\">"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "This is the data<br>"+
-                "</div>";
+         showdata.d+"</div>";
       d+="</div>";
       $("#Detail").html(d);
+      if (showdata.fine){
+         showdata.fine($("#Detail"));
+      }
+      $("#close").click(function(e){
+         console.log("click on close");
+         $("#analysedData").show();
+         $("#Detail").hide();
+      });
       window.dispatchEvent(new Event('resize'));
    }
    ClassAppletLib[applet].class.prototype.doSearch=function(){

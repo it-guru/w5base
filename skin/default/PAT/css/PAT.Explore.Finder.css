@@ -12,12 +12,12 @@
 }
 .DetailTitle{
   //border:1px solid black;
-  padding:5px;
+  padding:2px;
   margin:5px;
   margin-left:10px;
   margin-right:10px;
   border-radius: 8px;
-  margin-bottom:15px;
+  margin-bottom:5px;
   height:2.7em;
 }
 .DetailFrame{
