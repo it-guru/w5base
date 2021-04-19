@@ -1,3 +1,27 @@
+h1 {
+   margin-top:1.0em;
+   font-size:24.0pt;
+   color:#e20074;}
+
+h2 {
+   font-size:1.2em;
+   color:#e20074; 
+   }
+
+h3 {
+   margin-top:1.0em;
+   font-size:18.0pt;
+   }
+
+h4 {
+   margin-top:0.5em;
+   font-size:16.0pt;
+   }
+
+h5 {
+   margin-top:0.5em;
+   }
+
 .DetailWindow{
   //border:1px solid black;
   padding:1px;
@@ -28,6 +52,23 @@
   margin-left:10px;
   margin-right:10px;
   overflow:auto;
+}
+.ictnameItem{
+  //border:1px solid black;
+  padding:1px;
+  background-color: #e0e0f0;
+  margin:3px;
+  margin-left:10px;
+  margin-right:10px;
+  border-radius: 8px;
+  margin-bottom:10px;
+  padding-bottom:5px;
+}
+.ictnameLabel{
+  //border:1px solid black;
+  padding:5px;
+  padding-bottom:1px;
+  font-size: 1.1em
 }
 .businesssegItem{
   //border:1px solid black;
@@ -81,4 +122,86 @@
 #analysedData{
   overflow:auto;
 }
+
+
+/* PAT styles for timetables */
+
+table.timetable {
+  border-collapse:collapse;
+  width:100%
+}
+.timetable td{
+   border:1px solid gray;
+}
+
+table.recordsheet {
+  border-collapse:collapse;
+  width:100%;
+}
+
+td.pat {
+  text-align:left;
+}
+
+.clickableLink{
+   cursor:pointer;
+}
+.clickableLink:hover{
+   color:#e20074;
+}
+.clickableLink  .extlink {
+   display:inline-block;
+   visibility:hidden;
+   margin-left:10px;
+}
+.clickableLink:hover  .extlink {
+   display:inline-block;
+   visibility:visible;
+}
+//.clickableLink:hover:after {
+//    content: url(../../base/load/miniextlink.png); /* no need for qoutes */
+//    display: block;
+//}
+
+tr.headline {
+  text-align:left;
+  border-bottom: 2px solid #e20074;
+}
+
+tr.timetable-head {
+  text-align:left;
+  border-bottom: 2px solid #aaa;
+}
+
+tr.block-end {
+  text-align:left;
+  border-bottom: 1px solid #aaa;
+}
+
+td.mg_d2 { border: 1px solid #71003A; border-bottom: 1px solid #888; background-color:#71003A; }
+td.mg_d1 { border: 1px solid #A90057; border-bottom: 1px solid #888; background-color:#A90057; }
+td.mg_std { border: 1px solid #E20074; border-bottom: 1px solid #888; background-color:#E20074; }
+td.mg_h1 { border: 1px solid #E94097; border-bottom: 1px solid #888; background-color:#E94097; }
+td.mg_h2 { border: 1px solid #F180BA; border-bottom: 1px solid #888; background-color:#F180BA; }
+td.mg_h3 { border: 1px solid #F8C0DD; border-bottom: 1px solid #888; background-color:#F8C0DD; }
+td.g6_std { border: 1px solid #787878; border-bottom: 1px solid #888; background-color:#787878; }
+td.g5_std { border: 1px solid #919191; border-bottom: 1px solid #888; background-color:#919191; }
+td.g4_std { border: 1px solid #9D9D9D; border-bottom: 1px solid #888; background-color:#9D9D9D; }
+td.g3_std { border: 1px solid #BBBBBB; border-bottom: 1px solid #888; background-color:#BBBBBB; }
+td.g2_std { border: 1px solid #DCDCDC; border-bottom: 1px solid #888; background-color:#DCDCDC; }
+td.g1_std { border: 1px solid #F1F1F1; border-bottom: 1px solid #888; background-color:#F1F1F1; }
+td.db_d2 { border: 1px solid #213D55; border-bottom: 1px solid #888; background-color:#213D55; }
+td.db_d1 { border: 1px solid #315C80; border-bottom: 1px solid #888; background-color:#315C80; }
+td.db_std { border: 1px solid #427BAB; border-bottom: 1px solid #888; background-color:#427BAB; }
+td.db_h1 { border: 1px solid #719CC0; border-bottom: 1px solid #888; background-color:#719CC0; }
+td.db_h2 { border: 1px solid #A1BDD5; border-bottom: 1px solid #888; background-color:#A1BDD5; }
+td.db_h3 { border: 1px solid #D0DEEA; border-bottom: 1px solid #888; background-color:#D0DEEA; }
+td.pt_d2 { border: 1px solid #20474D; border-bottom: 1px solid #888; background-color:#20474D; }
+td.pt_d1 { border: 1px solid #306B73; border-bottom: 1px solid #888; background-color:#306B73; }
+td.pt_std { border: 1px solid #408F9A; border-bottom: 1px solid #888; background-color:#408F9A; }
+td.pt_h1 { border: 1px solid #70ABB3; border-bottom: 1px solid #888; background-color:#70ABB3; }
+td.pt_h2 { border: 1px solid #A0C7CD; border-bottom: 1px solid #888; background-color:#A0C7CD; }
+td.pt_h3 { border: 1px solid #D0E3E6; border-bottom: 1px solid #888; background-color:#D0E3E6; }
+td.default { border: 1px solid #bbb; border-bottom: 1px solid #888; background-color:#bbb; }
+
 

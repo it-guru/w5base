@@ -4,6 +4,15 @@ function hightLight(v,txt){
    txt=txt.replace(re,"<b><span class=hightLight>$1</span></b>");
    return(txt);
 }
+
+function extLink(h,url){
+   var d="<div class=extlink>"+
+         "<img height="+h+" "+
+         "data-extlink=\""+url+"\""+
+         "src=\"../../base/load/miniextlink.png\">"+
+         "</div>";
+   return(d);
+}
 define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
    ClassAppletLib[applet].class=function(app){
       ClassApplet.call(this,app);
@@ -30,7 +39,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                     w5obj.SetFilter({
                     });
                     w5obj.findRecord(
-                          "name,urlofcurrentrec,title,"+
+                          "name,urlofcurrentrec,title,description,comments,"+
                           "subprocesses,id",
                           function(data){
                        appletobj.data['businessseg']=new Object();
@@ -42,11 +51,28 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                  });
                  $(frm).queue("load",function(next){
                     $(".spinner").show();
+                    var w5obj=getModuleObject(cfg,'PAT::ictname');
+                    w5obj.SetFilter({
+                    });
+                    w5obj.findRecord(
+                          "name,id,urlofcurrentrec,ictoid,"+
+                          "comments",function(data){
+                       appletobj.data['ictname']=new Object();
+                       $.each(data,function(index,item){
+                          item.subprocesses=new Object();
+                          appletobj.data['ictname'][item.id]=item;
+                       }); 
+                       next();
+                    });
+                 });
+                 $(frm).queue("load",function(next){
+                    $(".spinner").show();
                     var w5obj=getModuleObject(cfg,'PAT::subprocess');
                     w5obj.SetFilter({
                     });
                     w5obj.findRecord(
-                          "name,urlofcurrentrec,title,"+
+                          "name,urlofcurrentrec,title,description,comments,"+
+                          "businessseg,businesssegid,,"+
                           "onlinetime,"+
                           "usetime,"+
                           "coretime,"+
@@ -62,10 +88,17 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                        appletobj.data['subprocess']=new Object();
                        $.each(data,function(index,item){
                           appletobj.data['subprocess'][item.id]=item;
+                          if (item.ictnames.length){
+                             for(var i=0;i<item.ictnames.length;i++){
+                                var inid=item.ictnames[i].ictnameid;
+                                appletobj.data['ictname'][inid
+                                  ].subprocesses[item.id]=
+                                   item;
+                             }
+                          }
                        }); 
                        next();
                     });
-     
                  });
                  $(frm).queue("load",function(next){
                     console.log("fine=",appletobj.data);
@@ -97,22 +130,79 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       )
    }
 
+   ClassAppletLib[applet].class.prototype.addClickLinks=function(win){
+      var appletobj=this;
+
+      $(win).find("[data-dataobj]").addClass("clickableLink");
+      $(win).find("[data-dataobj]").click(function(e){
+         var id=$(this).attr("data-dataobjid");
+         var dataobj=$(this).attr("data-dataobj");
+         appletobj.showItem(dataobj,id); 
+      });
+      $(win).find("[data-extlink]").click(function(e){
+         var url=$(this).attr("data-extlink");
+         var w=window.open(url,"_blank",
+                   'height=500,width=700,toolbar=no,status=no,'+
+                   'resizable=yes,scrollbars=yes');
+         e.stopPropagation();
+         return(true);
+      });
+   }
+
    ClassAppletLib[applet].class.prototype.showBusinessSeg=function(item){
       var appletobj=this;
       var app=this.app;
 
       var d="";
 
-      d+="<br>"+
-         "<hr>"+
-         "Subprocesses:<br>"+
-         "<hr>";
+      d+=item.comments;
+      if (item.subprocesses.length){
+         d+="<br><br>"+
+            "%TRANSLATE(fieldgroup.subprocesses,PAT::businessseg)%:<br>"+
+            "<hr>";
+         for(var spc=0;spc<item.subprocesses.length;spc++){
+            var spid=item.subprocesses[spc].id;
+            d+="<div style=\"border:0;padding:10px;margin-bottom:15px\">";
+            d+="<div ";
+            d+="data-dataobj=\"PAT::subprocess\" ";
+            d+="data-dataobjid=\""+spid+"\">";
+            d+=item.subprocesses[spc].fullname;
+            d+=extLink(9,appletobj.data.subprocess[spid].urlofcurrentrec); 
+            d+="</div>";
+            d+="<div>";
+            var sitem=appletobj.data.subprocess[spid];
+            var onlinetime=new TimeSpans(sitem.onlinetime,{defaultType:'o'});
+            var usetime=new TimeSpans(sitem.usetime,{defaultType:'u'});
+            var coretime=new TimeSpans(sitem.coretime,{defaultType:'c'});
+            var optimes=new TimeSpans("",{
+                typeColor:{
+                   'o':'#F180BA',
+                   'u':'#E20074',
+                   'c':'#A90057' 
+                },
+                dayLabel:{
+                   '0':'%TRANSLATE(mon-fri,kernel::Field::TimeSpans)%',
+                   '1':'%TRANSLATE(sat,kernel::Field::TimeSpans)%',
+                   '2':'%TRANSLATE(sun/HOL,kernel::Field::TimeSpans)%'
+                }
+            });
+            optimes=optimes.overlay(onlinetime);
+            optimes=optimes.overlay(usetime);
+            optimes=optimes.overlay(coretime);
+            d+=optimes.table();
+
+            d+="</div>";
+            d+="</div>";
+         }
+      }
+      
 
       return({
          title:"%T(PAT::businessseg,PAT::businessseg)%",
          subtitle:item.name+": "+item.title,
          d:d,
          fine:function(win){
+            appletobj.addClickLinks(win);
          }
       });
 
@@ -122,7 +212,42 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       var appletobj=this;
       var app=this.app;
 
-      var d="";
+      var d="<table class=\"recordsheet\">";
+      d+="<tr><td>%T(Description,PAT::subprocess)%:</td>";
+      d+="<td>"+item.description+"</td></tr>";
+      d+="<tr class=block-end>";
+      d+="<td>%T(Business-Segment,PAT::subprocess)%:</td>";
+      d+="<td><div data-dataobj=\"PAT::businessseg\" ";
+      d+="data-dataobjid=\""+item.businesssegid+"\">";
+      d+=item.businessseg;
+      d+=extLink(9,
+         appletobj.data.businessseg[item.businesssegid].urlofcurrentrec); 
+      d+="</div>";
+      d+="</td></tr>";
+      if (item.ictnames.length){
+         d+="<tr>";
+         d+="<td valign=top>ICTOs:</td>";
+         d+="<td><table width=60%>";
+         d+="<tr><th align=left>ICT-Name</th>"+
+            "<th width=1%>Relevanz</th></tr>";
+         for(var i=0;i<item.ictnames.length;i++){
+            var ictid=item.ictnames[i].ictnameid;
+            d+="<tr>";
+            d+="<td nowrap>";
+            d+="<div data-dataobj=\"PAT::ictname\" ";
+            d+="data-dataobjid=\""+ictid+"\"> ";
+            d+=item.ictnames[i].ictfullname;
+            d+=extLink(10,appletobj.data.ictname[ictid].urlofcurrentrec); 
+            d+="</div>";
+            d+="</td>";
+            d+="<td>";
+            d+=item.ictnames[i].relevance;
+            d+="</td>";
+            d+="</tr>";
+         }
+         d+="</table>";
+         d+="</td></tr>";
+      }
       var onlinetime=new TimeSpans(item.onlinetime,{defaultType:'o'});
       var usetime=new TimeSpans(item.usetime,{defaultType:'u'});
       var coretime=new TimeSpans(item.coretime,{defaultType:'c'});
@@ -181,36 +306,63 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       ibitimes=ibitimes.overlay(ibinonprodtime);
       ibitimes=ibitimes.overlay(ibicoretime);
 
-      d+="<br>"+
-         "<hr>"+
+      d+="</table>";
+
+      d+=""+
          "Operations-Times:<br>"+
          optimes.table()+"<br>"+
-         "onlinetime:"+item.onlinetime+"<br>"+
-         "usetime:"+item.usetime+"<br>"+
-         "coretime:"+item.coretime+"<br>"+
+         //"onlinetime:"+item.onlinetime+"<br>"+
+         //"usetime:"+item.usetime+"<br>"+
+         //"coretime:"+item.coretime+"<br>"+
          "<br>"+
-         "<hr>"+
          "IBI-Times<br>"+
          ibitimes.table()+"<br>"+
-         "ibithnonprodtimesat:"+item.ibinonprodtime+"<br>"+
-         "ibicoretime:"+item.ibicoretime+"<br>"+
+         //"ibithnonprodtimesat:"+item.ibinonprodtime+"<br>"+
+         //"ibicoretime:"+item.ibicoretime+"<br>"+
          "<hr>";
+
 
       return({
          title:"%T(PAT::subprocess,PAT::subprocess)%",
          subtitle:item.name+": "+item.title,
          d:d,
          fine:function(win){
+            appletobj.addClickLinks(win);
          }
       });
 
    }
    ClassAppletLib[applet].class.prototype.showICTOName=function(item){
+      var appletobj=this;
+
+      console.log("showICTOName:",item);
+
+      var label=item.ictoid+": "+item.name;
+
+      var d="";
+
+      if (d.comments){
+         d+=item.comments;
+         d+="<br>";
+      }
+      for(var spid in item.subprocesses){
+         d+="<div>";
+         d+="<div ";
+         d+="data-dataobj=\"PAT::subprocess\" ";
+         d+="data-dataobjid=\""+spid+"\"> ";
+         d+=item.subprocesses[spid].name+": "+
+            item.subprocesses[spid].title;
+         d+="</div>";
+         d+="</div>";
+      }
+
+
       return({
          title:"%T(PAT::ictname,PAT::ictname)%",
-         subtitle:"showICTOName",
-         d:"showICTOName",
+         subtitle:label,
+         d:d,
          fine:function(win){
+            appletobj.addClickLinks(win);
          }
       });
    }
@@ -219,6 +371,23 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
    ClassAppletLib[applet].class.prototype.showItem=function(dataobj,item){
       var appletobj=this;
       var app=this.app;
+
+      if (typeof(item)!=='object'){
+         console.log("item is not an Object; dataobj=",dataobj);
+         if (dataobj==='PAT::businessseg'){
+            console.log("item load as businessseg");
+            item=appletobj.data.businessseg[item];
+         }
+         else if (dataobj=='PAT::subprocess'){
+            console.log("item load as subprocess");
+            item=appletobj.data.subprocess[item];
+         }
+         else if (dataobj=='PAT::ictname'){
+            console.log("item load as ictname");
+            item=appletobj.data.ictname[item];
+         }
+      }
+
       $("#analysedData").hide();
       $("#Detail").show();
       var ModalWin=$("#Detail").first();
@@ -230,17 +399,24 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       else if (dataobj=="PAT::subprocess"){
          showdata=this.showSubProcess(item,ModalWin);
       }
-      else if (dataobj=="PAT::ictoname"){
+      else if (dataobj=="PAT::ictname"){
          showdata=this.showICTOName(item,ModalWin);
       }
       var d="";
       d+="<div class=\"DetailWindow\">";
       d+="<div class=\"DetailTitle\">";
-      d+="<div style=\"height:2.2em;display:inline-block;"+
-         "float:left;overflow:hidden;width:90%\">"+
-         showdata.title+"<br>"+
-         "<b>"+showdata.subtitle+"</b></div>";
-      d+="<div style=\"height:2.2em;display:inline-block;"+
+      d+="<div style=\"height:4.2em;display:inline-block;"+
+         "float:left;overflow:hidden;white-space: nowrap;width:90%\" "+
+         "<p>"+showdata.title+"</p>"+
+         "<div "+
+         "data-dataobj=\""+dataobj+"\" "+
+         "data-dataobjid=\""+item.id+"\" "+
+         "><h2>"+
+         showdata.subtitle+
+         extLink(16,item.urlofcurrentrec)+
+         "</h2></div>"+
+         "</div>";
+      d+="<div style=\"height:4.2em;display:inline-block;"+
          "float:right;text-align:right;width:10%;cursor:pointer\" "+
          "id=\"close\"><b>X</b></div>";
       d+="<div style=\"float:none;\"></div>";
@@ -270,6 +446,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
             $("#analysedData").html("");
             $("#Detail").hide();
             $("#analysedData").show();
+            var processSearch="";
             for (var businesssegid in appletobj.data.businessseg){
                var item=appletobj.data.businessseg[businesssegid];
                var showSeg=0;
@@ -316,32 +493,57 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                   var blk="<div class=businesssegItem>";
                   blk+="<div class=businesssegLabel "+
                        "data-dataobj=\"PAT::businessseg\" "+
-                       "data-dataobjid=\""+item.id+"\" "+
-                       ">"+
-                       hightLight(v,"<b>"+item.name+"</b>"+" - "+
-                       item.title)+"</div>";
+                       "data-dataobjid=\""+item.id+"\" "+">"+
+                       hightLight(v,"<b>"+item.name+"</b>"+" - "+item.title)+
+                       extLink(12,item.urlofcurrentrec)+ 
+                       "</div>";
                   $.each(subitem,function(subindex,item){
                      blk+=item;
                   });
                   blk+="</div>";
-                  $("#analysedData").append(blk);
+                  processSearch+=blk;
                }
-               
             };
-            $(".businesssegLabel").css("cursor","pointer");
-            $(".subprocessitem").css("cursor","pointer");
-            $(".businesssegLabel").click(function(e){
-               var id=$(this).attr("data-dataobjid");
-               var dataobj=$(this).attr("data-dataobj");
-               var item=appletobj.data.businessseg[id];
-               appletobj.showItem(dataobj,item); 
-            });  
-            $(".subprocessitem").click(function(e){
-               var id=$(this).attr("data-dataobjid");
-               var dataobj=$(this).attr("data-dataobj");
-               var item=appletobj.data.subprocess[id];
-               appletobj.showItem(dataobj,item); 
-            });  
+            var ictoSearch="";
+            for (var ictnameid in appletobj.data.ictname){
+               var item=appletobj.data.ictname[ictnameid];
+               if (item.name.toLowerCase().indexOf(v.toLowerCase())!=-1 ||
+                   item.ictoid.toLowerCase().indexOf(v.toLowerCase())!=-1){
+                  var blk="<div class=ictnameItem>";
+                  blk+="<div class=ictnameLabel "+
+                       "data-dataobj=\"PAT::ictname\" "+
+                       "data-dataobjid=\""+item.id+"\" "+
+                       ">"+
+                       hightLight(v,"<b>"+item.ictoid+"</b>"+": "+
+                       item.name)+"</div>";
+                  blk+="</div>";
+                  ictoSearch+=blk;
+               }
+            }
+            if (v.toLowerCase().indexOf("icto-")!=-1){
+               $("#analysedData").append(ictoSearch);
+               $("#analysedData").append(processSearch);
+            }
+            else{
+               $("#analysedData").append(processSearch);
+               $("#analysedData").append(ictoSearch);
+            }
+
+            appletobj.addClickLinks($("#analysedData").first());
+          //  $(".businesssegLabel").css("cursor","pointer");
+          //  $(".subprocessitem").css("cursor","pointer");
+          //  $(".businesssegLabel").click(function(e){
+          //     var id=$(this).attr("data-dataobjid");
+          //     var dataobj=$(this).attr("data-dataobj");
+          //     var item=appletobj.data.businessseg[id];
+          //     appletobj.showItem(dataobj,item); 
+          //  });  
+          //  $(".subprocessitem").click(function(e){
+          //     var id=$(this).attr("data-dataobjid");
+          //     var dataobj=$(this).attr("data-dataobj");
+          //     var item=appletobj.data.subprocess[id];
+          //     appletobj.showItem(dataobj,item); 
+          //  });  
             console.log("app",appletobj.data);
          }
          else{
@@ -381,10 +583,16 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                    "<div id=analysedData "+
                    "style=\"display: block;postion:relative\">"+
                    "<div style=\"text-align:center\">"+
+                   "<a href=\"https://share.zspi.telekom.de/"+
+                   "sites/LPRM_TelIT_RCA/PAT/app/pat.aspx\" target=_blank> "+
                    "<img "+
-                   "style=\"cursor:not-allowed;width:30%;height:30%;"+
+                   "style=\"cursor:pointer;width:30%;height:30%;"+
                    "margin-top:20px\" "+
-                   "src=\"../../../public/PAT/load/pat-logo.png\">"+
+                   "src=\"../../../public/PAT/load/pat-logo.png\"></a>"+
+                   "<center>"+
+                   "<div id=infotext style=\"width:80%;text-align:left\">"+
+                   "</div>"+
+                   "</center>"+
                    "<div class=databaseLoader "+
                    "style=\"position:absolute;text-align:center;left:50%;"+
                    "margin-left:auto;margin-right:auto;left:0;right:0;"+
@@ -402,6 +610,25 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
            },500);
         }
      });
+     setTimeout(function(){
+        $.ajax({
+           type:'GET',
+           url:"../../../public/PAT/load/tmpl/PAT.infotext?RAW=1",
+           headers:{
+             'Accept': "text/plain; charset=utf-8",         
+             'Content-Type': "text/html; charset=utf-8"   
+           },
+           dataType:'html',
+           success:function(d){
+              console.log("infotext loaded d=",d);
+              $("#infotext").html(d);
+           },
+           error:function(){
+              console.log("something went wrong");
+           }
+        });
+     },1000);
+
      $("#search").on('keypress',function(e) {
        if (e.which == 13) {
           appletobj.doSearch();
@@ -431,7 +658,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          var h=$(workspace).height();
          $(workspace).find('#analysedData').height((h-80));
          $(workspace).find('#Detail').height((h-80));
-         $(workspace).find('#DetailFrame').height((h-140));
+         $(workspace).find('#DetailFrame').height((h-180));
          if (e){
             e.stopPropagation();
          }
