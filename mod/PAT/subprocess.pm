@@ -62,7 +62,7 @@ sub new
                 vjoinon       =>['businesssegid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'businesssegid',
                 label         =>'Business-SegmentID',
                 dataobjattr   =>'PAT_subprocess.businessseg'),
@@ -96,7 +96,8 @@ sub new
                 vjointo       =>\'PAT::lnksubprocessictname',
                 vjoinon       =>['id'=>'subprocessid'],
                 vjoindisp     =>['relevance','ictname','cdate'],
-                vjoininhash   =>['relevance','ictname','cdate','ictfullname']),
+                vjoininhash   =>['relevance','ictname','cdate',
+                                 'ictfullname','ictnameid']),
 
       new kernel::Field::Text(
                 name          =>'allictnames',
