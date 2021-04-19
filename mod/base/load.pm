@@ -53,30 +53,45 @@ sub Run
 
    if ($func=~m/^tmpl\//){
       my $title=Query->Param("TITLE");
+      my $raw=Query->Param("RAW");
+      if ($raw){
+         $raw=1;
+      }
+      else{
+         $raw=0;
+      }
       my $static=Query->MultiVars();
       print $self->HttpHeader("text/html",%param);
-      print $self->HtmlHeader(style=>['default.css','mainwork.css'],
-                              prefix=>"../",
-                              title=>$title,
-                              js=>['toolbox.js','jquery.js','jquery.ui.js'],
-                              body=>1,form=>1);
-      print("<script language='JavaScript'>");
-      print("addEvent(document,'keydown',function(e){");
-      print("e=e || window.event;");
-      print("if (e.keyCode==27){");
-      print("   if (window.parent && parent.hidePopWin){");
-      print("      parent.hidePopWin(false);");
-      print("      return(false);");
-      print("   }");
-      print("}");
-      print("return(true);");
-      print("});");
-      print("</script>");
+      if (!$raw){
+         print $self->HtmlHeader(style=>['default.css','mainwork.css'],
+                                 prefix=>"../",
+                                 title=>$title,
+                                 js=>['toolbox.js','jquery.js','jquery.ui.js'],
+                                 body=>1,form=>1);
+         print("<script language='JavaScript'>");
+         print("addEvent(document,'keydown',function(e){");
+         print("e=e || window.event;");
+         print("if (e.keyCode==27){");
+         print("   if (window.parent && parent.hidePopWin){");
+         print("      parent.hidePopWin(false);");
+         print("      return(false);");
+         print("   }");
+         print("}");
+         print("return(true);");
+         print("});");
+         print("</script>");
+      }
       my $translation=$self->SkinBase();
       $translation.="::template.messages";
-      print $self->getParsedTemplate($func,{translation=>$translation,
+      my $d=$self->getParsedTemplate($func,{translation=>$translation,
                                             static=>$static});
-      print $self->HtmlBottom(body=>1,form=>1);
+      if ($ENV{HTTP_ACCEPT}=~m/charset=utf-{0,1}8/i){
+         utf8::encode($d);
+      }
+      print $d;
+      if (!$raw){
+         print $self->HtmlBottom(body=>1,form=>1);
+      }
       return(0);
    }
    elsif ($func=~m/^scriptpool\//){
