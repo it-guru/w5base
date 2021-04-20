@@ -30,15 +30,6 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->{history}=[qw(insert modify delete)];
-   $self->{tester}=[qw(11634961950007 11634966030005 11817228080001 
-                       12260596620002 13643853890000 13790292430004
-                       11920905730001 11634966030005
-
-                       11634961950007 11634966030005 11817228080001 
-                       11920905730001 12260596620002 12433231160001 
-                       13069287160000 13268958010000 13643853890000 
-                       13675837160000 13790292430004 14986433730000
-   )];
    return($self);
 }
 
@@ -861,12 +852,7 @@ sub nativProcess
                        fwddebtarget=>undef,
                        fwddebtargetid=>undef};
             msg(WARN,"reactivate SecFinding $WfRec->{id}");
-            if (!in_array($self->getParent->{tester},
-                          $h->{secfindingreponsibleid})){
-               $store->{fwdtargetid}=15632883160001;
-               $store->{fwdtarget}="base::user";
-            }
-            else{
+            if (1){
                $store->{fwdtargetid}=$h->{secfindingreponsibleid};
                $store->{fwdtarget}="base::user";
             }
@@ -1053,13 +1039,6 @@ sub nativProcess
 
       $h->{fwdtargetid}=$h->{secfindingreponsibleid};
       $h->{fwdtarget}="base::user";
-
-      if (!in_array($self->getParent->{tester},
-                    $h->{fwdtargetid})){
-         $h->{fwdtargetid}=15632883160001; # security_issue test contact
-         $h->{fwdtarget}="base::user";
-         delete($h->{secfindingaltreponsibleid});  # no tsms
-      }
 
       $h->{secfindingstate}="INANALYSE";
       my $secfindingaltreponsibleid=$h->{secfindingaltreponsibleid};
@@ -1333,20 +1312,12 @@ sub nativProcess
    }
    elsif ($op eq "wfreassign"){
       if ($WfRec->{fwdtargetid} eq "15632883160001" && #reassign nur wenn deffwd
-          $WfRec->{fwdtarget} eq "base::user" &&
-          in_array($self->getParent->{tester}, $h->{secfindingreponsibleid})){ 
+          $WfRec->{fwdtarget} eq "base::user"){ 
          $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
          my $store={fwddebtarget=>undef,
                     fwddebtargetid=>undef};
-         if (!in_array($self->getParent->{tester},
-                       $h->{secfindingreponsibleid})){
-            $store->{fwdtargetid}=15632883160001;
-            $store->{fwdtarget}="base::user";
-         }
-         else{
-            $store->{fwdtargetid}=$h->{secfindingreponsibleid};
-            $store->{fwdtarget}="base::user";
-         }
+         $store->{fwdtargetid}=$h->{secfindingreponsibleid};
+         $store->{fwdtarget}="base::user";
          if (defined($h->{secfindingaltreponsibleid})){
             $store->{secfindingaltreponsibleid}=$h->{secfindingreponsibleid};
          }
