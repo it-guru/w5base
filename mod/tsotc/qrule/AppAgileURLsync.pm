@@ -131,8 +131,14 @@ sub qcheckRecord
 
    my $itilurl=getModuleObject($dataobj->Config,"itil::lnkapplurl");
 
-   $itilurl->SetFilter([{
+   $itilurl->SetFilter([
+   {
        name=>join(" ",map({'"'.$_->{name}.'"'} @url)),
+       applid=>[$rec->{applid}],
+       networkid =>$netarea->{CNDTAG}
+   },
+   {
+       name=>join(" ",map({'"'.$_->{name}.'/*"'} @url)),
        applid=>[$rec->{applid}],
        networkid =>$netarea->{CNDTAG}
    },
@@ -169,7 +175,6 @@ sub qcheckRecord
                        MSG=>"$mode url $newrec->{name} ",
                        DATAOBJ=>'itil::lnkapplurl',
                        DATA=>{
-                          name          =>$newrec->{name},
                           networkid     =>$netarea->{CNDTAG},
                           itcloudareaid =>$rec->{id},
                           applid        =>$newrec->{applid},
@@ -182,10 +187,16 @@ sub qcheckRecord
                        if ($oldrec->{srcsys} ne $newrec->{srcsys}){
                           $oprec->{DATA}->{is_onshproxy}=1;
                        }
+                       my $newlen=length($newrec->{name});
+                       if ($newrec->{name} ne 
+                           substr($oldrec->{name},0,$newlen)){
+                          $oprec->{DATA}->{name}=$newrec->{name};
+                       }
                     }
                     if ($mode eq "insert"){
                        $oprec->{DATA}->{is_userfrontend}=1;
                        $oprec->{DATA}->{is_onshproxy}=1;
+                       $oprec->{DATA}->{name}=$newrec->{name};
                     }
                     return($oprec);
                  }
