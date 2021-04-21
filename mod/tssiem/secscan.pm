@@ -54,19 +54,39 @@ sub new
                 label         =>'Title',
                 dataobjattr   =>"title"),
 
-      new kernel::Field::Text(
-                name          =>'ictono',
-                label         =>'ICTO-ID',
+      new kernel::Field::Text(                  
+                name          =>'applid',             # primär Zuordnung
+                label         =>'Application W5BaseID',
+                group         =>'source',
+                selectfix     =>1,
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>"ictoid"),  # In Zukunft sollte die dann 
-                                            # irgendwann optional sein
+                dataobjattr   =>"w5baseid_appl"),
+
+      new kernel::Field::Text(
+                name          =>'ictono',   # sek Zuordnung (falls keine applid)
+                label         =>'ICTO-ID',
+                selectfix     =>1,
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"ictoid"),  
+                                           
+      new kernel::Field::Text(                  
+                name          =>'appl',  
+                label         =>'Application',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>\'itil::appl',
+                vjoindisp     =>'name',
+                vjoinon       =>['applid'=>'id'],
+                weblinkto     =>'none'),
+
       new kernel::Field::Text(
                 name          =>'itscanobjectid',
                 htmldetail    =>'NotEmpty',
+                group         =>'source',
                 searchable    =>0,
                 label         =>'IT-ScanObjectID',
-                dataobjattr   =>"ictoid"),  # da kann dann ICTOID oder W5BID 
-                                            # irgendwann mal drin sein.
+                dataobjattr   =>"decode(w5baseid_appl,NULL,".
+                                "ictoid,w5baseid_appl)"), 
+
       new kernel::Field::Text(
                 name          =>'stype',
                 htmlwidth     =>'200px',
@@ -89,6 +109,12 @@ sub new
                 name          =>'sdate',
                 label         =>'Scan date',
                 dataobjattr   =>'launch_datetime'),
+
+      new kernel::Field::Date(
+                name          =>'cdate',
+                group         =>'source',
+                label         =>'DB creation date',
+                dataobjattr   =>'creationdate'),
 
       new kernel::Field::Text(
                 name          =>'sduration',
@@ -312,7 +338,18 @@ sub new
                 vjointo       =>'TS::appl',
                 weblinkto     =>'NONE',
                 vjoinbase     =>{cistatusid=>"<6",applmgrid=>'!""'},
-                vjoinon       =>['ictono'=>'ictono'],
+                vjoinon       =>['itscanobjectid'=>'id'],
+                vjoinonfinish =>sub{
+                   my $self=shift;
+                   my $flt=shift;
+                   my $current=shift;
+                   my @flt=($flt);
+                   if ($current->{applid} eq "" &&
+                       $current->{ictono} ne ""){
+                      @flt=({ictono=>\$current->{ictono}});
+                   }
+                   return(@flt);
+                },
                 vjoindisp     =>'applmgr'),
 
       new kernel::Field::Text(
@@ -336,7 +373,7 @@ sub new
 
    );
    $self->{use_distinct}=0;
-   $self->setDefaultView(qw(sdate ictono name sduration secentcnt));
+   $self->setDefaultView(qw(sdate ictono appl name sduration secentcnt));
    $self->setWorktable("secscan");
    $self->BackendSessionName("W5SIEM_secscan_LongRead");  # try to force dedicated Session
                                                           # because lonReadLen and 

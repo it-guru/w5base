@@ -83,7 +83,8 @@ sub getSecscanFromSQL
 
    my $PerspectiveDecode=$self->getPerspectiveDecodeSQL("W5SIEM_secscan.");
    my $d="select W5SIEM_secscan.*,".
-         "decode(rank() over (partition by ictoid||($PerspectiveDecode) ".
+         #"decode(rank() over (partition by ictoid||($PerspectiveDecode) ".
+         "decode(rank() over (partition by decode(w5baseid_appl,NULL,ictoid,w5baseid_appl)||($PerspectiveDecode) ".
          "order by launch_datetime desc),1,1,0) islatest,".
          "($PerspectiveDecode) scanperspective ".
          "from W5SIEM_secscan ".
@@ -175,17 +176,23 @@ sub addICTOSecureFilter
 
 
          $appl->SetFilter(\@flt);
-         $appl->SetCurrentView(qw(ictono));
-         my $i=$appl->getHashIndexed("ictono");
+         $appl->SetCurrentView(qw(ictono id));
+         my $i=$appl->getHashIndexed("ictono","id");
 
          my @ictoid=keys(%{$i->{ictono}});
          @ictoid=qw(-1) if ($#ictoid==-1);
+         my @applid=keys(%{$i->{id}});
+         @applid=qw(-1) if ($#applid==-1);
 
          my %ictono=();
          map({$ictono{$_}++ } @ictoid);
-         if ($ENV{REMOTE_USER} ne "anonymous" && keys(%ictono)>0){
+         if ($ENV{REMOTE_USER} ne "anonymous" && (keys(%ictono)>0 || 
+                                                  $#applid!=-1)){
             push(@$addflt,
                        {ictono=>[keys(%ictono)]}
+            );
+            push(@$addflt,
+                       {applid=>\@applid}
             );
          }
          else{

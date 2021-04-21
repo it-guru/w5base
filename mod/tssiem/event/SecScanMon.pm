@@ -75,7 +75,7 @@ sub SecScanMon
    my %flt;
    {    #analyse lastSuccessRun
       %flt=( 
-         sdate=>">$startstamp"
+         cdate=>">$startstamp"
       );
       if (defined($firstrec)){
          my $lastmsg=$firstrec->{exitmsg};
@@ -83,14 +83,14 @@ sub SecScanMon
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
             $exitmsg=$lastmsg;
             $datastream->ResetFilter();
-            $datastream->SetFilter({id=>\$lastid,sdate=>\$laststamp});
+            $datastream->SetFilter({id=>\$lastid,cdate=>\$laststamp});
             my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
             if (!defined($lastrec)){
                msg(WARN,"record with id '$lastid' has been deleted or changed - using date only");
                $lastid=undef;
             }
             %flt=( 
-               sdate=>">=\"$laststamp GMT\""
+               cdate=>">=\"$laststamp GMT\""
             );
          }
       }
@@ -102,9 +102,9 @@ sub SecScanMon
       $datastream->ResetFilter();
       $datastream->SetFilter(\%flt);
       $datastream->SetCurrentView(qw(ictono urlofcurrentrec
-                                     name
-                                     sdate id));
-      $datastream->SetCurrentOrder("+sdate","+id");
+                                     name applid itscanobjectid
+                                     cdate id));
+      $datastream->SetCurrentOrder("+cdate","+id");
       $datastream->Limit(1000);
       my ($rec,$msg)=$datastream->getFirst();
 
@@ -116,7 +116,7 @@ sub SecScanMon
                }
             }
             if ($skiplevel==1){
-               if ($rec->{sdate} ne $laststamp){
+               if ($rec->{cdate} ne $laststamp){
                   msg(WARN,"record with id '$lastid' missing in datastream");
                   msg(WARN,"this can result in skiped records!");
                   $skiplevel=3;
@@ -124,7 +124,7 @@ sub SecScanMon
             }
             if ($skiplevel==0){
                if (defined($laststamp) && defined($lastid)){
-                  if ($laststamp eq $rec->{sdate}){
+                  if ($laststamp eq $rec->{cdate}){
                      $skiplevel=1;
                   }
                }
@@ -142,10 +142,10 @@ sub SecScanMon
                 $skiplevel==3){   # = all skips are done
                $self->analyseRecord($datastream,$rec,$res);
                $recno++;
-               $exitmsg="last:".$rec->{sdate}.";".$rec->{id};
+               $exitmsg="last:".$rec->{cdate}.";".$rec->{id};
             }
             else{
-               msg(INFO,"skip rec $rec->{sdate} - ".
+               msg(INFO,"skip rec $rec->{cdate} - ".
                         "id=$rec->{id} ".
                         "skiplevel=$skiplevel recon=$recno");
             }
@@ -163,10 +163,10 @@ sub SecScanMon
 
       my $a=1;
       if (keys(%{$res->{new}})){
-         foreach my $icto (keys(%{$res->{new}})){
+         foreach my $itscanobjectid (keys(%{$res->{new}})){
             $ncnt++;
-            $self->doNotify($datastream,$wfa,$user,$appl,$icto,
-                            $res->{new}->{$icto});
+            $self->doNotify($datastream,$wfa,$user,$appl,$itscanobjectid,
+                            $res->{new}->{$itscanobjectid});
          }
 
       }
@@ -187,16 +187,18 @@ sub analyseRecord
    my $rec=shift;
    my $res=shift;
 
-   msg(INFO,"PROCESS: $rec->{id} $rec->{sdate} icto='$rec->{ictono}'");
+   msg(INFO,"PROCESS: $rec->{id} $rec->{cdate} icto='$rec->{ictono}'");
 
-   if ($rec->{ictono} eq ""){
-      msg(ERROR,"found secscan with no ictono at $rec->{id} - abbort read");
-      exit(1); 
+   if (!exists($res->{new}->{$rec->{itscanobjectid}})){
+      $res->{new}->{$rec->{itscanobjectid}}=[];
    }
 
-   $res->{new}->{$rec->{ictono}}->{$rec->{urlofcurrentrec}}={
+   push(@{$res->{new}->{$rec->{itscanobjectid}}},{
+      urlofcurrentrec=>$rec->{urlofcurrentrec},
+      applid=>$rec->{applid},
+      ictoid=>$rec->{ictoid},
       name=>$rec->{name}
-   };
+   });
 }
 
 
@@ -207,19 +209,27 @@ sub doNotify
    my $wfa=shift;
    my $user=shift;
    my $appl=shift;
-   my $ictono=shift;
+   my $itscanobjectid=shift;
    my $rec=shift;
    my $debug="";
 
 
    $appl->ResetFilter();
-   $appl->SetFilter({ictono=>\$ictono,cistatusid=>"<6"});
+   if ($rec->[0]->{applid} ne ""){
+      $appl->SetFilter({id=>\$itscanobjectid,cistatusid=>"<6"});
+   }
+   else{
+      $appl->SetFilter({ictono=>\$itscanobjectid,cistatusid=>"<6"});
+   }
 
-   my @l=$appl->getHashList(qw(id name applmgr tsmid contacts));
+   my @l=$appl->getHashList(qw(name id applmgr tsmid contacts));
 
    my %uid;
 
+   my @itscanobjectname=();
+
    foreach my $arec (@l){
+      push(@itscanobjectname,$arec->{name});
       $uid{cc}->{$arec->{tsmid}}++;
       $uid{to}->{$arec->{applmgrid}}++;
       foreach my $crec (@{$arec->{contacts}}){
@@ -230,6 +240,9 @@ sub doNotify
             $uid{cc}->{$crec->{targetid}}++;
          }
       }
+   }
+   if ($#l>0){  # das ist nur dann der Fall, wenn per ICTO gescannt wurde
+      @itscanobjectname=($itscanobjectid);
    }
 
 
@@ -257,17 +270,19 @@ sub doNotify
          if (exists($uid{to}->{$userid})){
             push(@emailto,$userid);
          }
-         if (exists($uid{cc}->{$userid})){
+         elsif (exists($uid{cc}->{$userid})){
             push(@emailcc,$userid);
          }
       }
       my $subject=$datastream->T(
          "Qualys new security scan found for",
-         'tssiem::qrule::SecScanMon').' '.$ictono;
+         'tssiem::qrule::SecScanMon').' '.$itscanobjectname[0];
 
       my @scans;
-      foreach my $url (sort(keys(%$rec))){
-         push(@scans,sprintf("<b>%s</b>\n%s\n",$rec->{$url}->{name},$url));
+      foreach my $urlrec (@{$rec}){
+         push(@scans,sprintf("<b>%s</b>\n%s\n",
+                             $urlrec->{name},
+                             $urlrec->{urlofcurrentrec}));
       }
 
 
@@ -275,7 +290,7 @@ sub doNotify
       my $tmpl=$datastream->getParsedTemplate("tmpl/SecScanMon_MailNotify",{
          static=>{
             SCANLIST=>join("\n",@scans),
-            ICTONO=>$ictono,
+            ITSCANOBJECTNAME=>$itscanobjectname[0],
             DEBUG=>$debug
          }
       });
@@ -287,7 +302,7 @@ sub doNotify
                           'tssiem::event::SecScanMon',
                           'NewSecScan'],
          emailbcc=>[
-         #   11634953080001, # HV
+            11634953080001, # HV
             12663941300002  # Roland
          ]
       );

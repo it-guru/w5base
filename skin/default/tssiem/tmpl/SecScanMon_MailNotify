@@ -1,6 +1,6 @@
 Ladies and Gentlemen,
 
-on the ICTO-ID '%ICTONO%' the following Qualys SecurityScans are available:
+on  '%ITSCANOBJECTNAME%' the following Qualys SecurityScans are available:
 
 %SCANLIST%
 

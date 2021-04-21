@@ -10,4 +10,4 @@ en=>'Qualys: Security Scan'},
 'Scan type'=>{de=>'Scan-Typ'},
 'SecEnt count'=>{de=>'SecEnt Anzahl'},
 'perspective'=>{de=>'Perspektive'},
-
+'Application'=>{de=>'Anwendung'},
