@@ -175,15 +175,6 @@ sub new
                 label         =>'TCP/IP-Port',
                 dataobjattr   =>'swinstance.swport'),
 
-      new kernel::Field::TextDrop(
-                name          =>'swteam',
-                label         =>'Instance guardian team',
-                vjointo       =>'base::grp',
-                explore       =>300,
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['swteamid'=>'grpid'],
-                vjoindisp     =>'fullname'),
-
       new kernel::Field::Text(
                 name          =>'swinstanceid',
                 htmlwidth     =>'100px',
@@ -221,6 +212,16 @@ sub new
                 name          =>'adm2id',
                 group         =>'adm',
                 dataobjattr   =>'swinstance.adm2'),
+
+      new kernel::Field::TextDrop(
+                name          =>'swteam',
+                label         =>'Instance guardian team',
+                vjointo       =>'base::grp',
+                explore       =>300,
+                group         =>'adm',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['swteamid'=>'grpid'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Textarea(
                 name          =>'admcomments',
