@@ -56,7 +56,22 @@ sub new
          my $d;
          eval('use JSON; $d=decode_json($jsonpost);');
          if ($@ ne ""){
-            die("POST Request with JSON Data failed: $@");
+            if (lc($ENV{HTTP_ACCEPT}) eq "application/json"){
+               printf ("Content-Type: application/json\n\n");
+               my %d=(
+                  exitcode=>-1,
+                  request=>$jsonpost,
+                  exitmsg=>'parseerror: '.$@
+               );
+               eval('use JSON; print(encode_json(\%d));');
+               if ($@ ne ""){
+                  die("POST Request answer JSON Data '$jsonpost' failed: $@");
+               }
+               exit(1);
+            }
+            else{
+               die("POST Request with JSON Data '$jsonpost' failed: $@");
+            }
          }
          foreach my $name (keys(%$d)){
             $self->{'cgi'}->param(-name=>$name,-value=>$d->{$name});
