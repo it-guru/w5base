@@ -862,6 +862,7 @@ var W5ExploreClass=function(){
       $(this.mpath).append(m);
       var paramstack=new Array();
       var appletname;
+      console.trace("setMPath");
       console.log("this.setMPath setMPath()",arguments);
       if (arguments){
          for(mi=0;mi<arguments.length;mi++){
@@ -869,13 +870,8 @@ var W5ExploreClass=function(){
             url+="/";
             url+=arguments[mi].mtag;
             var m = document.createElement('li');
-            if (showMain){
-               m.innerHTML="<a href='"+url+"' class=TitleBarLink>"+
-                           arguments[mi].label+"</a>";
-            }
-            else{
-               m.innerHTML=arguments[mi].label;
-            }
+            m.innerHTML="<a href='"+url+"' class=TitleBarLink>"+
+                        arguments[mi].label+"</a>";
             if (mi==0){
                appletname=arguments[mi].mtag;
                if (showMain){
@@ -1006,6 +1002,7 @@ var W5ExploreClass=function(){
       if (app.runingApplet[applet]){
          if (paramstack){
             app.runingApplet[applet].run(paramstack);
+            return;
          }
          else{
             app.runingApplet[applet].run();

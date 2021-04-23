@@ -155,6 +155,16 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
 
       var d="";
 
+      appletobj.app.setMPath({
+            label:ClassAppletLib['%SELFNAME%'].desc.label,
+            mtag:'%SELFNAME%'
+         },
+         {
+            label:item.name,
+            mtag:'PAT::businessseg'+"/"+item.id
+         }
+      );
+
       d+=item.comments;
       if (item.subprocesses.length){
          d+="<br><br>"+
@@ -179,6 +189,11 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                    'o':'#F180BA',
                    'u':'#E20074',
                    'c':'#A90057' 
+                },
+                typeLabel:{
+                   'o':'%T(online,PAT::Explore::ibicalc)%',
+                   'u':'%T(use,PAT::Explore::ibicalc)%',
+                   'c':'%T(core,PAT::Explore::ibicalc)%'
                 },
                 dayLabel:{
                    '0':'%TRANSLATE(mon-fri,kernel::Field::TimeSpans)%',
@@ -212,6 +227,15 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       var appletobj=this;
       var app=this.app;
 
+      appletobj.app.setMPath({
+            label:ClassAppletLib['%SELFNAME%'].desc.label,
+            mtag:'%SELFNAME%'
+         },
+         {
+            label:item.name,
+            mtag:'PAT::subprocess'+"/"+item.id
+         }
+      );
       var d="<table class=\"recordsheet\">";
       d+="<tr><td>%T(Description,PAT::subprocess)%:</td>";
       d+="<td>"+item.description+"</td></tr>";
@@ -257,6 +281,11 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
              'u':'#E20074',
              'c':'#A90057' 
           },
+          typeLabel:{
+             'o':'%T(online,PAT::Explore::ibicalc)%',
+             'u':'%T(use,PAT::Explore::ibicalc)%',
+             'c':'%T(core,PAT::Explore::ibicalc)%'
+          },
           dayLabel:{
              '0':'%TRANSLATE(mon-fri,kernel::Field::TimeSpans)%',
              '1':'%TRANSLATE(sat,kernel::Field::TimeSpans)%',
@@ -275,6 +304,11 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
              'o':'#F180BA',
              'u':'#E20074',
              'c':'#A90057' 
+          },
+          typeLabel:{
+             'o':'%T(online,PAT::Explore::ibicalc)%',
+             'u':'%T(use,PAT::Explore::ibicalc)%',
+             'c':'%T(core,PAT::Explore::ibicalc)%'
           },
           dayLabel:{
              '0':'%TRANSLATE(mon-fri,kernel::Field::TimeSpans)%',
@@ -296,6 +330,10 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
           typeColor:{
              'B':'#427BAB',
              'C':'#315C80' 
+          },
+          typeLabel:{
+             'B':'%T(nonprod,PAT::Explore::ibicalc)%',
+             'C':'%T(core,PAT::Explore::ibicalc)%'
           },
           dayLabel:{
              '0':'%TRANSLATE(mon-fri,kernel::Field::TimeSpans)%',
@@ -432,6 +470,12 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          console.log("click on close");
          $("#analysedData").show();
          $("#Detail").hide();
+         console.log("fifi setMPath on close click");
+         appletobj.app.setMPath({
+               label:ClassAppletLib['%SELFNAME%'].desc.label,
+               mtag:'%SELFNAME%'
+            }
+         );
       });
       window.dispatchEvent(new Event('resize'));
    }
@@ -620,7 +664,6 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
            },
            dataType:'html',
            success:function(d){
-              console.log("infotext loaded d=",d);
               $("#infotext").html(d);
            },
            error:function(){
@@ -664,12 +707,30 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          }
       }
       $(window).on('resize',resizeModalHandler);
+      console.log("run: arguments:",arguments);
+      if (arguments.length){
+         var dataobj=arguments[0][0];
+         var dataobjid=arguments[0][1];
+         appletobj.app.setMPath({
+               label:ClassAppletLib['%SELFNAME%'].desc.label,
+               mtag:'%SELFNAME%'
+            },
+            { label:"loading ...", mtag:dataobj+"/"+dataobjid }
+         );
+         var frm=$("#workspace");
 
-      appletobj.app.setMPath({
-            label:ClassAppletLib['%SELFNAME%'].desc.label,
-            mtag:'%SELFNAME%'
+         appletobj.loadEntries();
+      }
+      else{
+         console.log("fifi setMPath without arguments");
+         appletobj.app.setMPath({
+               label:ClassAppletLib['%SELFNAME%'].desc.label,
+               mtag:'%SELFNAME%'
+            }
+         );
+         if (!appletobj.data){
+            appletobj.loadEntries();
          }
-      );
-      appletobj.loadEntries();
+      }
    }
 });

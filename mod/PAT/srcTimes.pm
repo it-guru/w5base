@@ -107,7 +107,8 @@ sub reformatExternal
      
         my $d1=sprintf("%02d:%02d",$h1,$m1);
         my $d2=sprintf("%02d:%02d",$h2,$m2);
-        $d2="23:59" if ($d2 eq "00:00");
+        $d2="24:00" if ($d2 eq "00:00");
+        $d2="24:00" if ($d2 eq "23:59");  # das scheint ein Eingabefehler
 
         my $trange="$d1-$d2";
 

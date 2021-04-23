@@ -2,4 +2,8 @@
 'description'=>{de=>'Prozesse und Applikationen der Telekom Deutschland' ,en=>'Processes and Application of Telekom Deutschland'},
 'sublabel'=>{de=>'PAT',en=>'PAT'},
 'PAT-Search'=>{de=>'PAT-Suche'},
+'core'=>{de=>'Kernzeit'},
+'use'=>{de=>'Nutzungszeit'},
+'online'=>{de=>'Onlinezeit'},
+'nonprod'=>{de=>'Randzeit'},
 

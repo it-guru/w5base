@@ -134,6 +134,10 @@ table.timetable {
    border:1px solid gray;
 }
 
+.timetable td div.timespan{
+   cursor:pointer;
+}
+
 table.recordsheet {
   border-collapse:collapse;
   width:100%;
