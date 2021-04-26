@@ -200,6 +200,7 @@ sub getDynamicFields
 
       new kernel::Field::Textarea(name          =>'secfindingdesc',
                                   label         =>'Description of finding',
+                                  htmlheight    =>'200px',
                                   uivisible     =>sub{
                                      my $self=shift;
                                      my $app=$self->getParent;
@@ -226,6 +227,9 @@ sub getDynamicFields
                                            "detaildescription");
                                      my $detaildescription=
                                            $d->RawValue($current);
+                                     return($detaildescription.
+                                            "\n------------------------\n".
+                                            $dsc);
                                      return($dsc.
                                             "\n".
                                             $detaildescription);
