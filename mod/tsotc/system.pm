@@ -820,6 +820,11 @@ sub Import
             $newrec->{name}=$sysrec->{altname};
          }
       }
+      # prevent parallel QCheck at night (which can result in doublicate 
+      # enties)
+      $newrec->{lastqcheck}=NowStamp("en");
+      # QCheck will be done at end of Import anyway
+      ##################################################################
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){
