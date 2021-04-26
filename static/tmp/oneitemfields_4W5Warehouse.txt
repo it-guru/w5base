@@ -1,0 +1,112 @@
+base::user:
+===========
+userid
+urlofcurrentrec
+surname
+givenname
+email
+dsid
+posix
+
+AL_TCom::appl:
+==============
+id
+urlofcurrentrec
+name  
+applid        
+cistatus 
+cistatusid
+criticality
+opmode
+contacts          (Achtung: XML!)
+phonenumbers      (Achtung: XML!)
+mgmtitemgroup
+maintwindow
+applmgrid            -> base::user::userid
+tsmid                -> base::user::userid
+tsm2id               -> base::user::userid
+
+AL_TCom::system:
+================
+id
+urlofcurrentrec
+name
+fullname
+cistatus 
+cistatusid
+mdate
+cdate
+
+
+AL_TCom::lnkapplappl:
+=====================
+id
+urlofcurrentrec
+ifrel
+contype
+fromappid            ->  ::appl::id
+toapplid             ->  ::appl::id
+gwapplid             ->  ::appl::id
+gwappl2id            ->  ::appl::id
+mdate
+cdate
+
+AL_TCom::lnkapplsystem:
+=======================
+id
+fullname
+reltyp
+applid               ->  ::appl::id
+systemid             ->  ::system::id
+
+
+AL_TCom::swinstance:
+====================
+id
+urlofcurrentrec
+fullname
+cistatus 
+cistatusid
+applid               ->  ::appl::id
+mdate
+cdate
+
+AL_TCom::itcloud:
+=====================
+id
+urlofcurrentrec
+name
+cistatus 
+cistatusid
+mdate
+cdate
+
+
+AL_TCom::itcloudarea:
+=====================
+id
+urlofcurrentrec
+fullname
+cistatus 
+cistatusid
+applid               ->  ::appl::id
+itcloudid            ->  ::itcloud::id
+mdate
+cdate
+
+tsgrpmgmt::grp:
+===============
+id
+fullname
+
+
+tsgrpmgmt::lnkmetagrp:
+======================
+id                (LinkID!)
+targetid             ->  tsgrpmgmt::grp
+responsibility    (technical functional customer ...)
+parentobj         (i.d.R. nur itil::appl)
+refid                ->  ::appl::id
+
+
+
