@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TRIGGERURL="https://w5base-devnull.telekom.de/darwin/auth/azure/subscription"
+TRIGGERURL="https://w5base-testenv.telekom.de/darwin/auth/azure/subscription"
 FUNCTION="TriggerEndpoint"
 
 
