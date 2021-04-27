@@ -16,20 +16,188 @@ package azure::subscription;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::App::Web;
-use CGI;
-@ISA=qw(kernel::App::Web);
+use kernel::Field;
+use azure::lib::Listedit;
+use JSON;
+@ISA=qw(azure::lib::Listedit);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->AddFields(
+      new kernel::Field::Id(     
+            name              =>'id',
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            dataobjattr       =>'subscriptionId',
+            label             =>'SubscriptionId'),
+
+      new kernel::Field::Text(     
+            name              =>'name',
+            ignorecase        =>1,
+            dataobjattr       =>'displayName',
+            label             =>'Name'),
+
+      new kernel::Field::TextDrop(
+            name              =>'appl',
+            searchable        =>0,
+            vjointo           =>'itil::appl',
+            vjoinon           =>['w5baseid'=>'id'],
+            searchable        =>0,
+            vjoindisp         =>'name',
+            label             =>'W5Base Application'),
+
+      new kernel::Field::Interface(     
+            name              =>'w5baseid',
+            container         =>'tags',
+            label             =>'Application W5BaseID'),
+
+      new kernel::Field::Container(
+            name              =>'tags',
+            group             =>'tags',
+            searchable        =>0,
+            uivisible         =>1,
+            label             =>'Tags'),
+
+      new kernel::Field::Text(     
+            name              =>'tenantid',
+            ignorecase        =>1,
+            group             =>'source',
+            dataobjattr       =>'tenantId',
+            label             =>'TenantId'),
+
+   );
+   $self->{'data'}=\&DataCollector;
+   $self->setDefaultView(qw(id name appl));
    return($self);
+}
+
+
+sub DataCollector
+{
+   my $self=shift;
+   my $filterset=shift;
+
+   my @view=$self->GetCurrentView();
+   #printf STDERR ("view=%s\n",Dumper(\@view));
+
+   my $Authorization=$self->getAzureAuthorizationToken();
+
+   my ($dbclass,$requesttoken)=$self->decodeFilter2Query4azure(
+      "subscriptions","id",
+      $filterset
+   );
+   my $d=$self->CollectREST(
+      dbname=>'AZURE',
+      requesttoken=>$requesttoken,
+      useproxy=>1,
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $base=shift;
+      
+         my $dataobjurl="https://management.azure.com/";
+         $dataobjurl.=$dbclass;
+         $dataobjurl.="?api-version=2020-01-01";
+         return($dataobjurl);
+      },
+
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $headers=['Authorization'=>$Authorization,
+                      'Content-Type'=>'application/json'];
+ 
+         return($headers);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+         if (ref($data) eq "HASH" && exists($data->{value})){
+            $data=$data->{value};
+         }
+         if (ref($data) ne "ARRAY"){
+            $data=[$data];
+         }
+         my @data;
+         foreach my $rawrec (@$data){
+            my $rec;
+            foreach my $v (qw(displayName subscriptionId tenantId tags)){
+               $rec->{$v}=$rawrec->{$v};
+            }
+            push(@data,$rec);
+         }
+         return(\@data);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            return([],"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data TPC subscription response");
+         return(undef);
+      }
+   );
+
+   return($d);
+}
+
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("default") if (!defined($rec));
+   return("ALL");
+}
+
+sub isWriteValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(undef);
+}
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+sub isUploadValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default machines tags source));
+}
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/itcloudarea.jpg?".$cgi->query_string());
 }
 
 
@@ -70,36 +238,8 @@ sub TriggerEndpoint
    return(0);
 }
 
-sub validateAnonymousAccess
-{
-   my $self=shift;
-   my $method=shift;
-
-   if (lc($ENV{REMOTE_USER}) eq "anonymous" ||
-       $ENV{REMOTE_USER} eq ""){
-      $self->rejectAnonymousAccess($method);
-      return(undef);
-   }
-   return(1);
-}
-
-
-sub rejectAnonymousAccess
-{
-   my $self=shift;
-   my $method=shift;
-
-   printf("Status: 403 Forbidden - no anonymous access allowed\n");
-   printf("Content-type: text/xml\n\n".
-          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>".
-          "<root>".
-          "<error>403 Forbidden - no anonymous access allowed</error>".
-          "</root>\n");
-}
-
-
-
-
 
 
 1;
+
+

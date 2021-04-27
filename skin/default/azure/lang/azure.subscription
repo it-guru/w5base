@@ -1,0 +1,5 @@
+'azure::subscription'=>{
+   de=>'Azure: Subscription',
+   en=>'Azure: Subscription'
+},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
