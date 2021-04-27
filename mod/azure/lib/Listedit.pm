@@ -133,10 +133,10 @@ sub caseHdl
    my $var=shift;
    my $exp=shift;
 
-   if ($fobj->{ignorecase}){
-      $var="tolower($var)";
-      $exp=lc($exp);
-   }
+ #  if ($fobj->{ignorecase}){
+ #     $var="tolower($var)";
+ #     $exp=lc($exp);
+ #  }
    if ($fobj->{uppersearch}){
       $exp=uc($exp);
    }
@@ -164,13 +164,6 @@ sub decodeFilter2Query4azure
    my %qparam;
 
    if (ref($filter) eq "HASH"){
-
-# &&          # ODATA Filters are verry simple!
-#       keys(%$filter)==1 &&
-#       exists($filter->{FILTER}) &&
-#       ref($filter->{FILTER}) eq "ARRAY" &&
-#       $#{$filter->{FILTER}}==0 &&
-#       ref($filter->{FILTER}->[0]) eq "HASH"){
       my @andLst=();
       foreach my $filtername (keys(%{$filter})){
          my $f=$filter->{$filtername}->[0];
@@ -202,7 +195,7 @@ sub decodeFilter2Query4azure
                   }
                   $requesttoken=$dbclass;
                }
-               else{   # "normal" field handling
+               if (0){   # ODATA $filter seems not to work
                   my @orLst;
                   my $fieldname=$fn;
                   if (exists($fld->{dataobjattr})){
@@ -323,9 +316,10 @@ sub decodeFilter2Query4azure
    }
    else{
       printf STDERR ("invalid Filterset in $self:%s\n",Dumper($filter));
-      $self->LastMsg(ERROR,"invalid filterset for vRealize query");
+      $self->LastMsg(ERROR,"invalid filterset for Azure query");
       return(undef);
    }
+   $qparam{'api-version'}="2020-01-01";
 
    if ($self->{_LimitStart}==0 && $self->{_Limit}>0 &&
        !($self->{_UseSoftLimit})){

@@ -63,6 +63,12 @@ sub new
             group             =>'tags',
             searchable        =>0,
             uivisible         =>1,
+            onRawValue        =>sub{
+               my $self=shift;
+               my $current=shift;
+               my $tagrec=$self->getParent->getTags($current->{id});
+               return($tagrec->[0]->{tags});
+            },
             label             =>'Tags'),
 
       new kernel::Field::Text(     
@@ -76,6 +82,72 @@ sub new
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name appl));
    return($self);
+}
+
+
+sub getTags
+{
+   my $self=shift;
+   my $subscriptionid=shift;
+
+   my $Authorization=$self->getAzureAuthorizationToken();
+
+   my ($dbclass,$requesttoken)=$self->decodeFilter2Query4azure(
+      "subscriptions","id",
+      {fld=>[{id=>\$subscriptionid}]}
+   );
+   my $d=$self->CollectREST(
+      dbname=>'AZURE',
+      requesttoken=>$requesttoken,
+      useproxy=>1,
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $base=shift;
+      
+         my $dataobjurl="https://management.azure.com/";
+         $dataobjurl.=$dbclass;
+         return($dataobjurl);
+      },
+
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $headers=['Authorization'=>$Authorization,
+                      'Content-Type'=>'application/json'];
+ 
+         return($headers);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+         if (ref($data) eq "HASH" && exists($data->{value})){
+            $data=$data->{value};
+         }
+         if (ref($data) ne "ARRAY"){
+            $data=[$data];
+         }
+         return($data);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            return([],"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data TPC subscription response");
+         return(undef);
+      }
+   );
+
+   return($d);
 }
 
 
@@ -105,7 +177,6 @@ sub DataCollector
       
          my $dataobjurl="https://management.azure.com/";
          $dataobjurl.=$dbclass;
-         $dataobjurl.="?api-version=2020-01-01";
          return($dataobjurl);
       },
 
@@ -131,7 +202,9 @@ sub DataCollector
          foreach my $rawrec (@$data){
             my $rec;
             foreach my $v (qw(displayName subscriptionId tenantId tags)){
-               $rec->{$v}=$rawrec->{$v};
+               if (exists($rawrec->{$v})){
+                  $rec->{$v}=$rawrec->{$v};
+               }
             }
             push(@data,$rec);
          }
