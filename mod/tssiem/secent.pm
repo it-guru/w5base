@@ -41,15 +41,24 @@ sub new
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"secscan.ictoid"),  # In Zukunft sollte die dann
                                             # irgendwann optional sein
+
       new kernel::Field::Text(
                 name          =>'itscanobjectid',
                 htmldetail    =>'NotEmpty',
+                group         =>'source',
                 searchable    =>0,
-                group         =>'scan',
                 label         =>'IT-ScanObjectID',
-                dataobjattr   =>"secscan.ictoid"), # da kann dann ICTOID 
-                                                   # oder W5BID irgendwann 
-                                                   # mal drin sein.
+                dataobjattr   =>"decode(secscan.w5baseid_appl,NULL,".
+                                "secscan.ictoid,secscan.w5baseid_appl)"), 
+
+      new kernel::Field::Text(                  
+                name          =>'applid',             # primär Zuordnung
+                label         =>'Application W5BaseID',
+                group         =>'source',
+                selectfix     =>1,
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"secscan.w5baseid_appl"),
+
       new kernel::Field::Date(
                 name          =>'sdate',
                 label         =>'Scan date',
