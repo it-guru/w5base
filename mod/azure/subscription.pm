@@ -38,6 +38,12 @@ sub new
             dataobjattr       =>'subscriptionId',
             label             =>'SubscriptionId'),
 
+      new kernel::Field::Linenumber(
+            name              =>'linenumber',
+            label             =>'No.'),
+
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(     
             name              =>'name',
             ignorecase        =>1,
@@ -66,8 +72,16 @@ sub new
             onRawValue        =>sub{
                my $self=shift;
                my $current=shift;
-               my $tagrec=$self->getParent->getTags($current->{id});
-               return($tagrec->[0]->{tags});
+               my $subscriptionid=$current->{id};
+               return({}) if ($subscriptionid eq "");
+               my $subrequest=$self->getParent->DataCollector({
+                  filter=>[{id=>\$subscriptionid}]
+               });
+               if (defined($subrequest) && ref($subrequest) eq "ARRAY" &&
+                   $#{$subrequest}==0){
+                  return($subrequest->[0]->{tags});
+               }
+               return({});
             },
             label             =>'Tags'),
 
@@ -82,72 +96,6 @@ sub new
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name appl));
    return($self);
-}
-
-
-sub getTags
-{
-   my $self=shift;
-   my $subscriptionid=shift;
-
-   my $Authorization=$self->getAzureAuthorizationToken();
-
-   my ($dbclass,$requesttoken)=$self->decodeFilter2Query4azure(
-      "subscriptions","id",
-      {fld=>[{id=>\$subscriptionid}]}
-   );
-   my $d=$self->CollectREST(
-      dbname=>'AZURE',
-      requesttoken=>$requesttoken,
-      useproxy=>1,
-      url=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         my $base=shift;
-      
-         my $dataobjurl="https://management.azure.com/";
-         $dataobjurl.=$dbclass;
-         return($dataobjurl);
-      },
-
-      headers=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         my $headers=['Authorization'=>$Authorization,
-                      'Content-Type'=>'application/json'];
- 
-         return($headers);
-      },
-      success=>sub{  # DataReformaterOnSucces
-         my $self=shift;
-         my $data=shift;
-         if (ref($data) eq "HASH" && exists($data->{value})){
-            $data=$data->{value};
-         }
-         if (ref($data) ne "ARRAY"){
-            $data=[$data];
-         }
-         return($data);
-      },
-      onfail=>sub{
-         my $self=shift;
-         my $code=shift;
-         my $statusline=shift;
-         my $content=shift;
-         my $reqtrace=shift;
-
-         if ($code eq "404"){  # 404 bedeutet nicht gefunden
-            return([],"200");
-         }
-         msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TPC subscription response");
-         return(undef);
-      }
-   );
-
-   return($d);
 }
 
 

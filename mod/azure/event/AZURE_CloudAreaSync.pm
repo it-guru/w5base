@@ -1,6 +1,6 @@
 package azure::event::AZURE_CloudAreaSync;
 #  W5Base Framework
-#  Copyright (C) 2020  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ sub AZURE_CloudAreaSync
    my $self=shift;
    my $queryparam=shift;
 
-   my $azurename="Azure";
+   my $azurename="Azure_DTIT";
    my $azurecode="AZURE";
 
    my $inscnt=0;
@@ -38,32 +38,22 @@ sub AZURE_CloudAreaSync
    my @a;
    my %itcloud;
 
-   my $pro=getModuleObject($self->Config,"azure::project");
-   my $mach=getModuleObject($self->Config,"azure::machine");
-   my $dep=getModuleObject($self->Config,"azure::deployment");
+   my $subsc=getModuleObject($self->Config,"azure::subscription");
    my $itcloudobj=getModuleObject($self->Config,"itil::itcloud");
    my $appl=getModuleObject($self->Config,"itil::appl");
-   my $sys=getModuleObject($self->Config,"itil::system");
    my $itcloudarea=getModuleObject($self->Config,"itil::itcloudarea");
 
-   if ($pro->isSuspended() ||
-       $dep->isSuspended()){
+   if ($subsc->isSuspended()){
       return({exitcode=>0,exitmsg=>'ok'});
    }
-
-
-   if (!($pro->Ping()) ||
-       !($dep->Ping()) ||
+   if (!($subsc->Ping()) ||
        !($itcloudobj->Ping())){
       msg(ERROR,"not all dataobjects available");
       return(undef);
    }
 
-   my $StreamDataobj="tssiem::secscan";
-
-
    my $joblog=getModuleObject($self->Config,"base::joblog");
-   my $eventlabel='IncStreamAnalyse::'.$dep->Self;
+   my $eventlabel='IncStreamAnalyse::'.$subsc->Self;
    my $method=(caller(0))[3];
 
    $joblog->SetFilter({name=>\$method,
@@ -106,13 +96,13 @@ sub AZURE_CloudAreaSync
 
 
    if (1){
-      $pro->ResetFilter();
-      $pro->SetFilter({});
-      my @ss=$pro->getHashList(qw(id name applid));
+      $subsc->ResetFilter();
+      $subsc->SetFilter({});
+      my @ss=$subsc->getHashList(qw(id name w5baseid));
       my @s;
       foreach my $rec (@ss){
          #next if ($rec->{name}=~m/test/i);
-         if ($rec->{applid}=~m/^[0-9]{3,20}$/){
+         if ($rec->{w5baseid}=~m/^[0-9]{3,20}$/){
           #  printf STDERR ("process: %s\n",$rec->{id});
           #  printf STDERR ("   name: %s\n",$rec->{name});
           #  printf STDERR (" applid: %s\n",$rec->{applid});
@@ -120,13 +110,14 @@ sub AZURE_CloudAreaSync
             push(@s,{
                id=>$rec->{id},
                name=>$rec->{name},
-               applid=>$rec->{applid}
+               applid=>$rec->{w5baseid}
             });
          }
       }
       $itcloudarea->ResetFilter();
       $itcloudarea->SetFilter({srcsys=>\$azurecode});
-      my @c=$itcloudarea->getHashList(qw(name itcloud srcsys srcid cistatusid));
+      my @c=$itcloudarea->getHashList(qw(name itcloud applid
+                                         srcsys srcid cistatusid));
 
       my @opList;
 
@@ -143,9 +134,10 @@ sub AZURE_CloudAreaSync
                my $aname=$a->{name};
                $aname=~s/\[.*\]$//;
                my $bname=$b->{name};
-               $bname=~s/\s+/_/g;
+               $bname=~s/[\s.]+/_/g;
                if ($aname eq $bname &&
-                   $a->{cistatusid}<6){
+                   $a->{cistatusid}<6 &&
+                   $a->{applid} eq $b->{applid}){
                   $eq=1;   # alles gleich - da braucht man nix machen
                }
             }
@@ -155,7 +147,7 @@ sub AZURE_CloudAreaSync
             my ($mode,$oldrec,$newrec,%p)=@_;
             if ($mode eq "insert" || $mode eq "update"){
                my $name=$newrec->{name};
-               $name=~s/\s+/_/g;
+               $name=~s/[\s.]+/_/g;
                my $oprec={
                   OP=>$mode,
                   DATAOBJ=>'itil::itcloudarea',
@@ -172,6 +164,10 @@ sub AZURE_CloudAreaSync
                }
                if ($mode eq "update"){
                   if ($oldrec->{cistatusid}==6){
+                     $oprec->{DATA}->{cistatusid}="3";
+                  }
+                  if ($oldrec->{cistatusid}!=3 &&
+                      $oldrec->{applid} ne $newrec->{applid}){
                      $oprec->{DATA}->{cistatusid}="3";
                   }
                   $oprec->{IDENTIFYBY}=$oldrec->{id};
@@ -196,7 +192,8 @@ sub AZURE_CloudAreaSync
       );
 
       for(my $c=0;$c<=$#opList;$c++){
-         if ($opList[$c]->{OP} eq "insert"){
+         if ($opList[$c]->{OP} eq "insert" ||
+             $opList[$c]->{OP} eq "update"){
             $appl->ResetFilter();
             $appl->SetFilter({id=>\$opList[$c]->{DATA}->{applid}});
             my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid));
@@ -228,46 +225,6 @@ sub AZURE_CloudAreaSync
       @msg=();     # project sync messages only on daychange
    }
 
-
-   if (1){
-      $dep->ResetFilter();
-      $dep->SetFilter(\%flt);
-      $dep->Limit(1000,0,0);
-      $dep->SetCurrentOrder(qw(cdate id));
-      my %machineid;
-      foreach my $deprec ($dep->getHashList(qw(opname cdate 
-                                               projectid resources))){
-         $ncnt++;
-         #msg(INFO,"$ncnt) op:".$deprec->{opname});
-         #msg(INFO,"cdate:".$deprec->{cdate});
-         #msg(INFO,"project:".$deprec->{projectid}."\n--\n");
-         my $resources=$deprec->{resources};
-         if (ref($resources) eq "ARRAY"){
-            foreach my $resrec (@$resources){
-               if ($resrec->{type}=~m/machine/i){
-                  $machineid{$resrec->{id}}++;
-               }
-            }
-         }
-      }
-      foreach my $machineid (sort(keys(%machineid))){
-         $mach->ResetFilter();
-         $mach->SetFilter({id=>\$machineid});
-         my ($mrec,$msg)=$mach->getOnlyFirst(qw(id urlofcurrentrec name));
-         if (defined($mrec)){
-            $sys->ResetFilter();
-            $sys->SetFilter({srcsys=>\'AZURE',srcid=>\$mrec->{id}});
-            my ($srec,$msg)=$sys->getOnlyFirst(qw(id cistatusid));
-            if (!defined($srec)){
-               # run import
-               $mach->Import({importname=>$mrec->{id}});
-            }
-            else{
-               # initiate QualityCheck on sysrec
-            }
-         }
-      }
-   }
 
    if ($#msg!=-1){
       $itcloudobj->ResetFilter();
