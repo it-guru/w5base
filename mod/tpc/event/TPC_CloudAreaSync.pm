@@ -59,7 +59,7 @@ sub TPC_CloudAreaSync
       return(undef);
    }
 
-   my $StreamDataobj="tssiem::secscan";
+   my $StreamDataobj="tpc::CloudAreaSync";
 
 
    my $joblog=getModuleObject($self->Config,"base::joblog");
@@ -126,7 +126,8 @@ sub TPC_CloudAreaSync
       }
       $itcloudarea->ResetFilter();
       $itcloudarea->SetFilter({srcsys=>\$tpccode});
-      my @c=$itcloudarea->getHashList(qw(name itcloud srcsys srcid cistatusid));
+      my @c=$itcloudarea->getHashList(qw(name itcloud applid 
+                                         srcsys srcid cistatusid));
 
       my @opList;
 
@@ -145,7 +146,8 @@ sub TPC_CloudAreaSync
                my $bname=$b->{name};
                $bname=~s/\s+/_/g;
                if ($aname eq $bname &&
-                   $a->{cistatusid}<6){
+                   $a->{cistatusid}<6 &&
+                   $a->{applid} eq $b->{applid}){
                   $eq=1;   # alles gleich - da braucht man nix machen
                }
             }
@@ -172,6 +174,10 @@ sub TPC_CloudAreaSync
                }
                if ($mode eq "update"){
                   if ($oldrec->{cistatusid}==6){
+                     $oprec->{DATA}->{cistatusid}="3";
+                  }
+                  if ($oldrec->{cistatusid}!=3 &&
+                      $oldrec->{applid} ne $newrec->{applid}){
                      $oprec->{DATA}->{cistatusid}="3";
                   }
                   $oprec->{IDENTIFYBY}=$oldrec->{id};
