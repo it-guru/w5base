@@ -752,6 +752,7 @@ sub Import
      #       $newrec->{name}=$sysrec->{altname};
      #    }
      # }
+      $newrec->{lastqcheck}=NowStamp("en");
       $identifyby=$sys->ValidatedInsertRecord($newrec);
 #   }
    if (defined($identifyby) && $identifyby!=0){
