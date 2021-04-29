@@ -97,7 +97,7 @@ sub new
                 vjoinon       =>['id'=>'subprocessid'],
                 vjoindisp     =>['relevance','ictname','cdate'],
                 vjoininhash   =>['relevance','ictname','cdate',
-                                 'ictfullname','ictnameid']),
+                                 'ictfullname','ictnameid','ictoid']),
 
       new kernel::Field::Text(
                 name          =>'allictnames',

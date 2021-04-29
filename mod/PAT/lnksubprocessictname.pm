@@ -134,6 +134,12 @@ sub new
                 label         =>'Source-Id',
                 dataobjattr   =>'PAT_lnksubprocessictname.srcid'),
 
+      new kernel::Field::Interface(
+                name          =>'ictoid',
+                group         =>'source',
+                label         =>'ICTO-ID',
+                dataobjattr   =>'PAT_ictname.ictoid'),
+
       new kernel::Field::Date(
                 name          =>'srcload',
                 history       =>0,
@@ -185,6 +191,17 @@ sub new
    $self->setWorktable("PAT_lnksubprocessictname");
    return($self);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $from="PAT_lnksubprocessictname ".
+            "left outer join PAT_ictname ".
+            "on PAT_lnksubprocessictname.ictname=".
+            "PAT_ictname.id ";
+   return($from);
+}
+
 
 
 sub getRecordImageUrl
