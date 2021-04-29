@@ -788,9 +788,10 @@ sub ProcessOpList
                my $idname=$idfield->Name();
                $dataobj->SetFilter({$idname=>\$op->{IDENTIFYBY}});
                my ($oldrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
-               my $id=$dataobj->ValidatedDeleteRecord($oldrec,
-                                                 {$idname=>\$op->{IDENTIFYBY}});
-               msg(INFO,"delete id ok = $id");
+               if (defined($oldrec)){ # if not found, record is already deleted
+                  my $id=$dataobj->ValidatedDeleteRecord($oldrec);
+                  msg(INFO,"delete id ok = $id");
+               }
             }
          }
       }
