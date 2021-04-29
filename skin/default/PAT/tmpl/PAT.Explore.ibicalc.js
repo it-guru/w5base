@@ -137,7 +137,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       $(win).find("[data-dataobj]").click(function(e){
          var id=$(this).attr("data-dataobjid");
          var dataobj=$(this).attr("data-dataobj");
-         appletobj.showItem(dataobj,id); 
+         var method=$(this).attr("data-method");
+         appletobj.showItem(dataobj,id,method); 
       });
       $(win).find("[data-extlink]").click(function(e){
          var url=$(this).attr("data-extlink");
@@ -370,6 +371,164 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       });
 
    }
+   ClassAppletLib[applet].class.prototype.doVote=function(
+         win,item,start_date,start_time,end_time,fullcheck){
+      var appletobj=this;
+      console.log("dovote",item,start_date,start_time,end_time,fullcheck);
+      var relsub=new Object();
+      for (var subprocessid in appletobj.data.subprocess){
+          var sp=appletobj.data.subprocess[subprocessid];
+          for (var i=0;i<sp.ictnames.length;i++){
+              if (sp.ictnames[i].ictnameid==item.id ||
+                  (fullcheck==true && item.ictoid==sp.ictnames[i].ictoid)){
+                 if (!(sp.id in relsub)){
+                    relsub[sp.id]={
+                       name:sp.name,
+                       id:sp.id,
+                       businessseg:sp.businessseg,
+                       businesssegid:sp.businesssegid,
+                       title:sp.title,
+                       relevance:sp.ictnames[i].relevance
+                    };
+                 }
+                 if (relsub[sp.id].relevance>sp.ictnames[i].relevance){
+                    relsub[sp.id].relevance=sp.ictnames[i].relevance;
+                 }
+              }
+          }
+      }
+      var subp=Object.keys(relsub).map(function(spid){
+        return relsub[spid];
+      }).sort(function(a,b){
+         if (a.relevance>b.relevance){
+            return(1);
+         }
+         else if (a.relevance<b.relevance){
+            return(-1);
+         }
+         else{
+            if (a.businessseg>b.businessseg){
+               return(1);
+            }
+            else if (a.businessseg<b.businessseg){
+               return(-1);
+            }
+            else{
+               if (a.name>b.name){
+                  return(1);
+               }
+               else if (a.name<b.name){
+                  return(-1);
+               }
+            }
+         }
+         return(0);
+      });
+      var d="";
+      for(var i;i<subp.length;i++){
+         var spid=subp[i].id;
+         d+="<div>";
+         d+="<div>";
+         d+=subp[i].businessseg+": "+
+            "<span data-dataobj=\"PAT::subprocess\" "+
+            "data-dataobjid=\""+spid+"\">"+
+            "<b>"+subp[i].name+": "+subp[i].title+"</b>";
+         d+=extLink(9,appletobj.data.subprocess[subp[i].id].urlofcurrentrec); 
+         d+="</span>";
+         d+="</div>";
+         console.log("spid=",spid,"rec=",appletobj.data.subprocess[spid]);
+         d+="<div style=\"margin-left:5px;margin-bottom:10px\">";
+         d+="ibicoretime: "+
+            appletobj.data.subprocess[spid].ibicoretime+"<br>";
+         d+="ibithcoretimemonfri: "+
+            appletobj.data.subprocess[spid].ibithcoretimemonfri+"<br>";
+         d+="ibithcoretimesat: "+
+            appletobj.data.subprocess[spid].ibithcoretimesat+"<br>";
+         d+="ibithcoretimesun: "+
+            appletobj.data.subprocess[spid].ibithcoretimesun+"<br>";
+         d+="--<br>";
+         d+="ibinonprodtime: "+
+            appletobj.data.subprocess[spid].ibinonprodtime+"<br>";
+         d+="ibithnonprodtimemonfri: "+
+            appletobj.data.subprocess[spid].ibithnonprodtimemonfri+"<br>";
+         d+="ibithnonprodtimesat: "+
+            appletobj.data.subprocess[spid].ibithnonprodtimesat+"<br>";
+         d+="ibithnonprodtimesun: "+
+            appletobj.data.subprocess[spid].ibithnonprodtimesun+"<br>";
+         d+="</div>";
+         d+="</div>";
+      }
+      console.log("relsub=",subp);
+      var a="Analyse:<br>";
+      a+="Ausfall: "+start_date+"  von "+start_time+" bis "+end_time;
+      a+="<br>";
+      a+="<hr>";
+      a+=d;
+      $(win).find("#vote").html(a);
+      appletobj.addClickLinks(win);
+   }
+   ClassAppletLib[applet].class.prototype.showIBIVote=function(item,m){
+      var appletobj=this;
+
+      console.log("showIBIvote:",item,m);
+
+      var label=item.ictoid+": "+item.name;
+
+      var now=new Date();
+      var today=now.getFullYear()+"-"+((now.getMonth() < 9) ? "0" : "")+
+                (now.getMonth()+1)+"-"+((now.getDate() < 10) ? "0" : "") + 
+                now.getDate();
+      var nowStr=((now.getHours() < 10) ? "0" : "") + 
+                 now.getHours() + ":" + ((now.getMinutes() < 10) ? "0" : "") + 
+                 now.getMinutes();
+      now=new Date(now - 3600000);
+      var nowM60=((now.getHours() < 10) ? "0" : "") + 
+                 now.getHours() + ":" + ((now.getMinutes() < 10) ? "0" : "") + 
+                 now.getMinutes();
+
+      var d="";
+
+      var d="<table class=\"recordsheet\">";
+
+      d+="<tr><td></td><td width=20% nowrap>Datum:</td>";
+      d+="<td width=20% nowrap><input id=start_date style=\"width:100%\" "+
+         "type=date value=\""+today+"\"></td><td></td></tr>";
+
+      d+="<tr><td></td><td width=20% nowrap>Beginn Zeit (HH:MM):</td>";
+      d+="<td width=20% nowrap><input id=start_time style=\"width:60%\" "+
+         "maxlength=5 type=text value=\""+nowM60+"\"></td><td></td></tr>";
+
+      d+="<tr><td></td><td width=20% nowrap>Ende Zeit (HH:MM):</td>";
+      d+="<td width=20% nowrap><input id=end_time style=\"width:60%\" "+
+         "maxlength=5 type=text value=\""+nowStr+"\"></td><td></td></tr>";
+
+      d+="<tr><td></td><td width=20% nowrap>vollständige ICTO Bewertung:</td>";
+      d+="<td width=20% nowrap><input id=fullcheck "+
+         "type=checkbox></td><td></td></tr>";
+
+      d+="</table><br><br>";
+      d+="<center><input id=dovote type=button style=\"width:80%\" "+
+         "value=\"bewerten\"></center>";
+      d+="<hr>";
+      d+="<div id=vote></div>";
+
+      return({
+         title:"incident IBI vote: "+m,
+         subtitle:label,
+         d:d,
+         fine:function(win){
+            appletobj.addClickLinks(win);
+            $(win).find("#dovote").click(function(e){
+               var start_date=$(win).find("#start_date").first().val();
+               var start_time=$(win).find("#start_time").first().val();
+               var end_time=$(win).find("#end_time").first().val();
+               var fcheck=$(win).find("#fullcheck").first().prop('checked');
+               appletobj.doVote(win,item,start_date,start_time,end_time,fcheck);
+            });
+         }
+      });
+   }
+
    ClassAppletLib[applet].class.prototype.showICTOName=function(item){
       var appletobj=this;
 
@@ -379,10 +538,26 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
 
       var d="";
 
-      if (d.comments){
-         d+=item.comments;
-         d+="<br>";
-      }
+      var d="<table class=\"recordsheet\">";
+
+      d+="<tr><td>%T(Comments,PAT::ictname)%:</td>";
+      d+="<td>"+item.comments+"</td></tr>";
+
+      d+="<tr><td>Aliases:</td>";
+      d+="<td>xxx, xxx</td></tr>";
+
+      d+="</table>";
+      d+="<br>";
+      d+="<ul>";
+      d+="<li>";
+      d+="<div data-dataobj=\"PAT::ictname\" ";
+      d+="     data-dataobjid=\""+item.id+"\" ";
+      d+="     data-method=\"ibiictovote\">";
+      d+="Ausfall bewerten";
+      d+="</div>";
+      d+="</li>";
+      d+="</ul>";
+      d+="<br>";
       for(var spid in item.subprocesses){
          d+="<div>";
          d+="<div ";
@@ -390,6 +565,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          d+="data-dataobjid=\""+spid+"\"> ";
          d+=item.subprocesses[spid].name+": "+
             item.subprocesses[spid].title;
+         d+=extLink(9,appletobj.data.subprocess[spid].urlofcurrentrec); 
          d+="</div>";
          d+="</div>";
       }
@@ -406,7 +582,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
    }
 
 
-   ClassAppletLib[applet].class.prototype.showItem=function(dataobj,item){
+   ClassAppletLib[applet].class.prototype.showItem=function(dataobj,item,m){
       var appletobj=this;
       var app=this.app;
 
@@ -438,7 +614,12 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          showdata=this.showSubProcess(item,ModalWin);
       }
       else if (dataobj=="PAT::ictname"){
-         showdata=this.showICTOName(item,ModalWin);
+         if (m=="ibiictovote" || m=="ibinamevote"){
+            showdata=this.showIBIVote(item,m,ModalWin);
+         }
+         else{
+            showdata=this.showICTOName(item,ModalWin);
+         }
       }
       var d="";
       d+="<div class=\"DetailWindow\">";
@@ -455,17 +636,36 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          "</h2></div>"+
          "</div>";
       d+="<div style=\"height:4.2em;display:inline-block;"+
-         "float:right;text-align:right;width:10%;cursor:pointer\" "+
+         "float:right;text-align:right;width:10%;\">";
+      if (appletobj.modalStack.length){
+         d+="<div style=\"display:inline-block;cursor:pointer;width:15px\" "+
+            "id=\"back\"><b><</b></div>";
+      }
+      d+="<div style=\"display:inline-block;cursor:pointer;width:15px\" "+
          "id=\"close\"><b>X</b></div>";
+      d+="</div>";
       d+="<div style=\"float:none;\"></div>";
       d+="</div>";
       d+="<div id=DetailFrame class=\"DetailFrame\">"+
          showdata.d+"</div>";
       d+="</div>";
+      appletobj.modalStack.push({
+         dataobj:dataobj,
+         dataobjid:item.id,
+         method:m
+      });
       $("#Detail").html(d);
       if (showdata.fine){
          showdata.fine($("#Detail"));
       }
+      $("#back").click(function(e){
+         var backo=appletobj.modalStack.pop();   // das aktuelle Modal
+         backo=appletobj.modalStack.pop();       // das letzte Modal (vor akt.)
+         var id=backo.dataobjid;
+         var dataobj=backo.dataobj;
+         var method=backo.method;
+         appletobj.showItem(dataobj,id,method); 
+      });
       $("#close").click(function(e){
          console.log("click on close");
          $("#analysedData").show();
@@ -476,6 +676,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                mtag:'%SELFNAME%'
             }
          );
+         appletobj.modalStack=new Array();
       });
       window.dispatchEvent(new Event('resize'));
    }
@@ -574,20 +775,6 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
             }
 
             appletobj.addClickLinks($("#analysedData").first());
-          //  $(".businesssegLabel").css("cursor","pointer");
-          //  $(".subprocessitem").css("cursor","pointer");
-          //  $(".businesssegLabel").click(function(e){
-          //     var id=$(this).attr("data-dataobjid");
-          //     var dataobj=$(this).attr("data-dataobj");
-          //     var item=appletobj.data.businessseg[id];
-          //     appletobj.showItem(dataobj,item); 
-          //  });  
-          //  $(".subprocessitem").click(function(e){
-          //     var id=$(this).attr("data-dataobjid");
-          //     var dataobj=$(this).attr("data-dataobj");
-          //     var item=appletobj.data.subprocess[id];
-          //     appletobj.showItem(dataobj,item); 
-          //  });  
             console.log("app",appletobj.data);
          }
          else{
@@ -693,6 +880,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       var app=this.app;
       this.app.LayoutSimple();
       //$(".spinner").hide();
+      appletobj.modalStack=new Array();
 
       app.loadCss("public/PAT/load/PAT.Explore.Finder.css");
 
@@ -714,8 +902,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          appletobj.app.setMPath({
                label:ClassAppletLib['%SELFNAME%'].desc.label,
                mtag:'%SELFNAME%'
-            },
-            { label:"loading ...", mtag:dataobj+"/"+dataobjid }
+            }
+           // ,{ label:"loading ...", mtag:dataobj+"/"+dataobjid }
          );
          var frm=$("#workspace");
 

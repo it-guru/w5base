@@ -78,7 +78,9 @@ sub new
                 htmldetail    =>'NotEmpty',
                 vjointo       =>\'PAT::lnksubprocessictname',
                 vjoinon       =>['id'=>'ictnameid'],
-                vjoindisp     =>['subprocess','relevance']),
+                vjoindisp     =>['subprocess','relevance'],
+                vjoininhash   =>['relevance','ictname','cdate',
+                                 'ictfullname','ictnameid','ictoid']),
 
       new kernel::Field::SubList(
                 name          =>'applications',

@@ -840,6 +840,7 @@ var W5ExploreClass=function(){
    this.setMPath=function(){
       var app=this;
       var url=document.location.href;
+      var wintitle=new Array();
       var showMain=1;
       if (url.match(/\/Start\//)){
          showMain=0;
@@ -850,10 +851,12 @@ var W5ExploreClass=function(){
       this.mpath.innerHTML = '';
       var m = document.createElement('li');
       if (showMain){
-         m.innerHTML="<a href='"+url+"' class=TitleBarLink>Explore</a>";
+         m.innerHTML="<a href='"+url+"' class=TitleBarLink>W5Explore</a>";
+         wintitle.push("W5Explore");
       }
       else{
-         m.innerHTML="Explore";
+         m.innerHTML="W5Explore";
+         wintitle.push("W5Explore");
       }
       $(m).find("a").click(function(e){
          app.MainMenu(); 
@@ -872,6 +875,7 @@ var W5ExploreClass=function(){
             var m = document.createElement('li');
             m.innerHTML="<a href='"+url+"' class=TitleBarLink>"+
                         arguments[mi].label+"</a>";
+            wintitle.push(arguments[mi].label);
             if (mi==0){
                appletname=arguments[mi].mtag;
                if (showMain){
@@ -894,6 +898,7 @@ var W5ExploreClass=function(){
             $(this.mpath).append(m);
          }
       }
+      window.document.title=wintitle.join(" -> ");
       window.history.pushState("objectstring", "Applet",url);
    };
 
