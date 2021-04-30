@@ -113,20 +113,22 @@ sub qcheckRecord
             }
          }
          if (!($found)){
-            $exitcode=3 if ($exitcode<3);
-            push(@{$desc->{qmsg}},
-                 $self->T('no SystemOverview attachment found / '.
-                          'no valid naming for SystemOverview attachment'));
-            push(@{$desc->{qmsg}},
-                 $self->T('requested SystemOverview name').": ".$nameexpr);
-            push(@{$desc->{dataissue}},
-                 $self->T('no SystemOverview attachment found / '.
-                          'no valid naming for SystemOverview attachment'));
+            my @msg=('no SystemOverview attachment found / '.
+                     'no valid naming for SystemOverview attachment',
+                     'requested SystemOverview name'.": ".$nameexpr);
+            push(@{$desc->{qmsg}},@msg);
+            if (lc($rec->{businessteam}) eq "extern"){
+               $exitcode=2 if ($exitcode<2);
+            }
+            else{
+               $exitcode=3 if ($exitcode<3);
+               push(@{$desc->{dataissue}},$msg[0]);
+            }
          }
          if ($foundasprivate){
             $exitcode=3 if ($exitcode<3);
-            my $m=$self->T('it is not allowed to mark SystemOverview '.
-                          'attachment as privacy');
+            my $m='it is not allowed to mark SystemOverview '.
+                  'attachment as privacy';
             push(@{$desc->{qmsg}},$m);
             push(@{$desc->{dataissue}},$m);
          }

@@ -100,13 +100,16 @@ sub qcheckRecord
          }
       }
       if (!($found)){
-         $exitcode=3 if ($exitcode<3);
-         push(@{$desc->{qmsg}},
-              $self->T('no Emergency Plan attachment found / '.
-                       'no valid naming for Emergency Plan attachment'));
-         push(@{$desc->{dataissue}},
-              $self->T('no Emergency Plan attachment found / '.
-                       'no valid naming for Emergency Plan attachment'));
+         my $msg='no Emergency Plan attachment found / '.
+                 'no valid naming for Emergency Plan attachment';
+         push(@{$desc->{qmsg}},$msg);
+         if (lc($rec->{businessteam}) eq "extern"){
+            $exitcode=2 if ($exitcode<2);
+         }
+         else{
+            $exitcode=3 if ($exitcode<3);
+            push(@{$desc->{dataissue}},$msg);
+         }
       }
    }
    else{
