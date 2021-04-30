@@ -410,6 +410,19 @@ sub managerState
 }
 
 
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+      return(0);
+   }
+   return($self->SUPER::SecureValidate($oldrec,$newrec));
+}
+
+
 sub Validate
 {
    my $self=shift;
