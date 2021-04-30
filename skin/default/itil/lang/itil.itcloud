@@ -16,3 +16,7 @@
 'phoneSUP'=>  {de=>'Support'           ,en=>'support'},
 'phoneINM'=>  {de=>'Incidentmanagement',en=>'incident management'},
 'phoneOTH'=>  {de=>'Sonstiges'         ,en=>'other'},
+'Platform Responsible'=>{de=>'Plattform Verantwortlicher'},
+'Security Responsible'=>{de=>'Security Verantwortlicher'},
+'in selected CI-Status a platform responsible needs to be defined'=>{de=>'Im gewählten CI-Status muss ein Plattform Verantwortlicher definiert werden'},
+'in selected CI-Status a security responsible needs to be defined'=>{de=>'Im gewählten CI-Status muss ein Security Verantwortlicher definiert werden'},

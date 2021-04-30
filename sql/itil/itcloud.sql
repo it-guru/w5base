@@ -57,3 +57,4 @@ alter table itcloud add can_paas   bool default '0';
 alter table itcloud add can_iaas   bool default '0';
 alter table itcloud add support    bigint(20);
 alter table itcloudarea add lastqcheck  datetime default NULL,add key(lastqcheck);
+alter table itcloud add platformresp bigint(20),add securityresp bigint(20);

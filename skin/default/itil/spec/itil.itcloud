@@ -1,0 +1,8 @@
+'platformresp'=>{
+de=>'Verantwortlich für die Cloud-Plattform oder die Anbindung der Cloud-Plattform ans Unternehmen',
+en=>'Responsible for the cloud platform or the connection of the cloud platform to the company'
+},
+'securityresp'=>{
+de=>'Verantwortlich für die Security der Cloud. Alle Security relevanten Meldung der Cloud werden zusätzlich an diesen Kontakt gesandt.',
+en=>'Responsible for the security of the cloud. All security-relevant messages related to the cloud are also sent to this contact.'
+},

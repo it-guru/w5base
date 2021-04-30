@@ -103,6 +103,26 @@ sub new
                 dataobjattr   =>'itcloud.databoss'),
 
       new kernel::Field::Contact(
+                name          =>'platformresp',
+                label         =>'Platform Responsible',
+                vjoinon       =>['platformrespid'=>'userid']),
+
+      new kernel::Field::Interface(
+                name          =>'platformrespid',
+                label         =>'Platform ResponsibleID',
+                dataobjattr   =>'itcloud.platformresp'),
+
+      new kernel::Field::Contact(
+                name          =>'securityresp',
+                label         =>'Security Responsible',
+                vjoinon       =>['securityrespid'=>'userid']),
+
+      new kernel::Field::Interface(
+                name          =>'securityrespid',
+                label         =>'Security ResponsibleID',
+                dataobjattr   =>'itcloud.securityresp'),
+
+      new kernel::Field::Contact(
                 name          =>'support',
                 AllowEmpty    =>1,
                 label         =>'Support Contact',
@@ -454,6 +474,24 @@ sub Validate
    if (exists($newrec->{name}) && $newrec->{name} ne $name){
       $newrec->{name}=$name;
    }
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"cistatusid")){
+      if (effVal($oldrec,$newrec,"cistatusid") eq "4" ||
+          effVal($oldrec,$newrec,"cistatusid") eq "3"){
+         if (effVal($oldrec,$newrec,"platformrespid") eq ""){
+            $self->LastMsg(ERROR,"in selected CI-Status a ".
+                                 "platform responsible ".
+                                 "needs to be defined");
+            return(0);
+         }
+         if (effVal($oldrec,$newrec,"securityrespid") eq ""){
+            $self->LastMsg(ERROR,"in selected CI-Status a ".
+                                 "security responsible ".
+                                 "needs to be defined");
+            return(0);
+         }
+      }
+   }
+
    ########################################################################
    # standard security handling
    #
