@@ -371,9 +371,107 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       });
 
    }
+   ClassAppletLib[applet].class.prototype.IBIcalc=function(
+         item,startDay,start_time,endDay,end_time){
+      var appletobj=this;
+      var spid=item.id;
+      var out={
+         SumCoreMins:0,
+         SumNonprodMins:0,
+         corePercVal:0,
+         nonprodPercVal:0,
+         ibipoints:0,
+         spans:[]
+      };
+      var evDayNum=0;
+      var day=new Date(startDay);
+      var startMins=parseInt(start_time.split(":")[0])*60+
+                    parseInt(start_time.split(":")[1]);
+      var endMins = parseInt(end_time.split(":")[0])*60+
+                    parseInt(end_time.split(":")[1]);
+      out.endMins=endMins;
+      out.startMins=startMins;
+      var sprec=appletobj.data['subprocess'][spid];
+      var ibinonprodtime=new TimeSpans(sprec.ibinonprodtime,{
+          defaultType:'B'
+      });
+      var ibicoretime=new TimeSpans(sprec.ibicoretime,{
+          defaultType:'C'
+      });
+      var ibitimes=new TimeSpans("");
+      ibitimes=ibitimes.overlay(ibinonprodtime);
+      ibitimes=ibitimes.overlay(ibicoretime);
+      console.log("ibitimes=",ibitimes._spans);
+
+      var thnonprod=sprec.ibithnonprodtimemonfri;
+      var thcore=sprec.ibithcoretimemonfri;
+      if (item.relevance!=1){
+         thnonprod*=3;
+         thcore*=3;
+      }
+      out.thcore=thcore;
+      out.thnonprod=thnonprod;
+
+      do{
+         var isSat = (day.getDay() == 6);
+         var isSun = (day.getDay() == 0);
+         var dayno=0;
+         if (isSat){
+            thnonprod=sprec.ibithnonprodtimesat;
+            thcore=sprec.ibithcoretimesat;
+            dayno=1;
+         }
+         else if (isSun){
+            thnonprod=sprec.ibithnonprodtimesun;
+            thcore=sprec.ibithcoretimesun;
+            dayno=2;
+         }
+         //--------------------------------------------------
+         console.log("IBIcalc evDayNum"+evDayNum,{
+            day:day,
+            thnonprod:thnonprod,
+            thcore:thcore
+         },item);
+         var dayStartMins=startMins;
+         var dayEndMins=endMins;
+         if (evDayNum!=0){
+            dayStartMins=0;
+         }
+         var spans=ibitimes.RangeScan(dayStartMins,dayEndMins,dayno);
+         if (spans.length){
+            var SumCoreMins=0;
+            var SumNonprodMins=0;
+            for(var spanno=0;spanno<spans.length;spanno++){
+               if (spans[spanno].type=='C'){
+                  var t=spans[spanno].endMin-spans[spanno].startMin;
+                  SumCoreMins+=t;
+               }
+               if (spans[spanno].type=='B'){
+                  var t=spans[spanno].endMin-spans[spanno].startMin;
+                  SumNonprodMins+=t;
+               }
+            }
+            var nonprodPercVal=Math.round(SumNonprodMins/thnonprod*1000);
+            var corePercVal=Math.round(SumCoreMins/thcore*1000);
+            var dayIBI=((nonprodPercVal+corePercVal)>=1000) ? 1 : 0;
+            out.ibipoints+=dayIBI;
+            out.SumNonprodMins+=SumNonprodMins;
+            out.SumCoreMins+=SumCoreMins;
+            out.nonprodPercVal+=nonprodPercVal;
+            out.corePercVal+=corePercVal;
+         }
+         out.spans.push(spans);
+         //--------------------------------------------------
+         var newDate = day.setDate(day.getDate()+1);
+         day=new Date(newDate);
+         evDayNum++;
+      }while(day <= endDay);
+      return(out);
+   }
    ClassAppletLib[applet].class.prototype.doVote=function(
          win,item,start_date,start_time,end_time,fullcheck){
       var appletobj=this;
+      var dateStartDay = new Date(start_date);
       console.log("dovote",item,start_date,start_time,end_time,fullcheck);
       var relsub=new Object();
       for (var subprocessid in appletobj.data.subprocess){
@@ -397,6 +495,12 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
               }
           }
       }
+      for (var spid in relsub){
+         var ibi=this.IBIcalc(relsub[spid],dateStartDay,start_time,
+                                           dateStartDay,end_time);
+         relsub[spid]=Object.assign(relsub[spid],ibi);
+      }
+
       var subp=Object.keys(relsub).map(function(spid){
         return relsub[spid];
       }).sort(function(a,b){
@@ -425,8 +529,10 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          return(0);
       });
       var d="";
-      for(var i;i<subp.length;i++){
+      var ibisum=0;
+      for(var i=0;i<subp.length;i++){
          var spid=subp[i].id;
+         ibisum+=subp[i].ibipoints;
          d+="<div>";
          d+="<div>";
          d+=subp[i].businessseg+": "+
@@ -436,33 +542,35 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          d+=extLink(9,appletobj.data.subprocess[subp[i].id].urlofcurrentrec); 
          d+="</span>";
          d+="</div>";
-         console.log("spid=",spid,"rec=",appletobj.data.subprocess[spid]);
          d+="<div style=\"margin-left:5px;margin-bottom:10px\">";
-         d+="ibicoretime: "+
-            appletobj.data.subprocess[spid].ibicoretime+"<br>";
-         d+="ibithcoretimemonfri: "+
-            appletobj.data.subprocess[spid].ibithcoretimemonfri+"<br>";
-         d+="ibithcoretimesat: "+
-            appletobj.data.subprocess[spid].ibithcoretimesat+"<br>";
-         d+="ibithcoretimesun: "+
-            appletobj.data.subprocess[spid].ibithcoretimesun+"<br>";
-         d+="--<br>";
-         d+="ibinonprodtime: "+
-            appletobj.data.subprocess[spid].ibinonprodtime+"<br>";
-         d+="ibithnonprodtimemonfri: "+
-            appletobj.data.subprocess[spid].ibithnonprodtimemonfri+"<br>";
-         d+="ibithnonprodtimesat: "+
-            appletobj.data.subprocess[spid].ibithnonprodtimesat+"<br>";
-         d+="ibithnonprodtimesun: "+
-            appletobj.data.subprocess[spid].ibithnonprodtimesun+"<br>";
+         d+=subp[i].ibipoints+" Pkt.";
+         d+=" Begründung: ";
+         if (subp[i].relevance==1){
+            d+=" Kernapplikation ";
+         }
+         d+=" Relevanz "+subp[i].relevance;
+         d+="<br>";
+         d+="Schwelle Nebenzeit: "+subp[i].thnonprod+"min,";
+         d+="Kernzeit: "+subp[i].thcore+"min ";
+         d+="<br>";
+         d+="Dauer: ";
+         d+="Nebenzeit "+subp[i].SumNonprodMins+"min ("+subp[i].nonprodPercVal+"),";
+         d+="Kernzeit "+subp[i].SumCoreMins+"min ("+subp[i].corePercVal+"),";
          d+="</div>";
          d+="</div>";
       }
       console.log("relsub=",subp);
-      var a="Analyse:<br>";
-      a+="Ausfall: "+start_date+"  von "+start_time+" bis "+end_time;
-      a+="<br>";
+      var a="";
+      if (fullcheck){
+         a+="<h2>"+item.ictoid+"</h2>";
+      }
+      else{
+         a+="<h2>"+item.ictoid+": "+item.name+"</h2>";
+      }
+      a+="<p>Vorfall: "+start_date+"  von "+start_time+" bis "+end_time+"</p>";
+      a+="<h3>IBI Punkte Summe:"+ibisum+"</h3>";
       a+="<hr>";
+      a+="<p>Detail-Analyse:</p>";
       a+=d;
       $(win).find("#vote").html(a);
       appletobj.addClickLinks(win);
@@ -543,8 +651,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       d+="<tr><td>%T(Comments,PAT::ictname)%:</td>";
       d+="<td>"+item.comments+"</td></tr>";
 
-      d+="<tr><td>Aliases:</td>";
-      d+="<td>xxx, xxx</td></tr>";
+      //d+="<tr><td>Aliases:</td>";
+      //d+="<td>xxx, xxx</td></tr>";
 
       d+="</table>";
       d+="<br>";
