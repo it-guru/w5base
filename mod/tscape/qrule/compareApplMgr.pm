@@ -120,6 +120,7 @@ sub qcheckRecord
    
 
    if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
+      delete($rec->{contacts}); # ensure contacts are new loaded
       my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
       return(undef,undef) if ($par->isSuspended());
       $par->SetFilter({archapplid=>\$rec->{ictono}});

@@ -133,7 +133,7 @@ sub qcheckRecord
             }
          }
          $autocorrect=1; 
- 
+         delete($rec->{contacts}); # ensure contacts are new loaded
          foreach my $amid (@am_soll){
             my $am2found=0;
             foreach my $crec (@{$rec->{contacts}}){

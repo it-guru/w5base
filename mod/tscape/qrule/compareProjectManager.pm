@@ -91,6 +91,7 @@ sub qcheckRecord
    my @notifymsg;
 
    if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
+      delete($rec->{contacts}); # ensure contacts are new loaded
       $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
        #  emailcc=>['11634953080001'],
       },{
@@ -127,6 +128,7 @@ sub qcheckRecord
                                                  "base::lnkcontact");
          #}
          my $pmexists=0;
+         
          foreach my $crec (@{$rec->{contacts}}){
             my $roles=$crec->{roles};
             $roles=[$roles] if (ref($roles) ne "ARRAY");
