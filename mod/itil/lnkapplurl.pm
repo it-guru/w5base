@@ -577,10 +577,15 @@ sub Validate
                return(undef);
             }
             else{
-               my @l=$itc->isWriteValid($clrec);
-               if (!in_array(\@l,[qw(default ALL)])){
-                  $self->LastMsg(ERROR,"no write access to cloud");
-                  return(undef);
+               if ($self->isDataInputFromUserFrontend()){
+                  my @l=$itc->isWriteValid($clrec);
+                  if (!in_array(\@l,[qw(default ALL)])){
+                     $self->LastMsg(ERROR,"no write access to cloud");
+                     return(undef);
+                  }
+                  else{
+                     $itcloudareaaccess=1;
+                  }
                }
                else{
                   $itcloudareaaccess=1;
