@@ -44,6 +44,14 @@ h5 {
   margin-bottom:5px;
   height:2.7em;
 }
+.DetailTitle div{
+  font-weight: bold;
+  font-size:1.2em;
+}
+td.label{
+  font-weight: bold;
+  font-size:1.1em;
+}
 .DetailFrame{
   //border:1px solid black;
   padding:5px;
@@ -124,23 +132,31 @@ h5 {
 }
 
 
-/* PAT styles for timetables */
-
-table.timetable {
-  border-collapse:collapse;
-  width:100%
-}
-.timetable td{
-   border:1px solid gray;
-}
-
-.timetable td div.timespan{
-   cursor:pointer;
-}
-
 table.recordsheet {
   border-collapse:collapse;
   width:100%;
+}
+.recordsheet td{
+  vertical-align:top;
+  padding:4px;
+}
+.subrecords td{
+  vertical-align:top;
+  padding:0;
+}
+ul.actions{
+list-style-type: none;
+margin-top:5px;
+margin-bottom:5px;
+}
+ul.actions li{
+  font-size: 1.2em;
+  margin-bottom:10px;
+}
+ul.actions li:before  {
+  content: "\25BA" " ";    
+  color: darkblue;
+  font-size: 1.5em;
 }
 
 td.pat {
@@ -207,5 +223,20 @@ td.pt_h1 { border: 1px solid #70ABB3; border-bottom: 1px solid #888; background-
 td.pt_h2 { border: 1px solid #A0C7CD; border-bottom: 1px solid #888; background-color:#A0C7CD; }
 td.pt_h3 { border: 1px solid #D0E3E6; border-bottom: 1px solid #888; background-color:#D0E3E6; }
 td.default { border: 1px solid #bbb; border-bottom: 1px solid #888; background-color:#bbb; }
+
+/* PAT styles for timetables */
+
+table.timetable {
+  border-collapse:collapse;
+  width:100%
+}
+.timetable td{
+   border:1px solid gray;
+   padding:1px;
+}
+
+.timetable td div.timespan{
+   cursor:pointer;
+}
 
 

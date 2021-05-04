@@ -6,4 +6,12 @@
 'use'=>{de=>'Nutzungszeit'},
 'online'=>{de=>'Onlinezeit'},
 'nonprod'=>{de=>'Randzeit'},
+'Vote Incident'=>{de=>'Ausfall/Vorfall bewerten'},
+'Begin time'=>{de=>'Beginn Zeit'},
+'End time'=>{de=>'Ende Zeit'},
+'Date'=>{de=>'Datum'},
+'full ICTO vote'=>{de=>'vollständige ICTO Bewertung'},
+'vote'=>{de=>'auswerten/bewerten'},
+'Incident IBI analysis'=>{de=>'Incident IBI Bewertung'},
+
 
