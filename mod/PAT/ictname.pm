@@ -63,7 +63,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'fullname',
                 readonly      =>1,
-                uivisible     =>0,
+                htmldetail    =>0,
                 uploadable    =>0,
                 label         =>'Sub-Process',
                 dataobjattr   =>"concat(if (PAT_ictname.ictoid<>'',".
@@ -194,6 +194,18 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"ictoid")){
+      my $ictoid=effVal($oldrec,$newrec,"ictoid");
+      if (!($ictoid=~m/^(icto|com)-/i)){
+         $newrec->{ictoid}=undef;
+      }
+      else{
+         $ictoid=uc($ictoid);
+         if (effVal($oldrec,$newrec,"ictoid") ne $ictoid){
+            $newrec->{ictoid}=$ictoid;
+         }
+      }
+   }
 
    return(1);
 }
