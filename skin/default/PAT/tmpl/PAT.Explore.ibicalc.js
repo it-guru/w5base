@@ -31,83 +31,94 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
             app.Config().then(function(cfg){
                  $(".spinner").show();
                  var frm=$("#analysedData").first();
-                 appletobj.data=new Object();
                  $(frm).queue("load",[]);
-                 $(frm).queue("load",function(next){
-                 $(".spinner").show();
-                    var w5obj=getModuleObject(cfg,'PAT::businessseg');
-                    w5obj.SetFilter({
-                    });
-                    w5obj.findRecord(
-                          "name,urlofcurrentrec,title,description,comments,"+
-                          "subprocesses,id",
-                          function(data){
-                       appletobj.data['businessseg']=new Object();
-                       $.each(data,function(index,item){
-                          appletobj.data['businessseg'][item.id]=item;
-                       }); 
-                       next();
-                    });
-                 });
-                 $(frm).queue("load",function(next){
+                 if (!appletobj.data){
+                    appletobj.data=new Object();
+                    $(frm).queue("load",function(next){
                     $(".spinner").show();
-                    var w5obj=getModuleObject(cfg,'PAT::ictname');
-                    w5obj.SetFilter({
+                       var w5obj=getModuleObject(cfg,'PAT::businessseg');
+                       w5obj.SetFilter({
+                       });
+                       w5obj.findRecord(
+                             "name,urlofcurrentrec,title,description,comments,"+
+                             "subprocesses,bsegopt,sopt,id",
+                             function(data){
+                          appletobj.data['businessseg']=new Object();
+                          $.each(data,function(index,item){
+                             appletobj.data['businessseg'][item.id]=item;
+                          }); 
+                          next();
+                       });
                     });
-                    w5obj.findRecord(
-                          "name,id,urlofcurrentrec,ictoid,"+
-                          "comments",function(data){
-                       appletobj.data['ictname']=new Object();
-                       $.each(data,function(index,item){
-                          item.subprocesses=new Object();
-                          appletobj.data['ictname'][item.id]=item;
-                       }); 
-                       next();
+                    $(frm).queue("load",function(next){
+                       $(".spinner").show();
+                       var w5obj=getModuleObject(cfg,'PAT::ictname');
+                       w5obj.SetFilter({
+                       });
+                       w5obj.findRecord(
+                             "name,id,urlofcurrentrec,ictoid,"+
+                             "comments",function(data){
+                          appletobj.data['ictname']=new Object();
+                          $.each(data,function(index,item){
+                             item.subprocesses=new Object();
+                             appletobj.data['ictname'][item.id]=item;
+                          }); 
+                          next();
+                       });
                     });
-                 });
-                 $(frm).queue("load",function(next){
-                    $(".spinner").show();
-                    var w5obj=getModuleObject(cfg,'PAT::subprocess');
-                    w5obj.SetFilter({
-                    });
-                    w5obj.findRecord(
-                          "name,urlofcurrentrec,title,description,comments,"+
-                          "businessseg,businesssegid,,"+
-                          "onlinetime,"+
-                          "usetime,"+
-                          "coretime,"+
-                          "ibicoretime,"+
-                          "ibithcoretimemonfri,"+
-                          "ibithcoretimesat,"+
-                          "ibithcoretimesun,"+
-                          "ibinonprodtime,"+
-                          "ibithnonprodtimemonfri,"+
-                          "ibithnonprodtimesat,"+
-                          "ibithnonprodtimesun,"+
-                          "ictnames,id",function(data){
-                       appletobj.data['subprocess']=new Object();
-                       $.each(data,function(index,item){
-                          appletobj.data['subprocess'][item.id]=item;
-                          if (item.ictnames.length){
-                             for(var i=0;i<item.ictnames.length;i++){
-                                var inid=item.ictnames[i].ictnameid;
-                                appletobj.data['ictname'][inid
-                                  ].subprocesses[item.id]=
-                                   item;
+                    $(frm).queue("load",function(next){
+                       $(".spinner").show();
+                       var w5obj=getModuleObject(cfg,'PAT::subprocess');
+                       w5obj.SetFilter({
+                       });
+                       w5obj.findRecord(
+                             "name,urlofcurrentrec,title,description,comments,"+
+                             "businessseg,businesssegid,,"+
+                             "onlinetime,"+
+                             "usetime,"+
+                             "coretime,"+
+                             "ibicoretime,"+
+                             "ibithcoretimemonfri,"+
+                             "ibithcoretimesat,"+
+                             "ibithcoretimesun,"+
+                             "ibinonprodtime,"+
+                             "ibithnonprodtimemonfri,"+
+                             "ibithnonprodtimesat,"+
+                             "ibithnonprodtimesun,"+
+                             "ictnames,id",function(data){
+                          appletobj.data['subprocess']=new Object();
+                          $.each(data,function(index,item){
+                             appletobj.data['subprocess'][item.id]=item;
+                             if (item.ictnames.length){
+                                for(var i=0;i<item.ictnames.length;i++){
+                                   var inid=item.ictnames[i].ictnameid;
+                                   appletobj.data['ictname'][inid
+                                     ].subprocesses[item.id]=
+                                      item;
+                                }
                              }
-                          }
-                       }); 
-                       next();
+                          }); 
+                          next();
+                       });
                     });
-                 });
+                 }
                  $(frm).queue("load",function(next){
-                    console.log("fine=",appletobj.data);
+                    console.log("fine database:",appletobj.data);
                     $(".spinner").hide();
                     $(".databaseLoader").remove();
                     $("#dosearch").css("cursor","pointer");
                     $("#Reloader").css("cursor","pointer");
                     $("#dosearch").click(function(){
                        appletobj.doSearch(); 
+                    });
+                    $("#Reloader").click(function(){
+                       delete appletobj.data;
+                       appletobj.app.setMPath({
+                             label:ClassAppletLib['%SELFNAME%'].desc.label,
+                             mtag:'%SELFNAME%'
+                          }
+                       );
+                       appletobj.loadMainPage();
                     });
                     if ($(searchbox).val().length>2){
                        appletobj.doSearch();
@@ -120,7 +131,6 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                  //appletobj.data=data;
                  //$("#analysedData").html("<xmp>"+Dumper(data)+"</xmp>");
                  window.dispatchEvent(new Event('resize'));
-                 ok("OK");
               }).catch(function(e){
                  console.log("get config failed",e);
                  app.console.log("can not get config");
@@ -154,7 +164,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       var appletobj=this;
       var app=this.app;
 
-      var d="";
+      var d="<table class=\"recordsheet\">";
 
       appletobj.app.setMPath({
             label:ClassAppletLib['%SELFNAME%'].desc.label,
@@ -166,13 +176,33 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          }
       );
 
-      d+=item.comments;
+      if (item.name){
+         d+="<tr class=headline>"+
+            "<td class=label><b>%T(Shortname,PAT::businessseg)%:</b></td>";
+         d+="<td width=70%>"+item.name+"</td></tr>";
+      }
+      if (item.bsegopt){
+         d+="<tr><td class=label>"+
+            "<b>%T(Business-Segment OPT,PAT::businessseg)%:</b></td>";
+         d+="<td>"+item.bsegopt+"</td></tr>";
+      }
+      if (item.sopt){
+         d+="<tr><td class=label><b>%T(S-OPT,PAT::businessseg)%:</b></td>";
+         d+="<td>"+item.sopt+"</td></tr>";
+      }
+      if (item.comments){
+         d+="<tr><td class=label><b>%T(Comments,PAT::businessseg)%:</b></td>";
+         d+="<td>"+item.comments+"</td></tr>";
+      }
+      d+="<tr><td colspan=2 class=block-end style=\"padding:0\">"+
+         "&nbsp;</td></tr>";
       if (item.subprocesses.length){
-         d+="<br><br>"+
-            "%TRANSLATE(fieldgroup.subprocesses,PAT::businessseg)%:<br>"+
-            "<hr>";
+         d+="<tr><td colspan=2 class=label style=\"padding-bottom:0\">"+
+            "%TRANSLATE(fieldgroup.subprocesses,PAT::businessseg)%:"+
+            "</td></tr>";
          for(var spc=0;spc<item.subprocesses.length;spc++){
             var spid=item.subprocesses[spc].id;
+            d+="<tr><td colspan=2>";
             d+="<div style=\"border:0;padding:10px;margin-bottom:15px\">";
             d+="<div ";
             d+="data-dataobj=\"PAT::subprocess\" ";
@@ -209,8 +239,10 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
 
             d+="</div>";
             d+="</div>";
+            d+="</td></tr>";
          }
       }
+      d+="</table>";
       
 
       return({
@@ -238,10 +270,10 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          }
       );
       var d="<table class=\"recordsheet\">";
-      d+="<tr><td>%T(Description,PAT::subprocess)%:</td>";
+      d+="<tr><td class=label>%T(Description,PAT::subprocess)%:</td>";
       d+="<td>"+item.description+"</td></tr>";
       d+="<tr class=block-end>";
-      d+="<td>%T(Business-Segment,PAT::subprocess)%:</td>";
+      d+="<td class=label>%T(Business-Segment,PAT::subprocess)%:</td>";
       d+="<td><div data-dataobj=\"PAT::businessseg\" ";
       d+="data-dataobjid=\""+item.businesssegid+"\">";
       d+=item.businessseg;
@@ -251,8 +283,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       d+="</td></tr>";
       if (item.ictnames.length){
          d+="<tr>";
-         d+="<td valign=top>ICTOs:</td>";
-         d+="<td><table width=60%>";
+         d+="<td valign=top class=label>ICTOs:</td>";
+         d+="<td><table width=60% class=subrecords>";
          d+="<tr><th align=left>ICT-Name</th>"+
             "<th width=1%>Relevanz</th></tr>";
          for(var i=0;i<item.ictnames.length;i++){
@@ -345,20 +377,20 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       ibitimes=ibitimes.overlay(ibinonprodtime);
       ibitimes=ibitimes.overlay(ibicoretime);
 
-      d+="</table>";
 
-      d+=""+
-         "Operations-Times:<br>"+
-         optimes.table()+"<br>"+
-         //"onlinetime:"+item.onlinetime+"<br>"+
-         //"usetime:"+item.usetime+"<br>"+
-         //"coretime:"+item.coretime+"<br>"+
-         "<br>"+
-         "IBI-Times<br>"+
-         ibitimes.table()+"<br>"+
-         //"ibithnonprodtimesat:"+item.ibinonprodtime+"<br>"+
-         //"ibicoretime:"+item.ibicoretime+"<br>"+
-         "<hr>";
+      d+="<tr><td class=label colspan=2  style=\"padding-bottom:0\">"+
+         "Operations-Times:</td>"+
+         "</tr>";
+      d+="<tr><td colspan=2>"+ 
+         optimes.table()+
+         "</td></tr>";
+      d+="<tr><td class=label colspan=2 style=\"padding-bottom:0\">"+
+         "IBI-Times:</td>"+
+         "</tr>";
+      d+="<tr><td colspan=2>"+ 
+         ibitimes.table()+
+         "</td></tr>";
+      d+="</table>";
 
 
       return({
@@ -598,30 +630,36 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
 
       var d="<table class=\"recordsheet\">";
 
-      d+="<tr><td></td><td width=20% nowrap>Datum:</td>";
+      d+="<tr><td></td><td width=20% nowrap>"+
+         "%T(Date,PAT::Explore::ibicalc)%"+
+         ":</td>";
       d+="<td width=20% nowrap><input id=start_date style=\"width:100%\" "+
          "type=date value=\""+today+"\"></td><td></td></tr>";
 
-      d+="<tr><td></td><td width=20% nowrap>Beginn Zeit (HH:MM):</td>";
+      d+="<tr><td></td><td width=20% nowrap>"+
+         "%T(Begin time,PAT::Explore::ibicalc)% (HH:MM):</td>";
       d+="<td width=20% nowrap><input id=start_time style=\"width:60%\" "+
          "maxlength=5 type=text value=\""+nowM60+"\"></td><td></td></tr>";
 
-      d+="<tr><td></td><td width=20% nowrap>Ende Zeit (HH:MM):</td>";
+      d+="<tr><td></td><td width=20% nowrap>"+
+         "%T(End time,PAT::Explore::ibicalc)% (HH:MM):</td>";
       d+="<td width=20% nowrap><input id=end_time style=\"width:60%\" "+
          "maxlength=5 type=text value=\""+nowStr+"\"></td><td></td></tr>";
 
-      d+="<tr><td></td><td width=20% nowrap>vollständige ICTO Bewertung:</td>";
+      d+="<tr><td></td><td width=20% nowrap>"+
+         "%T(full ICTO vote,PAT::Explore::ibicalc)%"+
+         ":</td>";
       d+="<td width=20% nowrap><input id=fullcheck "+
-         "type=checkbox></td><td></td></tr>";
+         "type=checkbox checked></td><td></td></tr>";
 
       d+="</table><br><br>";
       d+="<center><input id=dovote type=button style=\"width:80%\" "+
-         "value=\"bewerten\"></center>";
+         "value=\"%T(vote,PAT::Explore::ibicalc)%\"></center>";
       d+="<hr>";
       d+="<div id=vote></div>";
 
       return({
-         title:"incident IBI vote: "+m,
+         title:"%T(Incident IBI analysis,PAT::Explore::ibicalc)%: ",
          subtitle:label,
          d:d,
          fine:function(win){
@@ -640,6 +678,16 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
    ClassAppletLib[applet].class.prototype.showICTOName=function(item){
       var appletobj=this;
 
+      appletobj.app.setMPath({
+            label:ClassAppletLib['%SELFNAME%'].desc.label,
+            mtag:'%SELFNAME%'
+         },
+         {
+            label:item.ictoid+": "+item.name,
+            mtag:'PAT::ictname'+"/"+item.id
+         }
+      );
+
       console.log("showICTOName:",item);
 
       var label=item.ictoid+": "+item.name;
@@ -648,24 +696,50 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
 
       var d="<table class=\"recordsheet\">";
 
-      d+="<tr><td>%T(Comments,PAT::ictname)%:</td>";
-      d+="<td>"+item.comments+"</td></tr>";
+      var allnames=new Array();
+      $.each(appletobj.data.ictname,function(ictindex,ictrec){
+         if (ictrec.ictoid==item.ictoid){
+            allnames.push(ictrec)
+         }
+      });
+      if (allnames.length>1){
+         d+="<tr class=headline><td><b>Alias-Names:</b></td>";
+         d+="<td>";
+         d+=allnames.map(function(rec){
+               var l="<div data-dataobj=\"PAT::ictname\" ";
+               l+=" data-dataobjid=\""+rec.id+"\">";
+               l+=rec.name;
+               l+=extLink(9,rec.urlofcurrentrec); 
+               l+="</div>";
+               return(l);
+            }).join("\n");
+         d+="</td></tr>";
+      }
+      if (item.ictoid){
+         d+="<tr><td><b>%T(ICTO-ID,PAT::ictname)%:</b></td>";
+         d+="<td>"+item.ictoid+"</td></tr>";
+      }
+      if (item.comments){
+         d+="<tr><td><b>%T(Comments,PAT::ictname)%:</b></td>";
+         d+="<td>"+item.comments+"</td></tr>";
+      }
 
-      //d+="<tr><td>Aliases:</td>";
-      //d+="<td>xxx, xxx</td></tr>";
-
-      d+="</table>";
-      d+="<br>";
-      d+="<ul>";
-      d+="<li>";
-      d+="<div data-dataobj=\"PAT::ictname\" ";
+      d+="<tr class=block-end>";
+      d+="<td colspan=2>";
+      d+="<ul class=actions>";
+     // d+="<li>";
+      d+="<li data-dataobj=\"PAT::ictname\" ";
       d+="     data-dataobjid=\""+item.id+"\" ";
       d+="     data-method=\"ibiictovote\">";
-      d+="Ausfall bewerten";
-      d+="</div>";
+      d+="%T(Vote Incident,PAT::Explore::ibicalc)%";
+      d+="</li>";
       d+="</li>";
       d+="</ul>";
-      d+="<br>";
+      d+="</td></tr>";
+
+      d+="<tr class=block-end>"+
+         "<td><b>%T(Sub-Process references,PAT::ictname)%:</b></td>";
+      d+="<td>";
       for(var spid in item.subprocesses){
          d+="<div>";
          d+="<div ";
@@ -677,6 +751,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          d+="</div>";
          d+="</div>";
       }
+      d+="</td></tr>";
+      d+="</table>";
 
 
       return({
@@ -709,83 +785,93 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
             item=appletobj.data.ictname[item];
          }
       }
-
-      $("#analysedData").hide();
-      $("#Detail").show();
-      var ModalWin=$("#Detail").first();
-      var showdata=new Object();
-      console.log("ShowItem=",item,"as:",dataobj);
-      if (dataobj=="PAT::businessseg"){
-         showdata=this.showBusinessSeg(item,ModalWin);
-      }
-      else if (dataobj=="PAT::subprocess"){
-         showdata=this.showSubProcess(item,ModalWin);
-      }
-      else if (dataobj=="PAT::ictname"){
-         if (m=="ibiictovote" || m=="ibinamevote"){
-            showdata=this.showIBIVote(item,m,ModalWin);
+      if (typeof(item)=='object'){
+         $("#analysedData").hide();
+         $("#Detail").show();
+         var ModalWin=$("#Detail").first();
+         var showdata=new Object();
+         console.log("ShowItem=",item,"as:",dataobj);
+         if (dataobj=="PAT::businessseg"){
+            showdata=this.showBusinessSeg(item,ModalWin);
          }
-         else{
-            showdata=this.showICTOName(item,ModalWin);
+         else if (dataobj=="PAT::subprocess"){
+            showdata=this.showSubProcess(item,ModalWin);
          }
-      }
-      var d="";
-      d+="<div class=\"DetailWindow\">";
-      d+="<div class=\"DetailTitle\">";
-      d+="<div style=\"height:4.2em;display:inline-block;"+
-         "float:left;overflow:hidden;white-space: nowrap;width:90%\" "+
-         "<p>"+showdata.title+"</p>"+
-         "<div "+
-         "data-dataobj=\""+dataobj+"\" "+
-         "data-dataobjid=\""+item.id+"\" "+
-         "><h2>"+
-         showdata.subtitle+
-         extLink(16,item.urlofcurrentrec)+
-         "</h2></div>"+
-         "</div>";
-      d+="<div style=\"height:4.2em;display:inline-block;"+
-         "float:right;text-align:right;width:10%;\">";
-      if (appletobj.modalStack.length){
+         else if (dataobj=="PAT::ictname"){
+            if (m=="ibiictovote" || m=="ibinamevote"){
+               showdata=this.showIBIVote(item,m,ModalWin);
+            }
+            else{
+               showdata=this.showICTOName(item,ModalWin);
+            }
+         }
+         var d="";
+         d+="<div class=\"DetailWindow\">";
+         d+="<div class=\"DetailTitle\">";
+         d+="<div style=\"height:4.2em;display:inline-block;"+
+            "float:left;overflow:hidden;white-space: nowrap;width:90%\" "+
+            "<span style=\"font-size:+1\">"+showdata.title+"</span>"+
+            "<div "+
+            "data-dataobj=\""+dataobj+"\" "+
+            "data-dataobjid=\""+item.id+"\" "+
+            "><h2>"+
+            showdata.subtitle+
+            extLink(16,item.urlofcurrentrec)+
+            "</h2></div>"+
+            "</div>";
+         d+="<div style=\"height:4.2em;display:inline-block;"+
+            "float:right;text-align:right;width:10%;\">";
+         if (appletobj.modalStack.length){
+            d+="<div style=\"display:inline-block;cursor:pointer;width:15px\" "+
+               "id=\"back\"><b><</b></div>";
+         }
          d+="<div style=\"display:inline-block;cursor:pointer;width:15px\" "+
-            "id=\"back\"><b><</b></div>";
+            "id=\"close\"><b>X</b></div>";
+         d+="</div>";
+         d+="<div style=\"float:none;\"></div>";
+         d+="</div>";
+         d+="<div id=DetailFrame class=\"DetailFrame\">"+
+            showdata.d+"</div>";
+         d+="</div>";
+         appletobj.modalStack.push({
+            dataobj:dataobj,
+            dataobjid:item.id,
+            method:m
+         });
+         $("#Detail").html(d);
+         if (showdata.fine){
+            showdata.fine($("#Detail"));
+         }
+         $("#back").click(function(e){
+            var backo=appletobj.modalStack.pop(); // das aktuelle Modal
+            backo=appletobj.modalStack.pop();     // das letzte Modal (vor akt.)
+            var id=backo.dataobjid;
+            var dataobj=backo.dataobj;
+            var method=backo.method;
+            appletobj.showItem(dataobj,id,method); 
+         });
+         $("#close").click(function(e){
+            console.log("click on close");
+            $("#analysedData").show();
+            $("#Detail").hide();
+            appletobj.app.setMPath({
+                  label:ClassAppletLib['%SELFNAME%'].desc.label,
+                  mtag:'%SELFNAME%'
+               }
+            );
+            appletobj.modalStack=new Array();
+         });
       }
-      d+="<div style=\"display:inline-block;cursor:pointer;width:15px\" "+
-         "id=\"close\"><b>X</b></div>";
-      d+="</div>";
-      d+="<div style=\"float:none;\"></div>";
-      d+="</div>";
-      d+="<div id=DetailFrame class=\"DetailFrame\">"+
-         showdata.d+"</div>";
-      d+="</div>";
-      appletobj.modalStack.push({
-         dataobj:dataobj,
-         dataobjid:item.id,
-         method:m
-      });
-      $("#Detail").html(d);
-      if (showdata.fine){
-         showdata.fine($("#Detail"));
-      }
-      $("#back").click(function(e){
-         var backo=appletobj.modalStack.pop();   // das aktuelle Modal
-         backo=appletobj.modalStack.pop();       // das letzte Modal (vor akt.)
-         var id=backo.dataobjid;
-         var dataobj=backo.dataobj;
-         var method=backo.method;
-         appletobj.showItem(dataobj,id,method); 
-      });
-      $("#close").click(function(e){
-         console.log("click on close");
-         $("#analysedData").show();
-         $("#Detail").hide();
-         console.log("fifi setMPath on close click");
+      else{
          appletobj.app.setMPath({
                label:ClassAppletLib['%SELFNAME%'].desc.label,
                mtag:'%SELFNAME%'
+            },{
+               label:"invalid deep link",
+               mtag:''
             }
          );
-         appletobj.modalStack=new Array();
-      });
+      }
       window.dispatchEvent(new Event('resize'));
    }
    ClassAppletLib[applet].class.prototype.doSearch=function(){
@@ -873,14 +959,15 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                   ictoSearch+=blk;
                }
             }
-            if (v.toLowerCase().indexOf("icto-")!=-1){
+            //if (v.toLowerCase().indexOf("icto-")!=-1){
+            // ictos sind immer das wichtigste
                $("#analysedData").append(ictoSearch);
                $("#analysedData").append(processSearch);
-            }
-            else{
-               $("#analysedData").append(processSearch);
-               $("#analysedData").append(ictoSearch);
-            }
+            //}
+            //else{
+            //   $("#analysedData").append(processSearch);
+            //   $("#analysedData").append(ictoSearch);
+            //}
 
             appletobj.addClickLinks($("#analysedData").first());
             console.log("app",appletobj.data);
@@ -890,7 +977,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          }
       }
    }
-   ClassAppletLib[applet].class.prototype.loadEntries=function(){
+   ClassAppletLib[applet].class.prototype.loadMainPage=function(dataobj,id,m){
      var appletobj=this;
      var app=this.app;
      var div=document.createElement('div');
@@ -972,13 +1059,18 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
           appletobj.doSearch();
        }
      });
+
+
      $(".spinner").show();
      this.loadDatabase().then(function(d){
          appletobj.app.console.log("INFO","scenario is loaded");
-        // $(".spinner").hide();
+         if (dataobj!==undefined){
+            appletobj.showItem(dataobj,id,m); 
+         }
      }).catch(function(e){
          $(".spinner").hide();
      });
+
    };
 
 
@@ -1007,26 +1099,29 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       if (arguments.length){
          var dataobj=arguments[0][0];
          var dataobjid=arguments[0][1];
+         var m=arguments[0][2];
          appletobj.app.setMPath({
                label:ClassAppletLib['%SELFNAME%'].desc.label,
                mtag:'%SELFNAME%'
             }
-           // ,{ label:"loading ...", mtag:dataobj+"/"+dataobjid }
+            ,{ label:"loading direct link ...", mtag:dataobj+"/"+dataobjid }
          );
          var frm=$("#workspace");
-
-         appletobj.loadEntries();
+         
+         if (!appletobj.data){
+            appletobj.loadMainPage(dataobj,dataobjid,m); // load data and showItem
+         }
+         else{
+            appletobj.showItem(dataobj,dataobjid,m); 
+         }
       }
       else{
-         console.log("fifi setMPath without arguments");
          appletobj.app.setMPath({
                label:ClassAppletLib['%SELFNAME%'].desc.label,
                mtag:'%SELFNAME%'
             }
          );
-         if (!appletobj.data){
-            appletobj.loadEntries();
-         }
+         appletobj.loadMainPage();
       }
    }
 });
