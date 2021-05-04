@@ -56,7 +56,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                        w5obj.SetFilter({
                        });
                        w5obj.findRecord(
-                             "name,id,urlofcurrentrec,ictoid,"+
+                             "name,id,urlofcurrentrec,fullname,ictoid,"+
                              "comments",function(data){
                           appletobj.data['ictname']=new Object();
                           $.each(data,function(index,item){
@@ -645,12 +645,13 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          "%T(End time,PAT::Explore::ibicalc)% (HH:MM):</td>";
       d+="<td width=20% nowrap><input id=end_time style=\"width:60%\" "+
          "maxlength=5 type=text value=\""+nowStr+"\"></td><td></td></tr>";
-
-      d+="<tr><td></td><td width=20% nowrap>"+
-         "%T(full ICTO vote,PAT::Explore::ibicalc)%"+
-         ":</td>";
-      d+="<td width=20% nowrap><input id=fullcheck "+
-         "type=checkbox checked></td><td></td></tr>";
+      if (item.ictoid && item.ictoid!=""){
+         d+="<tr><td></td><td width=20% nowrap>"+
+            "%T(full ICTO vote,PAT::Explore::ibicalc)%"+
+            ":</td>";
+         d+="<td width=20% nowrap><input id=fullcheck "+
+            "type=checkbox checked></td><td></td></tr>";
+      }
 
       d+="</table><br><br>";
       d+="<center><input id=dovote type=button style=\"width:80%\" "+
@@ -683,14 +684,14 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
             mtag:'%SELFNAME%'
          },
          {
-            label:item.ictoid+": "+item.name,
+            label:item.fullname,
             mtag:'PAT::ictname'+"/"+item.id
          }
       );
 
       console.log("showICTOName:",item);
 
-      var label=item.ictoid+": "+item.name;
+      var label=item.fullname;
 
       var d="";
 
@@ -953,8 +954,9 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                        "data-dataobj=\"PAT::ictname\" "+
                        "data-dataobjid=\""+item.id+"\" "+
                        ">"+
-                       hightLight(v,"<b>"+item.ictoid+"</b>"+": "+
-                       item.name)+"</div>";
+                       hightLight(v,"<b>"+item.fullname+"</b>")+
+                       extLink(12,item.urlofcurrentrec)+ 
+                       "</div>";
                   blk+="</div>";
                   ictoSearch+=blk;
                }
