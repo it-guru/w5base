@@ -105,7 +105,7 @@ sub SecScanMon
                                      name applid itscanobjectid
                                      cdate id));
       $datastream->SetCurrentOrder("+cdate","+id");
-      $datastream->Limit(1000);
+      $datastream->Limit(1010);
       my ($rec,$msg)=$datastream->getFirst();
 
       if (defined($rec)){
