@@ -1612,7 +1612,7 @@ sub isViewValid
              qw(default name office officeacc private userparam groups 
                 userid userro control usersubst header qc interview));
    }
-   if ($self->IsMemberOf(["admin"])){
+   if ($self->IsMemberOf(["admin","support"])){
       push(@gl,"admcomments");
    }
    my $secstate=$self->getCurrentSecState();
@@ -1622,14 +1622,14 @@ sub isViewValid
        !(($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0) &&
          $self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"down"))){
       if ($secstate<2){
-         @gl=grep(/^(name|header)$/,@gl);
+         @gl=grep(/^(name|admcomments|header)$/,@gl);
       }
       elsif ($secstate<3){
-         @gl=grep(/^(name|header|office|default|groups|contacts|
+         @gl=grep(/^(name|admcomments|header|office|default|groups|contacts|
                      comments|nativcontact|userid|qc)$/x,@gl);
       }
       elsif ($secstate<4){
-         @gl=grep(/^(name|header|office|officeacc|private|contacts|
+         @gl=grep(/^(name|admcomments|header|office|officeacc|private|contacts|
                      default|groups|comments|nativcontact|userid|
                      control|qc|userro|history)$/x,@gl);
       }
