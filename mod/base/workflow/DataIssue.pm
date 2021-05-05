@@ -726,23 +726,10 @@ sub Process
       }
       if ($op eq "wfaddlnote"){
          my $note=Query->Param("note");
-         if ($note=~m/^\s*$/  || length($note)<10){
-            $self->LastMsg(ERROR,"empty or to short notes are not allowed");
-            return(0);
-         }
-         $note=trim($note);
-         my $oprec={};
-         $oprec->{stateid}=4;
-         my $effort=Query->Param("Formated_effort");
-         if ($self->getParent->getParent->Action->StoreRecord(
-             $WfRec->{id},"wfaddlnote",
-             {translation=>'base::workflow::request'},$note,$effort)){
-            $self->StoreRecord($WfRec,$oprec);
-            $self->PostProcess($action.".".$op,$WfRec,$actions);
-            Query->Delete("note");
-            return(1);
-         }
-         return(0);
+         my $h={
+            note=>$note
+         };
+         return($self->nativProcess($op,$h,$WfRec,$actions));
       }
       if ($op eq "wfdifine"){
          my $app=$self->getParent->getParent;

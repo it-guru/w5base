@@ -488,16 +488,34 @@ sub nativProcess
           $WfRec->{id},"wfaddnote",
           {translation=>'base::workflow::request',
            intiatornotify=>$intiatornotify},$note,$effort)){
+         my @emailto;
+
          if ($intiatornotify ne "" && defined($WfRec->{initiatorid}) &&
              $WfRec->{initiatorid} ne ""){
             my $user=getModuleObject($self->Config,"base::user");
             $user->SetFilter({userid=>\$WfRec->{initiatorid}});
             my ($urec,$msg)=$user->getOnlyFirst(qw(email));
             if ($urec->{email} ne ""){
-               $self->sendMail($WfRec,emailtext=>$note,
-                                      emailto=>$urec->{email}); 
+               push(@emailto,$urec->{email});
             }
          }
+         if (!grep(/^iscurrent$/,@{$actions})){ #  adder is not current
+            if ($WfRec->{fwdtarget} eq "base::user"){  # the current forward
+                                                       # needs info about add
+               my $user=getModuleObject($self->Config,"base::user");
+               $user->SetFilter({userid=>\$WfRec->{fwdtargetid}});
+               my ($urec,$msg)=$user->getOnlyFirst(qw(email));
+               if ($urec->{email} ne ""){
+                  if (!in_array(\@emailto,$urec->{email})){
+                     push(@emailto,$urec->{email});
+                  }
+               }
+            }
+         }
+         if ($#emailto!=-1){
+            $self->sendMail($WfRec,emailtext=>$note,emailto=>\@emailto); 
+         }
+
          if ($inquiryreset){
             $self->sendMail($WfRec,emailtext=>$note); 
          }
