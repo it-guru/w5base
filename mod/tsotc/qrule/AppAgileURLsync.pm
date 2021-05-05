@@ -131,22 +131,24 @@ sub qcheckRecord
 
    my $itilurl=getModuleObject($dataobj->Config,"itil::lnkapplurl");
 
-   $itilurl->SetFilter([
-   {
-       name=>join(" ",map({'"'.$_->{name}.'"'} @url)),
-       applid=>[$rec->{applid}],
-       networkid =>$netarea->{CNDTAG}
-   },
-   {
-       name=>join(" ",map({'"'.$_->{name}.'/*"'} @url)),
-       applid=>[$rec->{applid}],
-       networkid =>$netarea->{CNDTAG}
-   },
-   {
-       itcloudareaid=>$rec->{id},
-       applid=>[$rec->{applid}]
-   }]);
+   my $fltset=[
+      {
+          name=>join(" ",map({'"'.$_->{name}.'"'} @url)),
+          applid=>[$rec->{applid}],
+          networkid =>$netarea->{CNDTAG}
+      },
+      {
+          name=>join(" ",map({'"'.$_->{name}.'/*"'} @url)),
+          applid=>[$rec->{applid}],
+          networkid =>$netarea->{CNDTAG}
+      },
+      {
+          itcloudareaid=>$rec->{id},
+          applid=>[$rec->{applid}]
+      }
+   ];
 
+   $itilurl->SetFilter($fltset);
    my @curl=$itilurl->getHashList(qw(ALL));
 
    my @opList;
@@ -155,13 +157,13 @@ sub qcheckRecord
                  my ($a,$b)=@_;
                  my $eq;
                  my $blen=length($b->{name});
-                 if (($b->{name} eq substr($a->{name},0,$blen)) ||
+                 if ((lc($b->{name}) eq lc(substr($a->{name},0,$blen))) ||
                      ($a->{srcid} eq $b->{srcid} &&
                       $a->{srcsys} eq $b->{srcsys})){
                     $eq=0;
                     if ($a->{srcid} eq $b->{srcid} &&
                         $a->{srcsys} eq $b->{srcsys} &&
-                        $b->{name} eq substr($a->{name},0,$blen)){
+                        lc($b->{name}) eq lc(substr($a->{name},0,$blen))){
                        $eq=1;
                     }
                  }
