@@ -508,9 +508,12 @@ sub getNotifyDestinationsFromSMGroups
 
    my $lnkobj=getModuleObject($self->Config,'tssm::lnkusergroup');
    my $userobj=getModuleObject($self->Config,'tssm::useraccount');
+   my $grpobj=getModuleObject($self->Config,'tssm::group');
 
    return(0) if (ref($smgroups ne 'ARRAY') || $#{$smgroups}==-1);
    return(0) if (!$lnkobj->Ping);
+   return(0) if (!$grpobj->Ping);
+
 
    $lnkobj->SetFilter({lgroup=>$smgroups});
    my @grpuser=map {$_->{luser}} @{$lnkobj->getHashList('luser')};
@@ -519,6 +522,13 @@ sub getNotifyDestinationsFromSMGroups
                        grep(/^\S+\@\S+\.\S+$/,
                         map {$_->{email}} $userobj->getHashList('email'));
 
+   $grpobj->SetFilter({name=>$smgroups,active=>\'1'});
+   my @l=$grpobj->getHashList(qw(name groupmailbox));
+   foreach my $grprec (@l){
+      if ($grprec->{groupmailbox} ne ""){
+         $mailaddress{$grprec->{groupmailbox}}++;
+      }
+   }
    return(keys(%mailaddress));
 }
 
