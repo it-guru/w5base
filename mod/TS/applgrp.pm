@@ -31,10 +31,13 @@ sub new
 
 
    $self->AddFields(
-      new kernel::Field::Interface(
+      new kernel::Field::Text(
                 name          =>'TasteOS_SystemID',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 label         =>'TasteOS SystemID',
-                container     =>'additional')
+                container     =>'additional'),
+      insertafter=>'applgrpid'
    );
 
 
