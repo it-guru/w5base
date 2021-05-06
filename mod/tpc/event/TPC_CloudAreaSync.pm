@@ -129,6 +129,11 @@ sub TPC_CloudAreaSync
       my @c=$itcloudarea->getHashList(qw(name itcloud applid 
                                          srcsys srcid cistatusid));
 
+      if ($#c==-1){
+         my $msg="no projects found in TPC - sync abborted";
+         msg(ERROR,$msg);
+         return({exitcode=>1,exitmsg=>$msg});
+      }
       my @opList;
 
 
@@ -173,7 +178,8 @@ sub TPC_CloudAreaSync
                   $oprec->{DATA}->{cistatusid}="3";
                }
                if ($mode eq "update"){
-                  if ($oldrec->{cistatusid}==6){
+                  if ($oldrec->{cistatusid}==6 &&
+                      $oldrec->{applid} ne $newrec->{applid}){
                      $oprec->{DATA}->{cistatusid}="3";
                   }
                   if ($oldrec->{cistatusid}!=3 &&
@@ -205,7 +211,7 @@ sub TPC_CloudAreaSync
          if ($opList[$c]->{OP} eq "insert"){
             $appl->ResetFilter();
             $appl->SetFilter({id=>\$opList[$c]->{DATA}->{applid}});
-            my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid));
+            my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid name));
             if (!defined($arec)){
                $opList[$c]->{OP}="invalid";
                push(@msg,"ERROR: invalid application (W5BaseID) in project ".

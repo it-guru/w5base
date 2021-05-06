@@ -196,7 +196,7 @@ sub AZURE_CloudAreaSync
              $opList[$c]->{OP} eq "update"){
             $appl->ResetFilter();
             $appl->SetFilter({id=>\$opList[$c]->{DATA}->{applid}});
-            my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid));
+            my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid name));
             if (!defined($arec)){
                $opList[$c]->{OP}="invalid";
                push(@msg,"ERROR: invalid application (W5BaseID) in project ".
