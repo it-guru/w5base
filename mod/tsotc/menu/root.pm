@@ -35,52 +35,93 @@ sub Init
    my $self=shift;
 
    $self->RegisterObj("itu.tsotc",
+                      ">itu.cloud.tsotc");
+   
+   $self->RegisterObj("itu.tsotc.domain",
+                      ">itu.cloud.tsotc.domain");
+
+   $self->RegisterObj("itu.tsotc.project",
+                      ">itu.cloud.tsotc.project");
+
+   $self->RegisterObj("itu.tsotc.project.lnksystem",
+                      ">itu.cloud.tsotc.project.lnksystem");
+
+   $self->RegisterObj("itu.tsotc.system",
+                      ">itu.cloud.tsotc.system");
+
+   $self->RegisterObj("itu.tsotc.system.ipaddress",
+                      ">itu.cloud.tsotc.system.ipaddress");
+
+   $self->RegisterObj("itu.tsotc.system.ipaddress",
+                      ">itu.cloud.tsotc.system.ipaddress");
+
+   $self->RegisterObj("itu.tsotc.system.inipaddress",
+                      ">itu.cloud.tsotc.system.inipaddress");
+
+   $self->RegisterObj("itu.tsotc.system.lnkiaascontact",
+                      ">itu.cloud.tsotc.system.lnkiaascontact");
+
+   $self->RegisterObj("itu.tsotc.system.lnkiaccontact",
+                      ">itu.cloud.tsotc.system.lnkiaccontact");
+
+   $self->RegisterObj("itu.tsotc.appagile",
+                      ">itu.cloud.tsotc.appagile");
+
+   $self->RegisterObj("itu.tsotc.appagile.namespace",
+                      ">itu.cloud.tsotc.appagile.namespace");
+
+   $self->RegisterObj("itu.tsotc.appagile.url",
+                      ">itu.cloud.tsotc.appagile.url");
+
+
+
+   $self->RegisterObj("itu.cloud.tsotc",
                       "tmpl/welcome",
                       defaultacl=>['valid_user']);
    
-   $self->RegisterObj("itu.tsotc.domain",
+   $self->RegisterObj("itu.cloud.tsotc.domain",
                       "tsotc::domain",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.project",
+   $self->RegisterObj("itu.cloud.tsotc.project",
                       "tsotc::project",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.project.lnksystem",
+   $self->RegisterObj("itu.cloud.tsotc.project.lnksystem",
                       "tsotc::lnkprojectsystem",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.system",
+   $self->RegisterObj("itu.cloud.tsotc.system",
                       "tsotc::system",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.system.ipaddress",
+   $self->RegisterObj("itu.cloud.tsotc.system.ipaddress",
                       "tsotc::ipaddress",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.system.ipaddress",
-                      "tsotc::ipaddress",
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itu.tsotc.system.inipaddress",
+   $self->RegisterObj("itu.cloud.tsotc.system.inipaddress",
                       "tsotc::inipaddress",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.system.lnkiaascontact",
+   $self->RegisterObj("itu.cloud.tsotc.system.lnkiaascontact",
                       "tsotc::lnksystemiaascontact",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.system.lnkiaccontact",
+   $self->RegisterObj("itu.cloud.tsotc.system.lnkiaccontact",
                       "tsotc::lnksystemiaccontact",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.appagile",
+   $self->RegisterObj("itu.cloud.tsotc.appagile",
                       "tsotc::appagilecluster",
                       prio=>10000,
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itu.tsotc.appagile.namespace",
+   $self->RegisterObj("itu.cloud.tsotc.appagile.namespace",
                       "tsotc::appagilenamespace",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cloud.tsotc.appagile.url",
+                      "tsotc::appagileurl",
                       defaultacl=>['valid_user']);
 
    return($self);
