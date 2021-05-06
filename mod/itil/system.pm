@@ -2808,13 +2808,10 @@ sub QRuleSyncCloudSystem
                  sub{  # comperator 
                     my ($a,$b)=@_;
                     my $eq;
-                    if ($a->{name}.":".$a->{mac} eq $b->{name}.":".$b->{mac}){
-                       $eq=1;
+                    if (lc($a->{name}) eq lc($b->{name})){
+                       $eq=0;
+                       $eq=1 if ( lc($a->{mac}) eq lc($b->{mac}));
                     }
-                   # if ($a->{name} eq $b->{name}){
-                   #    $eq=0;
-                   #    $eq=1 if ( $a->{mac} eq $b->{mac});
-                   # }
                     return($eq);
                  },
                  sub{  # oprec generator
@@ -2857,7 +2854,7 @@ sub QRuleSyncCloudSystem
                  },
                  $rec->{sysiface},$parrec->{sysiface},\@opList,
                  refid=>$rec->{id});
-
+      #printf STDERR ("sysiface opList=%s\n",Dumper(\@opList));
       if ($autocorrect){
          if (!$res){
             my $opres=kernel::QRule::ProcessOpList($qrule->getParent,\@opList);

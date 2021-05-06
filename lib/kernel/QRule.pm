@@ -731,7 +731,22 @@ sub ProcessOpList
    my $config=$self->Config;
    my $objCache={};
    #msg(INFO,"ProcessOpList: Start");
-   foreach my $op (@{$opList}){
+
+   my @priorizedOpList=sort({      # 1st delete, then update, then insert
+      my $alevel;
+      my $blevel;
+      $alevel=1 if ($a->{OP} eq "delete");
+      $alevel=2 if ($a->{OP} eq "update");
+      $alevel=3 if ($a->{OP} eq "insert");
+      $blevel=1 if ($b->{OP} eq "delete");
+      $blevel=2 if ($b->{OP} eq "update");
+      $blevel=3 if ($b->{OP} eq "insert");
+      my $bk=$alevel<=>$blevel;
+      $bk;
+   }  @{$opList});
+
+   # printf STDERR ("ordered opList=%s\n",Dumper(\@priorizedOpList));
+   foreach my $op (@priorizedOpList){
       if (!exists($objCache->{$op->{DATAOBJ}})){
          $objCache->{$op->{DATAOBJ}}=getModuleObject($config,$op->{DATAOBJ});
       }
