@@ -42,6 +42,10 @@ sub Init
                       "azure::subscription",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.cloud.azure.virtualMachine",
+                      "azure::virtualMachine",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.cloud.azure.kernel",
                       "tmpl/welcome",
                       prio=>9999,

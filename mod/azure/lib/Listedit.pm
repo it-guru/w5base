@@ -150,6 +150,24 @@ sub caseHdl
 }
 
 
+sub AzID2W5BaseID
+{
+   my $id=shift;
+
+   $id=~s#^/##g;
+   $id=~s#\.\./##g;  # prevent ../ paths
+   $id=~s#/#|-#g;
+   return($id);
+}
+
+
+sub W5BaseID2AzID
+{
+   my $id=shift;
+
+   $id=~s#\|-#/#g;   # make |- as seperator (to get no colision with pipes
+   return($id);      # f.e. in resourceGroup names).
+}
 
 
 sub decodeFilter2Query4azure
@@ -158,13 +176,19 @@ sub decodeFilter2Query4azure
    my $dbclass=shift;
    my $idfield=shift;
    my $filter=shift;
+   my $qparam=shift;
    my $const={}; # for constances witch are derevided from query
    my $requesttoken="SEARCH.".time();
    my $query="";
    my %qparam;
 
+   if (ref($qparam) eq "HASH"){
+      %qparam=%{$qparam};
+   }
+   #printf STDERR ("filter=%s\n",Dumper($filter));
+   #printf STDERR ("dbclassTemplate=%s\n",Dumper(\$dbclass));
+
    if (ref($filter) eq "HASH"){
-      my @andLst=();
       foreach my $filtername (keys(%{$filter})){
          my $f=$filter->{$filtername}->[0];
          # ODATA Filter translation
@@ -172,7 +196,6 @@ sub decodeFilter2Query4azure
          foreach my $fn (keys(%{$f})){
             my $fld=$self->getField($fn);
             if (defined($fld)){
-               if ($fn eq $idfield){  # Id Field handling
                   my $id; 
                   if (ref($f->{$fn}) eq "ARRAY" &&
                       $#{$f->{$fn}}==0){
@@ -187,131 +210,16 @@ sub decodeFilter2Query4azure
                      }
                   }
                   $const->{$fn}=$id;
-                  if ($dbclass=~m/\{$idfield\}/){
-                     $dbclass=~s/\{$idfield\}/$id/g;
+                  if ($dbclass=~m/\{$fn\}/){
+                     $dbclass=~s/\{$fn\}/$id/g;
                   }
                   else{
-                     $dbclass=$dbclass."/".$id;
-                  }
-                  $requesttoken=$dbclass;
-               }
-               if (0){   # ODATA $filter seems not to work
-                  my @orLst;
-                  my $fieldname=$fn;
-                  if (exists($fld->{dataobjattr})){
-                     $fieldname=$fld->{dataobjattr};
-                  }
-                  my $fstr=$f->{$fn};
-                  if (ref($fstr) eq "SCALAR"){
-                     my @l=($$fstr);
-                     $fstr=\@l;
-                  }
-                  if (ref($fstr) eq "ARRAY"){
-                     foreach my $word (@$fstr){
-                        my $exp="'".$word."'";
-                        my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-                        push(@orLst,"$v eq $e");
+                     if ($fn eq $idfield){
+                        $dbclass=azure::lib::Listedit::W5BaseID2AzID($id);
                      }
                   }
-                  else{
-                     my $isdate=0;
-                     if (grep(/kernel::Field::Date/,
-                            Class::ISA::self_and_super_path($fld->Self))
-                            >0) {
-                        $isdate=1;
-                     }
-                     if ($fld->{ODATA_constFilter}){
-                        my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
-                        $qparam{$fieldname}=join(",",@words);
-                     }
-                     else{
-                        my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
-                        for(my $c=0;$c<=$#words;$c++){
-                           if ($words[$c] eq "AND" || $words[$c] eq "OR"){
-                              $self->LastMsg(ERROR,
-                                             "no ODATA support for AND or OR");
-                              return(undef);
-                           }
-                           if ($words[$c]=~m/'/){
-                              $self->LastMsg(ERROR,
-                                             "no ODATA support for ".
-                                             "single quotes");
-                              return(undef);
-                           }
-                           my $val=$words[$c];
-                           my $compop="eq";
-                           my $compopcount=0;
-                           while($val=~m/^[<>]/){
-                              if ($compopcount>0){
-                                 $self->LastMsg(ERROR,"illegal usage of ".
-                                                      "comparison operator");
-                                 return(undef);
-                              }
-                              if ($val=~m/^<=/){
-                                 $val=~s/^<=//;
-                                 $compop="le";
-                              }
-                              elsif ($val=~m/^</){
-                                 $val=~s/^<//;
-                                 $compop="lt";
-                              }
-                              elsif ($val=~m/^>=/){
-                                 $val=~s/^>=//;
-                                 $compop="ge";
-                              }
-                              elsif ($val=~m/^>/){
-                                 $val=~s/^>//;
-                                 $compop="gt";
-                              }
-
-                              elsif ($val=~m/^</){
-                                 $val=~s/^<//;
-                                 $compop="lt";
-                              }
-                              if ($val=~m/^>/){
-                                 $val=~s/^>//;
-                                 $compop="tg";
-                              }
-                              $compopcount++;
-                           }
-                           if ($isdate){
-                              my $tz=$fld->timezone();
-                              my $usertz=$self->UserTimezone();
-                              my $d=$self->ExpandTimeExpression(
-                                     $val,"EDM", $usertz, $tz);
-                              return(undef) if (!defined($d));
-                              $val=$d;
-                           }
-                           if ($val=~m/^\*[^*]+\*$/){
-                              $val=~s/\*$//;
-                              $val=~s/^\*//;
-                              my $exp="'".$val."'";
-                              my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-                              push(@orLst,"substringof($e,$v)");
-                           }
-                           elsif ($val=~m/^[^*]+\*$/){
-                              $val=~s/\*$//;
-                              my $exp="'".$val."'";
-                              my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-                              push(@orLst,"startswith($v,$e)");
-                           }
-                           else{
-                              my $exp="'".$val."'";
-                              my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-                              push(@orLst,"$v $compop $e");
-                           }
-                        }
-                     }
-                  }
-                  if ($#orLst!=-1){
-                     push(@andLst,"(".join(" or ",@orLst).")");
-                  }
-               }
             }
          }
-      }
-      if ($#andLst!=-1){
-         $qparam{'$filter'}=join(" and ",@andLst);
       }
    }
    else{
@@ -319,7 +227,9 @@ sub decodeFilter2Query4azure
       $self->LastMsg(ERROR,"invalid filterset for Azure query");
       return(undef);
    }
-   $qparam{'api-version'}="2020-01-01";
+   if (!exists($qparam{'api-version'})){
+      $qparam{'api-version'}="2020-01-01";
+   }
 
    if ($self->{_LimitStart}==0 && $self->{_Limit}>0 &&
        !($self->{_UseSoftLimit})){
@@ -375,6 +285,7 @@ sub decodeFilter2Query4azure
       $dbclass.="?".$qstr;
       $requesttoken=$dbclass;
    }
+   #printf STDERR ("dbclass=%s\n",Dumper(\$dbclass));
    
    return($dbclass,$requesttoken,$const);
 }

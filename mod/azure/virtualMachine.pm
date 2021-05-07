@@ -1,4 +1,4 @@
-package azure::subscription;
+package azure::virtualMachine;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -37,13 +37,6 @@ sub new
             htmldetail        =>'NotEmpty',
             label             =>'ResourceID'),
 
-      new kernel::Field::Text(     
-            name              =>'subscriptionId',
-            group             =>'source',
-            htmldetail        =>'NotEmpty',
-            dataobjattr       =>'subscriptionId',
-            label             =>'SubscriptionID'),
-
       new kernel::Field::Linenumber(
             name              =>'linenumber',
             label             =>'No.'),
@@ -53,63 +46,52 @@ sub new
       new kernel::Field::Text(     
             name              =>'name',
             ignorecase        =>1,
-            dataobjattr       =>'displayName',
             label             =>'Name'),
 
-      new kernel::Field::TextDrop(
-            name              =>'appl',
-            searchable        =>0,
-            vjointo           =>'itil::appl',
-            vjoinon           =>['w5baseid'=>'id'],
-            searchable        =>0,
-            vjoindisp         =>'name',
-            label             =>'W5Base Application'),
+      new kernel::Field::Text(     
+            name              =>'subscriptionId',
+            weblinkto         =>'azure::subscription',
+            weblinkon         =>['subscriptionId'=>'subscriptionId'],
+            label             =>'SubscriptionID'),
 
-      new kernel::Field::Interface(     
-            name              =>'w5baseid',
-            container         =>'tags',
-            label             =>'Application W5BaseID'),
 
-      new kernel::Field::SubList(
-                name          =>'virtualmachines',
-                label         =>'virtual Machines',
-                group         =>'virtualmachines',
-                searchable    =>0,
-                vjointo       =>'azure::virtualMachine',
-                vjoinon       =>['subscriptionId'=>'subscriptionId'],
-                vjoindisp     =>['name']),
 
+#      new kernel::Field::TextDrop(
+#            name              =>'appl',
+#            searchable        =>0,
+#            vjointo           =>'itil::appl',
+#            vjoinon           =>['w5baseid'=>'id'],
+#            searchable        =>0,
+#            vjoindisp         =>'name',
+#            label             =>'W5Base Application'),
+#
+#      new kernel::Field::Interface(     
+#            name              =>'w5baseid',
+#            container         =>'tags',
+#            label             =>'Application W5BaseID'),
+#
       new kernel::Field::Container(
             name              =>'tags',
             group             =>'tags',
             searchable        =>0,
             uivisible         =>1,
-            onRawValue        =>sub{
-               my $self=shift;
-               my $current=shift;
-               my $subscriptionid=$current->{id};
-               return({}) if ($subscriptionid eq "");
-               my $subrequest=$self->getParent->DataCollector({
-                  filter=>[{id=>\$subscriptionid}]
-               });
-               if (defined($subrequest) && ref($subrequest) eq "ARRAY" &&
-                   $#{$subrequest}==0){
-                  return($subrequest->[0]->{tags});
-               }
-               return({});
-            },
             label             =>'Tags'),
 
       new kernel::Field::Text(     
-            name              =>'tenantid',
+            name              =>'resourceGroup',
             ignorecase        =>1,
             group             =>'source',
-            dataobjattr       =>'tenantId',
-            label             =>'TenantId'),
+            label             =>'ResourceGroup'),
 
+      new kernel::Field::Text(     
+            name              =>'networkInterfacesId',
+            group             =>'source',
+            weblinkto         =>'azure::networkInterface',
+            weblinkon         =>['networkInterfacesId'=>'id'],
+            label             =>'NetworkInterfaceId'),
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name appl));
+   $self->setDefaultView(qw(id name));
    return($self);
 }
 
@@ -125,11 +107,14 @@ sub DataCollector
    my $Authorization=$self->getAzureAuthorizationToken();
 
    my ($dbclass,$requesttoken)=$self->decodeFilter2Query4azure(
-      "subscriptions","id",
-      $filterset,{
-        '$expand'=>'properties'
+      "subscriptions/{subscriptionId}/providers/Microsoft.Compute/".
+      "virtualMachines","id",
+      $filterset,
+      {
+         'api-version'=>'2021-03-01'
       }
    );
+
    my $d=$self->CollectREST(
       dbname=>'AZURE',
       requesttoken=>$requesttoken,
@@ -142,6 +127,7 @@ sub DataCollector
       
          my $dataobjurl="https://management.azure.com/";
          $dataobjurl.=$dbclass;
+         #printf STDERR ("dataobjurl=$dataobjurl\n");
          return($dataobjurl);
       },
 
@@ -166,13 +152,27 @@ sub DataCollector
          my @data;
          foreach my $rawrec (@$data){
             my $rec;
-            foreach my $v (qw(id displayName subscriptionId tenantId tags)){
+            foreach my $v (qw(name id location zones tags type)){
                if (exists($rawrec->{$v})){
                   $rec->{$v}=$rawrec->{$v};
-                  if ($v eq "id"){
-                     $rec->{$v}=azure::lib::Listedit::AzID2W5BaseID($rec->{$v});
-                  }
                }
+               if ($v eq "id"){
+                  $rec->{$v}=azure::lib::Listedit::AzID2W5BaseID($rec->{$v});
+               }
+            }
+
+            {
+               my $id=$rawrec->{properties}
+                            ->{networkProfile}
+                            ->{networkInterfaces}->[0]
+                            ->{id};
+               $rec->{networkInterfacesId}=
+                      azure::lib::Listedit::AzID2W5BaseID($id);
+            }
+
+            if (my (@idpath)=split(/\|-/,$rec->{id})){
+               $rec->{subscriptionId}=$idpath[1];
+               $rec->{resourceGroup}=$idpath[3];
             }
             push(@data,$rec);
          }
@@ -188,14 +188,33 @@ sub DataCollector
          if ($code eq "404"){  # 404 bedeutet nicht gefunden
             return([],"200");
          }
+         if ($code eq "400"){
+            my $json=eval('decode_json($content);');
+            if ($@ eq "" && ref($json) eq "HASH" &&
+                $json->{error}->{message} ne ""){
+               $self->LastMsg(ERROR,$json->{error}->{message});
+               return(undef);
+            }
+         }
          msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TPC subscription response");
+         $self->LastMsg(ERROR,"unexpected data TPC virtualMachine response");
          return(undef);
       }
    );
 
    return($d);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_subscriptionId"))){
+     Query->Param("search_subscriptionId"=>
+                  '2154c4f5-9af8-4e0f-9ee9-6782b9e3bf52');
+   }
+}
+
 
 sub isViewValid
 {
@@ -231,14 +250,14 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default virtualmachines tags source));
+   return(qw(header default machines tags source));
 }
 
 sub getRecordImageUrl
 {
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/itcloudarea.jpg?".$cgi->query_string());
+   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 }
 
 

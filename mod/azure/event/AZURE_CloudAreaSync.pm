@@ -98,7 +98,7 @@ sub AZURE_CloudAreaSync
    if (1){
       $subsc->ResetFilter();
       $subsc->SetFilter({});
-      my @ss=$subsc->getHashList(qw(id name w5baseid));
+      my @ss=$subsc->getHashList(qw(subscriptionId id name w5baseid));
       my @s;
       foreach my $rec (@ss){
          #next if ($rec->{name}=~m/test/i);
@@ -108,7 +108,7 @@ sub AZURE_CloudAreaSync
           #  printf STDERR (" applid: %s\n",$rec->{applid});
           #  printf STDERR ("\n");
             push(@s,{
-               id=>$rec->{id},
+               subscriptionId=>$rec->{subscriptionId},
                name=>$rec->{name},
                applid=>$rec->{w5baseid}
             });
@@ -118,6 +118,13 @@ sub AZURE_CloudAreaSync
       $itcloudarea->SetFilter({srcsys=>\$azurecode});
       my @c=$itcloudarea->getHashList(qw(name itcloud applid
                                          srcsys srcid cistatusid));
+
+
+      if ($#c==-1){
+         my $msg="no projects found in Azure - sync abborted";
+         msg(ERROR,$msg);
+         return({exitcode=>1,exitmsg=>$msg});
+      }
 
       my @opList;
 
@@ -129,7 +136,7 @@ sub AZURE_CloudAreaSync
          sub{  # comperator
             my ($a,$b)=@_;   # a=lnkadditionalci b=aus AM
             my $eq;          # undef= nicht gleich
-            if ( $a->{srcid} eq $b->{id}){
+            if ( $a->{srcid} eq $b->{subscriptionId}){
                $eq=0;  # rec found - aber u.U. update notwendig
                my $aname=$a->{name};
                $aname=~s/\[.*\]$//;
@@ -156,14 +163,15 @@ sub AZURE_CloudAreaSync
                      applid  =>$newrec->{applid},
                      cloud   =>$azurename,
                      srcsys  =>$azurecode,
-                     srcid   =>$newrec->{id}
+                     srcid   =>$newrec->{subscriptionId}
                   }
                };
                if ($mode eq "insert"){
                   $oprec->{DATA}->{cistatusid}="3";
                }
                if ($mode eq "update"){
-                  if ($oldrec->{cistatusid}==6){
+                  if ($oldrec->{cistatusid}==6 &&
+                      $oldrec->{applid} ne $newrec->{applid}){
                      $oprec->{DATA}->{cistatusid}="3";
                   }
                   if ($oldrec->{cistatusid}!=3 &&

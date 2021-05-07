@@ -1,0 +1,5 @@
+'azure::virtualMachine'=>{
+   de=>'Azure: virtualMachine',
+   en=>'Azure: virtualMachine'
+},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
