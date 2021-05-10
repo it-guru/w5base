@@ -475,8 +475,9 @@ sub Validate
       $newrec->{name}=$name;
    }
    if (!defined($oldrec) || effChanged($oldrec,$newrec,"cistatusid")){
-      if (effVal($oldrec,$newrec,"cistatusid") eq "4" ||
-          effVal($oldrec,$newrec,"cistatusid") eq "3"){
+      if (effVal($oldrec,$newrec,"cistatusid") eq "2" ||
+          effVal($oldrec,$newrec,"cistatusid") eq "3" ||
+          effVal($oldrec,$newrec,"cistatusid") eq "4"){
          if (effVal($oldrec,$newrec,"platformrespid") eq ""){
             $self->LastMsg(ERROR,"in selected CI-Status a ".
                                  "platform responsible ".
