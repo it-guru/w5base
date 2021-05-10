@@ -720,6 +720,16 @@ sub isWriteValid
 }
 
 
+
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/urlci.jpg?".$cgi->query_string());
+}
+
+
+
 sub isWriteToApplValid
 {
    my $self=shift;
