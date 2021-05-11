@@ -154,7 +154,7 @@ sub SecScanMon
                msg(ERROR,"db record problem: %s",$msg);
                return({exitcode=>1,msg=>$msg});
             }
-         }until(!defined($rec) || $recno>1000);
+         }until(!defined($rec) || $recno>500);
       }
    }
 
