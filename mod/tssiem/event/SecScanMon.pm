@@ -96,6 +96,8 @@ sub SecScanMon
       }
    }
 
+   $flt{islatest}="1";
+
    { # process new records
       my $skiplevel=0;
       my $recno=0;
@@ -105,7 +107,6 @@ sub SecScanMon
                                      name applid itscanobjectid
                                      cdate id));
       $datastream->SetCurrentOrder("+cdate","+id");
-      $datastream->Limit(1010);
       my ($rec,$msg)=$datastream->getFirst();
 
       if (defined($rec)){
@@ -154,7 +155,7 @@ sub SecScanMon
                msg(ERROR,"db record problem: %s",$msg);
                return({exitcode=>1,msg=>$msg});
             }
-         }until(!defined($rec) || $recno>500);
+         }until(!defined($rec) || $recno>10000);
       }
    }
 
