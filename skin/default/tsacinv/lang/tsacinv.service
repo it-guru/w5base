@@ -2,6 +2,7 @@
 'fieldgroup.default'=>{de=>'Service/Leistung',en=>'Service'},
 'Ammount'=>{de=>'Menge/Anzahl'},
 'Service Name'=>{de=>'Leistungsbez.'},
+'Service Fullname'=>{de=>'Leistungslangbez.'},
 'is ordered'=>{de=>'bestellte Leistung'},
 'is delivered'=>{de=>'gelieferte Leistung'},
 'Service Type'=>{de=>'Leistungsart'},

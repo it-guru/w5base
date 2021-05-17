@@ -532,8 +532,8 @@ sub new
                 vjoinbase     =>[{'isdelivered'=>\'0'}],
                 forwardSearch =>1,
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
-                vjoindisp     =>[qw(name type ammount unit)],
-                vjoininhash   =>['name','type','ammount']),
+                vjoindisp     =>[qw(longname type ammount unit)],
+                vjoininhash   =>['name','type','longname','ammount']),
 
       new kernel::Field::SubList(
                 name          =>'services',
@@ -543,8 +543,8 @@ sub new
                 vjointo       =>'tsacinv::service',
                 vjoinbase     =>[{'isdelivered'=>\'1'}],
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
-                vjoindisp     =>[qw(name type ammount unit)],
-                vjoininhash   =>['name','type','ammount']),
+                vjoindisp     =>[qw(longname type ammount unit)],
+                vjoininhash   =>['name','type','longname','ammount']),
 
 
       new kernel::Field::SubList(

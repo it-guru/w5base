@@ -73,6 +73,13 @@ sub new
                 dataobjattr   =>'"name"'),
 
       new kernel::Field::Text(
+                name          =>'longname',
+                label         =>'Service Fullname',
+                htmlwidth     =>250,
+                ignorecase    =>1,
+                dataobjattr   =>'"servicename"'),
+
+      new kernel::Field::Text(
                 name          =>'type',
                 label         =>'Service Type',
                 htmlwidth     =>200,
@@ -119,7 +126,7 @@ sub new
 
    );
    $self->setWorktable("service"); 
-   $self->setDefaultView(qw(linenumber serviceid systemid name 
+   $self->setDefaultView(qw(linenumber serviceid systemid name longname
                             type ammount unit 
                             costcenter sendcostcenter description));
    return($self);
