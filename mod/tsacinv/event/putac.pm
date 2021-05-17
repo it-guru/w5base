@@ -388,6 +388,7 @@ sub mkAcFtpRecAsset
    }
 
 
+
    if (!exists($locmap{$rec->{locationid}})){
       msg(INFO,"try to find ac location for $rec->{locationid}");
       $locmap{$rec->{locationid}}="0";
@@ -398,7 +399,7 @@ sub mkAcFtpRecAsset
          my $acloc=getModuleObject($self->Config,"tsacinv::location");
 
          # 1st try
-         my %flt=(location=>$w5locrec->{location},
+         my %flt=(location=>'"'.$w5locrec->{location}.'"',
                   locationtype=>\'Site',
                   zipcode=>$w5locrec->{zipcode});
          if ($rec->{class} ne "BUNDLE"){ #Only Bundles are allowed on 
@@ -418,7 +419,7 @@ sub mkAcFtpRecAsset
 
          # 2nd try
          if ($locmap{$rec->{locationid}} eq "0"){
-            my %flt=(location=>$w5locrec->{location},
+            my %flt=(location=>'"'.$w5locrec->{location}.'"',
                      locationtype=>\'Site');
             if ($rec->{class} ne "BUNDLE"){ #Only Bundles are allowed on 
                $flt{isdatacenter}=\'0';     #DataCenter 
@@ -433,6 +434,22 @@ sub mkAcFtpRecAsset
                $locmap{$rec->{locationid}}=$r->{code};
             }
          }
+
+         # 3th try
+         if ($locmap{$rec->{locationid}} eq "0"){
+            my %flt=(location=>'"'.$w5locrec->{location}.'"',
+                     locationtype=>\'Building');  # seems new for Amazon Frankf.
+            $acloc->ResetFilter();
+            $acloc->SetFilter(\%flt);
+            @l=$acloc->getHashList(qw(fullname code w5locid));
+         }
+         foreach my $r (@l){
+            if (ref($r->{w5locid}) eq "ARRAY" &&
+                in_array($r->{w5locid},$rec->{locationid})){
+               $locmap{$rec->{locationid}}=$r->{code};
+            }
+         }
+
       }
    }
    return(undef) if ($locmap{$rec->{locationid}} eq "0");
