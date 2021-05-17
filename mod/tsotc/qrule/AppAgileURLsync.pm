@@ -119,7 +119,7 @@ sub qcheckRecord
          }
       }
       foreach my $suburl (@suburl){
-         $url{$suburl}={
+         $url{$suburl->{name}}={
             name=>$suburl->{name},
             applid=>$rec->{applid},
             srcid=>$urlrec->{id}.":".$suburl->{port},  # TODO! 
