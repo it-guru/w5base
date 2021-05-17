@@ -170,7 +170,8 @@ sub qcheckRecord
                cpucount=>$parrec->{cpucount},
                memory=>$parrec->{memory},
                osrelease=>$parrec->{image_name},
-               ipaddresses=>\@ipaddresses
+               ipaddresses=>\@ipaddresses,
+               availabilityZone=>'Any'
             );
 
             my $w5itcloudarea;
