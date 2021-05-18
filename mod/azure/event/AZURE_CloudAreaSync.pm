@@ -100,6 +100,12 @@ sub AZURE_CloudAreaSync
       $subsc->SetFilter({});
       my @ss=$subsc->getHashList(qw(subscriptionId id name w5baseid));
       my @s;
+      if ($#ss==-1){
+         my $msg="no projects found in Azure - sync abborted";
+         msg(ERROR,$msg);
+         return({exitcode=>1,exitmsg=>$msg});
+      }
+
       foreach my $rec (@ss){
          #next if ($rec->{name}=~m/test/i);
          if ($rec->{w5baseid}=~m/^[0-9]{3,20}$/){
@@ -119,12 +125,6 @@ sub AZURE_CloudAreaSync
       my @c=$itcloudarea->getHashList(qw(name itcloud applid
                                          srcsys srcid cistatusid));
 
-
-      if ($#c==-1){
-         my $msg="no projects found in Azure - sync abborted";
-         msg(ERROR,$msg);
-         return({exitcode=>1,exitmsg=>$msg});
-      }
 
       my @opList;
 
