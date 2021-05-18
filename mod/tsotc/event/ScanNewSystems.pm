@@ -281,42 +281,6 @@ sub analyseRecord
 
 
 
-sub doNotify
-{
-   my $self=shift;
-   my $w5sys=shift;
-   my $datastream=shift;
-   my $wfa=shift;
-   my $user=shift;
-   my $rec=shift;
-   my $debug="";
-
-   my %notifyParam=(
-      emailcategory=>['OTC','SystemImport'],
-      emailbcc=>[
-         11634953080001, # HV
-      ]
-   );
-
-   push(@{$notifyParam{emailcategory}},"ImportSuccess");
-
-               
-   $w5sys->NotifyWriteAuthorizedContacts($rec,{},\%notifyParam,{},sub{
-      my ($subject,$ntext);
-      my $subject=$datastream->T("automatic system import from OTC",
-                                 'tsotc::event::ScanNewSystems')." : ".
-                                 $rec->{name};
-      my $tmpl=$datastream->getParsedTemplate("tmpl/ScanNewSystems_MailNotify",{
-         static=>{
-            URL=>$rec->{urlofcurrentrec},
-            SYSTEMNAME=>$rec->{name}
-         }
-      });
-      return($subject,$tmpl);
-   });
-
-}
-
 
 
 
