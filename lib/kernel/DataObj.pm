@@ -5210,11 +5210,17 @@ sub CollectREST
    if (!exists($c->{"RESTCallResult.$token"}) || 
        $c->{"RESTCallResult.$token"}->{t}<time()-$cachetime){
       my $dbname=$p{dbname};
-      my ($baseurl,$apikey,$apiuser,$base)=$self->GetRESTCredentials($dbname);
-      if (!defined($baseurl) || !defined($apikey)){
-         return(undef);
+      my ($baseurl,$apikey,$apiuser,$base);
+      if ($dbname ne ""){
+         ($baseurl,$apikey,$apiuser,$base)=$self->GetRESTCredentials($dbname);
+         if (!defined($baseurl) || !defined($apikey)){
+            return(undef);
+         }
       }
-      my $dataobjurl=&{$p{url}}($self,$baseurl,$apikey,$apiuser,$base);
+      my $dataobjurl=$p{url};
+      if (ref($p{url}) eq "CODE"){
+         $dataobjurl=&{$p{url}}($self,$baseurl,$apikey,$apiuser,$base);
+      }
       if (!defined($dataobjurl)){
          $self->LastMsg(ERROR,"no REST URL can be created");
          return(undef);
