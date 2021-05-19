@@ -86,17 +86,23 @@ sub SecScanMon
             $datastream->SetFilter({id=>\$lastid,cdate=>\$laststamp});
             my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
             if (!defined($lastrec)){
-               msg(WARN,"record with id '$lastid' has been deleted or changed - using date only");
+               msg(WARN,"record with id '$lastid' has been ".
+                        "deleted or changed - using date only");
                $lastid=undef;
             }
             %flt=( 
-               cdate=>">=\"$laststamp GMT\""
+               cdate=>">\"$laststamp GMT\""
             );
          }
+      }
+      else{
+         msg(WARN,"notify without $eventlabel informations!");
+         msg(WARN,"using secscan Filter=".Dumper(\%flt));
       }
    }
 
    $flt{islatest}="1";
+
 
    { # process new records
       my $skiplevel=0;
@@ -105,44 +111,57 @@ sub SecScanMon
       $datastream->SetFilter(\%flt);
       $datastream->SetCurrentView(qw(ictono urlofcurrentrec
                                      name applid itscanobjectid
-                                     cdate id));
+                                     cdate id sdate));
       $datastream->SetCurrentOrder("+cdate","+id");
       my ($rec,$msg)=$datastream->getFirst();
 
       if (defined($rec)){
          READLOOP: do{
-            if ($skiplevel==2){
-               if ($rec->{id} ne $lastid){
-                  $skiplevel=3;
-               }
-            }
-            if ($skiplevel==1){
-               if ($rec->{cdate} ne $laststamp){
-                  msg(WARN,"record with id '$lastid' missing in datastream");
-                  msg(WARN,"this can result in skiped records!");
-                  $skiplevel=3;
-               }
-            }
-            if ($skiplevel==0){
-               if (defined($laststamp) && defined($lastid)){
-                  if ($laststamp eq $rec->{cdate}){
-                     $skiplevel=1;
-                  }
-               }
-               else{
-                  $skiplevel=3;
-               }
-            }
-            if ($skiplevel==1){
-               if ($lastid eq $rec->{id}){
-                  msg(INFO,"got ladid point $lastid");
-                  $skiplevel=2;
-               }
-            }
+        #
+        #  skip by lastid removed, becaus this can cause in skiped scans
+        #  (lastid is in next scan not "islatest" and does not exists in
+        #   IncStream anymore)
+        #
+        #    if ($skiplevel==2){
+        #       if ($rec->{id} ne $lastid){
+        #          $skiplevel=3;
+        #       }
+        #    }
+        #    if ($skiplevel==1){
+        #       if ($rec->{cdate} ne $laststamp){
+        #          msg(WARN,"record with id '$lastid' missing in datastream");
+        #          msg(WARN,"this can result in skiped records!");
+        #          $skiplevel=3;
+        #       }
+        #    }
+        #    if ($skiplevel==0){
+        #       if (defined($laststamp) && defined($lastid)){
+        #          if ($laststamp eq $rec->{cdate}){
+        #             $skiplevel=1;
+        #          }
+        #       }
+        #       else{
+        #          $skiplevel=3;
+        #       }
+        #    }
+        #    if ($skiplevel==1){
+        #       if ($lastid eq $rec->{id}){
+        #          msg(INFO,"got ladid point $lastid");
+        #          $skiplevel=2;
+        #       }
+        #    }
             if ($skiplevel==0 ||  # = no records to skip
                 $skiplevel==3){   # = all skips are done
-               $self->analyseRecord($datastream,$rec,$res);
-               $recno++;
+               my $d=CalcDateDuration($rec->{sdate},NowStamp("en"));
+               if ($d->{totaldays}>2.0){
+                  msg(WARN,"skip notify for scan ".$rec->{id}." due scan ".
+                           "to far (".$d->{totaldays}." days) in the past");
+                 # msg(WARN,Dumper($rec));
+               }
+               else{
+                  $self->analyseRecord($datastream,$rec,$res);
+                  $recno++;
+               }
                $exitmsg="last:".$rec->{cdate}.";".$rec->{id};
             }
             else{
