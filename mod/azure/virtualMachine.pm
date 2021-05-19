@@ -21,6 +21,7 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field;
 use azure::lib::Listedit;
+use UUID::Tiny;
 use JSON;
 @ISA=qw(azure::lib::Listedit);
 
@@ -55,6 +56,15 @@ sub new
             label             =>'SubscriptionID'),
 
 
+      new kernel::Field::SubList(
+                name          =>'ipaddresses',
+                label         =>'IP-Adresses',
+                group         =>'ipaddresses',
+                searchable    =>0,
+                vjointo       =>'azure::ipaddress',
+                vjoinon       =>['id'=>'id'],
+                vjoindisp     =>['name','netareatag','ifname','mac']),
+
 
 #      new kernel::Field::TextDrop(
 #            name              =>'appl',
@@ -78,17 +88,16 @@ sub new
             label             =>'Tags'),
 
       new kernel::Field::Text(     
+            name              =>'uuid',
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            label             =>'Machine UUID'),
+
+      new kernel::Field::Text(     
             name              =>'resourceGroup',
             ignorecase        =>1,
             group             =>'source',
             label             =>'ResourceGroup'),
-
-      new kernel::Field::Text(     
-            name              =>'networkInterfacesId',
-            group             =>'source',
-            weblinkto         =>'azure::networkInterface',
-            weblinkon         =>['networkInterfacesId'=>'id'],
-            label             =>'NetworkInterfaceId'),
    );
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name));
@@ -161,19 +170,15 @@ sub DataCollector
                }
             }
 
-            {
-               my $id=$rawrec->{properties}
-                            ->{networkProfile}
-                            ->{networkInterfaces}->[0]
-                            ->{id};
-               $rec->{networkInterfacesId}=
-                      azure::lib::Listedit::AzID2W5BaseID($id);
-            }
 
             if (my (@idpath)=split(/\|-/,$rec->{id})){
                $rec->{subscriptionId}=$idpath[1];
                $rec->{resourceGroup}=$idpath[3];
             }
+            $rec->{uuid}="Azure-VM-".UUID::Tiny::create_uuid_as_string(UUID_V5, 
+                 $rec->{subscriptionId}."/".
+                 $rec->{resourceGroup}."/".
+                 $rec->{name});
             push(@data,$rec);
          }
          return(\@data);
@@ -250,7 +255,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default machines tags source));
+   return(qw(header default ipaddresses tags source));
 }
 
 sub getRecordImageUrl

@@ -3,3 +3,5 @@
    en=>'Azure: virtualMachine'
 },
 'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Adresses'},
+
