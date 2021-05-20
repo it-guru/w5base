@@ -221,7 +221,6 @@ sub qcheckRecord
    foreach my $oprec (@opList){
       if ($oprec->{OP} eq "insert"){
          $itilurl->ResetFilter();
-         print STDERR Dumper($oprec);
          my $url=$oprec->{DATA}->{name};
          my $networkid=$oprec->{DATA}->{networkid};
          my $applid=$oprec->{DATA}->{applid};
