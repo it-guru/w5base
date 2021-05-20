@@ -1,0 +1,7 @@
+'azure::qrule::syncSubscription'=>{
+  de=>'Azure Subscription sync',
+  en=>'Azure Subscription sync'
+},
+'AZURE account invalid or not accessable'=>{de=>'AZURE Account ungültig oder nicht zugreifbar'},
+'invalid CI-State for application'=>{de=>'ungültiger CI-Status der Anwendung'},
+'invalid application reference'=>{de=>'ungültige Anwendungszuordnung'},

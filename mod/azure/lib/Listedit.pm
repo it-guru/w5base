@@ -291,6 +291,14 @@ sub decodeFilter2Query4azure
 }
 
 
+sub AzureBase
+{
+   my $self=shift;
+
+   return("https://management.azure.com");
+}
+
+
 sub genReadAzureId
 {
    my $self=shift;

@@ -50,7 +50,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'ifname',
-                htmlwidth     =>'200px',
+                htmlwidth     =>'250px',
                 label         =>'System Interface'),
 
       new kernel::Field::Boolean(
@@ -133,8 +133,7 @@ sub DataCollector
                                            ->{'networkInterfaces'}}){
                   my $id=$ifrec->{id};
                   if ($id ne ""){
-                     $id="https://management.azure.com".$id.
-                         "?api-version=2021-02-01";
+                     $id=$self->AzureBase().$id."?api-version=2021-02-01";
                      my $rawifrec=$self->genReadAzureId($Authorization,$id);
                      #printf STDERR ("rawifrec=%s\n",Dumper($rawifrec));
                      my $tags=$rawifrec->{tags};
