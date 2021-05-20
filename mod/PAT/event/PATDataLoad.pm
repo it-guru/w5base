@@ -34,7 +34,7 @@ sub PATDataLoad
    $self->LoadsrcSubProcess();
 
 
-   return({exitcode=>1,exitmsg=>'OK'});
+   return({exitcode=>0,exitmsg=>'OK'});
 }
 
 sub LoadsrcBusinessSeg
