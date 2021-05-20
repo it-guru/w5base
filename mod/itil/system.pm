@@ -64,6 +64,7 @@ sub new
                 name          =>'name',
                 label         =>'Name',
                 size          =>63,
+                htmlwidth     =>'220px',
                 dataobjattr   =>'system.name'),
 
       new kernel::Field::Interface(
@@ -2652,8 +2653,14 @@ sub QRuleSyncCloudSystem
    if ($rec->{srcsys} eq $srcsystag){
       my $sysnamelist=$parrec->{name};
       $sysnamelist=[$sysnamelist] if (ref($sysnamelist) ne "ARRAY");
-      NAMECHK: foreach my $sysname (@$sysnamelist){
-         $sysname=lc($sysname);
+
+      my $parsysname;
+      my $parshortdesc;
+      NAMECHK: foreach my $orgsysname (@$sysnamelist){
+         if (!defined($parshortdesc)){
+            $parshortdesc=$orgsysname;
+         }
+         my $sysname=lc($orgsysname);
          if ($sysname=~m/^\S{5,32}\s/){  # Wenn der Name am Anfang steht und
             $sysname=~s/\s.*//;          # mit Leerzeichen sepperiert noch ein
          }                               # text, dann weg damit
@@ -2663,23 +2670,45 @@ sub QRuleSyncCloudSystem
             $sysname=substr($sysname,0,40);
          }
          if ($self->ValidateSystemname($sysname)){
-            if ($rec->{name} ne $sysname){
+            if ($rec->{name} ne $sysname){   
                $self->ResetFilter();
                $self->SetFilter({name=>'"'.$sysname.'"',id=>"!".$rec->{id}});
                my ($chkrec,$msg)=$self->getOnlyFirst(qw(id name));
                if (defined($chkrec)){
                   next NAMECHK;
                }
-               $qrule->IfComp($self,
-                             $rec,"name",
-                             {name=>$sysname},"name",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             $qmsg,$dataissue,$errorlevel,
-                             mode=>'string');
+               
             }
+            $parsysname=$sysname;
             last NAMECHK;
          }
       }
+      if ($parshortdesc eq $parsysname){
+         $parshortdesc=undef;
+      }
+      $qrule->IfComp($self,
+                    $rec,"name",
+                    {name=>$parsysname},"name",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    $qmsg,$dataissue,$errorlevel,
+                    mode=>'text');
+      if (exists($parrec->{shortdesc})){
+         $qrule->IfComp($self,
+                       $rec,"shortdesc",
+                       $parrec,"shortdesc",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       $qmsg,$dataissue,$errorlevel,
+                       mode=>'text');
+      }
+      else{
+         $qrule->IfComp($self,
+                       $rec,"shortdesc",
+                       {shortdesc=>$parshortdesc},"shortdesc",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       $qmsg,$dataissue,$errorlevel,
+                       mode=>'text');
+      }
+
       foreach my $var (qw(cpucount memory)){
          if (exists($parrec->{$var})){
             $qrule->IfComp($self,
@@ -2699,6 +2728,19 @@ sub QRuleSyncCloudSystem
                     iomapped=>$par);
 
       my $itcloudareaid=$parrec->{itcloudareaid};
+
+      if (exists($parrec->{itcloudareaid})){
+         if ($parrec->{itcloudareaid} ne ""){
+            if ($rec->{itcloudareaid} ne $parrec->{itcloudareaid}){
+               $forcedupd->{itcloudareaid}=$parrec->{itcloudareaid};
+            }
+         }
+         else{
+            if ($rec->{itcloudareaid} ne ""){
+               $forcedupd->{itcloudareaid}=undef;
+            }
+         }
+      }
 
 
       #printf STDERR ("parrec ips=%s\n",Dumper($parrec->{ipaddresses}));
