@@ -214,9 +214,33 @@ sub qcheckRecord
               },
               \@curl,\@url,\@opList,
               refid=>$rec->{id});
+
+   #
+   # Validate, if new URLs are already registered by other applications
+   #
+   foreach my $oprec (@opList){
+      if ($oprec->{OP} eq "insert"){
+         $itilurl->ResetFilter();
+         print STDERR Dumper($oprec);
+         my $url=$oprec->{DATA}->{name};
+         my $networkid=$oprec->{DATA}->{networkid};
+         my $applid=$oprec->{DATA}->{applid};
+         $itilurl->SetFilter({name=>'"'.$url.'"',networkid=>\$networkid});
+         my @l=$itilurl->getHashList(qw(name applid appl));
+         foreach my $failrec (@l){
+            my $msg="this URL is already registed by outer application: ".
+                    $failrec->{appl};
+            push(@qmsg,"URL: ".$failrec->{name});
+            push(@qmsg,$msg);
+            $errorlevel=2 if ($errorlevel<2);
+            $oprec->{OP}="invalid";
+         }
+      }
+   }
+
    if (!$res){
       my $opres=ProcessOpList($self->getParent,\@opList);
-      push(@qmsg,map({$_->{MSG}} @opList));
+      push(@qmsg,map({$_->{MSG}} grep({$_->{OP} ne "invalid"} @opList)));
    }
 
    #print STDERR Dumper($rec);

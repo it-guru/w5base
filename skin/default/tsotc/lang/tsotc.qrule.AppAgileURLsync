@@ -2,3 +2,6 @@
   de=>'AppAgile Namespace URL sync',
   en=>'AppAgile Namespace URL sync'
 },
+'this URL is already registed by outer application'=>{
+  de=>'diese URL ist bereits by einer anderen Anwendung registriert'
+}
