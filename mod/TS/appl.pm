@@ -960,30 +960,9 @@ sub isViewValid
    my $rec=shift;
    my @l=$self->SUPER::isViewValid($rec,@_);
 
-   if (lc($rec->{businessteam}) ne "extern"){
-      if (in_array(\@l,"inmchm")){
-         @l=grep(!/^inmchm$/,@l);
-         push(@l,"chm","inm");
-      }
-   }
    return(@l);
 }
 
-
-
-
-sub getDetailBlockPriority
-{
-   my $self=shift;
-   my @l=$self->SUPER::getDetailBlockPriority(@_);
-   my $inserti=$#l;
-   for(my $c=0;$c<=$#l;$c++){
-      $inserti=$c+1 if ($l[$c] eq "technical");
-   }
-   splice(@l,$inserti,$#l-$inserti,("inmchm","chm","inm",@l[$inserti..($#l+-1)]));
-   return(@l);
-
-}  
 
 
 sub Validate

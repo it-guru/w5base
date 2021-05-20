@@ -2581,6 +2581,16 @@ sub isViewValid
               technical workflowbasedata header inmchm inm chm interview efforts
               functional);
 
+   if (lc($rec->{businessteam}) ne "extern"){
+      if (in_array(\@all,"inmchm")){
+         @all=grep(!/^inmchm$/,@all);
+         push(@all,"chm","inm");
+      }
+   }
+   else{
+      @all=grep(!/^(inm|chm)$/,@all);
+      push(@all,"inmchm");
+   }
    return(@all);
 }
 
@@ -2739,7 +2749,9 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default functional itsem finance technical opmgmt delmgmt 
+          qw(header default functional itsem finance technical 
+             inmchm inm chm
+             opmgmt delmgmt 
              customer custcontracts supcontracts
              contacts phonenumbers 
              interfaces systems itcloudareas 
