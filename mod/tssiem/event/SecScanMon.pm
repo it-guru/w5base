@@ -325,8 +325,8 @@ sub doNotify
                           'tssiem::event::SecScanMon',
                           'NewSecScan'],
          emailbcc=>[
-            11634953080001, # HV
-         #   12663941300002  # Roland
+         #   11634953080001, # HV
+            12663941300002  # Roland
          ]
       );
    }
