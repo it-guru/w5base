@@ -80,6 +80,24 @@ sub new
 }
 
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orgrec=shift;
+
+   if (effChanged($oldrec,$newrec,"srcsys")){
+      if (effVal($oldrec,$newrec,"srcsys") eq "AssetManager"){
+         $newrec->{acinmassignmentgroupid}=undef;
+         $newrec->{scapprgroupid}=undef;
+      }
+   }
+
+   return($self->SUPER::Validate($oldrec,$newrec,$orgrec));
+}
+
+
 sub isViewValid
 {
    my $self=shift;
