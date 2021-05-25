@@ -111,7 +111,9 @@ sub SecScanMon
       $datastream->SetFilter(\%flt);
       $datastream->SetCurrentView(qw(ictono urlofcurrentrec
                                      name applid itscanobjectid
-                                     cdate id sdate));
+                                     cdate id 
+                                     secentcnt
+                                     sdate));
       $datastream->SetCurrentOrder("+cdate","+id");
       my ($rec,$msg)=$datastream->getFirst();
 
@@ -209,16 +211,17 @@ sub analyseRecord
 
    msg(INFO,"PROCESS: $rec->{id} $rec->{cdate} icto='$rec->{ictono}'");
 
-   if (!exists($res->{new}->{$rec->{itscanobjectid}})){
-      $res->{new}->{$rec->{itscanobjectid}}=[];
+   if ($rec->{secentcnt}>0){
+      if (!exists($res->{new}->{$rec->{itscanobjectid}})){
+         $res->{new}->{$rec->{itscanobjectid}}=[];
+      }
+      push(@{$res->{new}->{$rec->{itscanobjectid}}},{
+         urlofcurrentrec=>$rec->{urlofcurrentrec},
+         applid=>$rec->{applid},
+         ictoid=>$rec->{ictoid},
+         name=>$rec->{name}
+      });
    }
-
-   push(@{$res->{new}->{$rec->{itscanobjectid}}},{
-      urlofcurrentrec=>$rec->{urlofcurrentrec},
-      applid=>$rec->{applid},
-      ictoid=>$rec->{ictoid},
-      name=>$rec->{name}
-   });
 }
 
 
@@ -323,7 +326,7 @@ sub doNotify
                           'NewSecScan'],
          emailbcc=>[
             11634953080001, # HV
-            12663941300002  # Roland
+         #   12663941300002  # Roland
          ]
       );
    }
