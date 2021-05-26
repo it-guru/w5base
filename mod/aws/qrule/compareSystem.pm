@@ -85,15 +85,43 @@ sub qcheckRecord
    return(undef,undef) if ($rec->{srcsys} ne "AWS");
 
 
-   my ($awsid,$awsacccountid,$awsregion)=$rec->{srcid}=~m/^(\S+)\@([0-9]+)\@(\S+)$/;
+   my ($awsid,$awsacccountid,$awsregion)=
+      $rec->{srcid}=~m/^(\S+)\@([0-9]+)\@(\S+)$/;
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),"aws::system");
    return(undef,undef) if (!$par->Ping());
 
+
+   my $cloudarea=getModuleObject($self->getParent->Config,"itil::itcloudarea");
+   #
+   # Check if cloudarea is not "disposed of wasted"
+   # (Check on an AWS Account creates an access error - if account is not
+   #  accessable or does not exists anymore)
+   #
+   my $cloudareaok=1;
+   if ($rec->{itcloudareaid} ne ""){
+      $cloudarea->ResetFilter();
+      $cloudarea->SetFilter({id=>\$rec->{itcloudareaid}});
+      my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+      if (defined($w5cloudarearec)){
+         if ($w5cloudarearec->{cistatusid}>4){
+            if ($rec->{cistatusid}<$w5cloudarearec->{cistatusid}){
+               $forcedupd->{cistatusid}=$w5cloudarearec->{cistatusid};
+            }
+            if ($w5cloudarearec->{cistatusid}>5){
+               $cloudareaok=0;
+            }
+         } 
+         if ($rec->{cistatusid} eq "5" && $w5cloudarearec->{cistatusid} eq "4"){
+            $forcedupd->{cistatusid}="4";
+         }
+      }
+   }
+
    #
    # Level 1
    #
-   if (!defined($parrec)){      # pruefen ob wir bereits nach AWS geschrieben
+   if ($cloudareaok){      # pruefen ob wir bereits nach AWS geschrieben
       # try to find parrec by srcsys and srcid
       $par->ResetFilter();
       my $flt={
@@ -179,10 +207,7 @@ sub qcheckRecord
 
             my $w5itcloudarea;
             if ($parrec->{accountid} ne ""){
-               my $cloudarea=getModuleObject(
-                  $self->getParent->Config,
-                  "itil::itcloudarea"
-               );
+               $cloudarea->ResetFilter();
                $cloudarea->SetFilter({
                   cloud=>'AWS',
                   srcid=>$parrec->{accountid}
