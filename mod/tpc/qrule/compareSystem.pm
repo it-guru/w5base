@@ -175,12 +175,12 @@ sub qcheckRecord
             );
 
             my $w5itcloudarea;
-            if ($parrec->{projectid} ne ""){
+            if ($parrec->{projectId} ne ""){
                msg(INFO,"try to add cloudarea to system ".$rec->{name});
                my $cloudarea=getModuleObject($self->getParent->Config,
                                              "itil::itcloudarea");
-               $cloudarea->SetFilter({srcsys=>\'tsotc::project',
-                                      srcid=>\$parrec->{projectid}
+               $cloudarea->SetFilter({srcsys=>\'TPC',
+                                      srcid=>\$parrec->{projectId}
                });
                my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
                if (defined($w5cloudarearec)){
