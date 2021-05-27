@@ -3381,6 +3381,10 @@ sub Validate
    $sitename=~s/\/auth\/.*?$//;
    $sitename=~s/\/public\/.*?$//;
    $sitename="JobServer" if (!defined($sitename));
+
+   if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+      $sitename=~s/^http:/https:/i;
+   }
    return({$self->Name()=>$sitename}) if (!defined($oldrec));
 
    return({});
