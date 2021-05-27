@@ -574,6 +574,7 @@ sub nativQualityCheck
             my $res={ 
                rulelabel=>"$qrulelongname",
                ruleid=>$qrule->Self,
+               pass=>($circQC+1),
                havehints=>$havehints,
                result=>$self->T($resulttext),
                exitcode=>$qresult
@@ -957,6 +958,7 @@ function addToResult(ruleid)
        var ok=0;
        var warn=0;
        var fail=0;
+       var passno;
        if (results.length>0){
           for(rid=0;rid<results.length;rid++){
              var ruleres=results[rid];
@@ -976,6 +978,16 @@ function addToResult(ruleid)
              var havehints=ruleres.getElementsByTagName("havehints")[0];
              var havehintsChildNode=havehints.childNodes[0];
              var havehintstext=havehintsChildNode.nodeValue;
+
+             var pass=ruleres.getElementsByTagName("pass")[0];
+             var passChildNode=pass.childNodes[0];
+             var passtext=passChildNode.nodeValue;
+             if (passtext!=passno){
+                passno=passtext;
+                fail=0;
+                ok=0;
+                warn=0;
+             }
 
              var exitcode=ruleres.getElementsByTagName("exitcode")[0];
              var exitcodetext="?";
