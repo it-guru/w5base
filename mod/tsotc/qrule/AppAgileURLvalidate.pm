@@ -90,6 +90,7 @@ sub qcheckRecord
       if ($#l==-1){
          push(@qmsg,"removing URL due missing DNS-Route in AppAgile");
          $dataobj->ValidatedDeleteRecord($rec);
+         $checksession->{abortSession}="1";
       }
    }
 

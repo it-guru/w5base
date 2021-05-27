@@ -490,6 +490,7 @@ sub nativQualityCheck
 
    $param[0]->{autocorrect}=0 if (!exists($param[0]->{autocorrect}));;
    $param[0]->{ruleno}=0 if (!exists($param[0]->{ruleno}));;
+   delete($param[0]->{abortSession});
 
 
    my ($parent,$objlist,$finalQruleList)=
@@ -586,6 +587,10 @@ sub nativQualityCheck
                $self->translate_qmsg($control,$res,$qrulename);
             }
             push(@{$result->{rule}},$res);
+            if (exists($param[0]->{abortSession}) &&
+                $param[0]->{abortSession} ne ""){
+               last CIRCQC;
+            }
          }
          $W5V2::OperationContext=$oldcontext;
          if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
