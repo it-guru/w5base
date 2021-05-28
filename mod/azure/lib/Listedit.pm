@@ -107,19 +107,19 @@ sub getAzureAuthorizationToken
          die("Request for access_token failed");
       }
 
-      my $cacheTPCauthRec={
+      my $cacheAZUREauthRec={
          Authorization=>$d->{token_type}." ".$d->{access_token}
       };
      
       my $Authorization=$d->{token_type}." ".$d->{access_token};
      
       if (exists($d->{expires_inx})){
-         $cacheTPCauthRec->{Expiration}=time()+$d->{expires_in}-600;
+         $cacheAZUREauthRec->{Expiration}=time()+$d->{expires_in}-600;
       }
       else{
-         $cacheTPCauthRec->{Expiration}=time()+60;
+         $cacheAZUREauthRec->{Expiration}=time()+60;
       }
-      $gc->{$gckey}=$cacheTPCauthRec;
+      $gc->{$gckey}=$cacheAZUREauthRec;
    }
   
    return($gc->{$gckey}->{Authorization});

@@ -189,7 +189,7 @@ sub DataCollector
             return([],"200");
          }
          msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TPC subscription response");
+         $self->LastMsg(ERROR,"unexpected data Azure subscription response");
          return(undef);
       }
    );

@@ -180,7 +180,7 @@ sub DataCollector
             }
          }
          msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TPC virtualMachine response");
+         $self->LastMsg(ERROR,"unexpected data Azure virtualMachine response");
          return(undef);
       }
    );

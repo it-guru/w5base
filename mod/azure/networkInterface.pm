@@ -182,7 +182,7 @@ sub DataCollector
             }
          }
          msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TPC networkInterface response");
+         $self->LastMsg(ERROR,"unexpected data Azure networkInterface response");
          return(undef);
       }
    );
