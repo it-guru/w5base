@@ -113,6 +113,20 @@ sub notify
    my $par=shift;
    my $act=shift; # 'on', 'off' or 'roff' (lnkto deleted)
 
+   my $addrok=0;
+   if (defined($par->{mailto}) && 
+       ((ref($par->{mailto}) eq "ARRAY" && $#{$par->{mailto}}!=-1) ||
+        ($par->{mailto} ne ""))){
+      $addrok++;
+   }
+   if (defined($par->{mailcc}) && 
+       ((ref($par->{mailcc}) eq "ARRAY" && $#{$par->{mailcc}}!=-1) ||
+        ($par->{mailcc} ne ""))){
+      $addrok++;
+   }
+   return(1) if (!$addrok);  # prevent empty address mails
+
+
    $ENV{HTTP_FORCE_LANGUAGE}=$par->{lang} if $par->{lang} ne "";
       
    my $subject=$self->T("managed itemgroups notification");
