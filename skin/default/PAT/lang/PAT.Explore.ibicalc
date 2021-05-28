@@ -7,11 +7,24 @@
 'online'=>{de=>'Onlinezeit'},
 'nonprod'=>{de=>'Randzeit'},
 'Vote Incident'=>{de=>'Ausfall/Vorfall bewerten'},
+'Begin'=>{de=>'Beginn'},
+'End'=>{de=>'Ende'},
 'Begin time'=>{de=>'Beginn Zeit'},
 'End time'=>{de=>'Ende Zeit'},
 'Date'=>{de=>'Datum'},
 'full ICTO vote'=>{de=>'vollständige ICTO Bewertung'},
 'vote'=>{de=>'auswerten/bewerten'},
 'Incident IBI analysis'=>{de=>'Incident IBI Bewertung'},
+'Event'=>{de=>'Vorfall'},
+'from'=>{de=>'von'},
+'to'=>{de=>'bis'},
+'errStartTime'=>{
+ en=>'invalid format in start time',
+ de=>'ungültiges Format der Begin-Zeit'
+},
+'errEndTime'=>{
+ en=>'invalid format in end time',
+ de=>'ungültiges Format der Ende-Zeit'
+},
 
 
