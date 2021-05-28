@@ -304,6 +304,7 @@ sub Import
    my @l=$self->getHashList(qw(id name projectId));
    if ($#l==-1){
       $self->LastMsg(ERROR,"TPC machine not found");
+      msg(ERROR,"requested importname $importname can not be resolved");
       return(undef);
    }
 
