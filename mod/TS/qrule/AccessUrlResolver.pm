@@ -165,11 +165,15 @@ sub qcheckRecord
    $lastip->ResetFilter();
    my $srcload=NowStamp("en");
    foreach my $ip (@ipl){
-      $lastip->ValidatedInsertOrUpdateRecord({
+      my @idlist=$lastip->ValidatedInsertOrUpdateRecord({
          name=>$ip,
          srcload=>$srcload,
          lnkapplurlid=>$rec->{id}
       },{name=>\$ip,lnkapplurlid=>\$rec->{id}});
+      if ($#idlist==-1){
+         msg(ERROR,"error in ValidatedInsertOrUpdateRecord on url=".
+                   Dumper($rec));
+      }
    }
    $lastip->BulkDeleteRecord({'srcload'=>"<'$srcload-7d GMT' OR [EMPTY]",
                               lnkapplurlid=>\$rec->{id}});

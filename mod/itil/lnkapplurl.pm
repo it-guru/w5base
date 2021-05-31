@@ -159,6 +159,14 @@ sub new
                 dataobjattr   =>'accessurl.isonsharedproxy'),
 
       new kernel::Field::Boolean(
+                name          =>'is_derivatedfromif',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'derivated from interface',
+                dataobjattr   =>'if (accessurl.lnkapplappl is null,0,1)'),
+
+
+      new kernel::Field::Boolean(
                 name          =>'do_sslcertcheck',
                 group         =>'class',
                 selectfix     =>1,
@@ -170,7 +178,7 @@ sub new
                 group         =>'urlinfo',
                 readonly      =>1,
                 htmldetail    =>'NotEmpty',
-                label         =>'derivated from Interface',
+                label         =>'derivated from interface application',
                 vjointo       =>'itil::lnkapplappl',
                 vjoinon       =>['lnkapplapplid'=>'id'],
                 vjoindisp     =>'fullname'),
