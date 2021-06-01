@@ -1,6 +1,0 @@
-'invalid event start'=>{de=>'ungültiges Ereignisbeginn'},
-'A new event information has been registered by a non incident manager/operator. Please ensure that all neassasary actions be done, to handle this workflow correctly!'=>{de=>'Eine neue Ereignisinformation wurde von einem NICHT-Incident-Manager/Operator erfasst. Bitte stellen Sie sicher, dass für diese Ereignisinfo alle notwendigen Prozessschritte durchgeführt werden!'},
-'no incident managers found for selected config-item'=>{de=>'Es existieren keine Incident-Manager für das gewählte Config-Item'},
-'send early warning'=>{de=>'Vorwarnung versenden'},
-'early warning'=>{de=>'Vorwarnung auf Ereignisinformation'},
-'This message is an early warning about a upcoming event information.'=>{de=>'Dies ist eine vorab Benachrichtigung auf eine Ereingismeldung.'},

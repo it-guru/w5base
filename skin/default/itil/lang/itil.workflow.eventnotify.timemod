@@ -1,4 +1,0 @@
-'invalid event end'=>{de=>'ungültiges Ereignisende'},
-'invalid event start'=>{de=>'ungültiger Ereignisbegin'},
-'invalid expected event end'=>{de=>'ungültiges vorraussichtliches Ende'},
-"eventstart can not be in the future"=>{de=>"Ereignisbegin kann nicht in der Zukunft liegen"},

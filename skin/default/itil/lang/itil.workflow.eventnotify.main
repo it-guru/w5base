@@ -1,6 +1,0 @@
-'Send a customert notification'=>{de=>'Kundeninformation versenden'},
-'Send a management notification'=>{de=>'Managementinformation versenden'},
-'Close Workflow'=>{de=>'Ereignisinformation beenden'},
-'Add Note to flow'=>{de=>'Notiz dem Verlauf hinzufügen'},
-'Modify event timespan'=>{de=>'Ereigniszeitraum anpassen'}
-
