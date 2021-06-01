@@ -1333,13 +1333,13 @@ sub new
                 label         =>'allow business request workflows',
                 container     =>'additional'),
 
-      new kernel::Field::Select(
-                name          =>'eventlang',
-                group         =>'control',
-                htmleditwidth =>'30%',
-                value         =>['en','de','en-de','de-en'],
-                label         =>'default language for eventinformations',
-                dataobjattr   =>'appl.eventlang'),
+      #new kernel::Field::Select(
+      #          name          =>'eventlang',
+      #          group         =>'control',
+      #          htmleditwidth =>'30%',
+      #          value         =>['en','de','en-de','de-en'],
+      #          label         =>'default language for eventinformations',
+      #          dataobjattr   =>'appl.eventlang'),
 
 
       new kernel::Field::Boolean(
