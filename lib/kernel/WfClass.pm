@@ -94,6 +94,7 @@ sub handleDependenceChange
    my $dependnewstateid=shift;
 
    if ($dependoldstateid<=15 && $dependnewstateid>15){
+      my $stepobj;
       my $stepobj=$self->getStepObject($self->getParent->Config,$rec->{step});
       if (!defined($stepobj)){
          return(undef);
@@ -213,6 +214,9 @@ sub getStepObject
    if ($stepname eq ""){
       print STDERR msg(ERROR,"getStepObject:no stepname spezified");
       return(undef);
+   }
+   if ($self->Self() eq "base::workflow::Archive"){
+      $stepname="base::workflow::Archive::Archive";
    }
    $stepname=~s/[^a-z0-9:_]//gi;
    eval("\$obj=new $stepname(\$self);");
