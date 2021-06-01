@@ -214,7 +214,15 @@ sub new
                 selectfix     =>1,
                 htmlwidth     =>'1%',
                 htmldetail    =>0,
-                readonly      =>1,
+                readonly      =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $app=$self->getParent;
+                   return(0) if (!defined($current) &&
+                                 $app->IsMemberOf("admin"));
+                   return(0) if ($app->isMarkDeleteValid($current));
+                   return(1);
+                },
                 group         =>'state',
                 label         =>'marked as delete',
                 dataobjattr   =>'wfhead.is_deleted'),
@@ -973,6 +981,10 @@ sub isMarkDeleteValid
    my $self=shift;
    my $rec=shift;
    my $class=$rec->{class};
+
+   if (!defined($self->{SubDataObj}->{$class})){
+      $class="base::workflow::Archive";
+   }
    if (defined($self->{SubDataObj}->{$class})){
       return($self->{SubDataObj}->{$class}->isMarkDeleteValid($rec));
    }
@@ -1315,7 +1327,10 @@ sub getDynamicFields
    if (!defined($class)){
       $class=Query->Param("WorkflowClass");
    }
-   if (defined($class) && defined($self->getParent->{SubDataObj}->{$class})){
+   if (defined($class)){
+      if (!defined($self->getParent->{SubDataObj}->{$class})){
+         $class="base::workflow::Archive";
+      }
       my @subl=$self->getParent->{SubDataObj}->{$class}->getDynamicFields(
                                                                  %param);
       return(@subl);
@@ -1470,8 +1485,12 @@ sub isViewValid
    if ($param{format} ne "kernel::Output::HtmlDetail"){
       @addgroups=qw(default state source initstate affected);
    }
-   return("default","source","state") if (!defined($rec) || 
-                         !defined($self->{SubDataObj}->{$rec->{class}}));
+   return("default","source","state") if (!defined($rec));
+   if (!defined($self->{SubDataObj}->{$rec->{class}})){
+      my $class="base::workflow::Archive";
+      return($self->{SubDataObj}->{$class}->isViewValid($rec));
+   }
+
    my @grplist=(@addgroups,
                 $self->{SubDataObj}->{$rec->{class}}->isViewValid($rec));
    push(@grplist,"qc");
@@ -1736,6 +1755,9 @@ sub Validate
    }
    my $class=defined($oldrec) && defined($oldrec->{class}) ? 
              $oldrec->{class} : $newrec->{class};
+   if (!defined($self->{SubDataObj}->{$class}) && defined($oldrec)){
+      $class="base::workflow::Archive";
+   }
    if (!defined($self->{SubDataObj}->{$class})){
       $self->LastMsg(ERROR,"invalid worflow class '%s' spezified",$class);
       return(0);
@@ -2581,6 +2603,12 @@ sub Process                   # Workflow bearbeiten
       my $bk=$self->{SubDataObj}->{$class}->Process($class,$step,$WfRec);
       return($bk);
    }
+   else{
+      $class="base::workflow::Archive";
+      $step= "base::workflow::Archive::Archive";
+      my $bk=$self->{SubDataObj}->{$class}->Process($class,$step,$WfRec);
+      return($bk);
+   }
    my $output=new kernel::Output($self);
    my %param;
    $param{WindowMode}="Detail";
@@ -3070,11 +3098,16 @@ sub getRecordImageUrl
 {
    my $self=shift;
    my $current=shift;
-   if (defined($current) && defined($current->{class}) &&
-       defined($self->{SubDataObj}->{$current->{class}})){
-     # msg(INFO,"call getRecordImageUrl for $current->{class}");
-      return($self->{SubDataObj}->{$current->{class}}->getRecordImageUrl(
-             $current));
+   if (defined($current) && defined($current->{class})){
+      if (defined($self->{SubDataObj}->{$current->{class}})){
+         return($self->{SubDataObj}->{$current->{class}}->getRecordImageUrl(
+                $current));
+      }
+      else{
+         return(
+            $self->{SubDataObj}->{"base::workflow::Archive"}->getRecordImageUrl(
+            $current));
+      }
    }
 
    return($self->SUPER::getRecordImageUrl($current));
