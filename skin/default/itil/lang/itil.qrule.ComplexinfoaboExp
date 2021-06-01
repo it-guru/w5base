@@ -1,5 +1,0 @@
-'itil::qrule::ComplexinfoaboExp'=>{
-   de=>'Prüfung des Verfallsdatums eines KomplexInfoabos und ggf. Deaktivierung',
-   en=>'Check for expiration of a Complex infoabo and deactivation'},
-'set complex infoabo inactive due to expiration'=>{
-   de=>'setze InfoAbo inaktiv da Verfallsdatum überschritten'},

@@ -92,7 +92,6 @@
 'TSSlovakia.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'TSSlovakia.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'TSSlovakia.kern.bp.lnkappl'=>{de=>'Verkn. Anw.',en=>'Link Appl.'},
-'TSSlovakia.kern.complexinfoabo'=>{de=>'KomplexInfoabo',en=>'ComplexInfoabo'},
 'TSSlovakia.kern.interview'=>{de=>'CI-Interview',en=>'CI-Interview'},
 'TSSlovakia.kern.autodisce'=>{de=>'AutoDiscEngine',en=>'AutoDiscEngine'},
 'TSSlovakia.kern.autodisce.map'=>{de=>'SoftwareMap',en=>'SoftwareMap'},

@@ -92,7 +92,6 @@
 'TSHungary.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'TSHungary.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'TSHungary.kern.bp.lnkappl'=>{de=>'Verkn. Anw.',en=>'Link Appl.'},
-'TSHungary.kern.complexinfoabo'=>{de=>'KomplexInfoabo',en=>'ComplexInfoabo'},
 'TSHungary.kern.interview'=>{de=>'CI-Interview',en=>'CI-Interview'},
 'TSHungary.kern.autodisce'=>{de=>'AutoDiscEngine',en=>'AutoDiscEngine'},
 'TSHungary.kern.autodisce.map'=>{de=>'SoftwareMap',en=>'SoftwareMap'},

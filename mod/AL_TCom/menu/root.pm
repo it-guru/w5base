@@ -579,11 +579,6 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("AL_TCom.kern.complexinfoabo",
-                      "itil::complexinfoabo",
-                      func=>'MainWithNew',
-                      defaultacl=>['admin']);
-
    $self->RegisterObj("AL_TCom.kern.interview",
                       "TS::interview",
                       func=>'MainWithNew',

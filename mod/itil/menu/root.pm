@@ -563,11 +563,6 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itil.kern.complexinfoabo",
-                      "itil::complexinfoabo",
-                      func=>'MainWithNew',
-                      defaultacl=>['admin']);
-   
    $self->RegisterObj("itil.kern.itnormodel",
                       "itil::itnormodel",
                       func=>'MainWithNew',

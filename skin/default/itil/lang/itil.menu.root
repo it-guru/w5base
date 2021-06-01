@@ -121,7 +121,6 @@
 'itil.kern.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'itil.kern.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'itil.kern.bp.lnkappl'=>{de=>'Verkn. Anw.',en=>'Link Appl.'},
-'itil.kern.complexinfoabo'=>{de=>'KomplexInfoabo',en=>'ComplexInfoabo'},
 'itil.kern.autodisce'=>{de=>'AutoDiscEngine',en=>'AutoDiscEngine'},
 'itil.kern.autodisce.map'=>{de=>'SoftwareMap',en=>'SoftwareMap'},
 'itil.kern.autodisce.rec'=>{de=>'AutoDiscRecord',en=>'AutoDiscRecord'},
