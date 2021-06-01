@@ -203,6 +203,10 @@ sub qcheckRecord
                     return($oprec);
                  }
                  elsif ($mode eq "delete"){
+                    return(undef); # wegen colision der Löschoperation mit der
+                                   # qrule an der URLselbst (vielleicht wäre
+                                   # es gut, bei URLs auch einen CI-Status
+                                   # einzuführen
                     return(undef) if ($oldrec->{srcsys} ne $srcsys);
                     return({OP=>$mode,
                             MSG=>"delete url $oldrec->{name} ",
