@@ -39,10 +39,10 @@ sub getControlData
    my $app=$self->getParent();
 
    return([
-           'itil::appl' =>   {id  =>'100000001',
-                                              name=>'STEVeventinfobyorg'},
-           'itil::appl' =>   {id  =>'100000002',
-                                              name=>'STEVeventinfobyfunction'},
+#           'itil::appl' =>   {id  =>'100000001',
+#                                              name=>'STEVeventinfobyorg'},
+#           'itil::appl' =>   {id  =>'100000002',
+#                                              name=>'STEVeventinfobyfunction'},
            'itil::appl' =>   {id  =>'100000003',
                                               name=>'STEVapplchanged'},
            'itil::appl' =>   {id  =>'100000004',

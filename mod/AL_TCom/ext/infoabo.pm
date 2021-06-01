@@ -41,29 +41,23 @@ sub getControlData
            'AL_TCom::appl'=>   {target=>'name',
                                 mode  =>[    
                                      'changenotify'=>'itil::appl',
-                                     'eventnotify'=>'itil::appl',
-                                     'rootcauseinfo'=>'AL_TCom::appl',
                                      'daily_modified_appldiary'=>'itil::appl'
                                 ],
                                },
            'itil::appl'=>      {target=>'name',
                                 mode  =>[
-                                     'rootcauseinfo'=>'AL_TCom::appl',
                                 ],
                                },
            'itil::network'=>   {target=>'name',
                                 mode  =>[
-                                     'rootcauseinfo'=>'AL_TCom::appl',
                                 ],
                                },
            'base::location'=>  {target=>'name',
                                 mode  =>[
-                                     'rootcauseinfo'=>'AL_TCom::appl',
                                 ],
                                },
            'base::grp'=>       {target=>'fullname',
                                 mode  =>[
-                                     'rootcauseinfo'=>'AL_TCom::appl',
                                 ],
                                },
           });
