@@ -451,21 +451,24 @@ sub Validate
 
    if (!defined($oldrec) || effChanged($oldrec,$newrec,"cistatusid")){
       if ($newrec->{cistatusid}==4){
-         my $c=getModuleObject($self->Config,"itil::itcloud");
-         $c->SetFilter({id=>$itcloudid});
-         my ($crec,$msg)=$c->getOnlyFirst(qw(cistatusid));
-         my $itcloudcistatusid;
-         if (defined($crec)){
-            $itcloudcistatusid=$crec->{cistatusid};
-         }
-         if ($itcloudcistatusid!=4){
-            $self->LastMsg(ERROR,"cloud is not active");
-            return(0);
-         }
-         if (!$self->isWriteOnApplValid($applid,"default")){
-            $self->LastMsg(ERROR,"activation of cloudarea only allowed ".
-                                 "for application writeables");
-            return(0);
+         if ($self->isDataInputFromUserFrontend() && 
+             !$self->IsMemberOf("admin")){
+            my $c=getModuleObject($self->Config,"itil::itcloud");
+            $c->SetFilter({id=>$itcloudid});
+            my ($crec,$msg)=$c->getOnlyFirst(qw(cistatusid));
+            my $itcloudcistatusid;
+            if (defined($crec)){
+               $itcloudcistatusid=$crec->{cistatusid};
+            }
+            if ($itcloudcistatusid!=4){
+               $self->LastMsg(ERROR,"cloud is not active");
+               return(0);
+            }
+            if (!$self->isWriteOnApplValid($applid,"default")){
+               $self->LastMsg(ERROR,"activation of cloudarea only allowed ".
+                                    "for application writeables");
+               return(0);
+            }
          }
       }
    }
@@ -576,6 +579,13 @@ sub FinishWrite
              $newrec->{cistatusid}==4){
             $doNotify=3;
          }
+      }
+      if ($oldrec->{cistatusid}==6 &&   # it it is a reactivateion without 
+          exists($newrec->{applid}) &&  # aplication change, do no notification
+          $oldrec->{applid} eq $newrec->{applid} &&
+          exists($newrec->{cistatusid}) &&
+          $newrec->{cistatusid} eq "4"){
+         $doNotify=0;
       }
    }
    if ($doNotify){

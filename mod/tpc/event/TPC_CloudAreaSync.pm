@@ -110,6 +110,11 @@ sub TPC_CloudAreaSync
       $pro->SetFilter({});
       my @ss=$pro->getHashList(qw(id name applid));
       my @s;
+      if ($#ss==-1){
+         my $msg="no projects found in TPC - sync abborted";
+         msg(ERROR,$msg);
+         return({exitcode=>1,exitmsg=>$msg});
+      }
       foreach my $rec (@ss){
          #next if ($rec->{name}=~m/test/i);
          if ($rec->{applid}=~m/^[0-9]{3,20}$/){
@@ -129,11 +134,6 @@ sub TPC_CloudAreaSync
       my @c=$itcloudarea->getHashList(qw(name itcloud applid 
                                          srcsys srcid cistatusid));
 
-      if ($#c==-1){
-         my $msg="no projects found in TPC - sync abborted";
-         msg(ERROR,$msg);
-         return({exitcode=>1,exitmsg=>$msg});
-      }
       my @opList;
 
 
@@ -178,9 +178,13 @@ sub TPC_CloudAreaSync
                   $oprec->{DATA}->{cistatusid}="3";
                }
                if ($mode eq "update"){
-                  if ($oldrec->{cistatusid}==6 &&
-                      $oldrec->{applid} ne $newrec->{applid}){
-                     $oprec->{DATA}->{cistatusid}="3";
+                  if ($oldrec->{cistatusid}==6){
+                     if ($oldrec->{applid} ne $newrec->{applid}){
+                        $oprec->{DATA}->{cistatusid}="3";
+                     }
+                     else{
+                        $oprec->{DATA}->{cistatusid}="4";
+                     }
                   }
                   if ($oldrec->{cistatusid}!=3 &&
                       $oldrec->{applid} ne $newrec->{applid}){
