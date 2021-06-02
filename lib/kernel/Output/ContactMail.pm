@@ -234,12 +234,49 @@ sub ProcessHead
 
    my @useTO=Query->Param("useTO");
    my @useCC=Query->Param("useCC");
+   my $lc=Query->Param("lc");
    my $d=$self->SUPER::ProcessHead($fh,$rec,$msg);
 
    if ($#fieldlist!=0){
-      $d.="<table class=freeform width=98% border=0>";
+      my $country=getModuleObject($app->Config,"base::isocountry");
+      $d.="<center><table class=freeform width=98% border=0>";
       $d.="<tr>";
-      $d.="<td nowrap style=\"padding:15px;padding-top:0px;".
+      $d.="<td colspan=2 valign=bottom align=center>";
+      $d.="<select style=\"width:50%;min-width:200px\" name=lc>";
+      $d.="<option value=\"\">".
+          $app->T("no language or country restriction",$self->Self)."</option>";
+      $d.="<optgroup label=\"".
+          $app->T("user language selection",$self->Self).
+          "\">";
+      foreach my $lang (LangTable()){
+         my $value="talklang:$lang";
+         my $selected="";
+         if ($value eq $lc){
+            $selected=" selected ";
+         }
+         $d.="<option value=\"$value\" $selected>".
+             $self->getParent->getParent->T("Talk-Lang",'base::user').
+             ": $lang</option>";
+      }
+      $d.="</optgroup>";
+      $d.="<optgroup label=\"".$app->T("country",$self->Self)."\">";
+      $country->SetFilter({});
+      my @clist=$country->getHashList(qw(token fullname));
+      foreach my $crec (@clist){
+         my $value="country:".$crec->{token};
+         my $selected="";
+         if ($value eq $lc){
+            $selected=" selected ";
+         }
+         $d.="<option value=\"$value\" $selected>".
+             $crec->{fullname}."</option>";
+      }
+      $d.="</optgroup>";
+      $d.="</select>";
+      $d.="</td>";
+      $d.="</tr>";
+      $d.="<tr>";
+      $d.="<td nowrap style=\"padding:10px;padding-top:0px;".
           "padding-bottom:0px\">";
       $d.=$app->T("To:",$self->Self)."<br>";
       $d.=$self->fieldSelectBox($app,$rec,"useTO",\@fieldlist,\@useTO);
@@ -250,15 +287,24 @@ sub ProcessHead
       $d.=$app->T("CC:",$self->Self)."<br>";
       $d.=$self->fieldSelectBox($app,$rec,"useCC",\@fieldlist,\@useCC);
       $d.="</td>";
-      $d.="</tr><tr>";
+      $d.="</tr>";
+      $d.="<tr>";
       $d.="<td colspan=2 valign=bottom align=center>";
-      $d.="<input type=submit value=\"".
+      $d.="<img id=loader src=\"../../../public/base/load/ajaxloader.gif\" ".
+          "style=\"display:none;visibility:hidden\">";
+      $d.="<input id=sbutton type=submit value=\"".
           $self->getParent->getParent->T("get mail form",
                 'kernel::Output::ContactMail').
-          "\">";
+          "\" onclick=\"var e=document.getElementById('sbutton');".
+                       "e.style.visibility='hidden';".
+                       "e.style.display='none';".
+                       "var e=document.getElementById('loader');".
+                       "e.style.visibility='visible';".
+                       "e.style.display='block';".
+                       "return(true);\" >";
       $d.="</td>";
       $d.="</tr>";
-      $d.="</table>";
+      $d.="</table></center>";
 
 #      $d.="<div style=\"font-family:monospace;margin:5px;".
 #          "padding:5px;height:100px;overflow:auto;".
@@ -277,9 +323,18 @@ sub ProcessBottom
 
    my %l=();
    my @view;
+   my $lc=Query->Param("lc");
    my @useTO=Query->Param("useTO");
    my @useCC=Query->Param("useCC");
    my %search=$app->getSearchHash();
+   my $country;
+   if (my ($token)=$lc=~m/^country:([A-Z]{2})$/){
+      $country=$token;
+   }
+   my $talklang;
+   if (my ($lang)=$lc=~m/^talklang:([a-z]{2})$/){
+      $talklang=$lang;
+   }
 
 
    my %view;
@@ -439,18 +494,30 @@ sub ProcessBottom
       }
       if (keys(%{$res->{to}->{contactfullname}}) ||
           keys(%{$res->{cc}->{contactfullname}})){
-         $user->SetFilter({
+         my $ufilter={
             fullname=>[keys(%{$res->{to}->{contactfullname}}),
                        keys(%{$res->{cc}->{contactfullname}})],
             cistatusid=>[4]
-         });
-         foreach my $urec ($user->getHashList(qw(fullname email))){
+         };
+         if (defined($country)){
+            $ufilter->{country}=\$country;
+         }
+         my @uview=qw(fullname email);
+         if (defined($talklang)){
+            push(@uview,"talklang");
+         }
+         $user->SetFilter($ufilter);
+         foreach my $urec ($user->getHashList(@uview)){
              if (exists($res->{to}->{contactfullname}->{$urec->{fullname}})){
-                $res->{to}->{email}->{$urec->{email}}++;
+                if (!defined($talklang) || $talklang eq $urec->{talklang}){
+                   $res->{to}->{email}->{$urec->{email}}++;
+                }
                 delete($res->{to}->{contactfullname}->{$urec->{fullname}});
              }
              if (exists($res->{cc}->{contactfullname}->{$urec->{fullname}})){
-                $res->{cc}->{email}->{$urec->{email}}++;
+                if (!defined($talklang) || $talklang eq $urec->{talklang}){
+                   $res->{cc}->{email}->{$urec->{email}}++;
+                }
                 delete($res->{cc}->{contactfullname}->{$urec->{fullname}});
              }
          } 
@@ -458,18 +525,30 @@ sub ProcessBottom
       $user->ResetFilter();
       if (keys(%{$res->{to}->{userid}}) ||
           keys(%{$res->{cc}->{userid}})){
-         $user->SetFilter({
+         my $ufilter={
             userid=>[keys(%{$res->{to}->{userid}}),
                        keys(%{$res->{cc}->{userid}})],
             cistatusid=>[4]
-         });
-         foreach my $urec ($user->getHashList(qw(userid email))){
+         };
+         if (defined($country)){
+            $ufilter->{country}=\$country;
+         }
+         my @uview=qw(userid email);
+         if (defined($talklang)){
+            push(@uview,"talklang");
+         }
+         $user->SetFilter($ufilter);
+         foreach my $urec ($user->getHashList(@uview)){
              if (exists($res->{to}->{userid}->{$urec->{userid}})){
-                $res->{to}->{email}->{$urec->{email}}++;
+                if (!defined($talklang) || $talklang eq $urec->{talklang}){
+                   $res->{to}->{email}->{$urec->{email}}++;
+                }
                 delete($res->{to}->{userid}->{$urec->{userid}});
              }
              if (exists($res->{cc}->{userid}->{$urec->{userid}})){
-                $res->{cc}->{email}->{$urec->{email}}++;
+                if (!defined($talklang) || $talklang eq $urec->{talklang}){
+                   $res->{cc}->{email}->{$urec->{email}}++;
+                }
                 delete($res->{cc}->{userid}->{$urec->{userid}});
              }
          } 

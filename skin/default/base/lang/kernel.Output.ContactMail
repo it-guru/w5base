@@ -2,3 +2,6 @@
 'Databased Mail target address generator.'=>{de=>'Daten gestützte Mailadressaten generieren.'},
 'CC:'=>{de=>'Cc:'},
 'To:'=>{de=>'An:'},
+'no language or country restriction'=>{de=>'keine Sprach- oder Ländereingrenzung'},
+'user language selection'=>{de=>'Benutzersprachauswahl'},
+'country'=>{de=>'Land'},

@@ -50,6 +50,7 @@
 'f1024'=>{ de=>'optimiert für 1024x768 Bildschirmauflösung',
           en=>'optimized for 1024x768 resolution'},
 'Last-Lang'=>{ de=>'letztmalig verwendete Sprache'},
+'Talk-Lang'=>{ de=>'Kommunikations-Sprache'},
 'Last-Logon'=>{ de=>'letzte Anmeldung'},
 'normal'=>{ de=>'normal'},
 'Substitiutions'=>{ de=>'Mögliche Vertreter',en=>'possible Deputies'},
