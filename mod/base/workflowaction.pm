@@ -611,8 +611,21 @@ sub NotifyForward
    if ($adr{emailfrom} eq ""){
       delete($adr{emailfrom});
    }
-   if ($param{sendercc} && $from ne 'no_reply@w5base.net'){
-      $adr{emailcc}=[$from];
+   if ($param{sendercc}){
+      if (defined($from) && $from ne 'no_reply@w5base.net'){
+         $adr{emailcc}=[$from];
+      }
+      else{
+         # get from out of UserCache
+         my $UserCache=$self->Cache->{User}->{Cache};
+         if (defined($UserCache->{$ENV{REMOTE_USER}})){
+            $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+         }
+         if (defined($UserCache->{email}) &&
+             $UserCache->{email} ne ""){
+            $adr{emailcc}=[$UserCache->{email}];
+         }
+      }
    }
    if (defined($param{sendcc})){
       $param{sendcc}=[$param{sendcc}] if (ref($param{sendcc}) ne "ARRAY");
