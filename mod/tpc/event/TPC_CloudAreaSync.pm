@@ -269,14 +269,16 @@ sub TPC_CloudAreaSync
       foreach my $machineid (sort(keys(%machineid))){
          $mach->ResetFilter();
          $mach->SetFilter({id=>\$machineid});
-         my ($mrec,$msg)=$mach->getOnlyFirst(qw(id urlofcurrentrec name));
+         my ($mrec,$msg)=$mach->getOnlyFirst(qw(id 
+                                                urlofcurrentrec projectId
+                                                name));
          if (defined($mrec)){
             $sys->ResetFilter();
             $sys->SetFilter({srcsys=>\'TPC',srcid=>\$mrec->{id}});
             my ($srec,$msg)=$sys->getOnlyFirst(qw(id cistatusid));
             if (!defined($srec)){
                # run import
-               $mach->Import({importname=>$mrec->{id}});
+               $mach->Import({importrec=>$mrec});
             }
             else{
                # initiate QualityCheck on sysrec

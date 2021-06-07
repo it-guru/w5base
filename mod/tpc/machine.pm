@@ -262,8 +262,10 @@ sub Import
 
    my $flt;
    my $importname;
-   my ($sysuuid);
+   my $sysrec;
+
    if ($param->{importname} ne ""){
+      my $sysuuid;
       $importname=$param->{importname};
       msg(INFO,"start Import in aws::system with importname $importname");
       if (($sysuuid)=$importname
@@ -276,12 +278,31 @@ sub Import
          $self->LastMsg(ERROR,"sieht schlecht aus");
          return(undef);
       }
+      $self->ResetFilter();
+      $self->SetFilter($flt);
+      my @l=$self->getHashList(qw(id name projectId));
+      if ($#l==-1){
+         $self->LastMsg(ERROR,"TPC machine not found");
+         msg(ERROR,"requested importname $importname can not be resolved");
+         return(undef);
+      }
+    
+      if ($#l>0){
+         if ($self->isDataInputFromUserFrontend()){
+            $self->LastMsg(ERROR,"Systemname '%s' not unique in TPC",
+                                 $param->{importname});
+         }
+         return(undef);
+      }
+      $sysrec=$l[0];
+   }
+   elsif (ref($param->{importrec}) eq "HASH"){
+      $sysrec=$param->{importrec};
    }
    else{
       msg(ERROR,"no importname specified while ".$self->Self." Import call");
       return(undef);
    }
-   my $syssrcid=lc($importname);
    my $appl=getModuleObject($self->Config,"TS::appl");
    my $cloudarea=getModuleObject($self->Config,"itil::itcloudarea");
    my $itcloud=getModuleObject($self->Config,"itil::itcloud");
@@ -299,23 +320,6 @@ sub Import
       }
    }
 
-   $self->ResetFilter();
-   $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(id name projectId));
-   if ($#l==-1){
-      $self->LastMsg(ERROR,"TPC machine not found");
-      msg(ERROR,"requested importname $importname can not be resolved");
-      return(undef);
-   }
-
-   if ($#l>0){
-      if ($self->isDataInputFromUserFrontend()){
-         $self->LastMsg(ERROR,"Systemname '%s' not unique in TPC",
-                              $param->{importname});
-      }
-      return(undef);
-   }
-   my $sysrec=$l[0];
    my $syssrcid=$sysrec->{id};
    my $w5applrec;
    my $w5carec;
