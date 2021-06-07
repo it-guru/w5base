@@ -998,6 +998,223 @@ sub Validate
 
 
 
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   my @l=$self->SUPER::getValidWebFunctions(@_);
+   push(@l,"IdOrderValidate","NameSelector");
+   return(@l);
+}
+
+sub NameSelector
+{
+   my $self=shift;
+
+   return(
+      $self->simpleRESTCallHandler(
+         {
+            name=>{
+               typ=>'STRING',
+               mandatory=>1,
+               init=>'w5'
+            }
+         },undef,\&doNameSelector,@_)
+   );
+}
+
+sub IdOrderValidate
+{
+   my $self=shift;
+
+   return(
+      $self->simpleRESTCallHandler(
+         {
+            id=>{
+               typ=>'STRING',
+               mandatory=>1,
+               path=>0,
+               init=>'13736266300011'
+            },
+            dsid=>{
+               typ=>'STRING'
+            },
+            email=>{
+               typ=>'STRING'
+            }
+         },undef,\&doIdOrderValidate,@_)
+   );
+}
+
+sub doIdOrderValidate
+{
+   my $self=shift;
+   my $param=shift;
+   my $r={};
+
+   $self->ResetFilter();
+   $self->SetFilter({id=>\$param->{id}});
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+   if (($param->{id}=~m/^[0-9]{1,20}$/) && defined($rec)){
+      $r->{data}={
+         name=>$rec->{name}, 
+         conumber=>$rec->{conumber}, 
+         cistatusid=>$rec->{cistatusid}, 
+         mandator=>$rec->{mandator}, 
+         customer=>$rec->{customer} 
+      };
+      if ($rec->{cistatusid} eq "3" || $rec->{cistatusid} eq "4"){
+         $r->{orderPosible}="true";
+      }
+      else{
+         $r->{orderPosible}="false";
+      }
+      $r->{orderAllowed}="false";
+      my %userid=();
+      if ($param->{email} ne ""){
+         my $emailfilter=$param->{email};
+         $emailfilter=~s/[\s"'\*\?]//;
+         my $user=getModuleObject($self->Config,"base::user");
+         $user->SetFilter({emails=>$emailfilter,cistatusid=>[4,5]});
+         my @l=$user->getHashList(qw(userid fullname));
+         if ($#l==0){
+            $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
+         }
+      }
+      if ($param->{dsid} ne ""){
+         my $accountfilter=$param->{dsid};
+         $accountfilter=~s/[\s"'\*\?]//;
+         $accountfilter=~s/\\/\//;
+         my @flt=();
+         if (length($accountfilter)>3){
+            push(@flt,{accounts=>$accountfilter,cistatusid=>[4,5]});
+         }
+         my $dsidfilter=$param->{dsid};
+         $dsidfilter=~s/[\s"'\*\?]//;
+         if ($dsidfilter=~m/^\d{3,10}$/){
+            $dsidfilter="tCID:".$dsidfilter;
+            push(@flt,{dsid=>\$dsidfilter,cistatusid=>[4,5]});
+         }
+         if ($dsidfilter=~m/^a[0-9]{3,10}$/i){
+            $dsidfilter=~s/^a//i;
+            $dsidfilter="tCID:".$dsidfilter;
+            push(@flt,{dsid=>\$dsidfilter,cistatusid=>[4,5]});
+         }
+         if ($#flt!=-1){
+            my $user=getModuleObject($self->Config,"base::user");
+            $user->SetFilter(\@flt);
+            my @l=$user->getHashList(qw(userid fullname));
+            if ($#l==0){
+               $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
+            }
+         }
+      }
+      if (keys(%userid)){
+         $r->{userReference}=\%userid;
+      }
+      my @userid=keys(%userid);
+      if (keys(%userid)){
+         my @grpid;
+         foreach my $userid (@userid){
+            my %grps=$self->getGroupsOf($userid,["RMember"],"up");
+            push(@grpid,keys(%grps));
+         }
+         if ($r->{orderAllowed} ne "true"){
+            foreach my $fldname (qw(applmgrid itsemid itsem2id)){
+               if ($rec->{$fldname} ne "" && 
+                   in_array(\@userid,$rec->{$fldname})){
+                  $r->{orderAllowed}="true";
+               }
+            }
+         }
+         # due perf the check of grp and user is splited
+         if ($r->{orderAllowed} ne "true"){   # direct base::user check
+            UCHK: foreach my $crec (@{$rec->{contacts}}){
+               my $roles=$crec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if ($crec->{target} eq "base::user"){
+                  if (in_array($roles,"write") &&
+                      in_array(\@userid,$crec->{targetid})){
+                     $r->{orderAllowed}="true";
+                     last UCHK;
+                  }
+               }
+            }
+         }
+         if ($r->{orderAllowed} ne "true"){   # direct base::grp check
+            GCHK: foreach my $crec (@{$rec->{contacts}}){
+               my $roles=$crec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if ($crec->{target} eq "base::grp"){
+                  if (in_array($roles,"write") &&
+                      in_array(\@grpid,$crec->{targetid})){
+                     $r->{orderAllowed}="true";
+                     last UCHK;
+                  }
+               }
+            }
+         }
+      }
+
+
+      #applmgrid tsmid tsm2id
+
+   }
+   else{
+      return({
+         exitcode=>100,
+         exitmsg=>'invalid id'
+      });
+   }
+
+
+
+   
+   return({
+      result=>$r,
+      exitcode=>0,
+      exitmsg=>'OK'
+   });
+}
+
+sub doNameSelector
+{
+   my $self=shift;
+   my $param=shift;
+   my $r={};
+   my $limit=50;
+
+   $param->{name}=~s/[\*\s\?,'"]//g;
+
+   if (length($param->{name})<2){
+      return({
+         exitcode=>100,
+         exitmsg=>"'name' filter not specific enough"
+      });
+   }
+
+   $self->ResetFilter();
+   $self->SetFilter({name=>"*".$param->{name}."*",cistatusid=>[3,4,5]});
+   $self->Limit($limit+1);
+   my @l=$self->getHashList(qw(name id cistatusid urlofcurrentrec 
+                               customer mandator));
+   
+   $r->{data}=\@l;
+   if ($#l>=$limit){
+      $r->{ResultIncomplete}=1;
+      $r->{data}=[@l[0..($limit-1)]];
+   }
+   return({
+      result=>$r,
+      exitcode=>0,
+      exitmsg=>'OK'
+   });
+}
+
+
+
+
+
 
 
 
