@@ -46,6 +46,8 @@ sub new
                 align         =>'left',
                 dataobjattr   =>"all_views.view_name"),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'View Name',
