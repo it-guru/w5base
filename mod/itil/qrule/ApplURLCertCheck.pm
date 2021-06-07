@@ -186,6 +186,11 @@ sub qcheckRecord
       my $op=$dataobj->Clone();
       $op->SetFilter({id=>\$rec->{id}}); 
       my ($oldrec,$msg)=$op->getOnlyFirst(qw(ALL)); 
+      if (!defined($oldrec)){
+         msg(ERROR,"url deleted while qcheck on rec=".Dumper($rec));
+         $checksession->{abortSession}="1";
+         return(undef);
+      }
       $op->ValidatedUpdateRecord($oldrec,$forcedupd,{id=>\$rec->{id}});
       $forcedupd={};
 
