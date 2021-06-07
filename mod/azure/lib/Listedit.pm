@@ -24,6 +24,7 @@ use kernel::DataObj::Static;
 use kernel::Field;
 use kernel::Field::TextURL;
 use Text::ParseWords;
+use Time::HiRes qw(usleep);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
 
 sub new
@@ -187,6 +188,8 @@ sub decodeFilter2Query4azure
    }
    #printf STDERR ("filter=%s\n",Dumper($filter));
    #printf STDERR ("dbclassTemplate=%s\n",Dumper(\$dbclass));
+
+   usleep(300);
 
    if (ref($filter) eq "HASH"){
       foreach my $filtername (keys(%{$filter})){
