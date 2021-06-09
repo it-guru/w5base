@@ -853,7 +853,6 @@ sub calcBaseApplicationExpertGroup
               $u->{userid}->{$userid}->{phonename});
       }
    }
-printf STDERR ("a=%s\n",Dumper(\%a));
 
    return(\%a);
 }
