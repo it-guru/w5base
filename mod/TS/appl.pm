@@ -832,9 +832,19 @@ sub calcBaseApplicationExpertGroup
       push(@chkuid,@{$r->{userid}});
    }
    $user->SetFilter({userid=>\@chkuid});
-   $user->SetCurrentView(qw(phonename email));
+   $user->SetCurrentView(qw(phonename email cistatusid));
    my $u=$user->getHashIndexed("userid");
    foreach my $k (keys(%a)){
+
+      for(my $c=0;$c<=$#{$a{$k}->{userid}};$c++){
+         my $userid=$a{$k}->{userid}->[$c];
+         if ($u->{userid}->{$userid}->{cistatusid}<3 ||
+             $u->{userid}->{$userid}->{cistatusid}>5){
+            $a{$k}->{userid}->[$c]=undef; 
+         }
+      }
+      @{$a{$k}->{userid}}=grep({defined} @{$a{$k}->{userid}});
+
       foreach my $userid (@{$a{$k}->{userid}}){
          push(@{$a{$k}->{email}},$u->{userid}->{$userid}->{email});
       }
@@ -843,6 +853,7 @@ sub calcBaseApplicationExpertGroup
               $u->{userid}->{$userid}->{phonename});
       }
    }
+printf STDERR ("a=%s\n",Dumper(\%a));
 
    return(\%a);
 }
