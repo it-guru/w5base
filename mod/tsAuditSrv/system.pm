@@ -69,6 +69,14 @@ sub new
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Text(
+                name          =>'assetid',
+                label         =>'AssetID',
+                htmllabelwidth=>'250',
+                ignorecase    =>1,
+                dataobjattr   =>'DARWIN_TBL_ASSET_DATA.ASSET_ID'),
+
+
+      new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
                 dataobjattr   =>'DARWIN_TBL_ASSET_DATA.SYSTEM_STATUS'),
@@ -95,6 +103,7 @@ sub new
                 group         =>'auditmsgs',
                 vjointo       =>'tsAuditSrv::auditmsg',
                 htmllimit     =>30,
+                searchable    =>0,
                 forwardSearch =>1,
                 vjoinbase     =>{'excluded'=>'0',severity=>'>0'},
                 vjoinon       =>['systemid'=>'systemid'],
@@ -110,6 +119,16 @@ sub new
                 vjoinon       =>['systemid'=>'systemid'],
                 vjoindisp     =>['severity','firstoccur',
                                  'messagetext','resultreturnedshorted']),
+
+      new kernel::Field::SubList(
+                name          =>'inventmsgs',
+                label         =>'Inventory messages',
+                group         =>'inventmsgs',
+                vjointo       =>'tsAuditSrv::inventmsg',
+                htmldetail    =>0,
+                htmllimit     =>30,
+                vjoinon       =>['nodeid'=>'nodeid'],
+                vjoindisp     =>['messagetext','resultreturned']),
 
       new kernel::Field::SubList(
                 name          =>'files',
@@ -154,8 +173,36 @@ sub new
                 dataobjattr   =>'DARWIN_SYSTEM_STATUS.reaction_level'),
 
       new kernel::Field::Text(
+                name          =>'osversion',
+                label         =>'OS version',
+                group         =>'autodiscdata',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"(select result_returned from ".
+                                "darwin_inventory_data where ".
+                                "darwin_inventory_data.node_id=".
+                                "darwin_system_status.node_id and ".
+                                "darwin_inventory_data.message_text_en=".
+                                "'OS version' and ".
+                                "ROWNUM=1)"),
+
+      new kernel::Field::Text(
+                name          =>'operatingsystem',
+                label         =>'operating system',
+                group         =>'autodiscdata',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"(select result_returned from ".
+                                "darwin_inventory_data where ".
+                                "darwin_inventory_data.node_id=".
+                                "darwin_system_status.node_id and ".
+                                "darwin_inventory_data.message_text_en=".
+                                "'operating system' and ".
+                                "ROWNUM=1)"),
+
+
+      new kernel::Field::Text(
                 name          =>'nodeid',
                 label         =>'NodeID',
+                selectfix     =>1,
                 group         =>'source',
                 dataobjattr   =>'DARWIN_SYSTEM_STATUS.NODE_ID'),
 
@@ -171,14 +218,6 @@ sub new
                 label         =>'Patch Calculation Date',
                 group         =>'source',
                 dataobjattr   =>'DARWIN_SYSTEM_STATUS.patch_calculation_dat'),
-
-
-      new kernel::Field::Text(
-                name          =>'assetid',
-                label         =>'AssetID',
-                htmllabelwidth=>'250',
-                ignorecase    =>1,
-                dataobjattr   =>'DARWIN_TBL_ASSET_DATA.ASSET_ID'),
 
 
       new kernel::Field::Link(
@@ -290,7 +329,8 @@ sub isViewValid
    my @l=qw(default);
 
    if ($rec->{registered}){
-      push(@l,"audit","auditmsgs","auditfiles","w5basedata","source");
+      push(@l,"audit","auditmsgs","inventmsgs","autodiscdata",
+              "auditfiles","w5basedata","source");
    }
 
    return(@l);
@@ -309,7 +349,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default auditmsgs audit auditfiles w5basedata source));
+   return(qw(header default autodiscdata 
+             inventmsgs auditmsgs audit auditfiles w5basedata source));
 }
 
 sub Initialize

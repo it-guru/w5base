@@ -1,6 +1,6 @@
-package tsAuditSrv::auditmsg;
+package tsAuditSrv::inventmsg;
 #  W5Base Framework
-#  Copyright (C) 2019  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -42,95 +42,36 @@ sub new
                 name          =>'linenumber',
                 label         =>'No.'),
 
-      new kernel::Field::Id(
-                name          =>'id',
-                label         =>'MessageID',
-                group         =>'source',
-                searchable    =>0,
-                dataobjattr   =>"DARWIN_COMPLIANCE_DATA.MESSAGE_ID"),
-
-      new kernel::Field::RecordUrl(),
-
       new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
                 group         =>'default',
                 searchable    =>1,
                 uppersearch   =>1,
-                dataobjattr   =>"DARWIN_COMPLIANCE_DATA.SYSTEM_ID"),
+                dataobjattr   =>"DARWIN_INVENTORY_DATA.SYSTEM_ID"),
 
+      new kernel::Field::Text(
+                name          =>'nodeid',
+                label         =>'NodeID',
+                group         =>'default',
+                dataobjattr   =>'DARWIN_INVENTORY_DATA.NODE_ID'),
 
       new kernel::Field::Text(
                 name          =>'messagetext',
                 label         =>'Message Text',
                 htmlwidth     =>'220px',
                 sqlorder      =>'none',
-                dataobjattr   =>'DARWIN_COMPLIANCE_DATA.MESSAGE_TEXT_EN'),
-
-      new kernel::Field::Text(
-                name          =>'resultrequired',
-                label         =>'Result Required',
-                htmldetail    =>'NotEmpty',
-                sqlorder      =>'none',
-                dataobjattr   =>'DARWIN_COMPLIANCE_DATA.RESULT_REQUIRED_EN'),
+                dataobjattr   =>'DARWIN_INVENTORY_DATA.MESSAGE_TEXT_EN'),
 
       new kernel::Field::Text(
                 name          =>'resultreturned',
                 label         =>'Result Returned',
                 sqlorder      =>'none',
-                dataobjattr   =>'DARWIN_COMPLIANCE_DATA.RESULT_RETURNED'),
-
-      new kernel::Field::Text(
-                name          =>'resultreturnedshorted',
-                label         =>'Result Returned shorted',
-                htmldetail    =>0,
-                sqlorder      =>'none',
-                depend        =>['resultreturned'],
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $t=$current->{resultreturned};
-                   $t=~s/\n/ /g;
-                   $t=TextShorter($t,30,"INDICATED");
-                   return($t);
-                }),
-
-      new kernel::Field::Number(
-                name          =>'severity',
-                sqlorder      =>'ASC',
-                htmlwidth     =>'10px',
-                label         =>'Severity',
-                dataobjattr   =>'DARWIN_COMPLIANCE_DATA.SEVERITY'),
-
-      new kernel::Field::Text(
-                name          =>'authority',
-                label         =>'Authority',
-                dataobjattr   =>'DARWIN_COMPLIANCE_DATA.AUTHORITY'),
-
-      new kernel::Field::Boolean(
-                name          =>'excluded',
-                label         =>'Excluded',
-                dataobjattr   =>
-                  "decode(DARWIN_COMPLIANCE_DATA.EXCLUDED,'YES',1,0)"),
-
-      new kernel::Field::Date(
-                name          =>'excludedexpdate',
-                label         =>'Excluded expire date',
-                htmldetail    =>'NotEmpty',
-                dataobjattr   =>'DARWIN_COMPLIANCE_DATA.EXCLUDE_EXPIRE_DATE'),
-
-
-      new kernel::Field::Date(
-                name          =>'firstoccur',
-                label         =>'first occur',
-                htmldetail    =>'NotEmpty',
-                group         =>'source',
-                dataobjattr   =>'DARWIN_COMPLIANCE_DATA.FIRST_OCCUR'),
+                dataobjattr   =>'DARWIN_INVENTORY_DATA.RESULT_RETURNED'),
 
    );
-   $self->setWorktable("DARWIN_COMPLIANCE_DATA");
-   $self->setDefaultView(qw(systemid firstoccur messagetext 
-                            resultreturnedshorted resultrequired));
+   $self->setWorktable("DARWIN_INVENTORY_DATA");
+   $self->setDefaultView(qw(systemid messagetext resultreturned ));
    return($self);
 }
 
@@ -154,7 +95,7 @@ sub initSqlWhere
             my @secsystemid;
             #needed to fix ora "in" limits
             while (my @sid=splice(@systemid,0,500)){
-               push(@secsystemid,"DARWIN_COMPLIANCE_DATA.SYSTEM_ID in (".
+               push(@secsystemid,"DARWIN_INVENTORY_DATA.SYSTEM_ID in (".
                                  join(",",map({"'".$_."'"} @sid)).")");
             }
             $where="(".join(" OR ",@secsystemid).")";
