@@ -591,15 +591,103 @@ sub genericSystemImport
    $appl->ResetFilter();
    $appl->SetFilter({id=>\$cloudarearec->{applid}});
    my ($apprec,$msg)=$appl->getOnlyFirst(qw(ALL));
-   if (defined($apprec) && 
-       in_array([qw(2 3 4)],$apprec->{cistatusid})){
+   if (defined($apprec)){
       $w5applrec=$apprec;
    }
-
    if (!defined($w5applrec)){
       $self->LastMsg(ERROR,"no application record for $srcsys import");
       return(undef);
    }
+
+   # check if $w5applrec->{cistatusid} is in 3 4 
+
+   if (!($w5applrec->{cistatusid} eq "3" ||
+         $w5applrec->{cistatusid} eq "4")){
+      my %notifyParam=(
+         emailcategory=>[$srcsys,'ImportReject','InvalidApplication'],
+         emailcc=>[],
+         emailbcc=>[
+            11634953080001, # HV
+         ]
+      );
+      $appl->NotifyWriteAuthorizedContacts($w5applrec,{},
+                                           \%notifyParam,{mode=>'ERROR'},sub{
+         my ($_self,$notifyParam,$notifycontrol)=@_;
+         foreach my $fld (qw(securityrespid supportid)){
+            if ($itcloud->{$fld} ne "" && 
+                !in_array($notifyParam->{emailcc},$itcloud->{$fld}) &&
+                !in_array($notifyParam->{emailto},$itcloud->{$fld})){
+               push(@{$notifyParam->{emailcc}},$itcloud->{$fld});
+            }
+         }
+         my ($subject,$ntext);
+         my $subject=$self->T("automatic system import rejected",
+                              'TS::system')." - ".
+                     $self->T("invalid application cistatus",
+                              'TS::system');
+         my $tmpl=$self->getParsedTemplate(
+                    "tmpl/genericSystemImport_BadAppl",{
+            static=>{
+               SYSTEM=>$sysrec->{name},
+               URL=>$w5applrec->{urlofcurrentrec},
+               CLOUDAREA=>$cloudarearec->{fullname},
+               APPL=>$w5applrec->{name}
+            }
+         });
+         return($subject,$tmpl);
+      });
+      $self->LastMsg(ERROR,"invalid appl cistatus");
+      return(undef);
+   }
+
+
+   # check if $cloudarearec->{cistatusid} is in 4
+   if (!($cloudarearec->{cistatusid} eq "4")){
+      my %notifyParam=(
+         emailcategory=>[$srcsys,'ImportReject','InvalidApplication'],
+         emailcc=>[],
+         emailbcc=>[
+            11634953080001, # HV
+         ]
+      );
+      foreach my $fld (qw(securityrespid supportid)){
+         if ($itcloud->{$fld} ne "" && 
+             !in_array($notifyParam{emailcc},$itcloud->{$fld})){
+            push(@{$notifyParam{emailcc}},$itcloud->{$fld});
+         }
+      }
+      $appl->NotifyWriteAuthorizedContacts($w5applrec,{},
+                                           \%notifyParam,{mode=>'ERROR'},sub{
+         my ($_self,$notifyParam,$notifycontrol)=@_;
+         foreach my $fld (qw(securityrespid supportid)){
+            if ($itcloud->{$fld} ne "" && 
+                !in_array($notifyParam->{emailcc},$itcloud->{$fld}) &&
+                !in_array($notifyParam->{emailto},$itcloud->{$fld})){
+               push(@{$notifyParam->{emailcc}},$itcloud->{$fld});
+            }
+         }
+         my ($subject,$ntext);
+         my $subject=$self->T("automatic system import rejected",
+                              'TS::system')." - ".
+                     $self->T("invalid cloudarea cistatus",
+                              'TS::system');
+         my $tmpl=$self->getParsedTemplate(
+                    "tmpl/genericSystemImport_BadCloudArea",{
+            static=>{
+               SYSTEM=>$sysrec->{name},
+               URL=>$cloudarearec->{urlofcurrentrec},
+               CLOUDAREA=>$cloudarearec->{fullname},
+               APPL=>$w5applrec->{name}
+            }
+         });
+         return($subject,$tmpl);
+      });
+      $self->LastMsg(ERROR,"invalid cloudarea cistatus");
+      return(undef);
+   }
+
+
+
 
    my $w5sysrecmodified=0;
    $sys->ResetFilter();

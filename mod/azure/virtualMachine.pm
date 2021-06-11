@@ -428,6 +428,7 @@ sub Import
 
    my $flt;
    my $importname;
+   my $sysrec;
    if ($param->{importname} ne ""){
       $importname=$param->{importname};
       $importname=~s/\s//i; # prevent wildcard and or filters
@@ -437,12 +438,36 @@ sub Import
       else{
          return(undef);
       }
+      ########################################################################
+      # Detect System Record from Remote System
+      ########################################################################
+      $self->ResetFilter();
+      $self->SetFilter($flt);
+      my @l=$self->getHashList(qw(name 
+                                  id zone vmId
+                                  subscriptionId ipaddresses));
+      if ($#l==-1){
+         if ($self->isDataInputFromUserFrontend()){
+            $self->LastMsg(ERROR,"Systemname not found in AZURE");
+         }
+         return(undef);
+      }
+      if ($#l>0){
+         if ($self->isDataInputFromUserFrontend()){
+            $self->LastMsg(ERROR,"Systemname '%s' not unique in AZURE",
+                                 $param->{importname});
+         }
+         return(undef);
+      }
+      $sysrec=$l[0];
+   }
+   elsif (ref($param->{importrec}) eq "HASH"){
+      $sysrec=$param->{importrec};
    }
    else{
       msg(ERROR,"no importname specified while ".$self->Self." Import call");
       return(undef);
    }
-printf STDERR ("import filter=%s\n",Dumper($flt));
 
    my $system=getModuleObject($self->Config,"TS::system");
 
@@ -460,55 +485,6 @@ printf STDERR ("import filter=%s\n",Dumper($flt));
       }
    }
 
-   ########################################################################
-   # Detect System Record from Remote System
-   ########################################################################
-   $self->ResetFilter();
-   $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(name 
-                               id zone vmId
-                               subscriptionId ipaddresses));
-printf STDERR ("syslist %s\n",Dumper(\@l));
-   if ($#l==-1){
-      $self->LastMsg(ERROR,"Systemname not found in AZURE");
-      return(undef);
-   }
-   if ($#l>0){
-      {
-         #######################################################################
-         if (defined($itcloud) && ref($cloudrec) eq "HASH"){  # das solllte
-            my %notifyParam=(                                 # in die generic
-                mode=>'ERROR',
-                emailbcc=>11634953080001 # hartmut
-            );
-            if ($cloudrec->{supportid} ne ""){
-               $notifyParam{emailcc}=$cloudrec->{supportid};
-            }
-            push(@{$notifyParam{emailcategory}},"SystemImport");
-            push(@{$notifyParam{emailcategory}},"ImportFail");
-            push(@{$notifyParam{emailcategory}},"AZURE");
-
-            $itcloud->NotifyWriteAuthorizedContacts($cloudrec,
-                  {},\%notifyParam,
-                  {mode=>'ERROR'},sub{
-               my ($subject,$ntext);
-               my $subject="AZURE cloud systemname configuration error";
-               my $ntext="the systemname '".$param->{importname}."' is ".
-                         "not unique in AZURE";
-               $ntext.="\n";
-               return($subject,$ntext);
-            });
-         }
-         #######################################################################
-      }
-      if ($self->isDataInputFromUserFrontend()){
-         $self->LastMsg(ERROR,"Systemname '%s' not unique in AZURE",
-                              $param->{importname});
-      }
-      return(undef);
-   }
-
-   my $sysrec=$l[0];
 
    my %ipaddresses;
    foreach my $iprec (@{$sysrec->{ipaddresses}}){
@@ -564,11 +540,13 @@ printf STDERR ("syslist %s\n",Dumper(\@l));
       srcobj=>$self
    };
 
-   printf STDERR ("ImportRec(imprec):%s\n",Dumper($ImportRec->{imprec}));
+   #printf STDERR ("ImportRec(imprec):%s\n",Dumper($ImportRec->{imprec}));
    my $ImportResult=$system->genericSystemImport($ImportObjects,$ImportRec);
    #printf STDERR ("ImportResult:%s\n",Dumper($ImportResult));
-
-   return($ImportResult->{IdentifedBy});
+   if ($ImportResult){
+      $ImportResult->{IdentifedBy};
+   }
+   return();
 }
 
 

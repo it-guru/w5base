@@ -78,7 +78,7 @@ sub qcheckRecord
 
    return(undef,undef) if ($rec->{cloud} ne "AZURE" &&
                            $rec->{cloud} ne "Azure_DTIT");
-   return(undef,undef) if ($rec->{cistatusid}<4);
+   return(undef,undef) if ($rec->{cistatusid}<3);
 
    my $app=getModuleObject($self->getParent->Config(),"itil::appl");
    $app->SetFilter({id=>\$rec->{applid}});
@@ -165,8 +165,21 @@ sub qcheckRecord
 
       $par->ResetFilter();
       foreach my $srcid (@inssys){
-         push(@qmsg,"import $srcid");
-         $par->Import({importname=>$srcid});
+         $par->ResetFilter();
+         $par->SetFilter({id=>$srcid}); # reread record to prevent error msg
+                                        # on fast deleted systems
+         my @l=$par->getHashList(qw(name
+                                    id zone vmId
+                                    subscriptionId ipaddresses ));
+         foreach my $importrec (@l){  
+            my $bk=$par->Import({importrec=>$importrec});
+            if (!defined($bk)){
+               push(@qmsg,"fail import: ".$importrec->{id});
+            } 
+            else{
+               push(@qmsg,"import: ".$importrec->{id});
+            }
+         }
       }
       if (keys(%srcid) &&   # ensure, restcall get at least one result
           $#delsys!=-1){

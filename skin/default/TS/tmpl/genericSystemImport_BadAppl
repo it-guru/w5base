@@ -1,0 +1,10 @@
+The automatic import of logical system ...
+%SYSTEM%
+... from CloudArea %CLOUDAREA% was rejected.
+
+The reson for this reject is, the Application is active. On CloudAreas with not activated applications, no deployments are allowed. 
+
+As databoss (or write authorized person) of %APPL%, you can change the CI-Status to installed/activ, if you wan't to enable/allow deploment operations on the CloudArea.
+%URL%
+
+<b><font color=red>Deployments on CloudAreas with not activated applications causes in security issues!</font></b>
