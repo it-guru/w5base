@@ -5135,7 +5135,8 @@ sub DoRESTcall
       }
    }
    
-
+   $self->Log(INFO,"restcall",$self->Self()." ".$p{method}." ".$p{url}.
+                   " REMOTE_USER=$ENV{REMOTE_USER}");
 
 
    my $response=$ua->request($req);
