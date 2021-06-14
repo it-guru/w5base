@@ -693,6 +693,130 @@ sub ValidateDelete
 }
 
 
+sub validateCloudAreaImportState
+{
+   my $self=shift;
+   my $importname=shift;
+   my $cloudrec=shift;
+   my $cloudarearec=shift;
+   my $w5applrec=shift;
+
+   my $srcsys=$cloudarearec->{srcsys};
+
+   my $appl=getModuleObject($self->Config,"itil::appl");
+
+   # check if $w5applrec->{cistatusid} is in 3 4 
+
+   if (!($w5applrec->{cistatusid} eq "3" ||
+         $w5applrec->{cistatusid} eq "4")){
+      my %notifyParam=(
+         emailcategory=>[$srcsys,'ImportReject','InvalidApplication'],
+         emailcc=>[],
+         emailbcc=>[
+            11634953080001, # HV
+         ]
+      );
+      $appl->NotifyWriteAuthorizedContacts($w5applrec,{},
+                                           \%notifyParam,{mode=>'ERROR'},sub{
+         my ($_self,$notifyParam,$notifycontrol)=@_;
+         foreach my $fld (qw(securityrespid supportid)){
+            if ($cloudrec->{$fld} ne "" && 
+                !in_array($notifyParam->{emailcc},$cloudrec->{$fld}) &&
+                !in_array($notifyParam->{emailto},$cloudrec->{$fld})){
+               push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
+            }
+         }
+         my ($subject,$ntext);
+         my $subject=$self->T("automatic import rejected",
+                              'itil::itcloudarea')." - ".
+                     $self->T("invalid application cistatus",
+                              'itil::itcloudarea');
+         my $tmpl=$self->getParsedTemplate(
+                    "tmpl/genericSystemImport_BadAppl",{
+            static=>{
+               SYSTEM=>$importname,
+               URL=>$w5applrec->{urlofcurrentrec},
+               CLOUDAREA=>$cloudarearec->{fullname},
+               APPL=>$w5applrec->{name}
+            }
+         });
+         return($subject,$tmpl);
+      });
+      $self->LastMsg(ERROR,"invalid appl cistatus");
+      return(undef);
+   }
+
+
+   # check if $cloudarearec->{cistatusid} is in 4
+   if (!($cloudarearec->{cistatusid} eq "4")){
+      my %notifyParam=(
+         emailcategory=>[$srcsys,'ImportReject','InvalidApplication'],
+         emailcc=>[],
+         emailbcc=>[
+            11634953080001, # HV
+         ]
+      );
+      foreach my $fld (qw(securityrespid supportid)){
+         if ($cloudrec->{$fld} ne "" && 
+             !in_array($notifyParam{emailcc},$cloudrec->{$fld})){
+            push(@{$notifyParam{emailcc}},$cloudrec->{$fld});
+         }
+      }
+      $appl->NotifyWriteAuthorizedContacts($w5applrec,{},
+                                           \%notifyParam,{mode=>'ERROR'},sub{
+         my ($_self,$notifyParam,$notifycontrol)=@_;
+         my $cloudcontactadded=0;
+         foreach my $fld (qw(securityrespid supportid)){
+            if ($cloudrec->{$fld} ne "" && 
+                !in_array($notifyParam->{emailcc},$cloudrec->{$fld}) &&
+                !in_array($notifyParam->{emailto},$cloudrec->{$fld})){
+               push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
+               $cloudcontactadded++;
+            }
+         }
+         if (!$cloudcontactadded){
+            foreach my $fld (qw(platformrespid)){
+               if ($cloudrec->{$fld} ne "" && 
+                   !in_array($notifyParam->{emailcc},$cloudrec->{$fld}) &&
+                   !in_array($notifyParam->{emailto},$cloudrec->{$fld})){
+                  push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
+                  $cloudcontactadded++;
+               }
+            }
+         }
+         if (!$cloudcontactadded){
+            foreach my $fld (qw(databossid)){
+               if ($cloudrec->{$fld} ne "" && 
+                   !in_array($notifyParam->{emailcc},$cloudrec->{$fld}) &&
+                   !in_array($notifyParam->{emailto},$cloudrec->{$fld})){
+                  push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
+                  $cloudcontactadded++;
+               }
+            }
+         }
+         my ($subject,$ntext);
+         my $subject=$self->T("automatic import rejected",
+                              'itil::itcloudarea')." - ".
+                     $self->T("invalid cloudarea cistatus",
+                              'itil::itcloudarea');
+         my $tmpl=$self->getParsedTemplate(
+                    "tmpl/genericSystemImport_BadCloudArea",{
+            static=>{
+               SYSTEM=>$importname,
+               URL=>$cloudarearec->{urlofcurrentrec},
+               CLOUDAREA=>$cloudarearec->{fullname},
+               APPL=>$w5applrec->{name}
+            }
+         });
+         return($subject,$tmpl);
+      });
+      $self->LastMsg(ERROR,"invalid cloudarea cistatus");
+      return(undef);
+   }
+   return(1);
+}
+
+
 
 
 

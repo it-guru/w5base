@@ -76,7 +76,7 @@ sub qcheckRecord
    my $errorlevel=0;
 
    return(undef,undef) if ($rec->{srcsys} ne "tsotc::appagilenamespace");
-   return(undef,undef) if ($rec->{cistatusid}<4);
+   return(undef,undef) if ($rec->{cistatusid}<3);
    return(undef,undef) if ($rec->{cistatusid}>5);
 
    my $now=NowStamp("en");

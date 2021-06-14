@@ -563,7 +563,7 @@ sub Validate
 
    my $itcloudareaaccess=0;
 
-   if ($itcloudareaid ne ""){
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"itcloudareaid")){
       my $itca=$self->getPersistentModuleObject("itil::itcloudarea");
       $itca->SetFilter({id=>\$itcloudareaid});
       my ($carec,$msg)=$itca->getOnlyFirst(qw(ALL));
@@ -572,36 +572,45 @@ sub Validate
          return(undef);
       }
       else{
-         if ($carec->{cistatusid} ne "4"){
-            $self->LastMsg(ERROR,"specified cloudarea is not installed/active");
+         my $appl=getModuleObject($self->Config,"itil::appl");
+         $appl->SetFilter({id=>\$carec->{applid}});
+         my ($applrec,$msg)=$appl->getOnlyFirst(qw(ALL));
+         if (!defined($applrec)){
+            $self->LastMsg(ERROR,"invalid application referenced");
+            return(undef);
+         }
+
+         my $itc=$self->getPersistentModuleObject("itil::itcloud");
+         $itc->SetFilter({id=>\$carec->{cloudid}});
+         my ($clrec,$msg)=$itc->getOnlyFirst(qw(ALL));
+         if (!defined($clrec)){
+            $self->LastMsg(ERROR,"no valid cloud referenced");
             return(undef);
          }
          else{
-            my $itc=$self->getPersistentModuleObject("itil::itcloud");
-            $itc->SetFilter({id=>\$carec->{cloudid},cistatusid=>[3,4,5]});
-            my ($clrec,$msg)=$itc->getOnlyFirst(qw(ALL));
-            if (!defined($clrec)){
-               $self->LastMsg(ERROR,"no valid cloud referenced");
+            if (!$itca->validateCloudAreaImportState("URL: ".$name,
+                                            $clrec,$carec,$applrec)){
+               if ($self->LastMsg()==-1){
+                  $self->LastMsg(ERROR,"invalid CloudArea State");
+               }
                return(undef);
             }
-            else{
-               if ($self->isDataInputFromUserFrontend()){
-                  my @l=$itc->isWriteValid($clrec);
-                  if (!in_array(\@l,[qw(default ALL)])){
-                     $self->LastMsg(ERROR,"no write access to cloud");
-                     return(undef);
-                  }
-                  else{
-                     $itcloudareaaccess=1;
-                  }
+            if ($self->isDataInputFromUserFrontend()){
+               my @l=$itc->isWriteValid($clrec);
+               if (!in_array(\@l,[qw(default ALL)])){
+                  $self->LastMsg(ERROR,"no write access to cloud");
+                  return(undef);
                }
                else{
                   $itcloudareaaccess=1;
                }
-               my $applid=effVal($oldrec,$newrec,"applid");
-               if ($applid ne $carec->{applid}){
-                  $newrec->{applid}=$carec->{applid};
-               }
+            }
+            else{
+               $itcloudareaaccess=1;
+            }
+            my $applid=effVal($oldrec,$newrec,"applid");
+            if ($applid ne $carec->{applid}){
+               $newrec->{applid}=$carec->{applid};
             }
          }
       }
