@@ -189,7 +189,7 @@ sub decodeFilter2Query4azure
    #printf STDERR ("filter=%s\n",Dumper($filter));
    #printf STDERR ("dbclassTemplate=%s\n",Dumper(\$dbclass));
 
-   usleep(300);
+   usleep(600);
 
    if (ref($filter) eq "HASH"){
       foreach my $filtername (keys(%{$filter})){
