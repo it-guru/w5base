@@ -286,19 +286,24 @@ sub setClearingDestinations
 
 sub IsModuleSelectable
 {
-   my $self=shift;
-   my $acl;
-
-   $acl=$self->getParent->getMenuAcl($ENV{REMOTE_USER},
-                          "base::workflow",
-                          func=>'New',
-                          param=>'WorkflowClass=base::workflow::DataIssue');
-   if (defined($acl)){
-      return(1) if (grep(/^read$/,@$acl));
-   }
-   return(1) if ($self->getParent->IsMemberOf("admin"));
    return(0);
 }
+
+#sub IsModuleSelectable
+#{
+#   my $self=shift;
+#   my $acl;
+#
+#   $acl=$self->getParent->getMenuAcl($ENV{REMOTE_USER},
+#                          "base::workflow",
+#                          func=>'New',
+#                          param=>'WorkflowClass=base::workflow::DataIssue');
+#   if (defined($acl)){
+#      return(1) if (grep(/^read$/,@$acl));
+#   }
+#   return(1) if ($self->getParent->IsMemberOf("admin"));
+#   return(0);
+#}
 
 sub isViewValid
 {

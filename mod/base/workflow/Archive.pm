@@ -43,6 +43,11 @@ sub getDetailBlockPriority            # posibility to change the block order
    return("header","default","state");
 }
 
+sub IsModuleSelectable
+{
+   return(0);
+}
+
 
 sub getDynamicFields
 {
