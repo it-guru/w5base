@@ -32,3 +32,17 @@
 'wfschedule'=>{de=>'zyklische Aktivierung einstellen',en=>'scheduled activation preferences'},
 'wftakemessage'=>{en=>'Take the Workflow - no matter in witch process state the worklow curently is',de=>'Mit dieser Aktion können Sie den aktuellen Workflow übernehmen - egal wem er gerade zugewiesen ist bzw. in welchem Bearbeitungsstatus der Workflow ist. Sie müssen selbst sicherstellen, dass der aktuelle Bearbeiter von Ihrer Übernahme informiert wird, damit keine etwaigen Doppeltarbeiten durchgeführt werden! Diese Aktion sollte nur dann angewendet werden, wenn ein Workflow z.B. an eine nicht existierende bzw. mitgliederlose Gruppe zugewiesen wurde.'},
 'The request to reprocess a workflow is only 14 days and at most 5 times allowed. For this workflow, no reprocessing is posible.'=>{de=>'Die Anforderung zur Nachbesserung ist nur max. 14 Tage nach dem ersten Lösen des Requests möglich. Auch ist die Anforderung zur Nachbesserung/Zurückstellung/Reaktivierung nur max. 5 mal erlaubt. Für diesen Workflow ist Aufgrund dieser Regeln keine Nachbesserung mehr möglich. Falls Sie dennoch Anforderungen haben, stellen Sie bitte einen neuen Request ein.'},
+'INITIALMSG000'=>{
+de=>'
+Der Workflow wurde erfolgreich erzeugt und der zu Bearbeitung zugewiesen. 
+Für Sie sind vorerst keine weiteren Aktionen notwendig. 
+Sie können einfach im Menü einen anderen Punkt wählen oder das Browser-Fenster 
+schließen.
+Das aktuelle Weiterleitungs-Ziel wurde bereits per Mail über diesen neuen Workflow informiert.
+',
+en=>'
+The workflow has been successfully created and assigned to be processed.
+No further actions are necessary for you for the time being.
+You can simply select another item in the menu or close the browser window.
+The current forwarding target has already been informed about this new workflow by mail.
+'},

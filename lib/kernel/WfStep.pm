@@ -1040,8 +1040,16 @@ sub generateWorkspacePages
                    $$divset;
       }
       else{
-         $$divset="<div id=OPnop style=\"margin:15px\"></div>".
-                   $$divset;
+         my $initial=0;
+         if ($ENV{HTTP_REFERER}=~m#/base/workflow/New$#){
+            $initial++;
+         }
+         my $localdiv="<div id=OPnop style=\"margin:15px\">";
+         if ($initial){
+            $localdiv.=$self->getParent->T("INITIALMSG000",$tr);
+         }
+         $localdiv.="</div>";
+         $$divset=$localdiv.$$divset;
       }
    }
    if (grep(/^wfreject$/,@$actions)){
