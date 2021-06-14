@@ -1,0 +1,3 @@
+@import url("Output.HtmlViewEditor.css?SKIN=default");
+a:focus {outline: #b90b64 solid 1px;}
+input:focus {outline: #b90b64 solid 1px;}

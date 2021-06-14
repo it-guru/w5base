@@ -307,6 +307,8 @@ function InitDropBox()
 {
    var d=document.getElementById("NewCurrentView");
    addEvent(d,"keydown",DropBoxKh);
+   var i=document.getElementById("shortsearch");
+   i.focus();
 }
 
 addEvent(window,"load",InitDropBox);
@@ -498,7 +500,9 @@ sub getFullFieldTreeSelect
              "onClick=\"DoFieldonClick(this);\" ".
              "onMouseDown=\"return(false)\" ".
              "onSelectStart=\"return(false)\" ".
-             ">".$label."</li>";
+             "><input ".
+             "class=fieldadd type=button value=\"&#10148;\">".
+             $label."</li>";
          $d.="</ul>";
       }
       $d.="</li>";

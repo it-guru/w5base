@@ -21,4 +21,16 @@ a:link.viewdirectedit, a:visited.viewdirectedit, a:active.viewdirectedit  {
             color:#000000;
           }
 
+input[type="button"].fieldadd {
+border: none;
+margin:0px;
+margin-right:2px;
+padding:0px;
+outline:none;
+display: inline-block;
+}
+input[type="button"].fieldadd:focus {
+outline: 2px solid #30579f;
+}
+
 
