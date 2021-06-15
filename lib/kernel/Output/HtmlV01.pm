@@ -40,8 +40,38 @@ sub getDownloadFilename
    return($self->SUPER::getDownloadFilename().".html");
 }
 
+sub IsDirectLink
+{
+   return(0);
+}
 
 
+sub getRecordImageUrl
+{
+   return("../../../public/base/load/icon_htmltab.gif");
+}
+
+sub Label
+{
+   return("HTML active List");
+}
+sub Description
+{
+   return("HTML table with active query handling");
+}
+
+
+
+sub IsModuleSelectable
+{
+   return(1);
+}
+
+
+sub FormaterOrderPrio
+{
+   return(10011);  # unwichtig
+}
 
 
 sub getHttpHeader

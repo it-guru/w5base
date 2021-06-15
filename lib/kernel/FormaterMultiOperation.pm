@@ -29,6 +29,12 @@ sub new
    return($self);
 }
 
+sub FormaterOrderPrio
+{
+   return(500);
+}
+
+
 sub getRecordImageUrl
 {
    my $self=shift;

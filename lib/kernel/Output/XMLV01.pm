@@ -53,6 +53,14 @@ sub MimeType
    return("text/xml");
 }
 
+
+sub FormaterOrderPrio
+{
+   return(10009);  # unwichtig
+}
+
+
+
 sub getDownloadFilename
 {
    my $self=shift;

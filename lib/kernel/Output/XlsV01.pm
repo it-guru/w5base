@@ -31,6 +31,14 @@ sub new
    return($self);
 }
 
+
+sub FormaterOrderPrio
+{
+   return(100);
+}
+
+
+
 sub IsModuleSelectable
 {
    eval("use Spreadsheet::WriteExcel::Big;");

@@ -32,6 +32,13 @@ sub new
    return($self);
 }
 
+sub FormaterOrderPrio
+{
+   return(200);
+}
+
+
+
 sub IsModuleSelectable
 {
    return(1);

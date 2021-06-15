@@ -106,19 +106,41 @@ sub ProcessHead
    my ($d,$p);
    my $url=$ENV{SCRIPT_URI};
    my $q=Query->MultiVars(); 
+   my $app=$self->getParent->getParent();
 
    foreach my $v (keys(%$q)){
       delete($q->{$v}) if (!defined($q->{$v}) || $q->{$v} eq "");
       delete($q->{$v}) if (in_array([qw(UseLimit UseLimitStart 
                                         MOD FUNC DataObj)],$v));
    }
-   delete($q->{CurrentView}) if ($q->{CurrentView} eq "default");
+   if ($q->{CurrentView} eq ""){
+      $q->{CurrentView}="default";
+   }
+   if (!($q->{CurrentView}=~m/^\(.*\)$/)){
+      my @view=$app->getCurrentView();
+      $q->{CurrentView}="(".join(",",@view).")";
+   }
    $q->{FormatAs}=~s/^.*;//;
+
+   if ($q->{FormatAs}=~m/(JSON|XML)/i){    # better query for tech queries
+      if ($q->{search_cistatus} eq 
+          '"!'.$app->T("CI-Status(6)","base::cistatus").'"'){
+         $q->{search_cistatusid}="!6";
+         delete($q->{search_cistatus});
+      }
+   }
+   if ($q->{FormatAs} eq "HtmlV01"){
+      $q->{'$TITLE$'}="ActiveHtml Query";
+      $q->{'$NOVIEWSELECT$'}="1";
+
+   }
+
    foreach my $v (sort(keys(%$q))){
       my $d=$q->{$v};
       $d=[$q->{$v}] if (ref($q->{$v}) ne "ARRAY");
       foreach my $val (@{$d}){
-         $p.=sprintf("%20s = %s\n",$v,$val);
+         $val=$$val if (ref($val) eq "SCALAR");
+         $p.=sprintf("%30s = %s\n",$v,$val);
       }
    }
    my $bmlink=$ENV{SCRIPT_URI};
@@ -127,6 +149,12 @@ sub ProcessHead
    
    my $query=kernel::cgi::Hash2QueryString($q); 
    $bmlink.="?".$query if ($query ne "");
+
+   # make query better human readable
+   $query=~s/%28/(/g;
+   $query=~s/%29/)/g;
+   $query=~s/%2C/,/g;
+   $query=~s/%21/!/g;
    $url.="?".$query if ($query ne "");
 
    my $uri=$ENV{SCRIPT_URI};
@@ -139,6 +167,9 @@ sub ProcessHead
    my $bmname=Query->Param("bmname");
   
    $d=<<EOF;
+<script language=JavaScript type="text/javascript" 
+      src="../../../public/base/load/toolbox.js"></script>
+
 <link rel=stylesheet  href="../../base/load/default.css"></link>
 <link rel=stylesheet  href="../../base/load/frames.css"></link>
 <form method=POST target=bmcreate action="../../base/userbookmark/WebBookmarkCreate"><center><div class=winframe style="margin-top:5px;width:85%">
@@ -173,7 +204,7 @@ data structures in W5Base.<br>
 <div style="margin:5px;margin-right:10px">
 <div class=winframe style="width:100%;overflow:auto;margin:5px;padding:2px">
 <b>GET URL:</b>
-<XMP style='margin:0;padding:0'>$url</XMP>
+<XMP id=directGetURL onclick=\"copyToClipboard('directGetURL');\"  title=\"copy to clipboard\" style='cursor:pointer;margin:0;padding:0'>$url</XMP>
 </div>
 <div class=winframe style="width:100%;overflow:auto;margin:5px;padding:2px">
 <b>URI:</b>

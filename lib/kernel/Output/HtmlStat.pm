@@ -33,7 +33,13 @@ sub new
 
 sub IsModuleSelectable
 {
-   return(1);
+   my $self=shift;
+   my $app=$self->getParent->getParent();
+
+
+   return(1) if ($app->IsMemberOf("admin"));
+
+   return(0);
 }
 
 sub getRecordImageUrl

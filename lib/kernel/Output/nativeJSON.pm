@@ -33,8 +33,26 @@ sub new
 
 sub IsModuleSelectable
 {
-   return(0);
+   return(1);
 }
+
+sub Label
+{
+   return("JSON REST");
+}
+sub Description
+{
+   return("REST GET Request with JSON Response");
+}
+
+
+sub FormaterOrderPrio
+{
+   return(10010);  # unwichtig
+}
+
+
+
 
 
 sub MimeType

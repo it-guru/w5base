@@ -42,6 +42,18 @@ sub IsModuleDownloadable
 }
 
 
+sub IsDirectLink
+{
+   return(1);
+}
+
+
+sub FormaterOrderPrio
+{
+   return(1000);
+}
+
+
 sub modeName
 {
    my $self=shift;

@@ -51,6 +51,13 @@ sub getRecordImageUrl
 {
    return("../../../public/base/load/icon_asctab.gif");
 }
+
+sub FormaterOrderPrio
+{
+   return(300);  # unwichtig
+}
+
+
 sub Label
 {
    return("Output to one line");

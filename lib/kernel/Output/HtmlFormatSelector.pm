@@ -162,6 +162,7 @@ sub ProcessLine
          $rec{download}=0;
          $rec{function}="InitWorkflow";
          $rec{name}=$o->Name();
+         $rec{prio}=$o->FormaterOrderPrio();
          $rec{icon}=$o->getRecordImageUrl();
          $rec{mimetype}=$o->MimeType();
          $rec{label}=$self->getParent->getParent->T($o->Label(),$o->Self());
@@ -177,6 +178,8 @@ sub ProcessLine
       if ($o->IsModuleSelectable(%env)){
          my %rec=();
          $rec{download}=$o->IsModuleDownloadable(%env);
+         $rec{prio}=$o->FormaterOrderPrio();
+         $rec{directlink}=$o->IsDirectLink();
          if ($o->forceDownloadAsAttachment()){
             $rec{function}="DirectDownload";
          }
@@ -193,9 +196,28 @@ sub ProcessLine
       }
    }
 
+   my @formaterList=(values(%workoutput),@operator);
 
-   foreach my $frec (values(%workoutput),@operator){
+   @formaterList=sort({
+      my $bk=$a->{prio} <=> $b->{prio};
+      if ($bk eq "0"){
+         $bk=$a->{name} cmp $b->{name};
+      }
+      return($bk);
+   } @formaterList);
+
+
+
+   foreach my $frec (@formaterList){
       my $t1=$app->T("show the selected data in browser (if it is posible)");
+      my $lstart="";
+      my $lend="";
+
+      if ($frec->{directlink}){
+         $lstart="<a href=JavaScript:$frec->{function}(\"$frec->{name}\") ".
+                 "title=\"$t1\">";
+         $lend="</a>";
+      }
       $d.=<<EOF;
 <div style="padding:4px;
             margin:5px;
@@ -206,10 +228,9 @@ sub ProcessLine
             border-width:1px;">
 <table width="100%" cellspacing=0 cellpadding=0 border=0>
 <tr>
-<td width=1% valign=top>
-<a href=JavaScript:$frec->{function}("$frec->{name}") title="$t1">
+<td width=1% valign=top>${lstart}
 <img alt="format icon $frec->{name}" 
-     src="$frec->{icon}" border=0 style="margin-right:5px;"></a>
+     src="$frec->{icon}" border=0 style="margin-right:5px;">${lend}
 </td>
 <td valign=top>
 
@@ -228,9 +249,17 @@ EOF
               $frec->{label};
        my $t2=$app->T("download the selected data as offline file").': '.
               $frec->{label};
+       my $directDownload="<a onclick='DirectDownload(\"$frec->{name}\",".
+                  "\"DirectView\")' style='cursor:pointer' ".
+                  "title=\"$t2\">".
+                  "<img border=0 alt=\"download\" ".
+                  "src=\"../../../public/base/load/download_mini.gif\"></a>";
+       if (!$frec->{directlink}){
+          $directDownload="";
+       }
        $d.=<<EOF;
 <a style='cursor:pointer' onclick='ShowUrl("$frec->{name}")' title="$t1"><img border=0 alt="anker" src="../../../public/base/load/anker.gif"></a>&nbsp;
-<a onclick='DirectDownload("$frec->{name}",\"DirectView\")' style='cursor:pointer' title="$t2"><img border=0 alt="download" src="../../../public/base/load/download_mini.gif"></a>
+$directDownload
 EOF
     }
     else{

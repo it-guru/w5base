@@ -31,6 +31,15 @@ sub new
    return($self);
 }
 
+
+
+sub FormaterOrderPrio
+{
+   return(10000);  # unwichtig
+}
+
+
+
 sub getRecordImageUrl
 {
    return("../../../public/base/load/icon_xlso.gif");
