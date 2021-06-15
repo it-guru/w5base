@@ -959,13 +959,26 @@ sub parseSSL
 sub getSqlFrom
 {
    my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+
+
 
    my $secscansql=$self->getSecscanFromSQL();
    my $from="W5SIEM_secent ".
             "join ($secscansql) secscan ".
                "on W5SIEM_secent.ref=secscan.ref ".
             "left outer join ($secscansql) dupsecscan ".
-               "on secscan.ictoid=dupsecscan.ictoid ".
+               "on ".
+                   # "(".
+                   #  "(secscan.w5baseid_appl is not null and ".
+                   #    "secscan.w5baseid_appl=dupsecscan.w5baseid_appl)".
+                   #   " or ".
+                   #  "(secscan.w5baseid_appl is null and ".
+                   #    "secscan.ictoid=dupsecscan.ictoid)".
+                   # ") ".
+                    "(secscan.w5baseid_appl=dupsecscan.w5baseid_appl and ".
+                    "secscan.ictoid=dupsecscan.ictoid)".
                    " and dupsecscan.islatest='1' ".
                    " and dupsecscan.scanperspective='CNDTAG' ".
                    " and secscan.scanperspective<>'CNDTAG' ".
