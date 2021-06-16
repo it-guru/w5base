@@ -97,6 +97,8 @@ sub NotifyContactDataModification
    my $contactrec=shift;
    my $add=shift;
 
+   return() if (exists($rec->{cistatusid}) && $rec->{cistatusid}>5);
+
    my $targetid;
    if (exists($rec->{databossid})){
       $targetid=$rec->{databossid};
