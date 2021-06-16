@@ -422,7 +422,7 @@ sub FineProcess
                my $sw=$self->{prodcompmap}->{$prodcomp}->{software};
                my $version=$self->{prodcompmap}->{$prodcomp}->{version};
                my $swnature=$self->{prodcompmap}->{$prodcomp}->{swnature};
-               if ($sw ne ""){
+               if ($sw ne "" && $soll{$k}->{systemid} ne ""){
                   $sinst->ResetFilter();
                   $sinst->SetFilter({systemid=>\$soll{$k}->{systemid},
                                      software=>$sw});
