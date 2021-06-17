@@ -162,10 +162,15 @@ sub qcheckRecord
          }
       }
 
-      $par->ResetFilter();
       foreach my $srcid (@inssys){
-         push(@qmsg,"import $srcid");
-         $par->Import({importname=>$srcid});
+         $par->ResetFilter();
+         $par->SetFilter({id=>\$srcid});
+         my ($imprec)=$par->getOnlyFirst(qw(ALL));
+         if (defined($imprec)){
+            push(@qmsg,"import $srcid");
+            $par->ResetFilter();
+            $par->Import({importrec=>$imprec});
+         }
       }
       if (keys(%srcid) &&   # ensure, restcall get at least one result
           $#delsys!=-1){
