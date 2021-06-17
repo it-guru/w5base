@@ -37,7 +37,6 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                htmldetail    =>0,
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'postitnote.id'),
@@ -157,7 +156,7 @@ sub new
 sub initSearchQuery
 {
    my $self=shift;
-   if (!defined(Query->Param("search_isdeleted"))){
+   if (!defined(Query->Param("search_publicstate"))){
       Query->Param("search_publicstate"=>$self->T("yes"));
    }
 }

@@ -197,7 +197,7 @@ sub globalHelp
       @selstags=split(/,/,$selstags[0]);
    }
    if ($#selstags==-1){
-      @selstags=(qw(forum article));
+      $self->defaultSTags(\@selstags);
    }
    my $s="<select name=stags style=\"width:100%\" multiple size=4>";
     while($#stags!=-1){
@@ -254,6 +254,45 @@ sub Welcome
    return(0);
 }
 
+sub defaultSTags
+{
+   my $self=shift;
+   my $stags=shift;
+   my $defaultRec;
+
+   my @defaultSTags=qw(forum article);
+
+   my $nobj=$self->getPersistentModuleObject("base::note"); 
+   my $userid=$self->getCurrentUserId();
+   my $selfname=$self->Self;
+   my $selflabel=$self->Self."::STag";
+   if ($#{$stags}==-1){
+      $nobj->SetFilter({parentobj=>\$selfname,creatorid=>\$userid,
+                        publicstate=>0,
+                        name=>\$selflabel});
+      ($defaultRec)=$nobj->getOnlyFirst(qw(ALL));
+      if (defined($defaultRec)){
+         @$stags=sort(split(/\s+/,$defaultRec->{comments}));
+      }
+      else{
+         @$stags=@defaultSTags;
+      }
+   }
+   if (join(" ",sort(@defaultSTags)) ne join(" ",sort(@$stags)) ||
+       (defined($defaultRec) && 
+        sort(split(/^s+/,$defaultRec->{comments})) ne join(" ",sort(@$stags)))){
+      $nobj->ValidatedInsertOrUpdateRecord(
+                        {parentobj=>$selfname,
+                         parentid=>'1',
+                         name=>$selflabel,
+                         publicstate=>'0',
+                         comments=>join(" ",sort(@$stags)),
+                         creatorid=>$userid},
+                        {parentobj=>\$selfname,name=>\$selflabel,
+                         creatorid=>\$userid,publicstate=>\'0'});
+   }
+}
+
 sub doSearch
 {
    my $self=shift;
@@ -273,6 +312,7 @@ sub doSearch
    }
    if (Query->Param("stags") ne ""){
       @stags=Query->Param("stags");
+      $self->defaultSTags(\@stags);
    }
    if (Query->Param("FormatAs") ne ""){
       $FormatAs=Query->Param("FormatAs");
