@@ -595,7 +595,8 @@ sub genericSystemImport
       $w5applrec=$apprec;
    }
    if (!defined($w5applrec)){
-      $self->LastMsg(ERROR,"no application record for $srcsys import");
+      $self->LastMsg(ERROR,"no application record for $srcsys import ".
+                     "(system.id=$sysrec->{id},system.name=$sysrec->{name})");
       return(undef);
    }
 
