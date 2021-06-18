@@ -3,3 +3,4 @@
 
 'fieldgroup.amrel'=>{de=>'AssetManager Zuordnung',en=>'AssetManager Relation'},
 'fieldgroup.tsinmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
+'automatic system import'=>{de=>'automatischer System Import'},

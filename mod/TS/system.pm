@@ -542,11 +542,12 @@ sub genericSystemImportNotify
 
    $w5sys->NotifyWriteAuthorizedContacts($rec,{},\%notifyParam,{},sub{
       my ($subject,$ntext);
-      my $subject=$datastream->T("automatic system import from",
-                                 'tsotc::event::ScanNewSystems').$subjectlabel.
+      my $subject=$datastream->T("automatic system import",
+                                 'TS::system')." ".$subjectlabel.
                                  " : ".
                                  $rec->{name};
       my $tmpl=$datastream->getParsedTemplate("tmpl/ScanNewSystems_MailNotify",{
+         skinbase=>'TS',
          static=>{
             URL=>$rec->{urlofcurrentrec},
             SYSTEMNAME=>$rec->{name}
