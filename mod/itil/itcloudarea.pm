@@ -810,7 +810,9 @@ sub validateCloudAreaImportState
          });
          return($subject,$tmpl);
       });
-      $self->LastMsg(ERROR,"invalid cloudarea cistatus");
+      if ($self->isDataInputFromUserFrontend()){
+         $self->LastMsg(ERROR,"invalid cloudarea cistatus");
+      }
       return(undef);
    }
    return(1);
