@@ -563,7 +563,8 @@ sub Validate
 
    my $itcloudareaaccess=0;
 
-   if (!defined($oldrec) || effChanged($oldrec,$newrec,"itcloudareaid")){
+   if ((!defined($oldrec) && exists($newrec->{itcloudareaid})) || 
+       effChanged($oldrec,$newrec,"itcloudareaid")){
       my $itca=$self->getPersistentModuleObject("itil::itcloudarea");
       $itca->SetFilter({id=>\$itcloudareaid});
       my ($carec,$msg)=$itca->getOnlyFirst(qw(ALL));
