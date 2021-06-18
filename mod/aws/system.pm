@@ -342,6 +342,7 @@ sub Import
    my $flt;
    my $importname;
    my ($ec2id,$accountid,$region);
+   my $sysrec;
    if ($param->{importname} ne ""){
       $importname=$param->{importname};
       msg(INFO,"start Import in aws::system with importname $importname");
@@ -357,14 +358,41 @@ sub Import
          $self->LastMsg(ERROR,"sieht schlecht aus");
          return(undef);
       }
+
+      $self->ResetFilter();
+      $self->SetFilter($flt);
+      my @l=$self->getHashList(qw(id name idpath ipaddresses));
+      if ($#l==-1){
+         $self->LastMsg(ERROR,"EC2 Instanz not found in AWS");
+         return(undef);
+      }
+     
+      if ($#l>0){
+         if ($self->isDataInputFromUserFrontend()){
+            $self->LastMsg(ERROR,"Systemname '%s' not unique in AWS",
+                                 $param->{importname});
+         }
+         return(undef);
+      }
+      $sysrec=$l[0];
+   }
+   elsif (ref($param->{importrec}) eq "HASH"){
+      $sysrec=$param->{importrec};
    }
    else{
       msg(ERROR,"no importname specified while ".$self->Self." Import call");
       return(undef);
    }
-   my $syssrcid=lc($importname);
-   my $appl=getModuleObject($self->Config,"TS::appl");
-   my $cloudarea=getModuleObject($self->Config,"itil::itcloudarea");
+   my $syssrcid=$sysrec->{idpath};
+
+   my $system=getModuleObject($self->Config,"TS::system");
+
+
+
+   ########################################################################
+   # Detect Cloud Record
+   ########################################################################
+
    my $itcloud=getModuleObject($self->Config,"itil::itcloud");
    my $cloudrec;
    {
@@ -379,457 +407,64 @@ sub Import
          return(undef);
       }
    }
-   my $accountok=0;
-   my $w5cloudarearec;
-   foreach my $cloudarea (@{$cloudrec->{cloudareas}}){
-      if ($cloudarea->{srcid} eq $accountid){
-         $accountok++;
-         $w5cloudarearec=$cloudarea;
-      }
-   }
-   if (!$accountok){
-      $self->LastMsg(ERROR,"AWS-AccountID %s not found in CloudAreas",$accountid);
-      return(undef);
-   }
-   $self->ResetFilter();
-   $self->SetFilter($flt);
-   my @l=$self->getHashList(qw(id name));
-   if ($#l==-1){
-      $self->LastMsg(ERROR,"EC2 Instanz not found in AWS");
-      return(undef);
-   }
 
-   if ($#l>0){
-      if ($self->isDataInputFromUserFrontend()){
-         $self->LastMsg(ERROR,"Systemname '%s' not unique in AWS",
-                              $param->{importname});
-      }
-      return(undef);
-   }
-   my $sysrec=$l[0];
-   my $w5applrec;
+
+   # sysimporttempl is needed for 1st generic insert an refind a redeployment
+   my $sysimporttempl={
+      name=>$sysrec->{name},
+      initialname=>$sysrec->{uuid},
+      id=>$sysrec->{idpath},
+      srcid=>$sysrec->{idpath},
+      ipaddresses=>$sysrec->{ipaddresses}
+   };
+
+
+
+
+
+   my $appl=getModuleObject($self->Config,"TS::appl");
+   my $cloudarea=getModuleObject($self->Config,"itil::itcloudarea");
+
    my $w5carec;
 
-   my $applid=$w5cloudarearec->{applid};
-
-   msg(INFO,"try to add appl ".$w5cloudarearec->{applid}.
-            " to system ".$sysrec->{name});
-
-   $appl->SetFilter({id=>\$applid});
-   my ($apprec,$msg)=$appl->getOnlyFirst(qw(ALL));
-   if (defined($apprec) && 
-       in_array([qw(2 3 4)],$apprec->{cistatusid})){
-      $w5applrec=$apprec;
-   }
-
-
-
-   my $w5sysrecmodified=0;
-   my $sys=getModuleObject($self->Config,"TS::system");
-   $sys->ResetFilter();
-   $sys->SetFilter({srcsys=>\'AWS',srcid=>$syssrcid});
-   my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
-   #if (!defined($w5sysrec)){
-   #   $sys->ResetFilter();
-   #   $sys->SetFilter($flt);
-   #   ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
-   #}
-
-
-
-
-   if (!defined($w5sysrec)){   # srcid update kandidaten (schneller Redeploy)
-      my @flt;
-      if ($sysrec->{id}=~m/^i-(\S{5,20})$/){
-         push(@flt,{                       # manuell erfasstes i- Instanz
-           name=>$sysrec->{id},
-           srcsys=>'w5base ""'
-         });
-      }
-
-
-      if ($sysrec->{name} ne "" && ($sysrec->{name}=~m/^[a-z0-9_-]{5,40}$/)){
-         push(@flt,{
-           name=>$sysrec->{name},
-           srcsys=>\'AWS',
-           srcid=>'!'.$syssrcid
-         });
-      }
-      if ($sysrec->{ipaddress} ne ""){
-         push(@flt,{
-            ipaddresses=>$sysrec->{ipaddress},
-            srcsys=>\'AWS',
-            srcid=>'!'.$syssrcid
-         });
-      }
-
-
-      $sys->SetFilter(\@flt);
-      my @redepl=$sys->getHashList(qw(mdate cistatusid name 
-                                      srcid srcsys applications));
-
-      my $nredepl=$#redepl+1;
-      msg(INFO,"invantar check for AWS-SystemID: $syssrcid ".
-               "on $nredepl candidates");
-      foreach my $osys (@redepl){   # find best matching redepl candidate
-         my $applok=0;
-         msg(INFO,"check AWS-SystemID: $osys->{srcid} from inventar");
-         if ($osys->{srcid} eq $syssrcid){
-            msg(ERROR,"AWS-SystemID: $osys->{srcid} already in inventar");
-            # dieser Punkt dürfte nie erreicht werden, da ja oben bereits
-            # eine u.U. passende w5sysrec gesucht wurde.
-            last;
-         }
-         my $ageok=1;
-         if ($osys->{cistatusid}>5){  # prüfen, ob das Teil nicht schon
-                                      # ewig alt ist und "veraltet/gelöscht"
-            my $d=CalcDateDuration($osys->{mdate},NowStamp("en"));
-            if (defined($d) && $d->{days}>7){
-               next; # das Teil ist schon zu alt, um es wieder zu aktivieren
-            }
-         }
-         foreach my $appl (@{$osys->{applications}}){
-            if ($appl->{applid} eq $w5applrec->{id}){
-               $applok++;
-            }
-         }
-         my $sysallowed=0;
-         if ($ageok && $applok){
-            $self->ResetFilter();
-            $self->SetFilter({idpath=>\$osys->{srcid}});
-            msg(INFO,"check exist of AWS-SystemID: $osys->{srcid}");
-            my ($chkrec,$msg)=$self->getOnlyFirst(qw(id));
-            if (!defined($chkrec)){
-               msg(INFO,"AWS-SystemID: $osys->{srcid} does not exists anymore");
-               $sysallowed++;
-            }
-         }
-         if ($applok && $sysallowed && $ageok){
-            $sys->ResetFilter();
-            $sys->SetFilter({id=>\$osys->{id}});
-            my ($oldrec,$msg)=$sys->getOnlyFirst(qw(ALL));
-            if (defined($oldrec)){
-               if ($sys->ValidatedUpdateRecord($oldrec,{
-                       srcid=>$syssrcid,srcsys=>'AWS',
-                       cistatusid=>4
-                   },{id=>\$oldrec->{id}})) {
-                  $sys->ResetFilter();
-                  $sys->SetFilter({id=>\$osys->{id}});
-                  ($w5sysrec)=$sys->getOnlyFirst(qw(ALL));
-                  $w5sysrecmodified++;
-               }
-               last;
-            }
-         }
-      } 
-   }
-
-   my $identifyby;
-   if (defined($w5sysrec)){
-      if (uc($w5sysrec->{srcsys}) eq "AWS"){
-         my $msg=sprintf($self->T("Systemname '%s' already imported in W5Base"),
-                         $w5sysrec->{name});
-         if ($w5sysrec->{cistatusid} ne "4" || $w5sysrecmodified){
-            my %checksession;
-            my $qc=getModuleObject($self->Config,"base::qrule");
-            $qc->setParent($sys);
-            $checksession{autocorrect}=$w5sysrec->{allowifupdate};
-            $checksession{autocorrect}=1; # force import with autocorrect
-            $qc->nativQualityCheck(
-                 $sys->getQualityCheckCompat($w5sysrec),$w5sysrec,
-                               \%checksession);
-            return($w5sysrec->{id});
-         }
-         $self->LastMsg(ERROR,$msg);
-         return(undef);
-      }
-   }
-   if (defined($w5sysrec)){
-      if ($w5sysrec->{srcsys} ne "AWS" &&
-          lc($w5sysrec->{srcsys}) ne "w5base" &&
-          $w5sysrec->{srcsys} ne ""){
-         $self->LastMsg(ERROR,"name colision - systemname $w5sysrec->{name} ".
-                              "already in use. Import failed");
-         return(undef);
+   if ($accountid ne ""){
+      $cloudarea->SetFilter({cloudid=>$cloudrec->{id},
+                             srcid=>$accountid
+      });
+      my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+      if (defined($w5cloudarearec)){
+         $w5carec=$w5cloudarearec;
       }
    }
 
-   my $curdataboss;
-   if (defined($w5sysrec)){
-      $curdataboss=$w5sysrec->{databossid};
-      my %newrec=();
-      my $userid;
 
-      if ($self->isDataInputFromUserFrontend() &&   # only admins (and databoss)
-                                                    # can force
-          !$self->IsMemberOf("admin")) {            # reimport over webrontend
-         $userid=$self->getCurrentUserId();         # if record already exists
-         if ($w5sysrec->{cistatusid}<6 && $w5sysrec->{cistatusid}>2){
-            if ($userid ne $w5sysrec->{databossid}){
-               $self->LastMsg(ERROR,
-                              "reimport only posible by current databoss");
-               if (!$self->isDataInputFromUserFrontend()){
-                  msg(ERROR,"fail to import $sysrec->{name} with ".
-                            "id $sysrec->{id}");
-               }
-               return(undef);
-            }
-         }
-      }
-      if ($w5sysrec->{cistatusid} ne "4"){
-         $newrec{cistatusid}="4";
-      }
-      if ($w5sysrec->{srcsys} ne "AWS"){
-         $newrec{srcsys}="AWS";
-      }
-      if ($w5sysrec->{srcid} ne $sysrec->{id}){
-         $newrec{srcid}=$syssrcid;
-      }
-      if ($w5sysrec->{systemtype} ne "standard"){
-         $newrec{systemtype}="standard";
-      }
-      if ($w5sysrec->{osrelease} eq ""){
-         $newrec{osrelease}="other";
-      }
-      if (defined($w5applrec) &&
-          ($w5sysrec->{isprod}==0) &&
-          ($w5sysrec->{istest}==0) &&
-          ($w5sysrec->{isdevel}==0) &&
-          ($w5sysrec->{iseducation}==0) &&
-          ($w5sysrec->{isapprovtest}==0) &&
-          ($w5sysrec->{isreference}==0) &&
-          ($w5sysrec->{iscbreakdown}==0)) { # alter Datensatz - aber kein opmode
-         if ($w5applrec->{opmode} eq "prod"){   # dann nehmen wir halt die
-            $newrec{isprod}=1;                  # Anwendungsdaten
-         }
-         elsif ($w5applrec->{opmode} eq "test"){
-            $newrec{istest}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "devel"){
-            $newrec{isdevel}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "education"){
-            $newrec{iseducation}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "approvtest"){
-            $newrec{isapprovtest}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "reference"){
-            $newrec{isreference}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "cbreakdown"){
-            $newrec{iscbreakdown}=1;
-         }
-     }
-      if (defined($w5applrec) && $w5applrec->{conumber} ne "" &&
-          $w5applrec->{conumber} ne $sysrec->{conumber}){
-         $newrec{conumber}=$w5applrec->{conumber};
-      }
-      if (defined($w5applrec) && $w5applrec->{acinmassignmentgroupid} ne "" &&
-          $w5sysrec->{acinmassignmentgroupid} eq ""){
-         $newrec{acinmassignmentgroupid}=
-             $w5applrec->{acinmassignmentgroupid};
-      }
 
-      my $foundsystemclass=0;
-      foreach my $v (qw(isapplserver isworkstation isinfrastruct 
-                        isprinter isbackupsrv isdatabasesrv 
-                        iswebserver ismailserver isrouter 
-                        isnetswitch isterminalsrv isnas
-                        isclusternode)){
-         if ($w5sysrec->{$v}==1){
-            $foundsystemclass++;
-         }
+   my $ImportRec={
+      cloudrec=>$cloudrec,
+      cloudarearec=>$w5carec,
+      imprec=>$sysimporttempl,
+      srcsys=>'AWS',
+      checkForSystemExistsFilter=>sub{  # Nachfrage ob Reuse System-Candidat not
+         my $osys=shift;                # exists in srcobj
+         my $srcid=$osys->{srcid};
+         return({id=>\$srcid});
       }
-      if (!$foundsystemclass){
-         $newrec{isapplserver}="1"; 
-      }
-      if ($sys->ValidatedUpdateRecord($w5sysrec,\%newrec,
-                                      {id=>\$w5sysrec->{id}})) {
-         $identifyby=$w5sysrec->{id};
-      }
+   };
+   my $ImportObjects={   # Objects are in seperated Structur for better Dumping
+      itcloud=>$itcloud,
+      itcloudarea=>$cloudarea,
+      appl=>$appl,
+      system=>$system,
+      srcobj=>$self
+   };
+
+   #printf STDERR ("ImportRec(imprec):%s\n",Dumper($ImportRec->{imprec}));
+   my $ImportResult=$system->genericSystemImport($ImportObjects,$ImportRec);
+   #printf STDERR ("ImportResult:%s\n",Dumper($ImportResult));
+   if ($ImportResult){
+      return($ImportResult->{IdentifedBy});
    }
-   else{
-      msg(INFO,"try to import new with databoss $curdataboss ...");
-      # check 1: Assigmenen Group registered
-      #if ($sysrec->{lassignmentid} eq ""){
-      #   $self->LastMsg(ERROR,"SystemID has no Assignment Group");
-      #   return(undef);
-      #}
-      # check 2: Assingment Group active
-      #my $acgroup=getModuleObject($self->Config,"tsacinv::group");
-      #$acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
-      #my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisoremail));
-      #if (!defined($acgrouprec)){
-      #   $self->LastMsg(ERROR,"Can't find Assignment Group of system");
-      #   return(undef);
-      #}
-      # check 3: Supervisor registered
-      #if ($acgrouprec->{supervisoremail} eq ""){
-      #   $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
-      #   return(undef);
-      #}
-      #}
-
-      # final: do the insert operation
-      my $newrec={name=>$sysrec->{id},
-                  srcid=>$syssrcid,
-                  srcsys=>'AWS',
-                  osrelease=>'other',
-                  allowifupdate=>1,
-                  cistatusid=>4};
-
-
-      my $user=getModuleObject($self->Config,"base::user");
-      if ($self->isDataInputFromUserFrontend()){
-         $newrec->{databossid}=$self->getCurrentUserId();
-         $curdataboss=$newrec->{databossid};
-      }
-      else{
-         my $importname=$sysrec->{contactemail};
-         my @l;
-         if ($importname ne ""){
-            $user->SetFilter({cistatusid=>[4], emails=>$importname});
-            @l=$user->getHashList(qw(ALL));
-         }
-         if ($#l==0){
-            $newrec->{databossid}=$l[0]->{userid};
-            $curdataboss=$newrec->{databossid};
-         }
-         else{
-            if ($self->isDataInputFromUserFrontend()){
-               $self->LastMsg(ERROR,"can not find databoss contact record");
-            }
-            else{
-               #msg(WARN,"invalid databoss contact rec for ".
-               #          $sysrec->{contactemail});
-               if (defined($w5applrec) && $w5applrec->{databossid} ne ""){
-                  msg(INFO,"using databoss from application ".
-                           $w5applrec->{name});
-                  $newrec->{databossid}=$w5applrec->{databossid};
-                  $curdataboss=$newrec->{databossid};
-               }
-            }
-            if (!defined($curdataboss)){
-               if ($self->isDataInputFromUserFrontend()){
-                  msg(ERROR,"unable to import system '$sysrec->{name}' ".
-                            "without databoss");
-               }
-               else{
-                  my %notifyParam=(
-                      mode=>'ERROR',
-                      emailbcc=>11634953080001 # hartmut
-                  );
-                  if ($cloudrec->{supportid} ne ""){
-                     $notifyParam{emailcc}=$cloudrec->{supportid};
-                  }
-                  push(@{$notifyParam{emailcategory}},"SystemImport");
-                  push(@{$notifyParam{emailcategory}},"ImportFail");
-                  push(@{$notifyParam{emailcategory}},"AWS");
-                 
-                  $itcloud->NotifyWriteAuthorizedContacts($cloudrec,
-                        {},\%notifyParam,
-                        {mode=>'ERROR'},sub{
-                     my ($subject,$ntext);
-                     my $subject="AWS system import error";
-                     my $ntext="unable to import '".$sysrec->{name}."' in ".
-                               "it inventory - no databoss can be detected";
-                     $ntext.="\n";
-                     return($subject,$ntext);
-                  });
-               }
-               return();
-            }
-         }
-      }
-      if (!exists($newrec->{mandatorid})){
-         my @m=$user->getMandatorsOf($newrec->{databossid},
-                                     ["write","direct"]);
-         if ($#m==-1){
-            # no writeable mandator for new databoss
-            if ($self->isDataInputFromUserFrontend()){
-               $self->LastMsg(ERROR,"can not find a writeable mandator");
-               return();
-            }
-         }
-         $newrec->{mandatorid}=$m[0];
-      }
-      if (!exists($newrec->{mandatorid}) || $newrec->{mandatorid} eq ""){
-         if (defined($w5applrec) && $w5applrec->{mandatorid} ne ""){
-            $newrec->{mandatorid}=$w5applrec->{mandatorid};
-         }
-      }
-
-
-      if ($newrec->{mandatorid} eq ""){
-         $self->LastMsg(ERROR,"can't get mandator for import of ".
-                        "AWS System $sysrec->{name}");
-         #msg(ERROR,sprintf("w5applrec=%s",Dumper($w5applrec)));
-         return();
-      }
-      if (defined($w5applrec)){
-         if ($w5applrec->{conumber} ne ""){
-            $newrec->{conumber}=$w5applrec->{conumber};
-         }
-         if ($w5applrec->{acinmassignmentgroupid} ne ""){
-            $newrec->{acinmassignmentgroupid}=
-                $w5applrec->{acinmassignmentgroupid};
-         }
-         $newrec->{isapplserver}=1;  # per Default, all is an applicationserver
-         if ($w5applrec->{opmode} eq "prod"){
-            $newrec->{isprod}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "test"){
-            $newrec->{istest}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "devel"){
-            $newrec->{isdevel}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "education"){
-            $newrec->{iseducation}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "approvtest"){
-            $newrec->{isapprovtest}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "reference"){
-            $newrec->{isreference}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "cbreakdown"){
-            $newrec->{iscbreakdown}=1;
-         }
-      }
-     # {
-     #    my $newname=$newrec->{name};
-     #    $sys->ResetFilter();
-     #    $sys->SetFilter({name=>\$newname});
-     #    my ($chkrec)=$sys->getOnlyFirst(qw(id name));
-     #    if (defined($chkrec)){
-     #       $newrec->{name}=$sysrec->{altname};
-     #    }
-     #    if (($newrec->{name}=~m/\s/) || length($newrec->{name})>60){
-     #       $newrec->{name}=$sysrec->{altname};
-     #    }
-     # }
-      $newrec->{lastqcheck}=NowStamp("en");
-      $identifyby=$sys->ValidatedInsertRecord($newrec);
-   }
-   if (defined($identifyby) && $identifyby!=0){
-      $sys->initialImportFillup($identifyby,$curdataboss,$w5applrec);
-      if ($self->LastMsg()==0){  # do qulity checks only if all is ok
-         $sys->ResetFilter();
-         $sys->SetFilter({'id'=>\$identifyby});
-         my ($rec,$msg)=$sys->getOnlyFirst(qw(ALL));
-         if (defined($rec)){
-            my %checksession;
-            my $qc=getModuleObject($self->Config,"base::qrule");
-            $qc->setParent($sys);
-            $checksession{autocorrect}=$rec->{allowifupdate};
-            $qc->nativQualityCheck($sys->getQualityCheckCompat($rec),$rec,
-                                   \%checksession);
-         }
-      }
-   }
-   return($identifyby);
+   return();
 }
 
 

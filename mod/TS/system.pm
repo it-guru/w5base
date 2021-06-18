@@ -616,22 +616,25 @@ sub genericSystemImport
 
    if (!defined($w5sysrec)){   # srcid update kandidaten (schneller Redeploy)
       my @flt;
+      my @oldiprecords;
+      if (ref($sysrec->{ipaddresses}) eq "ARRAY" &&
+          $#{$sysrec->{ipaddresses}}!=-1){
+         my $ip=getModuleObject($self->Config,"itil::ipaddress");
 
-      my $ip=getModuleObject($self->Config,"itil::ipaddress");
-
-      my @ipflt;
-      foreach my $iprec (@{$sysrec->{ipaddresses}}){
-         push(@ipflt,{
-            name=>\$iprec->{name},
-            srcsys=>\$srcsys
-         });
-         push(@ipflt,{
-            name=>$iprec->{name}."[*",
-            srcsys=>\$srcsys
-         });
+         my @ipflt;
+         foreach my $iprec (@{$sysrec->{ipaddresses}}){
+            push(@ipflt,{
+               name=>\$iprec->{name},
+               srcsys=>\$srcsys
+            });
+            push(@ipflt,{
+               name=>$iprec->{name}."[*",
+               srcsys=>\$srcsys
+            });
+         }
+         $ip->SetFilter(\@ipflt);
+         @oldiprecords=$ip->getHashList(qw(name systemid));
       }
-      $ip->SetFilter(\@ipflt);
-      my @oldiprecords=$ip->getHashList(qw(name systemid));
 
       push(@flt,{
         name=>\$sysrec->{name},
