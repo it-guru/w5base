@@ -34,7 +34,7 @@
 'The request to reprocess a workflow is only 14 days and at most 5 times allowed. For this workflow, no reprocessing is posible.'=>{de=>'Die Anforderung zur Nachbesserung ist nur max. 14 Tage nach dem ersten Lösen des Requests möglich. Auch ist die Anforderung zur Nachbesserung/Zurückstellung/Reaktivierung nur max. 5 mal erlaubt. Für diesen Workflow ist Aufgrund dieser Regeln keine Nachbesserung mehr möglich. Falls Sie dennoch Anforderungen haben, stellen Sie bitte einen neuen Request ein.'},
 'INITIALMSG000'=>{
 de=>'
-Der Workflow wurde erfolgreich erzeugt und der zu Bearbeitung zugewiesen. 
+Der Workflow wurde erfolgreich erzeugt und der Bearbeitung zugewiesen. 
 Für Sie sind vorerst keine weiteren Aktionen notwendig. 
 Sie können einfach im Menü einen anderen Punkt wählen oder das Browser-Fenster 
 schließen.
