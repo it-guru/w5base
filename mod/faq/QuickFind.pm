@@ -288,7 +288,7 @@ sub defaultSTags
                          publicstate=>'0',
                          comments=>join(" ",sort(@$stags)),
                          creatorid=>$userid},
-                        {parentobj=>\$selfname,name=>\$selflabel,
+                        {parentobj=>\$selfname,name=>\$selflabel,parentid=>'1',
                          creatorid=>\$userid,publicstate=>\'0'});
    }
 }
