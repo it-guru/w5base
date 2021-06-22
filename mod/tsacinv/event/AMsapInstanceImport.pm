@@ -456,12 +456,25 @@ sub FineProcess
                      my $updswinst={
                         lnksoftwaresystemid=>$swinstrec->{id}
                      };
-                     if (defined($swnature)){
-                        $updswinst->{swnature}=$swnature;
-                     }
                      if ($swi->ValidatedUpdateRecord($oldrec,$updswinst,
                          {id=>\$oldrec->{id}})){
-                      #  msg(INFO,"add softwareinst OK");
+                        if (defined($swnature)){
+                           $swi->ResetFilter();
+                           $swi->SetFilter({id=>\$soll{$k}->{id}});
+                           my ($oldrec,$msg)=$swi->getOnlyFirst(qw(ALL));
+                           if (defined($oldrec)){
+                              $updswinst={swnature=>$swnature};
+                              if ($swi->ValidatedUpdateRecord($oldrec,
+                                  $updswinst,
+                                  {id=>\$oldrec->{id}})){
+                                 msg(INFO,"nature ok");
+                              }
+                              else{
+                                 msg(ERROR,"nature set failed on ".
+                                     Dumper($oldrec));
+                              }
+                           }
+                        }
                      }
                      else{
                         msg(INFO,"prodcomp '$prodcomp' as '$sw' to ".
