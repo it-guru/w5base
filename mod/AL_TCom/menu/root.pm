@@ -72,11 +72,6 @@ sub Init
                       func=>'Main',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj('AL_TCom::MyW5Base::MIReport$',
-                      'AL_TCom::MyW5Base::MIReport$',
-                      func=>'Main',
-                      defaultacl=>['admin']);
-
    $self->RegisterObj("AL_TCom",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
