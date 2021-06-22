@@ -151,7 +151,8 @@ sub CloudAreaSync
       cloud=>join(" ",sort(keys(%itcloud))),
    });
    $itcloudareaobj->SetCurrentView(qw(ALL));
-   my $itcloudarea=$itcloudareaobj->getHashIndexed("id","fullname","name");
+   my $itcloudarea=$itcloudareaobj->getHashIndexed("id","fullname",
+                                                   "name","srcid");
 
    #print Dumper(\%itcloud);
    #print Dumper($itcloud);
@@ -159,7 +160,6 @@ sub CloudAreaSync
    my $caref={};
 
    foreach my $a (@a){
-      last if ($inscnt>50);
       my $fullname=$a->{fullname};
       my $currec;
       my @ifullname=grep(/^\Q$fullname\E$/i,keys(%{$itcloudarea->{fullname}}));
@@ -172,6 +172,10 @@ sub CloudAreaSync
       }
       if (exists($itcloudarea->{fullname}->{$fullname})){
          $currec=$itcloudarea->{fullname}->{$fullname};
+         $caref->{$currec->{id}}=$a;
+      }
+      elsif (exists($itcloudarea->{srcid}->{$a->{srcid}})){
+         $currec=$itcloudarea->{srcid}->{$a->{srcid}};
          $caref->{$currec->{id}}=$a;
       }
       if (defined($a->{srcid}) && defined($a->{srcsys}) &&
@@ -281,6 +285,12 @@ sub CloudAreaSync
                         $updrec->{cistatusid}=3;
                      }
                   }
+               }
+            }
+            else{
+               if ($currec->{cistatusid} eq "6"){
+                  $updrec->{cistatusid}="4";
+                  $updrec->{applid}=$a->{applid};
                }
             }
             if (keys(%$updrec)){
