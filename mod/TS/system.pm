@@ -685,7 +685,7 @@ sub genericSystemImport
          if ($osys->{cistatusid} ne "4"){  # prüfen, ob das Teil nicht schon
                                            # ewig alt ist
             my $d=CalcDateDuration($osys->{mdate},NowStamp("en"));
-            if (defined($d) && $d->{days}>7){
+            if (defined($d) && $d->{days}>28){
                next; # das Teil ist schon zu alt, um es wieder zu aktivieren
             }
          }
