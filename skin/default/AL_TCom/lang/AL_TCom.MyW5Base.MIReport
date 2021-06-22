@@ -1,6 +1,0 @@
-'AL_TCom::MyW5Base::MIReport'=>{de=>'IT-Workflow: ITIL Ereignismeldungen - Major-Incident Report',
-                              en=>'IT-Workflow: ITIL Ereignismeldungen - Major-Incident Report'},
-'Year'=>{de=>'Jahr'},
-'event Prio'=>{de=>'Ereignisse Prio'},
-'any'=>{de=>'beliebig'},
-'ignore reporting flag'=>{de=>'Reporting-Flag ignorieren'},
