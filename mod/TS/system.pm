@@ -757,7 +757,8 @@ sub genericSystemImport
 
    my $identifyby;
    if (defined($w5sysrec)){
-      if (uc($w5sysrec->{srcsys}) eq $srcsys){
+      if (uc($w5sysrec->{srcsys}) eq uc($srcsys) &&
+          $w5sysrec->{srcid} eq $sysrec->{id}){
          my $msg=sprintf($self->T("Systemname '%s' already imported in W5Base"),
                          $w5sysrec->{name});
          if ($w5sysrec->{cistatusid} ne "4" || $w5sysrecmodified){

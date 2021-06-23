@@ -150,12 +150,12 @@ sub qcheckRecord
       }
       foreach my $sysrec (@cursys){
          my $srcid=$sysrec->{srcid};
-         if (!exists($srcid{$srcid}->{op})){
+         if (!exists($srcid{$srcid}) || !exists($srcid{$srcid}->{op})){
             push(@delsys,$srcid);
          }
       }
       foreach my $srcid (keys(%srcid)){
-         if (!exists($srcid{$srcid}->{op})){
+         if (!exists($srcid{$srcid}) || !exists($srcid{$srcid}->{op})){
             push(@inssys,$srcid);
          }
          elsif($srcid{$srcid}->{op} eq "upd"){
