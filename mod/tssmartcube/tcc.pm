@@ -1046,15 +1046,6 @@ sub Initialize
 }
 
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_saphier"))){
-#     Query->Param("search_saphier"=>
-#                  "\"9TS_ES.9DTIT\" \"9TS_ES.9DTIT.*\"");
-#   }
-#}
-
 sub getRecordImageUrl
 {
    my $self=shift;

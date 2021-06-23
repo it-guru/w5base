@@ -79,7 +79,7 @@ sub SetFilter
 
    foreach my $flt (@flt){
       if (ref($flt) eq "HASH"){
-         $flt->{saphier}="9TS_ES.9DTIT 9TS_ES.9DTIT.*";
+         $flt->{saphier}="YT5AGH.* YT5A_DTIT.*";
          $flt->{status}='"in operation" "hibernate"';
       }
    }
