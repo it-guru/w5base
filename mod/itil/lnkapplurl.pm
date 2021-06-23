@@ -450,6 +450,35 @@ sub new
                 vjoinon       =>['id'=>'accessurlid'],
                 vjoindisp     =>['name','ciusage']),
 
+
+      new kernel::Field::Number(
+                name          =>'sharedlevel',
+                label         =>'SharedLevel',
+                readonly      =>1,
+                uploadable    =>0,
+                htmldetail    =>0,
+                group         =>'lastipaddresses',
+                dataobjattr   =>"(select count(*) from accessurllastip ".
+                                "join accessurllastip altip ".
+                                "on accessurllastip.name=altip.name ".
+                                "join accessurl alturl ".
+                                "on altip.accessurl=alturl.id ".
+                                "join accessurl cururl ".
+                                "on accessurllastip.accessurl=cururl.id ".
+                                "join appl curappl ".
+                                "on cururl.appl=curappl.id ".
+                                "join appl altappl ".
+                                "on alturl.appl=altappl.id ".
+                                "left outer join lnkapplgrpappl curapplgrp ".
+                                "on curappl.id=curapplgrp.appl ".
+                                "left outer join lnkapplgrpappl altapplgrp ".
+                                "on altappl.id=altapplgrp.appl ".
+                                "where ".
+                                "accessurllastip.accessurl=accessurl.id and ".
+                                "cururl.network=alturl.network and ".
+                                "cururl.appl!=alturl.appl and ".
+                                "curapplgrp.applgrp!=altapplgrp.applgrp)"),
+
       new kernel::Field::Link(
                 name          =>'applid',
                 label         =>'ApplID',
