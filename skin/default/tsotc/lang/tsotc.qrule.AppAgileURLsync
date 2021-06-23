@@ -4,4 +4,5 @@
 },
 'this URL is already registed by outer application'=>{
   de=>'diese URL ist bereits by einer anderen Anwendung registriert'
-}
+},
+'invalid cloudarea or application state for import'=>{de=>'ungültiger CloudArea oder Anwendungs CI-Status für AutoImport'},

@@ -705,6 +705,26 @@ sub validateCloudAreaImportState
 
    my $appl=getModuleObject($self->Config,"itil::appl");
 
+   if (!defined($w5applrec) &&
+       defined($cloudarearec) &&
+       $cloudarearec->{applid} ne ""){ # load applrec if it is not already done
+      $appl->SetFilter({id=>\$cloudarearec->{applid}});
+      my ($arec,$msg)=$appl->getOnlyFirst(qw(ALL));
+      if (defined($arec)){
+         $w5applrec=$arec;
+      }
+   }
+   if (!defined($cloudrec) &&
+       defined($cloudarearec) &&
+       $cloudarearec->{cloudid} ne ""){ #load cloudrec if it is not already done
+      my $itcloud=getModuleObject($self->Config,"itil::itcloud");
+      $itcloud->SetFilter({id=>\$cloudarearec->{cloudid}});
+      my ($arec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
+      if (defined($arec)){
+         $cloudrec=$arec;
+      }
+   }
+
    # check if $w5applrec->{cistatusid} is in 3 4 
 
    if (!($w5applrec->{cistatusid} eq "3" ||

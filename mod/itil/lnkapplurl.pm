@@ -620,7 +620,7 @@ sub Validate
          else{
             if (!$itca->validateCloudAreaImportState("URL: ".$name,
                                             $clrec,$carec,$applrec)){
-               if ($self->LastMsg()==-1){
+               if ($self->LastMsg()==0){
                   $self->LastMsg(ERROR,"invalid CloudArea State");
                }
                return(undef);

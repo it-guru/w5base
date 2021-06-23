@@ -238,6 +238,14 @@ sub qcheckRecord
             $errorlevel=2 if ($errorlevel<2);
             $oprec->{OP}="invalid";
          }
+         if (!$dataobj->validateCloudAreaImportState(
+                 "URL: ".$url,undef,$rec,undef)){
+            my $msg="invalid cloudarea or application state for import: ".
+                    "URL: ".$url;
+            push(@qmsg,$msg);
+            $errorlevel=2 if ($errorlevel<2);
+            $oprec->{OP}="invalid";
+         }
       }
    }
 
