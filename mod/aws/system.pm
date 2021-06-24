@@ -447,7 +447,7 @@ sub Import
       checkForSystemExistsFilter=>sub{  # Nachfrage ob Reuse System-Candidat not
          my $osys=shift;                # exists in srcobj
          my $srcid=$osys->{srcid};
-         return({id=>\$srcid});
+         return({idpath=>\$srcid});
       }
    };
    my $ImportObjects={   # Objects are in seperated Structur for better Dumping
