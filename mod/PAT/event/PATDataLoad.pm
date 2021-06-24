@@ -135,6 +135,8 @@ sub LoadsrcSubProcess
             name=>$rec->{title},
             title=>$rec->{subarea},
             businesssegid=>$bsid,
+            business=>$rec->{business},
+            businesssubprocess=>$rec->{subprocess},
             mdate=>$rec->{mdate},
             comments=>$rec->{comments},
             description=>$rec->{description},

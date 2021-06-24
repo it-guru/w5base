@@ -101,3 +101,4 @@ create table PAT_lnksubprocessictname(
   FOREIGN KEY fk_ictname (ictname)  
   REFERENCES PAT_ictname (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table PAT_subprocess  add subprocess varchar(80);

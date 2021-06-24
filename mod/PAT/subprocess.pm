@@ -68,6 +68,16 @@ sub new
                 dataobjattr   =>'PAT_subprocess.businessseg'),
 
 
+      new kernel::Field::Text(
+                name          =>'business',
+                label         =>'Business',
+                dataobjattr   =>'PAT_subprocess.business'),
+
+      new kernel::Field::Text(
+                name          =>'businesssubprocess',
+                label         =>'Business-SubProcess',
+                dataobjattr   =>'PAT_subprocess.subprocess'),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',

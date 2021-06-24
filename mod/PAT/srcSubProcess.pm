@@ -66,6 +66,10 @@ sub new
                 label         =>'Sub-Process'),
 
       new kernel::Field::Text(
+                name          =>'business',
+                label         =>'Business'),
+
+      new kernel::Field::Text(
                 name          =>'r1',
                 label         =>'K1 Ids'),
 
@@ -167,6 +171,7 @@ sub reformatExternal
       $rec->{comments}=$raw->{Anmerkungen};
       $rec->{subarea}=$raw->{Teilbereich};
       $rec->{subprocess}=$raw->{Teilprozess};
+      $rec->{business}=$raw->{Business};
       $rec->{r1}=$raw->{Kernapplikationen_K1Id}->{results};
       $rec->{r2}=$raw->{Kernapplikationen_K2Id}->{results};
       $rec->{r3}=$raw->{Randapplikationen_R3Id}->{results};
