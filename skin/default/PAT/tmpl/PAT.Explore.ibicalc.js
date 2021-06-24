@@ -1,11 +1,17 @@
 var applet='%SELFNAME%';
 function hightLight(v,txt){
+   v=v.replace("(","\\(");
+   v=v.replace(")","\\)");
    var re = new RegExp("("+v+")",'ig');
    txt=txt.replace(re,"<b><span class=hightLight>$1</span></b>");
    return(txt);
 }
 
-function extLink(h,url){
+function extLink(h,url,id){
+   if (id!=""){
+      url=url.replace("::","/");
+      url="../../"+url+"/ById/"+id;
+   }
    var d="<div class=extlink>"+
          "<img height="+h+" "+
          "data-extlink=\""+url+"\""+
@@ -34,19 +40,31 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                  $(frm).queue("load",[]);
                  if (!appletobj.data){
                     appletobj.data=new Object();
-                    $(frm).queue("load",function(next){
-                    $(".spinner").show();
-                       var w5obj=getModuleObject(cfg,'PAT::businessseg');
+                    $(frm).queue("load2",function(next){
+                       $(".spinner").show();
+                       var w5obj=getModuleObject(cfg,'TS::lnkcanvasappl');
                        w5obj.SetFilter({
                        });
                        w5obj.findRecord(
-                             "name,urlofcurrentrec,title,description,comments,"+
-                             "subprocesses,bsegopt,sopt,id",
-                             function(data){
-                          appletobj.data['businessseg']=new Object();
+                             "canvascanvasid,canvas,canvasid,applid,"+
+                             "appl,ictono,"+
+                             "voushort",function(data){
+                          appletobj.data['relation']=new Object();
+                          appletobj.data.relation['raw']=new Array();
+                          appletobj.data.relation['byappl']=new Object();
+                          appletobj.data.relation['byicto']=new Object();
                           $.each(data,function(index,item){
-                             appletobj.data['businessseg'][item.id]=item;
+                             var reldata=appletobj.data.relation; 
+                             reldata.raw.push(item);
+                             reldata.byappl[item.applid]=item;
+                             if (item.ictono!=""){
+                                if (!reldata.byicto[item.ictono]){
+                                   reldata.byicto[item.ictono]=new Array();
+                                }
+                                reldata.byicto[item.ictono].push(item);
+                             }
                           }); 
+                          console.log("raw relations",appletobj.data.relation);
                           next();
                        });
                     });
@@ -102,6 +120,22 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                           next();
                        });
                     });
+                    $(frm).queue("load2",function(next){
+                    $(".spinner").show();
+                       var w5obj=getModuleObject(cfg,'PAT::businessseg');
+                       w5obj.SetFilter({
+                       });
+                       w5obj.findRecord(
+                             "name,urlofcurrentrec,title,description,comments,"+
+                             "subprocesses,bsegopt,sopt,id",
+                             function(data){
+                          appletobj.data['businessseg']=new Object();
+                          $.each(data,function(index,item){
+                             appletobj.data['businessseg'][item.id]=item;
+                          }); 
+                          next();
+                       });
+                    });
                  }
                  $(frm).queue("load",function(next){
                     console.log("fine database:",appletobj.data);
@@ -126,6 +160,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                     }
                     ok();
                  });
+                 $(frm).dequeue("load2");
                  $(frm).dequeue("load");
      
                  //$(".spinner").hide();
@@ -145,6 +180,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       var appletobj=this;
 
       $(win).find("[data-dataobj]").addClass("clickableLink");
+      $(win).find("[data-dataobj]").css("cursor","pointer");
       $(win).find("[data-dataobj]").click(function(e){
          var id=$(this).attr("data-dataobjid");
          var dataobj=$(this).attr("data-dataobj");
@@ -882,12 +918,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          }
       );
 
-      console.log("showICTOName:",item);
-
       var label=item.fullname;
-
       var d="";
-
       var d="<table class=\"recordsheet\">";
 
       var allnames=new Array();
@@ -912,6 +944,26 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       if (item.ictoid){
          d+="<tr><td><b>%T(ICTO-ID,PAT::ictname)%:</b></td>";
          d+="<td>"+item.ictoid+"</td></tr>";
+      }
+      if (item.ictoid  && appletobj.data.relation.byicto[item.ictoid]){
+         d+="<tr><td><b>Canvas:</b></td>";
+         d+="<td>";
+         var canvas=new Object();
+         $.each(appletobj.data.relation.byicto[item.ictoid],function(i,relrec){
+             if (relrec.canvascanvasid!=""){
+                canvas[relrec.canvascanvasid]=relrec;
+             }
+         });
+         for(var canvascanvasid in canvas){
+            var relrec=canvas[canvascanvasid];
+            d+="<div class=clickableLink>";
+            d+=canvascanvasid+" - "+relrec.canvas;
+            if (relrec.canvasid!=""){
+               d+=extLink(9,"TS::canvas",relrec.canvasid);
+            }
+            d+="</div>";
+         };
+         d+="</td></tr>";
       }
       if (item.comments){
          d+="<tr><td><b>%T(Comments,PAT::ictname)%:</b></td>";
@@ -946,6 +998,22 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          d+="</div>";
       }
       d+="</td></tr>";
+
+      if (appletobj.data.relation.byicto[item.ictoid]){
+         d+="<tr class=block-end>"+
+            "<td><b>%T(Applications,itil::system)%:</b></td>";
+         d+="<td>";
+         $.each(appletobj.data.relation.byicto[item.ictoid],function(i,relrec){
+            d+="<div>";
+            d+="<div class=clickableLink> ";
+            d+=relrec.appl;
+            d+=extLink(9,"TS::appl",relrec.applid);
+            d+="</div>";
+            d+="</div>";
+         });
+         d+="</td></tr>";
+      }
+
       d+="</table>";
 
 
@@ -1140,8 +1208,25 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
             var ictoSearch="";
             for (var ictnameid in appletobj.data.ictname){
                var item=appletobj.data.ictname[ictnameid];
+               var showByApplication=0;
+               var showByICTOid=0;
+               var applications=new Array();
+               if (appletobj.data.relation.byicto[item.ictoid]){
+                  $.each(appletobj.data.relation.byicto[item.ictoid],
+                         function(subindex,item){
+                     if (item.appl.toLowerCase().indexOf(v.toLowerCase())!=-1){
+                        showByApplication++;
+                     }
+                     applications.push(item.appl);
+                  });
+               }
+
                if (item.name.toLowerCase().indexOf(v.toLowerCase())!=-1 ||
                    item.ictoid.toLowerCase().indexOf(v.toLowerCase())!=-1){
+                  showByICTOid++;
+               }
+
+               if (showByICTOid || showByApplication){
                   var blk="<div class=ictnameItem>";
                   blk+="<div class=ictnameLabel "+
                        "data-dataobj=\"PAT::ictname\" "+
@@ -1150,8 +1235,50 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                        hightLight(v,"<b>"+item.fullname+"</b>")+
                        extLink(12,item.urlofcurrentrec)+ 
                        "</div>";
+                  if (applications.length){
+                     blk+="<div class=ictnameapplications>"+
+                          hightLight(v,applications.join(", "))+"</div>";
+                     blk+="</div>";
+                  }
                   blk+="</div>";
                   ictoSearch+=blk;
+               }
+            }
+            if (ictoSearch==""){
+               for (var ictono in appletobj.data.relation.byicto){
+                  var item=appletobj.data.relation.byicto[ictono];
+                  var showByApplication=0;
+                  var showByICTOid=0;
+                  var applications=new Array();
+                  if (appletobj.data.relation.byicto[ictono]){
+                     $.each(appletobj.data.relation.byicto[ictono],
+                            function(subindex,item){
+                        if (item.appl.toLowerCase().indexOf(v.toLowerCase())!=-1){
+                           showByApplication++;
+                        }
+                        applications.push(item.appl);
+                     });
+                  }
+              
+                  if (ictono.toLowerCase().indexOf(v.toLowerCase())!=-1 ||
+                      ictono.toLowerCase().indexOf(v.toLowerCase())!=-1){
+                     showByICTOid++;
+                  }
+              
+                  if (showByICTOid || showByApplication){
+                     var blk="<div class=ictnameItem>";
+                     blk+="<div class=ictnameLabel "+
+                          ">"+
+                          hightLight(v,"<b>"+ictono+"</b>")+
+                          "</div>";
+                     if (applications.length){
+                        blk+="<div class=ictnameapplications>"+
+                             hightLight(v,applications.join(", "))+"</div>";
+                        blk+="</div>";
+                     }
+                     blk+="</div>";
+                     ictoSearch+=blk;
+                  }
                }
             }
             //if (v.toLowerCase().indexOf("icto-")!=-1){
