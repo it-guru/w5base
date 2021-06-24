@@ -8,7 +8,7 @@ function hightLight(v,txt){
 }
 
 function extLink(h,url,id){
-   if (id!=""){
+   if (id!==undefined){
       url=url.replace("::","/");
       url="../../"+url+"/ById/"+id;
    }
