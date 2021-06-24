@@ -164,7 +164,7 @@ td.pat {
 }
 
 .clickableLink{
-   cursor:pointer;
+   xcursor:pointer;
 }
 .clickableLink:hover{
    color:#e20074;
@@ -177,6 +177,7 @@ td.pat {
 .clickableLink:hover  .extlink {
    display:inline-block;
    visibility:visible;
+   cursor:pointer;
 }
 //.clickableLink:hover:after {
 //    content: url(../../base/load/miniextlink.png); /* no need for qoutes */
@@ -238,5 +239,17 @@ table.timetable {
 .timetable td div.timespan{
    cursor:pointer;
 }
+
+
+.ictnameapplications{
+  padding:2px;
+  background-color: #f0f0f0;
+  margin-left:10px;
+  margin-right:20px;
+  margin-bottom:5px;
+  border-radius: 3px;
+  font-size: 0.8em
+}
+
 
 
