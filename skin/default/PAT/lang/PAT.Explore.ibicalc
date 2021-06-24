@@ -3,6 +3,7 @@
 'sublabel'=>{de=>'PAT',en=>'PAT'},
 'PAT-Search'=>{de=>'PAT-Suche'},
 'core'=>{de=>'Kernzeit'},
+'relevance'=>{de=>'Relevanz'},
 'use'=>{de=>'Nutzungszeit'},
 'online'=>{de=>'Onlinezeit'},
 'nonprod'=>{de=>'Randzeit'},
@@ -26,5 +27,10 @@
  en=>'invalid format in end time',
  de=>'ungültiges Format der Ende-Zeit'
 },
+'Duration'=>{de=>'Dauer'},
+'points sum'=>{de=>'Punkte Summe'},
+'Operations-Times'=>{de=>'Betriebszeiten'},
+'IBI-Times'=>{de=>'IBI-Zeiten'},
+'IBI-Thresholds'=>{de=>'IBI-Schwellwerte'},
 
 

@@ -73,7 +73,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                        });
                        w5obj.findRecord(
                              "name,urlofcurrentrec,title,description,comments,"+
-                             "businessseg,businesssegid,,"+
+                             "businessseg,businesssegid,"+
+                             "business,businesssubprocess,"+
                              "onlinetime,"+
                              "usetime,"+
                              "coretime,"+
@@ -272,7 +273,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       var d="<table class=\"recordsheet\">";
       d+="<tr><td class=label>%T(Description,PAT::subprocess)%:</td>";
       d+="<td>"+item.description+"</td></tr>";
-      d+="<tr class=block-end>";
+      d+="<tr>";
       d+="<td class=label>%T(Business-Segment,PAT::subprocess)%:</td>";
       d+="<td><div data-dataobj=\"PAT::businessseg\" ";
       d+="data-dataobjid=\""+item.businesssegid+"\">";
@@ -281,9 +282,11 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          appletobj.data.businessseg[item.businesssegid].urlofcurrentrec); 
       d+="</div>";
       d+="</td></tr>";
+      d+="<tr class=block-end><td class=label>Business:</td>";
+      d+="<td>"+item.business+"</td></tr>";
       if (item.ictnames.length){
          d+="<tr>";
-         d+="<td valign=top class=label>ICTOs:</td>";
+         d+="<td valign=top class=label>ICTO-Aliases:</td>";
          d+="<td><table width=60% class=subrecords>";
          d+="<tr><th align=left>ICT-Name</th>"+
             "<th width=1%>Relevanz</th></tr>";
@@ -379,17 +382,85 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
 
 
       d+="<tr><td class=label colspan=2  style=\"padding-bottom:0\">"+
-         "Operations-Times:</td>"+
+         "%T(Operations-Times,PAT::Explore::ibicalc)%:</td>"+
          "</tr>";
       d+="<tr><td colspan=2>"+ 
          optimes.table()+
          "</td></tr>";
       d+="<tr><td class=label colspan=2 style=\"padding-bottom:0\">"+
-         "IBI-Times:</td>"+
+         "%T(IBI-Times,PAT::Explore::ibicalc)%:</td>"+
          "</tr>";
       d+="<tr><td colspan=2>"+ 
          ibitimes.table()+
          "</td></tr>";
+      d+="<tr><td class=label colspan=2 style=\"padding-bottom:0\">"+
+         "%T(IBI-Thresholds,PAT::Explore::ibicalc)%:</td>"+
+         "</tr>";
+      d+="<tr><td colspan=2><table width=100%>"; 
+
+      d+="<tr>"; 
+      d+="<td width=10%>&nbsp;</td>";
+      d+="<td>%T(IBI Threashold Core-Time mon-fri,PAT::subprocess)%</td>"; 
+      if (item.ibithcoretimemonfri){
+         d+="<td>"+item.ibithcoretimemonfri+" min</td>"; 
+      }
+      else{
+         d+="<td>-</td>"; 
+      }
+      d+="<td width=10%>&nbsp;</td>";
+      d+="<td>%T(IBI Threashold NonProd-Time mon-fri,PAT::subprocess)%</td>"; 
+      if (item.ibithnonprodtimemonfri){
+         d+="<td>"+item.ibithnonprodtimemonfri+" min</td>"; 
+      }
+      else{
+         d+="<td>-</td>"; 
+      }
+
+      d+="<td width=10%>&nbsp;</td>";
+      d+="</tr>"; 
+
+      d+="<tr>"; 
+      d+="<td width=10%>&nbsp;</td>";
+      d+="<td>%T(IBI Threashold Core-Time sat,PAT::subprocess)%</td>"; 
+      if (item.ibithcoretimesat){
+         d+="<td>"+item.ibithcoretimesat+" min</td>"; 
+      }
+      else{
+         d+="<td>-</td>"; 
+      }
+      d+="<td width=10%>&nbsp;</td>";
+      d+="<td>%T(IBI Threashold NonProd-Time sat,PAT::subprocess)%</td>"; 
+      if (item.ibithnonprodtimesat){
+         d+="<td>"+item.ibithnonprodtimesat+" min</td>"; 
+      }
+      else{
+         d+="<td>-</td>"; 
+      }
+      d+="</tr>"; 
+      
+      d+="<tr>"; 
+      d+="<td width=10%>&nbsp;</td>";
+      d+="<td>%T(IBI Threashold Core-Time sun/HOL,PAT::subprocess)%</td>"; 
+      if (item.ibithcoretimesun){
+         d+="<td>"+item.ibithcoretimesun+" min</td>"; 
+      }
+      else{
+         d+="<td>-</td>"; 
+      }
+      d+="<td width=10%>&nbsp;</td>";
+      d+="<td>%T(IBI Threashold NonProd-Time sun/HOL,PAT::subprocess)%</td>"; 
+      if (item.ibithnonprodtimesun){
+         d+="<td>"+item.ibithnonprodtimesun+" min</td>"; 
+      }
+      else{
+         d+="<td>-</td>"; 
+      }
+      d+="<td width=10%>&nbsp;</td>";
+      d+="</tr>"; 
+      
+      
+      
+      d+="</table></td></tr>";
       d+="</table>";
 
 
@@ -412,7 +483,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          SumNonprodMins:0,
          corePercVal:0,
          nonprodPercVal:0,
-         ibipoints:0,
+         ibipoints:new Array(),
          spans:[]
       };
       var evDayNum=0;
@@ -433,12 +504,14 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       var ibitimes=new TimeSpans("");
       ibitimes=ibitimes.overlay(ibinonprodtime);
       ibitimes=ibitimes.overlay(ibicoretime);
-      console.log("ibitimes=",ibitimes._spans);
       out.thcoreSum=0;
       out.thnonprodSum=0;
 
 
       do{
+         if (!out.ibipoints[evDayNum]){
+            out.ibipoints[evDayNum]=0;
+         }
          var thnonprod=parseInt(sprec.ibithnonprodtimemonfri);
          var thcore=parseInt(sprec.ibithcoretimemonfri);
          var isSat = (day.getDay() == 6);
@@ -465,53 +538,47 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
             out.thnonprodSum=out.thnonprodSum+thnonprod;
          }
          //--------------------------------------------------
-         var dayStartMins=startMins;
-         var dayEndMins=endMins;
-         if (evDayNum!=0){
-            dayStartMins=0;
-         }
-         console.log("comp"+evDayNum,day,endDay,day<endDay);
-         if (day<endDay){
-            console.log("not end day"+evDayNum);
-            dayEndMins=1440;
-         }
-         console.log("IBIcalc evDayNum"+evDayNum,{
-            day:day,
-            dayStartMins:dayStartMins,
-            dayEndMins:dayEndMins,
-            thnonprod:thnonprod,
-            thcore:thcore
-         },item);
-         var spans=ibitimes.RangeScan(dayStartMins,dayEndMins,dayno);
-         if (spans.length){
-            var SumCoreMins=0;
-            var SumNonprodMins=0;
-            for(var spanno=0;spanno<spans.length;spanno++){
-               if (spans[spanno].type=='C'){
-                  var t=spans[spanno].endMin-spans[spanno].startMin;
-                  SumCoreMins+=t;
+         if (item.relevance==1 &&   // laut SharePoint 2 - 4 raus genommen
+             thcore>0){
+            var dayStartMins=startMins;
+            var dayEndMins=endMins;
+            if (evDayNum!=0){
+               dayStartMins=0;
+            }
+            if (day<endDay){
+               dayEndMins=1440;
+            }
+            var spans=ibitimes.RangeScan(dayStartMins,dayEndMins,dayno);
+            if (spans.length){
+               var SumCoreMins=0;
+               var SumNonprodMins=0;
+               for(var spanno=0;spanno<spans.length;spanno++){
+                  if (spans[spanno].type=='C'){
+                     var t=spans[spanno].endMin-spans[spanno].startMin;
+                     SumCoreMins+=t;
+                  }
+                  if (spans[spanno].type=='B'){
+                     var t=spans[spanno].endMin-spans[spanno].startMin;
+                     SumNonprodMins+=t;
+                  }
                }
-               if (spans[spanno].type=='B'){
-                  var t=spans[spanno].endMin-spans[spanno].startMin;
-                  SumNonprodMins+=t;
+               var nonprodPercVal=0;
+               var corePercVal=0;
+               if (SumNonprodMins>0 && thnonprod>0){
+                  nonprodPercVal=Math.round(SumNonprodMins/thnonprod*1000);
                }
+               if (SumCoreMins>0 && thcore>0){
+                  corePercVal=Math.round(SumCoreMins/thcore*1000);
+               }
+               var dayIBI=((nonprodPercVal+corePercVal)>=1000) ? 1 : 0;
+               out.ibipoints[evDayNum]+=dayIBI;
+               out.SumNonprodMins+=SumNonprodMins;
+               out.SumCoreMins+=SumCoreMins;
+               out.nonprodPercVal+=nonprodPercVal;
+               out.corePercVal+=corePercVal;
             }
-            var nonprodPercVal=0;
-            var corePercVal=0;
-            if (SumNonprodMins>0 && thnonprod>0){
-               nonprodPercVal=Math.round(SumNonprodMins/thnonprod*1000);
-            }
-            if (SumCoreMins>0 && thcore>0){
-               corePercVal=Math.round(SumCoreMins/thcore*1000);
-            }
-            var dayIBI=((nonprodPercVal+corePercVal)>=1000) ? 1 : 0;
-            out.ibipoints+=dayIBI;
-            out.SumNonprodMins+=SumNonprodMins;
-            out.SumCoreMins+=SumCoreMins;
-            out.nonprodPercVal+=nonprodPercVal;
-            out.corePercVal+=corePercVal;
+            out.spans.push(spans);
          }
-         out.spans.push(spans);
          //--------------------------------------------------
          day.setDate(day.getDate()+1);
          evDayNum++;
@@ -562,6 +629,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                     relsub[sp.id]={
                        name:sp.name,
                        id:sp.id,
+                       business:sp.business,
+                       businesssubprocess:sp.businesssubprocess,
                        businessseg:sp.businessseg,
                        businesssegid:sp.businesssegid,
                        title:sp.title,
@@ -576,34 +645,62 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       }
 
 
+      var ibisumbusinessseg=new Object();
       for (var spid in relsub){
          var ibi=this.IBIcalc(relsub[spid],dateStartDay,start_time,
                                            dateEndDay,end_time);
+         console.log("IBIcalc=",ibi);
          relsub[spid]=Object.assign(relsub[spid],ibi);
+         for(var DayNum=0;DayNum<relsub[spid].ibipoints.length;DayNum++){
+            if (relsub[spid].ibipoints[DayNum]){
+               var businesslist=relsub[spid].business;
+               if (!businesslist){
+                  businesslist="NONE";
+               }
+               businesslist=businesslist.split(/[,;+ ]+/);
+               for(var i=0;i<businesslist.length;i++){
+                  if (businesslist[i]!=""){
+                     ibisumbusinessseg[businesslist[i]+"@"+
+                                       relsub[spid].businesssubprocess+"@"+
+                                       relsub[spid].businesssegid+"@"+
+                                       DayNum]=1;
+                  }
+               }
+            }
+         }
       }
+      console.log("ibisumbusinessseg=",ibisumbusinessseg);
 
       var subp=Object.keys(relsub).map(function(spid){
         return relsub[spid];
       }).sort(function(a,b){
-         if (a.relevance>b.relevance){
+         if (a.ibipoints<b.ibipoints){
             return(1);
          }
-         else if (a.relevance<b.relevance){
+         else if (a.ibipoints>b.ibipoints){
             return(-1);
          }
          else{
-            if (a.businessseg>b.businessseg){
+            if (a.relevance>b.relevance){
                return(1);
             }
-            else if (a.businessseg<b.businessseg){
+            else if (a.relevance<b.relevance){
                return(-1);
             }
             else{
-               if (a.name>b.name){
+               if (a.businessseg>b.businessseg){
                   return(1);
                }
-               else if (a.name<b.name){
+               else if (a.businessseg<b.businessseg){
                   return(-1);
+               }
+               else{
+                  if (a.name>b.name){
+                     return(1);
+                  }
+                  else if (a.name<b.name){
+                     return(-1);
+                  }
                }
             }
          }
@@ -611,43 +708,58 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       });
       var d="";
       var ibisum=0;
+      var ibibusinesssegsum=0;
+      var lastbusinesssegid;
+      
+      for(var businesssegid in ibisumbusinessseg){
+         ibibusinesssegsum+=ibisumbusinessseg[businesssegid];
+      }
+
       for(var i=0;i<subp.length;i++){
          var spid=subp[i].id;
          ibisum+=subp[i].ibipoints;
          d+="<div>";
          d+="<div>";
-         d+=subp[i].businessseg+": "+
+         if (lastbusinesssegid!=subp[i].businesssegid){
+            d+="&nbsp;<br>";
+         }
+         lastbusinesssegid=subp[i].businesssegid;
+         d+="<b>"+subp[i].businessseg+"</b>"+": "+
             "<span data-dataobj=\"PAT::subprocess\" "+
             "data-dataobjid=\""+spid+"\">"+
-            "<b>"+subp[i].name+": "+subp[i].title+"</b>";
+            subp[i].name+": "+subp[i].title;
          d+=extLink(9,appletobj.data.subprocess[subp[i].id].urlofcurrentrec); 
          d+="</span>";
          d+="</div>";
          d+="<div style=\"margin-left:5px;margin-bottom:10px\">";
+         d+="<font size=-1><i>"+
+            subp[i].business+" "+subp[i].businesssubprocess+"</i></font><br>";
          d+=subp[i].ibipoints+" Pkt.";
          d+=" Begründung: ";
          if (subp[i].relevance==1){
             d+=" Kernapplikation ";
          }
-         d+=" Relevanz "+subp[i].relevance;
+         d+=" %T(relevance,PAT::Explore::ibicalc)% "+subp[i].relevance;
          d+="<br>";
-         d+="Kernzeit: "+subp[i].thcoreSum+"min";
+         d+="%T(core,PAT::Explore::ibicalc)%: "+subp[i].thcoreSum+"min";
          d+=", ";
          d+="Schwelle Nebenzeit: "+subp[i].thnonprodSum+"min";
-         d+="<br>";
-         d+="Dauer: ";
-         if (subp[i].SumCoreMins>0){
-            var pct=Math.round(subp[i].corePercVal/10.0)+"%";
-            d+="%T(core,PAT::Explore::ibicalc)% "+
-               subp[i].SumCoreMins+"min ("+pct+")";
-         }
-         if (subp[i].SumNonprodMins>0 && subp[i].SumCoreMins>0){
-            d+=", ";
-         }
-         if (subp[i].SumNonprodMins>0){
-            var pct=Math.round(subp[i].nonprodPercVal/10.0)+"%";
-            d+="%T(nonprod,PAT::Explore::ibicalc)% "+
-               subp[i].SumNonprodMins+"min ("+pct+")";
+         if (subp[i].SumCoreMins>0 || subp[i].SumNonprodMins>0){
+            d+="<br>";
+            d+="%T(Duration,PAT::Explore::ibicalc)%: ";
+            if (subp[i].SumCoreMins>0){
+               var pct=Math.round(subp[i].corePercVal/10.0)+"%";
+               d+="%T(core,PAT::Explore::ibicalc)% "+
+                  subp[i].SumCoreMins+"min ("+pct+")";
+            }
+            if (subp[i].SumNonprodMins>0 && subp[i].SumCoreMins>0){
+               d+=", ";
+            }
+            if (subp[i].SumNonprodMins>0){
+               var pct=Math.round(subp[i].nonprodPercVal/10.0)+"%";
+               d+="%T(nonprod,PAT::Explore::ibicalc)% "+
+                  subp[i].SumNonprodMins+"min ("+pct+")";
+            }
          }
          d+="</div>";
          d+="</div>";
@@ -670,7 +782,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                "%T(from,PAT::Explore::ibicalc)% "+start_time+
                " -"+end_time+"</p>";
       }
-      a+="<h3>IBI Punkte Summe:"+ibisum+"</h3>";
+      a+="<h3>IBI %T(points sum,PAT::Explore::ibicalc)%:"+
+         ibibusinesssegsum+"</h3>";
       a+="<hr>";
       a+="<p>Detail-Analyse:</p>";
       a+=d;

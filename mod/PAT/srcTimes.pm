@@ -93,7 +93,6 @@ sub reformatExternal
    foreach my $raw (@{$d->{d}->{results}}){
       my $rec={};
       $rec->{id}=$raw->{Id};
-print STDERR Dumper($raw) if ($raw->{Id} eq "68");
       my @l=qw(Beginn_MoFr Ende_MoFr Beginn_Sa Ende_Sa Beginn_So Ende_So);
       my @tblock;
       my $c=0;

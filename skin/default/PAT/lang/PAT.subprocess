@@ -13,6 +13,7 @@
 'Sub-Process'=>{de=>'Teilprozess'},
 'Description'=>{de=>'Beschreibung'},
 'Business-Segment'=>{de=>'Geschäftssegment'},
+'Business-SubProcess'=>{de=>'Business-Teilprozess'},
 'relevant ICT-AliasNames'=>{de=>'alle relevanten ICT-AliasNamen'},
 'IBI Core-Time'=>{de=>'IBI Kernzeit'},
 'IBI NonProd-Time'=>{de=>'IBI Nebenzeit'},
