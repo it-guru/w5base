@@ -30,6 +30,14 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->{srcsys}="SAPIIMP";
+   $self->{prodcompfix}={
+      'APPL568549'=>{
+         prodcomp=>'SAP HANA'
+      },
+      'APPL606584'=>{
+         prodcomp=>'SQUID'
+      }
+   };
    $self->{prodcompmap}={
       'Apache Webserver'        =>{ 
                                    software=>'Apache_Webserver',
@@ -291,7 +299,14 @@ sub FineProcess
 
    my %prodcomp=();
    foreach my $k (sort(keys(%{$store->{child}}))){
-      #print Dumper($store->{child}->{$k});
+      my $childapplid=$store->{child}->{$k}->{applid};
+      if (exists($self->{prodcompfix}->{$childapplid})){
+         printf STDERR ("fifi childfix\n");
+         $store->{child}->{$k}->{prodcomp}=
+            $self->{prodcompfix}->{$childapplid}->{prodcomp};
+      }
+      #printf STDERR ("process $childapplid as child=%s\n",Dumper($store->{child}->{$k}));
+
       if ($store->{child}->{$k}->{prodcomp} ne ""){
          $prodcomp{$store->{child}->{$k}->{prodcomp}}++;
       }
@@ -579,6 +594,7 @@ sub ProcessRecord
 
    if (!exists($store->{child}->{$rec->{child}})){
       $store->{child}->{$rec->{child}}={
+         applid=>$rec->{child_applid},
          name=>$rec->{child},
          syscnt=>$syscnt,
          system=>\@sys,
