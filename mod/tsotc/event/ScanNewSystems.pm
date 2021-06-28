@@ -44,6 +44,7 @@ sub validateSystemCompleteness
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
    my $sys=getModuleObject($self->Config,"itil::system");
    my @datastreamview=qw(cdate name id);
+   $datastream->SetFilter({cdate=>"<now-3h"});
    my @l=$datastream->getHashList(@datastreamview);
    my $misscnt=0;
 

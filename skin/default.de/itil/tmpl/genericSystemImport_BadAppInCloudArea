@@ -1,0 +1,9 @@
+Der automatisch Import von ...
+%SYSTEM%
+... aus einer CloudArea wurde abgewiesen.
+
+Der Grund dafür ist, dass in der CloudArea keine gültige Anwendungsreferenz (W5BaseID der Anwendung) gefunden werden konnte.
+
+Als Datenverantwortlicher (oder Schreibberechtigter) der Cloud <b>%CLOUD%</b>, müssen Sie hier tätig werden und das Datenproblem beseitigen.
+
+<b><font color=red>Deployments in CloudAreas mit nicht aktiven Anwendungen können zu Security-Probelmen führen!</font></b>

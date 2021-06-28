@@ -704,16 +704,8 @@ sub validateCloudAreaImportState
    my $srcsys=$cloudarearec->{srcsys};
 
    my $appl=getModuleObject($self->Config,"itil::appl");
+   my $cloudrecFullLoaded=0;
 
-   if (!defined($w5applrec) &&
-       defined($cloudarearec) &&
-       $cloudarearec->{applid} ne ""){ # load applrec if it is not already done
-      $appl->SetFilter({id=>\$cloudarearec->{applid}});
-      my ($arec,$msg)=$appl->getOnlyFirst(qw(ALL));
-      if (defined($arec)){
-         $w5applrec=$arec;
-      }
-   }
    if (!defined($cloudrec) &&
        defined($cloudarearec) &&
        $cloudarearec->{cloudid} ne ""){ #load cloudrec if it is not already done
@@ -722,6 +714,67 @@ sub validateCloudAreaImportState
       my ($arec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
       if (defined($arec)){
          $cloudrec=$arec;
+         $cloudrecFullLoaded++;
+      }
+   }
+   if (!defined($w5applrec) &&
+       defined($cloudarearec)){
+      if ($cloudarearec->{applid} ne ""){ # load applrec if it is not already
+         $appl->SetFilter({id=>\$cloudarearec->{applid}});
+         my ($arec,$msg)=$appl->getOnlyFirst(qw(ALL));
+         if (defined($arec)){
+            $w5applrec=$arec;
+         }
+      }
+      if (!defined($w5applrec)){
+         # Notify for invalid application in CloudArea
+         if ($cloudrec->{id} ne ""){
+            my $itcloud=getModuleObject($self->Config,"itil::itcloud");
+            if (!$cloudrecFullLoaded){
+               $itcloud->SetFilter({id=>\$cloudarearec->{cloudid}});
+               my ($arec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
+               if (defined($arec)){
+                  $cloudrec=$arec;
+               }
+            }
+            my %notifyParam=(
+               emailcategory=>[$srcsys,'ImportReject','InvalidApplication'],
+               emailcc=>[],
+               emailbcc=>[
+                  11634953080001, # HV
+               ]
+            );
+            $itcloud->NotifyWriteAuthorizedContacts($cloudrec,{},
+                                             \%notifyParam,{mode=>'ERROR'},sub{
+               my ($_self,$notifyParam,$notifycontrol)=@_;
+               my $cloudcontactadded=0;
+               foreach my $fld (qw(securityrespid supportid platformrespid)){
+                  if ($cloudrec->{$fld} ne "" && 
+                      !in_array($notifyParam->{emailcc},$cloudrec->{$fld}) &&
+                      !in_array($notifyParam->{emailto},$cloudrec->{$fld})){
+                     push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
+                     $cloudcontactadded++;
+                  }
+               }
+               my ($subject,$ntext);
+               my $subject=$self->T("automatic import rejected",
+                                    'itil::itcloudarea')." - ".
+                           $self->T("invalid application in cloudarea",
+                                    'itil::itcloudarea');
+               my $tmpl=$self->getParsedTemplate(
+                          "tmpl/genericSystemImport_BadAppInCloudArea",{
+                  static=>{
+                     SYSTEM=>$importname,
+                     CLOUD=>$cloudrec->{name}
+                  }
+               });
+               return($subject,$tmpl);
+            });
+         }
+         if ($self->isDataInputFromUserFrontend()){
+            $self->LastMsg(ERROR,"invalid appl record in cloudarea");
+         }
+         return(undef);
       }
    }
 
@@ -762,7 +815,9 @@ sub validateCloudAreaImportState
          });
          return($subject,$tmpl);
       });
-      $self->LastMsg(ERROR,"invalid appl cistatus");
+      if ($self->isDataInputFromUserFrontend()){
+         $self->LastMsg(ERROR,"invalid appl cistatus");
+      }
       return(undef);
    }
 

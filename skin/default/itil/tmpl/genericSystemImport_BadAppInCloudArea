@@ -1,0 +1,10 @@
+The automatic import of ...
+%SYSTEM%
+... from a CloudArea was rejected.
+
+The reson for this reject is, in CloudArea no valid application reference
+(W5BaseID of application) can be detected.
+
+As databoss (or write authorized person) of Cloud <b>%CLOUD%</b>, you need to fix this data problem!
+
+<b><font color=red>Deployments on CloudAreas with not activated applications causes in security issues!</font></b>

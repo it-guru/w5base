@@ -595,11 +595,13 @@ sub genericSystemImport
    if (defined($apprec)){
       $w5applrec=$apprec;
    }
-   if (!defined($w5applrec)){
-      $self->LastMsg(ERROR,"no application record for $srcsys import ".
-                     "(system.id=$sysrec->{id},system.name=$sysrec->{name})");
-      return(undef);
-   }
+   # Check now done by validateCloudAreaImportState
+   #
+   #if (!defined($w5applrec)){
+   #   $self->LastMsg(ERROR,"no application record for $srcsys import ".
+   #                  "(system.id=$sysrec->{id},system.name=$sysrec->{name})");
+   #   return(undef);
+   #}
 
    if (!$cloudarea->validateCloudAreaImportState("SYSTEM: ".$sysrec->{name},
                                          $cloudrec,$cloudarearec,$w5applrec)){

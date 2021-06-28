@@ -58,3 +58,4 @@ From now, it is allowed to deploy items in this area.
 'automatic import rejected'=>{de=>'Automatischer CI-Import abgewiesen'},
 'invalid application cistatus'=>{de=>'ungültiger CI-Status der Anwendung'},
 'invalid cloudarea cistatus'=>{de=>'ungültiger CI-Status der CloudArea'},
+'invalid application in cloudarea'=>{de=>'ungültige Anwendung in CloudArea'},
