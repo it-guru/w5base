@@ -761,6 +761,7 @@ sub ProcessOpList
             my $id=$dataobj->ValidatedInsertRecord($op->{DATA});
             if (!defined($id)){
                msg(ERROR,"insert error in ProcessOpList: ".Dumper($opList));
+               msg(ERROR,"priorizedOpList: ".Dumper(\@priorizedOpList));
             }
             else{
                $op->{IDENTIFYBY}=$id;
@@ -797,6 +798,8 @@ sub ProcessOpList
                   if (!defined($id)){
                      msg(ERROR,"update error in ProcessOpList: ".
                                Dumper($opList));
+                     msg(ERROR,"priorizedOpList: ".
+                               Dumper(\@priorizedOpList));
                   }
                   else{
                      msg(INFO,"update id ok = $id");
