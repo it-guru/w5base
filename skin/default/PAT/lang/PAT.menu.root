@@ -6,4 +6,5 @@
 'Tools.PAT.ictname'=>{de=>'ICT-AliasName',en=>'ICT-AliasName'},
 'Tools.PAT.ictname.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.PAT.source'=>{de=>'Datenquelle',en=>'Data-Source'},
+'Tools.PAT.canvas'=>{de=>'Canvas',en=>'Canvas'},
 
