@@ -69,6 +69,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.PAT.canvas",
+                      "PAT::canvas",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.PAT.source",
                       "tmpl/welcome",
                       prio=>9999,

@@ -28,7 +28,7 @@ create table PAT_subprocess(
   name            varchar(32)  NOT NULL,
   title           varchar(254) NOT NULL,
   businessseg     bigint(20)   NOT NULL,
-  business        varchar(32)  NOT NULL,
+  business        varchar(32),
   onlinetime      text,
   usetime         text,
   coretime        text,
@@ -102,3 +102,17 @@ create table PAT_lnksubprocessictname(
   REFERENCES PAT_ictname (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table PAT_subprocess  add subprocess varchar(80);
+create table PAT_canvas(
+  id         bigint(20)   NOT NULL,
+  ibiresponse         bigint(20)   NOT NULL,
+  comments            longtext     default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) default NULL,
+  modifyuser bigint(20) default NULL,
+  editor     varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  FOREIGN KEY fk_canvas (id)  
+  REFERENCES canvas (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
