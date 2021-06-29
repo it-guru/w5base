@@ -541,12 +541,24 @@ sub Validate
       return(undef);
    }
 
-      #
-      # now it's time to add fwdtarget,fwdtargetid,mandatorid,
-      # fwddebtarget,fwddebtargetid
-      # in an object specified method
-      #
-     
+
+   # Validate, if target is an allowed target (f.e. extern is not allowed
+   # and will be rerouted to admin)
+   my $target=effVal($oldrec,$newrec,"fwdtarget");
+   if ($target eq "base::user"){
+      if ( !defined($oldrec) || effChanged($oldrec,$newrec,"fwdtargetid")){
+         my $userid=effVal($oldrec,$newrec,"fwdtargetid");
+         my $u=getModuleObject($self->getParent->Config(),"base::user");
+         $u->SetFilter({userid=>\$userid});
+         my ($urec,$msg)=$u->getOnlyFirst(qw(cistatusid usertyp));
+         if (!defined($urec) || (
+              $urec->{usertyp} ne "user" && $urec->{usertyp} ne "service" 
+             ) || $urec->{cistatusid} ne "4"){
+            $newrec->{fwdtargetid}="1";
+            $newrec->{fwdtarget}="base::grp";
+         }
+      }
+   }
 
    return(1);
 }
