@@ -759,8 +759,13 @@ sub ProcessOpList
          }
          elsif ($op->{OP} eq "insert"){
             my $id=$dataobj->ValidatedInsertRecord($op->{DATA});
-            $op->{IDENTIFYBY}=$id;
-            msg(INFO,"insert id ok = $id");
+            if (!defined($id)){
+               msg(ERROR,"insert error in ProcessOpList: ".Dumper($opList));
+            }
+            else{
+               $op->{IDENTIFYBY}=$id;
+               msg(INFO,"insert id ok = $id");
+            }
          }
          elsif ($op->{OP} eq "update"){
             if ($op->{IDENTIFYBY} ne ""){
@@ -789,7 +794,13 @@ sub ProcessOpList
                   my $id=$dataobj->ValidatedUpdateRecord(
                      $oldrec,\%upd,{$idname=>\$op->{IDENTIFYBY}}
                   );
-                  msg(INFO,"update id ok = $id");
+                  if (!defined($id)){
+                     msg(ERROR,"update error in ProcessOpList: ".
+                               Dumper($opList));
+                  }
+                  else{
+                     msg(INFO,"update id ok = $id");
+                  }
                }
                else{
                   msg(INFO,"skip update for $op->{DATAOBJ} ".
