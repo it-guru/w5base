@@ -618,6 +618,10 @@ sub nativQualityCheck
          last CIRCQC;
       }
    }
+   if (exists($param[0]->{abortSession}) &&     # if abortSession, no handling
+              $param[0]->{abortSession} ne ""){ # for DataIssue Wf is allowed
+      return($result);
+   }
    if ($parent->Self() ne "base::workflow"){ # only DataIssues for nonworkflows!
       my $wf=getModuleObject($parent->Config,"base::workflow");
       my $dataobj=$parent;
