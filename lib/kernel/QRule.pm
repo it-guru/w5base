@@ -760,8 +760,8 @@ sub ProcessOpList
          elsif ($op->{OP} eq "insert"){
             my $id=$dataobj->ValidatedInsertRecord($op->{DATA});
             if (!defined($id)){
-               msg(ERROR,"insert error in ProcessOpList: ".Dumper($opList));
-               msg(ERROR,"priorizedOpList: ".Dumper(\@priorizedOpList));
+               #msg(ERROR,"insert error in ProcessOpList: ".Dumper($opList));
+               #msg(ERROR,"priorizedOpList: ".Dumper(\@priorizedOpList));
             }
             else{
                $op->{IDENTIFYBY}=$id;
