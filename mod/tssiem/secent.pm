@@ -253,6 +253,12 @@ sub new
                 depend        =>['results',"sslparsedissuer","sslparsedserial"],
                 onRawValue    =>\&sslparsew5baseref),
 
+      new kernel::Field::Text(
+                name          =>'sslparsedchainlength',
+                label         =>'SSL parsed Chain Length',
+                group         =>'sslcert',
+                depend        =>'results',
+                onRawValue    =>\&parseSSL),
 
       new kernel::Field::Textarea(
                 name          =>'vendor_reference',
@@ -930,6 +936,12 @@ sub parseSSL
             }
          }
          $lineno++;
+      }
+      if (defined($certno) && $certno ne ""){
+         $l{sslparsedchainlength}=$certno+1;
+      }
+      else{
+         $l{sslparsedchainlength}=0;
       }
       if (keys(%issuer)){
          my $i="";
