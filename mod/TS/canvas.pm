@@ -70,7 +70,7 @@ sub new
                 htmleditwidth =>'40%',
                 selectfix     =>1,
                 label         =>'responsible organisation',
-                vjoineditbase =>{grpid=>"200 822"},
+                vjoineditbase =>{grpid=>"200 822 196"},
                 vjointo       =>'base::grp',
                 vjoinon       =>['rorgid'=>'grpid'],
                 vjoindisp     =>'fullname'),
