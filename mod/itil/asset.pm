@@ -497,7 +497,6 @@ sub new
       new kernel::Field::Date(
                 name          =>'eohs',
                 group         =>'financeco',
-                htmldetail    =>'NotEmpty',
                 dayonly       =>1,
                 label         =>'end of hardware support',
                 dataobjattr   =>'asset.eohsd'),
@@ -1248,6 +1247,20 @@ sub Validate
          $newrec->{refreshpland}=undef;
       }
    }
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"eohs")){
+      my $eohs=effVal($oldrec,$newrec,"eohs");
+      if ($eohs ne ""){
+         my $nowstamp=NowStamp("en");
+         my $age=CalcDateDuration($nowstamp,$eohs);
+         if (!defined($age) ||
+             $age->{days}>365*11 ||
+             $age->{days}<(365*10)*-1){
+            $self->LastMsg(ERROR,"End of Hardware-Support in unexpected range");
+            return(0);
+         }
+      }
+   }
+   
    if (effChanged($oldrec,$newrec,"eohs")){  # reset refreshinfo if eohs changed
       foreach my $var (qw(refreshinfo3 refreshinfo2 refreshinfo1)){
          my $cur=effVal($oldrec,$newrec,$var);
