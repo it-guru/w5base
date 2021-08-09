@@ -331,24 +331,19 @@ sub qcheckRecord
                });
          }
       }
-print STDERR Dumper($to_refresh);
 
       if (defined($to_refresh) && $to_refresh->{days}<-30){
-printf STDERR ("fifi 01\n");
          my $msg="hardware is out of date - refresh is necessary";
          push(@qmsg,$msg);
          if ($self->allowDataIssueWorkflowCreation($rec)){
-printf STDERR ("fifi 02\n");
             push(@dataissue,$msg);
             $errorlevel=3 if ($errorlevel<3);
          }
          else{
-printf STDERR ("fifi 03\n");
             $errorlevel=2 if ($errorlevel<2);
          }
       }
    }
-printf STDERR ("fifi errorlevel=$errorlevel qmsg=%s\n",Dumper(\@qmsg));
    my @result=$self->HandleQRuleResults("None",
                  $dataobj,$rec,$checksession,
                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest,$forcedupd);
