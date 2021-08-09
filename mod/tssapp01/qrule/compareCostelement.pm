@@ -87,6 +87,10 @@ sub qcheckRecord
        $rec->{costcentertype} eq 'costcenter'){
       return(undef,{qmsg=>'TS Slovakia costcenter detected'});
    }
+   if ($rec->{name}=~m/^Y-[A-Z0-9]{3}-/ &&
+       $rec->{costcentertype} eq 'pspelement'){
+      return(undef,{qmsg=>'DT Technic costcenter detected'});
+   }
 
 
 

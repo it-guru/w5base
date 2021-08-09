@@ -868,6 +868,9 @@ sub sendMail
       my $baseurl=$ENV{SCRIPT_URI};
       $baseurl=~s#/(auth|public)/.*$##;
       my $url=$baseurl;
+      if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+         $url=~s/^http:/https:/i;
+      }
       $url.="/auth/base/workflow/ById/".$WfRec->{id};
       $m{emailtext}.="\n\n\n".$self->T("Workflow Link").":\n";
       $m{emailtext}.=$url;

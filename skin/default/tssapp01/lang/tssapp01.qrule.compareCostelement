@@ -4,4 +4,4 @@
 'different values stored in SAP'=>{de=>'unterschiedliche Inhalte in SAP P01'},
 'TS Slovakia costcenter detected'=>{de=>'TS Slovakia Kostenstelle erkannt'},
 "can't validate costobject against SAPP01"=>{de=>'Kontierungsojbekt konnte nicht gegen SAPP01 geprüft werden'},
-
+'DT Technic costcenter detected'=>{de=>'DT Technik PSP erkannt'},

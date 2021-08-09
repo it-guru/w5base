@@ -64,6 +64,7 @@ sub ValidateCONumber    # this method needs to be renamed in validateCostcenter
    !($conummer=~m/^[A-Z]-[A-Z,0-9]{10}$/) &&
    !($conummer=~m/^[0-9]{4}$/) &&  # SAP USA
    !($conummer=~m/^[A-Z0-9]{4}[0-9]{6}$/) &&  # OFI Kostenstelle
+   !($conummer=~m/^Y-[A-Z0-9]{3}-[A-Z0-9]{3}-[0-9]{1,2}-[0-9]{5,7}$/) && # DTT
    !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}$/) &&  # OFI PSP Top
    !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}-[0-9]{2}$/) &&  #OFI E2
    !($conummer=~m/^[A-Z]-[A-Z0-9]{3}-[0-9]{8,10}-[0-9]{2}-[0-9]{2,4}$/) &&  # E3
