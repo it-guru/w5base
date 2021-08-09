@@ -320,26 +320,23 @@ sub qcheckRecord
                                    mode=>'day');
                   }
                }
+
                if ($parrec->{eohs} ne ""){
                   my $d=CalcDateDuration(NowStamp("en"),$parrec->{eohs});
-                  if ($d->{days}<3660){           # date should not be more
-                     $self->IfComp($dataobj,      # then 10Y in the future
-                                   $rec,"eohs",
-                                   $parrec,"eohs",
-                                   $autocorrect,$forcedupd,$wfrequest,
-                                   \@qmsg,\@dataissue,\$errorlevel,
-                                   mode=>'day');
-                  }
-                  else{
-                     if ($rec->{eohs} ne ""){       # clear posible invalid
-                        $forcedupd->{eohs}=undef;   # eohs entries
-                     }
+                  if ($d->{days}>3660 ||
+                      $d->{days}<-3660){ # if date is not in +-10Y range, ignore
+                     $parrec->{eohs}=""; # it
                   }
                }
-               else{
-                  if ($rec->{eohs} ne ""){
-                     $forcedupd->{eohs}=undef;
-                  }
+
+
+               if ($parrec->{eohs} ne ""){
+                  $self->IfComp($dataobj,  
+                                $rec,"eohs",
+                                $parrec,"eohs",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'day');
                }
 
                $self->IfComp($dataobj,

@@ -581,6 +581,8 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
       }
    }
    #printf STDERR ("fifi request a DataIssue Workflow=%s\n",Dumper($wfrequest));
+   #printf STDERR ("fifi errorlevel=$$errorlevel qmsg=%s dataissue=%s\n",
+   #                Dumper($qmsg),Dumper($dataissue));
    if ($#{$qmsg}!=-1 || $$errorlevel>0){
       my $r={qmsg=>$qmsg,dataissue=>$dataissue};
       $r->{dataupdate}=$wfrequest;
