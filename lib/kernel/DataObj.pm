@@ -144,6 +144,8 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
          $flt[0]->{cdate}="<now-1h";           # on fresh created elements
       }
       if (my $mdate=$self->getField("mdate")){
+         $flt[0]->{mdate}="<now-10m";  # prevent recheck of element, if it is
+                                       # recently modified.
          $flt[1]->{cistatusid}=[6];
          $flt[1]->{mdate}=">now-28d";
       }
