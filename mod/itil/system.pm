@@ -2870,7 +2870,8 @@ sub QRuleSyncCloudSystem
                        if ($mode eq "update"){
                           $identifyby=$oldrec->{id};
                        }
-                       if ($newrec->{name}=~m/^\s*$/){
+                       if ($newrec->{name}=~m/^\s*$/ ||
+                           $newrec->{mac}=~m/^\s*$/){
                           $mode="nop";
                        }
                        return({OP=>$mode,
