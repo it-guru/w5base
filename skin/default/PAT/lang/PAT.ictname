@@ -4,6 +4,9 @@
 },
 'fieldgroup.applications'=>{en=>'Applications',de=>'Anwendungen'},
 'fieldgroup.subprocessrefs'=>{en=>'Sub-Process references',de=>'Teilprozess-Referenzen'},
+'fieldgroup.ibi'=>{de=>'IBI ICT Daten',en=>'IBI ICT data'},
+'fieldgroup.canvas'=>{de=>'Canvas Zuordnungen',en=>'Canvas Relations'},
 'Sub-Process references'=>{de=>'Teilprozess-Referenzen'},
 'Applications'=>{de=>'Anwendungen'},
-
+'ICT IBI responsible'=>{de=>'ICT IBI Ansprechpartner'},
+'IBI responsible'=>{de=>'IBI Ansprechpartner'},

@@ -55,10 +55,72 @@ sub new
                 label         =>'ICTO-ID',
                 dataobjattr   =>'PAT_ictname.ictoid'),
 
+      new kernel::Field::Contact(
+                name          =>'ibiresponse',
+                depend        =>['ictibiresponseid','canvas'],
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                label         =>'IBI responsible',
+                vjoinon       =>'ibiresponseid'),
+
+      new kernel::Field::Interface(
+                name          =>'ibiresponseid',
+                depend        =>['ictibiresponseid','canvas'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   if ($current->{ictibiresponseid} ne ""){
+                      return([$current->{ictibiresponseid}]);
+                   }
+                   my $fo=$self->getParent->getField("canvas");
+                   my $f=$fo->RawValue($current);
+                   if (ref($f) eq "ARRAY" && $#{$f}!=-1){
+                      my %cid;
+                      foreach my $cref (@$f){
+                         $cid{$cref->{canvasid}}++;
+                      }
+                      my @cid=keys(%cid);
+                      if ($#cid!=-1){
+                         my $p=$self->getParent->getPersistentModuleObject(
+                                   $self->Config,"PAT::canvas");
+                         $p->SetFilter({id=>\@cid});
+                         my @l=$p->getHashList(qw(canvasibiresponseid));
+                         my %ibiresponseid;
+                         foreach my $crec (@l){
+                            if ($crec->{canvasibiresponseid} ne ""){
+                               $ibiresponseid{$crec->{canvasibiresponseid}}++
+                            }
+                         } 
+                         return([keys(%ibiresponseid)]);
+                      }
+                   }
+                   return([]);
+                
+
+                   return([$current->{ictibiresponseid},'12689221830005']);
+                }),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'PAT_ictname.comments'),
+
+      new kernel::Field::Contact(
+                name          =>'ictibiresponse',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                AllowEmpty    =>1,
+                group         =>'ibi',
+                label         =>'ICT IBI responsible',
+                vjoinon       =>'ictibiresponseid'),
+
+      new kernel::Field::Interface(
+                name          =>'ictibiresponseid',
+                group         =>'ibi',
+                dataobjattr   =>'PAT_ictname.ibiresponse'),
 
       new kernel::Field::Text(
                 name          =>'fullname',
@@ -92,6 +154,18 @@ sub new
                 vjoinbase     =>{cistatusid=>'3 4 5'},
                 vjoinon       =>['ictoid'=>'ictono'],
                 vjoindisp     =>['name','opmode']),
+
+
+      new kernel::Field::SubList(
+                name          =>'canvas',
+                label         =>'Canvas',
+                group         =>'canvas',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                vjointo       =>\'TS::lnkcanvas',
+                vjoinon       =>['ictoid'=>'ictono'],
+                vjoindisp     =>['canvas','fraction'],
+                vjoininhash   =>['canvas','fraction','canvasid']),
 
 
       new kernel::Field::Text(
@@ -169,6 +243,8 @@ sub new
 }
 
 
+
+
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -181,9 +257,10 @@ sub getRecordImageUrl
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default 
+   return(qw(header default ibi
              subprocessrefs
              applications 
+             canvas
              source));
 }
 
@@ -216,7 +293,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my @wrgrp=qw(default);
+   my @wrgrp=qw(default ibi);
 
    return(@wrgrp) if ($self->PAT::lib::Listedit::isWriteValid($rec));
    return(undef);

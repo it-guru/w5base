@@ -116,3 +116,4 @@ create table PAT_canvas(
   FOREIGN KEY fk_canvas (id)  
   REFERENCES canvas (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table PAT_ictname add ibiresponse bigint(20) default NULL;
