@@ -197,6 +197,30 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       });
    }
 
+   ClassAppletLib[applet].class.prototype.addvjoindataload=function(win){
+      var appletobj=this;
+      var app=this.app;
+
+      $(win).find("[data-vjointo]").each(function(i,e){
+         var target=e;
+         $(target).html("<b>...</b");
+         var dataobj=$(e).attr("data-vjointo");
+         var view=$(e).attr("data-vjoindisp");
+         var fld=$(e).attr("data-vjoinfld");
+         var val=$(e).attr("data-vjoinval");
+         app.Config().then(function(cfg){
+            $(target).html(dataobj+"::"+val+"...");
+            var w5obj=getModuleObject(cfg,dataobj);
+            var flt=new Object();
+            flt[fld]=val;
+            w5obj.SetFilter(flt);
+            w5obj.findRecord(view,function(data){
+               $(target).text(data[0][view]);
+            });
+         });
+      });
+   }
+
    ClassAppletLib[applet].class.prototype.showBusinessSeg=function(item){
       var appletobj=this;
       var app=this.app;
@@ -965,6 +989,17 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          };
          d+="</td></tr>";
       }
+      if (1){
+         d+="<tr><td><b>IBI Ansprechpartner:</b></td>";
+         d+="<td>"+
+            "<span data-vjointo=\"PAT::ictname\" "+
+                 "data-vjoindisp=\"ibiresponse\" "+
+                 "data-vjoinfld=\"id\" "+
+                 "data-vjoinval=\""+item.id+"\" "+
+            "></span>";
+         d+="</td></tr>";
+      }
+
       if (item.comments){
          d+="<tr><td><b>%T(Comments,PAT::ictname)%:</b></td>";
          d+="<td>"+item.comments+"</td></tr>";
@@ -1003,7 +1038,12 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          d+="<tr class=block-end>"+
             "<td><b>%T(Applications,itil::system)%:</b></td>";
          d+="<td>";
+         var appl=new Object();
+
          $.each(appletobj.data.relation.byicto[item.ictoid],function(i,relrec){
+            appl[relrec.applid]=relrec;
+         });
+         $.each(Object.values(appl),function(i,relrec){
             d+="<div>";
             d+="<div class=clickableLink> ";
             d+=relrec.appl;
@@ -1023,6 +1063,7 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
          d:d,
          fine:function(win){
             appletobj.addClickLinks(win);
+            appletobj.addvjoindataload(win);
          }
       });
    }

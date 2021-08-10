@@ -1,4 +1,4 @@
 'PAT::canvas'=>{de=>'PAT: Canvas',en=>'PAT: Canvas'},
 'IBI comments'=>{de=>'IBI Bemerkungen'},
-'IBI responsible'=>{de=>'IBI Ansprechpartner'},
+'Canvas IBI responsible'=>{de=>'Canvas IBI Ansprechpartner'},
 'fieldgroup.ibi'=>{de=>'IBI Canvas Daten',en=>'IBI Canvas data'},

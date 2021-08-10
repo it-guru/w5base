@@ -39,16 +39,16 @@ sub new
                 dataobjattr   =>'PAT_canvas.id'),
 
       new kernel::Field::Contact(
-                name          =>'ibiresponse',
+                name          =>'canvasibiresponse',
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
                                  'usertyp'=>[qw(extern user)]},
                 AllowEmpty    =>1,
                 group         =>'ibi',
-                label         =>'IBI responsible',
-                vjoinon       =>'ibiresponseid'),
+                label         =>'Canvas IBI responsible',
+                vjoinon       =>'canvasibiresponseid'),
 
       new kernel::Field::Interface(
-                name          =>'ibiresponseid',
+                name          =>'canvasibiresponseid',
                 group         =>'ibi',
                 dataobjattr   =>'PAT_canvas.ibiresponse'),
 
