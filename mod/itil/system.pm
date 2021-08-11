@@ -2659,6 +2659,7 @@ sub QRuleSyncCloudSystem
       NAMECHK: foreach my $orgsysname (@$sysnamelist){
          if (!defined($parshortdesc)){
             $parshortdesc=UTF8toLatin1($orgsysname);
+            $parshortdesc=~s/[^a-z0-9_-]//gi; # remove non ASC Char
          }
          my $sysname=lc($orgsysname);
          if ($sysname=~m/^\S{5,32}\s/){  # Wenn der Name am Anfang steht und
@@ -2667,7 +2668,7 @@ sub QRuleSyncCloudSystem
          $sysname=~s/\s/_/g;
          $sysname=UTF8toLatin1($sysname);
          $sysname=~s/\..*$//; # remove posible Domain part 
-         $sysname=~s/[^a-z0-9_-]//; # remove non ASC Char
+         $sysname=~s/[^a-z0-9_-]//gi; # remove non ASC Char
          if (length($sysname)>40){
             $sysname=substr($sysname,0,40);
          }
