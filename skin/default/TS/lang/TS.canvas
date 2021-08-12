@@ -9,3 +9,4 @@
 'Unit Type'=>{de=>'Einheiten-Type'},
 'responsible organisation'=>{de=>'verantwortliche Organisation'},
 'invalid format of CanvasID'=>{de=>'ungültiges Format der CanvasID'},
+'Applications'=>{de=>'Anwendungen'},

@@ -149,6 +149,17 @@ sub new
                 vjoinon       =>['id'=>'canvasid'],
                 vjoindisp     =>['icto','fraction','vou']),
 
+      new kernel::Field::SubList(
+                name          =>'applications',
+                label         =>'Applications',
+                group         =>'ictorelations',
+                searchable    =>1,
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'TS::lnkcanvasappl',
+                vjoinon       =>['id'=>'canvasid'],
+                vjoindisp     =>['appl']),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
