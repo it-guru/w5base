@@ -40,6 +40,8 @@ sub new
    return($self);
 }
 
+
+
 sub getPresenter
 {
    my $self=shift;
@@ -48,7 +50,7 @@ sub getPresenter
           'APR'=>{
                          opcode=>\&displayAPR,
                          overview=>undef,
-                         group=>['Application','Group'],
+                         group=>['Application','Group','Canvas'],
                          prio=>5100,
                       }
          );
@@ -226,7 +228,6 @@ sub displayAPR
    }
    return() if (!defined($rmostat));
 
-
    my $app=$self->getParent();
    #my $user=$app->extractYear($primrec,$hist,"User",
    #                           setUndefZero=>1);
@@ -338,6 +339,7 @@ sub displayAPR
       }
    }
    if ($rmostat->{sgroup} eq "Group" ||
+       $rmostat->{sgroup} eq "Canvas" ||
        $rmostat->{sgroup} eq "Application"){
       foreach my $color (keys(%colors)){
          foreach my $prefix (qw(
@@ -641,10 +643,6 @@ sub displayAPR
 
 
 
-#print STDERR (Dumper($rmostat->{stats}));
-#print STDERR (Dumper($rmostat));
-
-
    if ($showLegend){
       $d.=$self->Legend();
       $d.="<hr>";
@@ -738,10 +736,18 @@ sub processRecord
    return() if ($statstream ne "APR");
 
    if ($module eq "tsAPR::appl"){
+      my %canvas;
       msg(INFO,"APR Processs $rec->{name}");
       $self->getParent->Trace("");
       $self->getParent->Trace("Processing: ".$rec->{name});
-      #print STDERR Dumper($rec);
+      my $o=$app->getPersistentModuleObject("TS::lnkcanvasappl");
+      $o->SetFilter({applid=>\$rec->{id}});
+      foreach my $crec ($o->getHashList(qw(canvas canvascanvasid 
+                                           canvasid fraction))){
+         $canvas{$crec->{canvasid}}={
+            name=>$crec->{canvascanvasid}.": ".$crec->{canvas}
+         };
+      }
       my %systemid=();
       my @systemid=();
       my @w5sysid=();
@@ -1041,6 +1047,13 @@ sub processRecord
             $self->getParent->storeStatVar("Group",
                \@repOrg,{},"APR.Appl.Count",1
             );
+            foreach my $canvasid (keys(%canvas)){
+               $self->getParent->storeStatVar("Canvas",
+                                              [$canvas{$canvasid}->{name}],
+                                              {nosplit=>1,
+                                               nameid=>$canvasid},
+                                              "APR.Appl.Count",1);
+            }
             $self->getParent->storeStatVar("Application",
                [$rec->{name}],{
                   nosplit=>1,nameid=>$rec->{id}
@@ -1050,6 +1063,12 @@ sub processRecord
             foreach my $k (keys(%$appkpi)){
                $self->getParent->storeStatVar("Group",\@repOrg,{},
                                               $k,$appkpi->{$k});
+               foreach my $canvasid (keys(%canvas)){
+                  $self->getParent->storeStatVar("Canvas",
+                                                 [$canvas{$canvasid}->{name}],
+                                                 {},
+                                                 $k,$appkpi->{$k});
+               }
             }
          }
       }
