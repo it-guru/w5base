@@ -47,6 +47,11 @@ sub new
                 label         =>'CanvasID',
                 dataobjattr   =>'lnkcanvas.canvasid'),
 
+      new kernel::Field::Interface(
+                name          =>'canvascanvasid',
+                label         =>'Canvas CanvasID',
+                dataobjattr   =>'canvas.canvasid'),
+
       new kernel::Field::Text(
                 name          =>'ictono',
                 htmldetail    =>0,
