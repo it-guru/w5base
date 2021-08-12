@@ -301,11 +301,9 @@ sub FineProcess
    foreach my $k (sort(keys(%{$store->{child}}))){
       my $childapplid=$store->{child}->{$k}->{applid};
       if (exists($self->{prodcompfix}->{$childapplid})){
-         printf STDERR ("fifi childfix\n");
          $store->{child}->{$k}->{prodcomp}=
             $self->{prodcompfix}->{$childapplid}->{prodcomp};
       }
-      #printf STDERR ("process $childapplid as child=%s\n",Dumper($store->{child}->{$k}));
 
       if ($store->{child}->{$k}->{prodcomp} ne ""){
          $prodcomp{$store->{child}->{$k}->{prodcomp}}++;
