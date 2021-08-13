@@ -1216,7 +1216,6 @@ sub postQualityCheckRecord
    my $userid=$rec->{userid};
 
    if ($userid ne ""){
-      printf STDERR ("fifi postQualityCheckRecord for $userid\n");
       my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
       $lnk->SetFilter({
          userid=>\$userid,
