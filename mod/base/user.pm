@@ -939,7 +939,8 @@ sub new
                 vjointo       =>'base::lnkgrpuser',
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>['group','grpweblink','roles'],
-                vjoininhash   =>['group','grpid','roles','cdate']),
+                vjoininhash   =>['group','grpid','roles','cdate',
+                                 'is_orggrp','is_projectgrp']),
 
       new kernel::Field::Text(
                 name          =>'groupnames',

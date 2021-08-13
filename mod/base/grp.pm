@@ -197,9 +197,9 @@ sub new
                 group         =>'grptype',
                 dataobjattr   =>'is_projectgrp'),
 
-      new kernel::Field::Boolean(
-                name          =>'is_orggrp',
-                label         =>'organisational Group',
+      new kernel::Field::Boolean(                # ACHTUNG: Das Feld ist auch 
+                name          =>'is_orggrp',     #          in base::lnkgrpuser
+                label         =>'organisational Group', #   definiert!
                 htmlhalfwidth =>1,
                 readonly      =>1,
                 group         =>'grptype',
