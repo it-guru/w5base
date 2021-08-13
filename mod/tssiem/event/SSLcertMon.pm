@@ -50,7 +50,10 @@ sub SSLcertMon
                                  sslparsedvalidfrom
                                  sslparsedvalidtill
                                  sslparsedvalidity
-                                 sdate srcid);
+                                 sslparsedchainlength
+                                 sdate srcid 
+                                 urlofcurrentrec
+                                 islatest);
    my $res={};
    if ($queryparam ne ""){
       msg(INFO,"try to process srcid='$queryparam'");
@@ -102,7 +105,8 @@ sub SSLcertMon
                $datastream->SetFilter({srcid=>\$lastid,sdate=>\$laststamp});
                my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
                if (!defined($lastrec)){
-                  msg(WARN,"record with id '$lastid' has been deleted or changed - using date only");
+                  msg(WARN,"record with id '$lastid' has been ".
+                           "deleted or changed - using date only");
                   $lastid=undef;
                }
                %flt=( 
@@ -119,7 +123,7 @@ sub SSLcertMon
          $datastream->SetFilter(\%flt);
          $datastream->SetCurrentView(@datastreamview);
          $datastream->SetCurrentOrder("+sdate","+srcid");
-         $datastream->Limit(5000);
+         #$datastream->Limit(5000);
          my ($rec,$msg)=$datastream->getFirst();
 
          if (defined($rec)){
@@ -154,7 +158,9 @@ sub SSLcertMon
                }
                if ($skiplevel==0 ||  # = no records to skip
                    $skiplevel==3){   # = all skips are done
-                  $self->analyseRecord($datastream,$rec,$res);
+                  if ($rec->{islatest}){
+                     $self->analyseRecord($datastream,$rec,$res);
+                  }
                   $recno++;
                   $exitmsg="last:".$rec->{sdate}.";".$rec->{srcid};
                }
@@ -168,7 +174,7 @@ sub SSLcertMon
                   msg(ERROR,"db record problem: %s",$msg);
                   return({exitcode=>1,msg=>$msg});
                }
-            }until(!defined($rec) || $recno>2000);
+            }until(!defined($rec) );
          }
       }
    }
@@ -224,6 +230,12 @@ sub analyseRecord
       # No notification is needed in this case.
       return();
    }
+   if ($rec->{sslparsedchainlength} eq "1" && $rec->{port} eq "3389"){
+      # hab ich mal implementiert, da Qualys Windows nicht immer korrekt
+      # erkennt. Auftrag von Roland zu dieser Anpassung steht noch aus 
+      # (Stand 13.03.2021)
+      return();
+   }
 
    my $notifyDayLimit=8*7;
 
@@ -245,7 +257,8 @@ sub analyseRecord
             port=>$rec->{port},
             protocol=>$rec->{protocol},
             days=>$d->{days},
-            ictono=>$rec->{ictono}
+            ictono=>$rec->{ictono},
+            urlofcurrentrec=>$rec->{urlofcurrentrec}
          };
       }
    }
@@ -315,9 +328,10 @@ sub doNotify
 
       my @certs;
       foreach my $ser (sort(keys(%$rec))){
-         push(@certs,sprintf("%-22s expires in %d days",
+         push(@certs,sprintf("%-22s expires in %d days\n%s",
                              $rec->{$ser}->{ipaddress}.":".$rec->{$ser}->{port},
-                             $rec->{$ser}->{days})
+                             $rec->{$ser}->{days},
+                             $rec->{$ser}->{urlofcurrentrec})
          );
       }
 
@@ -325,7 +339,7 @@ sub doNotify
 
       my $tmpl=$datastream->getParsedTemplate("tmpl/SSLcertMon_MailNotify",{
          static=>{
-            CERTLIST=>join("\n",@certs),
+            CERTLIST=>join("\n\n",@certs),
             ICTONO=>$ictono,
             DEBUG=>$debug
          }
@@ -333,7 +347,7 @@ sub doNotify
       $wfa->Notify( "WARN",$subject,$tmpl, 
          emailto=>\@emailto, 
          emailbcc=>[
-   #         11634953080001,   # HV
+            11634953080001,   # HV
             12663941300002    # Roland
          ],
          emailcategory =>['Qualys',
