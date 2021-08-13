@@ -350,6 +350,24 @@ sub new
                 label         =>'Grp CI-Statusid',
                 dataobjattr   =>'grp.cistatus'),
 
+      new kernel::Field::Interface(
+                name          =>'is_projectgrp',
+                label         =>'Group is Projectgroup',
+                readonly      =>1,
+                htmldetail    =>0,
+                dataobjattr   =>'grp.is_projectgrp'),
+
+      new kernel::Field::Interface(             
+                name          =>'is_orggrp',     
+                label         =>'Group is organisational Group', 
+                readonly      =>1,
+                dataobjattr   =>'if (grp.is_org=1 or '.
+                                    'grp.is_line=1 or '.
+                                    'grp.is_depart=1 or '.
+                                    'grp.is_resort=1 or '.
+                                    'grp.is_team=1 or '.
+                                    'grp.is_orggroup=1'.
+                                    ',1,0)'),
       new kernel::Field::Text(
                 name          =>'userid',
                 readonly      =>1,
