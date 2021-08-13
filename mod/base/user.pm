@@ -916,17 +916,32 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'lastknownbossid',
-                label         =>'last Known Boss IDs',
+                label         =>'last known boss IDs',
                 dataobjattr   =>'contact.lastknownboss'),
 
       new kernel::Field::SubList(
                 name          =>'lastknownboss',
-                label         =>'last Known Boss',
+                label         =>'last known boss',
                 htmldetail    =>0,
                 group         =>'userro',
                 searchable    =>0, # nicht suchbar, da kein db join möglich!
                 vjointo       =>'base::user',
                 vjoinon       =>['lastknownbossid'=>'userid'],
+                vjoindisp     =>['fullname']),
+
+      new kernel::Field::Link(
+                name          =>'lastknownpbossid',
+                label         =>'last known project boss IDs',
+                dataobjattr   =>'contact.lastknownpboss'),
+
+      new kernel::Field::SubList(
+                name          =>'lastknownpboss',
+                label         =>'last known project boss',
+                htmldetail    =>0,
+                group         =>'userro',
+                searchable    =>0, # nicht suchbar, da kein db join möglich!
+                vjointo       =>'base::user',
+                vjoinon       =>['lastknownpbossid'=>'userid'],
                 vjoindisp     =>['fullname']),
 
       new kernel::Field::SubList(
@@ -1201,41 +1216,104 @@ sub postQualityCheckRecord
    my $userid=$rec->{userid};
 
    if ($userid ne ""){
+      printf STDERR ("fifi postQualityCheckRecord for $userid\n");
       my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
-      $lnk->SetFilter({userid=>\$userid,rawnativroles=>[orgRoles()]});
+      $lnk->SetFilter({
+         userid=>\$userid,
+         rawnativroles=>[orgRoles()],
+         grpcistatusid=>[3,4,5]
+      });
       my @grp;
-      my @orggroups=$lnk->getHashList(qw(grpid nativroles));
+      my @orggroups=$lnk->getHashList(qw(grpid nativroles 
+                                         is_orggrp is_projectgrp)); 
+      my %grp;
+      my $grpobj=getModuleObject($self->Config,"base::grp");
       foreach my $lnkrec (@orggroups){
          my $roles=$lnkrec->{nativroles};
          $roles=[$roles] if (ref($roles) ne "ARRAY");
          $roles=[map({$_->{nativrole}} @{$roles})];
          if (in_array($roles,"RBoss")){ # TL Handling
-            my $grp=getModuleObject($self->Config,"base::grp");
-            $grp->SetFilter({grpid=>\$lnkrec->{grpid}});
-            foreach my $grprec ($grp->getHashList(qw(parentid))){
+            $grpobj->ResetFilter();
+            $grpobj->SetFilter({grpid=>\$lnkrec->{grpid}});
+            foreach my $grprec ($grpobj->getHashList(qw(parentid))){
                push(@grp,$grprec->{parentid});
+               $grp{$grprec->{grpid}}={
+                  is_orggrp=>$grprec->{is_orggrp},
+                  is_projectgrp=>$grprec->{is_projectgrp}
+               };
             }
          }
          else{
             push(@grp,$lnkrec->{grpid});
+            $grp{$lnkrec->{grpid}}={
+               is_orggrp=>$lnkrec->{is_orggrp},
+               is_projectgrp=>$lnkrec->{is_projectgrp}
+            }
          }
       }
-      my %boss;
+
       if ($#grp!=-1){
-         $lnk->ResetFilter();
-         $lnk->SetFilter({grpid=>\@grp,rawnativroles=>\"RBoss"});
-         foreach my $lnkrec ($lnk->getHashList(qw(userid))){
-            $boss{$lnkrec->{userid}}++;
-         }
+         my $recursecnt=0;
+         do{
+            $recursecnt++;
+            $lnk->ResetFilter();
+            $lnk->SetFilter({grpid=>\@grp,rawnativroles=>\"RBoss"});
+            foreach my $lnkrec ($lnk->getHashList(qw(userid grpid
+                                                     is_orggrp is_projectgrp))){
+               $grp{$lnkrec->{grpid}}->{boss}=$lnkrec->{userid};
+            }
+            @grp=();
+            foreach my $grpid (keys(%grp)){
+               if (!exists($grp{$grpid}->{boss}) &&
+                   !exists($grp{$grpid}->{parentid})){
+                  $grpobj->ResetFilter();
+                  $grpobj->SetFilter({grpid=>\$grpid});
+                  foreach my $grprec ($grpobj->getHashList(qw(parentid))){
+                     if ($grprec->{parentid} ne ""){
+                        $grp{$grpid}->{parentid}=$grprec->{parentid};
+                        push(@grp,$grprec->{parentid});
+                        # type of parent will be "virtual" inherit from 
+                        # subgroup to document the origin of the posible
+                        # found boss
+                        $grp{$grprec->{parentid}}={
+                           is_projectgrp=>$grp{$grpid}->{is_projectgrp}, 
+                           is_orggrp=>$grp{$grpid}->{is_orggrp}, 
+                        };
+                     }
+                  }
+               }
+            }
+         }while(!($recursecnt>2 || $#grp==-1));
       }
-      my $boss=join(" ",sort(grep(!/^$userid$/,keys(%boss))));
-      if (($boss ne "" || $#orggroups!=-1)  && 
-          $boss ne $rec->{lastknownbossid}){
-         #printf STDERR ("Info: Update lastknownbossid on $userid to $boss\n");
-         $boss=undef if ($boss eq "");
+      my %oboss;
+      my %pboss;
+      foreach my $grpid (keys(%grp)){
+         if ($grp{$grpid}->{is_projectgrp}){
+            $pboss{$grp{$grpid}->{boss}}++;
+         }
+         else{
+            $oboss{$grp{$grpid}->{boss}}++;  # auch is_orggrp=0 wird als Org 
+         }                                   # boss verwendet (falls kein org
+      }                                      # attribut gesetzt)
+
+
+      my %upd;
+      my $oboss=trim(join(" ",sort(grep(!/^$userid$/,keys(%oboss)))));
+      if (($oboss ne "" || $#orggroups!=-1)  && 
+          $oboss ne $rec->{lastknownbossid}){
+         $oboss=undef if ($oboss eq "");
+         $upd{lastknownbossid}=$oboss;
+      }
+      my $pboss=trim(join(" ",sort(grep(!/^$userid$/,keys(%pboss)))));
+      if (($pboss ne "" || $#orggroups!=-1)  && 
+          $pboss ne $rec->{lastknownpbossid}){
+         $pboss=undef if ($pboss eq "");
+         $upd{lastknownpbossid}=$pboss;
+      }
+
+      if (keys(%upd)){
          my $op=$self->Clone();
-         $op->ValidatedUpdateRecord($rec,{lastknownbossid=>$boss},
-                                    {userid=>\$userid});
+         $op->ValidatedUpdateRecord($rec,\%upd,{userid=>\$userid});
       }
    }
 
