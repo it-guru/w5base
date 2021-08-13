@@ -660,14 +660,17 @@ sub syncToGroups
       srcid=>\$id
    }]);
    my @l=$grp->getHashList(qw(fullname name description srcsys srcid cistatusid
-                              grpid is_orggroup parent parentid));
+                              grpid is_projectgrp 
+                              is_org is_line is_depart is_resort 
+                              is_team  is_orggroup
+                              parent parentid));
    my $grpid;
    if ($#l==-1){   # Gruppe muss neu erzeugt werden
       $grpid=$grp->ValidatedInsertRecord({
          name=>$shortname,
          cistatusid=>$cistatus,
          parent=>$parentgrp,
-         is_orggroup=>1,
+         is_projectgrp=>1,
          description=>$name,
          srcsys=>$self->SelfAsParentObject(),
          srcid=>$id,
@@ -681,7 +684,7 @@ sub syncToGroups
       $upd->{description}=$name    if ($l[0]->{description} ne $name);
       $upd->{cistatusid}=$cistatus if ($l[0]->{cistatusid} ne $cistatus);
       $upd->{srcid}=$id            if ($l[0]->{srcid} ne $id);
-      $upd->{is_orggroup}="1"      if ($l[0]->{is_orggroup} ne "1");
+      $upd->{is_projectgrp}="1"    if ($l[0]->{is_projectgrp} ne "1");
       if ($l[0]->{srcsys} ne $self->SelfAsParentObject()){
          $upd->{srcsys}=$self->SelfAsParentObject();
       }
@@ -707,7 +710,10 @@ sub syncToGroups
          $grp->SetFilter({parentid=>\$grpid});
          my @l=$grp->getHashList(qw(fullname name srcsys srcid cistatusid
                                     description 
-                                    grpid is_orggroup parent parentid));
+                                    grpid is_projectgrp
+                                    is_org is_line is_depart is_resort
+                                    is_team  is_orggroup
+                                    parent parentid));
 
          my @dellist;
          my @updlist;
@@ -741,6 +747,9 @@ sub syncToGroups
                if ($fnd->{srcsys} ne "TS::subvou"){
                   $upd->{srcsys}="TS::subvou";
                }
+               if ($fnd->{is_projectgrp} ne "1"){
+                  $upd->{is_projectgrp}="1";
+               }
                if (keys(%$upd)){
                   push(@updlist,[$fnd,$upd]);
                }
@@ -770,7 +779,7 @@ sub syncToGroups
                name=>$r->{name},
                cistatusid=>4,
                parentid=>$grpid,
-               is_orggroup=>1,
+               is_projectgrp=>1,
                srcsys=>"TS::subvou",
                srcid=>$r->{id},
                srcload=>NowStamp("en")

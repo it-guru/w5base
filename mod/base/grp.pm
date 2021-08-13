@@ -190,6 +190,27 @@ sub new
                 group         =>'grptype',
                 dataobjattr   =>'is_orggroup'),
 
+      new kernel::Field::Boolean(
+                name          =>'is_projectgrp',
+                label         =>'Projectgroup',
+                htmlhalfwidth =>1,
+                group         =>'grptype',
+                dataobjattr   =>'is_projectgrp'),
+
+      new kernel::Field::Boolean(
+                name          =>'is_orggrp',
+                label         =>'organisational Group',
+                htmlhalfwidth =>1,
+                readonly      =>1,
+                group         =>'grptype',
+                dataobjattr   =>'if (is_org=1 or '.
+                                    'is_line=1 or '.
+                                    'is_depart=1 or '.
+                                    'is_resort=1 or '.
+                                    'is_team=1 or '.
+                                    'is_orggroup=1'.
+                                    ',1,0)'),
+
       new kernel::Field::Htmlarea(
                 name          =>'grppresentation',
                 label         =>'Team-View Presentation',
@@ -440,6 +461,17 @@ sub Validate
          return(undef);
       }
    }
+   my @orgflags=qw(is_org is_line is_depart is_resort is_team  is_orggroup);
+
+   if (effVal($oldrec,$newrec,"is_projectgrp")){
+      foreach my $var (@orgflags){
+         if (effVal($oldrec,$newrec,$var)){
+            $newrec->{$var}=0;
+         }
+      }
+   }
+
+
    $newrec->{cistatusid}=4 if (!defined($oldrec) && $cistatus==0);
    if (!$self->SUPER::Validate($oldrec,$newrec,$origrec)){
       return(0);
