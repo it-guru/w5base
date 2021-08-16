@@ -466,10 +466,10 @@ $ua->agent("Mozilla/5.0 (X11; U; Linux i686; de-AT; rv:1.8.1.4) Gecko/20070509 S
          }
          else{
             $d->{exitcode}=1201;
-            msg(ERROR,"invalid JSON response from probeip ".
-                      "url '$probeipurl' at ".
-                      "network '$nrec->{name}' while query to '$url'");
-            print STDERR "DEBUG INfo:".Dumper($rdata);
+            #msg(ERROR,"invalid JSON response from probeip ".
+            #          "url '$probeipurl' at ".
+            #          "network '$nrec->{name}' while query to '$url'");
+            #print STDERR "DEBUG INfo:".Dumper($rdata);
             $d->{exitmsg}="probeip url answers with invalid json data";
          }
       }
