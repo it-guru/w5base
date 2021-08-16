@@ -347,7 +347,7 @@ sub doNotify
       $wfa->Notify( "WARN",$subject,$tmpl, 
          emailto=>\@emailto, 
          emailbcc=>[
-            11634953080001,   # HV
+            #11634953080001,   # HV
             12663941300002    # Roland
          ],
          emailcategory =>['Qualys',
