@@ -108,7 +108,6 @@ sub SecScanMon
       my $skiplevel=0;
       my $recno=0;
       $datastream->ResetFilter();
-      $datastream->SetNamedFilter("TransactionFix",{cdate=>'<now-36h'});
       $datastream->SetFilter(\%flt);
       $datastream->SetCurrentView(qw(ictono urlofcurrentrec
                                      name applid itscanobjectid
