@@ -129,129 +129,139 @@ sub qcheckRecord
    }
    my @url=sort({$a->{name} cmp $b->{name}} values(%url));
 
-   my $itilurl=getModuleObject($dataobj->Config,"itil::lnkapplurl");
-
-   my $fltset=[
-      {
-          name=>join(" ",map({'"'.$_->{name}.'"'} @url)),
-          applid=>[$rec->{applid}],
-          networkid =>$netarea->{CNDTAG}
-      },
-      {
-          name=>join(" ",map({'"'.$_->{name}.'/*"'} @url)),
-          applid=>[$rec->{applid}],
-          networkid =>$netarea->{CNDTAG}
-      },
-      {
-          itcloudareaid=>$rec->{id},
-          applid=>[$rec->{applid}]
-      }
-   ];
-
-   $itilurl->SetFilter($fltset);
-   my @curl=$itilurl->getHashList(qw(ALL));
-
-   my @opList;
-   my $res=OpAnalyse(
-              sub{  # comperator 
-                 my ($a,$b)=@_;
-                 my $eq;
-                 my $blen=length($b->{name});
-                 if ((lc($b->{name}) eq lc(substr($a->{name},0,$blen))) ||
-                     ($a->{srcid} eq $b->{srcid} &&
-                      $a->{srcsys} eq $b->{srcsys})){
-                    $eq=0;
-                    if ($a->{srcid} eq $b->{srcid} &&
-                        $a->{srcsys} eq $b->{srcsys} &&
-                        lc($b->{name}) eq lc(substr($a->{name},0,$blen))){
-                       $eq=1;
-                    }
-                 }
-                 return($eq);
-              },
-              sub{  # oprec generator
-                 my ($mode,$oldrec,$newrec,%p)=@_;
-                 if ($mode eq "insert" || $mode eq "update"){
-                    my $oprec={
-                       OP=>$mode,
-                       MSG=>"$mode url $newrec->{name} ",
-                       DATAOBJ=>'itil::lnkapplurl',
-                       DATA=>{
-                          networkid     =>$netarea->{CNDTAG},
-                          itcloudareaid =>$rec->{id},
-                          applid        =>$newrec->{applid},
-                          srcid         =>$newrec->{srcid},
-                          srcsys        =>$newrec->{srcsys},
-                       }
-                    };
-                    if ($mode eq "update"){
-                       $oprec->{IDENTIFYBY}=$oldrec->{id};
-                       if ($oldrec->{srcsys} ne $newrec->{srcsys}){
-                          $oprec->{DATA}->{is_onshproxy}=1;
-                       }
-                       my $newlen=length($newrec->{name});
-                       if ($newrec->{name} ne 
-                           substr($oldrec->{name},0,$newlen)){
-                          $oprec->{DATA}->{name}=$newrec->{name};
-                       }
-                    }
-                    if ($mode eq "insert"){
-                       $oprec->{DATA}->{is_userfrontend}=1;
-                       $oprec->{DATA}->{is_onshproxy}=1;
-                       $oprec->{DATA}->{name}=$newrec->{name};
-                    }
-                    return($oprec);
-                 }
-                 elsif ($mode eq "delete"){
-                    return(undef); # wegen colision der Löschoperation mit der
-                                   # qrule an der URLselbst (vielleicht wäre
-                                   # es gut, bei URLs auch einen CI-Status
-                                   # einzuführen
-                    return(undef) if ($oldrec->{srcsys} ne $srcsys);
-                    return({OP=>$mode,
-                            MSG=>"delete url $oldrec->{name} ",
-                            DATAOBJ=>'itil::lnkapplurl',
-                            IDENTIFYBY=>$oldrec->{id},
-                            });
-                 }
-                 return(undef);
-              },
-              \@curl,\@url,\@opList,
-              refid=>$rec->{id});
-
-   #
-   # Validate, if new URLs are already registered by other applications
-   #
-   foreach my $oprec (@opList){
-      if ($oprec->{OP} eq "insert"){
-         $itilurl->ResetFilter();
-         my $url=$oprec->{DATA}->{name};
-         my $networkid=$oprec->{DATA}->{networkid};
-         my $applid=$oprec->{DATA}->{applid};
-         $itilurl->SetFilter({name=>'"'.$url.'"',networkid=>\$networkid});
-         my @l=$itilurl->getHashList(qw(name applid appl));
-         foreach my $failrec (@l){
-            my $msg="this URL is already registed by outer application: ".
-                    $failrec->{appl};
-            push(@qmsg,"URL: ".$failrec->{name});
-            push(@qmsg,$msg);
-            $errorlevel=2 if ($errorlevel<2);
-            $oprec->{OP}="invalid";
-         }
-         if (!$dataobj->validateCloudAreaImportState(
-                 "URL: ".$url,undef,$rec,undef)){
-            my $msg="invalid cloudarea or application state for import: ".
-                    "URL: ".$url;
-            push(@qmsg,$msg);
-            $errorlevel=2 if ($errorlevel<2);
-            $oprec->{OP}="invalid";
-         }
+   if ($#url!=-1){
+      if (!$dataobj->validateCloudAreaImportState(
+                                          "CLOUDAREA: ".$rec->{fullname},
+                                          undef,$rec,undef)){
+         my $msg="invalid cloudarea or application state for import";
+         push(@qmsg,$msg);
       }
    }
-
-   if (!$res){
-      my $opres=ProcessOpList($self->getParent,\@opList);
-      push(@qmsg,map({$_->{MSG}} grep({$_->{OP} ne "invalid"} @opList)));
+   if ($#qmsg==-1){
+      my $itilurl=getModuleObject($dataobj->Config,"itil::lnkapplurl");
+     
+      my $fltset=[
+         {
+             name=>join(" ",map({'"'.$_->{name}.'"'} @url)),
+             applid=>[$rec->{applid}],
+             networkid =>$netarea->{CNDTAG}
+         },
+         {
+             name=>join(" ",map({'"'.$_->{name}.'/*"'} @url)),
+             applid=>[$rec->{applid}],
+             networkid =>$netarea->{CNDTAG}
+         },
+         {
+             itcloudareaid=>$rec->{id},
+             applid=>[$rec->{applid}]
+         }
+      ];
+     
+      $itilurl->SetFilter($fltset);
+      my @curl=$itilurl->getHashList(qw(ALL));
+     
+      my @opList;
+      my $res=OpAnalyse(
+                 sub{  # comperator 
+                    my ($a,$b)=@_;
+                    my $eq;
+                    my $blen=length($b->{name});
+                    if ((lc($b->{name}) eq lc(substr($a->{name},0,$blen))) ||
+                        ($a->{srcid} eq $b->{srcid} &&
+                         $a->{srcsys} eq $b->{srcsys})){
+                       $eq=0;
+                       if ($a->{srcid} eq $b->{srcid} &&
+                           $a->{srcsys} eq $b->{srcsys} &&
+                           lc($b->{name}) eq lc(substr($a->{name},0,$blen))){
+                          $eq=1;
+                       }
+                    }
+                    return($eq);
+                 },
+                 sub{  # oprec generator
+                    my ($mode,$oldrec,$newrec,%p)=@_;
+                    if ($mode eq "insert" || $mode eq "update"){
+                       my $oprec={
+                          OP=>$mode,
+                          MSG=>"$mode url $newrec->{name} ",
+                          DATAOBJ=>'itil::lnkapplurl',
+                          DATA=>{
+                             networkid     =>$netarea->{CNDTAG},
+                             itcloudareaid =>$rec->{id},
+                             applid        =>$newrec->{applid},
+                             srcid         =>$newrec->{srcid},
+                             srcsys        =>$newrec->{srcsys},
+                          }
+                       };
+                       if ($mode eq "update"){
+                          $oprec->{IDENTIFYBY}=$oldrec->{id};
+                          if ($oldrec->{srcsys} ne $newrec->{srcsys}){
+                             $oprec->{DATA}->{is_onshproxy}=1;
+                          }
+                          my $newlen=length($newrec->{name});
+                          if ($newrec->{name} ne 
+                              substr($oldrec->{name},0,$newlen)){
+                             $oprec->{DATA}->{name}=$newrec->{name};
+                          }
+                       }
+                       if ($mode eq "insert"){
+                          $oprec->{DATA}->{is_userfrontend}=1;
+                          $oprec->{DATA}->{is_onshproxy}=1;
+                          $oprec->{DATA}->{name}=$newrec->{name};
+                       }
+                       return($oprec);
+                    }
+                    elsif ($mode eq "delete"){
+                       return(undef); # wegen colision der Löschoperation mit der
+                                      # qrule an der URLselbst (vielleicht wäre
+                                      # es gut, bei URLs auch einen CI-Status
+                                      # einzuführen
+                       return(undef) if ($oldrec->{srcsys} ne $srcsys);
+                       return({OP=>$mode,
+                               MSG=>"delete url $oldrec->{name} ",
+                               DATAOBJ=>'itil::lnkapplurl',
+                               IDENTIFYBY=>$oldrec->{id},
+                               });
+                    }
+                    return(undef);
+                 },
+                 \@curl,\@url,\@opList,
+                 refid=>$rec->{id});
+     
+      #
+      # Validate, if new URLs are already registered by other applications
+      #
+      foreach my $oprec (@opList){
+         if ($oprec->{OP} eq "insert"){
+            $itilurl->ResetFilter();
+            my $url=$oprec->{DATA}->{name};
+            my $networkid=$oprec->{DATA}->{networkid};
+            my $applid=$oprec->{DATA}->{applid};
+            $itilurl->SetFilter({name=>'"'.$url.'"',networkid=>\$networkid});
+            my @l=$itilurl->getHashList(qw(name applid appl));
+            foreach my $failrec (@l){
+               my $msg="this URL is already registed by outer application: ".
+                       $failrec->{appl};
+               push(@qmsg,"URL: ".$failrec->{name});
+               push(@qmsg,$msg);
+               $errorlevel=2 if ($errorlevel<2);
+               $oprec->{OP}="invalid";
+            }
+            if (!$dataobj->validateCloudAreaImportState(
+                    "URL: ".$url,undef,$rec,undef)){
+               my $msg="invalid cloudarea or application state for import: ".
+                       "URL: ".$url;
+               push(@qmsg,$msg);
+               $errorlevel=2 if ($errorlevel<2);
+               $oprec->{OP}="invalid";
+            }
+         }
+      }
+     
+      if (!$res){
+         my $opres=ProcessOpList($self->getParent,\@opList);
+         push(@qmsg,map({$_->{MSG}} grep({$_->{OP} ne "invalid"} @opList)));
+      }
    }
 
    #print STDERR Dumper($rec);
