@@ -163,6 +163,14 @@ sub qcheckRecord
          elsif ($res->{exitcode} eq "9999"){
             $sslstate="unable to find network area for ssl checks";
          }
+         elsif ($res->{exitcode} eq "1201"){
+            $sslstate="unable to communicate with ssl url";
+         }
+         elsif ($res->{exitcode} eq "1101"){
+            $sslstate="unable to communicate with ssl url".
+                      " - ".
+                      "possibly a firewall problem";
+         }
          elsif ($res->{exitcode} eq "199"){
             $sslstate=$res->{exitmsg};
             $sslstate="generel problem while ProbeIP" if ($sslstate eq "");
