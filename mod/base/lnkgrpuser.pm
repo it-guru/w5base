@@ -184,7 +184,8 @@ sub new
                 label         =>'User',
                 vjointo       =>'base::user',
                 vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoindisp     =>'fullname',
+                dataobjattr   =>'contact.fullname'),
 
       new kernel::Field::TextDrop(
                 name          =>'email',
@@ -193,7 +194,8 @@ sub new
                 label         =>'E-Mail',
                 vjointo       =>'base::user',
                 vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>'email'),
+                vjoindisp     =>'email',
+                dataobjattr   =>'contact.email'),
 
       new kernel::Field::TextDrop(
                 name          =>'usertyp',
@@ -201,7 +203,8 @@ sub new
                 label         =>'Usertyp',
                 vjointo       =>'base::user',
                 vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>'usertyp'),
+                vjoindisp     =>'usertyp',
+                dataobjattr   =>'contact.usertyp'),
 
       new kernel::Field::TextDrop(
                 name          =>'posix',
@@ -343,6 +346,20 @@ sub new
                 label         =>'GrpID',
                 dataobjattr   =>'lnkgrpuser.grpid'),
 
+      new kernel::Field::Select(
+                name          =>'grpcistatus',
+                label         =>'Group CI-State',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['grpcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Date(
+                name          =>'grpmdate',
+                label         =>'Group Modification-Date',
+                dataobjattr   =>'grp.modifydate'),
+
       new kernel::Field::Interface(
                 name          =>'grpcistatusid',
                 readonly      =>1,
@@ -374,6 +391,27 @@ sub new
                 htmldetail    =>0,
                 label         =>'UserID',
                 dataobjattr   =>'lnkgrpuser.userid'),
+
+      new kernel::Field::Select(
+                name          =>'usercistatus',
+                label         =>'Contact CI-State',
+                htmldetail    =>0,
+                readonly      =>1,
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['usercistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Date(
+                name          =>'usermdate',
+                label         =>'Contact Modification-Date',
+                dataobjattr   =>'contact.modifydate'),
+
+      new kernel::Field::Interface(
+                name          =>'usercistatusid',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Contact CI-Statusid',
+                dataobjattr   =>'contact.cistatus'),
 
       new kernel::Field::DynWebIcon(
                 name          =>'userweblink',
@@ -516,6 +554,7 @@ sub getSqlFrom
    my $selfasparent=$self->SelfAsParentObject();
    my $from="$worktable left outer join lnkgrpuserrole ".
             "on $worktable.lnkgrpuserid=lnkgrpuserrole.lnkgrpuserid ".
+            "left outer join contact on $worktable.userid=contact.userid ".
             "left outer join grp on $worktable.grpid=grp.grpid";
 
    return($from);
