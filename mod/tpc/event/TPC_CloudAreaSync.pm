@@ -306,7 +306,6 @@ sub TPC_CloudAreaSync
          msg(ERROR,"invalid to find cloud $tpcname in cloud list");
       }
    }
-exit(1);
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
                                   exitmsg=>$exitmsg,
