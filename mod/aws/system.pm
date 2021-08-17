@@ -109,6 +109,10 @@ sub new
                 label         =>'Instance type'),
 
       new kernel::Field::Text(
+                name          =>'autoscalinggroup',
+                label         =>'AutoScalingGroup'),
+
+      new kernel::Field::Text(
                 name          =>'vpcid',
                 label         =>'VpcId'),
 
@@ -202,6 +206,7 @@ sub DataCollector
                       region=>$AWSRegion,
                       name=>$tag{Name},
                       tags=>\%tag,
+                      autoscalinggroup=>$tag{'aws:autoscaling:groupName'},
                       cdate=>$cdate,
                       idpath=>$instance->{InstanceId}.'@'.
                               $AWSAccount.'@'.
@@ -410,6 +415,7 @@ sub Import
    my $sysimporttempl={
       name=>$sysrec->{name},
       initialname=>$sysrec->{uuid},
+      autoscalinggroup=>$sysrec->{autoscalinggroup},
       id=>$sysrec->{idpath},
       srcid=>$sysrec->{idpath},
       ipaddresses=>$sysrec->{ipaddresses}

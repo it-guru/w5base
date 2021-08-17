@@ -1811,3 +1811,4 @@ create table lnkadditionalci (
 alter table asset add eohsd datetime default NULL;
 alter table lnkadditionalci add accessurl bigint(20),add FOREIGN KEY fk_accessurl (accessurl) REFERENCES accessurl (id) ON DELETE CASCADE;
 alter table network add tagname varchar(20) default NULL, add UNIQUE KEY tagname (tagname);
+alter table system add autoscalinggroup varchar(128) default NULL;

@@ -189,6 +189,7 @@ sub qcheckRecord
                id=>$parrec->{idpath},
                name=>\@sysname,
                cpucount=>$parrec->{cpucount},
+               autoscalinggroup=>$parrec->{autoscalinggroup},
                memory=>$parrec->{memory},
                osrelease=>$parrec->{image_name},
                sysiface=>\@sysiface,

@@ -910,6 +910,7 @@ sub genericSystemImport
       # final: do the insert operation
       my $newrec={name=>$sysrec->{id},
                   srcid=>$sysrec->{id},
+                  autoscalinggroup=>$sysrec->{autoscalinggroup},
                   srcsys=>$srcsys,
                   osrelease=>'other',
                   allowifupdate=>1,
