@@ -753,6 +753,14 @@ sub new
                                 "system.name,system.dsid)",
                 wrdataobjattr =>'system.dsid'),
 
+      new kernel::Field::Text(
+                name          =>'autoscalinggroup',
+                group         =>'misc',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'AutoScaling Group',
+                dataobjattr   =>"system.autoscalinggroup"),
+
       new kernel::Field::Link(
                 name          =>'rawdsid',
                 group         =>'misc',
@@ -2654,6 +2662,38 @@ sub QRuleSyncCloudSystem
       my $sysnamelist=$parrec->{name};
       $sysnamelist=[$sysnamelist] if (ref($sysnamelist) ne "ARRAY");
 
+      my $sysname=$sysnamelist->[0];
+      if ($parrec->{autoscalinggroup} ne "" &&
+          length($sysname)<55){ # AutoScale naming only on short basename
+         # calculate autoscaling name
+         my $AutoScaleSep="-as";
+         my $basename=$sysname;
+         if ($rec->{name}=~m/${basename}${AutoScaleSep}[0-9]{4}$/i){
+            unshift(@$sysnamelist,$rec->{name}); # system has already an 
+         }                               # AutoScale name suffix
+         else{
+            # find a new free autoscale name $basename-as000 schema
+            my $fnddataobj=$self->Clone();
+            $fnddataobj->SetFilter({
+               name=>"${basename}${AutoScaleSep}????",
+               id=>"!".$rec->{id}
+            });
+            my $freenum=1;
+            foreach my $chkrec ($fnddataobj->getHashList(qw(name))){
+               my $chkname=$basename.${AutoScaleSep}.
+                           sprintf("%04d",$freenum);
+               if (lc($chkrec->{name}) eq lc($chkname)){
+                  $freenum++;
+               }
+            }
+            if ($freenum<9000){
+               unshift(@$sysnamelist,$basename.${AutoScaleSep}.
+                    sprintf("%04d",$freenum));
+            }
+         }
+      }
+
+
       my $parsysname;
       my $parshortdesc;
       NAMECHK: foreach my $orgsysname (@$sysnamelist){
@@ -2689,6 +2729,13 @@ sub QRuleSyncCloudSystem
       if ($parshortdesc eq $parsysname){
          $parshortdesc=undef;
       }
+      if (substr(trim($parrec->{autoscalinggroup}),0,100) ne 
+          trim($rec->{autoscalinggroup})){
+         # autoscaling is forced to import
+         $forcedupd->{autoscalinggroup}=
+             substr(trim($parrec->{autoscalinggroup}),0,100);
+      }
+      
       $qrule->IfComp($self,
                     $rec,"name",
                     {name=>$parsysname},"name",
