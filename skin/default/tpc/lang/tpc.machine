@@ -2,3 +2,4 @@
    de=>'TelekomPrivateCloud: Maschine',
    en=>'TelekomPrivateCloud: Machine'
 }
+'generic name'=>{de=>'generischer Name'},

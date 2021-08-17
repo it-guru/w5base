@@ -147,6 +147,10 @@ sub qcheckRecord
                   push(@sysname,$sysname);
                }
             }
+            if ($parrec->{genname} ne "" && 
+                $parrec->{genname} ne $parrec->{name}){
+               push(@sysname,$parrec->{genname});
+            }
             push(@sysname,$parrec->{id});
 
             my %sysiface;
