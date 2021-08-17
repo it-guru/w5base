@@ -384,10 +384,7 @@ sub Import
       return(undef);
    }
    my $syssrcid=$sysrec->{idpath};
-
    my $system=getModuleObject($self->Config,"TS::system");
-
-
 
    ########################################################################
    # Detect Cloud Record
