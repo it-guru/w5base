@@ -254,9 +254,9 @@ sub TPC_CloudAreaSync
       foreach my $deprec ($dep->getHashList(qw(opname cdate 
                                                projectid resources))){
          $ncnt++;
-         #msg(INFO,"$ncnt) op:".$deprec->{opname});
-         #msg(INFO,"cdate:".$deprec->{cdate});
-         #msg(INFO,"project:".$deprec->{projectid}."\n--\n");
+         msg(INFO,"$ncnt) op:".$deprec->{opname});
+         msg(INFO,"cdate:".$deprec->{cdate});
+         msg(INFO,"project:".$deprec->{projectid}."\n--\n");
          my $resources=$deprec->{resources};
          if (ref($resources) eq "ARRAY"){
             foreach my $resrec (@$resources){
@@ -306,7 +306,7 @@ sub TPC_CloudAreaSync
          msg(ERROR,"invalid to find cloud $tpcname in cloud list");
       }
    }
-
+exit(1);
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
                                   exitmsg=>$exitmsg,
