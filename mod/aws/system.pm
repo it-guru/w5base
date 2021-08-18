@@ -414,12 +414,22 @@ sub Import
    # sysimporttempl is needed for 1st generic insert an refind a redeployment
    my $sysimporttempl={
       name=>$sysrec->{name},
-      initialname=>$sysrec->{uuid},
+      initialname=>$sysrec->{id},
       autoscalinggroup=>$sysrec->{autoscalinggroup},
       id=>$sysrec->{idpath},
       srcid=>$sysrec->{idpath},
       ipaddresses=>$sysrec->{ipaddresses}
    };
+   if (exists($sysrec->{tags})){
+      if (exists($sysrec->{tags}->{'eks:nodegroup-name'}) &&
+          $sysrec->{tags}->{'eks:nodegroup-name'} ne ""){
+         $sysimporttempl->{autoscalingsubgroup}=
+              $sysrec->{tags}->{'eks:nodegroup-name'};
+      }
+   }
+
+
+
 
 
 

@@ -613,6 +613,7 @@ sub genericSystemImport
 
 
    my $w5sysrecmodified=0;
+   my $w5autoscalegroupextend=0;
    $sys->ResetFilter();
    $sys->SetFilter({srcsys=>\$srcsys,srcid=>\$sysrec->{id}});
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
@@ -887,34 +888,17 @@ sub genericSystemImport
    }
    else{
       msg(INFO,"try to import new with databoss $curdataboss ...");
-      # check 1: Assigmenen Group registered
-      #if ($sysrec->{lassignmentid} eq ""){
-      #   $self->LastMsg(ERROR,"SystemID has no Assignment Group");
-      #   return(undef);
-      #}
-      # check 2: Assingment Group active
-      #my $acgroup=getModuleObject($self->Config,"tsacinv::group");
-      #$acgroup->SetFilter({lgroupid=>\$sysrec->{lassignmentid}});
-      #my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisoremail));
-      #if (!defined($acgrouprec)){
-      #   $self->LastMsg(ERROR,"Can't find Assignment Group of system");
-      #   return(undef);
-      #}
-      # check 3: Supervisor registered
-      #if ($acgrouprec->{supervisoremail} eq ""){
-      #   $self->LastMsg(ERROR,"incomplet Supervisor at Assignment Group");
-      #   return(undef);
-      #}
-      #}
-
-      # final: do the insert operation
       my $newrec={name=>$sysrec->{id},
                   srcid=>$sysrec->{id},
                   autoscalinggroup=>$sysrec->{autoscalinggroup},
+                  autoscalingsubgroup=>$sysrec->{autoscalingsubgroup},
                   srcsys=>$srcsys,
                   osrelease=>'other',
                   allowifupdate=>1,
                   cistatusid=>4};
+      if (defined($cloudarearec)){
+         $newrec->{itcloudareaid}=$cloudarearec->{id};
+      }
 
       $newrec->{name}=~s/\s/_/g;
 
@@ -980,6 +964,11 @@ sub genericSystemImport
             }
          }
       }
+      if (!exists($newrec->{mandatorid}) || $newrec->{mandatorid} eq ""){
+         if (defined($w5applrec) && $w5applrec->{mandatorid} ne ""){
+            $newrec->{mandatorid}=$w5applrec->{mandatorid};
+         }
+      }
       if (!exists($newrec->{mandatorid})){
          my @m=$user->getMandatorsOf($newrec->{databossid},
                                      ["write","direct"]);
@@ -991,11 +980,6 @@ sub genericSystemImport
             }
          }
          $newrec->{mandatorid}=$m[0];
-      }
-      if (!exists($newrec->{mandatorid}) || $newrec->{mandatorid} eq ""){
-         if (defined($w5applrec) && $w5applrec->{mandatorid} ne ""){
-            $newrec->{mandatorid}=$w5applrec->{mandatorid};
-         }
       }
 
 
@@ -1159,10 +1143,20 @@ sub genericSystemImport
             "of $srcsys Systemname $srec->{name}");
       }
       else{
-         msg(INFO,"start doNotify $srec->{name}");
-         $self->genericSystemImportNotify(
-            $srcsys,$sys,$srcobj,$wfa,$cloudrec,$srec
-         );
+         if ($srec->{autoscalinggroup} ne ""){
+            my $namenum;
+            ($namenum)=$srec->{name}=~m/-as([0-9]+)$/;
+            if ($namenum>1){   # prevent notification, if only a namerange is
+               $w5autoscalegroupextend=1;  # extended
+            }
+         }
+
+         if (!$w5autoscalegroupextend){
+            msg(INFO,"start doNotify $srec->{name}");
+            $self->genericSystemImportNotify(
+               $srcsys,$sys,$srcobj,$wfa,$cloudrec,$srec
+            );
+         }
       }
    }
 
