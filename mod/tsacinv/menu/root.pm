@@ -184,24 +184,6 @@ sub Init
                       "tsacinv::DBDataDiconary",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itts.system.acimport",
-                      "tsacinv::system",
-                      func=>'ImportSystem',
-                      prio=>20000,
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("AL_TCom.appl.acimport",
-                      "tsacinv::appl",
-                      func=>'ImportAppl',
-                      prio=>20000,
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("TSSlovakia.appl.acimport",
-                      "tsacinv::appl",
-                      func=>'ImportAppl',
-                      prio=>20000,
-                      defaultacl=>['valid_user']);
-   
    $self->RegisterObj("itts.appl.acimport",
                       "tsacinv::appl",
                       func=>'ImportAppl',
