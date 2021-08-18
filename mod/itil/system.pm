@@ -761,6 +761,14 @@ sub new
                 label         =>'AutoScaling Group',
                 dataobjattr   =>"system.autoscalinggroup"),
 
+      new kernel::Field::Text(
+                name          =>'autoscalingsubgroup',
+                group         =>'misc',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'AutoScaling SubGroup',
+                dataobjattr   =>"system.autoscalingsubgroup"),
+
       new kernel::Field::Link(
                 name          =>'rawdsid',
                 group         =>'misc',
@@ -2709,8 +2717,8 @@ sub QRuleSyncCloudSystem
          $sysname=UTF8toLatin1($sysname);
          $sysname=~s/\..*$//; # remove posible Domain part 
          $sysname=~s/[^a-z0-9_-]//gi; # remove non ASC Char
-         if (length($sysname)>40){
-            $sysname=substr($sysname,0,40);
+         if (length($sysname)>50){
+            $sysname=substr($sysname,0,50);
          }
          if ($self->ValidateSystemname($sysname)){
             if ($rec->{name} ne $sysname){   
@@ -2734,6 +2742,12 @@ sub QRuleSyncCloudSystem
          # autoscaling is forced to import
          $forcedupd->{autoscalinggroup}=
              substr(trim($parrec->{autoscalinggroup}),0,100);
+      }
+      if (substr(trim($parrec->{autoscalingsubgroup}),0,100) ne 
+          trim($rec->{autoscalingsubgroup})){
+         # autoscaling is forced to import (f.e. nodegroupname)
+         $forcedupd->{autoscalingsubgroup}=
+             substr(trim($parrec->{autoscalingsubgroup}),0,100);
       }
       
       $qrule->IfComp($self,

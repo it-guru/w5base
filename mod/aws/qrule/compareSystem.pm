@@ -195,6 +195,23 @@ sub qcheckRecord
                sysiface=>\@sysiface,
                ipaddresses=>\@ipaddresses
             );
+            if (exists($parrec->{tags})){
+               if (exists($parrec->{tags}->{'eks:nodegroup-name'}) &&
+                   $parrec->{tags}->{'eks:nodegroup-name'} ne ""){ 
+                  $syncData{autoscalingsubgroup}=
+                       $parrec->{tags}->{'eks:nodegroup-name'};
+                  if ($sysname eq ""){
+                     $sysname=$parrec->{tags}->{'eks:nodegroup-name'};
+                     unshift(@{$syncData{name}},$sysname);
+                  }
+               }
+            }
+            if ($sysname eq "" && $syncData{autoscalinggroup} ne ""){
+               $sysname=$syncData{autoscalinggroup};
+               unshift(@{$syncData{name}},$sysname);
+            }
+               
+            
             if ($parrec->{azoneid}=~m/^eu/){
                $syncData{availabilityZone}=$parrec->{azoneid};
             }
