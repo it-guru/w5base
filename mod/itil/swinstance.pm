@@ -924,17 +924,17 @@ sub new
                 onRawValue    =>\&calculateRelAppl),
 
 
-      new kernel::Field::SubList(
-                name          =>'lnkswinstanceparam',
-                htmldetail    =>'NotEmpty',
-                searchable    =>0,
-                htmleditwidth =>'80%',
-                label         =>'Life Parameters',
-                group         =>'swinstanceparam',
-                vjoinbase     =>{'islatest'=>'1',mdate=>'>now-56d'},
-                vjointo       =>'itil::lnkswinstanceparam',
-                vjoinon       =>['id'=>'swinstanceid'],
-                vjoindisp     =>['namegrp','name','val']),
+      #new kernel::Field::SubList(
+      #          name          =>'lnkswinstanceparam',
+      #          htmldetail    =>'NotEmpty',
+      #          searchable    =>0,
+      #          htmleditwidth =>'80%',
+      #          label         =>'Life Parameters',
+      #          group         =>'swinstanceparam',
+      #          vjoinbase     =>{'islatest'=>'1',mdate=>'>now-56d'},
+      #          vjointo       =>'itil::lnkswinstanceparam',
+      #          vjoinon       =>['id'=>'swinstanceid'],
+      #          vjoindisp     =>['namegrp','name','val']),
 
 
       new kernel::Field::Text(
