@@ -1416,9 +1416,28 @@ sub FormatedSearch
       $q=~s/%/\\%/g;
       $d.=<<EOF;
 <script langauge="JavaScript">
+var ifld=document.getElementsByName('search_$name');
+if (ifld){
+   for(var c=0;c<ifld.length;c++){
+      var sfld=ifld[c];
+      sfld.addEventListener('keydown',function(e){ 
+         if (e.keyCode === 112) {  // F1 Key redirects to HelpOnField
+           FieldHelp_On_$name();
+           e.preventDefault(); 
+         } 
+      });
+   }
+}
+
 function FieldHelp_On_$name()
 {
-   showPopWin('$FieldHelpUrl?$q',500,200,RestartApp);
+   showPopWin('$FieldHelpUrl?$q',500,200,function(){
+      RestartApp();
+      var ifld=document.getElementsByName('search_$name');
+      if (ifld && ifld[0]){
+         ifld[0].focus();
+      }
+   });
 }
 </script>
 EOF
