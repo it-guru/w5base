@@ -32,6 +32,9 @@ sub new
   # my $config=$self->getParent->getParent->Config();
    #$self->{SkinLoad}=getModuleObject($config,"base::load");
 
+   if (!defined($self->{ViewColMinScreenWidth})){
+      $self->{ViewColMinScreenWidth}=[];
+   }
    return($self);
 }
 
@@ -81,6 +84,29 @@ sub getStyle
    my $d="";
   # $d.=$app->getTemplate("css/Output.HtmlV00.css","base");
    return($d);
+}
+
+sub fixupColMinScreenWidth
+{
+   my $req=shift;
+   if (defined($req)){
+      if ($req<700){
+         $req=undef;
+      }
+      elsif($req>=1000){
+         $req=1000;
+      }
+      elsif($req>=900 && $req<999){
+         $req=900;
+      }
+      elsif($req>=800 && $req<899){
+         $req=800;
+      }
+      else{
+         $req=700;
+      }
+   }
+   return($req);
 }
 
 
@@ -167,7 +193,8 @@ EOF
    }
 
    $d.="<thead><tr class=subheadline>";
-   foreach my $fieldname (@view){
+   for(my $c=0;$c<=$#view;$c++){
+      my $fieldname=$view[$c];
       my $field=$app->getField($fieldname);
       my $displayname=$fieldname;
       if (defined($field)){
@@ -183,7 +210,15 @@ EOF
          $style.="white-space:nowrap;";
          $nowrap=" nowrap";
       }
-      $d.="<th class=subheadfield style=\"$style;$nowrap\">".
+
+      my $class="subheadfield";
+
+      my $minSW=fixupColMinScreenWidth($self->{ViewColMinScreenWidth}->[$c]);
+
+      if (defined($minSW)){
+         $class.=" showSW".$minSW;
+      }
+      $d.="<th class=\"$class\" style=\"$style;$nowrap\">".
           $displayname."</th>";
    }
    $d.="</tr></thead>\n<tbody>\n";
@@ -399,7 +434,16 @@ sub ProcessLine
       }
 
       $style.="width:auto;" if ($c==$#view && !defined($field->{htmlwidth}));
-      $d.="<td class=subdatafield valign=top $align";
+
+      my $class="subdatafield";
+
+      my $minSW=fixupColMinScreenWidth($self->{ViewColMinScreenWidth}->[$c]);
+
+      if (defined($minSW)){
+         $class.=" showSW".$minSW;
+      }
+
+      $d.="<td class=\"$class\" valign=top $align";
       $d.=" onClick=$fclick" if ($fclick ne "");
       $data="&nbsp;" if ($data=~m/^\s*$/);
       $d.=" style=\"$style\"";
