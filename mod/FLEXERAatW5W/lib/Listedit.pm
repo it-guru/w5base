@@ -66,10 +66,7 @@ sub initSqlWhere
                               DTAG.TSY.INT.DTIT_HU.E.HU-IT-3-CA.HU-IT-3-CAc
                               )],
           "RMember","up") ){
-         $where="(BEACONID is null ".
-                "or BEACONID='DEU0360DTIT' ".
-                "or BEACONID='DEU0360DEVLAB' ".
-                "or BEACONID='DEU0360WSICTS')";
+         $where="(BEACONID is null or BEACONID like 'DEU0360%')";
       }
    }
 
