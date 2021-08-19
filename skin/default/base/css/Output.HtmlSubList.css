@@ -115,6 +115,26 @@ table.subdatatable tr.subline:hover{
    background:#b0c5ec;
 }
 
+@media only screen and (max-width: 700px) {
+  td.showSW700 {display:none; }
+  th.showSW700 {display:none; }
+}
+
+@media only screen and (max-width: 800px) {
+  td.showSW800 {display:none; }
+  th.showSW800 {display:none; }
+}
+
+@media only screen and (max-width: 900px) {
+  td.showSW900 {display:none; }
+  th.showSW900 {display:none; }
+}
+
+@media only screen and (max-width: 1000px) {
+  td.showSW1000 {display:none; }
+  th.showSW1000 {display:none; }
+}
+
 td.subdatafield{
    padding-left:5px;
    padding-right:5px;

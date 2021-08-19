@@ -346,6 +346,10 @@ sub getSubListData
 
       $self->vjoinobj->SetCurrentView(@view);
       $param{parentfield}=$self->Name();
+      if (exists($self->{vjoindispminsw}) &&  # min. Screenwidth col definitions
+          ref($self->{vjoindispminsw}) eq "ARRAY"){
+         $param{ViewColMinScreenWidth}=$self->{vjoindispminsw};
+      }
       return($self->vjoinobj->getSubList($current,$mode,%param));
    }
    return("ERROR: Data-Source not available");
