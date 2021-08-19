@@ -727,9 +727,14 @@ sub genericSystemImport
                   my ($chkrec,$msg)=$sys->getOnlyFirst(qw(ALL));
                   if (defined($chkrec)){  # not good! - The systemname seems
                                           # to have changed his function
-                     printf STDERR ("WARN: reuse with function change ".
-                                    "of systemname %s detected while $srcsys ".
-                                    "import of %s\n",$oldname,$sysrec->{id});
+                    # Der alte Systemname ist bereits bei einem andern
+                    # System in Verwendung. Weshalb dann der alte 
+                    # Systemdatensatz nicht einfach so wieder aktiviert 
+                    # werden kann (das wuerde eine DoublicateEntry erzeugen).
+                    #
+                    # printf STDERR ("WARN: reuse with function change ".
+                    #                "of systemname %s detected while $srcsys ".
+                    #                "import of %s\n",$oldname,$sysrec->{id});
                      next;
                   }
                }
