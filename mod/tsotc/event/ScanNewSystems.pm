@@ -77,6 +77,11 @@ sub ScanNewSystems
 
    my $StreamDataobj="tsotc::system";
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
+   return({}) if ($datastream->isSuspended());
+   if (!$datastream->Ping()){
+      msg(ERROR,"no ping on $StreamDataobj"); # maybe mail to OTC AppMgr??
+      return({});
+   }
    my @datastreamview=qw(name cdate id contactemail 
                          availability_zone);
    if ($queryparam ne ""){
