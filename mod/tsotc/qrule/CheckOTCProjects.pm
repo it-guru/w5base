@@ -83,6 +83,16 @@ sub qcheckRecord
    my $otcp=getModuleObject($dataobj->Config,"tsotc::project");
    my $appl=getModuleObject($dataobj->Config,"itil::appl");
 
+   return(undef,undef) if ($otcp->isSuspended());
+   if (!$otcp->Ping()){
+      msg(ERROR,"no ping on tsotc::project in QC"); # maybe mail to OTC AppMgr??
+      return(undef,undef);
+   }
+
+
+
+
+
    $otcp->SetFilter({lastmondate=>">now-24h"});
    my @plst=$otcp->getHashList(qw(name fullname applid id));
 
