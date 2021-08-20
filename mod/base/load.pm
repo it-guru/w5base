@@ -73,7 +73,7 @@ sub Run
          print("e=e || window.event;");
          print("if (e.keyCode==27){");
          print("   if (window.parent && parent.hidePopWin){");
-         print("      parent.hidePopWin(false);");
+         print("      parent.hidePopWin(true,true);");
          print("      return(false);");
          print("   }");
          print("}");
