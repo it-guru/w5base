@@ -892,7 +892,11 @@ sub browser
                               prefix=>$prefix,
                               title=>"WebFS: ".$p);
    $header.=$self->HtmlSubModalDiv(prefix=>$prefix);
-   my $bar=$self->getAppTitleBar(prefix=>$prefix,title=>'WebFS: '.$p);
+   my $bar=$self->getAppTitleBar(
+       prefix=>$prefix,
+       title=>'WebFS: '.$p,
+       autofocus=>1
+   );
    $rootpath.="/" if ($rootpath eq "..");
    $rootpath.="./" if ($rootpath eq "");
    if ($ENV{REQUEST_METHOD} eq "PUT"){

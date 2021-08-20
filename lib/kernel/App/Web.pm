@@ -441,12 +441,16 @@ sub getAppTitleBar
    if (!defined($directLink)){
       $directLink=$self->getAppDirectLink();
    }
+   my $autofocus="";
+   if ($param{autofocus} eq "1" || $param{autofocus} eq "title"){
+      $autofocus=" autofocus"; 
+   }
    my $titlebar=sprintf("<tr class=TitleBar><td nowrap align=left>".
                  "<div $titleonclick ".
                  "style=\"margin:0;padding:0;padding-left:5px;".
                  "text-overflow:ellipsis;overflow:hidden;width:380px\">".
                  "<a class=TitleBarLink target=_top ".
-                 "href='$directLink'>".
+                 "href='$directLink'${autofocus}>".
                  "%s</a>&nbsp;</div></td>".
                  "<td align=right nowrap>".
                  "<a href=\"\" target=_blank $onclick>%s</a>".
