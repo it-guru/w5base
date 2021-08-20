@@ -1432,10 +1432,11 @@ if (ifld){
 function FieldHelp_On_$name()
 {
    showPopWin('$FieldHelpUrl?$q',500,200,function(){
-      RestartApp();
       var ifld=document.getElementsByName('search_$name');
       if (ifld && ifld[0]){
-         ifld[0].focus();
+         window.setTimeout(function(){
+            ifld[0].focus();
+         },500);
       }
    });
 }
