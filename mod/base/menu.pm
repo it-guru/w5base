@@ -815,6 +815,21 @@ sub SkinSwitcher
 
    my @skin=split(/:/,$self->Config->Param('SKIN'));
 
+   if (1){
+      print("<script language='JavaScript'>");
+      print("addEvent(document,'keydown',function(e){");
+      print("e=e || window.event;");
+      print("if (e.keyCode==27){");
+      print("   if (window.parent && parent.hidePopWin){");
+      print("      parent.hidePopWin(true,true);");
+      print("      return(false);");
+      print("   }");
+      print("}");
+      print("return(true);");
+      print("});");
+      print("</script>");
+   }
+
    printf("<div class=skinbox>");
    printf("<h2>%s:</h2><br><hr>",$self->T("select a skin"));
    printf("<div class=\"skinlist\">");
