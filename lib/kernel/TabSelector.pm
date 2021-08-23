@@ -55,16 +55,27 @@ EOF
       push(@pklist,shift(@plist));
       shift(@plist);
    }
+   my %keyFuncs=();
    my $CurMode=$param{activpage};
+   my $c=0;
    foreach my $f (@pklist){
+      $c++;
       if (grep(/^$f$/,keys(%pages))){
          $CurMode=$f if (!defined($param{activpage}) || 
                          $param{activpage} eq "");
          my $state="Inactiv";
          $state="Activ" if ($CurMode eq $f);
+         $keyFuncs{"${c}"}=$f;
+         my $flabel=$pages{${f}};
+         my $c1st=substr($flabel,0,1);
+         my $lower1st=lc($c1st);
+         if (!exists($keyFuncs{$lower1st})){
+            $keyFuncs{"${lower1st}"}=$f;
+            $flabel=~s#${c1st}#<u>${c1st}</u>#;
+         }
          my $flink="<span class=${name}$state ".
                    "onclick=${name}Set(\"$f\")>".
-                   "$pages{${f}}&nbsp;&nbsp;&nbsp;</span>";
+                   "${flabel}&nbsp;&nbsp;&nbsp;</span>";
          my $width=" width=1% nowrap";
          if (defined($param{tabwidth})){
             $width=" width=$param{tabwidth}";
@@ -114,6 +125,21 @@ EOF
        "</td></tr></table>";
    $d.="<input type=hidden name=${name}CurrentMode value=\"$CurMode\">";
    $d.="</div>";
+   if (keys(%keyFuncs)){
+      $d.="\n<script language=\"JavaScript\">\n";
+      $d.="function directTabKeyHandling(doc,e){\n";
+      $d.="var key=e.keyCode;\n";
+      $d.="key=(96 <= key && key <= 105)? key-48 : key;\n";
+      foreach my $k (sort(keys(%keyFuncs))){
+         $d.="if (e.altKey && ".
+             "String.fromCharCode(key).toLowerCase()==\"$k\"){\n";
+            $d.="${name}Set(\"$keyFuncs{$k}\");\n";
+         $d.="}\n";
+      } 
+      $d.="}\n";
+      $d.="\n</script>\n";
+
+   }
    return($d);
 }
 

@@ -819,6 +819,19 @@ EOF
    my $detailx=$self->DetailX();
    my $detaily=$self->DetailY()+100;
    print(<<EOF);
+addEvent(document,'keydown',function(e){
+   e=e || window.event;
+   globalKeyHandling(document,e);
+});
+
+function globalKeyHandling(doc,e){
+   if (e.altKey){
+      if (directTabKeyHandling){
+         directTabKeyHandling(doc,e);
+      }
+   }
+}
+
 function setEditMode(m)
 {
    this.SubFrameEditMode=m;
