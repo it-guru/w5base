@@ -2172,6 +2172,19 @@ sub Detail
 #      }
       print(<<EOF);
 <script language="JavaScript" type="text/javascript">
+addEvent(document,'keydown',function(e){
+   e=e || window.event;
+   globalKeyHandling(document,e);
+});
+
+function globalKeyHandling(doc,e){
+   if (e.altKey){
+      if (directTabKeyHandling){
+         directTabKeyHandling(doc,e);
+      }
+   }
+}
+
 function setEditMode(m)
 {
    this.SubFrameEditMode=m;

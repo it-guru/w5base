@@ -485,6 +485,14 @@ EOF
 </div>
 <script language="JavaScript">
 var shiftKey=0;
+
+if (parent && parent.globalKeyHandling){
+   addEvent(document,'keydown',function(e){
+      e=e || window.event;
+      parent.globalKeyHandling(document,e);
+   });
+}
+
 function setTitle()
 {
    var t=window.document.getElementById("WindowTitle");
