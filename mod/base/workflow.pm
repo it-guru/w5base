@@ -214,11 +214,12 @@ sub new
                 selectfix     =>1,
                 htmlwidth     =>'1%',
                 htmldetail    =>0,
+                uploadable    =>0,
                 readonly      =>sub{
                    my $self=shift;
                    my $current=shift;
                    my $app=$self->getParent;
-                   return(0) if (!defined($current) &&
+                   return(0) if (defined($current) &&
                                  $app->IsMemberOf("admin"));
                    return(0) if ($app->isMarkDeleteValid($current));
                    return(1);
