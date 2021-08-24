@@ -5,19 +5,52 @@ a:link.filelink , a:visited.filelink , a:active.filelink {
 }
 div.FileList{
    width:100%;
-   margin-top:2px;
+   height:100px;
+   margin-top:0px;
    margin-left:2px;
    border:solid;
    border-color:black;
    border-width:1px;
    background:#DDDDDD;
 }
+span.FileListModeInactive{
+   text-decoration: none;
+
+}
+span.FileListModeActive{
+   background:#DDDDDD;
+   font-weight: bold;
+   text-decoration: underline;
+}
+
+input[type=button].SelButton{
+   cursor:pointer;
+   width:15px;
+   height:15px;
+}
+
+input[type=button].ActSelButton{
+   cursor:pointer;
+   width:15px;
+   height:15px;
+   background:#DDDDDD;
+}
+
+input[type=submit]{
+   cursor:hand;
+}
+
+
+
 div.FileListModeLine{
    width:100%;
-   background:#95b5ef;
+   xbackground:#95b5ef;
    border-bottom:solid;
    border-color:black;
    border-width:1px;
+   border-bottom-width:0px;
+   margin-bottom:0px;
+   padding-bottom:0px;
 }
 div.FileListModeWork{
    width:100%;
@@ -43,3 +76,4 @@ a:active.FileListMode {
    margin-left:5px;
    margin-right:5px;
 }
+

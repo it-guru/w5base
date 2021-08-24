@@ -40,14 +40,21 @@ sub ModeLine
    my $self=shift;
    my $oldmode=shift;
    my @modes=("FileListMode.FILEADD",
+              "FileListMode.FILEMOD",
       #        "FileListMode.DIRADD",
               "FileListMode.DELENT");
 
    my $d="";
    while(my $e=shift(@modes)){
       $d.=" &bull; " if ($d ne "");
-      $d.="<a class=FileListMode href=JavaScript:setFileListMode(\"$e\")>";
+      my $span="FileListModeInactive";
+      if ($oldmode eq $e){
+         $span="FileListModeActive";
+      }
+      $d.="<span class=$span>".
+          "<a class=FileListMode href=JavaScript:setFileListMode(\"$e\")>";
       $d.=$self->getParent->T($e,'kernel::FileList')."</a>";
+      $d.="</span>";
    }
    $d=<<EOF;
 <script language="JavaScript">
@@ -60,9 +67,36 @@ function setFileListMode(o)
    if (document.forms[0].elements['file']){
       document.forms[0].elements['file'].value=null;
    }
+   if (document.forms[0].elements['ModId']){
+      document.forms[0].elements['ModId'].value=null;
+   }
+   if (document.forms[0].elements['comments']){
+      document.forms[0].elements['comments'].value=null;
+   }
    document.forms[0].target="_self";
    document.forms[0].submit();
 }
+
+function setFileEditMode(o,id)
+{
+   var op=document.forms[0].elements['OP'];
+   var mode=document.forms[0].elements['MODE'];
+   mode.value=o;
+   op.value="";
+   if (document.forms[0].elements['file']){
+      document.forms[0].elements['file'].value=null;
+   }
+   if (document.forms[0].elements['ModId']){
+      document.forms[0].elements['ModId'].value=id;
+   }
+   if (document.forms[0].elements['comments']){
+      document.forms[0].elements['comments'].value=null;
+   }
+   document.forms[0].target="_self";
+   document.forms[0].submit();
+}
+
+
 </script>
 <div class=FileListModeLine>
 $d
@@ -87,6 +121,7 @@ sub ListFiles
    $fo->SetFilter({parentobj=>$parentobj,
                    parentrefid=>$refid});
    my $ownerfield=$fo->getField("owner");
+   my $ModId=Query->Param("ModId");
    foreach my $rec ($fo->getHashList(qw(ALL))){
       if (defined($rec)){
          #next if ($mode eq "" && !$fo->isViewValid($rec));
@@ -102,11 +137,17 @@ sub ListFiles
                          "<font color=red><b>!</b></font></a>";
          }
          my $ownername=$ownerfield->FormatedDetail($rec,"HtmlV01");
+         $ownername=~s/ \(.*\)$//;
          my $t=$self->getParent->ExpandTimeExpression($rec->{mdate},
                $self->getParent->Lang())." GMT ".
                $self->getParent->T("by","kernel::FileList").
                " ".
                $ownername;
+         if ($rec->{comments} ne ""){
+            my $comments=$rec->{comments};
+            $comments=~s/["';&]//g;
+            $t.=" : ".$comments; 
+         }
 
          $clone{description}="$t";
          
@@ -114,6 +155,16 @@ sub ListFiles
                       "$refid/$clone{fid}/$clone{name}";
          if ($mode eq "FileListMode.DELENT"){
             $clone{labelprefix}="<input type=checkbox name=delid$clone{fid}>";
+         }
+         if ($mode eq "FileListMode.FILEMOD"){
+            my $class="SelButton";
+            if ($ModId eq $clone{fid}){
+               $class="ActSelButton";
+            }
+            $clone{labelprefix}="<input type=button class=$class ".
+                        " value=\"&nbsp;\" ".
+                        "onclick=\"setFileEditMode('FileListMode.FILEMOD',".
+                        "'$clone{fid}');\">&nbsp;";
          }
          push(@filelist,\%clone);
       }
@@ -244,7 +295,13 @@ sub HandleFILEADD
          $self->getParent->LastMsg(ERROR,"no file specified");
          
       }
-      print join("<br>",$self->getParent->LastMsg());
+      print join("<br>",map({
+                             if ($_=~m/^ERROR/){
+                                $_="<font style=\"color:red;\">".$_.
+                                   "</font>";
+                             }
+                             $_;
+                            } $self->getParent->LastMsg()));
 
       print <<EOF  if ($ok);
 <script language=JavaScript>
@@ -259,8 +316,9 @@ EOF
    if (Query->Param("isprivate") ne ""){
       $isprivate=" checked ";
    }
+   $d.="<div class=FileList>";
    $d.="<div class=FileListModeWork>";
-   $d.="<table width=\"100%\" height=80 border=0>";
+   $d.="<table width=\"100%\" height=\"100%\" border=\"0\">";
    $d.="<tr height=\"1%\">";
    $d.="<td>".$self->getParent->T("File to upload",'kernel::FileList').":</td>";
    $d.="<td colspan=2><input type=file name=file size=40></td>";
@@ -288,6 +346,140 @@ EOF
    $d.="</tr>";
 
    $d.="</table>";
+   $d.="</div>";
+   $d.="</div>";
+   print $d;
+}
+
+sub HandleFILEMOD
+{
+   my $self=shift;
+   my $refid=shift;
+   my $d="";
+   my $rec={};
+   my $parentobj=$self->{parentobj};
+   if (!defined($parentobj)){
+      $parentobj=$self->getParent->Self();
+   }
+
+   my $ModId=Query->Param("ModId");
+   if ($ModId ne ""){
+      my $fo=$self->getFileManagementObj();
+      $fo->SetFilter({fid=>\$ModId});
+      my ($oldrec,$msg)=$fo->getOnlyFirst(qw(ALL));
+      if (defined($oldrec)){
+         $rec=$oldrec;
+      }
+      else{
+         Query->Param("ModId"=>'');
+         $ModId=undef;
+      }
+   }
+
+
+
+   if (Query->Param("DO") ne ""){
+      my $isprivate=0;
+      if ($self->{privoption} && Query->Param("isprivate") ne ""){
+         $isprivate=1;
+      }
+      my $fh=Query->Param("file");
+      my $comments=Query->Param("comments");
+      my $ok=0;
+
+      if (1){
+         my $fo=$self->getFileManagementObj();
+         my %rec=(comments=>$comments,
+                  isprivate=>$isprivate);
+         if ($fh){
+            $rec{file}=$fh;
+            $rec{name}=$fh;
+         }
+         if (my $fid=$fo->SecureValidatedUpdateRecord($rec,
+                                                \%rec,{fid=>\$rec->{fid}})){
+            $self->getParent->LastMsg(INFO,"ok");
+            $ok=1;
+            if ($fid ne ""){
+               Query->Delete("isprivate");
+               Query->Delete("comments");
+               Query->Delete("file");
+               Query->Delete("ModId");
+            }
+         }
+      }
+      print join("<br>",map({
+                             if ($_=~m/^ERROR/){
+                                $_="<font style=\"color:red;\">".$_.
+                                   "</font>";
+                             }
+                             $_;
+                            } $self->getParent->LastMsg()));
+
+      print <<EOF  if ($ok);
+<script language=JavaScript>
+parent.document.forms[0].target='_self';
+parent.document.forms[0].submit();
+</script>
+EOF
+      return();
+   }
+   my $DisabledState="disabled";
+   my $oldname;
+   my $comments;
+   my $isprivate="";
+
+   my $ModId=Query->Param("ModId");
+   if ($ModId ne ""){
+      my $fo=$self->getFileManagementObj();
+      $fo->SetFilter({fid=>\$ModId});
+      my ($oldrec,$msg)=$fo->getOnlyFirst(qw(ALL));
+      if (defined($oldrec)){
+         $rec=$oldrec;
+         $comments=$rec->{comments};
+         $oldname=$rec->{name};
+         if ($rec->{isprivate}){
+            $isprivate=" checked ";
+         }
+         $DisabledState="";
+      }
+      else{
+         Query->Param("ModId"=>'');
+         $ModId=undef;
+      }
+   }
+   $d.="<div class=FileList>";
+   $d.="<div class=FileListModeWork>";
+   $d.="<table width=\"100%\" height=\"100%\" border=\"0\">";
+   $d.="<tr height=\"1%\">";
+   $d.="<td>".$self->getParent->T("File to upload",'kernel::FileList').":</td>";
+   $d.="<td colspan=2><input $DisabledState type=file name=file size=40>".
+       "<br><i>$oldname</i></td>";
+   $d.="</tr><tr>".
+       "<tr><td width=\"1%\" nowrap>".
+       $self->getParent->T("comments",'kernel::FileList').":</td>".
+       "<td colspan=2><input $DisabledState name=comments value=\"$comments\" ".
+       "type=text style=\"width:100%\"></tr>";
+
+   $d.="<tr>";
+   if ($self->{privoption}) {
+      $d.="<td width=\"1%\" nowrap>".
+           $self->getParent->T("handle file as private",'kernel::FileList').
+          "</td><td>".
+          "<input $DisabledState type=checkbox $isprivate name=isprivate>".
+          "</td>".
+          "<td valign=bottom>";
+   }
+   else {
+      $d.="<td>&nbsp;</td>".
+          "<td colspan=2 valign=bottom>";
+   }
+   $d.="<input $DisabledState ".
+       "type=submit name=DO style=\"width:100%\" value=\"".
+       $self->getParent->T("Update",'kernel::FileList')."\"></td>";
+   $d.="</tr>";
+
+   $d.="</table>";
+   $d.="</div>";
    $d.="</div>";
    print $d;
 }
@@ -326,7 +518,7 @@ sub HandleDELENT
                          parentrefid=>$refid});
          $fo->SetCurrentView(qw(ALL));
          $fo->ForeachFilteredRecord(sub{
-                         $fo->ValidatedDeleteRecord($_);
+                         $fo->SecureValidatedDeleteRecord($_);
                       });
          $ok=1;
       }
@@ -344,13 +536,15 @@ parent.document.forms[0].submit();
 EOF
       return();
    }
+   $d.="<div class=FileList>";
    $d.="<div class=FileListModeWork>";
-   $d.="<table width=\"100%\" height=\"40\" border=\"0\">";
-   $d.="<tr height=\"1%\">";
-   $d.="<td><input type=submit name=DO style=\"width:100%\" value=\"".
+   $d.="<table width=\"100%\" height=\"100%\" border=\"0\">";
+   $d.="<tr>";
+   $d.="<td valign=bottom><input type=submit name=DO style=\"width:100%\" value=\"".
        $self->getParent->T("delete marked files",'kernel::FileList')."\"></td>";
-   $d.="</tr><tr><td></td></tr>";
+   $d.="</tr>";
    $d.="</table>";
+   $d.="</div>";
    $d.="</div>";
    print $d;
 }
@@ -410,13 +604,16 @@ sub EditProcessor
       Query->Param("MODE"=>"FileListMode.FILEADD");
    }
    my $mode=Query->Param("MODE");
-   print("<div class=FileList>");
    if (Query->Param("DO") eq ""){
       print $self->ModeLine($mode);
    }
    CASE:{
       $mode eq "FileListMode.FILEADD" && do{
          $self->HandleFILEADD($refid);
+         last CASE;
+      };
+      $mode eq "FileListMode.FILEMOD" && do{
+         $self->HandleFILEMOD($refid);
          last CASE;
       };
       $mode eq "FileListMode.DIRADD" && do{
@@ -433,10 +630,9 @@ sub EditProcessor
 <iframe src=Empty style="width:100%;height:25px;overflow:hidden;border-style:none;padding:0;margin:0" 
         name=DO scrolling="no" frameborder="0"></iframe>
 EOF
-   print("</div>");
    print $self->ListFiles($refid,$mode);
    print $self->getParent->HtmlPersistentVariables(qw(MODE OP Field Seq 
-                                                      RefFromId));
+                                                      RefFromId ModId));
    print $self->getParent->HtmlBottom(form=>1,body=>1);
 }
 
