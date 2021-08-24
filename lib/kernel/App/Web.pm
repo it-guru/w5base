@@ -1694,8 +1694,7 @@ EOF
       $enctype="enctype=\"multipart/form-data\"" if ($param{multipart});
       $d.="<form id=\"$param{form}\" method=\"post\" $enctype";
       $d.=" onSubmit=\"if (this.SubmitCheck){return(this.SubmitCheck());}else{return(true);}\"";
-     # $d.=" onSubmit=\"if (SubmitCheck){return(SubmitCheck())}".
-     #     "else{return(true)}\""; # scheint bei IE nicht zu tun
+      # document.querySelectorAll('*').forEach(function(e){e.style.cursor='progress'});
       if (exists($param{action})){
          $d.=" action=\"$param{action}\"";
       }
