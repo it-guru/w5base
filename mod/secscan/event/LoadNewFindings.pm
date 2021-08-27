@@ -90,51 +90,49 @@ sub LoadNewFindings
    my $exitmsg="done";
    my $laststamp;
    my $lastid;
-   my %flt=(isdel=>\'0');;
-   #if ($queryparam ne "FORCEALL"){    #analyse lastSuccessRun
-   #   #%flt=( 
-   #   #   findcdate=>">$startstamp",
-   #   #   isdel=>\'0'
-   #   #);
-   #   %flt=( 
-   #      hstate=>"[EMPTY]",
-   #      isdel=>\'0'
-   #   );
-   #   if (defined($firstrec)){
-   #      my $lastmsg=$firstrec->{exitmsg};
-   #      if (($laststamp,$lastid)=
-   #          $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
-   #         $exitmsg=$lastmsg;
-   #         $datastream->ResetFilter();
-   #         $datastream->SetFilter({id=>\$lastid,findcdate=>\$laststamp});
-   #         my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
-   #         if (!defined($lastrec)){
-   #            msg(WARN,"record with id '$lastid' ".
-   #                     "has been deleted or changed - using date only");
-   #            $lastid=undef;
-   #         }
-   #         %flt=( 
-   #            findcdate=>">=\"$laststamp GMT\"",
-   #            isdel=>\'0'
-   #         );
-   #      }
-   #   }
-   #}
 
-   %flt=(  # sollte besser sein
+   my %flt=(  # sollte besser sein
       hstate=>"[EMPTY]",
       isdel=>\'0'
    );
 
-  # $flt{sectokenid}=
-  #      '578549447F31DA283E41159DB595E575E4CF9566395CD656CD4940C30B518E4E';
+
+   my @flt=(
+      \%flt
+   );
+
+
+
+   if (1){
+      my @reactivate=();
+      $self->{wf}->ResetFilter();
+      $self->{wf}->SetFilter({
+         stateid=>\'17',
+         class=>\'secscan::workflow::FindingHndl',
+         isdeleted=>\'0',
+         mdate=>'<now-14d'
+      });
+      my @l=$self->{wf}->getHashList(qw(srcsys mdate));
+      foreach my $rec (@l){
+         my $id=$rec->{srcsys};
+         $id=~s/^.*:://;
+         if ($id ne ""){
+            push(@reactivate,$id);
+         }
+      }
+      if ($#reactivate!=-1){
+         push(@flt,{sectokenid=>\@reactivate});
+      }
+      $self->{wf}->ResetFilter();
+   }
+
 
 
    if (1){ # process new records
       my $skiplevel=0;
       my $recno=0;
       $datastream->ResetFilter();
-      $datastream->SetFilter(\%flt);
+      $datastream->SetFilter(\@flt);
       $datastream->SetCurrentView(@datastreamview);
       $datastream->SetCurrentOrder("+findcdate","+id");
       #$datastream->Limit(1000);
@@ -274,16 +272,23 @@ sub analyseRecord
          $self->{wf}->ResetFilter();
          $self->{wf}->SetFilter({
             srcsys=>\$srckey,
-            step=>"!secscan::workflow::FindingHndl::finish"
+            stateid=>"<18"
          });
-         foreach my $wfrec ($self->{wf}->getHashList(qw(id))){
+         foreach my $wfrec ($self->{wf}->getHashList(qw(ALL))){
             #msg(WARN,"cleanup workflow id=$wfrec->{id} isdel=$rec->{isdel}");
             #msg(WARN,"rec=".Dumper($rec));
-            if ($wfop->nativProcess('wfforceobsolete',{},$wfrec->{id})){
-               $dataop->ValidatedUpdateRecord($rec,{
-                  wfhandeled=>'0',
-                  hstate=>"OBSOLETE"
-               },{id=>\$rec->{id}});
+            if ($wfrec->{stateid} eq "17"){ # ordentlich gelschlossen
+               if (!($wfop->nativProcess('wffine',{},$wfrec->{id}))){
+                  msg(ERROR,"failed wffine on $wfrec->{id}");
+               }
+            }
+            else{
+               if ($wfop->nativProcess('wfforceobsolete',{},$wfrec->{id})){
+                  $dataop->ValidatedUpdateRecord($rec,{
+                     wfhandeled=>'0',
+                     hstate=>"OBSOLETE"
+                  },{id=>\$rec->{id}});
+               }
             }
          }
       }
@@ -365,7 +370,8 @@ sub analyseRecord
                $newrec->{secfindingaltreponsibleid}=
                   [sort(keys(%altreponsibleid))];
             }
-            msg(WARN,"debug wfreactivate for wfhead $WfRec->{id} needed isdel=$rec->{isdel}");
+            msg(WARN,"debug wfreactivate for wfhead $WfRec->{id} ".
+                     "needed isdel=$rec->{isdel}");
             if ($wfop->nativProcess('wfreactivate',$newrec,$WfRec->{id})){
                msg(INFO,"ok - it was reactivated $WfRec->{id}");
             }
@@ -381,7 +387,10 @@ sub analyseRecord
                   $newrec->{secfindingaltreponsibleid}=
                      [sort(keys(%altreponsibleid))];
                }
-               msg(WARN,"debug wfreassign for wfhead $WfRec->{id} needed - $reponsibleid secfindingreponsibleid=".$WfRec->{secfindingreponsibleid});
+               msg(WARN,"debug wfreassign for wfhead $WfRec->{id} ".
+                        "needed - $reponsibleid ".
+                        "secfindingreponsibleid=".
+                        $WfRec->{secfindingreponsibleid});
                #msg(WARN,"rec=".Dumper($rec));
                if ($wfop->nativProcess('wfreassign',$newrec,$WfRec->{id})){
                   msg(INFO,"ok - it was reassigned $WfRec->{id}");

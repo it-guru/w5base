@@ -553,6 +553,9 @@ sub getPosibleActions
       if ($WfRec->{step} ne "secscan::workflow::FindingHndl::finish"){
          push(@l,"wfforceobsolete");
       }
+      if ($WfRec->{stateid}==17 ){
+         push(@l,"wffine");
+      }
       if ($WfRec->{stateid}>15 ){
          push(@l,"wfreactivate");
       }
@@ -831,6 +834,27 @@ sub nativProcess
 
       return(1);
    }
+   elsif($action eq "wffine"){
+      if ($self->getParent->getParent->Action->StoreRecord(
+          $WfRec->{id},"wffine",
+          {translation=>'base::workflow::request'},"",undef)){
+         my $nextstep=$self->getParent->getStepByShortname("finish");
+         my $store={stateid=>21,
+                    step=>$nextstep,
+                    fwdtargetid=>undef,
+                    fwdtarget=>undef,
+                    closedate=>NowStamp("en"),
+                    fwddebtarget=>undef,
+                    fwddebtargetid=>undef};
+         if ($WfRec->{eventend} eq ""){
+            $store->{eventend}=NowStamp("en");
+         }
+         $self->StoreRecord($WfRec,$store);
+         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+         $self->PostProcess("SaveStep.".$action,$WfRec,$actions);
+         return(1);
+      }
+   }
    if ($action eq "wfreactivate"){
       $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
       my $reseen=0;
@@ -852,6 +876,7 @@ sub nativProcess
             my $store={stateid=>2,
                        step=>$nextstep,
                        secfindingstate=>'INANALYSE',
+                       eventend=>undef,
                        closedate=>undef,
                        fwddebtarget=>undef,
                        fwddebtargetid=>undef};
@@ -1250,7 +1275,7 @@ sub nativProcess
           $WfRec->{id},"wfclosed",
           {translation=>'secscan::workflow::FindingHndl'},
           $h->{note})){
-         my $store={stateid=>21,
+         my $store={stateid=>17,
                     step=>'secscan::workflow::FindingHndl::finish',
                     fwdtargetid=>undef,
                     fwdtarget=>undef,
@@ -1343,25 +1368,7 @@ sub nativProcess
       }
    }
    elsif($op eq "wffine"){
-      if ($self->getParent->getParent->Action->StoreRecord(
-          $WfRec->{id},"wffine",
-          {translation=>'base::workflow::request'},"",undef)){
-         my $nextstep=$self->getParent->getStepByShortname("finish");
-         my $store={stateid=>21,
-                    step=>$nextstep,
-                    fwdtargetid=>undef,
-                    fwdtarget=>undef,
-                    closedate=>NowStamp("en"),
-                    fwddebtarget=>undef,
-                    fwddebtargetid=>undef};
-         if ($WfRec->{eventend} eq ""){
-            $store->{eventend}=NowStamp("en");
-         }
-         $self->StoreRecord($WfRec,$store);
-         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-         $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
-         return(1);
-      }
+      return($self->getParent->nativProcess($self,$op,$h,$WfRec,$actions));
    }
    elsif ($op eq "wfforceobsolete"){
       return($self->getParent->nativProcess($self,$op,$h,$WfRec,$actions));
@@ -1864,6 +1871,9 @@ sub nativProcess
 
 
    if ($op eq "wfreactivate"){
+      return($self->getParent->nativProcess($self,$op,$h,$WfRec,$actions));
+   }
+   if ($op eq "wffine"){
       return($self->getParent->nativProcess($self,$op,$h,$WfRec,$actions));
    }
    return($self->SUPER::nativProcess($op,$h,$WfRec,$actions));
