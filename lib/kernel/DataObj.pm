@@ -5066,11 +5066,13 @@ sub DoRESTcall
    my $reqtrace="---\n";
 
    my $ua;
+   if (!exists($p{verify_hostname})){
+      $p{verify_hostname}="1";
+   }
    eval('
       use JSON;
       use LWP::UserAgent;
-      #$ua=new LWP::UserAgent(env_proxy=>0,ssl_opts =>{verify_hostname=>0});
-      $ua=new LWP::UserAgent(env_proxy=>0);
+      $ua=new LWP::UserAgent(env_proxy=>0,ssl_opts =>{verify_hostname=>'.$p{verify_hostname}.'});
    ');
    if ($@ ne ""){
       $self->LastMsg(ERROR,"fail to create UserAgent for DoRESTcall");
