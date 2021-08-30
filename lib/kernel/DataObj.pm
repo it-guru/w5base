@@ -5156,12 +5156,23 @@ sub DoRESTcall
          $respcontent=&{$p{preprocess}}($self,$respcontent,$code,$message,
                                         $response);
       }
+      my $ContentType=$response->header('content-type');
+      $ContentType="text/json" if ($ContentType eq "");
 
-
-printf STDERR ("fifi content=%s\n",$response->header('content-type'));
-      my $d=decode_json($respcontent);
+      my $d;
+      if ($ContentType eq "application/xml"){
+         eval("use XML::Smart;");
+         return(undef) if ($@ ne "");
+         my $xmltree;
+         eval('$xmltree=new XML::Smart($respcontent);');
+         return(undef) if ($@ ne "");
+         $d=$xmltree;
+      }
+      else{
+         $d=decode_json($respcontent);
+      }
       #print STDERR ("Debug2: result=%s\n",Dumper($d));
-      if (ref($d) eq "HASH" || ref($d) eq "ARRAY"){
+      if (ref($d) eq "HASH" || ref($d) eq "ARRAY" || ref($d) eq "XML::Smart"){
          if ($p{success}){
             my $dd=&{$p{success}}($self,$d,$code,$message);
             if (defined($dd)){
