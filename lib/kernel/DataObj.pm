@@ -1912,7 +1912,8 @@ sub ValidatedInsertOrUpdateRecord
       my $restoremdate=1;
       foreach my $k (keys(%$newrec)){
          if ($k ne $idfname){
-            if ($newrec->{$k} ne $rec->{$k}){
+            if (exists($rec->{$k}) &&
+                $newrec->{$k} ne $rec->{$k}){
                $changed=1;
                if ($k ne "srcload"){
                   $restoremdate=0;
