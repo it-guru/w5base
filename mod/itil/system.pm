@@ -1244,7 +1244,7 @@ sub new
                 vjoininhash   =>['id','name','addresstyp',
                                  'cistatusid','networkid',
                                  'dnsname','comments','ifname','itcloudareaid',
-                                 'srcsys']),
+                                 'srcsys','networktag']),
 
       new kernel::Field::SubList(
                 name          =>'sysiface',
