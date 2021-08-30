@@ -48,6 +48,41 @@ sub new
                 label         =>'Name',
                 dataobjattr   =>'tsfiat_firewall.name'),
 
+      new kernel::Field::Text(
+                name          =>'vendor',
+                label         =>'Vendor',
+                dataobjattr   =>'tsfiat_firewall.vendor'),
+
+      new kernel::Field::Text(
+                name          =>'domainname',
+                label         =>'Domain name',
+                dataobjattr   =>'tsfiat_firewall.domainname'),
+
+      new kernel::Field::Text(
+                name          =>'domainid',
+                label         =>'Domain id',
+                dataobjattr   =>'tsfiat_firewall.domainid'),
+
+      new kernel::Field::Boolean(
+                name          =>'isoffline',
+                label         =>'is offline',
+                dataobjattr   =>'tsfiat_firewall.isoffline'),
+
+      new kernel::Field::Boolean(
+                name          =>'istopology',
+                label         =>'is topology',
+                dataobjattr   =>'tsfiat_firewall.istopology'),
+
+      new kernel::Field::Text(
+                name          =>'contextname',
+                label         =>'Context name',
+                dataobjattr   =>'tsfiat_firewall.contextname'),
+
+      new kernel::Field::Text(
+                name          =>'ipaddress',
+                label         =>'IP-Address',
+                dataobjattr   =>'tsfiat_firewall.ipaddress'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
@@ -75,7 +110,7 @@ sub new
                 dataobjattr   =>'tsfiat_firewall.srcload'),
 
    );
-   $self->setDefaultView(qw(name comments mdate srcload));
+   $self->setDefaultView(qw(name id ipaddress contextname mdate));
    $self->setWorktable("tsfiat_firewall");
    return($self);
 }
@@ -109,6 +144,18 @@ sub getDetailBlockPriority
    my %param=@_;
    return("header","default","soure");
 }
+
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
 
 
 
