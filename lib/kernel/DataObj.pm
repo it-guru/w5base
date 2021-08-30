@@ -5152,8 +5152,12 @@ sub DoRESTcall
       #                "result=%s\n",$response->decoded_content);
       my $respcontent=$response->decoded_content;
       if ($p{preprocess}){
-         $respcontent=&{$p{preprocess}}($self,$respcontent,$code,$message);
+         $respcontent=&{$p{preprocess}}($self,$respcontent,$code,$message,
+                                        $response);
       }
+
+
+printf STDERR ("fifi content=%s\n",$response->header('content-type'));
       my $d=decode_json($respcontent);
       #print STDERR ("Debug2: result=%s\n",Dumper($d));
       if (ref($d) eq "HASH" || ref($d) eq "ARRAY"){
@@ -5241,11 +5245,13 @@ sub CollectREST
       }
       $p{method}="GET" if (!exists($p{method}));
       $p{format}="JSON" if (!exists($p{format}));
+      $p{verify_hostname}="1" if (!exists($p{verify_hostname}));
 
       my @data=$self->DoRESTcall(
          method=>$p{method},    url=>$dataobjurl,
          content=>$Content,     headers=>$Headers,
          useproxy=>$p{useproxy},
+         verify_hostname=>$p{verify_hostname},
          data=>$p{data},
          BasicAuthUser=>undef, BasicAuthPass=>undef,
          format=>$p{format},
