@@ -79,6 +79,7 @@ sub qcheckRecord
    my %soll;
 
 
+   my $acis=getModuleObject($dataobj->Config,"itil::lnkadditionalci");
    my $aurl=getModuleObject($dataobj->Config,"itil::lnkapplurl");
 
    $aurl->SetFilter({applid=>\$applid});
@@ -94,13 +95,32 @@ sub qcheckRecord
          }
       }
    }
+   my @sid;
+   foreach my $sysrec (@{$rec->{systems}}){
+      if ($sysrec->{systemid} ne ""){
+         push(@sid,$sysrec->{systemid});
+      }
+   }
+   if ($#sid!=-1){
+      $acis->ResetFilter();
+      $acis->SetFilter({systemid=>\@sid});
+      my @sysacis=$acis->getHashList(qw(ALL));
+      foreach my $r (@sysacis){
+         my $k=$r->{name}.".".$r->{ciusage};
+         $soll{$k}={
+            name=>$r->{name},
+            ciusage=>$r->{ciusage}
+         };
+      }
+   }
+
 
    #
    # Hier müssen irgendwann mal die addcis aller an der Anwendung "hängenden"
    # logischen Systeme hinzugeladen werden.
    #
 
-   my $acis=getModuleObject($dataobj->Config,"itil::lnkadditionalci");
+   $acis->ResetFilter();
    $acis->SetFilter({applid=>\$rec->{id}});
    my @acis=$acis->getHashList(qw(ALL));
 
