@@ -70,11 +70,14 @@ sub FiatKernelLoad
                $isoffline=lc($isoffline) eq "false"  ? 0:1;
                my $istopology=$device->{topology};
                $istopology=lc($istopology) eq "false"  ? 0:1;
+               my $name=$device->{name};
+               my $context=$device->{context_name};
+               $name=~s/-$context$//;
                push(@l,{
                   id=>"".$device->{id},
                   parent_id=>"".$device->{parent_id},
                   ipaddress=>"".$device->{ip},
-                  name=>"".$device->{name},
+                  name=>$name,
                   domainname=>"".$device->{domain_name},
                   virtualtype=>"".$device->{virtual_type},
                   contextname=>"".$device->{context_name},

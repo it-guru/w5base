@@ -49,6 +49,14 @@ sub new
                 dataobjattr   =>'tsfiat_firewall.name'),
 
       new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Fullname',
+                htmldetail    =>0,
+                readonly      =>1,
+                dataobjattr   =>"concat(tsfiat_firewall.name,'-',".
+                                "tsfiat_firewall.contextname)"),
+
+      new kernel::Field::Text(
                 name          =>'vendor',
                 label         =>'Vendor',
                 dataobjattr   =>'tsfiat_firewall.vendor'),
