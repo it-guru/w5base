@@ -22,6 +22,7 @@ use kernel;
 use kernel::App::Web;
 use kernel::DataObj::DB;
 use kernel::Field;
+use MIME::Base64;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
 sub new
@@ -160,6 +161,158 @@ sub isQualityCheckValid
    my $self=shift;
    my $rec=shift;
    return(0);
+}
+
+
+sub getFirewallTable
+{
+   my $self=shift;
+
+   my $d=$self->CollectREST(
+      dbname=>'tsfiat',
+      useproxy=>0,
+      verify_hostname=>0,
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         $baseurl.="/"  if (!($baseurl=~m/\/$/));
+         my $dataobjurl=$baseurl."W5Base/devices?model=fmg_firewall";
+         return($dataobjurl);
+      },
+
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apiuser=shift;
+         my $headers=[Authorization =>'Basic '.
+                                      encode_base64($apiuser.':'.$apikey)];
+ 
+         return($headers);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+         my @l;
+
+         foreach my $device ($data->{devices}->nodes()){
+            my $name=$device->{name}; 
+            if ($name ne ""){
+               my $isoffline=$device->{offline};
+               $isoffline=lc($isoffline) eq "false"  ? 0:1;
+               my $istopology=$device->{topology};
+               $istopology=lc($istopology) eq "false"  ? 0:1;
+               my $name=$device->{name};
+               my $context=$device->{context_name};
+               $name=~s/-$context$//;
+               push(@l,{
+                  id=>"".$device->{id},
+                  parent_id=>"".$device->{parent_id},
+                  ipaddress=>"".$device->{ip},
+                  name=>$name,
+                  domainname=>"".$device->{domain_name},
+                  virtualtype=>"".$device->{virtual_type},
+                  contextname=>"".$device->{context_name},
+                  domainid=>"".$device->{domain_id},
+                  isoffline=>$isoffline,
+                  istopology=>$istopology,
+                  vendor=>"".$device->{vendor},
+                  model=>"".$device->{model},
+                  srcload=>NowStamp("en")
+               });
+            }
+            #printf STDERR ("name=%s\n",$device->{name});
+            #printf ("node=%s\n",join(",",$device->nodes_keys()));
+         }
+
+         return(\@l);
+      },
+      #onfail=>sub{
+      #   my $self=shift;
+      #   my $code=shift;
+      #   my $statusline=shift;
+      #   my $content=shift;
+      #   my $reqtrace=shift;
+#
+#         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+#            return([],"200");
+#         }
+#         msg(ERROR,$reqtrace);
+#         $self->LastMsg(ERROR,"unexpected data TPC project response");
+#         return(undef);
+#      }
+   );
+
+   return($d);
+}
+
+sub getFirewallByIp
+{
+   my $self=shift;
+   my $ip=shift;
+
+   my $d=$self->CollectREST(
+      dbname=>'tsfiat',
+      useproxy=>0,
+      verify_hostname=>0,
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         $baseurl.="/"  if (!($baseurl=~m/\/$/));
+         my $dataobjurl=$baseurl."W5Base/last_hop?host=".$ip;
+         return($dataobjurl);
+      },
+
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apiuser=shift;
+         my $headers=[Authorization =>'Basic '.
+                                      encode_base64($apiuser.':'.$apikey)];
+ 
+         return($headers);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+         my @l;
+
+         foreach my $if ($data->{interfaces}->nodes()){
+            my $id="".$if->{device_id}; 
+            my $ip="".$if->{ip}; 
+            my $mask="".$if->{mask}; 
+            my $name="".$if->{name}; 
+            if ($id ne ""){
+               push(@l,{
+                  id=>$id,
+                  ip=>$ip,
+                  mask=>$mask,
+                  name=>$name
+               });
+            }
+         }
+         return(\@l);
+      },
+      #onfail=>sub{
+      #   my $self=shift;
+      #   my $code=shift;
+      #   my $statusline=shift;
+      #   my $content=shift;
+      #   my $reqtrace=shift;
+#
+#         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+#            return([],"200");
+#         }
+#         msg(ERROR,$reqtrace);
+#         $self->LastMsg(ERROR,"unexpected data TPC project response");
+#         return(undef);
+#      }
+   );
+   #printf STDERR ("d=%s\n",Dumper($d));
+   return($d);
 }
 
 
