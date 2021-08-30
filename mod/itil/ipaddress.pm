@@ -395,6 +395,15 @@ sub new
                 label         =>'NetworkID',
                 dataobjattr   =>'ipaddress.network'),
 
+      new kernel::Field::Interface(
+                name          =>'networktag',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'NetworkTag',
+                vjointo       =>'itil::network',
+                vjoinon       =>['networkid'=>'id'],
+                vjoindisp     =>'networktag'),
+
       new kernel::Field::Link(
                 name          =>'uniqueflag',
                 label         =>'UniqueFlag',
