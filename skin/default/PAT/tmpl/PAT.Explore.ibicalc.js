@@ -717,7 +717,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                if (!businesslist){
                   businesslist="NONE";
                }
-               businesslist=businesslist.split(/[,;+ ]+/);
+               //businesslist=businesslist.split(/[,;+ ]+/);
+               businesslist=new Array(businesslist);
                for(var i=0;i<businesslist.length;i++){
                   if (businesslist[i]!=""){
                      ibisumbusinessseg[businesslist[i]+"@"+
@@ -1182,9 +1183,10 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       var app=this.app;
       var searchbox=$("#search").first();
       var v=searchbox.val();
+      v=v.trim();
       var mode=$("#dosearch").css("cursor");
       if (mode=="pointer"){
-         if (searchbox.val().length>2){
+         if (v.length>2){
             $("#analysedData").html("");
             $("#Detail").hide();
             $("#analysedData").show();
