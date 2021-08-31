@@ -112,18 +112,28 @@ sub qcheckRecord
    }
    if (keys(%fwlist)){
       $fiatfw->SetFilter({id=>[keys(%fwlist)]});
-      $fiatfw->SetCurrentView(qw(id name));
+      $fiatfw->SetCurrentView(qw(id name fullname));
       my $d=$fiatfw->getHashIndexed("id");
  
       foreach my $fwid (keys(%fwlist)){
+         my $fullname;
          if (exists($d->{id}->{$fwid})){
             $fwlist{$fwid}->{name}=$d->{id}->{$fwid}->{name};
+            $fwlist{$fwid}->{ciusage}="FIREWALL";
+            $fullname=$d->{id}->{$fwid}->{fullname};
          }
          $fwlist{$fwid}->{comments}="Interfaces:\n".join("\n",
                 sort(keys($fwlist{$fwid}->{ifname})));
+         if ($fullname ne ""){
+            $fwlist{$fullname}={
+               name=>$fullname,
+               ciusage=>"FIREWALL-VDOM",
+               comments=>''
+            };
+         }
       }
 
-      my @soll=sort({$a->{firewall} cmp $b->{firewall}} values(%fwlist));
+      my @soll=sort({$a->{name} cmp $b->{name}} values(%fwlist));
       
       my $acis=getModuleObject($dataobj->Config,"itil::lnkadditionalci");
       $acis->SetFilter({systemid=>\$rec->{id}});
@@ -141,7 +151,8 @@ sub qcheckRecord
                 $a->{name} eq $b->{name}){
                $eq=0;
                # eq=0 = Satz gefunden und es wird ein Update gemacht
-               if ($a->{comments} eq $b->{comments}){
+               if ($a->{comments} eq $b->{comments} &&
+                   $a->{ciusage} eq $b->{ciusage}){
                   $eq=1;
                   # eq=1 = alles super - kein Update notwendig
                }
@@ -157,8 +168,8 @@ sub qcheckRecord
                        "in W5Base",
                   DATAOBJ=>'itil::lnkadditionalci',
                   DATA=>{
-                     name   =>$newrec->{name},
-                     ciusage=>"FIREWALL",
+                     name      =>$newrec->{name},
+                     ciusage   =>$newrec->{ciusage},
                      srcload   =>NowStamp("en"),
                      srcsys    =>$srcsys,
                      systemid  =>$rec->{id}
