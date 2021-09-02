@@ -112,11 +112,14 @@ sub LoadNewAuditTasteOSFiles
       );
       if (defined($firstrec)){
          my $lastmsg=$firstrec->{exitmsg};
+         msg(DEBUG,"lastmsg: $lastmsg");
          if (($laststamp,$lastid)=
              $lastmsg=~m/^last:(\d+-\d+-\d+ \d+:\d+:\d+);(\S+)$/){
             $exitmsg=$lastmsg;
+            msg(DEBUG,"laststamp: $laststamp");
+            msg(DEBUG,"lastid: $lastid");
             $datastream->ResetFilter();
-            $datastream->SetFilter({id=>\$lastid,mdate=>\$laststamp});
+            $datastream->SetFilter({id=>\$lastid,mdate=>"\"$laststamp CET\""});
             my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
             if (!defined($lastrec)){
                msg(WARN,"record with id '$lastid' ".
@@ -124,7 +127,7 @@ sub LoadNewAuditTasteOSFiles
                $lastid=undef;
             }
             %flt=( 
-               mdate=>">=\"$laststamp\""; 
+               mdate=>">=\"$laststamp CET\"" 
             );
          }
       }
