@@ -92,6 +92,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'mdate',
                 group         =>'source',
+                timezone      =>'CET',
                 label         =>'Modification-Date',
                 dataobjattr   =>'mod_date'),
 
