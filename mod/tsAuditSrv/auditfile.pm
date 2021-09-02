@@ -94,7 +94,7 @@ sub new
                 group         =>'source',
                 timezone      =>'CET',
                 label         =>'Modification-Date',
-                dataobjattr   =>'mod_date'),
+                dataobjattr   =>"mod_date"),
 
       new kernel::Field::Id(
                 name          =>'id',
