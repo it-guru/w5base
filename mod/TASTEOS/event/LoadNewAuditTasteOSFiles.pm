@@ -55,8 +55,7 @@ sub LoadNewAuditTasteOSFiles
 
 
 
-   my @datastreamview=qw(mdate fullname systemid);
-   my @datastreamview=qw(mdate fullname systemid filecontent);
+   my @datastreamview=qw(mdate fullname systemname systemid filecontent);
 
 
    if ($_[0]=~m/^[0-9]{2,10}$/){
@@ -212,11 +211,33 @@ sub analyseRecord
    my $res=shift;
 
    msg(INFO,"F:$rec->{id}");
-   msg(INFO,"  SystemID:  $rec->{systemid}");
-   msg(INFO,"  mdate   :  $rec->{mdate}");
-   $self->{sys}->ResetFilter();
-   $self->{sys}->SetFilter({systemid=>\$rec->{systemid},cistatusid=>[3,4,5]});
-   my ($sysrec)=$self->{sys}->getOnlyFirst(qw(id systemid));
+   msg(INFO,"  Systemname:  $rec->{systemname}");
+   msg(INFO,"  SystemID  :  $rec->{systemid}");
+   msg(INFO,"  mdate     :  $rec->{mdate}");
+   my $sysrec;
+   if ($rec->{systemid} ne ""){
+      $self->{sys}->ResetFilter();
+      $self->{sys}->SetFilter({systemid=>\$rec->{systemid},
+                               cistatusid=>[3,4,5]});
+      my @l=$self->{sys}->getOnlyFirst(qw(id systemid));
+      if ($#l==0){
+         $sysrec=$l[0];
+      }
+   }
+   else{
+      my $systemname=$rec->{systemname};
+      $systemname=~s/[^0-9a-z_-]//gi;
+      if ($systemname ne ""){
+         $self->{sys}->ResetFilter();
+         $self->{sys}->SetFilter({name=>$systemname,
+                                  cistatusid=>[3,4,5]});
+         my @l=$self->{sys}->getOnlyFirst(qw(id systemid));
+         if ($#l==0){
+            printf ST
+            $sysrec=$l[0];
+         }
+      }
+   }
    if (defined($sysrec)){
       $self->{addsys}->ResetFilter();
       $self->{addsys}->SetFilter({systemid=>\$sysrec->{id}});
@@ -264,13 +285,15 @@ sub analyseRecord
                    my $reqtrace=shift;
              
                    if ($code eq "404"){  # 404 bedeutet nicht gefunden
-                      msg(ERROR,"$rec->{systemid} machineID:$MachineID - ".
+                      msg(ERROR,"$rec->{systemname}/$rec->{systemid} ".
+                                "machineID:$MachineID - ".
                                 "not found in TasteOS");
                       return([],"200");
                    }
                    if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
                       msg(ERROR,"PUT pkg_taste.txt($rec->{id} ".
-                                "for $rec->{systemid} returns $code");
+                                "for $rec->{systemname}/$rec->{systemid} ".
+                                "returns $code");
                       msg(ERROR,"$content");
                    }
                    return(undef);
