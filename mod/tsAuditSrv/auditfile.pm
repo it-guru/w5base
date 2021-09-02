@@ -47,27 +47,27 @@ sub new
                 uivisible     =>1,
                 searchable    =>0,
                 htmldetail    =>0,
-                dataobjattr   =>"(DARWIN_TBL_ASSET_DATA.SYSTEM_NAME||".
-                                "' ('||DARWIN_FILES.FILE_NAME||')')"),
+                dataobjattr   =>"(DARWIN_FILES_EXTENDED.SYSTEM_NAME||".
+                                "' ('||DARWIN_FILES_EXTENDED.FILE_NAME||')')"),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 weblinkto     =>\'tsAuditSrv::system',
                 weblinkon     =>['systemid'=>'systemid'],
-                dataobjattr   =>'DARWIN_TBL_ASSET_DATA.SYSTEM_NAME'),
+                dataobjattr   =>'DARWIN_FILES_EXTENDED.SYSTEM_NAME'),
 
       new kernel::Field::Text(
                 name          =>'filename',
                 label         =>'Filename',
                 ignorecase    =>1,
-                dataobjattr   =>'DARWIN_FILES.FILE_NAME'),
+                dataobjattr   =>'DARWIN_FILES_EXTENDED.FILE_NAME'),
 
       new kernel::Field::Number(
                 name          =>'filelength',
                 label         =>'File length',
                 precision     =>0,
-                dataobjattr   =>'dbms_lob.getlength(DARWIN_FILES.FILE_DATA)'),
+                dataobjattr   =>'dbms_lob.getlength(DARWIN_FILES_EXTENDED.FILE_DATA)'),
 
      new kernel::Field::File(
                 name          =>'filecontent',
@@ -79,7 +79,7 @@ sub new
                 uploadable    =>0,
                 allowempty    =>0,
                 allowdirect   =>1,
-                dataobjattr   =>'DARWIN_FILES.FILE_DATA'),
+                dataobjattr   =>'DARWIN_FILES_EXTENDED.FILE_DATA'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
@@ -87,15 +87,7 @@ sub new
                 group         =>'default',
                 searchable    =>1,
                 uppersearch   =>1,
-                dataobjattr   =>"DARWIN_TBL_ASSET_DATA.SYSTEM_ID"),
-
-      new kernel::Field::Text(
-                name          =>'systemid',
-                label         =>'SystemID',
-                group         =>'default',
-                searchable    =>1,
-                uppersearch   =>1,
-                dataobjattr   =>"DARWIN_TBL_ASSET_DATA.SYSTEM_ID"),
+                dataobjattr   =>"DARWIN_FILES_EXTENDED.SYSTEM_ID"),
 
       new kernel::Field::Date(
                 name          =>'mdate',
@@ -107,14 +99,14 @@ sub new
                 name          =>'id',
                 label         =>'FileID',
                 group         =>'source',
-                dataobjattr   =>"DARWIN_FILES.FILE_ID"),
+                dataobjattr   =>"DARWIN_FILES_EXTENDED.FILE_ID"),
 
       new kernel::Field::RecordUrl(),
    );
    $self->{use_distinct}=0;
    $self->BackendSessionName("tsAuditServer_LongRead"); 
 
-   $self->setWorktable("DARWIN_FILES");
+   $self->setWorktable("DARWIN_FILES_EXTENDED");
    $self->setDefaultView(qw(mdate systemid systemname fullname filelength));
    return($self);
 }
@@ -125,19 +117,7 @@ sub getSqlFrom
    my $self=shift;
    my $mode=shift;
    my @flt=@_;
-   my $from=
-         # "(select ".
-         # "FILE_ID,".
-         # "decode(rank() over (partition by system_id||'-'||file_name ".
-         # "order by mod_date desc),1,1,0) latest ".
-         # "from DARWIN_FILES ".
-         # ") DF join ".
-         # "DARWIN_FILES on DF.FILE_ID=DARWIN_FILES.FILE_ID and DF.latest='1' ".
-          "DARWIN_FILES ".
-          "JOIN DARWIN_TBL_ASSET_DATA on ".
-          "DARWIN_FILES.SYSTEM_ID=DARWIN_TBL_ASSET_DATA.SYSTEM_ID ";
-#          "LEFT OUTER JOIN DARWIN_SYSTEM_STATUS on ".
-#          "DARWIN_TBL_ASSET_DATA.SYSTEM_ID=DARWIN_SYSTEM_STATUS.SYSTEM_ID";
+   my $from="DARWIN_FILES_EXTENDED";
 
    return($from);
 }
@@ -161,7 +141,7 @@ sub initSqlWhere
             my @secsystemid;
             #needed to fix ora "in" limits
             while (my @sid=splice(@systemid,0,500)){
-               push(@secsystemid,"DARWIN_TBL_ASSET_DATA.SYSTEM_ID in (".
+               push(@secsystemid,"DARWIN_FILES_EXTENDED.SYSTEM_ID in (".
                                  join(",",map({"'".$_."'"} @sid)).")");
             }
             $where="(".join(" OR ",@secsystemid).")";
