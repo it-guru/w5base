@@ -229,6 +229,7 @@ sub analyseRecord
    }
    else{
       my $systemname=$rec->{systemname};
+      $systemname=~s/\..*$//;   # remove domain, if nodename with domain
       $systemname=~s/[^0-9a-z_-]//gi;
       if ($systemname ne ""){
          $self->{sys}->ResetFilter();
