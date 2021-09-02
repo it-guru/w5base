@@ -124,7 +124,7 @@ sub LoadNewAuditTasteOSFiles
                $lastid=undef;
             }
             %flt=( 
-               mdate=>">=\"$laststamp GMT\""
+               mdate=>">=\"$laststamp\""; 
             );
          }
       }
