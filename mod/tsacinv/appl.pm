@@ -882,6 +882,17 @@ sub jsExploreObjectMethods
 }
 
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
+
+
 
 
 
