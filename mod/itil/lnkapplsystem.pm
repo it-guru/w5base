@@ -463,7 +463,8 @@ sub new
                 readonly      =>1,
                 group         =>'applinfo',
                 label         =>'Business Team',
-                vjoinon       =>'businessteamid'),
+                vjoinon       =>'businessteamid',
+                dataobjattr   =>'businessteam.fullname'),
 
       new kernel::Field::Group(
                 name          =>'businessdepart',
@@ -1073,7 +1074,8 @@ sub getSqlFrom
             "on vsystem.asset=vasset.id ".
 
             "left outer join appl as secsystemappl ".
-            "on qlnkapplsystem.appl=secsystemappl.id and secsystemappl.cistatus<6 ".
+            "on qlnkapplsystem.appl=secsystemappl.id and ".
+               "secsystemappl.cistatus<6 ".
            
             "left outer join lnkcontact secsystemlnkcontact ".
             "on secsystemlnkcontact.parentobj='itil::appl' ".
@@ -1087,6 +1089,11 @@ sub getSqlFrom
 
             "left outer join applgrp ".
             "on applgrp.id=lnkapplgrpappl.applgrp ";
+
+    $from.="left outer join grp as businessteam ".
+           "on appl.businessteam=businessteam.grpid";
+
+
 
    return($from);
 }

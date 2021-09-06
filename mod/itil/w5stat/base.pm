@@ -324,23 +324,43 @@ sub displaySystem
    my ($primrec,$hist)=@_;
    return() if ($primrec->{dstrange}=~m/KW/);
    my $app=$self->getParent();
-   my $data=$app->extractYear($primrec,$hist,"ITIL.System.Count");
+   my $data1=$app->extractYear($primrec,$hist,"ITIL.System.Count");
+   my $data2=$app->extractYear($primrec,$hist,"ITIL.Operation.System.Count");
    my $user=$app->extractYear($primrec,$hist,"User",
                               setUndefZero=>1);
-   return(undef) if (!defined($data));
-   my $chart=$app->buildChart("ofcSystem",$data,
-                   employees=>$user,
-                   label=>$app->T('logical systems'),
-                   legend=>$app->T('count of logical systems'));
+   return(undef) if (!defined($data1) && !defined($data2));
 
-   my $d=$app->getParsedTemplate("tmpl/ext.w5stat.system",
-                              {current=>$primrec,
-                               static=>{
-                                    statname=>$primrec->{fullname},
-                                    chart1=>$chart
-                                       },
-                               skinbase=>'itil'
-                              });
+   my $d="";
+
+   if (defined($data1)){
+      my $chart1=$app->buildChart("ofcSystem",$data1,
+                      employees=>$user,
+                      label=>$app->T('logical systems'),
+                      legend=>$app->T('administrated logical systems'));
+      $d.=$app->getParsedTemplate("tmpl/ext.w5stat.system",
+                                 {current=>$primrec,
+                                  static=>{
+                                       statname=>$primrec->{fullname},
+                                       chart1=>$chart1
+                                          },
+                                  skinbase=>'itil'
+                                 });
+   }
+   if (defined($data2) && scalar(grep({defined($_)} @$data2))>0){
+      $d.="<br><br><br>" if ($d ne "");
+      my $chart2=$app->buildChart("ofcSystem2",$data2,
+                      employees=>$user,
+                      label=>$app->T('logical systems'),
+                      legend=>$app->T('operated logical systems'));
+      $d.=$app->getParsedTemplate("tmpl/ext.w5stat.system2",
+                                 {current=>$primrec,
+                                  static=>{
+                                       statname=>$primrec->{fullname},
+                                       chart2=>$chart2
+                                          },
+                                  skinbase=>'itil'
+                                 });
+   }
    return($d);
 }
 
@@ -571,6 +591,17 @@ sub processRecord
    }
    if ($module eq "itil::system"){
       if ($rec->{cistatusid}==4){
+         my %businessteam;
+         foreach my $appl (@{$rec->{applications}}){
+            if ($appl->{businessteam} ne ""){
+               $businessteam{$appl->{businessteam}}++;
+            }
+         }
+         if (keys(%businessteam)){
+            $self->getParent->storeStatVar("Group",[keys(%businessteam)],{},
+                                           "ITIL.Operation.System.Count",1);
+         }
+
          $self->getParent->storeStatVar("Group",[$rec->{adminteam}],{},
                                         "ITIL.System.Count",1);
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],

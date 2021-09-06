@@ -138,7 +138,7 @@ sub new
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['appl','applcistatus','reltyp','fraction'],
                 vjoininhash   =>['appl','applcistatusid','mandatorid',
-                                 'applid']),
+                                 'applid','businessteam']),
 
       new kernel::Field::Text(
                 name          =>'applicationnames',
