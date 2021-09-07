@@ -639,15 +639,19 @@ sub genericSystemImport
          $ip->SetFilter(\@ipflt);
          @oldiprecords=$ip->getHashList(qw(name systemid));
       }
+      my $searchname=$sysrec->{name};
+      if (!ref($sysrec->{name})){
+         $searchname=\$searchname;
+      }
 
       push(@flt,{
-        name=>\$sysrec->{name},
+        name=>$searchname,
         srcsys=>\$srcsys,
-        srcid=>'!'.$sysrec->{id}
+        srcid=>'!'.$sysrec->{id}  # erzeugt SQL Fehler im Darwin Kern!!!
       });
 
       push(@flt,{          # if system is alread create by hand with systemname
-        name=>\$sysrec->{name},
+        name=>$searchname,
         srcsys=>"w5base",
       });
 
@@ -669,7 +673,7 @@ sub genericSystemImport
          }
       }
 
-
+      $sys->ResetFilter();
       $sys->SetFilter(\@flt);
       my @redepl=$sys->getHashList(qw(mdate cistatusid name id
                                       srcid srcsys applications));
