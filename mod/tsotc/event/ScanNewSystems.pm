@@ -77,9 +77,16 @@ sub ScanNewSystems
 
    my $StreamDataobj="tsotc::system";
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
+
+   # on suspend, no Errors and quit the event silient
    return({}) if ($datastream->isSuspended());
+   # if ping failed ...
    if (!$datastream->Ping()){
-      msg(ERROR,"no ping on $StreamDataobj"); # maybe mail to OTC AppMgr??
+      # check if there are lastmsgs
+      # if there, send a message to interface partners
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      return({}) if ($infoObj->NotifyInterfaceContacts($datastream));
+      msg(ERROR,"no ping posible to $StreamDataobj");
       return({});
    }
    my @datastreamview=qw(name cdate id contactemail 
