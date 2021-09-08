@@ -624,12 +624,7 @@ sub Validate
       my ($grec,$msg)=$grp->getOnlyFirst(qw(ALL));
       if (grep(/^(RBoss|RBoss2|REmployee|RApprentice|RFreelancer|RBackoffice)$/,
                @$roles)){
-         if (!$grec->{is_org} &&
-             !$grec->{is_line} &&
-             !$grec->{is_depart} &&
-             !$grec->{is_resort} &&
-             !$grec->{is_team} &&
-             !$grec->{is_orggroup}){
+         if (!$grec->{is_orggrp} && !$grec->{is_projectgrp} ){
             $self->LastMsg(ERROR,"role relation with your ".
                                  "security state not allowed");
             return(0);
@@ -641,12 +636,7 @@ sub Validate
       }
       else{
          if (grep(/^(RMember)$/,@$roles)){
-            if ($grec->{is_org} ||
-                $grec->{is_line} ||
-                $grec->{is_depart} ||
-                $grec->{is_resort} ||
-                $grec->{is_team} ||
-                $grec->{is_orggroup}){
+            if ($grec->{is_orggrp} || $grec->{is_projectgrp}){
                $self->LastMsg(ERROR,"incorrect role combination");
                return(0);
             }
