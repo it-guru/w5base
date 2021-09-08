@@ -699,7 +699,20 @@ sub DeleteRecord
 sub Ping
 {
    my $self=shift;
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   my $errors;
+   # Ping is for checking backend connect, without any error displaying ...
+   {
+      open local(*STDERR), '>', \$errors;
+      $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   }
+   # ... so STDERR outputs from this method are redirected to $errors
+   if ($errors){
+      my $gc=globalContext();  # and errors are silent transfered to LastMsg
+      $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
+      foreach my $emsg (split(/[\n\r]+/,$errors)){
+         push(@{$gc->{LastMsg}},$emsg);
+      }
+   }
 
    my ($worktable,$workdb)=$self->getWorktable();
    $workdb=$self->{DB} if (!defined($workdb));
