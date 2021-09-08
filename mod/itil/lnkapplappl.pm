@@ -239,7 +239,9 @@ sub new
                 vjointo       =>'itil::lnkapplapplcomp',
                 allowcleanup  =>1,
                 vjoinon       =>['id'=>'lnkapplappl'],
-                vjoindisp     =>['name','namealt1','namealt2',"comments"]),
+                vjoindisp     =>['name','namealt1','namealt2',"comments"],
+                vjoininhash   =>['objtype','obj1id','obj2id','obj3id',
+                                 'name','namealt1','namealt2','comments']),
 
       new kernel::Field::Text(
                 name          =>'comments',
@@ -1625,6 +1627,7 @@ sub getValidWebFunctions
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(), qw(InterfaceAgreement));
 }
+
 
 
 

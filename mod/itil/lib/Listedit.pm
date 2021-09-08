@@ -1455,5 +1455,46 @@ sub SoftwareInstFullnameSql
 
 
 
+sub NotifyInterfaceContacts
+{
+   my $self=shift;
+   my $dataobj=shift;
+
+   my @to;
+   my @cc;
+   my @bcc;
+
+   if (exists($dataobj->{InterfaceHint})){
+      if (exists($dataobj->{InterfaceHint}->{'itil::lnkapplappl'})){
+         my $o;
+         if ($self->SelfAsParentObject() eq "itil::lnkapplappl"){
+            $o=$self;
+         }
+         $o->ResetFilter();
+         $o->SetFilter({id=>$dataobj->{InterfaceHint}->{'itil::lnkapplappl'}});
+         foreach my $ifrec ($o->getHashList(qw(fullname fromappl toappl
+                                               rawmonitor interfacescomp))){
+            printf STDERR ("Interface: %s\n",$ifrec->{fullname});
+            foreach my $crec (@{$ifrec->{interfacescomp}}){
+               foreach my $var (qw(name namealt1 namealt2)){
+                  if ($crec->{$var} ne ""){
+                     printf STDERR (" - contact $var: %s\n",$crec->{$var});
+                  }
+               }
+            }
+            printf STDERR ("---\n");
+         }
+      }
+   }
+
+   if ($dataobj->LastMsg()){
+      printf STDERR ("%s\n",join("\n",$dataobj->LastMsg()));
+   }
+   return(1);
+}
+
+
+
+
 
 1;
