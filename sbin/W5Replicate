@@ -559,11 +559,21 @@ sub getRequestedReplicationObjects
       #
       my $obj=getModuleObject($Config,$ctrl->{'name'});
       if (defined($obj)){
+         $ctrl->{'online'}=1;
          if ($obj->isSuspended()){
             $ctrl->{'online'}=0;
          }
-         else{
-            $ctrl->{'online'}=1;
+         if ($ctrl->{'online'}){
+            if (!$obj->Ping()){
+               my $infoObj=getModuleObject($Config,"itil::lnkapplappl");
+               if (defined($infoObj)){
+                  $infoObj->NotifyInterfaceContacts($obj);
+               }
+               $ctrl->{'online'}=0;
+            }
+         }
+
+         if ($ctrl->{'online'}){
             my $idobj=$obj->IdField();
             if (defined($idobj)){
                my $idname=$idobj->Name();
