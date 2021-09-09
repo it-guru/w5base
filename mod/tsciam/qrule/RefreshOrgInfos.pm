@@ -56,6 +56,9 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
+   my $checksession=shift;
+   my $autocorrect=$checksession->{autocorrect};
+
    my $errorlevel=undef;
    my @qmsg;
 
@@ -234,6 +237,7 @@ sub qcheckRecord
          #######################################################
          if (trim($c) ne trim($rec->{comments})){
             $forcedupd->{comments}=$c;
+            $checksession->{EssentialsChangedCnt}++;
          }
       }
       if (defined($ciamrec)){
