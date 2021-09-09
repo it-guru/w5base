@@ -291,7 +291,11 @@ sub LnkGrpUser
    }
    if (1){
       $lnk->ResetFilter();
-      $lnk->SetFilter({ grpcistatusid=>">5",expiration=>\undef});
+      $lnk->SetFilter({ 
+         grpcistatusid=>">5",
+         grpmdate=>"<now-7d",
+         expiration=>\undef
+     });
      
       foreach my $lrec ($lnk->getHashList(qw(ALL))){ 
          if ($lrec->{usercistatusid}<6){   # contact existiert noch
