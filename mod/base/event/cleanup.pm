@@ -277,61 +277,117 @@ sub LnkGrpUser
    my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
    my $lnkop=$lnk->Clone();
    my $nowstamp=NowStamp("en");
-   $lnk->SetFilter({expiration=>"<\"$nowstamp+28d\""});
-   my $oldcontext=$W5V2::OperationContext;
-   $W5V2::OperationContext="Kernel";
 
-   foreach my $lrec ($lnk->getHashList(qw(ALL))){
-      my $dur=CalcDateDuration($lrec->{expiration},$nowstamp);
-      my $days=$dur->{totalseconds}/86400;
-      if ($days>28){     
-         # sofort löschen
-         $lnkop->ValidatedDeleteRecord($lrec);
-      }
-      elsif($days>0){
-         if ($lrec->{alertstate} ne "red"){
-            $lnk->ValidatedUpdateRecord($lrec,{alertstate=>'red',
-                                               editor=>$lrec->{editor},
-                                               roles=>$lrec->{roles},
-                                               realeditor=>$lrec->{realeditor},
-                                               mdate=>$lrec->{mdate}},
-                                       {lnkgrpuserid=>\$lrec->{lnkgrpuserid}});
-         }
-         # red setzen
-      }
-      elsif($days>-21){
-         if ($lrec->{alertstate} ne "orange"){
-            if ($lnk->ValidatedUpdateRecord($lrec,
-                                            {alertstate=>'orange',
-                                             editor=>$lrec->{editor},
-                                             roles=>$lrec->{roles},
-                                             realeditor=>$lrec->{realeditor},
-                                             mdate=>$lrec->{mdate}},
-                                       {lnkgrpuserid=>\$lrec->{lnkgrpuserid}})){
-               $self->NotifyUser($lrec);
-            }
-         }
-         # orange setzen und mail verschicken
-      } 
-      else{
-         # yellow setzen und mail verschicken
-         if ($lrec->{alertstate} ne "yellow"){
-            if ($lnk->ValidatedUpdateRecord($lrec,
-                      {alertstate=>'yellow',
-                       editor=>$lrec->{editor},
-                       realeditor=>$lrec->{realeditor},
-                       roles=>$lrec->{roles},
-                       mdate=>$lrec->{mdate}},
-                      {lnkgrpuserid=>\$lrec->{lnkgrpuserid}})){
-               $self->NotifyAdmin($lrec);
-            }
-         }
-      }
-      
-     # msg(INFO,Dumper($lrec));
-     # msg(INFO,Dumper($dur));
+   if (1){
+      $lnk->ResetFilter();
+      $lnk->SetFilter([
+         { usercistatusid=>\undef },
+         { grpcistatusid=>\undef  }
+      ]);
+
+      foreach my $lrec ($lnk->getHashList(qw(ALL))){ #hard del relation records,
+         $lnkop->ValidatedDeleteRecord($lrec);       #if contactrec or grprec
+      }                                              #does not exists (anymore)
    }
-   $W5V2::OperationContext=$oldcontext;
+   if (1){
+      $lnk->ResetFilter();
+      $lnk->SetFilter({ grpcistatusid=>">5",expiration=>\undef});
+     
+      foreach my $lrec ($lnk->getHashList(qw(ALL))){ 
+         if ($lrec->{usercistatusid}<6){   # contact existiert noch
+            my $exp=$lnkop->ExpandTimeExpression("now+30d");
+            $lnkop->ValidatedUpdateRecord($lrec,{
+               expiration=>$exp
+            },{lnkgrpuserid=>\$lrec->{lnkgrpuserid}});
+         }
+         else{
+            $lnkop->ValidatedDeleteRecord($lrec);
+         }
+      }                                             
+   }                                             
+
+   if (1){
+      $lnk->ResetFilter();
+      $lnk->SetFilter({ 
+         usercistatusid=>">5",
+         usermdate=>"<now-7d",
+         expiration=>\undef
+      });
+     
+      foreach my $lrec ($lnk->getHashList(qw(ALL))){ 
+         if ($lrec->{grpcistatusid}<6){   # contact existiert noch
+            my $exp=$lnkop->ExpandTimeExpression("now+30d");
+            $lnkop->ValidatedUpdateRecord($lrec,{
+               expiration=>$exp
+            },{lnkgrpuserid=>\$lrec->{lnkgrpuserid}});
+         }
+         else{
+            $lnkop->ValidatedDeleteRecord($lrec);
+         }
+      }                                             
+   }                                             
+
+
+
+
+   if (1){
+      $lnk->ResetFilter();
+      $lnk->SetFilter({expiration=>"<\"$nowstamp+28d\""});
+      my $oldcontext=$W5V2::OperationContext;
+      $W5V2::OperationContext="Kernel";
+     
+      foreach my $lrec ($lnk->getHashList(qw(ALL))){
+         my $dur=CalcDateDuration($lrec->{expiration},$nowstamp);
+         my $days=$dur->{totalseconds}/86400;
+         if ($days>28){     
+            # sofort löschen
+            $lnkop->ValidatedDeleteRecord($lrec);
+         }
+         elsif($days>0){
+            if ($lrec->{alertstate} ne "red"){
+               $lnk->ValidatedUpdateRecord($lrec,{alertstate=>'red',
+                                                  editor=>$lrec->{editor},
+                                                  roles=>$lrec->{roles},
+                                                  realeditor=>$lrec->{realeditor},
+                                                  mdate=>$lrec->{mdate}},
+                                          {lnkgrpuserid=>\$lrec->{lnkgrpuserid}});
+            }
+            # red setzen
+         }
+         elsif($days>-21){
+            if ($lrec->{alertstate} ne "orange"){
+               if ($lnk->ValidatedUpdateRecord($lrec,
+                                               {alertstate=>'orange',
+                                                editor=>$lrec->{editor},
+                                                roles=>$lrec->{roles},
+                                                realeditor=>$lrec->{realeditor},
+                                                mdate=>$lrec->{mdate}},
+                                          {lnkgrpuserid=>\$lrec->{lnkgrpuserid}})){
+                  $self->NotifyUser($lrec);
+               }
+            }
+            # orange setzen und mail verschicken
+         } 
+         else{
+            # yellow setzen und mail verschicken
+            if ($lrec->{alertstate} ne "yellow"){
+               if ($lnk->ValidatedUpdateRecord($lrec,
+                         {alertstate=>'yellow',
+                          editor=>$lrec->{editor},
+                          realeditor=>$lrec->{realeditor},
+                          roles=>$lrec->{roles},
+                          mdate=>$lrec->{mdate}},
+                         {lnkgrpuserid=>\$lrec->{lnkgrpuserid}})){
+                  $self->NotifyAdmin($lrec);
+               }
+            }
+         }
+         
+        # msg(INFO,Dumper($lrec));
+        # msg(INFO,Dumper($dur));
+      }
+      $W5V2::OperationContext=$oldcontext;
+   }
 
    return({exitcode=>0,msg=>'OK'});
 }
