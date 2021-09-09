@@ -146,7 +146,6 @@
 'SECST.'=>{de=>'Normal',en=>'normal'},
 'SECST.vsnfd'=>{de=>'Verschlusssache - nur für den dienstlichen Gebrauch',en=>'VS-nfd'},
 
-'WF:event notification customer info targets'=>{de=>'WF:Ereignismeldung Kundeninformations Zieladressen'},
 'system count'=>{de=>'System Anzahl'},
 'log cpucount'=>{de=>'Anzahl logischer CPUs'},
 'relative phys. cpucount'=>{de=>'relative Anzahl phys. CPUs'},
