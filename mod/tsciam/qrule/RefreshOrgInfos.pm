@@ -113,6 +113,18 @@ sub qcheckRecord
                                           urlofcurrentrec));
       my $ext_refid1;
       if (defined($ciamrec)){
+
+         if (!($rec->{is_orggrp})){  # keine Org-Gruppe gesetzt - dann default
+            if (($ciamrec->{name}=~m/\sGmbH$/i) ||
+                ($ciamrec->{name}=~m/\sAG$/)){
+               $forcedupd->{is_org}=1;
+            }
+            else{
+               $forcedupd->{is_orggroup}="1";  # "organisatorische Untergruppe
+            }                                  # setzen
+         }            
+ 
+
          if ($ciamrec->{name} ne $rec->{description}){
             $forcedupd->{description}=$ciamrec->{name};
          }
