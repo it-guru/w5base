@@ -80,6 +80,25 @@ sub qcheckRecord
             return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
          }
          else{
+            my $nousers=1;
+            if (ref($ciamrec->{users}) eq "ARRAY" && 
+                $#{$ciamrec->{users}}!=-1){
+               $nousers=0;
+            }
+            my $nosgroups=1;
+            if (ref($ciamrec->{subunits}) eq "ARRAY" && 
+                $#{$ciamrec->{subunits}}!=-1){
+               $nosgroups=0;
+            }
+            if ($nosgroups && $nousers){  # empty CIAM Group: HR Rotz
+               push(@qmsg,"welded orgunit group in CIAM");
+               return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+            }
+         }
+
+
+
+         if (defined($ciamrec)){
             my $grp=getModuleObject($self->getParent->Config(),"base::grp");
             $grp->SetFilter({grpid=>\$rec->{parentid}});
             my ($pgrp,$msg)=$grp->getOnlyFirst(qw(srcsys srcid));
