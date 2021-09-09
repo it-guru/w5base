@@ -603,7 +603,12 @@ sub genericSystemImport
    #   return(undef);
    #}
 
-   if (!$cloudarea->validateCloudAreaImportState("SYSTEM: ".$sysrec->{name},
+   my $importname="SYSTEM: ".$sysrec->{name};
+   if (ref($sysrec->{name}) eq "ARRAY"){
+      $importname="SYSTEM: ".join(", ",@{$sysrec->{name}});
+   }
+
+   if (!$cloudarea->validateCloudAreaImportState($importname,
                                          $cloudrec,$cloudarearec,$w5applrec)){
       if ($self->LastMsg()==-1){
          $self->LastMsg(ERROR,"invalid CloudArea State");
