@@ -1,0 +1,10 @@
+'base::qrule::SubGroupDeactivation'=>{
+ de=>'Untergruppen CI-Status Prüfung',
+ en=>'Subgroup CI-Status check'
+},
+'not existing parent group - internal strukture error'=>{
+  de=>'nicht existierende Elterngruppe - interner structur fehler'
+},
+'parent group not active - deactivating group'=>{
+  de=>'Elterngruppe ist nicht installiert/aktiv - aktuelle Gruppe wird deaktiviert'
+},
