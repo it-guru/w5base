@@ -352,15 +352,6 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'businessprocessacl.aclmode'),
 
-      new kernel::Field::Email(
-                name          =>'wfdataeventnotifytargets',
-                label         =>'WF:event notification customer info targets',
-                htmldetail    =>0,
-                searchable    =>0,
-                uploadable    =>0,
-                group         =>'workflowbasedata',
-                onRawValue    =>\&getWfEventNotifyTargets),
- 
    );
    $self->setDefaultView(qw(linenumber selector cistatus importance));
    $self->setWorktable("businessprocess");
@@ -471,45 +462,6 @@ sub TreeLoad
    @{$d}=@l;
 }
 
-
-sub getWfEventNotifyTargets     # calculates the target email addresses
-{                               # for an customer information in
-   my $self=shift;              # itil::workflow::eventnotify
-   my $current=shift;
-   my $emailto={};
-
-   my $bpid=$current->{id};
-   my $ia=getModuleObject($self->getParent->Config,"base::infoabo");
-   my $bp=getModuleObject($self->getParent->Config,"crm::businessprocess");
-   $bp->SetFilter({id=>\$bpid});
-
-
-   my @byfunc;
-   my @byorg;
-   my @team;
-   my %allcustgrp;
-   foreach my $rec ($bp->getHashList(qw(processownerid processowner2id))){
-      foreach my $v (qw(processownerid processowner2id)){
-         my $fo=$bp->getField($v);
-         my $userid=$bp->getField($v)->RawValue($rec);
-         push(@byfunc,$userid) if ($userid ne "" && $userid>0);
-      }
-      if ($rec->{customerid}!=0){
-         $self->getParent->LoadGroups(\%allcustgrp,"up",
-                                      $rec->{customerid});
-         
-      }
-   }
-   if (keys(%allcustgrp)){
-      $ia->LoadTargets($emailto,'base::grp',\'eventnotify',
-                                [keys(%allcustgrp)]);
-   }
-   $ia->LoadTargets($emailto,'*::businessprocess',\'eventnotify',$bpid);
-   $ia->LoadTargets($emailto,'base::staticinfoabo',\'STEVeventinfobyfunction',
-                             '100000002',\@byfunc,default=>1);
-
-   return([sort(keys(%$emailto))]);
-}
 
 sub HandleInfoAboSubscribe
 {

@@ -24,7 +24,6 @@
 'default language for eventinformations'=>{de=>'Standard Spracheinstellung für den Workflow Ereignismeldung'},
 'Customers Process Prioritiy'=>{de=>'Priorität des Geschäftsprozesses'},
 'fieldgroup.workflowbasedata'=>{de=>'Workflow Basis-Daten',en=>'Workflow Base-Data'},
-'WF:event notification customer info targets'=>{de=>'WF:Ereignismeldung Kundeninformations Zieladressen'},
 'Nature'=>{de=>'Ausprägung'},
 'nat.DOMAIN'=>{de=>'Prozessdomäne',en=>'Process domain'},
 'nat.PROCESS'=>{de=>'Prozess',en=>'Process'},
