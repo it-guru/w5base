@@ -133,6 +133,9 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}!=4);
    return(undef)   if ($rec->{applgrpid} eq "");
+   if ($dataobj->Config->Param("W5BaseOperationMode") eq "test"){
+      return(undef,{qmsg=>'no sync on w5base testenv allowed'});
+   }
 
    my $appl=getModuleObject($dataobj->Config,"itil::appl");
    $appl->SetFilter({
