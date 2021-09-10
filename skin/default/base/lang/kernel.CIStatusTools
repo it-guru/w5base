@@ -189,4 +189,19 @@ Das Config-Item "%s" %swurde auf "%s" durch den User "%s" umbenannt.
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
 'argumentation'=>{de=>'Begründung'},
+'to many inactivations - '.
+  'create admin request to approve this operation'=>{
+de=>'zuviele Inaktivierungen - '.
+    'Operation muss durch Admin-Request angefordert werden'
+},
+'switch back to reserved makes no sense - '.
+  'create admin request to approve this operation'=>{
+de=>'zurückstellen auf "reserviert" macht keinen Sinn - '.
+    'Operation muss durch Admin-Request angefordert werden'
+},
+'flipping cistatus makes detect - '.
+  'create admin request to approve this operation'=>{
+de=>'Schwingung/Flippen des CI-Status erkannt - '.
+    'Operation muss durch Admin-Request angefordert werden'
+},
 
