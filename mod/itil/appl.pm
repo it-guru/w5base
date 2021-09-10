@@ -2320,6 +2320,21 @@ sub SecureSetFilter
    return($self->SetFilter(@flt));
 }
 
+
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+      return(0);
+   }
+   return($self->SUPER::SecureValidate($oldrec,$newrec));
+}
+
+
+
 sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("itil::appl");

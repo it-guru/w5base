@@ -189,6 +189,96 @@ sub HandleCIStatusModification
    return(1);   # all ok - now break error
 }
 
+sub _validateCIStatusHistoryActivity
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   return(1) if ($self->IsMemberOf("admin"));
+
+   my $idfield=$self->IdField();
+   my $dataobj=$self->SelfAsParentObject();
+   if (defined($idfield) && $dataobj ne ""){
+      my $id=effVal($oldrec,$newrec,$idfield->Name);
+      my $h=$self->ModuleObject("base::history");
+      $h->SetFilter({
+         name=>\'cistatusid',
+         dataobject=>\$dataobj,
+         dataobjectid=>\$id,
+         cdate=>'>now-12M'
+      });
+      my @l=$h->getHashList(qw(cdate name oldstate newstate));
+
+      my $inactcount=0;
+      my $tinactcount=0;
+      my $actcount=0;
+      my $sameop=0;
+      my $wasactive=0;
+      my $actdate;
+      foreach my $hrec (reverse(@l)){
+         if ($hrec->{newstate} eq "4"){
+            $actcount++;
+            $actdate=$hrec->{cdate};
+         }
+         if ($hrec->{oldstate} eq "4" && $hrec->{newstate} ne "4"){
+            $actdate=undef;
+         }
+         if ($hrec->{oldstate} eq "4" && $hrec->{newstate}>4){
+            $tinactcount++;  # temp inactive
+         }
+         if ($hrec->{oldstate} eq "4" && $hrec->{newstate} ne "4"){
+            $inactcount++;
+         }
+         if ($hrec->{oldstate} eq $oldrec->{cistatusid} &&
+             $hrec->{newstate} eq $newrec->{cistatusid}){
+            $sameop++;
+         }
+      }
+      if (0){
+         printf STDERR ("History:%s\n",Dumper(\@l));
+         printf STDERR ("Stat: actcount=$actcount ".
+                        "inactcount=$inactcount ".
+                        "tinactcount=$tinactcount ".
+                        "sameop=$sameop ".
+                        "actdate=$actdate\n");
+      }
+      if (defined($actdate)){
+         my $d=CalcDateDuration($actdate,NowStamp("en"));
+         if ($oldrec->{cistatusid} eq "4" && $newrec->{cistatusid}<4){
+            if ($d->{days}>28){
+               $self->LastMsg(ERROR,
+                       "downgrade CI-State not allowed on long active CI - ".
+                       "create admin request to approve this operation");
+               return(0),
+            }
+         }
+         print STDERR Dumper($d);
+      }
+      if ($sameop>2 && $oldrec->{cistatusid}<4){
+         $self->LastMsg(ERROR,"flipping cistatus makes detect - ".
+                           "create admin request to approve this operation");
+         return(0),
+      }
+      if ($oldrec->{cistatusid} eq "4" && 
+          ($newrec->{cistatusid}<4  || $newrec->{cistatusid}>4)){
+         if ($inactcount>3 || $sameop>2 || $tinactcount>1){
+            $self->LastMsg(ERROR,"to many inactivations - ".
+                              "create admin request to approve this operation");
+            return(0),
+         }
+      }
+      if (($oldrec->{cistatusid}>2 || $actcount>1) && 
+          $newrec->{cistatusid} eq "1"){
+         $self->LastMsg(ERROR,"switch back to reserved makes no sense - ".
+                           "create admin request to approve this operation");
+         return(0),
+      }
+   }
+
+   return(1);
+}
+
 sub HandleCIStatus
 {
    my $self=shift;
@@ -204,6 +294,16 @@ sub HandleCIStatus
       $param{mode}=$subroutine;
    }
    if ($param{mode} eq "SecureValidate"){
+      if (defined($oldrec) && defined($newrec)){ # classic true update operation
+         if (exists($newrec->{cistatusid})){
+            if (!($newrec->{cistatusid}==4 && $oldrec->{cistatusid}==4)){
+               if (!$self->_validateCIStatusHistoryActivity($oldrec,$newrec)){
+                  return(0);
+               }
+            }
+         }
+      }
+
       if (!defined($oldrec)){
          if ($newrec->{cistatusid}>2 || $newrec->{cistatusid}==0){
             if (!$self->isActivator($oldrec,$newrec,%param)){
