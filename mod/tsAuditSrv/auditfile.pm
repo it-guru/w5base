@@ -151,11 +151,6 @@ sub initSqlWhere
             $where="(1=0)";
          }
       }
-      if ($self->IsMemberOf([qw(w5base.tsAuditSrv.read)])){
-         $where.=" AND " if ($where ne "");
-         $where.=" (CUSTOMER like 'DTAG.%' ".
-                 "or CUSTOMER like 'Deutsche Telekom%')";
-      }
    }
 
    return($where);
