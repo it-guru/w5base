@@ -55,7 +55,8 @@ sub new
                 label         =>'Contact',
                 vjointo       =>'base::user',
                 vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>'fullname'),
+                vjoindisp     =>'fullname',
+                dataobjattr   =>'contact.fullname'),
                                   
       new kernel::Field::Link(
                 name          =>'userid',
@@ -75,6 +76,14 @@ sub new
                 vjointo       =>'base::user',
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>'givenname'),
+                                  
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'fullname',
+                htmldetail    =>0,
+                dataobjattr   =>"concat(if (contact.fullname is null,'',".
+                                "concat(contact.fullname,': ')),".
+                                "useraccount.account)"),
                                   
       new kernel::Field::Email(
                 name          =>'requestemail',
@@ -127,6 +136,15 @@ sub new
                 dataobjattr   =>'useraccount.apitoken'),
 
       new kernel::Field::Link(
+                name          =>'userreadytouse',
+                label         =>'UserAccount ready to use for masking',
+                readonly      =>1,
+                dataobjattr   =>"if (contact.cistatus is not null AND ".
+                                "(contact.cistatus='4' OR ".
+                                "contact.cistatus='5') AND ".
+                                "contact.gtcack is not null,1,0)"),
+
+      new kernel::Field::Link(
                 name          =>'ipacl',
                 label         =>'API IP access control',
                 dataobjattr   =>'useraccount.ipacl')
@@ -150,6 +168,7 @@ sub getSqlFrom
           "from userlogon group by account) userlogon ".
           "on $worktable.account=userlogon.account";
    }
+   $from.=" left outer join contact on useraccount.userid=contact.userid";
    return($from);
 }
 

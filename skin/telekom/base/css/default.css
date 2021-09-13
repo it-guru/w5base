@@ -1,6 +1,6 @@
 @import url("default.css?SKIN=default");
 body{
-   margin-top:2px;
+  // margin-top:2px;   // nicht gut - erzeut auf Empty Page Scrollbars
 }
 
 .TitleBar{
