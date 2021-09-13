@@ -707,7 +707,17 @@ sub genericSystemImport
             }
          }
          my $sysallowed=0;
-         if ($ageok && $applok){
+         if ($osys->{srcsys} eq "w5base"){ #den Fall muss ich erstmal beobachten
+            printf STDERR ("genericSystemImport: try to transform w5base ".
+                           "system record to $srcsys on system %d\n",
+                           $osys->{id});
+            printf STDERR ("genericSystemImport: ".
+                           "reject to check effects at 1st\n");
+            next;
+         }
+         if ($ageok && $applok && 
+             $osys->{srcsys} eq $srcsys &&   # OLDsys must be from the same 
+             $osys->{srcid} ne ""){          # srcsys and have a srcid
             if (defined($impparam->{checkForSystemExistsFilter})){
                my $flt=&{$impparam->{checkForSystemExistsFilter}}($osys);
                $srcobj->ResetFilter();
