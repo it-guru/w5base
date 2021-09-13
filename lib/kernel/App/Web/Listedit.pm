@@ -1453,10 +1453,10 @@ EOF
          "style=\"border-collapse:collapse;width:100%;height:100%\" ".
          "border=0 cellspacing=0 cellpadding=0>");
    if (!$param{nohead}){
-      printf("<tr><td height=1%% style=\"padding:1px\" ".
+      printf("<tr><td height=1%% ".
              "valign=top>%s</td></tr>",$self->getAppTitleBar());
    }
-   printf("<tr><td height=1%% style=\"padding:1px\">%s</td></tr>",
+   printf("<tr><td height=1%%>%s</td></tr>",
           $self->getParsedSearchTemplate(%param));
    print <<EOF;
 <script>

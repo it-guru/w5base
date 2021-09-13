@@ -3,4 +3,8 @@
 'Effective useraccount'=>{de=>'effektive Benutzerkennung'},
 'List of last used substitution accounts'=>{de=>'Liste der zuletzt benutzen Benutzerkennungen'},
 'account set by substitution id %s to \'%s\''=>{de=>'Benutzer durch Vertretungs-ID %s gesetzt auf \'%s\''},
-'reset to user'=>{de=>'zurücksetzen auf Benutzerkennung'}
+'reset to user'=>{de=>'zurücksetzen auf Benutzerkennung'},
+'set new effective useraccount'=>{de=>'neue effektive Benutzerkennung setzen'},
+'account not found'=>{de=>'Account nicht gefunden'},
+'account not allowed'=>{de=>'Account nicht erlaubt'},
+'account not unique'=>{de=>'Account nicht eindeutig'},

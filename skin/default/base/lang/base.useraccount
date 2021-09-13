@@ -1,6 +1,7 @@
 'base::useraccount'=>{ de=>'Benutzerkennung',en=>'Useraccount'},
 'Surname'=>{ de=>'Nachname'},
 'Contact'=>{ de=>'Kontakt'},
+'fullname'=>{ de=>'vollständiger Name'},
 'fieldgroup.default'=>{ de=>'Benutzerkennung',en=>'Useraccount'},
 'fieldgroup.control'=>{ de=>'Statusinformationen',en=>'State-Informations'},
 'Givenname'=>{ de=>'Vorname'},

@@ -425,6 +425,12 @@ sub getAppTitleBar
       $user.=" (".$self->T("authenticated as")." ".$ENV{REAL_REMOTE_USER}.")";
       
    }
+   if (length($user)>70){
+      $user=~s/\(.* (.*)\)$/($1)/;
+   }
+   if (length($user)<70){
+      $user=$self->T("Logged in as")." ".$user;
+   }
    if ($ENV{REMOTE_USER} eq "anonymous"){
       $onclick=" ";
    }
@@ -445,16 +451,18 @@ sub getAppTitleBar
    if ($param{autofocus} eq "1" || $param{autofocus} eq "title"){
       $autofocus=" autofocus"; 
    }
-   my $titlebar=sprintf("<tr class=TitleBar><td nowrap align=left>".
+   my $titlebar=sprintf("<tr class=TitleBar><td class=TitleBarLeftTD>".
                  "<div $titleonclick ".
-                 "style=\"margin:0;padding:0;padding-left:5px;".
-                 "text-overflow:ellipsis;overflow:hidden;width:380px\">".
+                 "style=\"margin:0;padding:0;".
+                 "text-overflow:ellipsis;overflow:hidden\">".
                  "<a class=TitleBarLink target=_top ".
                  "href='$directLink'${autofocus}>".
                  "%s</a>&nbsp;</div></td>".
-                 "<td align=right nowrap>".
+                 "<td class=TitleBarRightTD>".
+                 "<div>".
                  "<a href=\"\" target=_blank $onclick>%s</a>".
-                 "</td></tr>",$param{title},$self->T("Logged in as")." ".$user);
+                 "</div>".
+                 "</td></tr>",$param{title},$user);
    $d=<<EOF;
 <table id=TitleBar width=100% height=15 border=0 cellspacing=0 cellpadding=0>
 $titlebar
@@ -479,7 +487,7 @@ function RestartApp(retVal,isbreak)
 }
 function UserMask()
 {
-   showPopWin('$prefix../../base/usermask/Main',500,200,RestartApp);
+   showPopWin('$prefix../../base/usermask/Main',550,220,RestartApp);
    return(false);
 }
 function ModuleObjectInfo()

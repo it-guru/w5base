@@ -108,17 +108,35 @@ sub Main
    if (Query->Param("setnewuser") ne ""){
       my $setnewuser=trim(Query->Param("setnewuser"));
       $uainput="<input type=text id=setnewuser name=setnewuser ".
-               "value=\"$setnewuser\" ".
-               "style=\"width:100%\">";
+               "value=\"$setnewuser\" class=finput>";
       my $ua=getModuleObject($self->Config,"base::useraccount");
       $ua->SetFilter({account=>\$setnewuser});
-      my @l=$ua->getHashList(qw(account));
+      $ua->Limit(51);
+      my @l=$ua->getHashList(qw(fullname account));
       if ($#l==-1){
-         my $altsetnewuser="\"*$setnewuser*\"";
-         $ua->SetFilter({account=>$altsetnewuser});
-         @l=$ua->getHashList(qw(account));
+         my $altsetnewuser="\"$setnewuser\"";
+         if (!($setnewuser=~m/\*/)){
+            $altsetnewuser="\"*$setnewuser*\"";
+         }
+         if ($setnewuser=~m/\*/ && length($setnewuser)>3){
+            $ua->SetFilter({fullname=>$setnewuser,userreadytouse=>\'1'});
+         }
+         else{
+            $ua->SetFilter({account=>$altsetnewuser,userreadytouse=>\'1'});
+         }
+         $ua->Limit(51);
+         @l=$ua->getHashList(qw(fullname account));
          if ($#l==-1){
-            $lastmsg="ERROR "."account not found";
+            if (!($setnewuser=~m/\*/) && length($setnewuser)>3){
+               $altsetnewuser="\"*$setnewuser*\"";
+               $ua->ResetFilter();
+               $ua->SetFilter({fullname=>$altsetnewuser,userreadytouse=>\'1'});
+               $ua->Limit(51);
+               @l=$ua->getHashList(qw(fullname account));
+            }
+            if ($#l==-1){
+               $lastmsg="ERROR ".$self->T("account not found");
+            }
          }
       }
       if ($#l==0){
@@ -132,15 +150,48 @@ sub Main
                              $l[0]->{usersubstid},$setaccount);
          }
          else{ 
-            $lastmsg="ERROR "."account not allowed";
+            $lastmsg="ERROR ".$self->T("account not allowed");
          }
       }
       if ($#l>0){
-         $lastmsg="ERROR "."account not unique";
-         my $d="<select name=setnewuser style=\"width:100%\">";
+         $lastmsg="ERROR ".$self->T("account not unique");
+         my $d="<select name=setnewuser ".
+               "onChange=\"if (this.value==''){".
+               "transformElement(this,{type:'text',className:'finput'});".
+               "}\" ".
+               "style=\"width:100%\">";
+         $setnewuser=~s/[\<\>\\&"']//g;
          $d.="<option value=\"$setnewuser\">$setnewuser</option>";
+         my $c=0;
          foreach my $rec (@l){
-            $d.="<option value=\"$rec->{account}\">$rec->{account}</option>";
+print STDERR Dumper($rec);
+            $c++;
+            if ($c>40){
+               $d.="<option value=\"\">...</option>";
+               last;
+            }
+            my $fullname=$rec->{fullname};
+            $fullname=~s/[&'"<>]//ig;
+            my $displayname=$fullname;
+            if (length($displayname)>50){
+               if (my ($contactname,$email,$account)=$displayname
+                       =~m/^(.*)\s\((.*)\):\s*(.*)$/){
+                  my $shortemail=$email;
+                  $shortemail=~s/^.*\@/...\@/;
+                  $displayname=$contactname." (".$shortemail."):".$account;
+                  if (length($displayname)>50){
+                     $displayname=$contactname." ... ".$account;
+                  }
+               }
+               if (length($displayname)>50){
+                  $displayname=substr($displayname,0,17)."...".
+                               substr($displayname,length($displayname)-30,30);
+               }
+            }
+            $fullname=~s/ /&#013;/g;
+            $fullname=~s/\):/):&#013;/g;
+            $d.="<option value=\"$rec->{account}\" ".
+                "title=\"$fullname\">$displayname</option>";
          }
          $d.="<option value=\"\"></option>";
          $d.="</select>";
@@ -206,7 +257,8 @@ sub Main
       $h{'-cookie'}=$cookie;
    }
    print(Query->Header(%h)); 
-   print $self->HtmlHeader(style=>'default.css',
+   print $self->HtmlHeader(style=>['default.css','kernel.App.Web.css',
+                                   'usermask.css'],
                            js=>['toolbox.js'],
                            title=>$self->T($self->Self()),
                            onload=>'initOnLoad();');
@@ -267,21 +319,24 @@ EOF
    my $effectuserlabel=$self->T("Effective useraccount");
    my $lastlabel=$self->T("List of last used substitution accounts");
    my $resetlabel=$self->T("reset to user");
+   my $setlabel=$self->T("set new effective useraccount");
    if ($ENV{REAL_REMOTE_USER} eq $ENV{REMOTE_USER}){
       print <<EOF;
 <form method=post><center>
 <table border=0 cellspacing=2 cellpadding=1 width=98% height=180>
 <tr height=1%>
-<td width=1% nowrap>$currentuserlabel:</td>
+<td width=1% nowrap colspan=2>$currentuserlabel:</td>
 <td>
-<input style="width:100%;background:silver;" type=text value="$ENV{REAL_REMOTE_USER}" disabled>
+<input class=finput style="background:silver;" type=text value="$ENV{REAL_REMOTE_USER}" disabled>
 </td>
-<td>&nbsp;</td>
 </tr>
 <tr height=1%>
 <td width=1% nowrap>$effectuserlabel:</td>
-<td>$uainput</td>
-<td width=1%><input type=submit value="setzen"></td>
+<td colspan=2>$uainput</td>
+</tr>
+<tr height=1%>
+<td colspan=3 align=center>
+<input type=submit class="button submitbutton" value="$setlabel"></td>
 </tr>
 <tr height=1%>
 <td colspan=3>$lastmsg&nbsp;</td>
@@ -305,7 +360,7 @@ EOF
 </tr>
 <tr >
 <td nowrap align=center valign=center><input type=button 
-                  id=ResetBotton
+                  id=ResetBotton class="button submitbutton"
                   onclick=doResetAccount()
                   value="$resetlabel $ENV{REAL_REMOTE_USER}"
                   style="width:80%;height:40px"></td>
