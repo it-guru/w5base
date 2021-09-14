@@ -681,15 +681,16 @@ sub genericSystemImport
 
       $sys->ResetFilter();
       $sys->SetFilter(\@flt);
+      $sys->Limit(20);
       my @redepl=$sys->getHashList(qw(mdate cistatusid name id
                                       srcid srcsys applications));
-      if ($#redepl>20){
-         printf STDERR ("ERROR: genericSystemImport produces >20 rec\n");
-         printf STDERR ("ERROR: sysrec=%s\n",Dumper($sysrec));
-         printf STDERR ("ERROR: redepl=%s\n",Dumper(\@redepl));
-         printf STDERR ("ERROR: redepl check rejected\n");
-         @redepl=();
-      }
+      #if ($#redepl>20){
+      #   printf STDERR ("ERROR: genericSystemImport produces >20 rec\n");
+      #   printf STDERR ("ERROR: sysrec=%s\n",Dumper($sysrec));
+      #   printf STDERR ("ERROR: redepl=%s\n",Dumper(\@redepl));
+      #   printf STDERR ("ERROR: redepl check rejected\n");
+      #   @redepl=();
+      #}
 
 
       msg(INFO,"invantar check for $srcsys-SystemID: $sysrec->{id}");
