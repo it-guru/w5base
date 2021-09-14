@@ -1,0 +1,7 @@
+'finance::qrule::costcITSeM_DelMgr'=>{
+  de=>'Prüfung auf IT-SeM oder DelMgr',
+  en=>'Check on IT-SeM or DelMgr'
+},
+'missing Service Delivery Manager or IT Servicemanager'=>{
+  de=>'fehlender Service Delivery Manager oder IT Servicemanager'
+}
