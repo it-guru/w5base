@@ -683,10 +683,12 @@ sub genericSystemImport
       $sys->SetFilter(\@flt);
       my @redepl=$sys->getHashList(qw(mdate cistatusid name id
                                       srcid srcsys applications));
-      if ($#redepl>10){
-         printf STDERR ("ERROR: genericSystemImport produces >10 rec\n");
+      if ($#redepl>20){
+         printf STDERR ("ERROR: genericSystemImport produces >20 rec\n");
          printf STDERR ("ERROR: sysrec=%s\n",Dumper($sysrec));
-         die();
+         printf STDERR ("ERROR: redepl=%s\n",Dumper(\@redepl));
+         printf STDERR ("ERROR: redepl check rejected\n");
+         @redepl=();
       }
 
 
