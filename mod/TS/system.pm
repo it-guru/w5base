@@ -646,7 +646,8 @@ sub genericSystemImport
       }
       my $searchname=$sysrec->{name};
       if (!ref($sysrec->{name})){
-         $searchname=\$searchname;
+         #$searchname=\$searchname;   # ACHTUNG: Erzeugt Perl Schrott!!!
+         $searchname=[$searchname];
       }
 
       push(@flt,{
@@ -682,6 +683,12 @@ sub genericSystemImport
       $sys->SetFilter(\@flt);
       my @redepl=$sys->getHashList(qw(mdate cistatusid name id
                                       srcid srcsys applications));
+      if ($#redepl>10){
+         printf STDERR ("ERROR: genericSystemImport produces >10 rec\n");
+         printf STDERR ("ERROR: sysrec=%s\n",Dumper($sysrec));
+         die();
+      }
+
 
       msg(INFO,"invantar check for $srcsys-SystemID: $sysrec->{id}");
       foreach my $osys (@redepl){   # find best matching redepl candidate
@@ -711,9 +718,8 @@ sub genericSystemImport
             printf STDERR ("genericSystemImport: try to transform w5base ".
                            "system record to $srcsys on system %d\n",
                            $osys->{id});
-            printf STDERR ("genericSystemImport: ".
-                           "reject to check effects at 1st\n");
-            next;
+            printf STDERR ("genericSystemImport: searchname was %s\n\n",
+                           Dumper($searchname));
          }
          if ($ageok && $applok && 
              $osys->{srcsys} eq $srcsys &&   # OLDsys must be from the same 
