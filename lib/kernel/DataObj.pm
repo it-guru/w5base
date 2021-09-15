@@ -1905,18 +1905,31 @@ sub ValidatedInsertOrUpdateRecord
    my $idfname=$self->IdField()->Name();
    my $found=0;
    my @idlist=();
-         my $opobj=$self->Clone();
+   my $opobj=$self->Clone();
    $self->ForeachFilteredRecord(sub{
       my $rec=$_;
       my $changed=0;
       my $restoremdate=1;
       foreach my $k (keys(%$newrec)){
          if ($k ne $idfname){
-            if (exists($rec->{$k}) &&
-                $newrec->{$k} ne $rec->{$k}){
-               $changed=1;
-               if ($k ne "srcload"){
-                  $restoremdate=0;
+            if (exists($rec->{$k})){
+               my $o=$rec->{$k};
+               my $n=$newrec->{$k};
+               if (defined($o)){
+                  $o=rmNonLatin1(trim($o));
+                  $o=~s/\r\n/\n/gs;
+               }
+               if (defined($n)){
+                  $n=rmNonLatin1(trim($n));
+                  $n=~s/\r\n/\n/gs;
+               }
+               if ($o ne $n){
+                  $changed=1;
+                  if ($k ne "srcload"){
+#printf STDERR ("k=$k\nold='$rec->{$k}'\n\nnew='$newrec->{$k}'\n\n\n");
+#printf STDERR ("k=$k\nold:'\n%s\nnew:\n%s\n\n\n",HexDump($rec->{$k}),HexDump($newrec->{$k}));
+                     $restoremdate=0;
+                  }
                }
             }
          }
