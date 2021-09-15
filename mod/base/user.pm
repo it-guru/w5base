@@ -670,7 +670,7 @@ sub new
                 group         =>'userparam',
                 default       =>'normal',
                 value         =>['normal','large','persi',
-                                 'f800','f1024'],
+                                 'f800','f1024','vmax600','vmax800'],
                 container     =>'options'),
 
       new kernel::Field::Select(
