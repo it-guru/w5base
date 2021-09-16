@@ -75,6 +75,15 @@ sub new
                 label         =>'AWS-Region'),
 
       new kernel::Field::SubList(
+                name          =>'natgws',
+                label         =>'NatGateways',
+                group         =>'natgws',
+                searchable    =>0,
+                vjointo       =>'aws::NatGateway',
+                vjoinon       =>['idpath'=>'vpcidpath'],
+                vjoindisp     =>['name','id']),
+
+      new kernel::Field::SubList(
                 name          =>'subnets',
                 label         =>'SubNets',
                 group         =>'subnets',
@@ -196,7 +205,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","subnets","tags",
+   return("header","default","subnets","natgws","tags",
           "source");
 }
 

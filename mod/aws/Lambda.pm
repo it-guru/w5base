@@ -124,12 +124,9 @@ sub DataCollector
          #if (exists($query->{id}) && $query->{id} ne ""){
          #   $param{InstanceIds}=[$query->{id}];
          #}
-         #else{
-         #   $param{MaxResults}=20;
-         #}
-         $param{MaxItems}=20;
-         my $objItr=$obj->ListFunctions(%param);
-p $objItr;
+         printf STDERR ("results in InvalidContent - seems to be an API bug\n");
+         my $objItr=$obj->ListAllFunctions(%param);
+         p $objItr;
          if ($objItr){
             #      push(@result,$rec);
             #   }
@@ -161,7 +158,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_accountid"))){
-     Query->Param("search_accountid"=>'280962857063');
+     Query->Param("search_accountid"=>'110865811477');
    }
 }
 
