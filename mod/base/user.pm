@@ -1042,6 +1042,7 @@ sub new
 
    );
    $self->{CI_Handling}={uniquename=>"fullname",
+                         activator=>["admin","w5base.base.user"],
                          uniquesize=>255};
    $self->setWorktable("contact");
    $self->LoadSubObjs("user");

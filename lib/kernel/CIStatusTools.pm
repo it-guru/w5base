@@ -286,7 +286,7 @@ sub HandleCIStatus
    my $newrec=shift;
    my %param=@_;
 
-   $param{activator}="admin" if (!defined($param{activator}));
+   $param{activator}="valid_user" if (!defined($param{activator}));
    $param{activator}=[$param{activator}] if (ref($param{activator}) ne "ARRAY");
    if (!defined($param{mode})){
       my ($package,$filename, $line, $subroutine)=caller(1);
