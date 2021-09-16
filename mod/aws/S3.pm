@@ -1,4 +1,4 @@
-package aws::ECS_Cluster;
+package aws::S3;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -44,11 +44,21 @@ sub new
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Id(
-                name          =>'arn',
+                name          =>'idpath',
                 htmlwidth     =>'150',
                 searchable    =>0,
+                FieldHelpType =>'GenericConstant',
                 group         =>'source',
-                label         =>'ECS-Cluster-arn'),
+                label         =>'AWS-IdPath'),
+
+      new kernel::Field::Text(
+                name          =>'id',
+                htmlwidth     =>'150',
+                label         =>'S3Id'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Name'),
 
       new kernel::Field::Text(
                 name          =>'accountid',
@@ -63,9 +73,17 @@ sub new
                 },
                 FieldHelpType =>'GenericConstant',
                 label         =>'AWS-Region'),
+
+      new kernel::Field::Container(
+                name          =>'tags',
+                searchable    =>0,
+                group         =>'tags',
+                uivisible     =>1,
+                label         =>'Tags'),
+
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(arn accountid region));
+   $self->setDefaultView(qw(id name accountid cdate));
    return($self);
 }
 
@@ -81,7 +99,7 @@ sub DataCollector
    return(undef) if (!$self->genericSimpleFilterCheck4AWS($filterset));
    my $filter=$filterset->{FILTER}->[0];
 
-   my $query=$self->decodeFilter2Query4AWS("ECS",$filter);
+   my $query=$self->decodeFilter2Query4AWS("S3",$filter);
    if (!defined($query)){
       return(undef) if ($self->LastMsg());
       return([]);
@@ -92,7 +110,7 @@ sub DataCollector
    my @errStack;
    try {
       my ($stscred,$ua)=$self->GetCred4AWS($AWSAccount,$AWSRegion);
-      my $obj=Paws->service('ECS',
+      my $obj=Paws->service('S3',
             credentials=>$stscred,
             region =>$AWSRegion
       );
@@ -104,18 +122,28 @@ sub DataCollector
             $param{NextToken}=$NextToken;
          }
          if (exists($query->{id}) && $query->{id} ne ""){
-            $param{arn}=[$query->{id}];
+            $param{S3Ids}=[$query->{id}];
          }
-         my $objItr=$obj->ListClusters(%param);
+         my $objItr=$obj->ListBuckets(%param);
+         p $objItr;
          if ($objItr){
-            my $Ecss=$objItr->ClusterArns();
-            if ($Ecss){
-               #p $Ecss;
-               foreach my $elb (@$Ecss){
+            my $S3s=$objItr->Buckets();
+            if ($S3s){
+               p $S3s;
+               foreach my $elb (@$S3s){
+                  my %tag;
+                  foreach my $tag (@{$elb->Tags()}){
+                     $tag{$tag->Key()}=$tag->Value();
+                  }
                   my $rec={
-                      arn=>$elb,
+                      id=>$elb->{S3Id},
                       accountid=>$AWSAccount,
-                      region=>$AWSRegion
+                      region=>$AWSRegion,
+                      name=>$tag{Name},
+                      tags=>\%tag,
+                      idpath=>$elb->{S3Id}.'@'.
+                              $AWSAccount.'@'.
+                              $AWSRegion,
                   };
                   push(@result,$rec);
                }
@@ -146,7 +174,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_accountid"))){
-     Query->Param("search_accountid"=>'189784692849');
+     Query->Param("search_accountid"=>'154101356188');
    }
 }
 

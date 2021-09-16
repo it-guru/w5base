@@ -1,4 +1,4 @@
-package aws::ECS_Cluster;
+package aws::NatGateway;
 #  W5Base Framework
 #  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
 #
@@ -44,16 +44,46 @@ sub new
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Id(
-                name          =>'arn',
+                name          =>'idpath',
                 htmlwidth     =>'150',
                 searchable    =>0,
+                FieldHelpType =>'GenericConstant',
                 group         =>'source',
-                label         =>'ECS-Cluster-arn'),
+                label         =>'AWS-IdPath'),
+
+      new kernel::Field::Text(
+                name          =>'id',
+                htmlwidth     =>'150',
+                label         =>'NatGatewayId'),
+
+      new kernel::Field::Text(
+                name          =>'name',
+                label         =>'Name'),
 
       new kernel::Field::Text(
                 name          =>'accountid',
                 FieldHelpType =>'GenericConstant',
                 label         =>'AWS-AccountID'),
+
+      new kernel::Field::Text(
+                name          =>'privateip',
+                searchable    =>0,
+                label         =>'private IP'),
+
+      new kernel::Field::Text(
+                name          =>'publicip',
+                searchable    =>0,
+                label         =>'public IP'),
+
+      new kernel::Field::Text(
+                name          =>'vpcid',
+                weblinkto     =>'aws::VPC',
+                weblinkon     =>['vpcidpath'=>'idpath'],
+                label         =>'VpcId'),
+
+      new kernel::Field::Link(
+                name          =>'vpcidpath',
+                label         =>'VpcIdPath'),
 
       new kernel::Field::Text(
                 name          =>'region',
@@ -63,9 +93,17 @@ sub new
                 },
                 FieldHelpType =>'GenericConstant',
                 label         =>'AWS-Region'),
+
+      new kernel::Field::Container(
+                name          =>'tags',
+                searchable    =>0,
+                group         =>'tags',
+                uivisible     =>1,
+                label         =>'Tags'),
+
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(arn accountid region));
+   $self->setDefaultView(qw(id name accountid cdate));
    return($self);
 }
 
@@ -81,7 +119,7 @@ sub DataCollector
    return(undef) if (!$self->genericSimpleFilterCheck4AWS($filterset));
    my $filter=$filterset->{FILTER}->[0];
 
-   my $query=$self->decodeFilter2Query4AWS("ECS",$filter);
+   my $query=$self->decodeFilter2Query4AWS("NatGateway",$filter);
    if (!defined($query)){
       return(undef) if ($self->LastMsg());
       return([]);
@@ -92,7 +130,7 @@ sub DataCollector
    my @errStack;
    try {
       my ($stscred,$ua)=$self->GetCred4AWS($AWSAccount,$AWSRegion);
-      my $obj=Paws->service('ECS',
+      my $obj=Paws->service('EC2',
             credentials=>$stscred,
             region =>$AWSRegion
       );
@@ -104,22 +142,54 @@ sub DataCollector
             $param{NextToken}=$NextToken;
          }
          if (exists($query->{id}) && $query->{id} ne ""){
-            $param{arn}=[$query->{id}];
+            $param{'Filter'}=[
+               {
+                 Name=>'nat-gateway-id',
+                 Values=>[$query->{id}]
+               }
+            ];
          }
-         my $objItr=$obj->ListClusters(%param);
+         else{
+            $param{MaxResults}=20;
+         }
+         my $objItr=$obj->DescribeNatGateways(%param);
          if ($objItr){
-            my $Ecss=$objItr->ClusterArns();
-            if ($Ecss){
-               #p $Ecss;
-               foreach my $elb (@$Ecss){
+            my $Nats=$objItr->NatGateways();
+            if ($Nats){
+               foreach my $nat (@$Nats){
+                  my %tag;
+                  foreach my $tag (@{$nat->Tags()}){
+                     $tag{$tag->Key()}=$tag->Value();
+                  }
+                  my @privateIP;
+                  my @publicIP;
+                  my $ips=$nat->NatGatewayAddresses();
+                  if (defined($ips)){
+                     foreach my $ip (@$ips){
+                        push(@privateIP,$ip->PrivateIp());
+                        push(@publicIP,$ip->PublicIp());
+                     }
+                  }
                   my $rec={
-                      arn=>$elb,
+                      id=>$nat->{NatGatewayId},
+                      vpcid=>$nat->{VpcId},
+                      vpcidpath=>$nat->{VpcId}.'@'.
+                              $AWSAccount.'@'.
+                              $AWSRegion,
                       accountid=>$AWSAccount,
-                      region=>$AWSRegion
+                      region=>$AWSRegion,
+                      name=>$tag{Name},
+                      privateip=>\@privateIP,
+                      publicip=>\@publicIP,
+                      tags=>\%tag,
+                      idpath=>$nat->{NatGatewayId}.'@'.
+                              $AWSAccount.'@'.
+                              $AWSRegion,
                   };
                   push(@result,$rec);
                }
             }
+            $NextToken=$objItr->NextToken();
          }
          $blk++;
       }while($NextToken ne "");
@@ -146,7 +216,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_accountid"))){
-     Query->Param("search_accountid"=>'189784692849');
+     Query->Param("search_accountid"=>'110865811477');
    }
 }
 
