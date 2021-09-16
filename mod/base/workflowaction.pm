@@ -444,7 +444,9 @@ sub StoreRecord
          }
       }
       else{
-        Stacktrace();
+        msg(ERROR,"workflowaction StoreRecord class $class does not exist ".
+                  "anymore - posible deleted workflow class");
+        Stacktrace(1);
       }
    }
    #######################################################################
