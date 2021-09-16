@@ -122,15 +122,28 @@ sub qcheckRecord
    # Level 1
    #
    if ($cloudareaok){      # pruefen ob wir bereits nach AWS geschrieben
+      # validate AWS AccountID in CloudAreas
+      $cloudareaok=0;
+      if ($awsacccountid ne ""){
+         $cloudarea->ResetFilter();
+         $cloudarea->SetFilter({srcid=>\$awsacccountid,cloud=>\'AWS'});
+         my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+         if (defined($w5cloudarearec) && $w5cloudarearec->{cistatusid}<6){
+            $cloudareaok=1;
+         }
+      }
+
       # try to find parrec by srcsys and srcid
-      $par->ResetFilter();
-      my $flt={
-         id=>$awsid,
-         accountid=>$awsacccountid,
-         region=>$awsregion
-      };
-      $par->SetFilter($flt);
-      ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      if ($cloudareaok){
+         $par->ResetFilter();
+         my $flt={
+            id=>$awsid,
+            accountid=>$awsacccountid,
+            region=>$awsregion
+         };
+         $par->SetFilter($flt);
+         ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
+      }
    }
 
    #
