@@ -408,7 +408,9 @@ sub new
 
 
    }
+
    $self->{CI_Handling}={uniquename=>"name",
+                         activator=>["admin","w5base.base.location"],
                          uniquesize=>255};
    $self->setDefaultView(qw(location address1 name cistatus));
    $self->setWorktable("location");
