@@ -164,7 +164,6 @@ sub Main
          $d.="<option value=\"$setnewuser\">$setnewuser</option>";
          my $c=0;
          foreach my $rec (@l){
-print STDERR Dumper($rec);
             $c++;
             if ($c>40){
                $d.="<option value=\"\">...</option>";
