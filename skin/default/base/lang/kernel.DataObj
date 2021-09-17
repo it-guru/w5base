@@ -47,3 +47,4 @@ EOF
 'the datasource'=>{de=>'die Datenquelle'},
 'For Details of underlying ruleset, check QualityRule'=>{de=>'Nähere Informationen zum zugrundeligenden Regelwerk, finden Sie in der QualityRule'},
 'invalid individual Attribut'=>{de=>'ungültiges Individual Attribut'},
+'you are not autorized to update the requested record'=>{de=>'Sie sind nicht berechtigt, den angeforderten Datensatz zu aktualisieren'},
