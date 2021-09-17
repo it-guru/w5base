@@ -23,7 +23,6 @@ use kernel::App::Web;
 use kernel::App::Web::HierarchicalList;
 use kernel::DataObj::DB;
 use kernel::Field;
-use Data::Dumper;
 use Fcntl qw(SEEK_SET);
 use File::Temp(qw(tmpfile));
 @ISA=qw(kernel::App::Web::HierarchicalList kernel::DataObj::DB);
@@ -449,6 +448,51 @@ sub checkacl
    $context->{privacl}={} if (!defined($context->{privacl}));
    $context=$context->{aclmode};
    my $privcontext=$context->{privacl};
+
+   if ($rec->{parentobj} ne "base::filemgmt" && $rec->{parentrefid} ne "0" &&
+       $rec->{parentrefid} ne ""){
+      $context->{$rec->{fid}}={  
+         'read'=>0,
+         'write'=>0,
+         'admin'=>0
+      };
+      my $pobj=$self->getPersistentModuleObject($rec->{parentobj});
+      if (defined($pobj)){
+         my $idfld=$pobj->IdField();
+         if (defined($idfld)){
+            $pobj->SetFilter({$idfld->Name()=>\$rec->{parentrefid}});
+            my @l=$pobj->getHashList(qw(ALL));
+            my $prec;
+            if ($#l>0){
+               $self->LastMsg(ERROR,"systemerror - parent rec not unique");
+            }
+            if ($#l==0){
+               $prec=$l[0];
+            }
+            if (defined($prec)){
+               my @wgrps=$pobj->isWriteValid($prec);
+               if (in_array(\@wgrps,[qw(ALL attachments)])){
+                  $context->{$rec->{fid}}->{write}=1;
+                  $context->{$rec->{fid}}->{read}=1;
+               }
+               else{
+                  my @rgrps=$pobj->isViewValid($prec);
+                  if (in_array(\@rgrps,[qw(ALL attachments)])){
+                     $context->{$rec->{fid}}->{read}=1;
+                  }
+               }
+            }
+            else{
+               $self->LastMsg(ERROR,"systemerror - parent rec detected");
+            }
+         }
+         else{
+            $self->LastMsg(ERROR,"systemerror - IdField can not be detected");
+         }
+      }
+   }
+
+
    if (!defined($context->{$rec->{fid}}->{$mode})){
       # acl des eigenen Records laden und im context abspeichern
       # Achtung: Die ACL's der parents müssen recursiv nach oben
