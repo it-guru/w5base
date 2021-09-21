@@ -90,11 +90,51 @@ sub new
                 vjoinon       =>['networkid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Contact(
+                name          =>'ipnetresp',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                AllowEmpty    =>1,
+                label         =>'IP-Net responsible',
+                vjoinon       =>'ipnetrespid'),
+
+      new kernel::Field::Interface(
+                name          =>'ipnetrespid',
+                dataobjattr   =>'ipnet.ipnetresp'),
+
+
+      new kernel::Field::Contact(
+                name          =>'ipnetresp2',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                AllowEmpty    =>1,
+                label         =>'IP-Net responsible deputy',
+                vjoinon       =>'ipnetresp2id'),
+
+      new kernel::Field::Interface(
+                name          =>'ipnetresp2id',
+                dataobjattr   =>'ipnet.ipnetresp2'),
+
 
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
                 dataobjattr   =>'ipnet.description'),
+
+      new kernel::Field::SubList(
+                name          =>'pipnets',
+                label         =>'parent IP-Networks',
+                group         =>'pipnets',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'itil::lnkipnetipnet',
+                vjoinbase     =>[{pipnetcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'ipnetid'],
+                vjoindisp     =>['pipnet','pipnetname']),
+
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                group         =>'contacts'),
 
       new kernel::Field::Number(
                 name          =>'activeipaddresses',
@@ -108,6 +148,7 @@ sub new
                    return(1);
                 },
                 readonly      =>1,
+                group         =>'status',
                 uploadable    =>0,
                 dataobjattr   =>"(select count(*) from ipaddress ".
                                 "where ipnet.network=ipaddress.network ".
@@ -128,6 +169,7 @@ sub new
                 },
                 readonly      =>1,
                 uploadable    =>0,
+                group         =>'status',
                 dataobjattr   =>"(select count(*) from ipnet subipnet ".
                                 "where ipnet.network=subipnet.network ".
                                 "and subipnet.binnamekey like ".
@@ -140,11 +182,19 @@ sub new
                 label         =>'NetworkID',
                 dataobjattr   =>'ipnet.network'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'binnamekey',
                 label         =>'Binary IP-Net',
                 selectfix     =>1,
                 dataobjattr   =>'ipnet.binnamekey'),
+
+      new kernel::Field::Number(
+                name          =>'hostbitcount',
+                label         =>'Host bit count',
+                group         =>'status',
+                dataobjattr   =>"length(".
+                                 "replace(".
+                                  "replace(ipnet.binnamekey,'1',''),'0',''))"),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -220,8 +270,7 @@ sub new
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return($self->SUPER::getDetailBlockPriority(@_),
-          qw(default control misc source));
+   return(qw(header default pipnets contacts status control misc source));
 }
 
 
@@ -307,9 +356,9 @@ sub Validate
 
    if (my ($bits)=$netmask=~m/^\/([0-9]+)$/){
       if (($type eq "IPv4" &&
-           ($bits<=1 || $bits>=31)) ||
+           ($bits<=1 || $bits>32)) ||
           ($type eq "IPv6" &&
-           ($bits<=1 || $bits>=127))){
+           ($bits<=1 || $bits>128))){
          $self->LastMsg(ERROR,"netmask bits out of range");
          return(0);
       } 
@@ -328,10 +377,16 @@ sub Validate
       }
       $newrec->{netmask}=$netmask;
    }
-   my $netmasktype=$self->IPValidate($netmask,\$errmsg);
-
-
-
+   my $netmasktype;
+   if ($netmask eq "255.255.255.255"){ # IPv4 Host-Only Netmask
+      $netmasktype="IPv4";
+   }
+   elsif ($netmask eq "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"){ # IPv6 Host
+      $netmasktype="IPv6";
+   }
+   else{
+      $netmasktype=$self->IPValidate($netmask,\$errmsg);
+   }
 
    if ($netmasktype eq "IPv4"){
       my ($o1,$o2,$o3,$o4)=$netmask=~m/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
@@ -403,7 +458,7 @@ sub isWriteValid
    else{
       my $networkid=$rec->{networkid};
       if ($self->isWriteOnNetworkValid($networkid)){
-         return("default");
+         return("default","contacts");
       }
    }
    return();

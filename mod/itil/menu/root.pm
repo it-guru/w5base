@@ -452,6 +452,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itil.kern.network.ipnet.lnkipnetcontact",
+                      "itil::lnkipnetcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itil.kern.osrelease",
                       "itil::osrelease",
                       defaultacl=>['valid_user']);
@@ -637,6 +641,10 @@ sub Init
    
    $self->RegisterObj("itil.network.ipnet",
                       "itil::ipnet",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itil.network.ipnet.lnkipnetcontact",
+                      "itil::lnkipnetcontact",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itil.network.intercon",

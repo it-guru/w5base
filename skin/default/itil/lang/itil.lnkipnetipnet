@@ -1,0 +1,7 @@
+'itil::lnkipnetipnet'=>{
+  de=>'übergeornetetes IP-Netzwerk',
+  en=>'parent IP-Network'
+},
+'parent IP-Network'=>{de=>'überg. IP-Netzwerk'},
+'parent IP-Network Name'=>{de=>'übergeordnetes IP-Netzwerk Name'},
+

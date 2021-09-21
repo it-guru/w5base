@@ -118,6 +118,15 @@ sub getPosibleRoles
                                                      $self->Self),
             );
    }
+   if ($parentobj=~m/^.+::ipnet$/ ||
+       (defined($self->getParent) &&
+        defined($self->getParent->getParent) &&
+       $self->getParent->getParent->Self()=~m/^.+::ipnet$/)){
+      return(
+             "write"           =>$self->getParent->T("write",
+                                                     $self->Self),
+            );
+   }
    if ($parentobj=~m/^.+::supcontract$/ ||
        (defined($self->getParent) &&
         defined($self->getParent->getParent) &&
