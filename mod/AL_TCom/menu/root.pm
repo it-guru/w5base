@@ -616,7 +616,11 @@ sub Init
                       "itil::ipnet",
                       func=>'New',
                       defaultacl=>['valid_user']);
-   
+
+   $self->RegisterObj("AL_TCom.network.ipnet.lnkipnetcontact",
+                      "itil::lnkipnetcontact",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.network.intercon",
                       "AL_TCom::netintercon",
                       defaultacl=>['valid_user']);
