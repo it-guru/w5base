@@ -6,6 +6,7 @@
 'Netmask'=>{de=>'Netzwerkmaske'},
 'IP-Net responsible'=>{de=>'IP-Netz-Verantwortlicher'},
 'IP-Net responsible deputy'=>{de=>'IP-Netz-Verantwortlicher-Vertreter'},
+'technical contact'=>{de=>'technischer Kontakt'},
 'Network'=>{de=>'Netzwerkbereich'},
 'Description'=>{de=>'Bemerkungen'},
 'active IP-Addesses'=>{de=>'aktive IP-Adressen'},
