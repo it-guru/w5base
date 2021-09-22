@@ -1345,7 +1345,29 @@ sub WebChangeInherit
                                       'kernel.filemgmt.browser.css'],
                               form=>1,multipart=>1,
                               js=>['toolbox.js','subModal.js'],
+                              onload=>'initOnLoad();',
                               title=>$self->T("WebFS: Change rights inherit"));
+   $header.=<<EOF;
+<script language="JavaScript">
+function initOnLoad()
+{
+   var o=document.getElementsByName("do");
+   if (o){
+      o[0].focus();
+   }
+   addFunctionKeyHandler(document.forms[0],
+      function(e){
+         if (e.keyCode == 27) {
+            parent.hidePopWin(false);
+            return(false);
+         }
+         return(true);
+      }
+   );
+}
+</script>
+EOF
+
    $self->ResetFilter();
    $self->SetFilter({fid=>\$parentid});
    my ($rec)=$self->getOnlyFirst(qw(ALL));

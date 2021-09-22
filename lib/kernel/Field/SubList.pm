@@ -61,8 +61,34 @@ sub EditProcessor
    print $app->HtmlHeader(style=>['default.css','work.css',
                                    'kernel.App.Web.css','Output.HtmlV01.css',
                                    'Output.HtmlSubList.css'],
+                           js=>['toolbox.js'],
+                           onload=>'initOnLoad();',
                            body=>1,form=>1,
                            title=>'W5BaseV1-System');
+   print <<EOF;
+<script language="JavaScript">
+function initOnLoad()
+{
+   if (parent.hidePopWin){    // Die Funktion wurde über PopUp aufgerufen
+      addFunctionKeyHandler(document.forms[0],
+         function(e){
+            if (e.keyCode == 27) {
+               parent.hidePopWin(false);
+               return(false);
+            }
+            return(true);
+         }
+      );
+      if (document.querySelectorAll){
+         var e=document.querySelectorAll('input[type=text]');
+         if (e){
+            e[0].focus();
+         }
+      }
+   }
+}
+</script>
+EOF
 
    my $dfield=$app->getField($field);
 
