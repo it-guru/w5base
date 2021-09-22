@@ -260,8 +260,8 @@ sub Main
                                    'usermask.css'],
                            js=>['toolbox.js'],
                            title=>$self->T($self->Self()),
-                           onload=>'initOnLoad();');
-   print $self->HtmlBottom(body=>1,form=>1);
+                           onload=>'initOnLoad();',
+                           form=>1);
    print <<EOF;
 <script language="JavaScript">
 function initOnLoad()
