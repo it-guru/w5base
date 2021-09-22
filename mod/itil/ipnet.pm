@@ -102,7 +102,6 @@ sub new
                 name          =>'ipnetrespid',
                 dataobjattr   =>'ipnet.ipnetresp'),
 
-
       new kernel::Field::Contact(
                 name          =>'ipnetresp2',
                 vjoineditbase =>{'cistatusid'=>[3,4,5],
@@ -115,6 +114,17 @@ sub new
                 name          =>'ipnetresp2id',
                 dataobjattr   =>'ipnet.ipnetresp2'),
 
+      new kernel::Field::Contact(
+                name          =>'techcontact',
+                vjoineditbase =>{'cistatusid'=>[3,4,5],
+                                 'usertyp'=>[qw(extern user)]},
+                AllowEmpty    =>1,
+                label         =>'technical contact',
+                vjoinon       =>'techcontactid'),
+
+      new kernel::Field::Interface(
+                name          =>'techcontactid',
+                dataobjattr   =>'ipnet.techcontact'),
 
       new kernel::Field::Textarea(
                 name          =>'description',
@@ -309,7 +319,15 @@ sub Validate
 
 
    my $networkid=effVal($oldrec,$newrec,"networkid");
-   if (!$self->isWriteOnNetworkValid($networkid)){
+   my $ipnetid;
+   my $ipWriteOk=0;
+   if (defined($oldrec)){
+      $ipnetid=$oldrec->{id};
+      if ($self->isWriteOnIpNetValid($ipnetid)){
+         $ipWriteOk++;
+      }
+   }
+   if (!$ipWriteOk && !$self->isWriteOnNetworkValid($networkid)){
       $self->LastMsg(ERROR,
               "no write access, to modify ip-networks in selected networkarea");
       return(0);
@@ -456,6 +474,10 @@ sub isWriteValid
       return("default");
    }
    else{
+      my $ipnetid=$rec->{id};
+      if ($self->isWriteOnIpNetValid($ipnetid)){
+         return("default","contacts");
+      }
       my $networkid=$rec->{networkid};
       if ($self->isWriteOnNetworkValid($networkid)){
          return("default","contacts");
