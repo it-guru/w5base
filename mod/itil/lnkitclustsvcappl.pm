@@ -59,11 +59,11 @@ sub new
                 vjoinon       =>['itclustsvcid'=>'id'],
                 vjoindisp     =>'fullname'),
                                                    
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'applid',
                 dataobjattr   =>'lnkitclustsvcappl.appl'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'itclustsvcid',
                 dataobjattr   =>'lnkitclustsvcappl.itclustsvc'),
 
