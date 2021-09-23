@@ -1235,7 +1235,8 @@ sub postQualityCheckRecord
          if (in_array($roles,"RBoss")){ # TL Handling
             $grpobj->ResetFilter();
             $grpobj->SetFilter({grpid=>\$lnkrec->{grpid}});
-            foreach my $grprec ($grpobj->getHashList(qw(parentid))){
+            foreach my $grprec ($grpobj->getHashList(qw(parentid 
+                                                     is_orggrp is_projectgrp))){
                push(@grp,$grprec->{parentid});
                $grp{$grprec->{grpid}}={
                   is_orggrp=>$grprec->{is_orggrp},
@@ -1296,17 +1297,14 @@ sub postQualityCheckRecord
          }                                   # boss verwendet (falls kein org
       }                                      # attribut gesetzt)
 
-
       my %upd;
       my $oboss=trim(join(" ",sort(grep(!/^$userid$/,keys(%oboss)))));
-      if (($oboss ne "" || $#orggroups!=-1)  && 
-          $oboss ne $rec->{lastknownbossid}){
+      if (($oboss ne "")  && $oboss ne $rec->{lastknownbossid}){
          $oboss=undef if ($oboss eq "");
          $upd{lastknownbossid}=$oboss;
       }
       my $pboss=trim(join(" ",sort(grep(!/^$userid$/,keys(%pboss)))));
-      if (($pboss ne "" || $#orggroups!=-1)  && 
-          $pboss ne $rec->{lastknownpbossid}){
+      if (($pboss ne "")  && $pboss ne $rec->{lastknownpbossid}){
          $pboss=undef if ($pboss eq "");
          $upd{lastknownpbossid}=$pboss;
       }
