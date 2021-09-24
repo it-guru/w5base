@@ -2647,6 +2647,11 @@ sub UploadWelcome
 sub Welcome
 {
    my $self=shift;
+
+   if (!$self->Ping()){
+      print($self->notAvailable($self->T($self->Self,$self->Self)));
+      return(undef);
+   }
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css'],
                            body=>1,form=>1);
