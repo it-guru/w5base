@@ -435,6 +435,25 @@ sub Validate
                            "can not exist concurrently");
       return(0);
    }
+
+   if ((effVal($oldrec,$newrec,"delmgr2id") ne "" &&
+        effVal($oldrec,$newrec,"delmgrid") eq "") ||
+       (effVal($oldrec,$newrec,"itsem2id") ne "" &&
+        effVal($oldrec,$newrec,"itsemid") eq "")){
+      $self->LastMsg(ERROR,"specifing debuty only is not allowed");
+      return(0);
+   }
+
+   foreach my $v (qw(delmgrid delmgr2id delmgrteamid)){
+      $delmgr++ if (effVal($oldrec,$newrec,$v) ne "");
+   }
+   foreach my $v (qw(itsemid itsem2id itsemteamid)){
+      $itsem++ if (effVal($oldrec,$newrec,$v) ne "");
+   }
+
+
+
+
    my $name=effVal($oldrec,$newrec,"name");
    if (length(trim($name))<2){
       $self->LastMsg(ERROR,"invalid cost element specified");

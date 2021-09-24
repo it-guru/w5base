@@ -23,4 +23,5 @@
 'IT Servicemanagement an delivery management can not exist concurrently'=>{de=>'IT Servicemanagement und Delivery Management können nicht gleichzeit existieren'},
 'Deputy IT Servicemanager'=>{de=>'IT Servicemanager Vertreter'},
 'invalid cost element specified'=>{de=>'ungültig Kontierungsobjekt Bezeichnung'},
+'specifing debuty only is not allowed'=>{de=>'die alleinige Angabe des Vertreters ist nicht erlaubt'},
 

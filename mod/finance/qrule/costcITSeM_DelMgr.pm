@@ -67,16 +67,11 @@ sub qcheckRecord
    my $par;
    my $parrec;
 
-   if ($rec->{cistatusid}<6){
-      if ($rec->{costcentertype} ne "pspelement"){
-         return(undef);
-      }
-      if ($rec->{itsem} eq "" && 
-          $rec->{itsem2} eq "" && 
-          $rec->{itsemteam} eq "" &&
-          $rec->{delmgrid} eq "" && 
-          $rec->{delmgr2id} eq "" && 
-          $rec->{delmgrteam} eq ""){
+   if ($rec->{cistatusid}<6 && $rec->{cistatusid}>1){
+      if (($rec->{itsem} eq "" || 
+           $rec->{itsemteam} eq "") &&
+          ($rec->{delmgr} eq "" || 
+           $rec->{delmgrteam} eq "")){
          my $msg="missing Service Delivery Manager or IT Servicemanager";
          push(@qmsg,$msg);
          push(@dataissue,$msg);
