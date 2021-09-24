@@ -113,7 +113,10 @@ sub findtemplvar
                             $_;
                            } $self->LastMsg()));
       }
-      $d.="&nbsp;</div>";
+      else{
+         $d.="&nbsp;";
+      }
+      $d.="</div>";
       return($d);
    }
    while($chkobj->can("getParent")){

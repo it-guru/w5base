@@ -1515,6 +1515,24 @@ sub noAccess
    return($d);
 }
 
+sub notAvailable
+{
+   my $self=shift;
+   my $extinfo=shift;
+   my %param=@_;
+   my $d;
+
+   $d.=$self->HttpHeader("text/html");
+   $d.=$self->HtmlHeader(style=>['default.css','work.css'],
+                         body=>1,form=>1,
+                         title=>"not available ".$self->Self);
+   $d.=$self->getParsedTemplate("tmpl/kernel.notavailable",
+                                  { skinbase=>'base',
+                                    static=>{extinfo=>$extinfo}});
+   $d.=$self->HtmlBottom(body=>1,form=>1);
+   return($d);
+}
+
 sub queryError
 {
    my $self=shift;
@@ -1870,7 +1888,10 @@ sub findtemplvar
                             $_;
                            } $self->LastMsg()));
       }
-      $d.="&nbsp;</div>" if ($param[0] ne "RAW");
+      else{
+         $d.="&nbsp;" if ($param[0] ne "RAW");
+      }
+      $d.="</div>" if ($param[0] ne "RAW");
       return($d);
    }
    elsif ($var eq "T"){
