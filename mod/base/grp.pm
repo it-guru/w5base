@@ -98,7 +98,7 @@ sub new
                 vjoinon       =>['grpid'=>'grpid'],
                 vjoindisp     =>['user','userweblink','roles'],
                 vjoininhash   =>['userid','email','user',
-                                 'posix','usertyp','roles']),
+                                 'posix','usertyp','roles','srcsys']),
 
       new kernel::Field::Text(
                 name          =>'orgusers',
@@ -357,7 +357,7 @@ sub new
                 vjoinbase     =>{'cistatusid'=>"<6"},
                 vjoinon       =>['grpid'=>'parentid'],
                 vjoindisp     =>['name','cistatus'],
-                vjoininhash   =>['grpid','name','fullname']),
+                vjoininhash   =>['grpid','name','fullname','srcsys']),
 
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
