@@ -94,13 +94,18 @@ sub qcheckRecord
    my $rec=shift;
 
    return(0,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
-   if (!$rec->{haveitsem}){
+   if (!$rec->{conumberexists} ||       # CO-Nummer ist als Objekt vorhanden
+       ($rec->{conumberexists} &&       # und dort ist ein DeliveryManager
+        $rec->{conumber_delmgrid} ne "")){  # eingetragen
       if (!defined($rec->{responseteam}) || $rec->{responseteam} eq ""){
          return(3,{
             qmsg=>['no responseteam/IT-Servicemanagement team defined'],
             dataissue=>['no responseteam/IT-Servicemanagement team defined']
          });
       }
+   }
+   else{
+      return(undef);
    }
    return(0,undef);
 

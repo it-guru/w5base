@@ -112,6 +112,11 @@ sub new
                 weblinkon     =>['conumber'=>'name'],
                 dataobjattr   =>'appl.conumber'),
 
+      new itil::appl::Link(
+                name          =>'conumberexists',
+                readonly      =>1,
+                dataobjattr   =>"if (costcenter.id is null,0,1)"),
+
       new kernel::Field::Text(
                 name          =>'conodenumber',
                 readonly      =>1,
@@ -234,6 +239,11 @@ sub new
                 name          =>'itsemid',
                 group         =>'itsem',
                 dataobjattr   =>'costcenter.itsem'),
+
+      new kernel::Field::Interface(
+                name          =>'conumber_delmgrid',
+                group         =>'itsem',
+                dataobjattr   =>'costcenter.delmgr'),
 
       new kernel::Field::TextDrop(
                 name          =>'itsem2',
@@ -2242,7 +2252,9 @@ sub getSqlFrom
             "left outer join appladv on (appl.id=appladv.appl and ".
             "appladv.isactive=1) ".
             "left outer join itcrmappl on appl.id=itcrmappl.id ".
-            "left outer join costcenter on appl.conumber=costcenter.name ".
+            "left outer join costcenter on (appl.conumber=costcenter.name and ".
+                                           "costcenter.cistatus>1 and ".
+                                           "costcenter.cistatus<6) ".
             "left outer join lnkapplgrpappl on lnkapplgrpappl.appl=".
             "(select s.appl from lnkapplgrpappl s".
             " where appl.id=s.appl ".
