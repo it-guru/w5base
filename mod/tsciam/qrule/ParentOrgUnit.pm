@@ -79,27 +79,10 @@ sub qcheckRecord
             push(@qmsg,"orgunit id not found in CIAM");
             return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
          }
-         else{
-            my $nousers=1;
-            if (ref($ciamrec->{users}) eq "ARRAY" && 
-                $#{$ciamrec->{users}}!=-1){
-               $nousers=0;
-            }
-            my $nosgroups=1;
-            if (ref($ciamrec->{subunits}) eq "ARRAY" && 
-                $#{$ciamrec->{subunits}}!=-1){
-               $nosgroups=0;
-            }
-            if ($nosgroups && $nousers){  # empty CIAM Group: HR Rotz
-               push(@qmsg,"welded orgunit group in CIAM");
-               return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
-            }
-         }
-
-
-
          if (defined($ciamrec)){
             my $grp=getModuleObject($self->getParent->Config(),"base::grp");
+
+
             $grp->SetFilter({grpid=>\$rec->{parentid}});
             my ($pgrp,$msg)=$grp->getOnlyFirst(qw(srcsys srcid));
             if ($pgrp->{srcsys} ne "CIAM"){
@@ -110,10 +93,6 @@ sub qcheckRecord
             }
             else{
                my $parentid=$ciamrec->{parentid};
-       #        if ($rec->{fullname} eq "DTAG.TSI.INT"){
-       #           # bind LBUs direct to T-Systems International
-       #           $parentid="15131753";
-       #        }
                if ($parentid ne ""){
                   my $grp=getModuleObject($self->getParent->Config(),
                                           "base::grp");
@@ -137,6 +116,31 @@ sub qcheckRecord
                   }
                }
             }
+
+            ##################################################################
+            # orphaned check
+            my $nousers=1;
+            foreach my $urec (@{$rec->{users}}){
+               if ($urec->{srcsys} eq "CIAM"){
+                  my $roles=$urec->{roles};
+                  $roles=[$roles] if (ref($roles) ne "ARRAY");
+                  my @rchk=grep(!/^RBoss/,orgRoles());
+                  if (in_array($roles,\@rchk)){
+                     $nousers=0;
+                  }
+               }
+            }
+            my $nosgroups=1;
+            foreach my $grec (@{$rec->{subunits}}){
+               if ($grec->{srcsys} eq "CIAM"){
+                  $nosgroups=0;
+               }
+            }
+            if ($nosgroups && $nousers){  # empty CIAM Group: HR Rotz
+               push(@qmsg,"orphaned orgunit group from CIAM");
+               return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+            }
+            ##################################################################
          }
       }
    }
