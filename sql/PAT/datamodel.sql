@@ -41,7 +41,7 @@ create table PAT_subprocess(
   ibi_th_coretime_sat       int(20) default NULL,
   ibi_th_coretime_sun       int(20) default NULL,
    additional     longtext     default NULL,
-  comments    longtext     default NULL,description longtext,
+  comments    longtext     default NULL,description longtext,longdesc longtext,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   createuser bigint(20) default NULL,

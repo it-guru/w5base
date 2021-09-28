@@ -12,6 +12,7 @@
 'Shortname'=>{de=>'Kürzel'},
 'Sub-Process'=>{de=>'Teilprozess'},
 'Description'=>{de=>'Beschreibung'},
+'Longdescription'=>{de=>'Langbeschreibung'},
 'Business-Segment'=>{de=>'Geschäftssegment'},
 'Business-SubProcess'=>{de=>'Business-Teilprozess'},
 'relevant ICT-AliasNames'=>{de=>'alle relevanten ICT-AliasNamen'},

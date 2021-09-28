@@ -84,6 +84,11 @@ sub new
                 dataobjattr   =>'PAT_subprocess.description'),
 
       new kernel::Field::Textarea(
+                name          =>'longdesc',
+                label         =>'Longdescription',
+                dataobjattr   =>'PAT_subprocess.longdesc'),
+
+      new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'PAT_subprocess.comments'),

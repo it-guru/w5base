@@ -118,6 +118,10 @@ sub new
                 label         =>'Description'),
 
       new kernel::Field::Textarea(
+                name          =>'longdesc',
+                label         =>'Londescription'),
+
+      new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments'),
 
@@ -168,6 +172,7 @@ sub reformatExternal
       $rec->{srcBusinessSegId}=$raw->{Gesch_x00e4_ftssegmentId};
       $rec->{title}=$raw->{Title};
       $rec->{description}=$raw->{Beschreibung};
+      $rec->{longdesc}=$raw->{Freifeld};
       $rec->{comments}=$raw->{Anmerkungen};
       $rec->{subarea}=$raw->{Teilbereich};
       $rec->{subprocess}=$raw->{Teilprozess};

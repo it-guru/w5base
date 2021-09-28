@@ -139,6 +139,7 @@ sub LoadsrcSubProcess
             businesssubprocess=>$rec->{subprocess},
             mdate=>$rec->{mdate},
             comments=>$rec->{comments},
+            longdesc=>$rec->{longdesc},
             description=>$rec->{description},
             cdate=>$rec->{cdate},
             onlinetime=>$onlinetime,
