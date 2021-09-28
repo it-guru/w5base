@@ -90,7 +90,8 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
                        w5obj.SetFilter({
                        });
                        w5obj.findRecord(
-                             "name,urlofcurrentrec,title,description,comments,"+
+                             "name,urlofcurrentrec,title,"+
+                             "description,longdesc,comments,"+
                              "businessseg,businesssegid,"+
                              "business,businesssubprocess,"+
                              "onlinetime,"+
@@ -344,6 +345,13 @@ define(["datadumper","TimeSpans"],function (datadumper,TimeSpans){
       d+="</td></tr>";
       d+="<tr class=block-end><td class=label>Business:</td>";
       d+="<td>"+item.business+"</td></tr>";
+      var longdesc=item.longdesc;
+      longdesc=longdesc.replace(/</g,"&lt;");
+      longdesc=longdesc.replace(/>/g,"&gt;");
+      longdesc=longdesc.replace(/\n/g,"<br>");
+      d+="<tr class=block-end><td class=label>"+
+         "%T(Longdescription,PAT::subprocess)%:</td>";
+      d+="<td>"+longdesc+"</td></tr>";
       if (item.ictnames.length){
          d+="<tr>";
          d+="<td valign=top class=label>ICTO-Aliases:</td>";
