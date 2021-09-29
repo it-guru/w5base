@@ -1403,7 +1403,8 @@ sub FormatedSearch
    my $FieldHelpUrl=$self->getFieldHelpUrl();
    if (defined($FieldHelpUrl)){
       $d.="<td width=10 valign=top align=right>";
-      $d.="<img style=\"cursor:pointer;cursor:hand;float:right;\" ".
+      $d.="<img class=hideOnMobile ".
+          "style=\"cursor:pointer;cursor:hand;float:right;\" ".
           "onClick=\"FieldHelp_On_$name()\" align=right ".
           "alt=\"Field-Help\" ".
           "src=\"../../../public/base/load/questionmark.gif\" ".

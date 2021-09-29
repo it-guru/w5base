@@ -107,8 +107,14 @@ EOF
          $functions{$l}=$f;
          push(@labels,$l);
       }
-      my $fl=join(" &bull; ",map({
-         my $f="<a class=${name}FunctionLink href=JavaScript:$functions{$_}()>".
+      my $c=0;
+      my $fl=join(" <span class=hideOnMobile>&bull;</span> ",map({
+         my $fclass="${name}FunctionLink";
+         if ($c!=$#labels){
+            $fclass.=" hideOnMobile";
+         }
+         $c++;
+         my $f="<a class=\"$fclass\" href=JavaScript:$functions{$_}()>".
                $_."</a>";
          $f;
       } @labels));
