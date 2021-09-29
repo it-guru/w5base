@@ -22,6 +22,13 @@ use kernel;
 use kernel::Event;
 @ISA=qw(kernel::Event);
 
+sub new
+{
+   my $type=shift;
+   my $self=bless({@_},$type);
+   $self->{OTC_ScanNewSystems_timeout}=600;
+   return($self);
+}
 
 
 
@@ -30,10 +37,19 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("ScanNewSystems","ScanNewSystems",timeout=>600);
-   $self->RegisterEvent("OTC_ScanNewSystems","ScanNewSystems",timeout=>600);
-   $self->RegisterEvent("OTC_validateSystemCompleteness","validateSystemCompleteness",timeout=>1800);
-   $self->RegisterEvent("validateSystemCompleteness","validateSystemCompleteness",timeout=>1800);
+   $self->RegisterEvent("ScanNewSystems","ScanNewSystems",
+                        timeout=>$self->{OTC_ScanNewSystems_timeout});
+
+   $self->RegisterEvent("OTC_ScanNewSystems","ScanNewSystems",
+                        timeout=>$self->{OTC_ScanNewSystems_timeout});
+
+   $self->RegisterEvent("OTC_validateSystemCompleteness",
+                        "validateSystemCompleteness",
+                        timeout=>1800);
+
+   $self->RegisterEvent("validateSystemCompleteness",
+                        "validateSystemCompleteness",
+                        timeout=>1800);
 }
 
 
@@ -170,6 +186,9 @@ sub ScanNewSystems
       }
    }
 
+   my $tstart=time();
+   my $recmaxtime=60;
+
    { # process new records
       my $skiplevel=0;
       my $recno=0;
@@ -216,11 +235,14 @@ sub ScanNewSystems
             if ($skiplevel==0 ||  # = no records to skip
                 $skiplevel==3){   # = all skips are done
                $cnt++;
+               my $t0=time();
                if ($self->analyseRecord($datastream,$rec,$res)){
                   $imp++;
                }
                $recno++;
                $exitmsg="last:".$rec->{cdate}.";".$rec->{id};
+               my $rectime=time()-$t0;
+               $recmaxtime=$rectime if ($rectime>$recmaxtime);
             }
             else{
                msg(INFO,"skip rec $rec->{sdate} - ".
@@ -232,7 +254,9 @@ sub ScanNewSystems
                msg(ERROR,"db record problem: %s",$msg);
                return({exitcode=>1,msg=>$msg});
             }
-         }until(!defined($rec) || $recno>10);
+         }until(!defined($rec) || $recno>50 ||
+                ($self->{OTC_ScanNewSystems_timeout}-(time()-$tstart)-
+                 (2*$recmaxtime)<0));
       }
    }
 
