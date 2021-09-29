@@ -20,6 +20,15 @@ iframe#fmenutop{
    }
 }
 
+@media screen and (orientation: portrait) {                  
+   .hideOnMobile {
+      display: none;
+   }
+   iframe#fmenutop{
+      height:4px;
+   }
+}
+
 
 iframe.HtmlDetailPage{
    width:100%;
