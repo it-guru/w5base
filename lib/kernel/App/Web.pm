@@ -459,7 +459,7 @@ sub getAppTitleBar
                  "href='$directLink'${autofocus}>".
                  "%s</a>&nbsp;</div></td>".
                  "<td class=TitleBarRightTD>".
-                 "<div>".
+                 "<div class=hideOnMobile>".
                  "<a href=\"\" target=_blank $onclick>%s</a>".
                  "</div>".
                  "</td></tr>",$param{title},$user);

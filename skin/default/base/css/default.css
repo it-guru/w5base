@@ -7,6 +7,19 @@
 a:focus {outline: 1px solid #30579f;}
 a:focus img {outline: 2px solid #30579f;}
 
+iframe#fmenutop{
+   height:100px;
+}
+
+@media screen and (max-width: 510px) {                  
+   .hideOnMobile {
+      display: none;
+   }
+   iframe#fmenutop{
+      height:4px;
+   }
+}
+
 
 iframe.HtmlDetailPage{
    width:100%;

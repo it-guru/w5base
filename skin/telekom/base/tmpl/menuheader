@@ -46,7 +46,7 @@ a:link, a:visited, a:active  {
 </td>
 -->
 <td>
-<div style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.1;font-size:0.7rem"><a href="../../faq/QuickFind/anyQuestions" target=work>%TRANSLATE(anyQuestions,faq::QuickFind)%</a></div>
+<div class=hideOnMobile style="margin-left:20px;font-family:Tele,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:600;color:white;line-height:1.1;font-size:0.7rem"><a href="../../faq/QuickFind/anyQuestions" target=work>%TRANSLATE(anyQuestions,faq::QuickFind)%</a></div>
 </td>
 <td align=right>
 %SKINSWITCHER()%
