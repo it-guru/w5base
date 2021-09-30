@@ -12,25 +12,41 @@ iframe#fmenutop{
 }
 
 @media screen and (max-width: 510px) {                  
-   .hideOnMobile {
-      display: none;
-   }
-   iframe#fmenutop{
-      height:4px;
-   }
+  .hideOnMobile {
+     display: none;
+  }
+  iframe#fmenutop{
+     height:4px;
+  }
+  table.stackedOnMobile td {
+    display: block;
+  }
+  table.stackedOnMobile td:first-child {
+    font-weight: bold
+  }
+  img.toplineimage{
+     max-height:60px;
+  }
 }
 
-// Not working if Desktop-Chrome hast portait window form
-//
-//
-//@media screen and (orientation: portrait) {                  
-//   .hideOnMobile {
-//      display: none;
-//   }
-//   iframe#fmenutop{
-//      height:4px;
-//   }
-//}
+
+@media handheld and (orientation: portrait) {                  
+  .hideOnMobile {
+     display: none;
+  }
+  iframe#fmenutop{
+     height:4px;
+  }
+  table.stackedOnMobile td {
+    display: block;
+  }
+  table.stackedOnMobile td:first-child {
+    font-weight: bold
+  }
+  img.toplineimage{
+     max-height:60px;
+  }
+}
 
 
 iframe.HtmlDetailPage{

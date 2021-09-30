@@ -1,11 +1,12 @@
-<div style="position:absolute;right:0px">
+<div style="position:absolute;right:0px" class=hideOnMobile>
 <a href="../../../auth/faq/QuickFind/globalHelp" target="_blank"><img  style="margin:2px" border=0 src="../../../public/base/load/listweblink.gif"></a>
 </div>
 <table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
-<tr height=1%><td align=left width=1%>
+<tr height=1%><td align=left width=1% valign=top><span style="display:inline-block">
 <a href="../../../auth/base/menu/msel/faq" target=_blank>
-<img style="margin:4px" border=0 src="../load/faqglobalHelp.jpg"></a>
-</td>
+<img class=toplineimage style="margin:4px" 
+     border=0 src="../load/faqglobalHelp.jpg"></a>
+</span></td>
 <td>
 
 <table>
