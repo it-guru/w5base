@@ -122,6 +122,31 @@ sub decodeFilter2Query4AWS
                }
                $query->{region}=$region;
             }
+            elsif (my ($type,$region,$accountid,$objectpath)=
+                $query->{$qvarpref.'idpath'}
+                =~m/^arn:aws:([^:]+):([^:]+):([^:]+):(.+)$/){
+               if (exists($query->{$qvarpref.'id'}) && 
+                   $query->{$qvarpref.'id'} ne ""  &&
+                   $query->{$qvarpref.'id'} ne $query->{$qvarpref.'idpath'}){
+                  # query parameters combination can't get a valid result
+                  return(undef);
+               }
+               $query->{$qvarpref.'id'}=$query->{$qvarpref.'idpath'};
+               if (exists($query->{'accountid'}) && 
+                   $query->{'accountid'} ne ""  &&
+                   $query->{'accountid'} ne $accountid){
+                  # query parameters combination can't get a valid result
+                  return(undef);
+               }
+               $query->{'accountid'}=$accountid;
+               if (exists($query->{region}) && 
+                   $query->{region} ne "" &&
+                   $query->{region} ne $region){
+                  # query parameters combination can't get a valid result
+                  return(undef);
+               }
+               $query->{region}=$region;
+            }
             else{
                printf STDERR ("decodeFilter2Query4AWS: invalid idpath ".
                               "$qvar : %s\n",Dumper($query));
