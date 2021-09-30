@@ -886,14 +886,18 @@ EOF
             }
             $link.=">";
             $link=~s/\%/\\%/g;
-            $set[$setno].="&bull;&nbsp;$link$indexdata[$c]->{label}</a><br>";
+            $set[$setno].="<li>$link$indexdata[$c]->{label}</a></li>";
          }
+      }
+      for(my $icolnum=0;$icolnum<$indexcols;$icolnum++){
+         $set[$icolnum]="<ul class=HtmlDetailIndex>".$set[$icolnum]."</ul>";
       }
       my $indexcoldata=""; # long group names special handling
       for(my $icolnum=0;$icolnum<$indexcols;$icolnum++){
          $indexcoldata.='<td width=40% valign=top>'.
                         '<table style="table-layout:fixed;width:100%" '.
-                        'cellspacing=0 cellpadding=0 border=0><tr><td>'.
+                        'cellspacing=0 cellpadding=0 border=0>'.
+                        '<tr><td style="overflow:hidden">'.
                         $set[$icolnum].
                         '</td></tr></table>'.
                         '</td>';
