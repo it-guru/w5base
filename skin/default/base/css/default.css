@@ -20,14 +20,17 @@ iframe#fmenutop{
    }
 }
 
-@media screen and (orientation: portrait) {                  
-   .hideOnMobile {
-      display: none;
-   }
-   iframe#fmenutop{
-      height:4px;
-   }
-}
+// Not working if Desktop-Chrome hast portait window form
+//
+//
+//@media screen and (orientation: portrait) {                  
+//   .hideOnMobile {
+//      display: none;
+//   }
+//   iframe#fmenutop{
+//      height:4px;
+//   }
+//}
 
 
 iframe.HtmlDetailPage{
