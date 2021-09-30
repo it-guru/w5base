@@ -901,17 +901,20 @@ sub menuframe
                            prefix=>$rootpath,
                            onload=>'scrollToActive();',
                            style=>['default.css','menu.css']);
-   print("<script language=\"JavaScript\">");
-   print("function scrollToActive(){");
-   print("var e=document.getElementById('activeMenuTree');");
-   print("if (e){");
-   print("var rect = e.getBoundingClientRect();");
-   print("if (rect){");
-   print("document.body.scrollTop=rect.top;");
-   print("}");
-   print("}");
-   print("}");
-   print("</script>");
+   print <<EOF;
+<script language="JavaScript">
+function scrollToActive(){
+   var e=document.getElementById('activeMenuTree');
+   if (e){
+      var rect = e.getBoundingClientRect();
+      if (rect){
+         document.body.scrollTop=rect.top;
+      }
+   }
+}
+</script>
+<div id=MenuSwitcher onClick="SwitchMenuVisible()" class="showOnMobile">&nbsp;</div>
+EOF
 
 
 
