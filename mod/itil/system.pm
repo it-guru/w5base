@@ -2529,7 +2529,7 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
       $htmlresult.="</h1></td></tr>";
    }
    else{
-      $htmlresult.="<table>\n";
+      $htmlresult.="<table class=stackedOnMobile>\n";
    }
    my @l=$self->getHtmlPublicDetailFields($rec);
    foreach my $v (@l){
