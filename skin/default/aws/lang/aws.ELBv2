@@ -1,0 +1,4 @@
+'aws::ELBv2'=>{
+  de=>'AWS: Elastic Loadblancer V2',
+  en=>'AWS: Elastic Loadblancer V2'
+}

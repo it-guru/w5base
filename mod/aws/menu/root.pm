@@ -46,6 +46,10 @@ sub Init
                       "aws::system",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.cloud.AWS.elb",
+                      "aws::ELBv2",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.cloud.AWS.VPC",
                       "aws::VPC",
                       defaultacl=>['valid_user']);
