@@ -80,7 +80,11 @@ EOF
          if (defined($param{tabwidth})){
             $width=" width=$param{tabwidth}";
          }
-         push(@ml,"<td class=${name}$state$width>$flink</td>");
+         my $tabClass="${name}$state";
+         if ($state ne "Activ" ||$c>1){
+            $tabClass.=" hideOnMobile";
+         }
+         push(@ml,"<td class=\"$tabClass\"$width>$flink</td>");
       }
    }
    my $ml="<td class=${name}Sep>&nbsp;</td>".
