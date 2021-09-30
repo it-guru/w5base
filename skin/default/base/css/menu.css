@@ -40,3 +40,20 @@ body{
    margin:0;
    padding:0;
 }
+
+#MenuSwitcher{
+   position:fixed;
+   bottom:50%;
+   right:0;
+   opacity: 0.5;
+   width:8px;
+   cursor:col-resize;
+   height:40px;
+   background:rgba(192, 192, 192, .6);
+   border-radius: 10px 0px 0px 10px; 
+}
+@media handheld{
+   #MenuSwitcher{
+      width:20px;
+   }
+}

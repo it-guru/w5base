@@ -10,13 +10,12 @@ a:focus img {outline: 2px solid #30579f;}
 iframe#fmenutop{
    height:100px;
 }
-
 @media screen and (max-width: 510px) {                  
   .hideOnMobile {
      display: none;
   }
   iframe#fmenutop{
-     height:4px;
+     height:0px;
   }
   table.stackedOnMobile td {
     display: block;
@@ -33,6 +32,9 @@ iframe#fmenutop{
 @media handheld and (orientation: portrait) {                  
   .hideOnMobile {
      display: none;
+  }
+  .showOnMobile {
+     display: block;
   }
   iframe#fmenutop{
      height:4px;
