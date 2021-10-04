@@ -67,6 +67,7 @@ use kernel::Field::RealEditor;
 use kernel::Field::Import;
 use kernel::Field::Dynamic;
 use kernel::Field::Container;
+use kernel::Field::Objects;
 use kernel::Field::KeyHandler;
 use kernel::Field::KeyText;
 use kernel::Field::Mandator;
