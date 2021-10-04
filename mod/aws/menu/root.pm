@@ -50,6 +50,10 @@ sub Init
                       "aws::ELBv2",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.cloud.AWS.NetIf",
+                      "aws::NetworkInterface",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.cloud.AWS.VPC",
                       "aws::VPC",
                       defaultacl=>['valid_user']);
