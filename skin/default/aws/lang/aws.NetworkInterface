@@ -1,0 +1,4 @@
+'aws::NetworkInterface'=>{
+  de=>'AWS: Elastic Netzwerk Interface',
+  en=>'AWS: Elastic Network Interface'
+}
