@@ -18,6 +18,7 @@ package W5FastConfig;
 #
 
 use strict;
+use File::Temp qw(tempfile);
 use vars(qw(@ISA));
 
 sub new
@@ -111,11 +112,13 @@ sub LoadIntoCurrentConfig
    my $currentconfig=shift;
    my $configfile=shift;
    my $back=1;
-   local (*F);
+   #local (*F);
+   my $F;
 
 
    if ($configfile ne ""){
-      if ($configfile=~m/^\// || $configfile=~m/^\.+\// ){
+      if ($configfile=~m/^\// || $configfile=~m/^\.+\// ||
+          $configfile=~m/^(http|https):\//){
          $self->{conffile}=$configfile;
       }
       else{
@@ -132,50 +135,77 @@ sub LoadIntoCurrentConfig
          }
       }
    }
-   if (open(F,$self->{conffile})){
-      while(<F>){
-         chomp;
-         my ($myvar,$mykey,$myval)=();
-         if ( ! /^\s*\#.*$/ ){
-            if (my ($incl)=/^INCLUDE\s+(.*)$/){
-               my $bk;
-               $bk=$self->LoadIntoCurrentConfig($currentconfig,$incl);
-               if (!$bk){
-                  printf STDERR ("ERROR: can't read Include ".
-                                 "'$incl' in '$configfile'\n");
-                  return($bk);
-               }
-            }
-            if (defined($_)){
-               if (($myvar,$mykey,$myval)=
-                    m/^(.+?)\[([0-9]+?)\]\s*=\s*[\",'](.*)[\",'].*$/){
-                  $myvar=~tr/[a-z]/[A-Z]/;
-                  if (!defined($currentconfig->{$myvar})){
-                     $currentconfig->{$myvar}=[];
-                  }
-                  ${$currentconfig->{$myvar}}[$mykey]="$myval";
-               }
-               elsif (($myvar,$mykey,$myval)=
-                       m/^(.+?)\[(.+?)\]\s*=\s*[\",'](.*)[\",'].*$/){
-                  $myvar=~tr/[a-z]/[A-Z]/;
-                  if (!defined($currentconfig->{$myvar})){
-                     $currentconfig->{$myvar}={};
-                  }
-                  $currentconfig->{$myvar}->{$mykey}="$myval";
-               }
-               elsif (($myvar,$myval)=m/^(.+?)\s*=\s*[\",'](.*)[\",'].*$/){
-                  $myvar=~tr/[a-z]/[A-Z]/;
-                  $currentconfig->{$myvar}="$myval";
-               }
-            }
-         }
-         #printf STDERR ("READ $myvar from $configfile\n");
+
+   my $pfilename;
+   if ($self->{conffile}=~m/^(http|https):\//){
+      my $ua;
+      $F = tempfile();
+      eval('
+         use JSON;
+         use LWP::UserAgent;
+         $ua=new LWP::UserAgent(env_proxy=>0,ssl_opts=>{verify_hostname=>1});
+      ');
+      if ($@ ne ""){
+         printf STDERR ("ERROR: %s\n",$@);
+         return(1);
       }
-      close(F);
+      my $res=$ua->get($self->{conffile});
+      if (defined($res) && $res->is_success()){
+         print $F $res->decoded_content();
+      }
+      else{
+         printf STDERR ("ERROR: can not fetch %s\n",$self->{conffile});
+         printf STDERR ("ERROR: result: %s\n",$res->status_line);
+         return(0);
+      }
+      seek($F,0,0);
    }
    else{
-      $back=0;    
+      $pfilename="<".$self->{conffile};
+      if (!open($F,$pfilename)){
+         printf STDERR ("open $pfilename failed\n");
+         return(0);
+      }
    }
+   while(<$F>){
+      chomp;
+      my ($myvar,$mykey,$myval)=();
+      if ( ! /^\s*\#.*$/ ){
+         if (my ($incl)=/^INCLUDE\s+(.*)$/){
+            my $bk;
+            $bk=$self->LoadIntoCurrentConfig($currentconfig,$incl);
+            if (!$bk){
+               printf STDERR ("ERROR: can't read Include ".
+                              "'$incl' in '$configfile'\n");
+               return($bk);
+            }
+         }
+         if (defined($_)){
+            if (($myvar,$mykey,$myval)=
+                 m/^(.+?)\[([0-9]+?)\]\s*=\s*[\",'](.*)[\",'].*$/){
+               $myvar=~tr/[a-z]/[A-Z]/;
+               if (!defined($currentconfig->{$myvar})){
+                  $currentconfig->{$myvar}=[];
+               }
+               ${$currentconfig->{$myvar}}[$mykey]="$myval";
+            }
+            elsif (($myvar,$mykey,$myval)=
+                    m/^(.+?)\[(.+?)\]\s*=\s*[\",'](.*)[\",'].*$/){
+               $myvar=~tr/[a-z]/[A-Z]/;
+               if (!defined($currentconfig->{$myvar})){
+                  $currentconfig->{$myvar}={};
+               }
+               $currentconfig->{$myvar}->{$mykey}="$myval";
+            }
+            elsif (($myvar,$myval)=m/^(.+?)\s*=\s*[\",'](.*)[\",'].*$/){
+               $myvar=~tr/[a-z]/[A-Z]/;
+               $currentconfig->{$myvar}="$myval";
+            }
+         }
+      }
+      #printf STDERR ("READ $myvar from $configfile\n");
+   }
+   close($F);
    return($back);
 }
 
