@@ -50,6 +50,30 @@ sub QualityCheck
 {
    my $self=shift;
    my $dataobj=shift;
+   my $qualitytask;
+   my $qualitytasktasknum;
+   my $qualitytasktaskcnt;
+
+   if ($_[0]=~m/^T/){
+      $qualitytask=shift;
+      if (my ($num,$cnt)=$qualitytask=~m/^T([0-9]+)\/([0-9]+)$/){
+         $qualitytasktasknum=$num;
+         $qualitytasktaskcnt=$cnt;
+      }
+      else{
+         die("invalid Task specification");
+      }
+      if ($qualitytasktasknum<1 || $qualitytasktasknum>10){
+         die("invalid Task num");
+      }
+      if ($qualitytasktaskcnt<1 || $qualitytasktaskcnt>10){
+         die("invalid Task cnt");
+      }
+      if ($qualitytasktasknum>$qualitytasktaskcnt){
+         die("invalid Task run num");
+      }
+   }
+
    my $dataobjid=shift;     # for debugging, it is posible to specify a id
    msg(DEBUG,"starting QualityCheck");
    my $lnkq=getModuleObject($self->Config,"base::lnkqrulemandator");
@@ -63,12 +87,32 @@ sub QualityCheck
       $doSleep=300 if ($doSleep>300);
       foreach my $dataobj (sort(keys(%dataobjtocheck))){
          msg(INFO,"calling QualityCheck for '$dataobj'");
-         my $bk=$self->W5ServerCall("rpcCallEvent","QualityCheck",$dataobj);
-         if (!defined($bk->{AsyncID})){
-            msg(ERROR,"can't call QualityCheck for ".
-                      "dataobj '$dataobj' Event");
+         my $o=getModuleObject($self->Config,$dataobj);
+         if (defined($o)){
+            my $cnt=$o->CountRecords();
+            if ($dataobj eq "base::workflow" || $cnt<50000){
+               my $bk=$self->W5ServerCall("rpcCallEvent",
+                                          "QualityCheck",$dataobj);
+               if (!defined($bk->{AsyncID})){
+                  msg(ERROR,"can't call QualityCheck for ".
+                            "dataobj '$dataobj' Event");
+               }
+               sleep($doSleep);
+            }
+            else{
+               my @tasks=(1,2);
+               foreach my $t (@tasks){
+                  my $bk=$self->W5ServerCall("rpcCallEvent",
+                                             "QualityCheck",$dataobj,
+                                             "T".$t."/2");
+                  if (!defined($bk->{AsyncID})){
+                     msg(ERROR,"can't call QualityCheck for ".
+                               "dataobj '$dataobj' Event");
+                  }
+               }
+               sleep($doSleep);
+            }
          }
-         sleep($doSleep);
       }
    }
    else{
@@ -94,6 +138,29 @@ sub QualityCheck
                              dataobjattr   =>'('.$lastqcheck->{dataobjattr}.
                                              '>='.$mdate->{dataobjattr}.')')
                )
+            }
+         }
+         if ($qualitytask ne ""){
+            my $qchecktask=$obj->getField("qchecktask");
+            if (!defined($qchecktask)){
+               my $idfield=$obj->IdField();
+               if (defined($idfield)){
+                  my $idfielddataobjattr=$idfield->{dataobjattr};
+                  if ($idfielddataobjattr ne ""){
+                     $obj->AddFields(
+                         new kernel::Field::Number(
+                                   name          =>'qchecktask',
+                                   label         =>'qcheck TaskID',
+                                   uivisible     =>0,
+                                   precision     =>0,
+                                   noselect      =>1,
+                                   dataobjattr   =>'mod('.
+                                                    $idfielddataobjattr.
+                                                   ',11)')
+                     );
+                     $qchecktask=$obj->getField("qchecktask");
+                  }
+               }
             }
          }
 
@@ -122,6 +189,21 @@ sub QualityCheck
                }
             }
          }
+         if ($qualitytask ne ""){
+            my @tasks=(0..100);
+            for(my $c=0;$c<=$#tasks;$c++){
+               my $mod=($c % $qualitytasktaskcnt)+1;
+               if ($mod!=$qualitytasktasknum){
+                  $tasks[$c]=undef;
+               }
+            }
+            @tasks=grep({defined($_)} @tasks);
+            if (ref($basefilter) ne "HASH"){
+               $basefilter={};
+            }
+            $basefilter->{qchecktask}=\@tasks;
+         }
+         
          return($self->doQualityCheck($basefilter,$obj));
       }
       else{
