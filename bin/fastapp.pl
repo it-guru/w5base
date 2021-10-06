@@ -131,7 +131,7 @@ while($request->Accept()>=0){
       my $pt=new Proc::ProcessTable();
       my %info = map({$_->pid =>$_} @{$pt->table});
       my $rss=$info{$$}->rss;
-      my $szlimit=700000000;
+      my $szlimit=800000000;
       if ($rss>$szlimit){ 
          printf STDERR ("cleanup perl process due size ".
                         "limitation %d (limit=%d)\n",$rss,$szlimit);
