@@ -834,7 +834,9 @@ sub processRecord
                                                    softwareinstrelmsg
                                                    itclustsvc system
                                                    swinstances
-                                                   denyupd))){
+                                                   denyupd denyupselect
+                                                   denyupdcomments
+                                                   denyupdvalidto))){
                #print Dumper($swirec);
                my $instrating="";
                if ($swirec->{softwareinstrelstate}=~m/^FAIL/){
@@ -850,6 +852,21 @@ sub processRecord
                   $instrating="";
                }
                my $softwareinstrelmsg=$swirec->{softwareinstrelmsg};
+               if ($swirec->{denyupd} eq "120"){
+                  my $d=CalcDateDuration(NowStamp("en"),
+                                         $swirec->{denyupdvalidto});
+                  if ($d->{days}>0){
+                     $instrating="gray";
+                     $softwareinstrelmsg=$swirec->{denyupselect};
+                     $softwareinstrelmsg=~s/^.*?[,-]\s+//;
+                     if ($swirec->{denyupdcomments} ne "" &&
+                         length($swirec->{denyupdcomments})<100){
+                        $softwareinstrelmsg.=" (".
+                                             $swirec->{denyupdcomments}.
+                                             ")";
+                     }
+                  }
+               }
                $softwareinstrelmsg=~s/;/ /g;
                $softwareinstrelmsg=~s/\n/ /g;
                my $refid;
