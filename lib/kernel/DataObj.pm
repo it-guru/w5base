@@ -1794,6 +1794,9 @@ sub getIdByHashIOMapped
 
    $$debug.="\nRequest after mappings:\n" if ($debug);
    foreach my $k (keys(%flt)){  # fix search (no like)
+      if (exists($param{iomapped}) && ref($param{iomapped}) eq "HASH"){
+         $param{iomapped}->{$k}=$flt{$k};   # return the mapped record
+      }
       my $v=$flt{$k};
       $$debug.=sprintf("%-10s => %s\n","'".$k."'","'".$v."'") if ($debug);
       if ($v ne ""){

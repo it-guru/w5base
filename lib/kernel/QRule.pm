@@ -266,6 +266,7 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
           $param{mode} eq "leftouterlinkbaselogged" ||
           $param{mode} eq "leftouterlinkmissok" ||
           $param{mode} eq "leftouterlink"){  # like servicesupprt links
+      my $iomappedRec={};
       if (exists($comprec->{$compfieldname}) &&
           defined($comprec->{$compfieldname}) &&
           (!defined($origrec->{$origfieldname}) ||
@@ -285,6 +286,7 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                   $param{iomapped}->Self(),
                   $iorec,
                   DEBUG=>\$d,
+                  iomapped=>$iomappedRec,
                   ForceLikeSearch=>1
                );
                if ($iorec->{$lnkfield->{vjoindisp}} ne 
@@ -296,6 +298,11 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                                     "'".$iorec->{$lnkfield->{vjoindisp}}."' ".
                                     "but not storedable");
                      }
+                     %joinfilter=(
+                        $lnkfield->{vjoindisp}=>"\"".
+                                   $iomappedRec->{$lnkfield->{vjoindisp}}."\""
+                     );
+                     $remotecompval=$iomappedRec->{$lnkfield->{vjoindisp}};
                   }
                }
                #printf STDERR ("debug=%s\n",$d);
@@ -320,9 +327,11 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                      }
                   }
                   elsif (ref($param{onCreate}) eq "CODE"){
-                     $newrec=&{$param{onCreate}}($self,
-                                                 $origrec,$comprec,
-                                                 $comprec->{$compfieldname});
+                     my $cval=$comprec->{$compfieldname};
+                     if (defined($param{iomapped}) && ref($param{iomapped})){
+                        $cval=$iomappedRec->{$lnkfield->{vjoindisp}};
+                     }
+                     $newrec=&{$param{onCreate}}($self,$origrec,$comprec,$cval);
                   }
                   if (ref($newrec) eq "HASH" && keys(%$newrec)){
                      #printf STDERR ("MSG: auto create element in '%s'\n%s\n",
