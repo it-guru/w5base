@@ -389,42 +389,63 @@ sub Ping
 {
    my $self=shift;
 
-   my $Authorization=$self->getVRealizeAuthorizationToken();
-
-   my $d=$self->CollectREST(
-      dbname=>'TPC',
-      url=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl."iaas/deployments";
-         $dataobjurl.="?top=2";
-         return($dataobjurl);
-      },
-      headers=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         my $headers=['Authorization'=>$Authorization,
-                      'Content-Type'=>'application/json'];
- 
-         return($headers);
-      },
-      onfail=>sub{
-         my $self=shift;
-         my $code=shift;
-         my $statusline=shift;
-         my $content=shift;
-         my $reqtrace=shift;
-
+   my $errors;
+   my $d;
+   # Ping is for checking backend connect, without any error displaying ...
+   {
+      open local(*STDERR), '>', \$errors;
+      eval('
+         my $Authorization=$self->getVRealizeAuthorizationToken();
+        
+         $d=$self->CollectREST(
+            dbname=>"TPC",
+            url=>sub{
+               my $self=shift;
+               my $baseurl=shift;
+               my $apikey=shift;
+               $baseurl.="/"  if (!($baseurl=~m/\/$/));
+               my $dataobjurl=$baseurl."iaas/deployments";
+               $dataobjurl.="?top=2";
+               return($dataobjurl);
+            },
+            headers=>sub{
+               my $self=shift;
+               my $baseurl=shift;
+               my $apikey=shift;
+               my $headers=["Authorization"=>$Authorization,
+                            "Content-Type"=>"application/json"];
+        
+               return($headers);
+            },
+            onfail=>sub{
+               my $self=shift;
+               my $code=shift;
+               my $statusline=shift;
+               my $content=shift;
+               my $reqtrace=shift;
+        
+               my $gc=globalContext(); 
+               $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
+               push(@{$gc->{LastMsg}},"ERROR: ".$statusline);
+        
+               return(undef);
+            }
+         );
+      ');
+   }
+   if (!defined($d) && !$self->LastMsg()){
+      $self->LastMsg(ERROR,"bad Ping on TPC");
+   }
+   if (!$self->LastMsg()){
+      if ($errors){
          my $gc=globalContext();  # and errors are silent transfered to LastMsg
          $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
-         push(@{$gc->{LastMsg}},"ERROR: ".$statusline);
-
-         return(undef);
+         foreach my $emsg (split(/[\n\r]+/,$errors)){
+            push(@{$gc->{LastMsg}},$emsg);
+         }
       }
-   );
+   }
+
    return(0) if (!defined($d));
    return(1);
 
