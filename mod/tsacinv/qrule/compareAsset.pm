@@ -269,7 +269,8 @@ sub qcheckRecord
                                 }
                                 return({name=>$newval,cistatusid=>4});
                              },
-                             mode=>'leftouterlinkcreate');
+                             mode=>'leftouterlinkcreate',
+                             iomapped=>$par);
 
                if ($parrec->{acqumode} eq "1"){
                   $parrec->{acqumode}="RENTAL";
