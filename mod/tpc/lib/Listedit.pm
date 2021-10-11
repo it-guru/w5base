@@ -218,7 +218,10 @@ sub decodeFilter2Query4vRealize
                         push(@orLst,"$v eq $e");
                      }
                   }
-                  else{
+                  elsif ($fld->{ODATA_filter}){
+                     if ($fld->{ODATA_filter} ne "1"){
+                        $fieldname=$fld->{ODATA_filter};
+                     }
                      my $isdate=0;
                      if (grep(/kernel::Field::Date/,
                             Class::ISA::self_and_super_path($fld->Self))
@@ -287,29 +290,33 @@ sub decodeFilter2Query4vRealize
                               return(undef) if (!defined($d));
                               $val=$d;
                            }
-                           if ($val=~m/^\*[^*]+\*$/){
-                              $val=~s/\*$//;
-                              $val=~s/^\*//;
-                              my $exp="'".$val."'";
-                              my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-                              push(@orLst,"substringof($e,$v)");
-                           }
-                           elsif ($val=~m/^[^*]+\*$/){
-                              $val=~s/\*$//;
-                              my $exp="'".$val."'";
-                              my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-                              push(@orLst,"startswith($v,$e)");
-                           }
-                           else{
+                         #
+                         #   * works on eq operations
+                         # 
+                         #  if ($val=~m/^\*[^*]+\*$/){
+                         #     $val=~s/\*$//;
+                         #     $val=~s/^\*//;
+                         #     my $exp="'".$val."'";
+                         #     my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
+                         #     push(@orLst,"substringof($e,$v)");
+                         #  }
+                         #  elsif ($val=~m/^[^*]+\*$/){
+                         #     $val=~s/\*$//;
+                         #     my $exp="'".$val."'";
+                         #     my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
+                         #     push(@orLst,"startswith($v,$e)");
+                         #  }
+                         #  else{
                               my $exp="'".$val."'";
                               my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
                               push(@orLst,"$v $compop $e");
-                           }
+                         #  }
                         }
                      }
                   }
                   if ($#orLst!=-1){
-                     push(@andLst,"(".join(" or ",@orLst).")");
+                   #  push(@andLst,"(".join(" or ",@orLst).")");
+                     push(@andLst,join(" or ",@orLst));
                   }
                }
             }
@@ -331,6 +338,9 @@ sub decodeFilter2Query4vRealize
       if ($self->{_LimitStart}>0){
          $qparam{'$skip'}=$self->{_LimitStart};
       }
+   }
+   else{
+      $qparam{'$top'}=99999;
    }
    if ($dbclass=~m/\{[^{}]+\}/){
       $self->LastMsg(ERROR,"missing constant query parameter");
@@ -370,7 +380,6 @@ sub decodeFilter2Query4vRealize
          $qparam{'$orderby'}=join(",",@ODATA_order);
       }
    }
-
 
    #printf STDERR ("qparam=%s\n",Dumper(\%qparam));
 

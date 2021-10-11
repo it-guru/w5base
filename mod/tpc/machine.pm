@@ -24,6 +24,9 @@ use tpc::lib::Listedit;
 use JSON;
 @ISA=qw(tpc::lib::Listedit);
 
+# API at https://code.vmware.com/apis/39/vrealize-automation
+# https://code.vmware.com/apis/978
+
 sub new
 {
    my $type=shift;
@@ -51,6 +54,7 @@ sub new
 
       new kernel::Field::Text(     
             name              =>'genname',
+            ODATA_filter      =>'name',
             searchable        =>1,
             htmlwidth         =>'200px',
             label             =>'generic name'),
@@ -96,6 +100,7 @@ sub new
 
       new kernel::Field::Text(     
             name              =>'address',
+            ODATA_filter      =>'1',
             searchable        =>1,
             label             =>'IP-Address'),
 
@@ -103,6 +108,38 @@ sub new
             name              =>'description',
             searchable        =>1,
             label             =>'Description'),
+
+      new kernel::Field::Container(
+            name              =>'tags',
+            label             =>'Tags',
+            uivisible         =>1,
+            searchable        =>0,
+            group             =>'tags'),
+
+      new kernel::Field::Container(
+            name              =>'custprops',
+            label             =>'customProperties',
+            uivisible         =>sub{
+               my $self=shift;
+               return(1) if ($self->getParent->IsMemberOf("admin"));
+               return(0);
+            },
+            searchable        =>0,
+            group             =>'tags'),
+
+      new kernel::Field::Text(     
+            name              =>'instanceUUID',
+            searchable        =>0,
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            label             =>'instanceUUID'),
+
+      new kernel::Field::Text(     
+            name              =>'vcUuid',
+            searchable        =>0,
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            label             =>'vcUuid'),
 
       new kernel::Field::CDate(
             name              =>'cdate',
@@ -146,6 +183,7 @@ sub DataCollector
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
          my $dataobjurl=$baseurl."iaas/".$dbclass;
+         #printf STDERR ("url=%s\n",$dataobjurl);
          return($dataobjurl);
       },
 
@@ -174,8 +212,22 @@ sub DataCollector
              $_->{memory}=$_->{customProperties}->{memoryInMB};
              $_->{osclass}=$_->{customProperties}->{osType};
              $_->{osrelease}=$_->{customProperties}->{softwareName};
+             $_->{custprops}=$_->{customProperties};
+             if (exists($_->{customProperties}->{vcUuid})){
+                $_->{vcUuid}=$_->{customProperties}->{vcUuid};
+             }
+             if (exists($_->{customProperties}->{instanceUUID})){
+                $_->{instanceUUID}=$_->{customProperties}->{instanceUUID};
+             }
              $_->{genname}=$_->{name};
              $_->{name}=~s/-mcm[0-9]{3,10}-[0-9]{3,20}$//;
+             if (ref($_->{tags}) eq "ARRAY"){
+                my %h;
+                foreach my $rec (@{$_->{tags}}){
+                   $h{$rec->{key}}=$rec->{value} 
+                }
+                $_->{tags}=\%h;
+             }
          } @$data);
          return($data);
       },
@@ -195,7 +247,7 @@ sub DataCollector
       }
 
    );
-   #printf STDERR ("rawdata=%s\n",Dumper($d));
+   #customProperties
 
    return($d);
 }
@@ -416,6 +468,13 @@ sub Import
 }
 
 
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default tags source));
+}
 
 
 
