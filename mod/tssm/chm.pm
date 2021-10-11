@@ -517,6 +517,11 @@ sub new
                 uivisible     =>\&showQualityFields),
    );
 
+   $self->{InterfaceHint}={
+      'itil::lnkapplappl'=>['14274428190001'],
+      'itil::appl'=>['13541093000005']
+   };
+
    $self->setDefaultView(qw(linenumber changenumber 
                             plannedstart plannedend 
                             status name));
