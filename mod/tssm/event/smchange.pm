@@ -50,6 +50,20 @@ sub smchange
    my $selfname=$self->Self();
    $self->InitScImportEnviroment();
    my $chm=getModuleObject($self->Config,"tssm::chm");
+
+
+   return({}) if ($chm->isSuspended());
+   # if ping failed ...
+   if (!$chm->Ping()){
+      # check if there are lastmsgs
+      # if there, send a message to interface partners
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      return({}) if ($infoObj->NotifyInterfaceContacts($chm));
+      msg(ERROR,"no ping posible to ".$chm->Self());
+      return({});
+   }
+
+
    msg(DEBUG,"ServiceManager chm is connected");
    $chm->SetCurrentView(qw(addgrp approvalstatus approved assignarea
                            assignedto category changenumber closecode

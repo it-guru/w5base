@@ -75,6 +75,19 @@ sub smgroup
    my $opmgrp=$mgrp->Clone();
    my %dataobj=(agrp=>$opagrp,sgrp=>$opsgrp,mgrp=>$opmgrp);
 
+
+   return({}) if ($sgrp->isSuspended());
+   # if ping failed ...
+   if (!$sgrp->Ping()){
+      # check if there are lastmsgs
+      # if there, send a message to interface partners
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      return({}) if ($infoObj->NotifyInterfaceContacts($sgrp));
+      msg(ERROR,"no ping posible to ".$sgrp->Self());
+      return({});
+   }
+
+
    my $srcsys=$self->Self;
 
    my @incloader=(
