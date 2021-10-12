@@ -3,5 +3,5 @@
   en=>'Check on IT-SeM or DelMgr'
 },
 'missing Service Delivery Manager or IT Servicemanager'=>{
-  de=>'fehlender Service Delivery Manager oder IT Servicemanager'
+  de=>'fehlender Service Delivery Manager/SDM Team oder IT Servicemanager/IT SeM Team'
 }
