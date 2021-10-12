@@ -2262,7 +2262,7 @@ sub isViewValid
    return("header","default","systemclass") if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(header default swinstances 
-              inmchm addcis
+              inmchm addcis softsetvalidation
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses sysiface phonenumbers sec applications
               location source customer history upd relperson
