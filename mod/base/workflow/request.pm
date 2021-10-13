@@ -282,12 +282,33 @@ sub isWriteValid
    }
    if (!grep(/^init$/,@l) && defined($rec)){
       if ($self->isWorkflowManager($rec)){
-    #     push(@l,"default");   # wird ab 11/2011 nicht mehr zugelassen!
          if ($rec->{state}<20){
             push(@l,"init");
          }
       }
    }
+
+   {  # check if rewrite auf default DataBlock is allowed
+      my $DefEditAllowed=0;
+      if ($rec->{state}==2 ){
+         my $d=CalcDateDuration($rec->{createdate},NowStamp("en"));
+         if ($d->{days}<14){
+            $DefEditAllowed=1 if (in_array(\@l,"init"));
+            if (ref($rec->{shortactionlog}) eq "ARRAY"){
+               foreach my $arec (@{$rec->{shortactionlog}}){
+                  if ($arec->{effort}>0){
+                     $DefEditAllowed=0;
+                  }
+                  if ($arec->{name} eq "addnote"){
+                     $DefEditAllowed=0;
+                  }
+               }
+            }
+         }
+      }
+      push(@l,"default") if ($DefEditAllowed==1);
+   }
+
    return(@l);
 }
 
