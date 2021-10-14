@@ -39,7 +39,9 @@ Zusätzlich werden Referenzen auf Kontakte oder Gruppen entfernt, bei
 denen der Kontakt länger als 4 Wochen im Status "veraltet/gelöscht"
 steht. Werden Datenverantwortliche erkannt, die länger als 4 Wochen
 nicht gültig sind, werden diese automatisch durch den letzten bekannten
-Vorgesetzten ersetzt.
+Projekt-Vorgesetzten ersetzt. Wird kein letzter bekannter 
+Projekt-Vorgesetzter gefunden, so wird der letzten bekannte Vorgesetzte
+verwendet.
 
 Alle Veränderungen der Kontakte werden an den Datenverantwortlichen
 per E-Mail notifiziert.
@@ -62,7 +64,8 @@ In addition, references to contacts or groups are also removed when
 in the status "disposed of waste" for more than 4 weeks.
 If databosses are identified who have for more than 4 weeks
 are not valid, they are automatically replaced by the last known
-superiors.
+project-superiors. If no project-superiors is found, the last 
+known superiors is used.
 
 All changes of the contacts will be forwarded to the databoss as
 by e-mail.
@@ -167,8 +170,17 @@ sub setReferencesToNull
                }
                else{
                   # set lastknownbossid as new databoss
-                  my ($lastbossid)=split(/\s+/,$contactrec->{lastknownbossid});
-                  if ($lastbossid ne ""){
+                  my @lastknownboss;
+                  if ($contactrec->{lastknownpbossid} ne ""){
+                     push(@lastknownboss,sort(split(/\s+/,
+                                             $contactrec->{lastknownpbossid})));
+                  }
+                  if ($contactrec->{lastknownbossid} ne ""){
+                     push(@lastknownboss,sort(split(/\s+/,
+                                              $contactrec->{lastknownbossid})));
+                  }
+                  my $lastbossid=shift(@lastknownboss);
+                  BLOOP: foreach my $lastbossid (@lastknownboss){
                      my $o=getModuleObject($dataobj->Config,"base::user");
                      $o->SetFilter({userid=>\$lastbossid});
                      my ($newbossrec,$msg)=$o->getOnlyFirst(qw(usertyp 
@@ -184,7 +196,6 @@ sub setReferencesToNull
                            }
                         }
                      }
-
                      if (defined($newbossrec) &&
                          $is_currently_boss>0 &&
                          $newbossrec->{cistatusid} eq "4" &&
@@ -206,6 +217,7 @@ sub setReferencesToNull
                                                          $rec,$contactrec,
                                                          $lastbossid);
                            $ReferenceIsStillInvalid=0;
+                           last BLOOP;
                         }
                      }
                   }
