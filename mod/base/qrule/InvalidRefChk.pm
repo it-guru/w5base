@@ -372,7 +372,8 @@ sub qcheckRecord
          $user->ResetFilter();
          $user->SetFilter({userid=>\$targetid});
          my ($chkrec)=$user->getOnlyFirst(qw(cistatusid fullname email
-                                             mdate lastknownbossid));
+                                             mdate lastknownbossid
+                                                   lastknownpbossid));
          if (!defined($chkrec)){
             foreach my $ref (@{$chklst{$k}->{r}}){
                $self->setReferencesToNull($dataobj,"invalid",$ref,$rec);
