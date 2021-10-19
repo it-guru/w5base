@@ -199,6 +199,7 @@ de=>'zuviele Inaktivierungen - '.
 de=>'zurückstellen auf "reserviert" macht keinen Sinn - '.
     'Operation muss durch Admin-Request angefordert werden'
 },
+'CI-State downgrade not allowed on long lasting active CI - create admin request to approve this operation'=>{de=>'CI-Status-Herabstufung bei lang auf aktiv gestellten CIs nicht erlaubt - Admin-Anfrage erstellen, um diesen Vorgang zu genehmigen'},
 'flipping cistatus makes detect - '.
   'create admin request to approve this operation'=>{
 de=>'Schwingung/Flippen des CI-Status erkannt - '.
