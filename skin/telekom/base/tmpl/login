@@ -56,7 +56,7 @@ function dologin()
 }
 function dossologin()
 {
-   parent.parent.parent.document.location.href="https://myportal-websso.corp.telekom.de/w5base-devnull.telekom.de";
+   parent.parent.parent.document.location.href="https://myportal-websso.corp.telekom.de/"+parent.parent.parent.document.location.hostname;
 }
 function doadlogin()
 {
