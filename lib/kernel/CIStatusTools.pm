@@ -248,8 +248,9 @@ sub _validateCIStatusHistoryActivity
          if ($oldrec->{cistatusid} eq "4" && $newrec->{cistatusid}<4){
             if ($d->{days}>28){
                $self->LastMsg(ERROR,
-                       "downgrade CI-State not allowed on long active CI - ".
-                       "create admin request to approve this operation");
+                       "CI-State downgrade not allowed on long ".
+                       "lasting active CI - create admin request to ".
+                       "approve this operation");
                return(0),
             }
          }
