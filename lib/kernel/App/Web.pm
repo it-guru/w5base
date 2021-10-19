@@ -1232,6 +1232,9 @@ sub HandleNewUser
                      $subject=$sitename.": ".$subject;
                   }
                   my $currenturl=$ENV{SCRIPT_URI};
+                  if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+                     $currenturl=~s/^http:/https:/;
+                  }
                   $currenturl=~
                      s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
                   my $fromemail=$em;
@@ -1305,6 +1308,12 @@ sub HandleNewUser
                                       });
          }
          else{
+            if ($em eq ""){
+               my $HeaderField=$self->Config->Param("InitialEMailHeaderFetch");
+               if ($HeaderField ne "" && exists($ENV{$HeaderField})){
+                  $em=$ENV{$HeaderField};
+               }
+            }
             print $self->getParsedTemplate("tmpl/accountverification",{
                                      static=>{ email=>$em,
                                                account=>$ENV{REMOTE_USER}},
@@ -2290,7 +2299,6 @@ sub simpleRESTCallHandler
          if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
             $SCRIPT_URI=~s/^http:/https:/;
          }
-
          print $self->getParsedTemplate(
                "tmpl/kernel.simpleRESTform",
                { 
