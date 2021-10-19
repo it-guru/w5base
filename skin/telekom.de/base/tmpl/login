@@ -64,7 +64,7 @@ function dossologin()
 
 function doadlogin()
 {
-   parent.parent.parent.document.location.href="https://kerberos.myportal-websso.corp.telekom.de/redir.html?Target=https://SSO:@myportal-websso.corp.telekom.de/w5base-devnull.telekom.de"
+   parent.parent.parent.document.location.href="https://kerberos.myportal-websso.corp.telekom.de/redir.html?Target=https://SSO:@myportal-websso.corp.telekom.de/"+parent.parent.parent.document.location.hostname;
 }
 
 </script>
