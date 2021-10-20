@@ -357,6 +357,9 @@ sub isWriteOnNetworkValid
    if ($self->IsMemberOf("admin")){
        return(1);
    }
+   if ($W5V2::OperationContext eq "W5Server"){
+       return(1);
+   }
    return(0);
 }
 

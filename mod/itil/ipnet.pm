@@ -316,6 +316,7 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $orgrec=shift;
 
 
    my $networkid=effVal($oldrec,$newrec,"networkid");
@@ -394,6 +395,7 @@ sub Validate
          }
       }
       $newrec->{netmask}=$netmask;
+      $orgrec->{netmask}=$netmask;
    }
    my $netmasktype;
    if ($netmask eq "255.255.255.255"){ # IPv4 Host-Only Netmask
