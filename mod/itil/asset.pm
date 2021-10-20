@@ -821,6 +821,10 @@ sub new
    );
    $self->{workflowlink}={ workflowkey=>\&createWorkflowQuery
                          };
+
+   $self->{CI_Handling}={uniquename=>"name",
+                         uniquesize=>40};
+
    $self->{history}={
       update=>[
          'local'
