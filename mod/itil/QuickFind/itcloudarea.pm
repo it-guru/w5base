@@ -42,7 +42,7 @@ sub CISearchResult
    my @l;
    if (grep(/^ci$/,@$stag) &&
        (!defined($tag) || grep(/^$tag$/,qw(itcloudarea)))){
-      my $flt=[{name=>"$searchtext",cistatusid=>"<=5"}];
+      my $flt=[{fullname=>"\"*$searchtext*\"",cistatusid=>"<=5"}];
       if ($searchtext=~m/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/){
          push(@$flt,{ipaddresses=>"$searchtext",cistatusid=>"<=5"});
       }
