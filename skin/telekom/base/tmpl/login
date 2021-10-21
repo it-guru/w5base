@@ -52,16 +52,28 @@ To continue please click on <b>"W5Base/Darwin Login"</b>.<br>
 <script language="JavaScript">
 function dologin()
 {
-   parent.parent.parent.document.location.href="../../../auth/base/menu/root";
+   var topwin=parent.parent.parent;
+   topwin.document.location.href="../../../auth/base/menu/root";
 }
+
 function dossologin()
 {
-   parent.parent.parent.document.location.href="https://myportal-websso.corp.telekom.de/"+parent.parent.parent.document.location.hostname;
+    var topwin=parent.parent.parent;
+    var topUrl = topwin.document.location.href;
+    topUrl=topUrl.replace(/\/\//,'//SSO:@');
+    topUrl=topUrl.replace(/\/public\//,'/auth/');
+    topwin.location.href=topUrl;
 }
+
 function doadlogin()
 {
-   parent.parent.parent.document.location.href="https://kerberos.myportal-websso.corp.telekom.de/redir.html?Target=https://SSO:@myportal-websso.corp.telekom.de/"+parent.parent.parent.document.location.hostname;
+    var topwin=parent.parent.parent;
+    var topUrl = topwin.document.location.href;
+    topUrl=topUrl.replace(/\/\//,'//ADS:@');
+    topUrl=topUrl.replace(/\/public\//,'/auth/');
+    topwin.document.location.href=topUrl;
 }
+
 </script>
 <br>
 <br>

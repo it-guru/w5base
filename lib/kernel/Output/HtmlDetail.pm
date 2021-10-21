@@ -438,14 +438,17 @@ EOF
       my $ByIdLinkEnd="";
       my $dragname="";
       if ($id ne ""){
-         if (grep(/^ById$/,
-                  $self->getParent->getParent->getValidWebFunctions())){
+         if (grep(/^ById$/,$app->getValidWebFunctions())){
             my $targeturl="ById/$id";
+            if ($app->can("getAbsolutByIdUrl")){
+               $targeturl=$app->getAbsolutByIdUrl($id,{});
+            }
             if ($self->getParent->getParent->can("allowAnonymousByIdAccess")){
                if ($self->getParent->getParent->allowAnonymousByIdAccess()){
-                  my $s=$self->getParent->getParent->Self();
-                  $s=~s/::/\//g;
-                  $targeturl="../../../public/$s/ById/$id";
+               #   my $s=$self->getParent->getParent->Self();
+               #   $s=~s/::/\//g;
+               #   $targeturl="../../../public/$s/ById/$id";
+                   $targeturl=~s/\/auth\//\/public\//;
                }
             }
             $ByIdLinkStart="<a tabindex=-1 ".
