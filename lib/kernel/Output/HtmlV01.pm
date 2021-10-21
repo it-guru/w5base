@@ -276,7 +276,12 @@ sub ProcessLine
       if ($idfield){
          if ($id ne ""){
             if ($ResultLineClickHandler eq "ById"){
-               $dest="ById/".$id;
+               if ($app->can("getAbsolutByIdUrl")){
+                  $dest=$app->getAbsolutByIdUrl($id,{});
+               }
+               else{
+                  $dest="ById/".$id;
+               }
             }
             else{
                if ($app->can($ResultLineClickHandler)){
