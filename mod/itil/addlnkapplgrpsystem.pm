@@ -87,9 +87,21 @@ sub new
                 label         =>'Additionalinformations',
                 group         =>'add',
                 htmldetail    =>0,
+                searchable    =>sub{
+                   my $self=shift;
+                   if ($self->getParent->IsMemberOf("admin")){
+                      return(1);
+                   }
+                    
+                   return(0);
+                },
                 uivisible     =>sub{
                    my $self=shift;
                    my $mode=shift;
+                   if ($mode eq "SearchMask" &&
+                       $self->getParent->IsMemberOf("admin")){
+                      return(1);
+                   }
                    my %param=@_;
                    my $rec=$param{current};
                    if (!defined($rec->{$self->Name()})){
