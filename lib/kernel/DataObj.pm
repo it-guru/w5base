@@ -143,12 +143,18 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
       if (my $cdate=$self->getField("cdate")){ # prevent qcheck at night 
          $flt[0]->{cdate}="<now-1h";           # on fresh created elements
       }
+      if (my $lastqcheck=$self->getField("lastqcheck")){
+         $flt[0]->{lastqcheck}="<now-6h";  # prevent double checks  of active
+      }                                    # CIs in nighly QCheck
       if (my $mdate=$self->getField("mdate")){
          $flt[0]->{mdate}="<now-10m";  # prevent recheck of element, if it is
                                        # recently modified.
-         $flt[1]->{cistatusid}=[6];
-         $flt[1]->{mdate}=">now-28d";
-      }
+         if (my $lastqcheck=$self->getField("lastqcheck")){
+            $flt[1]->{cistatusid}=[6];        # check of cistatus=6 is only
+            $flt[1]->{mdate}=">now-28d";      # posible, if qcheck is
+            $flt[1]->{lastqcheck}="<now-7d";  # lastqcheckBased - these
+         }                                    # records are only checked once
+      }                                       # a week
    }
    $self->SetFilter(\@flt);
    $self->SetCurrentView(@view);
