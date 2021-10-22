@@ -193,8 +193,9 @@ sub FormatedDetail
       if (defined($idfield)){
          my $id=$idfield->RawValue($current,$mode);
          my $divid="ViewProcessor_$self->{name}_$id";
-         my $XMLUrl="$ENV{SCRIPT_URI}";
-         $XMLUrl=~s/^[a-z]+?://; # rm protocol to prevent reverse proxy issues
+         my $XMLUrl="";
+        # my $XMLUrl="$ENV{SCRIPT_URI}";
+        # $XMLUrl=~s/^[a-z]+?://; # rm protocol to prevent reverse proxy issues
          my $parent=$self->getParent->Self;
          $parent=~s/::/\//g;
  
@@ -233,8 +234,9 @@ function onLoadViewProcessor_$self->{name}_$id(timedout)
       IssueBox.innerHTML="Checking DataIssue ...";
       // window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
       // timeout handling ist noch bugy!
+      var reqTarget=document.location.pathname+"$XMLUrl";
       var xmlhttp=getXMLHttpRequest();
-      xmlhttp.open("POST","$XMLUrl",true);
+      xmlhttp.open("POST",reqTarget,true);
       xmlhttp.onreadystatechange=function() {
          var r=document.getElementById("$divid");
          var r=IssueBox;
