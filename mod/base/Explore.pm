@@ -49,12 +49,24 @@ sub Main
 
    print $self->HttpHeader("text/html",charset=>'UTF-8');
 
+   my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
+   if (!($EventJobBaseUrl=~m/\/$/)){
+      $EventJobBaseUrl.="/";
+   }
+   $EventJobBaseUrl=~s#^http[s]?://[^/]+/#/#;
+
    my $getAppTitleBar=$self->getAppTitleBar();
    my $BASE=$ENV{REQUEST_URI};
-   $BASE=~s#/Explore/Main.*?$#/Explore/Main#;
+   $BASE=~s#\?.*$##;
+   $BASE=~s#^.*/(auth|public)/base/Explore/Main[/]{0,1}##;
+   $BASE=~s#[^/]+#..#g;
+   if ($BASE eq ""){
+      $BASE="./";
+   }
 
    my $opt={
       static=>{
+         EventJobBaseUrl=>$EventJobBaseUrl,
          BASE=>$BASE
       }
    };
@@ -70,9 +82,20 @@ sub Start
 
    print $self->HttpHeader("text/html",charset=>'UTF-8');
 
+   my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
+   if (!($EventJobBaseUrl=~m/\/$/)){
+      $EventJobBaseUrl.="/";
+   }
+   $EventJobBaseUrl=~s#^http[s]?://[^/]+/#/#;
+
    my $getAppTitleBar=$self->getAppTitleBar();
    my $BASE=$ENV{REQUEST_URI};
-   $BASE=~s#/Explore/Start.*?$#/Explore/Start#;
+   $BASE=~s#\?.*$##;
+   $BASE=~s#^.*/(auth|public)/base/Explore/Start[/]{0,1}##;
+   $BASE=~s#[^/]+#..#g;
+   if ($BASE eq ""){
+      $BASE="./";
+   }
 
    my $opt={
       static=>{
