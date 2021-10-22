@@ -1611,7 +1611,7 @@ sub AsyncFieldPlaceholder
    if (defined($idfield)){
       my $id=$idfield->RawValue($current);
       my $divid="ViewProcessor_$self->{name}";
-      my $XMLUrl="$ENV{SCRIPT_URI}";
+      my $XMLUrl="";
       $XMLUrl=~s/^[a-z]+?://; # rm protocol to prevent reverse proxy issues
       $XMLUrl.="/../ViewProcessor/XML/$self->{name}/$id";
       my $d="<div id=\"$divid\"><font color=silver>init ...</font></div>";
@@ -1632,7 +1632,8 @@ function onLoadViewProcessor_$self->{name}(timedout)
    // window.setTimeout("onLoadViewProcessor_$self->{name}(1);",10000);
    // timeout handling ist noch bugy!
    var xmlhttp=getXMLHttpRequest();
-   xmlhttp.open("POST","$XMLUrl",true);
+   var reqTarget=document.location.pathname+"$XMLUrl";
+   xmlhttp.open("POST",reqTarget,true);
    xmlhttp.onreadystatechange=function() {
       var r=document.getElementById("$divid");
       if (r){
