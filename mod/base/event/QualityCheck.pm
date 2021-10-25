@@ -136,6 +136,8 @@ sub QualityCheck
                              uivisible     =>0,
                              noselect      =>1,
                              dataobjattr   =>'('.$lastqcheck->{dataobjattr}.
+                                             ' is not null OR '.
+                                             $lastqcheck->{dataobjattr}.
                                              '>='.$mdate->{dataobjattr}.')')
                )
             }

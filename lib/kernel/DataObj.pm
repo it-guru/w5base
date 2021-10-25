@@ -155,6 +155,9 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
             $flt[1]->{lastqcheck}="<now-7d";  # lastqcheckBased - these
          }                                    # records are only checked once
       }                                       # a week
+      my %fltadd=%{$flt[0]};
+      $fltadd{lastqcheck}=undef;    # handle uncheckt records prefered
+      push(@flt,\%fltadd);
    }
    $self->SetFilter(\@flt);
    $self->SetCurrentView(@view);
