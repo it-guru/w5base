@@ -912,11 +912,16 @@ function scrollToActive(){
       }
    }
 }
+function ClickOn_clipicon(o,href,labelpath){
+   var e=document.getElementById('clipicontext');
+   e.innerHTML="<font face='Courier;Courier New' color='black'>"+
+               labelpath+"<br>\\n"+href+"<br></font>";
+   copyToClipboard('clipicontext');
+}
 </script>
+<div id=clipicontext style="display:none;visibility:hidden">Hey</div>
 <div id=MenuSwitcher onClick="SwitchMenuVisible()" class="showOnMobile">&nbsp;</div>
 EOF
-
-
 
 
    my $m=$self->MenuTab($rootpath,$fp,
@@ -1223,6 +1228,7 @@ sub MenuTab
                      tree=>$self->_getMenuEntryFinalList($active,"normal"),
                      hrefclass=>'menulink',
                      imgparam =>$skinparam,
+                     clipicon =>'clipicon',
                      rootlink =>$rootlink,
                      rootpath => $rootpath);
    return($d);
@@ -1235,6 +1241,18 @@ sub _getMenuEntryFinalList
    my $mode=shift;
    my $mt=$self->Cache->{Menu}->{Cache};
 
+   my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
+
+   if (!($EventJobBaseUrl=~m#/$#)){
+      $EventJobBaseUrl.="/";
+   }
+
+   if ($ENV{SCRIPT_URI}=~m#/auth/#){
+      $EventJobBaseUrl.="auth/";
+   }
+   $EventJobBaseUrl.="base/menu/";
+   $self->{hrefbase}=" ".$EventJobBaseUrl;  # Hack to prevent WebSSO from
+                                            # modifing Links (ReverseProxy)
    my @mlist=();
    # Pass 1 Basis-Liste zusammenstellen
    foreach my $srcrec (values(%{$mt->{menuid}})){
@@ -1251,7 +1269,8 @@ sub _getMenuEntryFinalList
       next if ($m->{target}=~m/^>/);
       next if ($m->{fullname}=~m/\$$/);
       if (grep(/^(read|write)$/,$self->getMenuAcl($ENV{REMOTE_USER},$m))){
-         $self->processSubs($mt,$m,$active,$mode);
+         my @labelpath;
+         $self->processSubs(\@labelpath,$mt,$m,$active,$mode);
          push(@modmlist,$m);
       }
    }
@@ -1261,6 +1280,7 @@ sub _getMenuEntryFinalList
 sub processSubs
 {
    my $self=shift;
+   my $labelpath=shift;
    my $mt=shift;
    my $m=shift;
    my $active=shift;
@@ -1271,6 +1291,22 @@ sub processSubs
 
 
    my @subs=();
+
+   if ($m->{translation} ne ""){
+      $m->{label}=$self->mT($m->{fullname},$m->{translation});
+   }
+   else{
+      $m->{label}=$m->{fullname};
+      $m->{label}=~s/^.*\.//;
+      $m->{label}=~s/_/ /g;
+   }
+   push(@{$labelpath},$m->{label});
+   my $desc=$self->T($m->{fullname}.":Desc",$m->{translation});
+   if ($desc ne $m->{fullname}.":Desc"){
+      $m->{description}=$desc;
+   }
+   $m->{labelpath}=join("->",@{$labelpath});
+
    foreach my $mid (@{$m->{subid}}){
       if ((substr($active,0,length($m->{fullname})+1) eq $m->{fullname}.'.' ||
           $active eq $m->{fullname}) || $mode eq "mobile"){
@@ -1282,30 +1318,21 @@ sub processSubs
              grep(/^(read|write)$/,$self->getCurrentAclModes($ENV{REMOTE_USER},
                                                      $clone{acls}))){
                   push(@subs,\%clone);
-            $self->processSubs($mt,\%clone,$active,$mode);
+            my @labelpath=@{$labelpath};
+            $self->processSubs(\@labelpath,$mt,\%clone,$active,$mode);
          }
       }
    }
    $m->{tree}=\@subs;
    delete($m->{tree}) if ($#{$m->{tree}}==-1);
-   if ($m->{translation} ne ""){
-      $m->{label}=$self->mT($m->{fullname},$m->{translation});
-   }
-   else{
-      $m->{label}=$m->{fullname};
-      $m->{label}=~s/^.*\.//;
-      $m->{label}=~s/_/ /g;
-   }
-   my $desc=$self->T($m->{fullname}.":Desc",$m->{translation});
-   if ($desc ne $m->{fullname}.":Desc"){
-      $m->{description}=$desc;
-   }
-   $m->{href}="${rootpath}msel/$m->{fullname}";
+
+
+
    $m->{active}=0;
    $m->{active}=1 if ($m->{fullname} eq $active);
    my $path=$m->{fullname};
    $path=~s/\./\//g;
-   $m->{href}="${rootpath}msel/$path";
+   $m->{href}=$self->{hrefbase}."msel/$path";
 }
 
 

@@ -1,4 +1,31 @@
 a:focus {outline: silver solid 1px;}
+
+div.clipicon {
+  position: absolute;
+  display: inline-block;
+  top:3;
+  right:5;
+  width:10px;
+  height:10px;
+  z-index:99;
+  cursor:pointer;
+  background-image: url('../../base/load/edit_copy.gif');
+  background-size:100%;
+  z-index:100;
+}
+
+div.clipicon {
+  opacity: 0;
+  transition: opacity .5s, top .5s;
+}
+
+div.clipicon:hover {
+  opacity: 1;
+}
+
+
+
+
 ul.mktree{ 
    margin-left:0px; 
    padding:0px;
@@ -48,9 +75,10 @@ body{
    opacity: 0.5;
    width:8px;
    cursor:col-resize;
-   height:40px;
+   height:50px;
    background:rgba(192, 192, 192, .6);
-   border-radius: 10px 0px 0px 10px; 
+   border-radius: 5px 0px 0px 5px; 
+   z-index:500;
 }
 @media handheld{
    #MenuSwitcher{
