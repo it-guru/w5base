@@ -120,12 +120,23 @@ sub _TreeLine
       if (defined($ment->{hreftarget}) && $ment->{hreftarget} ne ""){
          $target="target=\"$ment->{hreftarget}\"";
       }
+      $d.="<div style=\"position:relative\">";
       if (defined($href)){
-         $d.="<a $target $hrefclass $contextM $usehref title=\"$desc\">";
+         $d.="<a $target $hrefclass $contextM title=\"$desc\n\" $usehref>";
       }
       $d.=$text  if (defined($text));
       $d.="</a>" if (defined($href));
+      if (exists($control->{clipicon})){
+         my $labelpath=$ment->{labelpath};
+         $labelpath=~s/['"]//g;
+         $d.="<div onclick=".
+         "\"ClickOn_".$control->{clipicon}."(this,'$href','$labelpath');\" ".
+         "class=\"".$control->{clipicon}."\"></div>\n";
+      }
       $d.= ' ('.CGI::escapeHTML(limitlen($comm,30,1)).')' if ($comm ne '');
+
+      $d.="</div>";
+
       $d.="</td></tr></table>";
       $d.="</div>\n";
       if (defined($ment->{contextMenu}) && 
