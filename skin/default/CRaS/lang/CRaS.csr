@@ -1,0 +1,4 @@
+'CRaS::csr'=>{
+  de=>'CRaS: Zertifikats-Request',
+  en=>'CRaS: Certificate-Request'
+}
