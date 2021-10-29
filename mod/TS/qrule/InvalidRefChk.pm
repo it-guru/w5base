@@ -179,7 +179,6 @@ sub setReferencesToNull
                      push(@lastknownboss,sort(split(/\s+/,
                                               $contactrec->{lastknownbossid})));
                   }
-                  my $lastbossid=shift(@lastknownboss);
                   BLOOP: foreach my $lastbossid (@lastknownboss){
                      my $o=getModuleObject($dataobj->Config,"base::user");
                      $o->SetFilter({userid=>\$lastbossid});
