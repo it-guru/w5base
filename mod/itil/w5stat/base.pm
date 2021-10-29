@@ -189,10 +189,6 @@ sub getStatSelectionBox
       },
       {
          cistatusid=>'3 4 5',
-         businessteamid=>\@grpids,
-      },
-      {
-         cistatusid=>'3 4 5',
          secapplmgr2id=>\$userid
       }
    );
