@@ -174,7 +174,6 @@ sub fieldSelectBox
                $view=[$view] if (ref($view) ne "ARRAY");
                my @subs;
                foreach my $vfld (@$view){
-#printf STDERR ("fifi vfld=%s.$vfld\n",$fld->Name());
                   my $subfld=$vjoinobj->getField($vfld);
                   if (defined($subfld)){
                      if (exists($subfld->{vjointo}) &&
@@ -348,7 +347,7 @@ sub ProcessBottom
 
    if ($#view!=-1){
       my $opobj=$app->Clone();
-      $opobj->SetFilter(\%search);
+      $opobj->SecureSetFilter(\%search);
       my @l=$opobj->getHashList(@view);
 
       my %finalTO;
