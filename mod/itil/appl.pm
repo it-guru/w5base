@@ -2305,7 +2305,7 @@ sub addApplicationSecureFilter
                push(@$addflt,{$ns.$fld=>\$userid});
             }
          }
-         foreach my $fld (qw(businessteamid responseteamid)){
+         foreach my $fld (qw(businessteamid responseteamid responseorgid)){
             if ($self->getField($ns.$fld)){
                push(@$addflt,{$ns.$fld=>\@grpids});
             }
