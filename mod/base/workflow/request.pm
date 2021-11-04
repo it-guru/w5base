@@ -257,15 +257,20 @@ sub isWriteValid
    my $userid=$self->getParent->getCurrentUserId();
    return(1) if (!defined($rec));
    my @l;
-   if ($rec->{state}==1 || $rec->{state}==4){
-      if ($rec->{initiatorid}==$userid){
+   if ($rec->{state}==1 || $rec->{state}==2 || $rec->{state}==3 || 
+       $rec->{state}==4){
+      if ($rec->{initiatorid}==$userid &&
+          $rec->{fwdtarget} eq "base::user" &&
+          $rec->{fwdtargetid} eq $userid){
          push(@l,"default");
       }
       else{
-         if ($rec->{initiatorgroupid} ne ""){
-            if ($self->getParent->IsMemberOf($rec->{initiatorgroupid},
-                                             "RMember","direct")){
-               push(@l,"default");
+         if ($rec->{state}==1){
+            if ($rec->{initiatorgroupid} ne ""){
+               if ($self->getParent->IsMemberOf($rec->{initiatorgroupid},
+                                                "RMember","direct")){
+                  push(@l,"default");
+               }
             }
          }
       }
@@ -601,7 +606,12 @@ sub getPosibleActions
                }
                if ($reprook){
                   push(@l,"wffollowup"); # Nachtrag 
-                  push(@l,"wfreprocess");# Zuweisen zur Nachbesserung 
+                  if ($stateid==16){
+                     push(@l,"wfreprocess");# Zuweisen zur Nachbesserung 
+                  }
+                  else{
+                     push(@l,"wfactivate");# Initiale Bearbeitung
+                  }
                }
                else{
                   if ($stateid<20){
