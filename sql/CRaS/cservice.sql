@@ -6,7 +6,16 @@ create table csteam (
    grp            bigint(20) NOT NULL,
    orgarea        bigint(20) NOT NULL,
    comments       longtext default NULL,
-   UNIQUE KEY uk_name (name)
+   createdate     datetime NOT NULL default '0000-00-00 00:00:00',
+   modifydate     datetime NOT NULL default '0000-00-00 00:00:00',
+   createuser     bigint(20) NOT NULL default '0',
+   modifyuser     bigint(20) NOT NULL default '0',
+   editor         varchar(100) NOT NULL default '',
+   realeditor     varchar(100) NOT NULL default '',
+   srcsys     varchar(100) default 'w5base',
+   srcid      varchar(40) default NULL,
+   srcload    datetime    default NULL,
+   UNIQUE KEY `srcsys` (srcsys,srcid),UNIQUE KEY uk_name (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table csr (
    id             bigint(20) NOT NULL,
@@ -39,7 +48,10 @@ create table csr (
    modifyuser     bigint(20) NOT NULL default '0',
    editor         varchar(100) NOT NULL default '',
    realeditor     varchar(100) NOT NULL default '',
-   PRIMARY KEY (id),
+   srcsys     varchar(100) default 'w5base',
+   srcid      varchar(40) default NULL,
+   srcload    datetime    default NULL,
+   PRIMARY KEY (id),UNIQUE KEY `srcsys` (srcsys,srcid),
    FOREIGN KEY fk_appl (applid) REFERENCES appl (id) ON DELETE CASCADE,
    FOREIGN KEY fk_csteam (csteam) REFERENCES csteam (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

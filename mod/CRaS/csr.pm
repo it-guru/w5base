@@ -26,10 +26,32 @@ use itil::lib::Listedit;
 use Date::Parse;
 use DateTime;
 use Crypt::OpenSSL::X509 qw(FORMAT_PEM FORMAT_ASN1);
+use Crypt::PKCS10;
 
 use vars qw(@ISA);
 
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
+
+# State-Flow:
+#
+# captured/erfasst  (1) = requestor has stored the PKCS10 request
+#                         in this state, all tsm/opm and businessteam users
+#                         can update the request.
+#                         On store, a message will be send to applmgr.
+# accepted/     
+# angenommen        (2) = from csteam the request has been accepted 
+#                       
+# sign in progress/     
+# signieren         (3) = from csteam the request has been trasferted to CA
+#                       
+# signed /signiert  (4) = cs team has stored the signresult from CA
+#                       
+# renewal requested (5) = requestor has requested a renewal (process from
+#                         now is the same as on "accepted")
+# disposed of wasted/   
+# veraltet/gelöscht (6) = entry is deleted
+
+
 
 sub new
 {
@@ -41,33 +63,80 @@ sub new
    $self->AddFields(
       new kernel::Field::RecordUrl(),
 
-      new kernel::Field::Linenumber(
-                name          =>'linenumber',
-                label         =>'No.'),
-
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'csr.id'),
-
-      new kernel::Field::Text(
-                name          =>'shortdesc',
-                htmlwidth     =>'150px',
-                label         =>'Brief description',
-                dataobjattr   =>'csr.shortdesc'),
-
-      new kernel::Field::Textarea(
-                name          =>'comments',
-                label         =>'Comments',
-                dataobjattr   =>'csr.comments'),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'Name',
                 readonly      =>1,
+                group         =>'default',
+                dataobjattr   =>'csr.name'),
+
+      new kernel::Field::Select(
+                name          =>'state',
+                htmltablesort =>'Number',
+                selectfix     =>1,
+                htmlwidth     =>'80px',
+                label         =>'Certificate state',
+                htmleditwidth =>'50%',
+                transprefix   =>'CSRSTATE.',
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $newrec=shift;
+                   my $app=$self->getParent();
+                   my @states=qw(1 2 3 4 5 6);
+
+                   my @r;
+                   foreach my $st (@states){
+                      if ($app->isDataInputFromUserFrontend()){
+                         if (!defined($current)){
+                            next if ($st ne "1");
+                         }
+                         else{ 
+                            if ($current->{rawstate} eq "5"){
+                               if (!in_array($st,[qw(2 5 3)])){
+                                  next;
+                               }
+                            }
+                            if ($current->{rawstate} eq "4"){
+                               if (!in_array($st,[qw(4 5 6)])){
+                                  next;
+                               }
+                            }
+                            if ($current->{rawstate} eq "2"){
+                               if (!in_array($st,[qw(3 2 6)])){
+                                  next;
+                               }
+                            }
+                            if ($current->{rawstate} eq "3"){
+                               if (!in_array($st,[qw(4 3 6)])){
+                                  next;
+                               }
+                            }
+                         }
+                      }
+                      push(@r,$st,$app->T("CSRSTATE.".$st));
+                   }
+                   return(@r);
+                },
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(0);
+                },
+                dataobjattr   =>'csr.status'),
+
+      new kernel::Field::Interface(
+                name          =>'rawstate',
+                label         =>'Raw State',
                 htmldetail    =>0,
-                dataobjattr   =>'name'),
+                dataobjattr   =>'csr.status'),
 
       new kernel::Field::Link(
                 name          =>'applid',
@@ -76,100 +145,177 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'appl',
-                label         =>'Application',
+                label         =>'related application',
                 vjointo       =>'itil::appl',
+                group         =>['default','request'],
                 vjoinon       =>['applid'=>'id'],
+                vjoineditbase =>{cistatusid=>">2 AND <5"},
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if (defined($rec));
+                   return(0);
+                },
                 vjoindisp     =>'name'),
                 
+      new kernel::Field::TextDrop(
+                name          =>'csteam',
+                label         =>'Certificate Service Team',
+                group         =>'source',
+                vjointo       =>'CRaS::csteam',
+                vjoinon       =>['csteamid'=>'id'],
+                vjoindisp     =>'name',
+                dataobjattr   =>'csteam.name'),
+                
+      new kernel::Field::Link(
+                name          =>'csteamid',
+                label         =>'CS Team ID',
+                dataobjattr   =>'csr.csteam'),
+
+      new kernel::Field::Link(
+                name          =>'csteamgrpid',
+                label         =>'CS Team Group ID',
+                dataobjattr   =>'csteam.grp'),
+
+      new kernel::Field::Textarea(
+                name          =>'comments',
+                label         =>'Comments',
+                group         =>['default','request'],
+                dataobjattr   =>'csr.comments'),
+
+#      new kernel::Field::Text(
+#                name          =>'sslcertdocname',
+#                label         =>'SSL-Certificate-Document Name',
+#                searchable    =>0,
+#                uploadable    =>0,
+#                readonly      =>1,
+#                htmldetail    =>0,
+#                dataobjattr   =>'csr.sslcertdocname'),
+
+      new kernel::Field::Text(
+                name          =>'sslcertcommon',
+                label         =>'SSL-Certificate Common Name',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'csr.sslcertcommon'),
+
+
+      new kernel::Field::Text(
+                name          =>'sslcertorg',
+                label         =>'SSL-Certificate Organisation',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'csr.sslcertorg'),
+
+      new kernel::Field::Text(
+                name          =>'refno',
+                label         =>'CA Reference No.',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'csr.refno'),
+
+      new kernel::Field::Text(
+                name          =>'replacedrefno',
+                label         =>'CA replaced Ref. No.',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'csr.replacedrefno'),
+
+      new kernel::Field::Text(
+                name          =>'spassword',
+                label         =>'CA Service-Password',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'csr.spassword'),
+
+#      new kernel::Field::Select(
+#                name          =>'expnotifyleaddays',
+#                htmleditwidth =>'280px',
+#                default       =>'56',
+#                label         =>'Expiration notify lead time',
+#                value         =>['14','21','28','56','70'],
+#                transprefix   =>'EXPNOTIFYLEAD.',
+#                translation   =>'itil::applcsr',
+#                dataobjattr   =>'csr.expnotifyleaddays'),
+
+#      new kernel::Field::Date(
+#                name          =>'sslexpnotify1',
+#                history       =>0,
+#                htmldetail    =>0,
+#                searchable    =>0,
+#                label         =>'Notification of Certificate Expiration',
+#                dataobjattr   =>'csr.exp_notify1'),
+
+#      new kernel::Field::Date(
+#                name          =>'startdate',
+#                label         =>'Certificate begin',
+#                group         =>'detail',
+#                readonly      =>1,
+#                dataobjattr   =>'csr.startdate'),
+#
+#      new kernel::Field::Date(
+#                name          =>'enddate',
+#                label         =>'Certificate end',
+#                group         =>'detail',
+#                readonly      =>1,
+#                dataobjattr   =>'csr.enddate'),
+
+      new kernel::Field::Text(
+                name          =>'ssslsubject',
+                label         =>'SSL-Certificate Owner',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'csr.ssslsubject'),
+
+      new kernel::Field::Text(
+                name          =>'ssslissuer',
+                label         =>'SSL-Certificate Issuer',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'csr.ssslissuer'),
+
+      new kernel::Field::Text(
+                name          =>'ssslserialno',
+                label         =>'SSL-Certificate Serial No.',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'csr.ssslserialno'),
+
       new kernel::Field::File(
                 name          =>'sslcert',
-                label         =>'Certificate file',
-                types         =>['crt','cer','pem','der'],
-                filename      =>'sslcertdocname',
+                label         =>'certificate request',
+                group         =>['detail','request'],
                 maxsize       =>65533,
+                readonly      =>1,
                 searchable    =>0,
                 uploadable    =>0,
                 allowempty    =>0,
                 allowdirect   =>1,
                 dataobjattr   =>'csr.sslcert'),
 
-      new kernel::Field::Text(
-                name          =>'sslcertdocname',
-                label         =>'SSL-Certificate-Document Name',
-                searchable    =>0,
-                uploadable    =>0,
-                readonly      =>1,
-                htmldetail    =>0,
-                dataobjattr   =>'csr.sslcertdocname'),
 
-      new kernel::Field::Select(
-                name          =>'expnotifyleaddays',
-                htmleditwidth =>'280px',
-                default       =>'56',
-                label         =>'Expiration notify lead time',
-                value         =>['14','21','28','56','70'],
-                transprefix   =>'EXPNOTIFYLEAD.',
-                translation   =>'itil::applcsr',
-                dataobjattr   =>'csr.expnotifyleaddays'),
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                selectfix     =>1,
+                label         =>'Source-System',
+                dataobjattr   =>'csr.srcsys'),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                label         =>'Source-Id',
+                dataobjattr   =>'csr.srcid'),
 
       new kernel::Field::Date(
-                name          =>'sslexpnotify1',
+                name          =>'srcload',
                 history       =>0,
-                htmldetail    =>0,
-                searchable    =>0,
-                label         =>'Notification of Certificate Expiration',
-                dataobjattr   =>'csr.exp_notify1'),
-
-      new kernel::Field::Date(
-                name          =>'startdate',
-                label         =>'Certificate begin',
-                group         =>'detail',
-                readonly      =>1,
-                dataobjattr   =>'csr.startdate'),
-
-      new kernel::Field::Date(
-                name          =>'enddate',
-                label         =>'Certificate end',
-                group         =>'detail',
-                readonly      =>1,
-                dataobjattr   =>'csr.enddate'),
-
-      new kernel::Field::Textarea(
-                name          =>'subject',
-                label         =>'Owner',
-                group         =>'detail',
-                readonly      =>1,
-                dataobjattr   =>'csr.subject'),
-
-      new kernel::Field::Textarea(
-                name          =>'issuer',
-                label         =>'Issuer',
-                group         =>'detail',
-                readonly      =>1,
-                dataobjattr   =>'csr.issuer'),
-
-      new kernel::Field::Text(
-                name          =>'issuerdn',
-                label         =>'Issuer DN',
-                group         =>'detail',
-                htmldetail    =>1,
-                readonly      =>1,
-                dataobjattr   =>'csr.issuerdn'),
-
-      new kernel::Field::Text(
-                name          =>'altname',
-                label         =>'alternate Names',
-                group         =>'detail',
-                htmldetail    =>"notEmpty",
-                readonly      =>1,
-                dataobjattr   =>'csr.altname'),
-
-      new kernel::Field::Text(
-                name          =>'serialno',
-                label         =>'Serial Nr.',
-                group         =>'detail',
-                readonly      =>1,
-                dataobjattr   =>'csr.serialno'),
+                group         =>'source',
+                label         =>'Source-Load',
+                dataobjattr   =>'csr.srcload'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -222,7 +368,7 @@ sub new
                 dataobjattr   =>"lpad(csr.id,35,'0')"),
 
    );
-   $self->setDefaultView(qw(linenumber shortdesc enddate appl name));
+   $self->setDefaultView(qw(sslcertcommon state appl mdate));
    $self->setWorktable('csr');
    return($self);
 }
@@ -234,6 +380,20 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/certificate.jpg?".$cgi->query_string());
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my $worktable="csr";
+   my $from="$worktable join csteam ".
+            "on $worktable.csteam=csteam.id ";
+
+   return($from);
+}
+
+
 
 
 sub SecureSetFilter
@@ -279,6 +439,8 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
+   return("request") if (!defined($rec));
+
    if ($self->itil::lib::Listedit::isWriteOnApplValid(
                                        $rec->{applid},"technical")) {
       return("default");
@@ -287,6 +449,18 @@ sub isWriteValid
    return(undef);
 }
 
+sub isViewValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return("request") if (!defined($rec));
+
+   if ($rec->{rawstate}>0){
+      return(qw(history default detail header source));
+   }
+
+   return(qw(ALL));
+}
 
 sub parseCertDate
 {
@@ -329,25 +503,77 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if (effVal($oldrec,$newrec,'shortdesc') eq '') {
-      $self->LastMsg(ERROR,"No brief description specified");
-      return(0);
+   if ($self->isDataInputFromUserFrontend() && !defined($oldrec)){
+$newrec->{sslcert}=<<EOF;
+-----BEGIN CERTIFICATE REQUEST-----
+MIIE9DCCAtwCAQAwga4xCzAJBgNVBAYTAkRFMQwwCgYDVQQIDANOUlcxDTALBgNV
+BAcMBEJvbm4xITAfBgNVBAoMGERldXRzY2hlIFRlbGVrb20gSVQgR21iSDEXMBUG
+A1UECwwOVGVsZWtvbS1JVCBQVkcxHjAcBgNVBAMMFXNob3BwbGFuZXIudGVsZWtv
+bS5kZTEmMCQGCSqGSIb3DQEJARYXamFuLmthbmRhQHQtc3lzdGVtcy5jb20wggIi
+MA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDBXfpSunBMPInekJ1tfVOq0shs
+WHIjXEN+HhjSEgmYmER9h+Piy7nZ0FNlBR2Ii2bqwc64NTNarxUjHEc4751QEtFr
+FZ89MNQpv0iQmtbvIEx0UYdzG/+m6HoHpPjFputw7Jh9iDe2r4FNjR5+rck66Dv2
+noCtthhz/r+S4Rvj7DtK2igxflLHaujkivV70GF5bsP4HXqpo5r7DC22KsaBKqpF
+6TI28O4VpZUTYXktaECJmaoLYzUr4dwZXTX2OufDJALu0azk6ZVFxhrJsXJAeJ8K
+gqIcbkS+1+vtVg4/H5cfCQWNfw0M7eYl/tsk+L5CiRA1lXsb7J2+/5EZmgTnDhrL
+Z++WsfhsFW8T+n1hI0TAlTfYCJ/TvYjHFhiM9EfaqMw9dC3id50K2W8OeDMaqy3G
+P4iolbVhBaH8HYXRphpTObD5HEh4fRrNmjTHsSwOeJd/GrWY3m5okjtMhxy4Mp4a
+9lyxBCHUMRoL4ycH69djIayMO5VUnwtxm2iZvNV/Iwct7odHyHhDDolbKinK5Zry
+ZJGzib9HjiXcY2vU1Wc/YCGKTOyYtTgs7KG1MyQ8VAK1ge7trRw4EfgTVLZqXzZ6
+NNqlcCHuZb6uKfWbbFFeUZjhabCrbogx+bSwzkRVCthP4WeKwlIJ1l2D3+eIDQ2k
+k61yx/wZVmLJmNamMQIDAQABoAAwDQYJKoZIhvcNAQELBQADggIBAAkH6nr064K+
+k1zekqu1c14poD5MJ3ObizY8RxsAcjpVFbXqPQxfU9vRbqMJRpgSc9DOtXyWxS+c
+wNQlHgLiEIgyQ9W8LN+glg+g5t5QwuAbdd/qXXGQCyle8fkvXrkfV/GrDBKoC5Pi
+BplZZdBAW0wwZKmyDpko0d5HjqMdxXGSZlECCoSeTh0v+82FbPca221f28jYJMSp
+A12QugNO+TAm25+xAXU8ZkSl8AZL2Z8SYNTUgSQSYRc9pOr4w9xSCTH3jXBLYh64
+OblTH+8GDl7+4tcTn+86Dm99iJV71/jddZslQM2mw6gWsvbGQn/djD1Dj35yM/Fn
+q3asPXwmwZ33/AOCWrTsejfh6lO5Ujo28RtynqhLdw3WSrTc41bBIDiAL7gxW8yY
+zP+Qs3xlphOqGlPHxuaeAKTXTHC2axa4GMSA15f+qSnVBhaBsfGew/SOqodbUCj5
+teblY+jsRAPBrxO4cxQ/6aM5morEPNkeh4N86y6XIJBwH6Gn0ote92kk7X0331t0
+sjE8ipHjZeA4R+4G/FuQotrxkge/KRjb5Q/mXW3/oKN/ZPI1zp+PHu6wSue8GIjF
+7MOb5z/4YrkCfgfayYN9PVfuZfsg5gmESJil5SP/lfqz6mE9mvOTRc+IL4jSHdEh
+m2U/7Rd5u0FxEoIjT84/wX1GIBmp0+sW
+-----END CERTIFICATE REQUEST-----
+EOF
+   }
+   #if (effVal($oldrec,$newrec,'shortdesc') eq '') {
+   #   $self->LastMsg(ERROR,"No brief description specified");
+   #   return(0);
+   #}
+
+   if (!defined($oldrec)){
+      if (!exists($newrec->{state}) && !exists($newrec->{rawstate})){
+         $newrec->{state}=1;
+      }
+      my $applid=effVal($oldrec,$newrec,"applid"); 
+      my $appl=getModuleObject($self->Config,"itil::appl");
+      $appl->SetFilter({id=>\$applid});
+      my ($arec)=$appl->getOnlyFirst(qw(ALL));
+      
+      my $csteam=getModuleObject($self->Config,"CRaS::csteam");
+      $csteam->SetFilter({});
+      my ($csteamrec)=$csteam->getOnlyFirst(qw(ALL));
+
+      $newrec->{csteamid}=$csteamrec->{id}; 
    }
 
-   if (effVal($oldrec,$newrec,'applid') eq '') {
-      $self->LastMsg(ERROR,"No application specified");
-      return(0);
+   if ($self->isDataInputFromUserFrontend()){
+      if (effVal($oldrec,$newrec,'applid') eq '') {
+         $self->LastMsg(ERROR,"No application specified");
+         return(0);
+      }
+      if (!$self->itil::lib::Listedit::isWriteOnApplValid(
+                                          $newrec->{applid},"technical")) {
+         $self->LastMsg(ERROR,"No write access on specified application");
+         return(0);
+      }
    }
 
-   if (effVal($oldrec,$newrec,'sslcert') eq '') {
-      $self->LastMsg(ERROR,"No certificate file selected");
-      return(0);
-   }
-
-   if (!$self->itil::lib::Listedit::isWriteOnApplValid(
-                                       $newrec->{applid},"technical")) {
-      $self->LastMsg(ERROR,"No write access on specified application");
-      return(0);
+   if ($self->isDataInputFromUserFrontend()){
+      if (!defined($oldrec) && effVal($oldrec,$newrec,'sslcert') eq '') {
+         $self->LastMsg(ERROR,"No certificate file selected");
+         return(0);
+      }
    }
 
    if (effChanged($oldrec,$newrec,"expnotifyleaddays")){
@@ -357,104 +583,33 @@ sub Validate
 
    if (effChangedVal($oldrec,$newrec,'sslcert')) {
       my $sslcertfile=effVal($oldrec,$newrec,"sslcert");
-      my $x509;
-      # try multiple file formats
-      eval('$x509=Crypt::OpenSSL::X509->new_from_string($sslcertfile,
-                                                        FORMAT_PEM);');
-      if ($@ ne "") {
-         eval('$x509=Crypt::OpenSSL::X509->new_from_string($sslcertfile,
-                                                           FORMAT_ASN1);');
-      }
 
+      Crypt::PKCS10->setAPIversion(0);
+      my $pkcs;
+      # try multiple file formats
+      eval('$pkcs=Crypt::PKCS10->new($sslcertfile);');
       if ($@ ne "") {
-         $self->LastMsg(ERROR,"Unknown file format");
+         $self->LastMsg(ERROR,"Unknown file format - PKCS10 required");
          return(0);      
       }
    
-      # Startdate / Enddate
-      my $startdate=$x509->notBefore();
-      $newrec->{startdate}=$self->parseCertDate($startdate);
-
-      my $enddate=$x509->notAfter();
-      $newrec->{enddate}=$self->parseCertDate($enddate);
-
-      if (!defined($newrec->{startdate}) ||
-          !defined($newrec->{enddate})) {
-         $self->LastMsg(ERROR,"Validity date is not interpretable");
-         return(0);
-      }
-
       # Subject
-      my $sobjs=$x509->subject_name->entries();
-      $newrec->{subject}=$self->formatedMultiline($sobjs);
+      $newrec->{ssslsubject}=$pkcs->subject();
 
-      # Issuer
-      my $iobjs=$x509->issuer_name->entries();
-      $newrec->{issuer}=$self->formatedMultiline($iobjs);
-
-      $newrec->{issuerdn}=$x509->issuer();
-
-      # SerialNr. (hex format)
-      $newrec->{serialno}=$x509->serial();
+#      # Issuer
+#      my $iobjs=$pkcs->issuer_name->entries();
+#      $newrec->{issuer}=$self->formatedMultiline($iobjs);
+#
+#      $newrec->{issuerdn}=$pkcs->issuer();
+#
+#      # SerialNr. (hex format)
+#      $newrec->{serialno}=$pkcs->serial();
 
 
       # Name
-      my ($cn)=grep({$_->type() eq 'CN'} @$iobjs);
-      if (defined($cn)){
-         $newrec->{name}=$cn->value().' - '.$newrec->{serialno};
-      }
-      else{
-         $newrec->{name}="Common Nameless - ".$newrec->{serialno};
-      }
-
-      # "Alternative Name" analyse
-      my $alternativeNames;
-
-      my $exts;
-
-      eval('$exts=$x509->extensions_by_oid();');
-      if ($@){
-         msg(WARN,"x509::extensions_by_oid crashed with $@");
-      }
-      if (ref($exts) eq "HASH"){
-         foreach my $oid (keys(%$exts)){
-           my $ext=$exts->{$oid};
-           if ($oid eq "2.5.29.17"){
-              my $val=$ext->value(); 
-              if ($ext->can("to_string")){
-                 $val=$ext->to_string();
-              }
-              elsif ($ext->can("as_string")){
-                 $val=$ext->as_string();
-              }
-              $alternativeNames=$val;
-           }
-         }
-      }
-      if (defined($alternativeNames)){
-         if (!defined($oldrec)){
-            $newrec->{altname}=$alternativeNames;
-         }
-         else{
-            if ($oldrec->{altname} ne $alternativeNames){
-               $newrec->{altname}=$alternativeNames;
-            }
-         }
-      }
-      msg(INFO,"alternativeNames=$alternativeNames");
-
-      # check if already expired
-      my $duration=CalcDateDuration(NowStamp('en'),$newrec->{enddate});
-
-      if ($duration->{days}<7) {
-         my $msg='Certificate expires soon';
-         if ($duration->{totalseconds}<0) {
-            $msg='Certificate has already expired';
-         }
-         $self->LastMsg(ERROR,$msg);
-
-         return(0);
-      }
+      $newrec->{name}=$pkcs->commonName();
+      $newrec->{sslcertcommon}=$pkcs->commonName();
+      $newrec->{sslcertorg}=$pkcs->organizationName();
    }
 
    return(1);

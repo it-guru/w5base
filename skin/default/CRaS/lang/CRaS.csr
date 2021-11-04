@@ -1,4 +1,26 @@
 'CRaS::csr'=>{
   de=>'CRaS: Zertifikats-Request',
   en=>'CRaS: Certificate-Request'
-}
+},
+'fieldgroup.default'=>{
+  de=>'CRaS: Zertifikat',
+  en=>'CRaS: Certificate'
+},
+'fieldgroup.request'=>{
+  de=>'Zertifikats-Request',
+  en=>'Certificate-request'
+},
+'fieldgroup.detail'=>{
+  de=>'Zertifikat',
+  en=>'Certificate'
+},
+'related application'=>{de=>'zugeordnete Anwendung'},
+'certificate request'=>{de=>'Zertifikats Request'},
+'Certificate state'=>{de=>'Zertifikats-Status'},
+'CSRSTATE.1'=>{de=>'erfasst',en=>'captured'},
+'CSRSTATE.2'=>{en=>'accepted',de=>'angenommen'},
+'CSRSTATE.3'=>{de=>'signieren',en=>'sign in progress'},
+'CSRSTATE.4'=>{de=>'signiert',en=>'signed'},
+'CSRSTATE.5'=>{de=>'Erneuerung angefordert',en=>'renewal requested'},
+'CSRSTATE.6'=>{en=>'disposed of wasted',de=>'veraltet/gelöscht'},
+
