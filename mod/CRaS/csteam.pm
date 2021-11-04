@@ -29,13 +29,12 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Linenumber(
-                name          =>'linenumber',
-                label         =>'No.'),
+      new kernel::Field::RecordUrl(),
 
       new kernel::Field::Id(
                 name          =>'id',
                 sqlorder      =>'desc',
+                group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'csteam.id'),
                                                   
@@ -45,57 +44,40 @@ sub new
                 label         =>'Name',
                 dataobjattr   =>'csteam.name'),
 
-      new kernel::Field::Select(
-                name          =>'cistatus',
-                htmleditwidth =>'40%',
-                label         =>'CI-State',
-                vjoineditbase =>{id=>">0 AND <7"},
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['cistatusid'=>'id'],
-                vjoindisp     =>'name'),
+
+      new kernel::Field::TextDrop(
+                name          =>'orgarea',
+                label         =>'oranisational area',
+                vjointo       =>'base::grp',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['orgareaid'=>'grpid'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
-                name          =>'cistatusid',
-                label         =>'CI-StateID',
-                dataobjattr   =>'csteam.cistatus'),
+                name          =>'orgareaid',
+                selectfix     =>1,
+                dataobjattr   =>'csteam.orgarea'),
+
+
+      new kernel::Field::TextDrop(
+                name          =>'grp',
+                label         =>'service team',
+                vjointo       =>'base::grp',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['grpid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'grpid',
+                selectfix     =>1,
+                dataobjattr   =>'csteam.grp'),
+
 
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
                 dataobjattr   =>'csteam.comments'),
 
-      new kernel::Field::SubList(
-                name          =>'software',
-                label         =>'Software',
-                group         =>'software',
-                vjointo       =>'itil::software',
-                vjoinon       =>['id'=>'csteamid'],
-                vjoindisp     =>['name','cistatus'],
-                vjoinbase     =>[{cistatusid=>'<6'}]),
-
-      new kernel::Field::SubList(
-                name          =>'models',
-                label         =>'Hardware-Models',
-                group         =>'models',
-                vjointo       =>'itil::hwmodel',
-                vjoinon       =>['id'=>'csteamid'],
-                vjoindisp     =>['name','cistatus'],
-                vjoinbase     =>[{cistatusid=>'<6'}]),
-
-      new kernel::Field::Container(
-                name          =>'additional',
-                label         =>'Additionalinformations',
-                uivisible     =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $rec=$param{current};
-                   if (!defined($rec->{$self->Name()})){
-                      return(0);
-                   }
-                   return(1);
-                },
-                dataobjattr   =>'csteam.additional'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -167,11 +149,8 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(name id cistatus cdate mdate));
+   $self->setDefaultView(qw(name id grp cdate mdate));
    $self->setWorktable("csteam");
-   $self->{CI_Handling}={uniquename=>"name",
-                         activator=>["admin","w5base.itil.csteam"],
-                         uniquesize=>255};
    return($self);
 }
 
@@ -195,34 +174,9 @@ sub Validate
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
    }
-   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
-      return(0);
-   }
    return(1);
 }
 
-
-sub FinishWrite
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
-      return(0);
-   }
-   return(1);
-}
-
-
-sub FinishDelete
-{
-   my $self=shift;
-   my $oldrec=shift;
-   if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
-      return(0);
-   }
-   return(1);
-}
 
 
 sub isWriteValid
@@ -230,10 +184,8 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   my $userid=$self->getCurrentUserId();
-   return("default") if (!defined($rec) ||
-                         ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
-                         $self->IsMemberOf($self->{CI_Handling}->{activator}));
+
+   return("default") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 
@@ -244,15 +196,6 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    return("ALL");
-}
-
-sub initSearchQuery
-{
-   my $self=shift;
-   if (!defined(Query->Param("search_cistatus"))){
-     Query->Param("search_cistatus"=>
-                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
-   }
 }
 
 
