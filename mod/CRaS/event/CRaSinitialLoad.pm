@@ -225,6 +225,39 @@ sub ProcessXLS
                srcid=>$srcid,
                srcload=>NowStamp("en")
             );
+            if ($rec{SharePointLfdNr} ne ""){
+               $csrrec{comments}.="\n" if ($csrrec{comments} ne "");
+               $csrrec{comments}.="SharePoint Laufende-Nummer: ".
+                                  "$rec{SharePointLfdNr}";
+            }
+            if ($rec{applid} eq "" && $rec{ICTO} ne ""){
+               $csrrec{comments}.="\n" if ($csrrec{comments} ne "");
+               $csrrec{comments}.="Angefordert für $rec{ICTO}";
+            }
+            if ($rec{Anforderer} ne ""){
+               $csrrec{comments}.="\n" if ($csrrec{comments} ne "");
+               $csrrec{comments}.="Angefordert durch $rec{Anforderer}";
+               if (my ($n1,$n2)=$rec{Anforderer}=~m/^(\S+)\s+(.*)$/){
+                  my $u=$self->getPersistentModuleObject("usr","base::user");
+                  $u->SetFilter([
+                     {
+                         surname=>$n1,
+                         givenname=>$n2,
+                         cistatusid=>"3 4 5"
+                     },
+                     {
+                         surname=>$n2,
+                         givenname=>$n1,
+                         cistatusid=>"3 4 5"
+                     }
+                  ]);
+                  my @l=$u->getHashList(qw(userid));
+                  if ($#l==0){
+                     $csrrec{creatorid}=$l[0]->{userid};
+                  }
+               }
+            }
+
             if ($rec{applid} ne ""){
                $csrrec{applid}=$rec{applid};
             }
@@ -236,6 +269,12 @@ sub ProcessXLS
             if ($csrrec{refno} ne ""){
                $csrrec{state}=4;
             }
+            if ($rec{'Ersatz durch  Renewal ID'} ne ""){
+               $csrrec{state}=6;
+               if ($rec{'Ersatz durch  Renewal ID'}=~m/^[0-9]+$/){
+                  $csrrec{replacedrefno}=$rec{'Ersatz durch  Renewal ID'}; 
+               }
+            }
             if ($rec{'Seriennummer (hex)'} ne ""){
                $csrrec{ssslserialno}=$rec{'Seriennummer (hex)'};
             }
@@ -244,26 +283,18 @@ sub ProcessXLS
             }
             $csrrec{spassword}=~s/./*/g;
 
+            if ((my ($d,$m,$y)=$rec{'Ausgestellt am'}
+                =~m/^\s*([0-9]+)\.([0-9]+)\.([0-9]+)\s*$/)){
+               $csrrec{ssslstartdate}=sprintf("%04d-%02d-%02d 12:00:00",
+                                              $y,$m,$d);
+            }
+            if ((my ($d,$m,$y)=$rec{'Gültig bis'}
+                =~m/^\s*([0-9]+)\.([0-9]+)\.([0-9]+)\s*$/)){
+               $csrrec{ssslenddate}=sprintf("%04d-%02d-%02d 12:00:00",
+                                              $y,$m,$d);
+            }
 
-            #{
-            #   'Anforderer' => 'Adrian Vogel',
-            #   'Ausgestellt am' => '15.10.2021',
-            #   'CommonName' => 'xxxxxxxxxxxxxxxkom.net',
-            #   'Gültig bis' => '19.10.2022',
-            #   'ICTO' => 'One.ERP_CERP_MyStore',
-            #   'PSP Element' => 'xxxxxxxxxxxxxxx-10-0001',
-            #   'Referenznummer' => '295764',
-            #   'Seriennummer (hex)' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-            #   'Service-Passwort' => 'xxxxxxxxxx',
-            #   'SharePointLfdNr' => '1229',
-            #   'initiale Organisation Alias' => '(Standard & SAN)',
-            #   'xlsrow' => 1231,
-            #   'xlssheet' => 'Tabelle1'
-            # };
-
-            
-
-            if ($rec{applid} ne ""){
+            if (1 || $rec{applid} ne ""){
                $csr->ValidatedInsertOrUpdateRecord(\%csrrec,{
                   srcid=>\$srcid
                });

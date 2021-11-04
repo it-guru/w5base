@@ -89,6 +89,7 @@ sub new
                    my $self=shift;
                    my $current=shift;
                    my $newrec=shift;
+                   my $mode=shift;
                    my $app=$self->getParent();
                    my @states=qw(1 2 3 4 5 6);
 
@@ -96,7 +97,7 @@ sub new
                    foreach my $st (@states){
                       if ($app->isDataInputFromUserFrontend()){
                          if (!defined($current)){
-                            next if ($st ne "1");
+                          #  next if ($st ne "1");
                          }
                          else{ 
                             if ($current->{rawstate} eq "5"){
@@ -149,6 +150,7 @@ sub new
                 vjointo       =>'itil::appl',
                 group         =>['default','request'],
                 vjoinon       =>['applid'=>'id'],
+                htmldetail    =>'NotEmptyOrEdit',
                 vjoineditbase =>{cistatusid=>">2 AND <5"},
                 readonly      =>sub{
                    my $self=shift;
@@ -219,6 +221,8 @@ sub new
                 label         =>'CA replaced Ref. No.',
                 group         =>'detail',
                 htmldetail    =>'NotEmpty',
+                weblinkto     =>'CRaS::csr',
+                weblinkon     =>['replacedrefno'=>'refno'],
                 dataobjattr   =>'csr.replacedrefno'),
 
       new kernel::Field::Text(
@@ -246,19 +250,21 @@ sub new
 #                label         =>'Notification of Certificate Expiration',
 #                dataobjattr   =>'csr.exp_notify1'),
 
-#      new kernel::Field::Date(
-#                name          =>'startdate',
-#                label         =>'Certificate begin',
-#                group         =>'detail',
-#                readonly      =>1,
-#                dataobjattr   =>'csr.startdate'),
-#
-#      new kernel::Field::Date(
-#                name          =>'enddate',
-#                label         =>'Certificate end',
-#                group         =>'detail',
-#                readonly      =>1,
-#                dataobjattr   =>'csr.enddate'),
+      new kernel::Field::Date(
+                name          =>'ssslstartdate',
+                label         =>'SSL-Certificate begin',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'csr.ssslstartdate'),
+
+      new kernel::Field::Date(
+                name          =>'ssslenddate',
+                label         =>'SSL-Certificate end',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'csr.ssslenddate'),
 
       new kernel::Field::Text(
                 name          =>'ssslsubject',
@@ -333,6 +339,12 @@ sub new
 
       new kernel::Field::Creator(
                 name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'csr.createuser'),
+
+      new kernel::Field::Link(
+                name          =>'creatorid',
                 group         =>'source',
                 label         =>'Creator',
                 dataobjattr   =>'csr.createuser'),
@@ -623,6 +635,18 @@ sub getDetailBlockPriority
 }
 
 
+sub isDeleteValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(0) if ($rec->{state}<6);
+
+   return($self->SUPER::isDeleteValid($rec));
+}
+
+
+
 sub isUploadValid
 {
    return(0);
@@ -633,6 +657,17 @@ sub isQualityCheckValid
 {
    return(0);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_state"))){
+     Query->Param("search_state"=>
+                  "\"!".$self->T("CSRSTATE.6")."\"");
+   }
+}
+
 
 
 
