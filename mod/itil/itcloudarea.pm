@@ -164,7 +164,10 @@ sub new
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjointo       =>'itil::ipaddress',
                 vjoinon       =>['id'=>'itcloudareaid'],
-                vjoindisp     =>['name','cistatus','network']),
+                vjoindisp     =>['name','cistatus','network'],
+                vjoininhash   =>['name','cistatusid','networkid','network',
+                                 'systemid','itclustsvcid',
+                                 'srcsys','srcid','id']),
 
       new kernel::Field::SubList(
                 name          =>'systems',

@@ -73,6 +73,15 @@ sub new
                 uivisible     =>1,
                 label         =>'IP-Adresses'),
 
+      new kernel::Field::Boolean(
+                name          =>'isremote',
+                label         =>'is remote interface'),
+
+      new kernel::Field::Text(
+                name          =>'eniownerid',
+                FieldHelpType =>'GenericConstant',
+                label         =>'ENI OwnerID'),
+
       new kernel::Field::Text(
                 name          =>'accountid',
                 FieldHelpType =>'GenericConstant',
@@ -133,6 +142,7 @@ sub DataCollector
    my $AWSRegion=$query->{region};
 
    my @errStack;
+   my $cnt=0;
    try {
       my ($stscred,$ua)=$self->GetCred4AWS($AWSAccount,$AWSRegion);
       my $obj=Paws->service('EC2',
@@ -141,6 +151,7 @@ sub DataCollector
       );
       my $blk=0;
       my $NextToken;
+      my %vpcpath;
       do{
          my %param=();
          if ($NextToken ne ""){
@@ -149,31 +160,56 @@ sub DataCollector
          if (exists($query->{id}) && $query->{id} ne ""){
             $param{NetworkInterfaceIds }=[$query->{id}];
          }
+         else{
+            $param{MaxResults}=100;
+            if (exists($filter->{isremote}) &&
+                ($filter->{isremote} eq "0" ||
+                (ref($filter->{isremote}) eq "ARRAY" &&
+                 in_array("0",$filter->{isremote})) ||
+                (ref($filter->{isremote}) eq "SCALAR" &&
+                 ${$filter->{isremote}} eq "0"))){
+               $param{'Filters'}=[
+                  {
+                     Name=>'owner-id',
+                     Values=>[$AWSAccount]
+                  }
+               ];
+            }
+         }
          my $objItr=$obj->DescribeNetworkInterfaces(%param);
          #p $objItr;
          if ($objItr){
+            $NextToken=$objItr->NextToken();
             my $netIfs=$objItr->NetworkInterfaces();
             if ($netIfs){
                #p $netIfs;
                foreach my $netIf (@$netIfs){
-                  my %vpcpath;
                   my %tag;
                   my $rec={
                       id=>$netIf->{NetworkInterfaceId},
                       accountid=>$AWSAccount,
                       region=>$AWSRegion,
                       name=>$netIf->PrivateDnsName(),
+                      eniownerid=>$netIf->OwnerId(),
                       description=>$netIf->Description(),
                       mac=>$netIf->MacAddress(),
                       idpath=>$netIf->{NetworkInterfaceId}.'@'.
                               $AWSAccount.'@'.
                               $AWSRegion,
                   };
+                  if ($rec->{accountid} ne $rec->{eniownerid}){
+                     $rec->{isremote}="1";
+                  }
+                  else{
+                     $rec->{isremote}="0";
+                  }
                   $rec->{vpcid}=$netIf->VpcId();
                   $rec->{vpcidpath}=$rec->{vpcid}.'@'.
                                     $AWSAccount.'@'.
                                     $AWSRegion;
-                  $vpcpath{$rec->{vpcidpath}}++;
+                  if (!exists($vpcpath{$rec->{vpcidpath}})){
+                     $vpcpath{$rec->{vpcidpath}}++;
+                  }
 
                   my @ip;
                   foreach my $ip4rec (@{$netIf->PrivateIpAddresses()}){
@@ -189,34 +225,6 @@ sub DataCollector
                   foreach my $ip6rec (@{$netIf->Ipv6Addresses()}){
                      p $ip6rec;
                   }
-
-                  if (keys(%vpcpath)){
-                     foreach my $vpc (keys(%vpcpath)){
-                        my $vo=$self->getPersistentModuleObject("VPC",
-                                                                "aws::VPC");
-                        $vo->SetFilter({idpath=>$vpc});
-                        my ($vpcrec,$msg)=$vo->getOnlyFirst(qw(id subnets));
-                        $vpcpath{$vpc}=$vpcrec;
-                     }
-                  }
-                  foreach my $rec (@result){
-                     if ($rec->{vpcidpath} ne "" &&
-                         exists($vpcpath{$rec->{vpcidpath}}) &&
-                         ref($vpcpath{$rec->{vpcidpath}}) eq "HASH"){
-                        foreach my $subnet (
-                                @{$vpcpath{$rec->{vpcidpath}}->{subnets}}){
-                           foreach my $iprec (@ip){
-                              if ($ip->isIpInNet($iprec->{name},
-                                                 $subnet->{ipnet})){
-                                 if ($subnet->{netareatag} ne ""){
-                                    $iprec->{netareatag}=$subnet->{netareatag};
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
                   $rec->{ipadresses}=\@ip;
                   push(@result,$rec);
                }
@@ -224,6 +232,36 @@ sub DataCollector
          }
          $blk++;
       }while($NextToken ne "");
+
+      if (keys(%vpcpath)){
+         foreach my $vpc (keys(%vpcpath)){
+            my $vo=$self->getPersistentModuleObject("VPC",
+                                                    "aws::VPC");
+            $vo->SetFilter({idpath=>$vpc});
+            my ($vpcrec,$msg)=$vo->getOnlyFirst(qw(id subnets));
+            $vpcpath{$vpc}=$vpcrec;
+         }
+      }
+      foreach my $rec (@result){
+         if ($rec->{vpcidpath} ne "" &&
+             exists($vpcpath{$rec->{vpcidpath}}) &&
+             ref($vpcpath{$rec->{vpcidpath}}) eq "HASH"){
+            foreach my $subnet (
+                    @{$vpcpath{$rec->{vpcidpath}}->{subnets}}){
+               foreach my $iprec (@{$rec->{ipadresses}}){
+                  if ($ip->isIpInNet($iprec->{name},
+                                     $subnet->{ipnet})){
+                     if ($subnet->{netareatag} ne ""){
+                        $iprec->{netareatag}=$subnet->{netareatag};
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+
+
    }
    catch {
       my $eclass=blessed($_);
@@ -248,6 +286,9 @@ sub initSearchQuery
    my $self=shift;
    if (!defined(Query->Param("search_accountid"))){
      Query->Param("search_accountid"=>'154101356188');
+   }
+   if (!defined(Query->Param("search_isremote"))){
+     Query->Param("search_isremote"=>"\"".$self->T("boolean.false")."\"");
    }
 }
 
