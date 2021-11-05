@@ -133,9 +133,10 @@ sub new
                 },
                 dataobjattr   =>'csr.status'),
 
-      new kernel::Field::Interface(
+      new kernel::Field::Text(
                 name          =>'rawstate',
-                label         =>'Raw State',
+                label         =>'Raw Certificate State',
+                selectfix     =>1,
                 htmldetail    =>0,
                 dataobjattr   =>'csr.status'),
 
@@ -164,6 +165,7 @@ sub new
                 name          =>'csteam',
                 label         =>'Certificate Service Team',
                 group         =>'source',
+                readonly      =>1,
                 vjointo       =>'CRaS::csteam',
                 vjoinon       =>['csteamid'=>'id'],
                 vjoindisp     =>'name',
@@ -178,6 +180,22 @@ sub new
                 name          =>'csteamgrpid',
                 label         =>'CS Team Group ID',
                 dataobjattr   =>'csteam.grp'),
+
+      new kernel::Field::TextDrop(
+                name          =>'csgroup',
+                label         =>'Service Group',
+                group         =>'source',
+                readonly      =>1,
+                vjointo       =>'base::grp',
+                vjoinon       =>['csgrpid'=>'grpid'],
+                vjoindisp     =>'fullname',
+                dataobjattr   =>'grp.fullname'),
+                
+      new kernel::Field::Link(
+                name          =>'csgrpid',
+                selectfix     =>1,
+                label         =>'ServiceGroup ID',
+                dataobjattr   =>'grp.grpid'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -380,8 +398,17 @@ sub new
                 dataobjattr   =>"lpad(csr.id,35,'0')"),
 
    );
-   $self->setDefaultView(qw(sslcertcommon state appl mdate));
+   $self->setDefaultView(qw(state mdate sslcertcommon appl));
    $self->setWorktable('csr');
+   $self->{history}={
+      delete=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ]
+   };
+
    return($self);
 }
 
@@ -400,7 +427,8 @@ sub getSqlFrom
    my @flt=@_;
    my $worktable="csr";
    my $from="$worktable join csteam ".
-            "on $worktable.csteam=csteam.id ";
+            "on $worktable.csteam=csteam.id ".
+            "left outer join grp on csteam.grp=grp.grpid ";
 
    return($from);
 }
@@ -414,9 +442,11 @@ sub SecureSetFilter
    my @flt=@_;
 
    if (!$self->IsMemberOf([qw(admin support w5base.itil.applcsr.read)])) {
+      my @addflt;
       my $userid=$self->getCurrentUserId();
       my %grps=$self->getGroupsOf($userid,"RMember","up");
       my @grpids=keys(%grps);
+      @grpids=qw(-99) if ($#grpids==-1);
 
       my $applobj=getModuleObject($self->Config,'itil::appl');
       $applobj->SetFilter([{sectarget=>\'base::user',
@@ -439,7 +469,9 @@ sub SecureSetFilter
                            {delmgr2id=>\$userid}]);
       my @secappl=map($_->{id},$applobj->getHashList(qw(id)));
 
-      push(@flt,{applid=>\@secappl});
+      push(@addflt,{applid=>\@secappl});
+      push(@addflt,{csgrpid=>\@grpids});
+      push(@flt,\@addflt);
    }
 
    return($self->SetFilter(@flt));
@@ -453,11 +485,21 @@ sub isWriteValid
 
    return("request") if (!defined($rec));
 
-   if ($self->itil::lib::Listedit::isWriteOnApplValid(
-                                       $rec->{applid},"technical")) {
-      return("default");
+   if ($rec->{state}==1 || $rec->{state}==4){
+      if ($self->itil::lib::Listedit::isWriteOnApplValid(
+                                          $rec->{applid},"technical")) {
+         return("default");
+      }
    }
+   my $userid=$self->getCurrentUserId();
 
+
+   if ($rec->{state}==2){
+      return("default") if ($rec->{owner}==$userid);
+   }
+   else{
+      return("default") if ($self->IsMemberOf($rec->{csgrpid}));
+   }
    return(undef);
 }
 
@@ -516,6 +558,7 @@ sub Validate
    my $newrec=shift;
 
    if ($self->isDataInputFromUserFrontend() && !defined($oldrec)){
+      if ($newrec->{sslcert} eq ""){
 $newrec->{sslcert}=<<EOF;
 -----BEGIN CERTIFICATE REQUEST-----
 MIIE9DCCAtwCAQAwga4xCzAJBgNVBAYTAkRFMQwwCgYDVQQIDANOUlcxDTALBgNV
@@ -547,6 +590,7 @@ sjE8ipHjZeA4R+4G/FuQotrxkge/KRjb5Q/mXW3/oKN/ZPI1zp+PHu6wSue8GIjF
 m2U/7Rd5u0FxEoIjT84/wX1GIBmp0+sW
 -----END CERTIFICATE REQUEST-----
 EOF
+      }
    }
    #if (effVal($oldrec,$newrec,'shortdesc') eq '') {
    #   $self->LastMsg(ERROR,"No brief description specified");
