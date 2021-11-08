@@ -47,6 +47,11 @@ sub Init
                       "CRaS::csteam",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("Tools.CRaS.csteam.ResponseHandler",
+                      "CRaS::csr",
+                      func=>'CAresponseHandler',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("Tools.CRaS.csteam.new",
                       "CRaS::csteam",
                       func=>'New',

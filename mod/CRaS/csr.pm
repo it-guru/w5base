@@ -713,6 +713,67 @@ sub initSearchQuery
 }
 
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),"CAresponseHandler");
+}
+
+sub doCAresponseHandler
+{
+   my $self=shift;
+   my $q=shift;
+
+
+   return({
+    exitmsg=>'OK',
+    mailtext=>$q->{mailtext},
+    exitcode=>0
+   });
+}
+
+
+sub CAresponseHandler
+{
+   my $self=shift;
+   my $qfields=shift;
+   my $authorize=shift;
+   my $f=shift;
+   my @param=@_;
+
+
+   my @accept=split(/\s*,\s*/,lc($ENV{HTTP_ACCEPT}));
+   if (in_array(\@accept,["application/json","application/xml",
+                          "text/javascript"])){
+      my $q=Query->MultiVars();
+      $self->_simpleRESTCallHandler_SendResult(0,
+                   $self->doCAresponseHandler($q));
+   }
+   else{
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(
+                        body=>1,
+                        style=>['default.css','mainwork.css',
+                                'kernel.App.Web.css'],
+                        js=>['jquery.js','toolbox.js'],
+                        title=>"CA Response Handler");
+      print $self->getAppTitleBar();
+      print $self->getParsedTemplate(
+            "tmpl/CAresponseHandlerForm",
+            { 
+               static=>{
+               }
+            }
+          );
+
+      printf("</body>");
+      printf("</html>");
+   }
+}
+
+
+
+
 
 
 1;

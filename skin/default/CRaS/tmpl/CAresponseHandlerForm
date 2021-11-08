@@ -1,0 +1,102 @@
+<script language="JavaScript">
+
+$(document).ready(function(){
+   $("#mailtext").focus();
+   $("#doPost").click(function(){
+      var form=$("#form");
+      console.log("form="+form.serialize());
+
+      $("#resultset").height(100);
+      $("#resultset").show();
+      $("#result").text("");
+      $.ajax({
+          type: "POST",
+          data: form.serialize(),
+          dataType: "json",
+          url: window.location.pathname,
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+          success: function(data) {
+             console.log("data=",data);
+             var t=JSON.stringify(data,undefined,2);
+             t=t.replace(/\\n/g,"\n      ");
+             $("#result").text(t);
+          },
+          error: function(e) {
+              console.log("e=",e);
+          //    alert('error handling here');
+          }
+      });
+
+
+
+   });
+});
+
+</script>
+<style>
+fieldset{
+   background:#eee;
+}
+legend{
+  margin-top: 19px;
+  font-weight: bold;
+  background: #ddd;
+  border: 1px solid #999;
+}
+xlabel{
+   display: inline-block;
+   text-align: right;
+   float: left;
+   width:200px;
+}
+
+#form input{  
+    xdisplay: inline-block;
+    text-align: left;
+    xfloat: left;
+    xwidth:200px;
+    xmargin-left:10px;
+}
+
+form{
+   width:540px;
+   margin: 0 auto;
+}
+fieldset > div{
+   margin:10px;
+}
+
+</style>
+<form id=form>
+<h1>CA Resonse Handler</h1>
+
+<fieldset>
+<legend>Mail</legend>
+<div>
+<label for="mailtext">Mailtext:</label>
+<textarea rows=8 id=mailtext name=mailtext style="width:100%">
+</textarea>
+</div>
+ 
+<div>
+<label for="certfile">CertFile:</label>
+<input type=file name=certfile>
+</div>
+</fieldset>
+ 
+<br>
+<input id=doPost type=button style="text-align:center;width:100%;margin:0px" value="%TRANSLATE(process,CRaS::csr)%">
+<br>
+<br>
+</form>
+
+<center>
+<fieldset id=resultset style="display:none;overflow:auto;width:80%;text-align:left">
+<legend>Result</legend>
+<xmp id=result>
+</xmp>
+</fieldset>
+</center>
+
+
