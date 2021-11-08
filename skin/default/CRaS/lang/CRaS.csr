@@ -28,4 +28,4 @@
 'CSRSTATE.4'=>{de=>'signiert',en=>'signed'},
 'CSRSTATE.5'=>{de=>'Erneuerung angefordert',en=>'renewal requested'},
 'CSRSTATE.6'=>{en=>'disposed of wasted',de=>'veraltet/gelöscht'},
-
+'process'=>{de=>'Mailtext verarbeiten/behandeln',en=>'process mailtext'},
