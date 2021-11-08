@@ -60,7 +60,7 @@ label{
 }
 
 form{
-   width:640px;
+   width:540px;
    margin: 0 auto;
 }
 
@@ -73,12 +73,14 @@ form{
 <input id=doPost type=button style="text-align:center;width:100%;margin:0px" value="POST with application/javascript REQUEST">
 <br>
 <br>
+</form>
 
-<fieldset id=resultset style="display:none;overflow:auto">
+<center>
+<fieldset id=resultset style="display:none;overflow:auto;width:80%;text-align:left">
 <legend>Result</legend>
 <xmp id=result>
 </xmp>
 </fieldset>
+</center>
 
-</form>
 
