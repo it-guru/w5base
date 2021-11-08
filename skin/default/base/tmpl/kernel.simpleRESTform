@@ -6,6 +6,7 @@ $(document).ready(function(){
       var form=$("#form");
       console.log("form="+form.serialize());
 
+      $("#resultset").height(200);
       $("#resultset").show();
       $("#result").text("");
       $.ajax({
@@ -73,7 +74,7 @@ form{
 <br>
 <br>
 
-<fieldset id=resultset style="display:none">
+<fieldset id=resultset style="display:none;overflow:auto">
 <legend>Result</legend>
 <xmp id=result>
 </xmp>

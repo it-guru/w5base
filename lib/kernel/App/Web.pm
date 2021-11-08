@@ -2276,8 +2276,11 @@ sub simpleRESTCallHandler
          print $self->HttpHeader("text/html");
          print $self->HtmlHeader(
                            body=>1,
-                           js=>['jquery.js'],
+                           style=>['default.css','mainwork.css',
+                                   'kernel.App.Web.css'],
+                           js=>['jquery.js','toolbox.js'],
                            title=>"W5Base REST Debugger");
+         print $self->getAppTitleBar();
          my $fForm="<fieldset>";
          $fForm.="<legend>Call Parameters:</legend>";
 
@@ -2290,7 +2293,7 @@ sub simpleRESTCallHandler
                $fForm.="<div>";
                $fForm.="<label for=\"$v\">$v</label>";
                $fForm.="<input type=\"input\" name=\"$v\" id=\"$v\" ".
-                       "value=\"$init\">";
+                       "value=\"$init\" style=\"float:none\">";
                $fForm.="</div>\n";
             }
          }
