@@ -372,6 +372,13 @@ sub ViewProcessor
       }
       else{
          my $ext=".bin";
+         if (ref($self->{types}) eq "ARRAY"){
+            my @l=@{$self->{types}};
+            @l=grep(!/\*/,@l);
+            if ($#l>=0){
+               $ext=".".$l[0];
+            }
+         }
          if (!defined($content)){
             $content=$self->{content};
          }
