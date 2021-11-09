@@ -106,8 +106,15 @@ sub new
                                }
                             }
                             if ($current->{rawstate} eq "4"){
-                               if (!in_array($st,[qw(4 5 6)])){
-                                  next;
+                               if ($current->{refno} ne ""){
+                                  if (!in_array($st,[qw(4 5 6)])){
+                                     next;
+                                  }
+                               }
+                               else{  # verlaengerung nur mit refno moeglich
+                                  if (!in_array($st,[qw(4 6)])){
+                                     next;
+                                  }
                                }
                             }
                             if ($current->{rawstate} eq "2"){
@@ -118,6 +125,19 @@ sub new
                             if ($current->{rawstate} eq "3"){
                                if (!in_array($st,[qw(4 3 6)])){
                                   next;
+                               }
+                            }
+                            if ($current->{rawstate} eq "1"){
+                               if ($app->IsMemberOf([$current->{csgrpid},
+                                                     "admin"])){
+                                  if (!in_array($st,[qw(1 2 3 6)])){
+                                     next;
+                                  }
+                               }
+                               else{
+                                  if (!in_array($st,[qw(1 6)])){
+                                     next;
+                                  }
                                }
                             }
                          }
@@ -228,10 +248,17 @@ sub new
                 dataobjattr   =>'csr.sslcertorg'),
 
       new kernel::Field::Text(
+                name          =>'editrefno',
+                label         =>'CA Reference No.',
+                group         =>'caref',
+                dataobjattr   =>'csr.refno'),
+
+      new kernel::Field::Text(
                 name          =>'refno',
                 label         =>'CA Reference No.',
-                group         =>'detail',
                 htmldetail    =>'NotEmpty',
+                group         =>'detail',
+                selectfix     =>1,
                 dataobjattr   =>'csr.refno'),
 
       new kernel::Field::Text(
@@ -247,6 +274,18 @@ sub new
                 name          =>'spassword',
                 label         =>'CA Service-Password',
                 group         =>'detail',
+                history       =>0,
+                searchable    =>0,
+                prepRawValue  =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent();
+                   my $d=shift;
+                   my $current=shift;
+                   if (!$app->IsMemberOf([$current->{csgrpid},"admin"])){
+                      $d=~s/./?/g;
+                   }
+                   return($d);
+                },
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>'csr.spassword'),
 
@@ -268,6 +307,42 @@ sub new
 #                label         =>'Notification of Certificate Expiration',
 #                dataobjattr   =>'csr.exp_notify1'),
 
+      new kernel::Field::Text(
+                name          =>'ssslsubject',
+                label         =>'SSL-Certificate Owner',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'csr.ssslsubject'),
+
+      new kernel::Field::File(
+                name          =>'sslcert',
+                label         =>'certificate request',
+                group         =>['detail','request'],
+                maxsize       =>65533,
+                readonly      =>1,
+                searchable    =>0,
+                uploadable    =>0,
+                allowempty    =>0,
+                allowdirect   =>1,
+                dataobjattr   =>'csr.sslcert'),
+
+      new kernel::Field::Text(
+                name          =>'ssslissuerdn',
+                label         =>'SSL-Certificate Issuer DN',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'csr.ssslissuer'),
+
+      new kernel::Field::Text(
+                name          =>'ssslserialno',
+                label         =>'SSL-Certificate Serial No.',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>'csr.ssslserialno'),
+
       new kernel::Field::Date(
                 name          =>'ssslstartdate',
                 label         =>'SSL-Certificate begin',
@@ -284,41 +359,18 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'csr.ssslenddate'),
 
-      new kernel::Field::Text(
-                name          =>'ssslsubject',
-                label         =>'SSL-Certificate Owner',
-                group         =>'detail',
-                htmldetail    =>'NotEmpty',
-                readonly      =>1,
-                dataobjattr   =>'csr.ssslsubject'),
-
-      new kernel::Field::Text(
-                name          =>'ssslissuer',
-                label         =>'SSL-Certificate Issuer',
-                group         =>'detail',
-                htmldetail    =>'NotEmpty',
-                readonly      =>1,
-                dataobjattr   =>'csr.ssslissuer'),
-
-      new kernel::Field::Text(
-                name          =>'ssslserialno',
-                label         =>'SSL-Certificate Serial No.',
-                group         =>'detail',
-                htmldetail    =>'NotEmpty',
-                readonly      =>1,
-                dataobjattr   =>'csr.ssslserialno'),
-
       new kernel::Field::File(
-                name          =>'sslcert',
-                label         =>'certificate request',
-                group         =>['detail','request'],
+                name          =>'ssslcert',
+                label         =>'signed certificate',
+                group         =>['detail'],
+                types         =>['pem'],
                 maxsize       =>65533,
                 readonly      =>1,
                 searchable    =>0,
                 uploadable    =>0,
                 allowempty    =>0,
                 allowdirect   =>1,
-                dataobjattr   =>'csr.sslcert'),
+                dataobjattr   =>'csr.ssslcert'),
 
 
       new kernel::Field::Text(
@@ -485,6 +537,9 @@ sub isWriteValid
 
    return("request") if (!defined($rec));
 
+   if ($self->IsMemberOf("admin")){
+      return(qw(default caref));
+   }
    if ($rec->{state}==1 || $rec->{state}==4){
       if ($self->itil::lib::Listedit::isWriteOnApplValid(
                                           $rec->{applid},"technical")) {
@@ -495,10 +550,19 @@ sub isWriteValid
 
 
    if ($rec->{state}==2){
-      return("default") if ($rec->{owner}==$userid);
+      if ($rec->{owner}==$userid){
+         my @l=("default","caref");
+         return(@l);
+      }
    }
    else{
-      return("default") if ($self->IsMemberOf($rec->{csgrpid}));
+      if ($self->IsMemberOf($rec->{csgrpid})){
+         my @l=("default");
+         if ($rec->{state}==1){
+            push(@l,"caref");
+         }
+         return(@l);
+      }
    }
    return(undef);
 }
@@ -509,11 +573,16 @@ sub isViewValid
    my $rec=shift;
    return("request") if (!defined($rec));
 
-   if ($rec->{rawstate}>0){
-      return(qw(history default detail header source));
-   }
+   my @l=();
 
-   return(qw(ALL));
+   if ($rec->{rawstate}>0){
+      push(@l,qw(history default detail header source));
+   }
+   if ($rec->{rawstate}==1 || $rec->{rawstate}==2 ||
+       $rec->{rawstate}==3){
+      push(@l,qw(caref));
+   }
+   return(@l);
 }
 
 sub parseCertDate
@@ -557,41 +626,41 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if ($self->isDataInputFromUserFrontend() && !defined($oldrec)){
-      if ($newrec->{sslcert} eq ""){
-$newrec->{sslcert}=<<EOF;
------BEGIN CERTIFICATE REQUEST-----
-MIIE9DCCAtwCAQAwga4xCzAJBgNVBAYTAkRFMQwwCgYDVQQIDANOUlcxDTALBgNV
-BAcMBEJvbm4xITAfBgNVBAoMGERldXRzY2hlIFRlbGVrb20gSVQgR21iSDEXMBUG
-A1UECwwOVGVsZWtvbS1JVCBQVkcxHjAcBgNVBAMMFXNob3BwbGFuZXIudGVsZWtv
-bS5kZTEmMCQGCSqGSIb3DQEJARYXamFuLmthbmRhQHQtc3lzdGVtcy5jb20wggIi
-MA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDBXfpSunBMPInekJ1tfVOq0shs
-WHIjXEN+HhjSEgmYmER9h+Piy7nZ0FNlBR2Ii2bqwc64NTNarxUjHEc4751QEtFr
-FZ89MNQpv0iQmtbvIEx0UYdzG/+m6HoHpPjFputw7Jh9iDe2r4FNjR5+rck66Dv2
-noCtthhz/r+S4Rvj7DtK2igxflLHaujkivV70GF5bsP4HXqpo5r7DC22KsaBKqpF
-6TI28O4VpZUTYXktaECJmaoLYzUr4dwZXTX2OufDJALu0azk6ZVFxhrJsXJAeJ8K
-gqIcbkS+1+vtVg4/H5cfCQWNfw0M7eYl/tsk+L5CiRA1lXsb7J2+/5EZmgTnDhrL
-Z++WsfhsFW8T+n1hI0TAlTfYCJ/TvYjHFhiM9EfaqMw9dC3id50K2W8OeDMaqy3G
-P4iolbVhBaH8HYXRphpTObD5HEh4fRrNmjTHsSwOeJd/GrWY3m5okjtMhxy4Mp4a
-9lyxBCHUMRoL4ycH69djIayMO5VUnwtxm2iZvNV/Iwct7odHyHhDDolbKinK5Zry
-ZJGzib9HjiXcY2vU1Wc/YCGKTOyYtTgs7KG1MyQ8VAK1ge7trRw4EfgTVLZqXzZ6
-NNqlcCHuZb6uKfWbbFFeUZjhabCrbogx+bSwzkRVCthP4WeKwlIJ1l2D3+eIDQ2k
-k61yx/wZVmLJmNamMQIDAQABoAAwDQYJKoZIhvcNAQELBQADggIBAAkH6nr064K+
-k1zekqu1c14poD5MJ3ObizY8RxsAcjpVFbXqPQxfU9vRbqMJRpgSc9DOtXyWxS+c
-wNQlHgLiEIgyQ9W8LN+glg+g5t5QwuAbdd/qXXGQCyle8fkvXrkfV/GrDBKoC5Pi
-BplZZdBAW0wwZKmyDpko0d5HjqMdxXGSZlECCoSeTh0v+82FbPca221f28jYJMSp
-A12QugNO+TAm25+xAXU8ZkSl8AZL2Z8SYNTUgSQSYRc9pOr4w9xSCTH3jXBLYh64
-OblTH+8GDl7+4tcTn+86Dm99iJV71/jddZslQM2mw6gWsvbGQn/djD1Dj35yM/Fn
-q3asPXwmwZ33/AOCWrTsejfh6lO5Ujo28RtynqhLdw3WSrTc41bBIDiAL7gxW8yY
-zP+Qs3xlphOqGlPHxuaeAKTXTHC2axa4GMSA15f+qSnVBhaBsfGew/SOqodbUCj5
-teblY+jsRAPBrxO4cxQ/6aM5morEPNkeh4N86y6XIJBwH6Gn0ote92kk7X0331t0
-sjE8ipHjZeA4R+4G/FuQotrxkge/KRjb5Q/mXW3/oKN/ZPI1zp+PHu6wSue8GIjF
-7MOb5z/4YrkCfgfayYN9PVfuZfsg5gmESJil5SP/lfqz6mE9mvOTRc+IL4jSHdEh
-m2U/7Rd5u0FxEoIjT84/wX1GIBmp0+sW
------END CERTIFICATE REQUEST-----
-EOF
-      }
-   }
+#   if ($self->isDataInputFromUserFrontend() && !defined($oldrec)){
+#      if ($newrec->{sslcert} eq ""){
+#$newrec->{sslcert}=<<EOF;
+#-----BEGIN CERTIFICATE REQUEST-----
+#MIIE9DCCAtwCAQAwga4xCzAJBgNVBAYTAkRFMQwwCgYDVQQIDANOUlcxDTALBgNV
+#BAcMBEJvbm4xITAfBgNVBAoMGERldXRzY2hlIFRlbGVrb20gSVQgR21iSDEXMBUG
+#A1UECwwOVGVsZWtvbS1JVCBQVkcxHjAcBgNVBAMMFXNob3BwbGFuZXIudGVsZWtv
+#bS5kZTEmMCQGCSqGSIb3DQEJARYXamFuLmthbmRhQHQtc3lzdGVtcy5jb20wggIi
+#MA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDBXfpSunBMPInekJ1tfVOq0shs
+#WHIjXEN+HhjSEgmYmER9h+Piy7nZ0FNlBR2Ii2bqwc64NTNarxUjHEc4751QEtFr
+#FZ89MNQpv0iQmtbvIEx0UYdzG/+m6HoHpPjFputw7Jh9iDe2r4FNjR5+rck66Dv2
+#noCtthhz/r+S4Rvj7DtK2igxflLHaujkivV70GF5bsP4HXqpo5r7DC22KsaBKqpF
+#6TI28O4VpZUTYXktaECJmaoLYzUr4dwZXTX2OufDJALu0azk6ZVFxhrJsXJAeJ8K
+#gqIcbkS+1+vtVg4/H5cfCQWNfw0M7eYl/tsk+L5CiRA1lXsb7J2+/5EZmgTnDhrL
+#Z++WsfhsFW8T+n1hI0TAlTfYCJ/TvYjHFhiM9EfaqMw9dC3id50K2W8OeDMaqy3G
+#P4iolbVhBaH8HYXRphpTObD5HEh4fRrNmjTHsSwOeJd/GrWY3m5okjtMhxy4Mp4a
+#9lyxBCHUMRoL4ycH69djIayMO5VUnwtxm2iZvNV/Iwct7odHyHhDDolbKinK5Zry
+#ZJGzib9HjiXcY2vU1Wc/YCGKTOyYtTgs7KG1MyQ8VAK1ge7trRw4EfgTVLZqXzZ6
+#NNqlcCHuZb6uKfWbbFFeUZjhabCrbogx+bSwzkRVCthP4WeKwlIJ1l2D3+eIDQ2k
+#k61yx/wZVmLJmNamMQIDAQABoAAwDQYJKoZIhvcNAQELBQADggIBAAkH6nr064K+
+#k1zekqu1c14poD5MJ3ObizY8RxsAcjpVFbXqPQxfU9vRbqMJRpgSc9DOtXyWxS+c
+#wNQlHgLiEIgyQ9W8LN+glg+g5t5QwuAbdd/qXXGQCyle8fkvXrkfV/GrDBKoC5Pi
+#BplZZdBAW0wwZKmyDpko0d5HjqMdxXGSZlECCoSeTh0v+82FbPca221f28jYJMSp
+#A12QugNO+TAm25+xAXU8ZkSl8AZL2Z8SYNTUgSQSYRc9pOr4w9xSCTH3jXBLYh64
+#OblTH+8GDl7+4tcTn+86Dm99iJV71/jddZslQM2mw6gWsvbGQn/djD1Dj35yM/Fn
+#q3asPXwmwZ33/AOCWrTsejfh6lO5Ujo28RtynqhLdw3WSrTc41bBIDiAL7gxW8yY
+#zP+Qs3xlphOqGlPHxuaeAKTXTHC2axa4GMSA15f+qSnVBhaBsfGew/SOqodbUCj5
+#teblY+jsRAPBrxO4cxQ/6aM5morEPNkeh4N86y6XIJBwH6Gn0ote92kk7X0331t0
+#sjE8ipHjZeA4R+4G/FuQotrxkge/KRjb5Q/mXW3/oKN/ZPI1zp+PHu6wSue8GIjF
+#7MOb5z/4YrkCfgfayYN9PVfuZfsg5gmESJil5SP/lfqz6mE9mvOTRc+IL4jSHdEh
+#m2U/7Rd5u0FxEoIjT84/wX1GIBmp0+sW
+#-----END CERTIFICATE REQUEST-----
+#EOF
+#      }
+#   }
    #if (effVal($oldrec,$newrec,'shortdesc') eq '') {
    #   $self->LastMsg(ERROR,"No brief description specified");
    #   return(0);
@@ -605,12 +674,35 @@ EOF
       my $appl=getModuleObject($self->Config,"itil::appl");
       $appl->SetFilter({id=>\$applid});
       my ($arec)=$appl->getOnlyFirst(qw(ALL));
-      
+      my @org;
+      if (defined($arec)){
+         my @grp;
+         my $team=$arec->{businessteam};
+         my @team=split(/\./,$team);
+         for(my $c=0;$c<=$#team;$c++){
+            push(@org,join(".",@team[0..$c])); 
+         }
+      }
       my $csteam=getModuleObject($self->Config,"CRaS::csteam");
-      $csteam->SetFilter({});
-      my ($csteamrec)=$csteam->getOnlyFirst(qw(ALL));
-
-      $newrec->{csteamid}=$csteamrec->{id}; 
+      if ($self->isDataInputFromUserFrontend()){
+         $csteam->SetFilter({orgarea=>\@org});
+      }
+      else{
+         $csteam->SetFilter({});
+      }
+      my @l=$csteam->getHashList(qw(orgarea id));
+      if ($#l>=0){
+         $newrec->{csteamid}=$l[0]->{id}; 
+      }
+   }
+   if (!defined($oldrec) && !defined($newrec->{csteamid})){
+      $self->LastMsg(ERROR,
+        "unable to find Certificate-Service Team for selected application");
+      return(0);
+   }
+   if (!exists($newrec->{state}) && $newrec->{editrefno} ne "" &&
+       in_array(effVal($oldrec,$newrec,"state"),[qw(1 2)])){
+      $newrec->{state}="3";
    }
 
    if ($self->isDataInputFromUserFrontend()){
@@ -620,14 +712,14 @@ EOF
       }
       if (!$self->itil::lib::Listedit::isWriteOnApplValid(
                                           $newrec->{applid},"technical")) {
-         $self->LastMsg(ERROR,"No write access on specified application");
+         $self->LastMsg(ERROR,"no write access on specified application");
          return(0);
       }
    }
 
    if ($self->isDataInputFromUserFrontend()){
       if (!defined($oldrec) && effVal($oldrec,$newrec,'sslcert') eq '') {
-         $self->LastMsg(ERROR,"No certificate file selected");
+         $self->LastMsg(ERROR,"no csr file specified");
          return(0);
       }
    }
@@ -667,15 +759,64 @@ EOF
       $newrec->{sslcertcommon}=$pkcs->commonName();
       $newrec->{sslcertorg}=$pkcs->organizationName();
    }
+   if (exists($newrec->{'ssslcert'})) {
+      my $x509=$self->readPEM(effVal($oldrec,$newrec,'ssslcert'));
+      if (!defined($x509)){
+         $self->LastMsg(ERROR,"signed cert in invalid format");
+         return(0);      
+      }
+      $newrec->{ssslstartdate}=$x509->{startdate};
+      $newrec->{ssslenddate}=$x509->{enddate};
+      $newrec->{ssslissuerdn}=$x509->{ssslissuerdn};
+   }
 
    return(1);
 }
 
 
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $orig=shift;
+
+   if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "5"){
+      my %newrec=();
+      #
+      # derive a new csr in state captured from the current record
+      #
+      $newrec{applid}=$oldrec->{applid};
+      $newrec{name}=$oldrec->{name};
+      $newrec{sslcert}=$oldrec->{sslcert} if ($oldrec->{sslcert} ne "");
+      $newrec{ssslcert}=$oldrec->{ssslcert};
+      $newrec{replacedrefno}=$oldrec->{refno};
+      $newrec{spassword}=$oldrec->{spassword};
+      $newrec{state}="1";
+      $self->ValidatedInsertRecord(\%newrec);
+   }
+   if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4"){
+     my $replacedrefno=effVal($oldrec,$newrec,"replacedrefno");
+     if ($replacedrefno ne ""){
+        $self->ResetFilter();
+        $self->SetFilter({state=>'5',refno=>\$replacedrefno});
+        my $op=$self->Clone();
+        foreach my $oldrec ($self->getHashList(qw(ALL))){
+           $op->UpdateRecord({state=>6},{id=>\$oldrec->{id}});
+        }
+      }
+   }
+   return($self->SUPER::FinishWrite($oldrec,$newrec,$orig));
+}
+
+
+
+
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default detail source));
+   return(qw(header default caref detail source));
 }
 
 
@@ -719,17 +860,205 @@ sub getValidWebFunctions
    return($self->SUPER::getValidWebFunctions(),"CAresponseHandler");
 }
 
+sub readPEM
+{
+   my $self=shift;
+   my $pem=shift;
+   my %oprec=();
+   my $x509;
+
+   # try multiple file formats
+   eval('$x509=Crypt::OpenSSL::X509->new_from_string($pem,FORMAT_PEM);');
+   if ($@ ne "") {
+      eval('$x509=Crypt::OpenSSL::X509->new_from_string($pem,FORMAT_ASN1);');
+   }
+   if ($@ ne "") {
+      return(undef);
+   }
+   else{
+      # SerialNr. (hex format)
+      $oprec{ssslserialno}=$x509->serial();
+
+      # Issuer
+      my $iobjs=$x509->issuer_name->entries();
+      $oprec{ssslissuer}=$self->formatedMultiline($iobjs);
+      $oprec{ssslissuerdn}=$x509->issuer();
+
+      # Name
+      my ($cn)=grep({$_->type() eq 'CN'} @$iobjs);
+      if (defined($cn)){
+         $oprec{ssslcertcommon}=$cn->value();
+      }
+      # Startdate / Enddate
+      my $startdate=$x509->notBefore();
+      $oprec{startdate}=$self->parseCertDate($startdate);
+
+      my $enddate=$x509->notAfter();
+      $oprec{enddate}=$self->parseCertDate($enddate);
+
+   }
+   return(\%oprec);
+
+
+}
+
 sub doCAresponseHandler
 {
    my $self=shift;
    my $q=shift;
+   my %result;
+
+   $result{exitmsg}="OK";
+   $result{exitcode}=0;
+
+   my %oprec;
+
+   my $mailtext=$q->{mailtext};
+   $mailtext=~s/\r\n/\n/gs;
+   my @mailtext=split(/\n/,$mailtext);
 
 
-   return({
-    exitmsg=>'OK',
-    mailtext=>$q->{mailtext},
-    exitcode=>0
-   });
+   # interpret mailtext
+   my $incert=0;
+   my @cert;
+   foreach my $l (@mailtext){
+      if ($l=~m/[-]+-BEGIN CERTIFICATE-[-]+$/){
+         $incert++;
+      }
+      if ($incert){
+         push(@cert,$l);
+      }
+      else{
+         if (!exists($oprec{refno}) && 
+             (my ($refno)=$l=~m/^\s*Referenznummer\s*:\s*([0-9.]+)\s*$/)){
+            $oprec{refno}=$refno;
+         }
+         if (!exists($oprec{validto}) && 
+             (my ($validto)=$l=~m/^\s*G.*ltig bis\s*:\s*([0-9.]+)\s*$/)){
+            $oprec{validto}=$validto;
+         }
+         if (!exists($oprec{ssslserialno}) && 
+             (my ($ssslserialno)=$l=~m/^\s*Serienn.*:\s*([0-9a-f]+)\s*$/i)){
+            $oprec{ssslserialno}=$ssslserialno;
+         }
+         if (!exists($oprec{spassword}) && 
+             (my ($spassword)=$l=~m/^\s*Service.*Pass.*:\s*(\S+)\s*$/i)){
+            $oprec{spassword}=$spassword;
+         }
+         if (!exists($oprec{force}) && 
+             (my ($force)=$l=~m/^force:\s*([0-9])\s*$/)){
+            $oprec{force}=$force;
+         }
+         if (!exists($oprec{sslcertcommon}) && 
+             (my ($common)=$l=~m/^\s*CommonName.*:\s*([\S]+)\s*$/i)){
+            $oprec{sslcertcommon}=$common;
+         }
+      }
+      if ($l=~m/[-]+-END CERTIFICATE-[-]+$/){
+         $incert=0;
+      }
+   }
+   if ($#cert!=-1){
+      $oprec{cert}=join("\n",@cert)."\n";
+   }
+   if (exists($q->{certfile})){
+      if (exists($oprec{cert})){
+         $result{msg}="using cert from file - not from mailtext";
+      }
+      $oprec{cert}=$q->{certfile};
+   }
+   if ($result{exitcode}==0 && !exists($oprec{cert})){
+      $result{exitcode}=100;
+      $result{exitmsg}="no cert file in response";
+   }
+
+   if ($result{exitcode}==0 && exists($oprec{cert})){
+      my $x509=$self->readPEM($oprec{cert});
+      if (!defined($x509)){
+         $result{exitcode}=200;
+         $result{exitmsg}="unexpected cert file format";
+      }
+      else{
+         foreach my $k (%{$x509}){
+            $oprec{$k}=$x509->{$k};
+         }
+      }
+   }
+   if ($result{exitcode}==0 && exists($oprec{refno})){
+      $self->ResetFilter();
+      $self->SetFilter({refno=>\$oprec{refno}});
+      my @l=$self->getHashList(qw(ALL));
+      if ($#l==0){
+         $oprec{csrrec}=$l[0];
+      }
+      else{
+         $result{exitcode}=300;
+         $result{exitmsg}="unable to find csr by refno";
+      }
+   }
+   if ($result{exitcode}==0 && exists($oprec{ssslcertcommon}) &&
+       !exists($oprec{csrrec})){
+      $self->ResetFilter();
+      $self->SetFilter({state=>3,sslcertcommon=>\$oprec{ssslcertcommon}});
+      my @l=$self->getHashList(qw(ALL));
+      if ($#l==0){
+         $oprec{csrrec}=$l[0];
+      }
+      else{
+         $result{exitcode}=301;
+         $result{exitmsg}="unable to find csr by CommonName";
+      }
+   }
+   if (!$oprec{force}){
+      if ($result{exitcode}==0  && exists($oprec{csrrec})){
+         if ($oprec{csrrec}->{state} eq "4"){
+            $result{exitcode}=501;
+            $result{exitmsg}="csr record is already singed";
+         }
+      }
+   }
+
+
+   if (!$oprec{force}){
+      if ($result{exitcode}==0 && exists($oprec{sslcertcommon}) &&
+          exists($oprec{csrrec})){
+         if ($oprec{csrrec}->{sslcertcommon} ne $oprec{sslcertcommon}){
+            $result{exitcode}=501;
+            $result{exitmsg}="CommonName does not match csr record";
+         }
+      }
+   }
+
+
+   if ($result{exitcode}==0 && exists($oprec{csrrec})){
+      #printf STDERR ("fifi try to ValidatedUpdateRecord %s\n",
+      #               $oprec{csrrec}->{id});
+      my $updrec={
+         state=>4,
+         ssslcert=>$oprec{cert}
+      };
+      if ($oprec{spassword} ne ""){
+         $updrec->{spassword}=$oprec{spassword};
+      }
+      my $id=$oprec{csrrec}->{id};
+      $self->ValidatedUpdateRecord($oprec{csrrec},$updrec,{id=>\$id});
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+   $result{oprec}=\%oprec;
+
+   return(\%result);
 }
 
 
