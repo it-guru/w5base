@@ -10,6 +10,10 @@
   de=>'Zertifikats-Request',
   en=>'Certificate-request'
 },
+'fieldgroup.caref'=>{
+  de=>'CA Referenz',
+  en=>'CA Reference'
+},
 'fieldgroup.detail'=>{
   de=>'Zertifikat',
   en=>'Certificate'
@@ -29,3 +33,8 @@
 'CSRSTATE.5'=>{de=>'Erneuerung angefordert',en=>'renewal requested'},
 'CSRSTATE.6'=>{en=>'disposed of wasted',de=>'veraltet/gelöscht'},
 'process'=>{de=>'Mailtext verarbeiten/behandeln',en=>'process mailtext'},
+'no csr file specified'=>{de=>'kein CSR angegeben'},
+'no write access on specified application'=>{de=>'kein Schreibzurgriff auf die angegebene Anwendung'},
+'signed certificate'=>{de=>'signiertes Zertifikat'},
+'unable to find csr by CommonName'=>{de=>'csr kann per CommonName nicht gefunden werden'},
+'unable to find Certificate-Service Team for selected application'=>{de=>'kein Zertifikats-Service Team für die gewählte Anwendung auffindbar'},
