@@ -52,6 +52,6 @@ create table csr (
    srcid      varchar(40) default NULL,
    srcload    datetime    default NULL,
    PRIMARY KEY (id),UNIQUE KEY `srcsys` (srcsys,srcid),
-   key `applid` (applid), #FOREIGN KEY fk_appl (applid) REFERENCES appl (id) ON DELETE CASCADE,
+   key `applid` (applid), 
    FOREIGN KEY fk_csteam (csteam) REFERENCES csteam (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
