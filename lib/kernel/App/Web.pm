@@ -2213,6 +2213,8 @@ sub _simpleRESTCallHandler_SendResult
          if ($@ eq ""){
       #      $jsonok=1;
             $JSON->utf8(1);
+            $JSON->allow_blessed(1);
+            $JSON->convert_blessed(1);
             print $JSON->pretty->encode($result);
          }
       }
