@@ -91,6 +91,16 @@ sub CRaSinitialLoad
       '^[a-z]\.\s*'        , '',
    ];
 
+   my $csteam=$self->getPersistentModuleObject("cst","CRaS::csteam");
+   $csteam->SetFilter({});
+   my @l=$csteam->getHashList(qw(id));
+   if ($#l==-1){
+      $csteam->ValidatedInsertRecord({
+          orgarea=>'DTAG.GHQ.VTI.DTIT',
+          grp=>'DTAG.GHQ.VTI.DTIT.Hub.RBA',
+          name=>'Test Cert Service Team'
+      });
+   }
    
 
    my ($fh,$filename)=File::Temp::tempfile('tempXXXXX',SUFFIX =>'.xls',
@@ -215,7 +225,7 @@ sub ProcessXLS
                $self->{CertNoRel}++;
                $self->{notFoundICTO}->{$rec{ICTO}}++;
                #print STDERR Dumper(\%rec);
-               printf STDERR ("CommonName: %s\n", $rec{CommonName});
+               #printf STDERR ("CommonName: %s\n", $rec{CommonName});
             }
             my $srcid=$rec{SharePointLfdNr};
             my $csr=$self->getPersistentModuleObject("csr","CRaS::csr");
@@ -313,8 +323,8 @@ sub ProcessXLS
 
    #print "\nEmployee=".Dumper(\%employee)."\n";
    #print "\nProjectname=".Dumper(\%projectname)."\n";
-   printf("MissICTO: %s\n",join(", ",sort(keys(%{$self->{notFoundICTO}}))));
-   printf("cnt/fail  %d/%d\n",$self->{CertCnt},$self->{CertNoRel});
+   #printf("MissICTO: %s\n",join(", ",sort(keys(%{$self->{notFoundICTO}}))));
+   #printf("cnt/fail  %d/%d\n",$self->{CertCnt},$self->{CertNoRel});
 }
 
 
@@ -343,7 +353,7 @@ sub loadRemoteFile
    if ($resp->is_success()){
       print $fh $resp->decoded_content();
       seek($fh,0,0);
-      printf STDERR ("OK\n");
+      #printf STDERR ("OK\n");
    }
    else{
      printf("%s\n",$resp->status_line());
