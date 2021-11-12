@@ -63,9 +63,10 @@ sub getVRealizeAuthorizationToken
    my $gckey="TPC_AuthCache";
 
    if (!exists($gc->{$gckey}) || $gc->{$gckey}->{Expiration}<time()){
-      my $d=$self->CollectREST(
+      my $pred=$self->CollectREST(
          method=>'POST',
          dbname=>'TPC',
+         requesttoken=>'AuthLevel1',
          url=>sub{
             my $self=shift;
             my $baseurl=shift;
@@ -100,24 +101,63 @@ sub getVRealizeAuthorizationToken
             return($headers);
          },
       );
+      if (ref($pred) ne "HASH"){
+         die("Request for preaccess_token failed");
+      }
+      my $refresh_token=$pred->{refresh_token};
+
+      my $d=$self->CollectREST(
+         method=>'POST',
+         dbname=>'TPC',
+         requesttoken=>'AuthLevel2',
+         url=>sub{
+            my $self=shift;
+            my $baseurl=shift;
+            my $apikey=shift;
+            $baseurl.="/"  if (!($baseurl=~m/\/$/));
+            my $dataobjurl=$baseurl."iaas/api/login";
+            return($dataobjurl);
+         },
+         content=>sub{
+            my $self=shift;
+            my $baseurl=shift;
+            my $apikey=shift;
+            my $apiuser=shift;
+            my $json=new JSON;
+     
+            $json->utf8(1);
+            $json->property(utf8=>1);
+            my $postd=$json->encode({
+               refreshToken=>$refresh_token
+            });
+            return($postd);
+         },
+         headers=>sub{
+            my $self=shift;
+            my $baseurl=shift;
+            my $apikey=shift;
+            my $headers=['Content-Type'=>'application/json',
+                         'Accept'=>'application/json'];
+            return($headers);
+         },
+      );
       if (ref($d) ne "HASH"){
          die("Request for access_token failed");
       }
 
       my $cacheTPCauthRec={
-         Authorization=>$d->{token_type}." ".$d->{access_token}
+         Authorization=>$d->{tokenType}." ".$d->{token}
       };
      
-      my $Authorization=$d->{token_type}." ".$d->{access_token};
+      my $Authorization=$d->{tokenType}." ".$d->{token};
      
       if (exists($d->{expires_inx})){
          $cacheTPCauthRec->{Expiration}=time()+$d->{expires_in}-600;
       }
       else{
-         $cacheTPCauthRec->{Expiration}=time()+60;
+         $cacheTPCauthRec->{Expiration}=time()+600;
       }
       $gc->{$gckey}=$cacheTPCauthRec;
-      #printf STDERR ("fifi getNewAuth=%s\n",$gc->{$gckey}->{Authorization});
    }
   
    return($gc->{$gckey}->{Authorization});
