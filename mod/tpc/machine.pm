@@ -404,9 +404,18 @@ sub Import
    my $system=getModuleObject($self->Config,"TS::system");
 
    if (!defined($w5carec)){
-      $self->LastMsg(ERROR,
-                     "missing cloudarea for TPC import of '%s'",
-                     $param->{importname});
+      my $msg;
+      if (exists($param->{importname})){
+         $msg=$param->{importname};
+      }
+      else{
+         $msg=$param->{importrec}->{id};
+      }
+      if ($self->isDataInputFromUserFrontend()){
+         # if import is from Job (W5Server f.e.) no error on missing
+         # ca rec is needed - ca's are guranted by other processes
+         $self->LastMsg(ERROR,"missing cloudarea for TPC import of '%s'",$msg);
+      }
       return(undef);
    }
 
