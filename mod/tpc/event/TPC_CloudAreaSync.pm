@@ -61,6 +61,17 @@ sub TPC_CloudAreaSync
       return(undef);
    }
 
+   $itcloudobj->ResetFilter();
+   $itcloudobj->SetFilter({name=>\$tpcname});
+   my ($tpccloudrec)=$itcloudobj->getOnlyFirst(qw(ALL));
+   if (!defined($tpccloudrec)){
+      msg(ERROR,"invalid to find cloud $tpcname in cloud list");
+      return(undef);
+   }
+
+
+
+
    my $StreamDataobj="tpc::CloudAreaSync";
 
 
@@ -118,18 +129,14 @@ sub TPC_CloudAreaSync
          return({exitcode=>1,exitmsg=>$msg});
       }
       foreach my $rec (@ss){
-         #next if ($rec->{name}=~m/test/i);
+         my $crec={
+            id=>$rec->{id},
+            name=>$rec->{name},
+         };
          if ($rec->{applid}=~m/^[0-9]{3,20}$/){
-          #  printf STDERR ("process: %s\n",$rec->{id});
-          #  printf STDERR ("   name: %s\n",$rec->{name});
-          #  printf STDERR (" applid: %s\n",$rec->{applid});
-          #  printf STDERR ("\n");
-            push(@s,{
-               id=>$rec->{id},
-               name=>$rec->{name},
-               applid=>$rec->{applid}
-            });
+            $crec->{applid}=$rec->{applid};
          }
+         push(@s,$crec);
       }
       $itcloudarea->ResetFilter();
       $itcloudarea->SetFilter({srcsys=>\$tpccode});
@@ -215,10 +222,13 @@ sub TPC_CloudAreaSync
 
       for(my $c=0;$c<=$#opList;$c++){
          if ($opList[$c]->{OP} eq "insert"){
+            my ($arec,$msg);
             $appl->ResetFilter();
-            $appl->SetFilter({id=>\$opList[$c]->{DATA}->{applid}});
-            my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid name));
-            if (!defined($arec)){
+            if ($opList[$c]->{DATA}->{applid} ne ""){
+               $appl->SetFilter({id=>\$opList[$c]->{DATA}->{applid}});
+               ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid name));
+            }
+            if (!defined($arec) || $opList[$c]->{DATA}->{applid} eq ""){
                $opList[$c]->{OP}="invalid";
                push(@msg,"ERROR: invalid application (W5BaseID) in project ".
                          $opList[$c]->{DATA}->{name});
@@ -290,10 +300,6 @@ sub TPC_CloudAreaSync
    }
 
    if ($#msg!=-1){
-      $itcloudobj->ResetFilter();
-      $itcloudobj->SetFilter({name=>\$tpcname});
-      my ($tpccloudrec,$msg)=$itcloudobj->getOnlyFirst(qw(ALL));
-      if (defined($tpccloudrec)){
          my %notifyParam=();
          $itcloudobj->NotifyWriteAuthorizedContacts(
                       $tpccloudrec,{},
@@ -303,10 +309,6 @@ sub TPC_CloudAreaSync
             my $tmpl=join("\n",@msg);
             return($subject,$tmpl);
          });
-      }
-      else{
-         msg(ERROR,"invalid to find cloud $tpcname in cloud list");
-      }
    }
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
