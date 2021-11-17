@@ -135,7 +135,7 @@ sub DataCollector
                   if ($id ne ""){
                      $id=$self->AzureBase().$id."?api-version=2021-02-01";
                      my $rawifrec=$self->genReadAzureId($Authorization,$id);
-                     printf STDERR ("rawifrec=%s\n",Dumper($rawifrec));
+                     #printf STDERR ("rawifrec=%s\n",Dumper($rawifrec));
                      my $tags=$rawifrec->{tags};
                      my $prop=$rawifrec->{properties};
                      my $ips=$prop->{ipConfigurations};
@@ -157,6 +157,26 @@ sub DataCollector
                            $iprec->{netareatag}="CNDTAG";
                         }
                         push(@subrec,$iprec);
+                        if (exists($ipprop->{publicIPAddress}) &&
+                            ref($ipprop->{publicIPAddress}) eq "HASH"){
+                           my $PubIPid=$ipprop->{publicIPAddress}->{id};
+                           my $idref=$self->AzureBase().$PubIPid.
+                                     "?api-version=2021-02-01";
+                           my $pi=$self->genReadAzureId($Authorization,$idref);
+                           if (defined($pi)){
+                              my $ip=$pi->{properties}->{ipAddress};
+                              if ($ip ne ""){
+                                  my $iprec={
+                                     id=>$machineId,
+                                     mac=>$mac,
+                                     ifname=>$ifname,
+                                     netareatag=>"INTERNET",
+                                     name=>$ip
+                                  };
+                                  push(@subrec,$iprec);
+                              }
+                           }
+                        }
                      }
                   }
 
