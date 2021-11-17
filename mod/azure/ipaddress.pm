@@ -135,7 +135,7 @@ sub DataCollector
                   if ($id ne ""){
                      $id=$self->AzureBase().$id."?api-version=2021-02-01";
                      my $rawifrec=$self->genReadAzureId($Authorization,$id);
-                     #printf STDERR ("rawifrec=%s\n",Dumper($rawifrec));
+                     printf STDERR ("rawifrec=%s\n",Dumper($rawifrec));
                      my $tags=$rawifrec->{tags};
                      my $prop=$rawifrec->{properties};
                      my $ips=$prop->{ipConfigurations};
@@ -152,6 +152,10 @@ sub DataCollector
                            netareatag=>"ISLAND",
                            name=>$ipprop->{privateIPAddress},
                         };
+                        if (exists($tags->{w5base_cndtag_ip_prefix}) &&
+                            $tags->{w5base_cndtag_ip_prefix} ne ""){
+                           $iprec->{netareatag}="CNDTAG";
+                        }
                         push(@subrec,$iprec);
                      }
                   }
