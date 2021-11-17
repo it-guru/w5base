@@ -50,6 +50,14 @@ sub Init
                       "tmpl/welcome",
                       prio=>9999,
                       defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.cloud.azure.kernel.vmSize",
+                      "azure::vmSize",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cloud.azure.kernel.Location",
+                      "azure::Location",
+                      defaultacl=>['valid_user']);
    return($self);
 }
 
