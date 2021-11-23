@@ -91,19 +91,34 @@ sub qcheckRecord
    my @certs=$walletobj->getHashList(qw(ALL));
 
    foreach my $cert (@certs) {
-      my $ok=$self->itil::lib::Listedit::handleCertExpiration(
-                                            $walletobj,$cert,$dataobj,$rec,
-                                            \@qmsg,\@dataissue,\$errorlevel,
-                                            {
-            expnotifyfld=>'sslexpnotify1',
-            expnotifyleaddays=>$cert->{expnotifyleaddays},
-            expdatefld=>'enddate'
-      });
-      if (!$ok) {
-         msg(ERROR,sprintf("QualityCheck of '%s' (%d) failed",
-                           $walletobj->Self(),$cert->{id}));
+      my $isdel=0;
+      if ($cert->{enddate} ne ""){
+         my $d=CalcDateDuration(NowStamp("en"),$cert->{enddate});
+         if ($d->{days}<-7){
+            my $op=$walletobj->Clone();
+            $op->ValidatedDeleteRecord($cert);
+            $isdel=1;
+            my $desc={};
+            push(@qmsg,'Certificate deleted due long expiration: '.
+                          $cert->{name});
+         }
       }
+      if (!$isdel){
+         my $ok=$self->itil::lib::Listedit::handleCertExpiration(
+                                               $walletobj,$cert,$dataobj,$rec,
+                                               \@qmsg,\@dataissue,\$errorlevel,
+                                               {
+               expnotifyfld=>'sslexpnotify1',
+               expnotifyleaddays=>$cert->{expnotifyleaddays},
+               expdatefld=>'enddate'
+         });
+         if (!$ok) {
+            msg(ERROR,sprintf("QualityCheck of '%s' (%d) failed",
+                              $walletobj->Self(),$cert->{id}));
+         }
+     }
    }
+
 
    if (@qmsg) {
       return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue});
