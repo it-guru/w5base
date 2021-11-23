@@ -138,6 +138,7 @@ sub new
 
       new kernel::Field::Text(     name       =>'srcsys',
                                    group      =>'source',
+                                   selectfix  =>1,       # for InlineAttachment
                                    label      =>'Source-System',
                                    dataobjattr=>'filemgmt.srcsys'),
 
@@ -638,7 +639,8 @@ sub isViewValid
    return(qw(header default)) if (!defined($rec));
 
    if (defined($rec)){
-      return(qw(ALL)) if ($self->checkacl($rec,"read"));
+      return(qw(ALL)) if ($rec->{srcsys} eq "W5Base::InlineAttach" ||
+                          $self->checkacl($rec,"read"));
    }
    return(undef);
 }
