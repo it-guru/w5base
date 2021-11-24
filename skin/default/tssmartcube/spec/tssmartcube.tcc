@@ -1,11 +1,9 @@
 'fieldgroup.dsk'=>{
 de=>'
 Weiterführende Hinweise/Hilfen unter: <a target=_blank href="https://darwin.telekom.de/darwin/public/faq/article/ById/16375791330001">FAQ: E_StorageAndServerConnectivityGuide_Verfahrensanweisung.pdf</a><br>
-(zugreifbar für die geschlossene Benutzergruppe "Patchmanagement")
 ',
 en=>'
 further informations at: <a target=_blank href="https://darwin.telekom.de/darwin/public/faq/article/ById/16375791330001">FAQ: E_StorageAndServerConnectivityGuide_Verfahrensanweisung.pdf</a><br>
-(accessable for closed usergroup "Patchmanagement")
 '
 },
 'fieldgroup.auditserver'=>{
