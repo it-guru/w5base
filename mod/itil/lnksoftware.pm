@@ -892,6 +892,23 @@ sub calcRightsMgmtState
 }
 
 
+sub SecureValidatedUpdateRecord
+{
+   my $self=shift;
+   my $oldrec=$_[0];
+   my $newrec=$_[1];
+
+   if (defined($oldrec) && $oldrec->{softwareinstpclass} eq "OPTION"){
+      if ($oldrec->{software} eq $newrec->{software}){
+         delete($newrec->{software});  # Update of Software not allowed
+      }
+      delete($newrec->{parentid});  # Update of parentid not allowed
+   }
+
+   return($self->SUPER::SecureValidatedUpdateRecord(@_));
+}
+
+
 
 
 sub Validate
