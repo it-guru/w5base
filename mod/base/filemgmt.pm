@@ -1571,6 +1571,15 @@ sub getRecordImageUrl
    return("../../../public/base/load/filefolder.jpg?".$cgi->query_string());
 }
 
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    return(1) if ($_[0] eq "load");
+    return($self->SUPER::isAnonymousAccessValid(@_));
+}
+
+
+
 
 
 1;
