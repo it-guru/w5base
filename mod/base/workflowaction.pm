@@ -654,9 +654,13 @@ sub NotifyForward
       $baseurl=$ENV{SCRIPT_URI};
       $baseurl=~s/\/auth\/.*$//;
    }
-   else{
-      my $baseurl=$self->Config->Param("EventJobBaseUrl");
-      $baseurl.="/" if (!($baseurl=~m/\/$/));
+   my $jobbaseurl=$self->Config->Param("EventJobBaseUrl");
+   if ($jobbaseurl ne ""){
+      $jobbaseurl=~s#/$##;
+      $baseurl=$jobbaseurl;
+   }
+   if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+      $baseurl=~s/^http:/https:/i;
    }
 
    if ($baseurl ne ""){
