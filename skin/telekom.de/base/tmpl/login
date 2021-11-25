@@ -5,15 +5,22 @@
 <br>
 <hr width=80%>
 <p>
-<div style="padding:10px;width:80%;border-style:solid;border-color:#E20074;border-width:4px;text-align:left">
+<div style="padding:10px;width:80%;border-style:solid;border-color:#E20074;border-width:4px;text-align:left;overflow:hidden">
+<table width=100% border=0 cellspacing=0 cellpadding=0>
+<tr><td>
+
 <center>
 <input type=button style="font-size:14px;padding:1px;margin:2px;width:250px" value=" W5Base/Darwin Login " onclick="dologin();"><br>
 <input type=button style="font-size:14px;padding:1px;margin:2px;width:150px" value="T-SSO Login " onclick="dossologin();">
 <input type=button disabled="disabled" style="font-size:14px;padding:1px;margin:2px;width:150px" value="AD Login " onclick="doadlogin();">
 </center>
 
+</td><td width=1%>
 
-<img align=right style="position:relative;top:-40px;right:-10px;align:right" src="../../../public/base/load/logo_200x78.jpg">
+<img align=right src="../../../public/base/load/logo_200x78.jpg">
+
+</td></tr>
+</table>
 
 <br>In der Anwendung W5Base/Darwin können Sie sich mit Ihrer ...
 <ul>
