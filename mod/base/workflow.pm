@@ -2754,7 +2754,15 @@ sub externalMailHandler
             $notiy{emailtext}.="\n\nDirectLink:\n";
             my $baseurl=$ENV{SCRIPT_URI};
             $baseurl=~s/\/(auth|public)\/.*$//;
+            my $jobbaseurl=$self->Config->Param("EventJobBaseUrl");
+            if ($jobbaseurl ne ""){
+               $jobbaseurl=~s#/$##;
+               $baseurl=$jobbaseurl;
+            }
             my $url=$baseurl;
+            if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+               $url=~s/^http:/https:/i;
+            }
             my $p=$parent;
             $p=~s/::/\//g;
             $url.="/auth/$p/ById/".$id;
