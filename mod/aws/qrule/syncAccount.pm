@@ -119,6 +119,7 @@ sub qcheckRecord
       my @netif=$netIf->getHashList(qw(id ipadresses));
       my %allip;
       my %delip;
+      my %updip;
       foreach my $if (@netif){
          foreach my $iprec (@{$if->{ipadresses}}){
             $allip{$iprec->{name}}={
@@ -207,11 +208,52 @@ sub qcheckRecord
       delete($rec->{ipaddresses}); # reload ips
       #printf STDERR ("allip=%s\n",Dumper(\%allip));
       #printf STDERR ("ipaddresses=%s\n",Dumper($rec->{ipaddresses}));
+
+
+      my $net=getModuleObject($self->getParent->Config(),"itil::network");
+      my $netarea={};
+      if (defined($net)){
+         $netarea=$net->getTaggedNetworkAreaId();
+      }
+
       foreach my $iprec (@{$rec->{ipaddresses}}){
          if ($iprec->{srcsys} eq "AWS"){
             my $ip=$iprec->{name};
             if (exists($allip{$ip})){
-               delete($allip{$ip});
+               my $directFound=0;
+               foreach my $chkiprec (@{$rec->{ipaddresses}}){
+                  if ($chkiprec->{name} eq $iprec->{name} && 
+                      ($iprec->{systemid} ne "" ||
+                       $iprec->{itclustsvcid} ne "")){
+                     $directFound++;
+                  }
+               }
+               if ($directFound){
+                  delete($allip{$ip});
+               }
+            }
+         }
+      }
+
+
+      foreach my $iprec (@{$rec->{ipaddresses}}){
+         if ($iprec->{srcsys} eq "AWS"){
+            my $ip=$iprec->{name};
+            if (exists($allip{$ip})){
+               if  (!defined($iprec->{systemid}) &&
+                    !defined($iprec->{itclustsvcid})){
+                  if ($iprec->{networkid} ne 
+                      $netarea->{$allip{$ip}->{netareatag}}){
+
+                     $iprec->{NetareaTag}=$allip{$ip}->{netareatag};
+                     $ipobj->switchSystemIpToNetarea({$ip=>$iprec},undef,
+                                                     $netarea,\@qmsg);
+                  }
+                  delete($allip{$ip});
+               }
+               else{
+                  $delip{$iprec->{id}}=$iprec;
+               }
             }
             else{
                if (!defined($iprec->{systemid}) &&
@@ -221,6 +263,10 @@ sub qcheckRecord
             }
          }
       }
+
+
+
+
       #my $dummy={
       #   name=>"1.2.3.4",
       #   netareatag=>"CNDTAG"
@@ -228,11 +274,6 @@ sub qcheckRecord
       #$allip{$dummy->{name}}=$dummy;
 
       if (keys(%allip) || keys(%delip)){
-         my $net=getModuleObject($self->getParent->Config(),"itil::network");
-         my $netarea={};
-         if (defined($net)){
-            $netarea=$net->getTaggedNetworkAreaId();
-         }
          foreach my $iprec (values(%allip)){
             my $rec={
                name         =>$iprec->{name},
@@ -243,30 +284,16 @@ sub qcheckRecord
                networkid    =>$netarea->{ISLAND}
             };
             my $newid=$ipobj->ValidatedInsertRecord($rec);
-            if ($newid ne ""){
-               $ipobj->ResetFilter();
-               $ipobj->SetFilter({id=>\$newid});
-               printf STDERR ("fifi newid=%s\n",$newid); 
-               my ($oldrec)=$ipobj->getOnlyFirst(qw(ALL));
-               if ($oldrec->{networkid} ne $netarea->{$iprec->{netareatag}}){
-                 # TODO:
-                 # $oldrec->{NetareaTag}=$iprec->{networktag};
-                 # $ipobj->switchSystemIpToNetarea($oldrec,undef,
-                 #                                 $netarea,\@qmsg);
-               }
-
-               #if (exists($netarea->{$iprec->{netareatag}})){
-               #   $rec->{NetareaTag}=$netarea->{$iprec->{netareatag}};
-               #}
-            }
+            push(@qmsg,"added: ".$iprec->{name});
+            $checksession->{EssentialsChangedCnt}++;
          }
          foreach my $iprec (values(%delip)){
-            $ipobj->ValidatedUpdateRecord($iprec,{cistatusid=>6},
-                  {id=>$iprec->{id}}
-            );
+            if ($ipobj->ValidatedUpdateRecord($iprec,{cistatusid=>6},
+                  {id=>$iprec->{id}})){
+               push(@qmsg,"deleted: ".$iprec->{name});
+            }
          }
       }
-      #printf STDERR ("need to ins=%s\n",Dumper(\%allip));
    }
 
    my @result=$self->HandleQRuleResults("AWS",
