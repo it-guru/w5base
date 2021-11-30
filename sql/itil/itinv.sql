@@ -1814,3 +1814,4 @@ alter table network add tagname varchar(20) default NULL, add UNIQUE KEY tagname
 alter table system add autoscalinggroup varchar(128) default NULL;
 alter table system add autoscalingsubgroup varchar(128) default NULL;
 alter table ipnet add ipnetresp bigint(20) default NULL,add ipnetresp2 bigint(20) default NULL,add techcontact bigint(20) default NULL;
+alter table accessurl add ssl_expnotifyleaddays int(22) default '56';

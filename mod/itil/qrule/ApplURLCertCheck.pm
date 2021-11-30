@@ -208,12 +208,12 @@ sub qcheckRecord
             my $m="SSL check: invalid or undefined sslend returend";
             return(3,{qmsg=>[$m],dataissue=>[$m]});
          }
-
          my $ok=$self->itil::lib::Listedit::handleCertExpiration(
                                      $dataobj,$oldrec,undef,undef,
                                      \@qmsg,\@dataissue,\$errorlevel,
                                      {
             expnotifyfld=>'sslexpnotify1',
+            expnotifyleaddays=>$oldrec->{ssl_expnotifyleaddays},
             expdatefld=>'sslend'
          });
          if (!$ok) {
