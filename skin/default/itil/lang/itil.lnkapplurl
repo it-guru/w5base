@@ -4,6 +4,7 @@
 'Application CI-State'=>{de=>'Anwendungs CI-Status'},
 'Network'=>{de=>'Netzbereich'},
 'fieldgroup.class'=>{de=>'URL-Klassifikation',en=>'URL-Classification'},
+'fieldgroup.sslclass'=>{de=>'SSL-Zertifikat',en=>'SSL-Certificate'},
 'fieldgroup.applinfo'=>{de=>'Anwendungsdaten',en=>'Applicationdata'},
 'fieldgroup.lastipaddresses'=>{de=>'letzte bekannte IP-Adressen',en=>'last known IP addresses'},
 'fieldgroup.urlinfo'=>{de=>'URL-Daten',en=>'URL-Data'},

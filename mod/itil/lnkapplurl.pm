@@ -168,10 +168,23 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'do_sslcertcheck',
-                group         =>'class',
+                group         =>'sslclass',
+                jsonchanged   =>\&getOnChangedClassScript,
+                jsoninit      =>\&getOnChangedClassScript,
                 selectfix     =>1,
                 label         =>'perform cyclic SSL certificate checks',
                 dataobjattr   =>'accessurl.do_ssl_cert_check'),
+
+      new kernel::Field::Select(
+                name          =>'ssl_expnotifyleaddays',
+                htmleditwidth =>'180px',
+                group         =>'sslclass',
+                default       =>'56',
+                label         =>'SSL Expiration notify lead time',
+                value         =>['14','21','28','56','70'],
+                transprefix   =>'EXPNOTIFYLEAD.',
+                translation   =>'itil::applwallet',
+                dataobjattr   =>'accessurl.ssl_expnotifyleaddays'),
 
       new kernel::Field::TextDrop(
                 name          =>'lnkapplappl',
@@ -524,6 +537,29 @@ sub getSqlFrom
    return($from);
 }
 
+sub getOnChangedClassScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+
+var d=document.forms[0].elements['Formated_do_sslcertcheck'];
+var r=document.forms[0].elements['Formated_ssl_expnotifyleaddays'];
+
+if (d && r){
+   var v=d.options[d.selectedIndex].value;
+   if (v!="" && v!="0"){
+      r.disabled=false;
+   }
+   else{
+      r.disabled=true;
+   }
+}
+EOF
+   return($d);
+}
+
 
 sub initSearchQuery
 {
@@ -721,7 +757,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(
-          qw(header default class applinfo urlinfo ssl 
+          qw(header default class sslclass applinfo urlinfo ssl 
              lastipaddresses addcis source));
 }
 
@@ -732,9 +768,9 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default","class") if (!defined($rec));
+   return("header","default","class","sslclass") if (!defined($rec));
 
-   my @l=qw(header default history class applinfo urlinfo 
+   my @l=qw(header default history class sslclass applinfo urlinfo 
             source history addcis);
 
    if ($rec->{do_sslcertcheck}){
@@ -762,7 +798,7 @@ sub isWriteValid
 
    my $wrok=$self->isWriteToApplValid($applid);
 
-   return("default","class") if ($wrok);
+   return("default","class","sslclass" ) if ($wrok);
    return(undef);
 }
 
