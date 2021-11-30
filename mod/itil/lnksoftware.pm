@@ -902,6 +902,7 @@ sub SecureValidatedUpdateRecord
       if ($oldrec->{software} eq $newrec->{software}){
          delete($newrec->{software});  # Update of Software not allowed
       }
+      delete($newrec->{systemid});  # Update of systemid not allowed
       delete($newrec->{parentid});  # Update of parentid not allowed
    }
 
