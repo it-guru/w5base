@@ -421,6 +421,7 @@ sub new
                 vjointo       =>'tsacinv::lnksharedstorage',
                 weblinkto     =>'NONE',
                 htmldetail    =>0,
+                preferArray   =>1,
                 vjoinon       =>['applid'=>'applid'],
                 vjoindisp     =>'storagename'),
 
