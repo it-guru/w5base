@@ -320,7 +320,8 @@ sub InitRequest
             my $fldlst="account,loghour,logondate,logonbrowser,".
                        "logonip,lang,site";
             my $vallst="'$user','$loghour','$now',".
-                       "'$ENV{HTTP_USER_AGENT}','".getClientAddrIdString()."','$lang',".
+                       "'$ENV{HTTP_USER_AGENT}','".
+                       getClientAddrIdString()."','$lang',".
                        "'$site'"; 
             my $cmd="replace delayed into userlogon";
             $cmd.=" ($fldlst)";
@@ -335,7 +336,12 @@ sub InitRequest
                     "WHEN MATCHED THEN ".
                     "UPDATE SET loghour='$loghour',logondate='$now'";
             }
-            $db->do($cmd); 
+            if ($db->ping()){
+               $db->do($cmd); 
+            }
+            else{
+               msg(INFO,"db error - can not store userlogon - ping failed");
+            }
          }
       }
    }
