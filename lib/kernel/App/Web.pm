@@ -336,7 +336,7 @@ sub InitRequest
                     "WHEN MATCHED THEN ".
                     "UPDATE SET loghour='$loghour',logondate='$now'";
             }
-            if ($db->ping()){
+            if ($db->Ping()){
                $db->do($cmd); 
             }
             else{
