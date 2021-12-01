@@ -614,6 +614,7 @@ sub new
                 vjointo       =>'tsacinv::lnksharednet',
                 weblinkto     =>'NONE',
                 htmldetail    =>0,
+                preferArray   =>1,
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>'netname'),
 

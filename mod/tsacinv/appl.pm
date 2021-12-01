@@ -430,6 +430,7 @@ sub new
                 label         =>'direct connected Shared-Network Components',
                 vjointo       =>'tsacinv::lnksharednet',
                 htmldetail    =>0,
+                preferArray   =>1,
                 weblinkto     =>'NONE',
                 vjoinon       =>['applid'=>'applid'],
                 vjoindisp     =>'netname'),
