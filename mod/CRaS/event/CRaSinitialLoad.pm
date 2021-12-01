@@ -97,8 +97,8 @@ sub CRaSinitialLoad
    if ($#l==-1){
       $csteam->ValidatedInsertRecord({
           orgarea=>'DTAG.GHQ.VTI.DTIT',
-          grp=>'DTAG.GHQ.VTI.DTIT.Hub.RBA',
-          name=>'Test Cert Service Team'
+          grp=>'membergroup.ZertifikateDTIT',
+          name=>'Cert Service Team TelekomIT'
       });
    }
    
@@ -172,16 +172,14 @@ sub ProcessXLS
          $rec{xlsrow}=$row+1;
          $rec{xlssheet}=$worksheet->get_name();
          # record fixups
-         if (exists($rec{ICTO})){
+         if (exists($rec{ICTO}) && ($rec{ICTO}=~m/icto/i)){
             $rec{ICTO}=~s/:.*$//;
             $rec{ICTO}=~s/^ICTO /ICTO-/;
             $rec{ICTO}=~s/-+/-/;
             $rec{ICTO}=~s/^ICTO-ICTO-/ICTO-/;
-
             $rec{ICTO}=~s/[^0-9a-z]*$//i;
-
-            $rec{ICTO}=trim($rec{ICTO});
          }
+         $rec{ICTO}=trim($rec{ICTO});
          if ($rec{CommonName} ne ""){
             my $aurl=$self->getPersistentModuleObject("aur","itil::lnkapplurl");
             $aurl->SetFilter({hostname=>'"'.$rec{CommonName}.'"'});
@@ -192,10 +190,18 @@ sub ProcessXLS
          }
          if ($rec{applid} eq "" && $rec{ICTO} ne ""){
             my $appl=$self->getPersistentModuleObject("ap","TS::appl");
-            $appl->SetFilter({ictono=>\$rec{ICTO},cistatusid=>"3 4 5"});
+            $appl->SetFilter({name=>\$rec{ICTO},cistatusid=>"3 4 5"});
             my @l=$appl->getHashList(qw(opmode id));
             if ($#l>=0){
                $rec{applid}=$l[0]->{id};
+            }
+            if ($rec{applid} eq ""){
+               $appl->ResetFilter();
+               $appl->SetFilter({ictono=>\$rec{ICTO},cistatusid=>"3 4 5"});
+               my @l=$appl->getHashList(qw(opmode id));
+               if ($#l>=0){
+                  $rec{applid}=$l[0]->{id};
+               }
             }
          }
          if ($rec{csteamid} eq ""){
@@ -206,10 +212,6 @@ sub ProcessXLS
                $rec{csteamid}=$l[0]->{id};
             }
          }
-
- 
-
-
 
          # process record
          foreach my $k (keys(%rec)){
