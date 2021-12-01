@@ -100,6 +100,11 @@ sub new
                           #  next if ($st ne "1");
                          }
                          else{ 
+                            if ($current->{rawstate} eq "6"){
+                               if (!in_array($st,[qw(6)])){
+                                  next;
+                               }
+                            }
                             if ($current->{rawstate} eq "5"){
                                if (!in_array($st,[qw(2 5 3)])){
                                   next;
@@ -289,23 +294,32 @@ sub new
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>'csr.spassword'),
 
-#      new kernel::Field::Select(
-#                name          =>'expnotifyleaddays',
-#                htmleditwidth =>'280px',
-#                default       =>'56',
-#                label         =>'Expiration notify lead time',
-#                value         =>['14','21','28','56','70'],
-#                transprefix   =>'EXPNOTIFYLEAD.',
-#                translation   =>'itil::applcsr',
-#                dataobjattr   =>'csr.expnotifyleaddays'),
+      new kernel::Field::Select(
+                name          =>'expnotifyleaddays',
+                htmleditwidth =>'280px',
+                default       =>'56',
+                htmldetail    =>0,
+                label         =>'Expiration notify lead time',
+                value         =>['14','21','28','56','70'],
+                transprefix   =>'EXPNOTIFYLEAD.',
+                translation   =>'itil::applwallet',
+                dataobjattr   =>'csr.expnotifyleaddays'),
 
-#      new kernel::Field::Date(
-#                name          =>'sslexpnotify1',
-#                history       =>0,
-#                htmldetail    =>0,
-#                searchable    =>0,
-#                label         =>'Notification of Certificate Expiration',
-#                dataobjattr   =>'csr.exp_notify1'),
+      new kernel::Field::Date(
+                name          =>'sslexpnotify1',
+                history       =>0,
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'1.Notification of Certificate Expiration',
+                dataobjattr   =>'csr.expnotify1'),
+
+      new kernel::Field::Date(
+                name          =>'sslexpnotify2',
+                history       =>0,
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'2.Notification of Certificate Expiration',
+                dataobjattr   =>'csr.expnotify2'),
 
       new kernel::Field::Text(
                 name          =>'ssslsubject',
@@ -723,9 +737,14 @@ sub Validate
          return(0);
       }
    }
+   if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4"){
+      $newrec->{sslexpnotify1}=undef;
+      $newrec->{sslexpnotify2}=undef;
+   }
 
    if (effChanged($oldrec,$newrec,"expnotifyleaddays")){
       $newrec->{sslexpnotify1}=undef;
+      $newrec->{sslexpnotify2}=undef;
    }
 
 
@@ -807,8 +826,192 @@ sub FinishWrite
         }
       }
    }
+
+   if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4"){
+      # notify requestor about new signed cert
+      my $csrid=effVal($oldrec,$newrec,"id");
+      $self->doNotify($csrid,"CERTSIGNED");
+   }
+
+   if ((!defined($oldrec) || effChanged($oldrec,$newrec,"state")) && 
+       $newrec->{state} eq "1"){
+      # notify service team abount new request
+      my $csrid=effVal($oldrec,$newrec,"id");
+      $self->doNotify($csrid,"NEWCERT");
+   }
+
+
    return($self->SUPER::FinishWrite($oldrec,$newrec,$orig));
 }
+
+
+sub doNotify
+{
+   my $self=shift;
+   my $csrid=shift;
+   my $mode=shift;    # NEWCERT | CERTSIGNED | CERTEXPIRE1 | CERTEXPIRE2
+
+   my $obj=$self->Clone();
+
+   $obj->ResetFilter();
+   $obj->SetFilter({id=>\$csrid});
+   my ($rec)=$obj->getOnlyFirst(qw(ALL));
+   if (defined($rec)){
+      my $arec;
+      if ($rec->{applid} ne ""){
+         my $aobj=$self->getPersistentModuleObject("appl","itil::appl");
+         $aobj->SetFilter({id=>\$rec->{applid}});
+         ($arec)=$aobj->getOnlyFirst(qw(tsmid tsm2id contacts 
+                                       opmid opm2id applmgrid));
+      }
+      #printf STDERR ("fifi02 arec=%s\n",Dumper($arec));
+
+      #######################################################################
+      ## E-Mail generation                                                 ##
+      #######################################################################
+
+      my $grp=$self->getPersistentModuleObject("grp","base::grp");
+      my %touid;
+      my %ccuid;
+
+      if ($mode eq "NEWCERT" || $mode eq "CERTEXPIRE2"){
+         my @csteam;
+         if ($rec->{csteamgrpid} ne ""){
+            @csteam=$obj->getMembersOf($rec->{csteamgrpid},
+               "RMember",
+               "direct"
+            );
+         }
+         if ($mode eq "NEWCERT"){
+            foreach my $uid (@csteam){
+               $touid{$uid}++;
+            }
+         }
+         if ($mode eq "CERTEXPIRE2"){
+            foreach my $uid (@csteam){
+               $touid{$uid}++;
+            }
+         }
+      }
+
+      if ($mode eq "CERTSIGNED" || $mode eq "CERTEXPIRE1" || 
+                                   $mode eq "CERTEXPIRE2"){ 
+         if (defined($arec)){
+            $touid{$arec->{tsmid}}++;
+            $ccuid{$arec->{tsm2id}}++;
+            $touid{$arec->{opmid}}++;
+            $ccuid{$arec->{opm2id}}++;
+            $ccuid{$arec->{applmgrid}}++;
+            foreach my $crec (@{$arec->{contacts}}){
+               my $roles=$crec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if ($crec->{target} eq "base::user" &&
+                   in_array($roles,"applmgr2")){
+                  $ccuid{$crec->{targetid}}++;
+               }
+            }
+         }
+      }
+
+      # printf STDERR ("fifi CERTEXPIRE1 to=%s\n",Dumper(\%touid));
+      # printf STDERR ("fifi CERTEXPIRE1 cc=%s\n",Dumper(\%ccuid));
+     
+     
+      my @targetuids=(keys(%touid),keys(%ccuid)); #now we got all target userids
+     
+      my %nrec;
+     
+      my $user=$self->getPersistentModuleObject("user","base::user");
+      my $wfa=$self->getPersistentModuleObject("wfa","base::workflowaction");
+
+      $user->ResetFilter(); 
+      $user->SetFilter({userid=>\@targetuids});
+      foreach my $urec ($user->getHashList(qw(fullname userid lastlang lang))){
+         my $lang=$urec->{lastlang};
+         $lang=$urec->{lang} if ($lang eq "");
+         $lang="en" if ($lang eq "");
+         $nrec{$lang}->{$urec->{userid}}++;
+      }
+      my $lastlang;
+      if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
+         $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+      }
+      foreach my $lang (keys(%nrec)){
+         $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+         my @emailto;
+         my @emailcc;
+         foreach my $uid (keys(%touid)){
+            if (exists($nrec{$lang}->{$uid})){
+               push(@emailto,$uid);
+            }
+         }
+         foreach my $uid (keys(%ccuid)){
+            if (!exists($touid{$uid})){
+               if (exists($nrec{$lang}->{$uid})){
+                  push(@emailcc,$uid);
+               }
+            }
+         }
+         if ($#emailto!=-1 || $#emailcc!=-1){
+            my $subject=$self->T(
+               "CRaS centificate service",
+               $obj->Self).": ".$rec->{sslcertcommon};
+            
+           
+            my $tmpl=$self->getParsedTemplate("tmpl/CRaS_Notify_$mode",{
+               static=>{
+               }
+            });
+            my $level="INFO";
+            if ($mode eq "NEWCERT"){
+               $subject=$self->T(
+                  "CRaS new CSR to process",
+                  $obj->Self).": ".$rec->{sslcertcommon};
+            }
+            if ($mode eq "CERTSIGNED"){
+               $subject=$self->T(
+                  "CRaS certificate signed",
+                  $obj->Self).": ".$rec->{sslcertcommon};
+            }
+            if ($mode eq "CERTEXPIRE1"){
+               $level="WARN";
+               $subject=$self->T(
+                  "CRaS check for renew",
+                  $obj->Self).": ".$rec->{sslcertcommon};
+            }
+            if ($mode eq "CERTEXPIRE2"){
+               $level="ERROR";
+               $subject=$self->T(
+                  "CRaS expiration extrem near",
+                  $obj->Self).": ".$rec->{sslcertcommon};
+            }
+ 
+            $wfa->Notify($level,$subject,$tmpl, 
+               emailto=>\@emailto, 
+               emailcc=>\@emailcc, 
+               emailbcc=>[
+                  11634953080001,   # HV
+               ],
+               emailcategory =>['CRaS']
+            );
+         }
+      }
+      if ($lastlang ne ""){
+         $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+      }
+      else{
+         delete($ENV{HTTP_FORCE_LANGUAGE});
+      }
+      #######################################################################
+   }
+
+
+   #printf STDERR ("Notify(%s)=%s\n",$mode,Dumper($rec));
+
+   return(1);
+}
+
+
 
 
 
