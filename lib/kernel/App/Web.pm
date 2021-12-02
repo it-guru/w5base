@@ -1920,11 +1920,16 @@ sub findtemplvar
       $mode="text" if (in_array(\@param,"text"));
       if (defined($u)){
          $u->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
-         my ($urec)=$u->getOnlyFirst(qw(email office_phone));
+         my ($urec)=$u->getOnlyFirst(qw(email givenname office_phone));
          if (defined($urec)){
             if ($urec->{email} ne ""){
+               my $prefix="Support";
+               if ($urec->{givenname} ne ""){ 
+                  $prefix=$urec->{givenname};
+                  $prefix=~s/[<>&]//g;
+               }
                if ($mode eq "html"){
-                  $d.="Support: <a href=\"mailto:$urec->{email}\" ".
+                  $d.=$prefix.": <a href=\"mailto:$urec->{email}\" ".
                       "class=supportinfo>$urec->{email}</a>";
                }
                if ($mode eq "text"){
@@ -1934,13 +1939,16 @@ sub findtemplvar
             $d.="&nbsp;&nbsp;" if ($d ne "" && $mode eq "html");
             $d.="  " if ($d ne "" && $mode eq "text");
             if ($urec->{office_phone} ne ""){
+               my $label=$self->T("Phonenumber","base::user").":";
+               my $label="";
                if ($mode eq "html"){
-                  $d.="1st Level Support Phone: <a  class=supportinfo ".
+                  $d.="&bull;&nbsp;";
+                  $d.=$label." <a  class=supportinfo ".
                       "href=\"callto:$urec->{office_phone}\">".
                       "$urec->{office_phone}</a>";
                }
                if ($mode eq "text"){
-                  $d.="Phone: ".
+                  $d.=$label." ".
                       "$urec->{office_phone}";
                }
             }
