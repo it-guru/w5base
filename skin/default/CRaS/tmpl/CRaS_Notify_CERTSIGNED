@@ -1,1 +1,6 @@
-Cert Singed english
+Dear Sir or Madam,
+
+the CSR you entered has been successfully signed.
+
+%SIGCERT%
+
