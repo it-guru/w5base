@@ -32,16 +32,7 @@ sub new
       $self->{onDownloadUrl}=sub{
          my $self=shift;
          my $current=shift;
-         my $parent=$self->getParent();
-         my $idField=$parent->IdField();
-         my $id;
-         if (defined($idField)){
-            $id=$idField->RawValue($current);
-         }
-         if ($id ne ""){
-            return("ViewProcessor/Raw/".$self->{name}."/".$id);
-         }
-         return(undef);
+         return($self->getDownloadUrl($current));
       };
    }
    $self->{allowempty}=1 if (!exists($self->{allowempty}));
@@ -75,6 +66,40 @@ sub new
       }
    }
    return($self);
+}
+
+
+sub getDownloadUrl
+{
+   my $self=shift;
+   my $current=shift;
+   my $absolut=shift;  # undef|0 = relativ  1=absolut
+
+   my $url=undef;
+
+   my $parent=$self->getParent();
+   my $idField=$parent->IdField();
+   my $id;
+   if (defined($idField)){
+      $id=$idField->RawValue($current);
+   }
+   if ($id ne ""){
+      $url="ViewProcessor/Raw/".$self->{name}."/".$id;
+   }
+   if ($absolut){
+      my $baseurl=$ENV{SCRIPT_URI};
+      $baseurl=~s/\/(auth|public)\/.*$//;
+      my $jobbaseurl=$self->getParent->Config->Param("EventJobBaseUrl");
+      if ($jobbaseurl ne ""){
+         $jobbaseurl=~s#/$##;
+         $baseurl=$jobbaseurl;
+      }
+      my $parent=$self->getParent()->Self();
+      $parent=~s/::/\//g;
+      $url=$baseurl."/auth/".$parent."/".$url;
+   }
+   return($url);
+
 }
 
 

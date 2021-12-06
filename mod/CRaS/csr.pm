@@ -956,12 +956,50 @@ sub doNotify
             my $subject=$self->T(
                "CRaS centificate service",
                $obj->Self).": ".$rec->{sslcertcommon};
-            
+
+            my $csrlink="";
+            my $sigcert="";
+
+            if ($rec->{sslcert} ne ""){
+               my $fo=$self->getField("sslcert",$rec);
+               my $url=$fo->getDownloadUrl($rec,1);
+               $csrlink="\nCSR:\n".$url."\n";
+            }
+
+            if ($rec->{ssslcert} ne ""){
+               my $fo=$self->getField("ssslcert",$rec);
+               my $url=$fo->getDownloadUrl($rec,1);
+               $sigcert="\nSigned Cert:\n".$url."\n";
+            }
            
             my $tmpl=$self->getParsedTemplate("tmpl/CRaS_Notify_$mode",{
                static=>{
+                  CSRLINK=>$csrlink,
+                  SIGCERT=>$sigcert,
                }
             });
+
+            if (1){
+               $tmpl.="\n\nDirectLink:\n";
+               my $baseurl=$ENV{SCRIPT_URI};
+               $baseurl=~s/\/(auth|public)\/.*$//;
+               my $jobbaseurl=$self->Config->Param("EventJobBaseUrl");
+               if ($jobbaseurl ne ""){
+                  $jobbaseurl=~s#/$##;
+                  $baseurl=$jobbaseurl;
+               }
+               my $url=$baseurl;
+               if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+                  $url=~s/^http:/https:/i;
+               }
+               my $p=$self->Self();
+               $p=~s/::/\//g;
+               $url.="/auth/$p/ById/".$rec->{id};
+               $tmpl.=$url;
+               $tmpl.="\n\n";
+            }
+
+
             my $level="INFO";
             if ($mode eq "NEWCERT"){
                $subject=$self->T(
