@@ -55,3 +55,4 @@ create table csr (
    key `applid` (applid), 
    FOREIGN KEY fk_csteam (csteam) REFERENCES csteam (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table csr add sslaltnames longtext;

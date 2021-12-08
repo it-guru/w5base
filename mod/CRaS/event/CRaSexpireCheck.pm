@@ -43,10 +43,10 @@ sub CRaSexpireCheck
 
    my $obj=$self->getPersistentModuleObject("csr","CRaS::csr");
 
-   $obj->SetFilter({state=>'4',ssslenddate=>"<now+14d"});
+   $obj->SetFilter({state=>'4',ssslenddate=>"<now+21d"});
    my $wobj=$obj->Clone();
    foreach my $rec ($obj->getHashList(qw(ALL))){
-      if (1| $rec->{sslexpnotify1} eq ""){
+      if ($rec->{sslexpnotify1} eq ""){
          if ($obj->doNotify($rec->{id},"CERTEXPIRE1")){
             $wobj->ValidatedUpdateRecord($rec,{
                sslexpnotify1=>NowStamp("en"),
@@ -55,12 +55,15 @@ sub CRaSexpireCheck
          }
       }
       else{
-         if ($rec->{sslexpnotify2} eq ""){
-            if ($obj->doNotify($rec->{id},"CERTEXPIRE2")){
-               $wobj->ValidatedUpdateRecord($rec,{
-                  sslexpnotify2=>NowStamp("en"),
-                  mdate=>$rec->{mdate}
-               },id=>\$rec->{id});
+         my $d=CalcDateDuration($rec->{ssslenddate},NowStamp("en"));
+         if ($d->{days}>6){
+            if ($rec->{sslexpnotify2} eq ""){
+               if ($obj->doNotify($rec->{id},"CERTEXPIRE2")){
+                  $wobj->ValidatedUpdateRecord($rec,{
+                     sslexpnotify2=>NowStamp("en"),
+                     mdate=>$rec->{mdate}
+                  },id=>\$rec->{id});
+               }
             }
          }
       }

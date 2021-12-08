@@ -244,6 +244,12 @@ sub new
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>'csr.sslcertcommon'),
 
+      new kernel::Field::Text(
+                name          =>'sslaltnames',
+                label         =>'SSL-Certificate alternate Names',
+                group         =>'detail',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'csr.sslaltnames'),
 
       new kernel::Field::Text(
                 name          =>'sslcertorg',
@@ -763,20 +769,68 @@ sub Validate
       # Subject
       $newrec->{ssslsubject}=$pkcs->subject();
 
-#      # Issuer
-#      my $iobjs=$pkcs->issuer_name->entries();
-#      $newrec->{issuer}=$self->formatedMultiline($iobjs);
-#
-#      $newrec->{issuerdn}=$pkcs->issuer();
-#
-#      # SerialNr. (hex format)
-#      $newrec->{serialno}=$pkcs->serial();
-
-
       # Name
       $newrec->{name}=$pkcs->commonName();
       $newrec->{sslcertcommon}=$pkcs->commonName();
       $newrec->{sslcertorg}=$pkcs->organizationName();
+
+      my @altnames;
+
+      if ($pkcs->can("extensionValue")){
+         my @names = $pkcs->extensionValue('subjectAltName' );
+         if ($#names==0 && ref($names[0]) eq "ARRAY"){
+            @names=@{$names[0]};
+         }
+         
+         foreach my $nrec (@names){
+            if ($nrec->{dNSName} ne ""){
+               push(@altnames,$nrec->{dNSName});
+            }
+         }
+      }
+      if ($#altnames!=-1){
+         $newrec->{sslaltnames}=join("; ",sort(@altnames));
+      }
+
+
+
+
+#      if (1){
+#         # "Alternative Name" analyse
+#         my $alternativeNames;
+#         my $exts;
+#
+#         eval('$exts=$pkcs->extensions_by_oid();');
+#         if ($@){
+#            msg(WARN,"x509::extensions_by_oid crashed with $@");
+#         }
+#         if (ref($exts) eq "HASH"){
+#            foreach my $oid (keys(%$exts)){
+#              my $ext=$exts->{$oid};
+#              if ($oid eq "2.5.29.17"){
+#                 my $val=$ext->value();
+#                 if ($ext->can("to_string")){
+#                    $val=$ext->to_string();
+#                 }
+#                 elsif ($ext->can("as_string")){
+#                    $val=$ext->as_string();
+#                 }
+#                 $alternativeNames=$val;
+#              }
+#            }
+#         }
+#         if (defined($alternativeNames)){
+#            if (!defined($oldrec)){
+#               $newrec->{altname}=$alternativeNames;
+#            }
+#            else{
+#               if ($oldrec->{altname} ne $alternativeNames){
+#                  $newrec->{altname}=$alternativeNames;
+#               }
+#            }
+#         }
+#         msg(INFO,"alternativeNames=$alternativeNames");
+#      }
    }
    if (exists($newrec->{'ssslcert'})) {
       my $x509=$self->readPEM(effVal($oldrec,$newrec,'ssslcert'));
@@ -787,6 +841,12 @@ sub Validate
       $newrec->{ssslstartdate}=$x509->{startdate};
       $newrec->{ssslenddate}=$x509->{enddate};
       $newrec->{ssslissuerdn}=$x509->{ssslissuerdn};
+      if ($x509->can("serial")){
+         $newrec->{ssslserialno}=$x509->serial();
+      }
+      if ($x509->can("issuer")){
+         $newrec->{ssslissuerdn}=$x509->issuer();
+      }
    }
 
    return(1);
