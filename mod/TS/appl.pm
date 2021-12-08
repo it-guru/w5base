@@ -1159,7 +1159,7 @@ sub doIdOrderValidate
                   if (in_array($roles,"write") &&
                       in_array(\@grpid,$crec->{targetid})){
                      $r->{orderAllowed}="true";
-                     last UCHK;
+                     last GCHK;
                   }
                }
             }
