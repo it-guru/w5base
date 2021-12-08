@@ -267,12 +267,13 @@ sub analyseRecord
                 my $scandatatxt;
                 eval('
                    use IO::Uncompress::Gunzip qw(gunzip);
-                   my $z=new IO::Uncompress::Gunzip(\$scandata,\$scandatatxt);
+                   gunzip(\$scandata => \$scandatatxt);
                 ');
                 if ($scandatatxt ne ""){
                    $scandata=$scandatatxt;
                 }
                 else{
+                   msg(ERROR,"gunzip result=$@");
                    msg(ERROR,"uncompress problem ".
                              "in $rec->{filename} $MachineID");
                    return(1);
