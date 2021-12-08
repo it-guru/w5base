@@ -261,7 +261,23 @@ sub analyseRecord
           }
           if (defined($MachineID)){
              msg(INFO,"process machineid=$MachineID");
+             msg(INFO,"filename=$rec->{filename}");
              my $scandata=$rec->{filecontent};
+             if ($rec->{filename}=~m/\.gz$/i){
+                my $scandatatxt;
+                eval('
+                   use IO::Uncompress::Gunzip qw(gunzip);
+                   my $z=new IO::Uncompress::Gunzip(\$scandata,\$scandatatxt);
+                ');
+                if ($scandatatxt ne ""){
+                   $scandata=$scandatatxt;
+                }
+                else{
+                   msg(ERROR,"uncompress problem ".
+                             "in $rec->{filename} $MachineID");
+                   return(1);
+                }
+             }
              $scandata=~s/^\s*#\s+Uuid:\s+.*$/# Uuid: $MachineID/m;
              my ($d,$code,$message)=$dataobj->CollectREST(
                 dbname=>'TASTEOScollector',
