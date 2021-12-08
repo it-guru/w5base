@@ -132,6 +132,13 @@ sub qcheckRecord
             };
          }
       }
+      foreach my $fullname (keys(%fwlist)){
+         if ($fwlist{$fullname}->{name} eq ""){
+            push(@{$desc->{qmsg}},"error - firewall id '$fullname' can ".
+                                  "not be resolved from firewall cache");
+            delete($fwlist{$fullname});
+         }
+      }
 
       my @soll=sort({$a->{name} cmp $b->{name}} values(%fwlist));
       
