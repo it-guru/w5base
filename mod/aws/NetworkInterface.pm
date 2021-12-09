@@ -182,7 +182,7 @@ sub DataCollector
             $NextToken=$objItr->NextToken();
             my $netIfs=$objItr->NetworkInterfaces();
             if ($netIfs){
-               #p $netIfs;
+              # p $netIfs;
                foreach my $netIf (@$netIfs){
                   my %tag;
                   my $rec={
@@ -221,6 +221,18 @@ sub DataCollector
                         netareatag=>"ISLAND"
                      };
                      push(@ip,$iprec);
+                  }
+                  my $asso=$netIf->Association();
+                  if (defined($asso)){
+                     my $iprec={
+                        name=>$asso->PublicIp(),
+                        isprimary=>0,
+                        dnsname=>$asso->PublicDnsName(),
+                        isipv4=>1,
+                        netareatag=>"INTERNET"
+                     };
+                     push(@ip,$iprec);
+
                   }
                   foreach my $ip6rec (@{$netIf->Ipv6Addresses()}){
                      p $ip6rec;
