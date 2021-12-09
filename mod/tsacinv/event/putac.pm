@@ -16,6 +16,10 @@ package tsacinv::event::putac;
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+
+# Doku AssetManager XML Interface unter ...
+# https://mywiki.telekom.de/display/CM/Asset+Manager-Interfaces-XML+interfaces+over+FTP+server
+
 use strict;
 use vars qw(@ISA);
 use kernel;
