@@ -201,6 +201,7 @@ sub TriggerEndpoint
       exitmsg=>'OK'
    });
    print $d;
+   printf STDERR ("got AWS Trigger:%s\n",$d);
    return(0);
 }
 
