@@ -275,6 +275,7 @@ sub TriggerEndpoint
       ptimestamp=>NowStamp(),
       exitmsg=>'OK'
    });
+   printf STDERR ("got AZURE Trigger:%s\n",$d);
    print $d;
    return(0);
 }
