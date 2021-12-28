@@ -1,0 +1,12 @@
+### T-SSO (WebSSO) Begin ######
+RewriteCond %{LA-U:REMOTE_USER} ^(sso|ciam|SSO|CIAM)$
+RewriteRule "^/(.*)" https://websso-myiam-ite1-cp.app.t-internal.com/w5base-devnull.telekom.de/$1 [R,NE,END]
+
+RewriteCond "%{LA-U:REMOTE_USER}" ^(ad|AD|ads|ADS)$
+RewriteCond "%{QUERY_STRING}" ^(.*)$
+RewriteRule "^/(.*)" https://websso-myiam-ite1-cp.app.t-internal.com/login/direct/kerb?target=https://websso-myiam-ite1-cp.app.t-internal.com/w5base-devnull.telekom.de/$1?%1 [QSD,B,NE,R,END]
+
+RewriteCond %{HTTP:iv-user} !^$
+RewriteRule ^/darwin/public/base/menu/root https://myportal-websso.corp.telekom.de/w5base-devnull.telekom.de/darwin/auth/base/menu/root [R,END]
+### T-SSO (WebSSO) End   ######
+
