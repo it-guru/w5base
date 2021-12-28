@@ -122,6 +122,19 @@ function DetailInit()  // used from asyncron sub data to restore position in
 EOF
    }
    $d.=<<EOF;
+
+function userCountTimer(){
+   window.setTimeout("userCountTimer()", 120000);
+   \$jsonp.send('../../base/userlogon/userCount', {
+       callbackName: '_JSONP',
+       onSuccess: function(json){
+       },
+       onTimeout: function(){
+       },
+       timeout: 5
+   });
+}
+
 function onNew()
 {
    var t=document.getElementById("TabSelectorModeSelect");
@@ -129,6 +142,7 @@ function onNew()
       var e=document.getElementById("HtmlDetail");
       e.style.height=(t.offsetHeight-30)+"px";
    }
+   window.setTimeout("userCountTimer()", 100);
 }
 function startFixBackToTop(){
    setTimeout(function(){

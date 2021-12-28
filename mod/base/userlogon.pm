@@ -128,4 +128,44 @@ sub getRecordImageUrl
    return("../../../public/base/load/env.jpg?".$cgi->query_string());
 }
 
+
+
+sub isAnonymousAccessValid
+{
+    my $self=shift;
+    return(1) if ($_[0] eq "userCount");
+    return($self->SUPER::isAnonymousAccessValid(@_));
+}
+
+
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),"userCount");
+}
+
+
+sub userCount
+{
+   my $self=shift;
+
+   print($self->HttpHeader("application/json"));
+
+   my $n="???";
+
+   $self->ResetFilter();
+   $self->SetFilter({logondate=>">now-1h"});
+   my $cnt=$self->CountRecords();
+   $n=$cnt;
+
+   my $d="";
+   my $JSONP=Query->Param("callback");
+   $JSONP="_JSONP" if ($JSONP eq "");
+   $d.="$JSONP({";
+   $d.="\"count\":\"$n\"";
+   $d.="});";
+
+   print($d);
+}
+
 1;

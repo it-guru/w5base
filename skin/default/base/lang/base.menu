@@ -10,4 +10,5 @@
 'data area'=>{de=>'Datenbereich'},
 'navigation area'=>{de=>'Navigationsbereich'},
 'select a skin'=>{de=>'Wählen Sie einen Skin'},
-'KeyNode in Datamodel'=>{de=>'Schlüsselknoten in Datenmodel'}
+'KeyNode in Datamodel'=>{de=>'Schlüsselknoten in Datenmodel'},
+'current user count'=>{de=>'aktuelle Nutzeranzahl'},

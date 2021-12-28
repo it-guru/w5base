@@ -901,9 +901,32 @@ sub menuframe
                            prefix=>$rootpath,
                            onload=>'scrollToActive();',
                            style=>['default.css','menu.css']);
+   my $usercount=$self->T("current user count");
    print <<EOF;
 <script language="JavaScript">
+function userCountTimer(){
+   var e=document.getElementById('userCount');
+   window.setTimeout("userCountTimer()", 50000);
+   if (e){
+      const now = new Date();
+      \$jsonp.send('${rootpath}/../../userlogon/userCount', {
+          callbackName: '_JSONP',
+          onSuccess: function(json){
+              if (json){
+                 e.innerHTML ="${usercount}: "+json.count;
+              }
+          },
+          onTimeout: function(){
+              e.innerHTML ="Users: ?";
+              console.log('timeout!');
+          },
+          timeout: 5
+      });
+   }
+}
+
 function scrollToActive(){
+   window.setTimeout("userCountTimer()", 100);
    var e=document.getElementById('activeMenuTree');
    if (e){
       var rect = e.getBoundingClientRect();
@@ -912,6 +935,7 @@ function scrollToActive(){
       }
    }
 }
+
 function ClickOn_clipicon(o,href,labelpath){
    var e=document.getElementById('clipicontext');
    e.innerHTML="<font face='Courier;Courier New' color='black'>"+
@@ -930,6 +954,11 @@ EOF
                                        static=>{menutab=>$m,
                                                 rootpath=>$rootpath}});
    print $menuframe;
+
+   if ($ENV{REMOTE_USER} ne "anonymous" &&
+       $ENV{REMOTE_USER} ne ""){
+      print("<div id=userCount>...</div>");
+   }
 
    print ("</html>");
 }
