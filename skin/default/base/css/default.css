@@ -149,6 +149,12 @@ div.context_menu td.std {
 	cursor: default;
 }
 
+div#userCount{
+   font-size:8px;
+   margin:10px;
+   margin-top:20px;
+}
+
 div.context_menu td.active {
 	background-color: Highlight;
 	color: HighlightText;
