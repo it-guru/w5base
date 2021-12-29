@@ -207,6 +207,8 @@ sub ProbeIP()
    );
 
    my $url=$q->param("url");
+   $url=~s/^["'\s]*//g;
+   $url=~s/["'\s]*$//g;
    my $uri=new URI($url);
    $SIG{ALRM}=sub{
       outputResults();
@@ -285,10 +287,18 @@ sub resolv2ip
       return($W5ProbeIP::resolvip::Cache{$k});
    }
 
-
-   my @okt=unpack("C4",pack("C4",split(/\./,$host)));
-   @okt=grep({ $_>=0 and $_< 256 } @okt);
-   my $parsed=join('.',unpack("C4",pack("C4",split(/\./,$host))));
+   my @oktstr=split(/\./,$host);
+   my $oktpacked;
+   my $parsed;
+   if ($#oktstr==3){
+      eval('$oktpacked=pack("C4",@oktstr);');
+   }
+   my @okt;
+   if ($@ eq "" && defined($oktpacked)){
+      $oktpacked=unpack("C4",$oktpacked);
+      @okt=grep({ $_>=0 and $_< 256 } @okt);
+      $parsed=join('.',unpack("C4",pack("C4",split(/\./,$host))));
+   }
    if ($parsed eq $host){ # is already v4 address
       $r->{ipaddress}=[$host];
       $r->{exitcode}=0;
