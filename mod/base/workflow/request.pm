@@ -257,11 +257,9 @@ sub isWriteValid
    my $userid=$self->getParent->getCurrentUserId();
    return(1) if (!defined($rec));
    my @l;
-   if ($rec->{state}==1 || $rec->{state}==2 || $rec->{state}==3 || 
-       $rec->{state}==4){
-      if ($rec->{initiatorid}==$userid &&
-          $rec->{fwdtarget} eq "base::user" &&
-          $rec->{fwdtargetid} eq $userid){
+
+   if ($rec->{state}==1){
+      if ($rec->{initiatorid}==$userid && $self->isCurrentForward($rec)){
          push(@l,"default");
       }
       else{
@@ -275,6 +273,11 @@ sub isWriteValid
          }
       }
    }
+
+
+
+
+
 #   push(@l,"default") if ($rec->{state}<10 && $rec->{state}>1 &&
 #                         ($self->isCurrentForward($rec) ||
 #                          $self->getParent->IsMemberOf("admin")));
@@ -293,7 +296,8 @@ sub isWriteValid
       }
    }
 
-   {  # check if rewrite auf default DataBlock is allowed
+   # check if rewrite auf default DataBlock is allowed
+   if ($self->isCurrentForward($rec)){
       my $DefEditAllowed=0;
       if ($rec->{state}==2 ){
          my $d=CalcDateDuration($rec->{createdate},NowStamp("en"));
