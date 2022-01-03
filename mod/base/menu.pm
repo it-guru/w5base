@@ -906,7 +906,7 @@ sub menuframe
 <script language="JavaScript">
 function userCountTimer(){
    var e=document.getElementById('userCount');
-   window.setTimeout("userCountTimer()", 50000);
+   window.setTimeout("userCountTimer()", 290000);
    if (e){
       const now = new Date();
       \$jsonp.send('${rootpath}/../../userlogon/userCount', {

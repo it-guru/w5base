@@ -124,7 +124,7 @@ EOF
    $d.=<<EOF;
 
 function userCountTimer(){
-   window.setTimeout("userCountTimer()", 120000);
+   window.setTimeout("userCountTimer()", 310000);
    \$jsonp.send('../../base/userlogon/userCount', {
        callbackName: '_JSONP',
        onSuccess: function(json){
