@@ -909,7 +909,8 @@ function userCountTimer(){
    window.setTimeout("userCountTimer()", 290000);
    if (e){
       const now = new Date();
-      \$jsonp.send('${rootpath}/../../userlogon/userCount', {
+      var tnow=new Date().getTime();
+      \$jsonp.send('${rootpath}/../../userlogon/userCount?t='+tnow, {
           callbackName: '_JSONP',
           onSuccess: function(json){
               if (json){
