@@ -29,7 +29,9 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
    my $self=bless($type->SUPER::new(%param),$type);
+
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -71,6 +73,11 @@ sub new
                 name          =>'domainid',
                 label         =>'Domain id',
                 dataobjattr   =>'tsfiat_firewall.domainid'),
+
+      new kernel::Field::Boolean(
+                name          =>'isexcluded',
+                label         =>'is excluded',
+                dataobjattr   =>'tsfiat_firewall.isexcluded'),
 
       new kernel::Field::Boolean(
                 name          =>'isoffline',
@@ -244,6 +251,66 @@ sub getFirewallTable
 #      }
    );
 
+   my $dexcl=$self->CollectREST(
+      dbname=>'tsfiat',
+      useproxy=>0,
+      requesttoken=>'t'.time(),
+      verify_hostname=>0,
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         $baseurl.="/"  if (!($baseurl=~m/\/$/));
+         my $dataobjurl=$baseurl."securechangeworkflow/api/securechange/".
+                                 "devices/excluded?show_all=false";
+         return($dataobjurl);
+      },
+
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apiuser=shift;
+         my $headers=[Authorization =>'Basic '.
+                                      encode_base64($apiuser.':'.$apikey)];
+ 
+         return($headers);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+         my @l;
+
+         foreach my $device ($data->{device_ids}->nodes()){
+            my $id="".$device->{CONTENT}; 
+            push(@l,{id=>$id});
+         }
+
+         return(\@l);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data TPC project response");
+         return(undef);
+      }
+   );
+   my %excl=();
+   foreach my $rec (@$dexcl){
+      $excl{$rec->{id}}++;
+   }
+   foreach my $rec (@$d){
+      $rec->{isexcluded}=0;
+      if (exists($excl{$rec->{id}})){
+         $rec->{isexcluded}=1;
+      }
+   }
+
    return($d);
 }
 
@@ -311,9 +378,27 @@ sub getFirewallByIp
 #         return(undef);
 #      }
    );
+
+
+
+
    #printf STDERR ("d=%s\n",Dumper($d));
    return($d);
 }
+
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_isexcluded"))){
+     Query->Param("search_isexcluded"=>$self->T("no"));
+   }
+}
+
+
+
+
 
 
 

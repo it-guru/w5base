@@ -18,3 +18,4 @@ create table tsfiat_firewall(
   srcload    datetime default NULL,
   PRIMARY KEY  (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table tsfiat_firewall add isexcluded tinyint(1) default '0';

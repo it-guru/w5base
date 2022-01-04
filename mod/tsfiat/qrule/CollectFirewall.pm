@@ -112,15 +112,19 @@ sub qcheckRecord
    }
    if (keys(%fwlist)){
       $fiatfw->SetFilter({id=>[keys(%fwlist)]});
-      $fiatfw->SetCurrentView(qw(id name fullname));
+      $fiatfw->SetCurrentView(qw(id name fullname isexcluded));
       my $d=$fiatfw->getHashIndexed("id");
  
       foreach my $fwid (keys(%fwlist)){
          my $fullname;
+         my $isexcluded;
          if (exists($d->{id}->{$fwid})){
             $fwlist{$fwid}->{name}=$d->{id}->{$fwid}->{name};
             $fwlist{$fwid}->{ciusage}="FIREWALL";
-            $fullname=$d->{id}->{$fwid}->{fullname};
+            $fwlist{$fwid}->{isexcluded}=$d->{id}->{$fwid}->{isexcluded};
+            if (!$fwlist{$fwid}->{isexcluded}){
+               $fullname=$d->{id}->{$fwid}->{fullname};
+            }
          }
          $fwlist{$fwid}->{comments}="Interfaces:\n".join("\n",
                 sort(keys($fwlist{$fwid}->{ifname})));
@@ -133,10 +137,17 @@ sub qcheckRecord
          }
       }
       foreach my $fullname (keys(%fwlist)){
-         if ($fwlist{$fullname}->{name} eq ""){
-            push(@{$desc->{qmsg}},"error - firewall id '$fullname' can ".
-                                  "not be resolved from firewall cache");
+         #print STDERR "$fullname: = ".Dumper($fwlist{$fullname});
+         if ($fwlist{$fullname}->{isexcluded}){
+            push(@{$desc->{qmsg}},"firewall id '$fullname' is excluded");
             delete($fwlist{$fullname});
+         }
+         else{
+            if ($fwlist{$fullname}->{name} eq ""){
+               push(@{$desc->{qmsg}},"error - firewall id '$fullname' can ".
+                                     "not be resolved from firewall cache");
+               delete($fwlist{$fullname});
+            }
          }
       }
 
