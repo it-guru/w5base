@@ -235,20 +235,17 @@ sub getFirewallTable
 
          return(\@l);
       },
-      #onfail=>sub{
-      #   my $self=shift;
-      #   my $code=shift;
-      #   my $statusline=shift;
-      #   my $content=shift;
-      #   my $reqtrace=shift;
-#
-#         if ($code eq "404"){  # 404 bedeutet nicht gefunden
-#            return([],"200");
-#         }
-#         msg(ERROR,$reqtrace);
-#         $self->LastMsg(ERROR,"unexpected data TPC project response");
-#         return(undef);
-#      }
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data from FIAT (devices)");
+         die();
+      }
    );
 
    my $dexcl=$self->CollectREST(
@@ -296,7 +293,8 @@ sub getFirewallTable
          my $reqtrace=shift;
 
          msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TPC project response");
+         $self->LastMsg(ERROR,"unexpected data from FIAT (excluded)");
+         die();
          return(undef);
       }
    );
