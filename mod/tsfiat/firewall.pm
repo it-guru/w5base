@@ -184,7 +184,7 @@ sub getFirewallTable
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl."W5Base/devices?model=fmg_firewall";
+         my $dataobjurl=$baseurl."W5Base/devices";
          return($dataobjurl);
       },
 
