@@ -274,13 +274,6 @@ sub isWriteValid
       }
    }
 
-
-
-
-
-#   push(@l,"default") if ($rec->{state}<10 && $rec->{state}>1 &&
-#                         ($self->isCurrentForward($rec) ||
-#                          $self->getParent->IsMemberOf("admin")));
    push(@l,"default") if ($rec->{state}<10 && $rec->{state}>1 &&
                           $self->getParent->IsMemberOf("admin"));
    if (grep(/^default$/,@l) &&
@@ -297,12 +290,12 @@ sub isWriteValid
    }
 
    # check if rewrite auf default DataBlock is allowed
-   if ($self->isCurrentForward($rec)){
-      my $DefEditAllowed=0;
+   if ($self->isCurrentForward($rec) && !in_array(\@l,"default")){
+      my $DefEditAllowed=1;
       if ($rec->{state}==2 ){
          my $d=CalcDateDuration($rec->{createdate},NowStamp("en"));
          if ($d->{days}<14){
-            $DefEditAllowed=1 if (in_array(\@l,"init"));
+           # $DefEditAllowed=1 if (in_array(\@l,"init"));
             if (ref($rec->{shortactionlog}) eq "ARRAY"){
                foreach my $arec (@{$rec->{shortactionlog}}){
                   if ($arec->{effort}>0){
