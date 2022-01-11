@@ -23,6 +23,41 @@ use kernel::Event;
 use kernel::QRule;
 @ISA=qw(kernel::Event);
 
+sub Init
+{
+   my $self=shift;
+
+   $self->RegisterEvent("AZURE_CloudAreaSync","AZURE_CloudAreaSync");
+   $self->RegisterEvent("AZURE_QualityCheck","AZURE_QualityCheck");
+   return(1);
+}
+
+sub AZURE_QualityCheck
+{
+   my $self=shift;
+   my $cloudareaid=shift;
+
+   #printf STDERR ("fifi do AZURE_QualityCheck on $cloudareaid\n");
+   my $job=getModuleObject($self->Config,"base::joblog");
+   $job->SetFilter({event=>"\"QualityCheck 'itil::itcloudarea'*\"",
+                    exitstate=>"[EMPTY]",
+                    cdate=>">now-2h"});
+   my @l=$job->getHashList(qw(mdate id event exitstate));
+
+   #printf STDERR ("fifi joblogl=%s\n",Dumper(\@l));
+   if ($#l==-1){
+      my $bk=$self->W5ServerCall("rpcCallEvent",
+                                 "QualityCheck","itil::itcloudarea",
+                                 $cloudareaid);
+      return({exitcode=>'0'});
+   }
+   else{
+      printf STDERR ("retry event for AZURE_QualityCheck due job entries %s\n",
+                     Dumper(\@l));
+
+   }
+   return({exitcode=>'1'});
+}
 
 
 sub AZURE_CloudAreaSync
@@ -262,6 +297,9 @@ sub AZURE_CloudAreaSync
 
    return({exitcode=>0,exitmsg=>'ok'});
 }
+
+
+
 
 
 

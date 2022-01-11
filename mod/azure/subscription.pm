@@ -275,8 +275,55 @@ sub TriggerEndpoint
       ptimestamp=>NowStamp(),
       exitmsg=>'OK'
    });
-   printf STDERR ("got AZURE Trigger:%s\n",$d);
    print $d;
+
+   my $userid=$self->getCurrentUserId();
+   my $subscriptionId=$q->{subscriptionId}; 
+   my $action=$q->{action};
+
+   if ($subscriptionId ne "" && (
+        ($action=~m/\/virtualMachines\/write/i) ||
+        ($action=~m/\/virtualMachines\/delete/i)
+       )){
+      my $ca=$self->getPersistentModuleObject("_CloudA","itil::itcloudarea");
+      $ca->SetFilter({srcsys=>\'AZURE',
+                      srcid=>\$subscriptionId,
+                      cistatusid=>'4'});
+      my ($carec,$msg)=$ca->getOnlyFirst(qw(ALL));
+      if (defined($carec)){
+         my %p=(eventname=>'AZURE_QualityCheck',
+                spooltag=>'AZURE_QualityCheck-'.$carec->{id},
+                redefine=>'1',
+                retryinterval=>120,
+                firstcalldelay=>180,
+                maxretry=>10,
+                eventparam=>$carec->{id},
+                userid=>$userid);
+         my $res;
+         if (defined($res=$self->W5ServerCall("rpcCallSpooledEvent",%p)) &&
+            $res->{exitcode}==0){
+            msg(INFO,"AZURE_QualityCheck ------------------------------");
+            msg(INFO,"AZURE_QualityCheck action=".$action);
+            msg(INFO,"AZURE_QualityCheck resourceId=".$q->{resourceId});
+            msg(INFO,"AZURE_QualityCheck Event for $subscriptionId sent OK");
+            msg(INFO,"AZURE_QualityCheck ------------------------------");
+         }
+         else{
+            msg(ERROR,"AZURE_QualityCheck Event sent failed");
+         }
+         return(0);
+      }
+      else{
+         msg(ERROR,"azure::TriggerEndpoint - no active CloudArea for ".
+                   "$subscriptionId");
+         return(0);
+      }
+   }
+   if ($action=~m/\/Microsoft.DBforPostgreSQL\//){
+      # ignore this action
+      return(0);
+   }
+   printf STDERR ("got not processed AZURE Trigger:%s\n",$d);
    return(0);
 }
 
