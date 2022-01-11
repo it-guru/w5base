@@ -201,7 +201,55 @@ sub TriggerEndpoint
       exitmsg=>'OK'
    });
    print $d;
-   printf STDERR ("got AWS Trigger:%s\n",$d);
+
+
+   my $userid=$self->getCurrentUserId();
+   my $AccountID=$q->{AccountID}; 
+   my $OP=$q->{OP};
+
+   if ($AccountID ne "" && (
+        ($OP=~m/add/i) ||
+        ($OP=~m/remove/i)
+       )){
+      my $ca=$self->getPersistentModuleObject("_CloudA","itil::itcloudarea");
+      $ca->SetFilter({cloud=>\'AWS',
+                      srcid=>\$AccountID,
+                      cistatusid=>'4'});
+      my ($carec,$msg)=$ca->getOnlyFirst(qw(ALL));
+      if (defined($carec)){
+         my %p=(eventname=>'AWS_QualityCheck',
+                spooltag=>'AWS_QualityCheck-'.$carec->{id},
+                redefine=>'1',
+                retryinterval=>120,
+                firstcalldelay=>180,
+                maxretry=>10,
+                eventparam=>$carec->{id},
+                userid=>$userid);
+         my $res;
+         if (defined($res=$self->W5ServerCall("rpcCallSpooledEvent",%p)) &&
+            $res->{exitcode}==0){
+            msg(INFO,"AWS_QualityCheck ------------------------------");
+            msg(INFO,"AWS_QualityCheck OP=".$OP);
+            msg(INFO,"AWS_QualityCheck InstanceID=".$q->{InstanceID});
+            msg(INFO,"AWS_QualityCheck Event for $AccountID sent OK");
+            msg(INFO,"AWS_QualityCheck ------------------------------");
+         }
+         else{
+            msg(ERROR,"AWS_QualityCheck Event sent failed");
+         }
+         return(0);
+      }
+      else{
+         msg(ERROR,"aws::TriggerEndpoint - no active CloudArea for ".
+                   "$AccountID");
+         return(0);
+      }
+   }
+
+
+
+
+   printf STDERR ("got not processed AWS Trigger:%s\n",$d);
    return(0);
 }
 
