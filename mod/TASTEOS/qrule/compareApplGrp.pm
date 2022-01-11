@@ -131,7 +131,7 @@ sub qcheckRecord
    my $errorlevel=0;
    my %contact;
 
-   return(0,undef) if ($rec->{cistatusid}!=4);
+   return(0,undef) if ($rec->{cistatusid}<3);
    return(undef)   if ($rec->{applgrpid} eq "");
    if ($dataobj->Config->Param("W5BaseOperationMode") eq "test"){
       return(undef,{qmsg=>'no sync on w5base testenv allowed'});
@@ -244,9 +244,23 @@ sub qcheckRecord
    $tsossys->ResetFilter();
    $tsossys->SetFilter({ictoNumber=>$rec->{applgrpid}});
    $tsossys->SetCurrentView(qw(id ictoNumber machines));
-   my $curSys=$tsossys->getHashIndexed(qw(ictoNumber));
+   my $curSys=$tsossys->getHashIndexed(qw(ictoNumber id));
    #printf STDERR ("curSys getHashIndexed=%s\n",Dumper($curSys));
 
+   if ($rec->{cistatusid}>5){
+      if (keys(%{$curSys->{id}})){
+         my @qmsg;
+         foreach my $id (keys(%{$curSys->{id}})){
+            push(@qmsg,"drop TasteOS system: ".$id);
+            $tsossys->ValidatedDeleteRecord({id=>$id});
+            if ($tsossys->LastMsg()){
+               push(@qmsg,($tsossys->LastMsg()));
+            }
+         }
+         return(0,{qmsg=>\@qmsg});
+      }
+      return(undef,undef);
+   }
 
    my $dd=Dumper($rec->{additional});
 
