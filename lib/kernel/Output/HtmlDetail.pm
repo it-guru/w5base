@@ -131,8 +131,12 @@ function userCountTimer(){
        onSuccess: function(json){
        },
        onTimeout: function(){
+          // connection to Server seems to broken
+          console.log("timeout userCount - serverconnection broken");
+          window.top.close();
+          window.close();
        },
-       timeout: 5
+       timeout: 60
    });
 }
 
