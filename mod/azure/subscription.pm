@@ -328,6 +328,63 @@ sub TriggerEndpoint
 }
 
 
+sub loadSkusTable
+{
+   my $self=shift;
+   my $subscriptionId=shift;
+
+   my $Authorization=$self->getAzureAuthorizationToken();
+
+   my $d=$self->CollectREST(
+      dbname=>'AZURE',
+      useproxy=>1,
+      requesttoken=>"t=".time(),
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $base=shift;
+      
+         my $dataobjurl="https://management.azure.com/";
+         $dataobjurl.="subscriptions/".$subscriptionId."/providers/".
+                      "Microsoft.Compute/skus?api-version=2019-04-01";
+         return($dataobjurl);
+      },
+
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $headers=['Authorization'=>$Authorization,
+                      'Content-Type'=>'application/json'];
+ 
+         return($headers);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+
+         if (ref($data) eq "HASH" && exists($data->{value})){
+            $data=$data->{value};
+         }
+         return($data);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data Azure subscription response");
+         return(undef);
+      }
+   );
+
+   return($d);
+}
+
 
 1;
 
