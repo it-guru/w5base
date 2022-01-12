@@ -902,15 +902,25 @@ sub menuframe
                            onload=>'scrollToActive();',
                            style=>['default.css','menu.css']);
    my $usercount=$self->T("current user count");
+
+   my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
+   if (!($EventJobBaseUrl=~m#/$#)){
+      $EventJobBaseUrl.="/";
+   }
+   my $userCountUrl=$EventJobBaseUrl."auth/base/userlogon/userCount";
+   my $baseMenuUrl=$EventJobBaseUrl."auth/base/menu/root";
    print <<EOF;
 <script language="JavaScript">
 function userCountTimer(){
    var e=document.getElementById('userCount');
-   window.setTimeout("userCountTimer()", 290000);
    if (e){
+      window.setTimeout("userCountTimer()", 290000);
       const now = new Date();
       var tnow=new Date().getTime();
-      \$jsonp.send('${rootpath}/../../userlogon/userCount?t='+tnow, {
+      //\$jsonp.send('${rootpath}/../../userlogon/userCount?t='+tnow, {
+      var req='${userCountUrl}?t='+tnow;
+      console.log("run request:",req);
+      \$jsonp.send(req, {
           callbackName: '_JSONP',
           onSuccess: function(json){
               if (json){
@@ -919,9 +929,11 @@ function userCountTimer(){
           },
           onTimeout: function(){
               e.innerHTML ="Users: ?";
-              console.log('timeout!');
+              console.log('userCount timeout! - '+
+                          'connection to server seems to be lost');
+              top.document.location.href='${baseMenuUrl}';
           },
-          timeout: 5
+          timeout: 60
       });
    }
 }
