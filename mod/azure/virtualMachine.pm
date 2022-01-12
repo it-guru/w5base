@@ -77,14 +77,24 @@ sub new
             name              =>'hwprofile',
             label             =>'Hardware-Profile'),
 
+      new kernel::Field::Text(     
+            name              =>'skus',
+            label             =>'Skus-Name'),
+
       new kernel::Field::Text(
             name              =>'cpucount',
             searchable        =>0,
+            vjointo           =>\'azure::skus',
+            vjoinon           =>['skus'=>'fullname'],
+            vjoindisp         =>'vcpus',
             label             =>'CPU-Count'),
 
       new kernel::Field::Text(
             name              =>'memory',
             searchable        =>0,
+            vjointo           =>\'azure::skus',
+            vjoinon           =>['skus'=>'fullname'],
+            vjoindisp         =>'memory',
             label             =>'Memory'),
 
 
@@ -232,6 +242,7 @@ sub DataCollector
             $rec->{hwprofile}=$rawrec->{'properties'}
                                      ->{'hardwareProfile'}
                                      ->{'vmSize'};
+            $rec->{skus}=$rec->{location}."-virtualMachines-".$rec->{hwprofile};
 
             $rec->{vmId}=$rawrec->{'properties'}->{'vmId'};
 
@@ -240,22 +251,22 @@ sub DataCollector
                $rec->{resourceGroup}=$idpath[3];
             }
 
-            if (in_array(\@view,[qw(ALL cpucount memory)])){
-               $rec->{cpucount}=1;
-               $rec->{memory}=1;
-               if ($rec->{subscriptionId} ne "" &&
-                   $rec->{location} ne ""){
-                  my $vmSizesUrl=$self->AzureBase().
-                                 "/subscriptions/".$rec->{subscriptionId}.
-                                 "/providers/Microsoft.Compute".
-                                 "/skus?api-version=2019-04-01".
-                               "&\$filter=(location eq '".$rec->{location}."')";
-                 #my $vmszrec=$self->genReadAzureId($Authorization,$vmSizesUrl);
-                  #if (ref($vmszrec->{value}) eq "ARRAY"){
-                  #}
-                  #print STDERR Dumper($vmszrec);
-               }
-            }
+            #if (in_array(\@view,[qw(ALL cpucount memory)])){
+            #   $rec->{cpucount}=1;
+            #   $rec->{memory}=1;
+            #   if ($rec->{subscriptionId} ne "" &&
+            #       $rec->{location} ne ""){
+            #      my $vmSizesUrl=$self->AzureBase().
+            #                     "/subscriptions/".$rec->{subscriptionId}.
+            #                     "/providers/Microsoft.Compute".
+            #                     "/skus?api-version=2019-04-01".
+            #                   "&\$filter=(location eq '".$rec->{location}."')";
+            #     #my $vmszrec=$self->genReadAzureId($Authorization,$vmSizesUrl);
+            #      #if (ref($vmszrec->{value}) eq "ARRAY"){
+            #      #}
+            #      #print STDERR Dumper($vmszrec);
+            #   }
+            #}
 
 
             $rec->{uuid}="Azure-VM-".UUID::Tiny::create_uuid_as_string(UUID_V5, 

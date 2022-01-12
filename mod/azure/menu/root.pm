@@ -55,6 +55,10 @@ sub Init
                       "azure::vmSize",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.cloud.azure.kernel.skus",
+                      "azure::skus",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.cloud.azure.kernel.Location",
                       "azure::Location",
                       defaultacl=>['valid_user']);
