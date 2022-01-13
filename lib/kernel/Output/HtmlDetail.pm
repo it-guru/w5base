@@ -133,8 +133,8 @@ function userCountTimer(){
        onTimeout: function(){
           // connection to Server seems to broken
           console.log("timeout userCount - serverconnection broken");
-          window.top.close();
-          window.close();
+          //window.top.close();
+          //window.close();
        },
        timeout: 60
    });
