@@ -45,18 +45,37 @@ sub new
       new kernel::Field::Text(
                 name          =>'namespaceid',
                 label         =>'AppAgileNamespaceID',
-                dataobjattr   =>"concat(appagile_namespaces_on_otc4darwin_vw.appagile_cluster,'.',appagile_namespaces_on_otc4darwin_vw.namespace)"),
+                dataobjattr   =>"concat(appagile_namespaces_on_otc4darwin_vw.".
+                                "appagile_cluster,'.',".
+                                "appagile_namespaces_on_otc4darwin_vw.".
+                                "namespace)"),
 
       new kernel::Field::Link(
                 name          =>'fullname',
                 label         =>'AppAgileUrl',
-                dataobjattr   =>"concat(appagile_namespaces_on_otc4darwin_vw.appagile_cluster,'.',appagile_namespaces_on_otc4darwin_vw.namespace,': ',appagile_routes_on_otc4darwin_vw.dns_route_name)"),
+                dataobjattr   =>"concat(".
+                                "appagile_namespaces_on_otc4darwin_vw.".
+                                "appagile_cluster,'.',".
+                                "appagile_namespaces_on_otc4darwin_vw.".
+                                "namespace,': ',".
+                                "appagile_routes_on_otc4darwin_vw.".
+                                "dns_route_name)"),
 
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'DNS-Name',
                 dataobjattr   =>"appagile_routes_on_otc4darwin_vw.".
                                 "dns_route_name"),
+      
+      new kernel::Field::Boolean(
+                name          =>'isdnsnamevalid',
+                label         =>'is DNS-Name valid',
+                dataobjattr   =>"case ".
+                                "when length(substring(".
+                                      "dns_route_name,'([^.]*)\.'))<=63".
+                                      " then '1' ".
+                                "else '0' ".
+                                "end"),
 
       new kernel::Field::Boolean(
                 name          =>'ishttps',

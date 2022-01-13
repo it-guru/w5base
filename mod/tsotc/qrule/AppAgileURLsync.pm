@@ -92,7 +92,7 @@ sub qcheckRecord
 
    my $namespace=$rec->{fullname}; 
 
-   $parobj->SetFilter({namespaceid=>\$namespace});
+   $parobj->SetFilter({namespaceid=>\$namespace,isdnsnamevalid=>\'1'});
 
    my @l=$parobj->getHashList(qw(ALL));
 
