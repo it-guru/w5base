@@ -1,6 +1,7 @@
 'itil::itcloud'=>{de=>'Cloud',en=>'Cloud'},
 'fieldgroup.areas'=>{de=>'Cloud Areas',en=>'Cloud Areas'},
 'fieldgroup.inm'=>{de=>'Incident Management',en=>'Incident Management'},
+'fieldgroup.rootcontrol'=>{de=>'Administrationsparameter',en=>'admin-parameters'},
 'fieldgroup.phonenumbers'=>{de=>'Rufnummernverzeichnis',en=>'Phonenumbers'},
 'Full Cloud Name'=>{de=>'vollständiger Cloud-Name'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
@@ -20,3 +21,5 @@
 'Security Responsible'=>{de=>'Security Verantwortlicher'},
 'in selected CI-Status a platform responsible needs to be defined'=>{de=>'Im gewählten CI-Status muss ein Plattform Verantwortlicher definiert werden'},
 'in selected CI-Status a security responsible needs to be defined'=>{de=>'Im gewählten CI-Status muss ein Security Verantwortlicher definiert werden'},
+'notify support on cloudarea state change'=>{de=>'Benachrichtigung an Support bei CloudArea Statusänderung'},
+'allow unclean sequences and ci state checking'=>{de=>'unsaubere Abläufe erlauben und nur minimale CI-Status Prüfung'},
