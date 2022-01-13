@@ -602,6 +602,18 @@ sub FinishWrite
          my $appl=getModuleObject($self->Config,"itil::appl");
          $appl->SetFilter({id=>\$carec->{applid}});
          my ($arec,$msg)=$appl->getOnlyFirst(qw(ALL));
+
+         my $itcloud=getModuleObject($self->Config,"itil::itcloud");
+         $itcloud->SetFilter({id=>\$carec->{cloudid}});
+         my ($crec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
+
+         my $supportcontact=$crec->{support};
+         if ($supportcontact eq ""){
+            $supportcontact=$crec->{platformresp};
+         }
+         if ($supportcontact eq ""){
+            $supportcontact=$crec->{databoss};
+         }
          if ($doNotify==1){
             $appl->NotifyWriteAuthorizedContacts($arec,{},{
                      dataobj=>$self->Self,
@@ -613,16 +625,14 @@ sub FinishWrite
                $subject.=$carec->{fullname};
                my $ntext=$self->T("Dear databoss",'kernel::QRule');
                $ntext.=",\n\n";                             
-               $ntext.=sprintf($self->T("CMSG001"),
-                               $carec->{name},$arec->{name});
+               my $msgtempl=$self->T("CMSG001");
+               $msgtempl=~s/%SUPPORTCONTACT%/$supportcontact/g;
+               $ntext.=sprintf($msgtempl,$carec->{name},$arec->{name});
                $ntext.="\n";
                return($subject,$ntext);
             });
          }
          if ($doNotify==2 || $doNotify==3){
-            my $itcloud=getModuleObject($self->Config,"itil::itcloud");
-            $itcloud->SetFilter({id=>\$carec->{cloudid}});
-            my ($crec,$msg)=$itcloud->getOnlyFirst(qw(ALL));
             my %notifyParam=(
                 dataobj=>$self->Self,
                 dataobjid=>$carec->{id},
@@ -742,6 +752,13 @@ sub validateCloudAreaImportState
                   $cloudrec=$arec;
                }
             }
+            my $supportcontact=$cloudrec->{support};
+            if ($supportcontact eq ""){
+               $supportcontact=$cloudrec->{platformresp};
+            }
+            if ($supportcontact eq ""){
+               $supportcontact=$cloudrec->{databoss};
+            }
             my %notifyParam=(
                emailcategory=>[$srcsys,'ImportReject','InvalidApplication'],
                emailcc=>[],
@@ -771,6 +788,7 @@ sub validateCloudAreaImportState
                   my $tmpl=$self->getParsedTemplate(
                              "tmpl/genericSystemImport_BadAppInCloudArea",{
                      static=>{
+                        SUPPORTCONTACT=>$supportcontact,
                         SYSTEM=>$importname,
                         CLOUD=>$cloudrec->{name}
                      }
