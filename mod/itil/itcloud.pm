@@ -159,11 +159,18 @@ sub new
                 vjoininhash   =>['fullname','cistatusid','applid',
                                  'name','id','mdate','srcid','srcsys']),
 
-#      new kernel::Field::Boolean(
-#                name          =>'allowifupdate',
-#                group         =>'control',
-#                label         =>'allow automatic updates by interfaces',
-#                dataobjattr   =>'itcloud.allowifupdate'),
+      new kernel::Field::Boolean(
+                name          =>'notifysupport',
+                group         =>'control',
+                label         =>'notify support on cloudarea state change',
+                dataobjattr   =>'itcloud.notifysupport'),
+
+      new kernel::Field::Boolean(
+                name          =>'allowuncleanseq',
+                group         =>'rootcontrol',
+                readonly      =>1,
+                label         =>'allow unclean sequences and ci state checking',
+                dataobjattr   =>'itcloud.allowuncleanseq'),
 
 #      new kernel::Field::Select(
 #                name          =>'defrunpolicy',
@@ -210,6 +217,8 @@ sub new
                 parentobj     =>'itil::itcloud',
                 label         =>'Attachments',
                 group         =>'attachments'),
+
+
 
 
       new kernel::Field::Container(
@@ -347,7 +356,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default servicemodels 
-             areas systems contacts phonenumbers misc inm control
+             areas systems contacts phonenumbers misc inm control rootcontrol
              attachments source));
 }
 
@@ -601,7 +610,7 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    return(qw(header default history source areas contacts 
              servicemodels
-             attachments control phonenumbers inm misc));
+             attachments control rootcontrol phonenumbers inm misc));
 }
 
 sub isWriteValid
@@ -611,8 +620,11 @@ sub isWriteValid
    my $userid=$self->getCurrentUserId();
 
    my @databossedit=qw(default contacts attachments phonenumbers 
-                       servicemodels
-                       inm misc control);
+                       servicemodels control
+                       inm misc);
+   if ($self->IsMemberOf("admin")){
+      push(@databossedit,"rootcontrol");
+   }
    if (!defined($rec)){
       return(@databossedit);
    }

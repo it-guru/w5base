@@ -628,8 +628,10 @@ sub FinishWrite
                 dataobjid=>$carec->{id},
                 emailbcc=>11634953080001
             );
-            if ($crec->{supportid} ne ""){
-               $notifyParam{emailcc}=$crec->{supportid};
+            if ($crec->{notifysupport}){
+               if ($crec->{supportid} ne ""){
+                  $notifyParam{emailcc}=$crec->{supportid};
+               }
             }
 
             $itcloud->NotifyWriteAuthorizedContacts($crec,{},\%notifyParam,
