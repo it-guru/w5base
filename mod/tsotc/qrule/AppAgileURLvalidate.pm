@@ -84,7 +84,7 @@ sub qcheckRecord
    my ($chkid,$port)=$rec->{srcid}=~m/^([0-9]+):(.*)$/;
 
    if ($chkid ne ""){
-      $parobj->SetFilter({id=>\$chkid});
+      $parobj->SetFilter({id=>\$chkid,isdnsnamevalid=>\'1'});
 
       my @l=$parobj->getHashList(qw(ALL));
       if ($#l==-1){
