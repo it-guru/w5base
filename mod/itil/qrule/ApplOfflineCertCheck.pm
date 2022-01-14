@@ -79,8 +79,7 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(0,undef) if ($rec->{'cistatusid'}!=4 && 
-                       $rec->{'cistatusid'}!=3);
+   return(0,undef) if ($rec->{'cistatusid'}<3);
 
    my $errorlevel=0;
    my @qmsg;
