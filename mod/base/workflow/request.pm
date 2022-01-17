@@ -291,11 +291,10 @@ sub isWriteValid
 
    # check if rewrite auf default DataBlock is allowed
    if ($self->isCurrentForward($rec) && !in_array(\@l,"default")){
-      my $DefEditAllowed=1;
       if ($rec->{state}==2 ){
          my $d=CalcDateDuration($rec->{createdate},NowStamp("en"));
          if ($d->{days}<14){
-           # $DefEditAllowed=1 if (in_array(\@l,"init"));
+            my $DefEditAllowed=1;
             if (ref($rec->{shortactionlog}) eq "ARRAY"){
                foreach my $arec (@{$rec->{shortactionlog}}){
                   if ($arec->{effort}>0){
@@ -306,9 +305,9 @@ sub isWriteValid
                   }
                }
             }
+            push(@l,"default") if ($DefEditAllowed==1);
          }
       }
-      push(@l,"default") if ($DefEditAllowed==1);
    }
 
    return(@l);
