@@ -13,7 +13,7 @@
 <center>
 <input type=button style="font-size:14px;padding:1px;margin:2px;width:250px" value=" W5Base/Darwin Login " onclick="dologin();"><br>
 <input type=button style="font-size:14px;padding:1px;margin:2px;width:150px" value="T-SSO Login " onclick="dossologin();">
-<input type=button disabled="disabled" style="font-size:14px;padding:1px;margin:2px;width:150px" value="AD Login " onclick="doadlogin();">
+<input type=button style="font-size:14px;padding:1px;margin:2px;width:150px" value="AD Login " onclick="doadlogin();">
 </center>
 
 </td><td width=1%>
