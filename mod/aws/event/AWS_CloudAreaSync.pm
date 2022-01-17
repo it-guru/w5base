@@ -38,7 +38,8 @@ sub AWS_QualityCheck
 
    #printf STDERR ("fifi do AWS_QualityCheck on $cloudareaid\n");
    my $job=getModuleObject($self->Config,"base::joblog");
-   $job->SetFilter({event=>"\"QualityCheck 'itil::itcloudarea'*\"",
+   $job->SetFilter({event=>"\"QualityCheck 'itil::itcloudarea'\" ".
+                           "\"QualityCheck 'itil::itcloudarea' T*\"",
                     exitstate=>"[EMPTY]",
                     cdate=>">now-2h"});
    my @l=$job->getHashList(qw(mdate id event exitstate));
@@ -53,6 +54,8 @@ sub AWS_QualityCheck
    else{
       printf STDERR ("retry event for AWS_QualityCheck due job entries %s\n",
                      Dumper(\@l));
+      sleep(1);
+      printf STDERR ("\n\n");
 
    }
    return({exitcode=>'1'});
