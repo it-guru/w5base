@@ -235,7 +235,15 @@ sub DataCollector
 
                   }
                   foreach my $ip6rec (@{$netIf->Ipv6Addresses()}){
-                     p $ip6rec;
+                     my $ipv6=$ip6rec->Ipv6Address();
+                     my $iprec={
+                        name=>$ip->Ipv6Expand($ipv6),
+                        isprimary=>0,
+                        isipv6=>1,
+                        netareatag=>"ISLAND"
+                     };
+                     push(@ip,$iprec);
+                    # p $ip6rec;
                   }
                   $rec->{ipadresses}=\@ip;
                   push(@result,$rec);
