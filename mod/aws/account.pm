@@ -220,9 +220,9 @@ sub TriggerEndpoint
          my %p=(eventname=>'AWS_QualityCheck',
                 spooltag=>'AWS_QualityCheck-'.$carec->{id},
                 redefine=>'1',
-                retryinterval=>120,
-                firstcalldelay=>180,
-                maxretry=>10,
+                retryinterval=>310,
+                firstcalldelay=>490,
+                maxretry=>12,
                 eventparam=>$carec->{id},
                 userid=>$userid);
          my $res;
