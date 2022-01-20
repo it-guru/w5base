@@ -1815,3 +1815,25 @@ alter table system add autoscalinggroup varchar(128) default NULL;
 alter table system add autoscalingsubgroup varchar(128) default NULL;
 alter table ipnet add ipnetresp bigint(20) default NULL,add ipnetresp2 bigint(20) default NULL,add techcontact bigint(20) default NULL;
 alter table accessurl add ssl_expnotifyleaddays int(22) default '56';
+create table lnkapplappltag (
+  id           bigint(20) NOT NULL,
+  lnkapplappl  bigint(20) NOT NULL,
+  name         varchar(40) NOT NULL,
+  value        varchar(128) NOT NULL,
+  comments     longtext    default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(20) default NULL, 
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  KEY name (name),
+  FOREIGN KEY lnkapplappl (lnkapplappl) 
+  REFERENCES lnkapplappl (id) ON DELETE CASCADE,
+  KEY lnkapplappl (lnkapplappl),               
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
