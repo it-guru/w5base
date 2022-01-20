@@ -37,24 +37,18 @@ sub AZURE_QualityCheck
    my $self=shift;
    my $cloudareaid=shift;
 
-   #printf STDERR ("fifi do AZURE_QualityCheck on $cloudareaid\n");
    my $job=getModuleObject($self->Config,"base::joblog");
-   $job->SetFilter({event=>"\"QualityCheck 'itil::itcloudarea'*\"",
+   $job->SetFilter({event=>"\"QualityCheck 'itil::itcloudarea'\" ".
+                           "\"QualityCheck 'itil::itcloudarea' T*\"",
                     exitstate=>"[EMPTY]",
-                    cdate=>">now-2h"});
+                    cdate=>">now-6h"});
    my @l=$job->getHashList(qw(mdate id event exitstate));
 
-   #printf STDERR ("fifi joblogl=%s\n",Dumper(\@l));
    if ($#l==-1){
       my $bk=$self->W5ServerCall("rpcCallEvent",
                                  "QualityCheck","itil::itcloudarea",
                                  $cloudareaid);
       return({exitcode=>'0'});
-   }
-   else{
-      printf STDERR ("retry event for AZURE_QualityCheck due job entries %s\n",
-                     Dumper(\@l));
-
    }
    return({exitcode=>'1'});
 }

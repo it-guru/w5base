@@ -294,9 +294,9 @@ sub TriggerEndpoint
          my %p=(eventname=>'AZURE_QualityCheck',
                 spooltag=>'AZURE_QualityCheck-'.$carec->{id},
                 redefine=>'1',
-                retryinterval=>120,
-                firstcalldelay=>180,
-                maxretry=>10,
+                retryinterval=>310,
+                firstcalldelay=>290,
+                maxretry=>13,
                 eventparam=>$carec->{id},
                 userid=>$userid);
          my $res;
