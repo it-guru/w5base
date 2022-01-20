@@ -63,3 +63,4 @@ From now, it is allowed to deploy items in this area.
 'invalid application cistatus'=>{de=>'ungültiger CI-Status der Anwendung'},
 'invalid cloudarea cistatus'=>{de=>'ungültiger CI-Status der CloudArea'},
 'invalid application in cloudarea'=>{de=>'ungültige Anwendung in CloudArea'},
+'Notification on successful automatic CI-Import'=>{de=>'Benachrichtigung bei erfolgreichem CI-Import'},
