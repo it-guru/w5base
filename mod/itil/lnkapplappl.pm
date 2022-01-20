@@ -243,6 +243,16 @@ sub new
                 vjoininhash   =>['objtype','obj1id','obj2id','obj3id',
                                  'name','namealt1','namealt2','comments']),
 
+      new kernel::Field::SubList(
+                name          =>'interfacestag',
+                label         =>'Interface Tags',
+                group         =>'interfacetag',
+                subeditmsk    =>'subedit.iftag',
+                vjointo       =>'itil::lnkapplappltag',
+                allowcleanup  =>1,
+                vjoinon       =>['id'=>'lnkapplappl'],
+                vjoindisp     =>['name','value']),
+
       new kernel::Field::Text(
                 name          =>'comments',
                 label         =>'Comments',
@@ -1341,7 +1351,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default ifagreement agreement comdetails impl
-             interfacescomp desc classi source));
+             interfacescomp interfacetag desc classi source));
 }
 
 
@@ -1352,7 +1362,8 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    my @l=qw(header default ifagreement agreement comdetails impl
-             interfacescomp desc classi source history toapplcontacts);
+             interfacescomp interfacetag 
+             desc classi source history toapplcontacts);
    if (defined($rec) && exists($rec->{ifagreementneeded}) &&
        !$rec->{ifagreementneeded}){
       @l=grep(!/^agreement$/,@l);
@@ -1398,7 +1409,7 @@ sub isWriteValid
    my $oldrec=shift;
    my $newrec=shift;
    my $applid=effVal($oldrec,$newrec,"fromapplid");
-   my @editgroup=("default","interfacescomp","desc","agreement",
+   my @editgroup=("default","interfacescomp","interfacetag","desc","agreement",
                   "ifagreement",
                   "comdetails","impl","classi");
 

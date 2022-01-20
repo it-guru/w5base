@@ -17,6 +17,9 @@
 'fieldgroup.interfacescomp'=>{
     de=>'spezielle Schnittstellen Komponenten/Einzelheiten und Kontakte',
     en=>'individual Interface components and contacts'},
+'fieldgroup.interfacetag'=>{
+    de=>'Schnittstellen Tags',
+    en=>'interface tags'},
 'Interface components'=>{de=>'Schnittstellen Komponenten'},
 'interface agreement necessary'=>{de=>'Schnittstellenvereinbarung ist notwendig'},
 'interface agreement language'=>{de=>'Schnittstellenvereinbarungsdokument-Sprachfestlegung'},
@@ -149,3 +152,4 @@
 'further Gateway Application'=>{de=>'weitere Gateway-Anwendung'},
 'to application not allowed as gateway application'=>{de=>'"nach Anwendung" nicht als Gateway-Anwendung erlaubt'},
 'from application not allowed as gateway application'=>{de=>'"von Anwendung" nicht als Gateway-Anwendung erlaubt'},
+'Interface Tags'=>{de=>'Schnittstellen Tags'},
