@@ -522,13 +522,16 @@ sub genericSystemImportNotify
    my $datastream=shift;
    my $wfa=shift;
    my $itcloud=shift;
+   my $itcloudarea=shift;
    my $rec=shift;
    my $debug="";
+
+   return() if (defined($itcloudarea) && !$itcloudarea->{deplnotify});
 
    my %notifyParam=(
       emailcategory=>[$srcsys,'SystemImport'],
       emailbcc=>[
-         11634953080001, # HV
+       #  11634953080001, # HV
       ]
    );
 
@@ -1187,7 +1190,7 @@ sub genericSystemImport
          if (!$w5autoscalegroupextend){
             msg(INFO,"start doNotify $srec->{name}");
             $self->genericSystemImportNotify(
-               $srcsys,$sys,$srcobj,$wfa,$cloudrec,$srec
+               $srcsys,$sys,$srcobj,$wfa,$cloudrec,$cloudarearec,$srec
             );
          }
       }

@@ -195,6 +195,13 @@ sub new
                 vjoinon       =>['id'=>'itcloudareaid'],
                 vjoindisp     =>['fullname','cistatus']),
 
+      new kernel::Field::Boolean(
+                name          =>'deplnotify',
+                group         =>'control',
+                htmleditwidth =>'30%',
+                label         =>'Notification on successful automatic CI-Import',
+                dataobjattr   =>'qitcloudarea.deplnotify'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -534,7 +541,7 @@ sub isWriteValid
       if ($oldrec->{cistatusid}>=3 &&
           $oldrec->{cistatusid}<=5){
          if ($self->isWriteOnApplValid($applid,"default")){
-            return("default");
+            return("default","control");
          }
       }
    }
