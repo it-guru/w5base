@@ -2,9 +2,9 @@
    <table class=editframe>
       <tr>
          <td class=fname width=10%>%name(label)%:</td>
-         <td class=finput colspan=3>%name(sublistedit)%</td>
+         <td class=finput width=30%>%name(sublistedit)%</td>
          <td class=fname width=10%>%value(label)%:</td>
-         <td class=finput colspan=3>%value(sublistedit)%</td>
+         <td class=finput width=50%>%value(sublistedit)%</td>
       </tr>
    </table>
 </div>

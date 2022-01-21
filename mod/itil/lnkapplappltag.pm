@@ -27,6 +27,8 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
+   $self->{use_distinct}=1;
   
    $self->AddFields(
       new kernel::Field::Id(
@@ -39,15 +41,85 @@ sub new
                 label         =>'Interface ID',
                 dataobjattr   =>'lnkapplappltag.lnkapplappl'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Select(
                 name          =>'name',
                 label         =>'Name',
-                dataobjattr   =>'lnkapplappltag.name'),
+                allowfree     =>'1',
+                dataobjattr   =>'lnkapplappltag.name',
+                vjointo       =>\'itil::lnkapplappltag',
+                vjoindisp     =>'name',
+                vjoinbase     =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @flt;
+                   # pre selection list of names in DeailView Edit mode
+                   my $id=Query->Param("id");   # id from tag
+                   if ($id ne ""){
+                      push(@flt,{taglnkapplappltagid=>\$id});
+                   }
+                   # pre selection list of names in SubList Edit Mode
+                   my $lnkapplappl=Query->Param("lnkapplappl"); # id from if
+                   if ($lnkapplappl ne ""){
+                      push(@flt,{taglnkapplappl=>\$lnkapplappl});
+                   }
+                   return(\@flt);
+                },
+                vjoinon       =>['name'=>'name']),
+
 
       new kernel::Field::Text(
                 name          =>'value',
                 label         =>'Value',
                 dataobjattr   =>'lnkapplappltag.value'),
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                htmleditwidth =>'40%',
+                group         =>'ifdata',
+                label         =>'Interface-State',
+                vjointo       =>'base::cistatus',
+                vjoineditbase =>{id=>[3,4,5,6]},
+                default       =>'4',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                group         =>'ifdata',
+                label         =>'CI-StateID',
+                dataobjattr   =>'lnkapplappl.cistatus'),
+
+      new kernel::Field::Text(
+                name          =>'fromappl',
+                group         =>'ifdata',
+                label         =>'from Application',
+                dataobjattr   =>'fromappl.name'),
+
+      new kernel::Field::Link(
+                name          =>'fromapplid',
+                selectfix     =>1,
+                dataobjattr   =>'fromappl.id'),
+
+      new kernel::Field::Text(
+                name          =>'toappl',
+                group         =>'ifdata',
+                label         =>'to Application',
+                dataobjattr   =>'toappl.name'),
+
+      #######################################################################
+      # needed for tag name distinct selction dropdown box
+      new kernel::Field::Link(
+                name          =>'taglnkapplappl',
+                label         =>'tag filter Interface ID',
+                noselect      =>'1',
+                dataobjattr   =>'taglnkapplappl.id'),
+
+      new kernel::Field::Link(
+                name          =>'taglnkapplappltagid',
+                label         =>'tag filter Interface ID',
+                noselect      =>'1',
+                dataobjattr   =>'taglnkapplappltag.id'),
+      #######################################################################
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -103,7 +175,7 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'lnkapplappltag.realeditor'),
    );
-   $self->setDefaultView(qw(id fromappl toappl cdate editor));
+   $self->setDefaultView(qw(id fromappl toappl name value mdate));
    $self->setWorktable("lnkapplappltag");
    return($self);
 }
@@ -163,12 +235,51 @@ sub checkWriteValid
 }
 
 
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+
+   my $from="lnkapplappltag ".
+            "join lnkapplappl ".
+            "on lnkapplappltag.lnkapplappl=lnkapplappl.id ".
+            "left outer join appl as fromappl ".
+            "on lnkapplappl.fromappl=fromappl.id ".
+            "left outer join appl as toappl ".
+            "on lnkapplappl.toappl=toappl.id ".
+            "left outer join appl as tagfromappl ".
+            "on lnkapplappl.fromappl=tagfromappl.id ".
+            "left outer join lnkapplappl as taglnkapplappl ".
+            "on taglnkapplappl.fromappl=tagfromappl.id ".
+            "left outer join lnkapplappltag as taglnkapplappltag ".
+            "on taglnkapplappltag.lnkapplappl=taglnkapplappl.id";
+   return($from);
+}
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return(qw(header default ifdata control source));
+}
+
 sub isQualityCheckValid
 {
    my $self=shift;
    my $rec=shift;
    return(0);
 }
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_cistatus"))){
+     Query->Param("search_cistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
 
 
 

@@ -1,2 +1,6 @@
 'itil::lnkapplappltag'=>{de=>'Schnittstellen Tag',en=>'Interface tag'},
 'Value'=>{de=>'Inhalt'},
+'fieldgroup.ifdata'=>{de=>'Schnittstellen-Daten',en=>'Interface data'},
+'Interface-State'=>{de=>'Schnittstellen-Status'},
+'from Application'=>{de=>'von Anwendung'},
+'to Application'=>{de=>'nach Anwendung'},
