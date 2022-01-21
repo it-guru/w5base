@@ -107,10 +107,19 @@ sub getPostibleValues
          exit(1);
       }
       my $joinidfield=$joinidfieldobj->Name();
-      my @view=($self->{vjoindisp},$joinidfield);
-      my @l=$self->vjoinobj->getHashList(@view); 
       my @res=(); 
-      map({push(@res,$_->{$joinidfield},$_->{$self->{vjoindisp}})} @l);
+      my @view=($self->{vjoindisp},$joinidfield);
+
+      if ($self->{vjoinon}->[1] eq $self->{vjoindisp}){
+         @view=("VDISTINCT",$self->{vjoindisp});
+      }
+      my @l=$self->vjoinobj->getHashList(@view); 
+      if ($self->{vjoinon}->[1] eq $self->{vjoindisp}){
+         map({push(@res,$_->{$self->{vjoindisp}},$_->{$self->{vjoindisp}})} @l);
+      }
+      else{
+         map({push(@res,$_->{$joinidfield},$_->{$self->{vjoindisp}})} @l);
+      }
       if ($self->{allowempty}==1){
          unshift(@res,"","[".$self->getParent->T("none")."]");
       }
