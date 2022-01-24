@@ -534,9 +534,6 @@ sub isWriteValid
 
    my $itcloudid=$oldrec->{"cloudid"};
    my $applid=$oldrec->{"applid"};
-   if ($self->isWriteOnITCloudValid($itcloudid,"default")){
-      return("default");
-   }
    if (defined($oldrec)){
       if ($oldrec->{cistatusid}>=3 &&
           $oldrec->{cistatusid}<=5){
@@ -544,6 +541,9 @@ sub isWriteValid
             return("default","control");
          }
       }
+   }
+   if ($self->isWriteOnITCloudValid($itcloudid,"default")){
+      return("default");
    }
    return(undef);
 }
