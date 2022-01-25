@@ -112,6 +112,25 @@ sub getDynamicFields
                                   group       =>'mailsend',
                                   container   =>'headref'),
 
+      new kernel::Field::Textarea(name        =>'emailplaintext',
+                                  label       =>'Mail Plain Text',
+                                  group       =>'mailsend',
+                                  htmldetail  =>0,
+                                  depend      =>[qw(emailtext)],
+                                  onRawValue  =>sub {
+                                     my $self=shift;
+                                     my $current=shift;
+                                     my $mode=shift;
+                                     my $fld=$self->getParent->getField(
+                                                    "emailtext",$current);
+                                     if (defined($fld)){
+                                        my $data=$fld->RawValue($current);
+                                        $data=~s/<[^>]*>//g;
+                                        return($data);
+                                     }
+                                     return("");
+                                  }),
+
       new kernel::Field::Textarea(name        =>'emailbottom',
                                   uivisible   =>0,
                                   label       =>'Mail bottom',
