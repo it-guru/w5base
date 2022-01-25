@@ -97,8 +97,8 @@ sub getDynamicFields
                                              
       new kernel::Field::Text(    name        =>'emailcategory',
                                   label       =>'Mail Category',
-                                  uivisible   =>0,
                                   group       =>'mailsend',
+                                  htmldetail  =>0,
                                   container   =>'headref'),
                                              
       new kernel::Field::Textarea(name        =>'emailhead',
