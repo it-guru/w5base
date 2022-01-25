@@ -217,7 +217,8 @@ sub AZURE_CloudAreaSync
                   DATAOBJ=>'itil::itcloudarea',
                   IDENTIFYBY=>$oldrec->{id},
                   DATA=>{
-                     cistatusid  =>6
+                     cistatusid  =>6,
+                     srcid   =>$oldrec->{srcid}
                   }
                };
                return(undef) if ($oldrec->{cistatusid} eq "6");
@@ -231,21 +232,26 @@ sub AZURE_CloudAreaSync
       for(my $c=0;$c<=$#opList;$c++){
          if ($opList[$c]->{OP} eq "insert" ||
              $opList[$c]->{OP} eq "update"){
-            $appl->ResetFilter();
-            $appl->SetFilter({id=>\$opList[$c]->{DATA}->{applid}});
-            my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid name));
-            if (!defined($arec)){
-               $opList[$c]->{OP}="invalid";
-               push(@msg,"ERROR: invalid application (W5BaseID) in project ".
-                         $opList[$c]->{DATA}->{name});
-            }
-            else{
-               if ($arec->{cistatusid} ne "3" &&
-                   $arec->{cistatusid} ne "4"){
+            if (exists($opList[$c]->{DATA}->{applid})){
+               $appl->ResetFilter();
+               $appl->SetFilter({id=>\$opList[$c]->{DATA}->{applid}});
+               my ($arec,$msg)=$appl->getOnlyFirst(qw(id cistatusid name));
+               if (!defined($arec)){
                   $opList[$c]->{OP}="invalid";
-                  push(@msg,"ERROR: invalid cistatus for application ".
-                            $arec->{name}.
-                            " in project ".$opList[$c]->{DATA}->{name});
+                  push(@msg,"ERROR: invalid application (W5BaseID) in ".
+                            "project '".
+                             $opList[$c]->{DATA}->{name}."' (".
+                             $opList[$c]->{DATA}->{srcid}.
+                             ")");
+               }
+               else{
+                  if ($arec->{cistatusid} ne "3" &&
+                      $arec->{cistatusid} ne "4"){
+                     $opList[$c]->{OP}="invalid";
+                     push(@msg,"ERROR: invalid cistatus for application ".
+                               $arec->{name}.
+                               " in project ".$opList[$c]->{DATA}->{name});
+                  }
                }
             }
          }
@@ -254,6 +260,7 @@ sub AZURE_CloudAreaSync
          my $opres=ProcessOpList($itcloudarea,\@opList);
       }
    }
+
 
    my ($dlast)=$laststamp=~m/^(\S+)\s/;
    my ($dnow)=NowStamp("en")=~m/^(\S+)\s/;
