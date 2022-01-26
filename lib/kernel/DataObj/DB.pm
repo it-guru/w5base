@@ -134,7 +134,7 @@ sub getSqlFields
    my $drivername=defined($self->{DB}) ? $self->{DB}->DriverName():undef;
    my $distinct;
    if ($view[0] eq "VDISTINCT"){
-      $distinct="distinct";
+      $distinct=" distinct ";
       shift(@view);
    }
    if (!$distinct){
