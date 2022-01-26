@@ -323,7 +323,7 @@ sub doNotify
       $ENV{HTTP_FORCE_LANGUAGE}=$lang;
       my @emailto=keys(%{$nrec{$lang}});
       my $subject=$datastream->T(
-         "Qualys centificate near expiration detected at",
+         "Qualys certificate near expiration detected at",
          'tssiem::qrule::SSLcertMon').' '.$ictono;
 
       my @certs;

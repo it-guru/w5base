@@ -1014,7 +1014,7 @@ sub doNotify
          }
          if ($#emailto!=-1 || $#emailcc!=-1){
             my $subject=$self->T(
-               "CRaS centificate service",
+               "CRaS certificate service",
                $obj->Self).": ".$rec->{sslcertcommon};
 
             my $csrlink="";
