@@ -38,7 +38,7 @@
 'signed certificate'=>{de=>'signiertes Zertifikat'},
 'unable to find csr by CommonName'=>{de=>'csr kann per CommonName nicht gefunden werden'},
 'unable to find Certificate-Service Team for selected application'=>{de=>'kein Zertifikats-Service Team für die gewählte Anwendung auffindbar'},
-'CRaS centificate service'=>{de=>'CRaS Zertifikats-Service'},
+'CRaS certificate service'=>{de=>'CRaS Zertifikats-Service'},
 'CRaS new CSR to process'=>{de=>'CRaS neuer CSR zur Bearbeitung'},
 'CRaS certificate signed'=>{de=>'CRaS Zertifikat signiert'},
 'CRaS check for renew'=>{de=>'CRaS Prüfung der Erneuerung/Verlängerung'},
