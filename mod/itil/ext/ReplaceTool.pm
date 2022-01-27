@@ -175,6 +175,14 @@ sub getControlRecord
              idfield      =>'targetid',
              targetlabel  =>'businessservice',
              baseflt      =>{secparentobj=>\'itil::businessservice'}
+           },
+           userapplcontact=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::lnkapplcontact',
+             target       =>'targetname',
+             idfield      =>'targetid',
+             targetlabel  =>'application',
+             baseflt      =>{secparentobj=>\'itil::appl',applcistatusid=>"<6"}
            }
          ];
    return($d);

@@ -38,6 +38,16 @@ sub new
                 vjoindisp     =>'name'),
       insertafter=>'id'
    );
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'applcistatusid',
+                htmlwidth     =>'100px',
+                label         =>'Application CI-Status',
+                vjointo       =>'itil::appl',
+                vjoinon       =>['refid'=>'id'],
+                vjoindisp     =>'cistatusid'),
+      insertafter=>'id'
+   );
    $self->{secparentobj}='itil::appl';
    $self->setDefaultView(qw(application targetname cdate editor));
    return($self);
