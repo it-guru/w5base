@@ -557,9 +557,7 @@ sub ProcessRecord
       applid=>\$rec->{child_applid},
       deleted=>0,
       status=>'!"out of operation"',
-      assignmentgroup=>'TIT.TSI.INT.AO.CO05 '.
-                       'TIT.TSI.INT.AO.CO06 '.
-                       'TIT.TSI.INT.AO.CO07'
+      assignmentgroup=>'TIT.HUB.INT.SAS.*'
    });
    my ($amapplrec,$msg)=$amappl->getOnlyFirst(qw(ALL));
 
