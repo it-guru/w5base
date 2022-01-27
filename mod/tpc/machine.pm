@@ -98,6 +98,11 @@ sub new
             label             =>'Memory',
             unit              =>'MB'),
 
+      new kernel::Field::Boolean(
+            name              =>'ismcos',
+            searchable        =>0,
+            label             =>'MCOS'),
+
       new kernel::Field::Text(     
             name              =>'address',
             ODATA_filter      =>'1',
@@ -133,6 +138,13 @@ sub new
             group             =>'source',
             htmldetail        =>'NotEmpty',
             label             =>'instanceUUID'),
+
+      new kernel::Field::Text(     
+            name              =>'UCinstanceUUID',
+            searchable        =>0,
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            label             =>'UCinstanceUUID'),
 
       new kernel::Field::Text(     
             name              =>'vcUuid',
@@ -218,6 +230,7 @@ sub DataCollector
              }
              if (exists($_->{customProperties}->{instanceUUID})){
                 $_->{instanceUUID}=$_->{customProperties}->{instanceUUID};
+                $_->{UCinstanceUUID}=uc($_->{customProperties}->{instanceUUID});
              }
              $_->{genname}=$_->{name};
              $_->{name}=~s/-mcm[0-9]{3,10}-[0-9]{3,20}$//;
@@ -227,6 +240,12 @@ sub DataCollector
                    $h{$rec->{key}}=$rec->{value} 
                 }
                 $_->{tags}=\%h;
+             }
+             if (exists($_->{tags}->{mcos})){
+                $_->{ismcos}=1;
+             }
+             else{
+                $_->{ismcos}=0;
              }
          } @$data);
          return($data);
