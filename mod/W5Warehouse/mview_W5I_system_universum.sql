@@ -50,8 +50,8 @@ from  (
                                 amsysbyname.systemid),
                     amsysbysysid.systemid) amsystemid,
              '0'  is_t4dp,
-             NULL t4dpsystemid,
-             NULL t4dpcomputer_sys_id
+             ' ' t4dpsystemid,
+             ' ' t4dpcomputer_sys_id
       from (
          select w5sys.systemname,w5sys.systemid from w5sys
          union
