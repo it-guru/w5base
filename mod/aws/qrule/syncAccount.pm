@@ -142,11 +142,13 @@ sub qcheckRecord
 
       my @id;
       my %srcid;
+      my $awssyscount=0;
       foreach my $irec (@l){
          push(@id,$irec->{id});
          $srcid{$irec->{id}.'@'.$awsaccountid.'@'.$awsregion}={
             cdate=>$irec->{cdate}
          };
+         $awssyscount++;
       }
       my $sys=getModuleObject($self->getParent->Config(),"itil::system");
 
@@ -285,7 +287,9 @@ sub qcheckRecord
             };
             my $newid=$ipobj->ValidatedInsertRecord($rec);
             push(@qmsg,"added: ".$iprec->{name});
-            $checksession->{EssentialsChangedCnt}++;
+            if ($awssyscount<50){
+               $checksession->{EssentialsChangedCnt}++;
+            }
          }
          foreach my $iprec (values(%delip)){
             if ($ipobj->ValidatedUpdateRecord($iprec,{cistatusid=>6},
