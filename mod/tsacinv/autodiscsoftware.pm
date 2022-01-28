@@ -59,6 +59,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'version',
                 label         =>'Version',
+                dataobjattr   =>"REGEXP_REPLACE(".
+                                "REGEXP_REPLACE(\"version\",'\\s.*\$',''),".
+                                "'\\.[0]+([0-9])','.\\1')"),
+
+      new kernel::Field::Text(
+                name          =>'rawversion',
+                label         =>'Raw Version',
                 dataobjattr   =>'"version"'),
 
       new kernel::Field::Text(
