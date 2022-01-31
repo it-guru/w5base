@@ -219,9 +219,10 @@ sub TPC_CloudAreaSync
          },
          \@c,\@s,\@opList
       );
-
       for(my $c=0;$c<=$#opList;$c++){
-         if ($opList[$c]->{OP} eq "insert"){
+         if ($opList[$c]->{OP} eq "insert" ||
+             ($opList[$c]->{OP} eq "update" && 
+              exists($opList[$c]->{DATA}->{applid}))){
             my ($arec,$msg);
             $appl->ResetFilter();
             if ($opList[$c]->{DATA}->{applid} ne ""){
