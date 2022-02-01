@@ -293,7 +293,8 @@ sub ProcessXLS
             if ($rec{'Service-Passwort'} ne ""){
                $csrrec{spassword}=$rec{'Service-Passwort'};
             }
-            $csrrec{spassword}=~s/./*/g;
+            #ensure passwords are not loaded in development phase
+            #$csrrec{spassword}=~s/./*/g;
 
             if ((my ($d,$m,$y)=$rec{'Ausgestellt am'}
                 =~m/^\s*([0-9]+)\.([0-9]+)\.([0-9]+)\s*$/)){
