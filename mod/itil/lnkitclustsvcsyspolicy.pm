@@ -216,9 +216,9 @@ sub new
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"concat(concat(".
+                dataobjattr   =>"md5(concat(concat(".
                                 "lpad(qlnkitclustsvc.id,35,'0'),'-'),".
-                                "lpad(qsystem.id,35,'0'))"),
+                                "lpad(qsystem.id,35,'0')))"),
                                    
       new kernel::Field::Owner(
                 name          =>'owner',
