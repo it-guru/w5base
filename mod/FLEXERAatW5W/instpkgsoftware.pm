@@ -77,6 +77,12 @@ sub new
                 dataobjattr   =>'VERSION'),
 
       new kernel::Field::Text(
+                name          =>'fullversion',
+                label         =>'full version string',
+                ignorecase    =>1,
+                dataobjattr   =>'VERSIONRAW'),
+
+      new kernel::Field::Text(
                 name          =>'classification',
                 label         =>'Classification',
                 ignorecase    =>1,
@@ -111,6 +117,48 @@ sub new
                 dataobjattr   =>'FLEXERA_system.BEACONID'),
 
       new kernel::Field::Date(
+                name          =>'dreleasedate',
+                group         =>'support',
+                sqlorder      =>'desc',
+                label         =>'release date',
+                dataobjattr   =>'RELEASEDATE'),
+
+      new kernel::Field::Date(
+                name          =>'dstartoflifedate',
+                group         =>'support',
+                sqlorder      =>'desc',
+                label         =>'start of life date',
+                dataobjattr   =>'STARTOFLIFEDATE'),
+
+      new kernel::Field::Date(
+                name          =>'dendoflifedate',
+                group         =>'support',
+                sqlorder      =>'desc',
+                label         =>'end of life date',
+                dataobjattr   =>'ENDOFLIFEDATE'),
+
+      new kernel::Field::Date(
+                name          =>'dendofsalesdate',
+                group         =>'support',
+                sqlorder      =>'desc',
+                label         =>'end of sales date',
+                dataobjattr   =>'ENDOFSALESDATE'),
+
+      new kernel::Field::Date(
+                name          =>'dsupporteduntil',
+                group         =>'support',
+                sqlorder      =>'desc',
+                label         =>'supported until',
+                dataobjattr   =>'SUPPORTEDUNTIL'),
+
+      new kernel::Field::Date(
+                name          =>'dextendedsupportuntil',
+                group         =>'support',
+                sqlorder      =>'desc',
+                label         =>'extended support until',
+                dataobjattr   =>'EXTENDEDSUPPORTUNTIL'),
+
+      new kernel::Field::Date(
                 name          =>'swinstdate',
                 group         =>'source',
                 sqlorder      =>'desc',
@@ -133,7 +181,7 @@ sub new
 
    );
    $self->setWorktable("FLEXERA_instsoftware");
-   $self->setDefaultView(qw(systemname publisher software version 
+   $self->setDefaultView(qw(systemname publisher software fullversion 
                             edition classification));
    return($self);
 }
@@ -197,8 +245,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default software 
-             source));
+   return(qw(header default software support source));
 }  
 
 1;
