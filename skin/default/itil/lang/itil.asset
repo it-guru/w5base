@@ -3,7 +3,7 @@
 'fieldgroup.physasset'=>{de=>'Hardwaredaten',en=>'Assetdata'},
 'fieldgroup.upd'=>{de=>'Update/Refresh Möglichkeiten',en=>'Update/Refresh posibilities'},
 'you are only authorized to add in \'order\' or \'reserved\' state'=>{de=>'Sie sind nur berechtig, im Status \'angefordert\' oder \'reserviert\' Datensätze zu erzeugen'},
-'fieldgroup.financeco'=>{de=>'Kontierung und Finanzen',en=>'finance informations'},
+'fieldgroup.financeco'=>{de=>'Kontierung, Finanzen und Lifecyle',en=>'finance, accounting and lifecycle'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'fieldgroup.location'=>{de=>'Standort',en=>'Location'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
