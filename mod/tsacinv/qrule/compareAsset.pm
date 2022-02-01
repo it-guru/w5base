@@ -340,6 +340,23 @@ sub qcheckRecord
                                 mode=>'day');
                }
 
+               if ($parrec->{dschedretire} ne ""){
+                  my $d=CalcDateDuration(NowStamp("en"),$parrec->{dschedretire});
+                  if ($d->{days}>366*5 ||
+                      $d->{days}<-366){ # if date is not in +-10Y range, ignore
+                     $parrec->{dschedretire}=""; # it
+                  }
+               }
+               if ($parrec->{dschedretire} ne ""){
+                  $self->IfComp($dataobj,  
+                                $rec,"plandecons",
+                                $parrec,"dschedretire",
+                                $autocorrect,$forcedupd,$wfrequest,
+                                \@qmsg,\@dataissue,\$errorlevel,
+                                mode=>'day');
+               }
+
+
                $self->IfComp($dataobj,
                              $rec,"corecount",
                              $parrec,"corecount",

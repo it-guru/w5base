@@ -1837,3 +1837,4 @@ create table lnkapplappltag (
   KEY lnkapplappl (lnkapplappl),               
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table asset add plandecons datetime default NULL;
