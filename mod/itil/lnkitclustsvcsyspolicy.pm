@@ -313,17 +313,17 @@ sub getSqlFrom
 {
    my $self=shift;
 
-   my $join="left outer";
+   my $join="left outer join";
 
    if ($W5V2::OperationContext eq "W5Replicate"){
-      $join="left outer";
+      $join="join";
    }
    my $from="lnkitclustsvc qlnkitclustsvc  ".
             "join itclust qitclust ".
             "on qlnkitclustsvc.itclust=qitclust.id ".
             "join system qsystem ".
             "on qsystem.clusterid=qitclust.id ".
-            "${join} join lnkitclustsvcsyspolicy qlnkitclustsvcsyspolicy ".
+            "${join} lnkitclustsvcsyspolicy qlnkitclustsvcsyspolicy ".
             "on qlnkitclustsvc.id=qlnkitclustsvcsyspolicy.itclustsvc and ".
             "   qsystem.id=qlnkitclustsvcsyspolicy.system";
    return($from);
