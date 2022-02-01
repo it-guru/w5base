@@ -501,6 +501,13 @@ sub new
                 label         =>'end of hardware support',
                 dataobjattr   =>'asset.eohsd'),
 
+      new kernel::Field::Date(
+                name          =>'plandecons',
+                group         =>'financeco',
+                dayonly       =>1,
+                label         =>'planned deconstruction date',
+                dataobjattr   =>'asset.plandecons'),
+
       new kernel::Field::Select(
                 name          =>'denyupselect',
                 label         =>'it is posible to refresh hardware',
@@ -1261,6 +1268,20 @@ sub Validate
    if (effVal($oldrec,$newrec,"denyupd")!=0){
       if (effVal($oldrec,$newrec,"refreshpland") ne ""){
          $newrec->{refreshpland}=undef;
+      }
+   }
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"plandecons")){
+      my $eohs=effVal($oldrec,$newrec,"plandecons");
+      if ($eohs ne ""){
+         my $nowstamp=NowStamp("en");
+         my $age=CalcDateDuration($nowstamp,$eohs);
+         if (!defined($age) ||
+             $age->{days}>365*5 ||
+             $age->{days}<(365*1)*-1){
+            $self->LastMsg(ERROR,
+                       "planned deconstruction date in unexpected range");
+            return(0);
+         }
       }
    }
    if (!defined($oldrec) || effChanged($oldrec,$newrec,"eohs")){
