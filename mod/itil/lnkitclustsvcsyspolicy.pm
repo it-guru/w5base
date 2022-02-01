@@ -312,12 +312,18 @@ sub ValidatedUpdateRecord
 sub getSqlFrom
 {
    my $self=shift;
+
+   my $join="left outer";
+
+   if ($W5V2::OperationContext eq "W5Replicate"){
+      $join="left outer";
+   }
    my $from="lnkitclustsvc qlnkitclustsvc  ".
             "join itclust qitclust ".
             "on qlnkitclustsvc.itclust=qitclust.id ".
             "join system qsystem ".
             "on qsystem.clusterid=qitclust.id ".
-            "left outer join lnkitclustsvcsyspolicy qlnkitclustsvcsyspolicy ".
+            "${join} join lnkitclustsvcsyspolicy qlnkitclustsvcsyspolicy ".
             "on qlnkitclustsvc.id=qlnkitclustsvcsyspolicy.itclustsvc and ".
             "   qsystem.id=qlnkitclustsvcsyspolicy.system";
    return($from);
