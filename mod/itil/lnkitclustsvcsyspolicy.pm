@@ -167,13 +167,13 @@ sub new
 
 
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'clustid',
                 label         =>'ClustID',
                 selectfix     =>1,
                 dataobjattr   =>"qitclust.id"),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'syssystemid',
                 label         =>'SystemID',
                 selectfix     =>1,
@@ -192,7 +192,7 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'qitclust.cistatus'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'itclustsvcid',
                 label         =>'ClusterServiceID',
                 selectfix     =>1,
@@ -205,10 +205,25 @@ sub new
                 label         =>'Overflow ID',
                 dataobjattr   =>'qlnkitclustsvcsyspolicy.refid'),
 
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"qlnkitclustsvcsyspolicy.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"concat(concat(".
+                                "lpad(qlnkitclustsvc.id,35,'0'),'-'),".
+                                "lpad(qsystem.id,35,'0'))"),
                                    
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
+                selectfix     =>1,
                 label         =>'last Editor',
                 dataobjattr   =>'qlnkitclustsvcsyspolicy.modifyuser',
                 wrdataobjattr =>'modifyuser'),
@@ -325,7 +340,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if ($rec->{owner} eq "");
+   return("header","default","source") if ($rec->{owner} eq "");
    return("ALL");
 }
 
