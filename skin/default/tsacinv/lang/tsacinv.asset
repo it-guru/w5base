@@ -47,3 +47,4 @@
 'marked as delete'=>{de=>'gelöscht markiert'},
 'Slot number'=>{de=>'Steckplatznummer'},
 'end of hardware support'=>{de=>'Ende des Hardware-Supports'},
+'planned deconstruction date'=>{de=>'geplanter Rückbau Zeitpunkt'},

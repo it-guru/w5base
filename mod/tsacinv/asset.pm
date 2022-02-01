@@ -425,6 +425,14 @@ sub new
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>'"Withdrawn_support"'),
 
+      new kernel::Field::Date(
+                name          =>'dschedretire',
+                label         =>'planned deconstruction date',
+                dayonly       =>1,
+                group         =>'maint',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'"schedretire"'),
+
       new kernel::Field::Link(
                 name          =>'locationid',
                 label         =>'LocationID',
