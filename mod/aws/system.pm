@@ -368,7 +368,9 @@ sub Import
       $self->SetFilter($flt);
       my @l=$self->getHashList(qw(id name idpath ipaddresses));
       if ($#l==-1){
-         $self->LastMsg(ERROR,"EC2 Instanz not found in AWS");
+         if ($self->isDataInputFromUserFrontend()){
+            $self->LastMsg(ERROR,"EC2 Instanz not found in AWS");
+         }
          return(undef);
       }
      
