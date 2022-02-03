@@ -2232,7 +2232,18 @@ sub _simpleRESTCallHandler_SendResult
             print $JSON->pretty->encode($result);
          }
       }
-      if (in_array(\@accept,["application/xml"])){
+      elsif (in_array(\@accept,["application/xml"])){
+      }
+      else{  # direct path query by Web-Browser
+         print $self->HttpHeader("text/plain",charset=>'utf-8');
+         my $JSON;
+         eval("use JSON;\$JSON=new JSON;");
+         if ($@ eq ""){
+            $JSON->utf8(1);
+            $JSON->allow_blessed(1);
+            $JSON->convert_blessed(1);
+            print $JSON->pretty->encode($result);
+         }
       }
    }
    return($result);
@@ -2263,13 +2274,19 @@ sub simpleRESTCallHandler
             }
          }
       }
+      my $directPathParam=0;
+      if (exists($q->{RootPath}) && $q->{RootPath} ne ""){
+         $directPathParam++;
+      }
+
       delete($q->{RootPath});
       delete($q->{FunctionPath});
       delete($q->{FUNC});
       delete($q->{MOD});
       my @accept=split(/\s*,\s*/,lc($ENV{HTTP_ACCEPT}));
       if (in_array(\@accept,["application/json","application/xml",
-                             "text/javascript"])){
+                             "text/javascript"]) ||
+          $directPathParam){
          my $chk=$self->_simpleRESTCallHandler_ParamCheck($qfields,$q);
          if ($chk){
             return($self->_simpleRESTCallHandler_SendResult(0,$chk));
