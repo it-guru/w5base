@@ -36,6 +36,8 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+   $param{MainSearchFieldLines}=4 if (!exists($param{MainSearchFieldLines}));
+
    my $self=bless($type->SUPER::new(%param),$type);
   
    $self->AddFields(
@@ -58,24 +60,54 @@ sub new
                 label         =>'ApplicationGroup',
                 vjointo       =>'itil::applgrp',
                 vjoinon       =>['applgrpid'=>'id'],
-                vjoindisp     =>'fullname'),
+                vjoindisp     =>'fullname',
+                dataobjattr   =>'applgrp.fullname'),
 
       new kernel::Field::Link(
                 name          =>'applgrpid',
                 label         =>'ApplicationGroupID',
                 dataobjattr   =>'addlnkapplgrpsystem.applgrp'),
 
+      new kernel::Field::Select(
+                name          =>'applgrpcistatus',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'Applicationgroup CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['applgrpcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'applgrpcistatusid',
+                label         =>'ApplGrpCiStatusID',
+                dataobjattr   =>'applgrp.cistatus'),
+
       new kernel::Field::TextDrop(
                 name          =>'system',
                 label         =>'System',
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>'system.name'),
 
       new kernel::Field::Link(
                 name          =>'systemid',
                 label         =>'SystemID',
                 dataobjattr   =>'addlnkapplgrpsystem.system'),
+
+      new kernel::Field::Select(
+                name          =>'systemcistatus',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'System CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['systemcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'systemcistatusid',
+                label         =>'SystemCiStatusID',
+                dataobjattr   =>'system.cistatus'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
@@ -207,39 +239,18 @@ sub isQualityCheckValid
 
 
 
-#sub getSqlFrom
-#{
-#   my $self=shift;
-#   my $from=<<EOF;
-#( select lnkapplsystem.appl applid,ipaddress.id as ipid
-#      from lnkapplsystem,ipaddress
-#      where lnkapplsystem.system=ipaddress.system
-#   union
-#   select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
-#      from lnkitclustsvcappl,ipaddress 
-#      where lnkitclustsvcappl.itclustsvc=ipaddress.lnkitclustsvc
-#   union
-#   select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
-#      from lnkitclustsvcappl
-#           join lnkitclustsvc on lnkitclustsvcappl.itclustsvc=lnkitclustsvc.id
-#           join itclust on lnkitclustsvc.itclust=itclust.id 
-#           join system on system.clusterid=itclust.id 
-#           join ipaddress on ipaddress.system=system.id
-#           left outer join lnkitclustsvcsyspolicy 
-#              on lnkitclustsvc.id=lnkitclustsvcsyspolicy.itclustsvc 
-#                 and lnkitclustsvcsyspolicy.system=system.id 
-#      where system.cistatus<=4 and itclust.cistatus<=4 
-#            and ( (lnkitclustsvcsyspolicy.runpolicy is null and 
-#                   itclust.defrunpolicy<>'deny') or 
-#                  (lnkitclustsvcsyspolicy.runpolicy is not null and 
-#                   lnkitclustsvcsyspolicy.runpolicy<>'deny'))
-#
-#) as ai,appl,ipaddress 
-#
-#EOF
-#
-#   return($from);
-#}
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+
+   my $from="$worktable ".
+            "join applgrp on $worktable.applgrp=applgrp.id ".
+            "join system on $worktable.system=system.id";
+   return($from);
+}
 
 
 #sub initSqlWhere
@@ -271,6 +282,22 @@ sub isViewValid
 
    return(qw(ALL));
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_applgrpcistatus"))){
+     Query->Param("search_applgrpcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+   if (!defined(Query->Param("search_systemcistatus"))){
+     Query->Param("search_systemcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 
 1;

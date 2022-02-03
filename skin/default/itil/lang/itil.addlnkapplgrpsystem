@@ -1,2 +1,5 @@
 'itil::addlnkapplgrpsystem'=>{de=>'Verküpfung Anwendungsgruppe-System Daten',en=>'Relation ApplicationGroup-System data'},
 'no existing relation between application group and system'=>{de=>'keine existierende Verbindung zwischen Anwendungsgruppe und System'},
+'Applicationgroup'=>{de=>'Anwendungsgruppe'},
+'Applicationgroup CI-State'=>{de=>'Anwendungsgruppe CI-Status'},
+'System CI-State'=>{de=>'System CI-Status'},
