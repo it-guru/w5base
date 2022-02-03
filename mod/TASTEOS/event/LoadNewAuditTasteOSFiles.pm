@@ -244,7 +244,9 @@ sub analyseRecord
    }
    if (defined($sysrec)){
       $self->{addsys}->ResetFilter();
-      $self->{addsys}->SetFilter({systemid=>\$sysrec->{id}});
+      $self->{addsys}->SetFilter({systemid=>\$sysrec->{id},
+                                  systemcistatusid=>[3,4],
+                                  applgrpcistatusid=>[3,4]});
       my @l=$self->{addsys}->getHashList(qw(ALL));
       foreach my $addsysrec (@l){
           next if (!defined($addsysrec->{applgrp}));
