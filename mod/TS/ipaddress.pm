@@ -202,13 +202,14 @@ sub doAnalyse
 
    if (!keys(%applid) && 
        !keys(%cadmin) && !keys(%tadmin)){  # Query NOAH - if IP is not in Darwin
-      msg(INFO,"start handling unknown ip adresses");
+      #msg(INFO,"start handling unknown ip adresses");
       my $newcomments="";
       my $ipflt=$param->{ipaddr};
       $ipflt=~s/\*//g;
       $ipflt=~s/\?//g;
       #msg(INFO,"try to query NOAH on ip $ipflt");
       if ($ipflt ne ""){
+         $r->{query}->{ipaddr}=$ipflt;
          my $noa=getModuleObject($self->Config,"tsnoah::ipaddress");
          if (!defined($noa) || !$noa->Ping()){
             return({
