@@ -2299,11 +2299,27 @@ sub simpleRESTCallHandler
          print $self->getAppTitleBar();
          my $fForm="<fieldset>";
          $fForm.="<legend>Call Parameters:</legend>";
-
+         my $initfound=0;
+         foreach my $v (keys(%$qfields)){
+            if (exists($q->{$v})){
+               $initfound++;
+            }
+         }
          foreach my $v (keys(%$qfields)){
             my $typ=$qfields->{$v}->{typ};
             $typ="STRING" if ($typ eq "");
-            my $init=$qfields->{$v}->{init};
+            my $init;
+            if (!$initfound){
+               $init=$qfields->{$v}->{init};
+            }
+            else{
+               if (exists($q->{$v})){
+                  $init=$q->{$v};
+                  if (ref($init) eq "ARRAY"){
+                     $init=join(" ",@$init);
+                  }
+               }
+            }
             $init=~s/"/&quot;/g;
             if ($typ eq "STRING"){
                $fForm.="<div>";
