@@ -82,6 +82,7 @@ sub doAnalyse
    my @appltadminfields=qw(tsmid tsm2id opmid opm2id);
    my $notes;
    my %networks;
+   my $r={};
 
 
    $ipflt->{name}=[$param->{ipaddr}];
@@ -102,9 +103,12 @@ sub doAnalyse
    $self->SetFilter($ipflt);
 
    my @l=$self->getHashList(qw(id applications network networkid
-                               dnsname name system itclustsvc));
+                               dnsname name system itclustsvc
+                               systemid itclustsvcid));
 
    my %applid;
+
+   my %systemid;
 
    foreach my $iprec (@l){
       $networks{$iprec->{networkid}}={
@@ -121,12 +125,46 @@ sub doAnalyse
       if ($iprec->{system} ne ""){
          if (!in_array(\@indication,"system: ".$iprec->{system})){
             push(@indication,"system: ".$iprec->{system});
+            $systemid{$iprec->{systemid}}++;
          }
       }
       if ($iprec->{itclustsvc} ne ""){
          if (!in_array(\@indication,"clusterservice: ".$iprec->{itclustsvc})){
             push(@indication,"clusterservice: ".$iprec->{itclustsvc});
          }
+      }
+   }
+   if ((!keys(%applid)) && 
+       keys(%systemid)){ # logical system without any applications
+      my $sys=getModuleObject($self->Config,"itil::system");
+      $sys->SetFilter({id=>[keys(%systemid)]});
+      my @l=$sys->getHashList(qw(id databossid admid adm2id));
+      foreach my $r (@l){
+         if ($r->{databossid} ne ""){
+            my $userid=$r->{databossid};
+            $userid{$userid}++;
+            if (!exists($cadmin{$userid})){
+               $cadmin{$userid}++;
+               push(@cadmin,$userid);
+            }
+         }
+         if ($r->{admid} ne ""){
+            my $userid=$r->{admid};
+            $userid{$userid}++;
+            if (!exists($tadmin{$userid}) &&
+                !exists($cadmin{$userid})){
+               $tadmin{$userid}++;
+               push(@tadmin,$userid);
+            }
+         }
+     #    if ($r->{adm2id} ne ""){
+     #       my $userid=$r->{adm2id};
+     #       $userid{$userid}++;
+     #       if (!exists($tadmin{$userid})){
+     #          $tadmin{$userid}++;
+     #          push(@tadmin,$userid);
+     #       }
+     #    }
       }
    }
 
@@ -158,8 +196,13 @@ sub doAnalyse
          $applid{$r->{applid}}++;
       }
    }
-   if (!keys(%applid)){  # Query NOAH - if IP is not in Darwin
-      #msg(INFO,"start handling unknown ip adresses");
+
+
+
+
+   if (!keys(%applid) && 
+       !keys(%cadmin) && !keys(%tadmin)){  # Query NOAH - if IP is not in Darwin
+      msg(INFO,"start handling unknown ip adresses");
       my $newcomments="";
       my $ipflt=$param->{ipaddr};
       $ipflt=~s/\*//g;
@@ -261,7 +304,12 @@ sub doAnalyse
                   $user->SetFilter($flt);
                   my ($urec)=$user->getOnlyFirst(qw(userid));
                   if (defined($urec)){
-                     $userid{$urec->{userid}}={};
+                     $userid=$urec->{userid};
+                     $userid{$userid}++;
+                     if (!exists($cadmin{$userid})){
+                        $cadmin{$userid}++;
+                        push(@cadmin,$userid);
+                     }
                   }
                }
             }
@@ -344,27 +392,45 @@ sub doAnalyse
          }
       }
    }
-   else{
-      # admin-c resolved by NOAH
-      my @userids=sort(keys(%userid));
-      if (exists($userid->{userid}->{$userids[0]}) &&
-          !exists($cadmin{$userids[0]})){
-         push(@cadmin,$userid->{userid}->{$userids[0]});
+
+   {
+      my @cadminuser;
+      foreach my $admrec (@cadmin){
+         if (ref($admrec)){
+            push(@cadminuser,$admrec);
+         }
+         else{
+            if (exists($userid->{userid}->{$admrec})){
+               push(@cadminuser,$userid->{userid}->{$admrec});
+            }
+         }
       }
+      @cadmin=@cadminuser;
+   }
 
-
-
-      
+   {
+      my @tadminuser;
+      foreach my $admrec (@tadmin){
+         if (ref($admrec)){
+            push(@tadminuser,$admrec);
+         }
+         else{
+            if (exists($userid->{userid}->{$admrec})){
+               push(@tadminuser,$userid->{userid}->{$admrec});
+            }
+         }
+      }
+      @tadmin=@tadminuser;
    }
 
 
-   my $r={};
+
+
    if ($#indication!=-1){
       $r->{indication}=\@indication;
    }
    if ($#cadmin!=-1){
       $r->{'Admin-C'}=\@cadmin;
-      
    }
    if ($#tadmin!=-1){
       $r->{'Tech-C'}=\@tadmin;
