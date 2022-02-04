@@ -46,16 +46,17 @@ If the events will be handled from an business team, enter this team.
 '},
 'icto'=>{
    de=>'
-Der Wert wird bei der Anlage eines ICTO-Objektes in Cape nach TIAB-Beschluss 
-erzeugt und für weitere Verweise an der Applikation in W5Base/Darwin 
-zur Verfügung gestellt.
-Lässt sich die ICTO-ID Default nicht eintragen bitte die Freigabe bei FMB SD-PQIT-NC anfordern.
+Der Wert wird bei der Anlage eines Architektur Objektes in Cape 
+erzeugt und für weitere Verweise an der Applikation 
+in W5Base/Darwin zur Verfügung gestellt. 
+Lässt sich die ICTO-ID oder Plattform-ID Default nicht eintragen 
+bitte die Freigabe bei FMB XAMSHelp anfordern.
 ', en=>'
-The value is generated when an ICTO object is created in Cape according 
-to the TIAB decision and made available for further references to the 
-application in W5Base/Darwin.
-If you are unable to enter the ICTO-ID Default, please request 
-the release at "FMB SD-PQIT-NC".
+The value is generated when an architecture object is 
+created in Cape and made available for further references 
+to the application in W5Base/Darwin. 
+If you are unable to enter the ICTO-ID or Plattform-ID Default, 
+please request the release at "FMB XAMSHelp".
 '},
 'rtolevel'=>{
    de=>'
