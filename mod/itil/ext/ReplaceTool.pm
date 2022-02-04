@@ -181,6 +181,7 @@ sub getControlRecord
              dataobj      =>'itil::lnkapplcontact',
              target       =>'targetname',
              idfield      =>'targetid',
+             referenceonly=>1,
              targetlabel  =>'application',
              baseflt      =>{secparentobj=>\'itil::appl',applcistatusid=>"<6"}
            }
