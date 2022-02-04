@@ -47,18 +47,24 @@ sub getDynamicFields
          my $crec=$self->{ReplaceTool}->{$module}->getControlRecord();
          while(my $k=shift(@$crec)){
             my $data=shift(@$crec);
-            my $do=$data->{replaceoptype};
-            $self->{dstnames}->{$do}=$self->getParent->T($do,$do);
-            my $dataobj=getModuleObject($self->getParent->Config,$do);
-            if (defined($dataobj)){
-               my $idname=$dataobj->IdField->Name();
-               my $nameobj=$dataobj->getField("fullname");
-               if (!defined($nameobj)){
-                  $nameobj=$dataobj->getField("name");
-               }
-               if (defined($nameobj)){
-                  my $name=$nameobj->Name();
-                  $target{$do}=$name;
+            my $referenceonly=0;
+            if (exists($data->{referenceonly}) && $data->{referenceonly}){
+               $referenceonly=$data->{referenceonly};
+            }
+            if (!$referenceonly){
+               my $do=$data->{replaceoptype};
+               $self->{dstnames}->{$do}=$self->getParent->T($do,$do);
+               my $dataobj=getModuleObject($self->getParent->Config,$do);
+               if (defined($dataobj)){
+                  my $idname=$dataobj->IdField->Name();
+                  my $nameobj=$dataobj->getField("fullname");
+                  if (!defined($nameobj)){
+                     $nameobj=$dataobj->getField("name");
+                  }
+                  if (defined($nameobj)){
+                     my $name=$nameobj->Name();
+                     $target{$do}=$name;
+                  }
                }
             }
          }
@@ -186,7 +192,11 @@ sub getImputTemplate
       my $crec=$self->{ReplaceTool}->{$module}->getControlRecord();
       while(my $k=shift(@$crec)){
          my $data=shift(@$crec);
-         if ($data->{replaceoptype} eq $replaceoptype){
+         my $referenceonly=0;
+         if (exists($data->{referenceonly}) && $data->{referenceonly}){
+            $referenceonly=$data->{referenceonly};
+         }
+         if ((!$referenceonly) && $data->{replaceoptype} eq $replaceoptype){
             my $dataobj=getModuleObject($self->getParent->Config,
                                         $data->{dataobj});
             my $label;
