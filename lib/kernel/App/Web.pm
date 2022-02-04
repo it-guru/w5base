@@ -1667,15 +1667,31 @@ EOF
              "type=\"text/javascript\" src=\"$jsname\"></script>\n";
       }
    }
-   $d.="<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />";
-   if (defined($param{'shorticon'})){
-      my $shorticon=$param{'shorticon'};
-      $d.="<link rel=\"shortcut icon\" ".
-          "href=\"$param{prefix}$param{base}../../../public/base/".
-          "load/$shorticon\" type=\"image/x-icon\">\n";
-      $d.="<link rel=\"icon\" ".
-          "href=\"$param{prefix}$param{base}../../../public/base/".
-          "load/$shorticon\" type=\"image/x-icon\">\n";
+   $d.="<meta name=\"viewport\" ".
+       "content=\"width=device-width, initial-scale=1\" />";
+
+   {
+      my $shorticon="icon_w5base.ico";
+      if (defined($param{'shorticon'})){   # shorticon can be xxx.ico
+         $shorticon=$param{'shorticon'};   # or /module/load/xxx.ico if module
+      }                                    # specific load is needed.
+      if (!($shorticon=~m/^\//)){
+         $shorticon="/base/load/".$shorticon;
+      }
+      my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
+      if ($EventJobBaseUrl ne ""){
+         if (!($EventJobBaseUrl=~m#/$#)){
+            $EventJobBaseUrl.="/";
+         }
+         $shorticon=$EventJobBaseUrl."public".$shorticon;
+      }
+      else{
+         $shorticon="$param{prefix}$param{base}../../../public".$shorticon;
+      }
+      $d.="<link rel=\"shortcut icon\" href=\"$shorticon\" ".
+          "type=\"image/x-icon\">\n";
+      $d.="<link rel=\"icon\" href=\"$shorticon\" ".
+          "type=\"image/x-icon\">\n";
    }
    my $charset="ISO-8859-1";
    $charset=$param{charset} if (defined($param{charset}));
