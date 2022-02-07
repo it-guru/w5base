@@ -75,10 +75,37 @@ sub qcheckRecord
        #     $ciam->SetFilter({toucid=>\$ciamrec->{parentid}});
        #     ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(ALL));
        #  }
+
+         my $nousers=0;
          if (!defined($ciamrec)){
             push(@qmsg,"orgunit id not found in CIAM");
             return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
          }
+         else{
+            my $nosgroups=1;
+            if (ref($ciamrec->{subunits}) eq "ARRAY" &&
+                $#{$ciamrec->{subunits}}!=-1){
+               $nosgroups=0;
+            }
+            if ($nosgroups){ # check users only, if there are no subgroups
+               $nousers=1;   # to reduce querys on CIAM
+               msg(INFO,"check users, because there are no subgroups");
+               if (ref($ciamrec->{users}) eq "ARRAY" &&
+                   $#{$ciamrec->{users}}!=-1){
+                  $nousers=0;
+               }
+            }
+            if (!($ciam->LastMsg())){
+               if ($nosgroups && $nousers){  # empty CIAM Group: HR Rotz
+                  push(@qmsg,"orphaned orgunit group in CIAM");
+                  return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+               }
+            }
+            else{
+               $ciam->LastMsg(""); # reset posible CIAM Errors
+            }
+         }
+
          if (defined($ciamrec)){
             my $grp=getModuleObject($self->getParent->Config(),"base::grp");
 
@@ -119,17 +146,6 @@ sub qcheckRecord
 
             ##################################################################
             # orphaned check
-            my $nousers=1;
-            foreach my $urec (@{$rec->{users}}){
-               if ($urec->{srcsys} eq "CIAM"){
-                  my $roles=$urec->{roles};
-                  $roles=[$roles] if (ref($roles) ne "ARRAY");
-                  my @rchk=grep(!/^RBoss/,orgRoles());
-                  if (in_array($roles,\@rchk)){
-                     $nousers=0;
-                  }
-               }
-            }
             my $nosgroups=1;
             foreach my $grec (@{$rec->{subunits}}){
                if ($grec->{srcsys} eq "CIAM"){
