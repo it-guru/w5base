@@ -129,8 +129,8 @@ sub AZURE_CloudAreaSync
       $subsc->SetFilter({});
       my @ss=$subsc->getHashList(qw(subscriptionId id name w5baseid));
       my @s;
-      if ($#ss==-1){
-         my $msg="no projects found in Azure - sync abborted";
+      if ($#ss<6){
+         my $msg="not enough projects (5) found in Azure - sync abborted";
          msg(ERROR,$msg);
          return({exitcode=>1,exitmsg=>$msg});
       }
