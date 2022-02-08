@@ -89,6 +89,16 @@ sub qcheckRecord
    $walletobj->SetFilter({applid=>$rec->{id}});
    my @certs=$walletobj->getHashList(qw(ALL));
 
+
+   my $dropAllCerts=0;
+
+   if ($rec->{cistatusid}>5){
+      my $d=CalcDateDuration(NowStamp("en"),$rec->{mdate});
+      if ($d->{days}<-14){
+         $dropAllCerts=0;
+      }
+   }
+
    foreach my $cert (@certs) {
       my $isdel=0;
       if ($cert->{enddate} ne ""){
@@ -102,6 +112,15 @@ sub qcheckRecord
                           $cert->{name});
          }
       }
+      if (!$isdel && $dropAllCerts){
+         my $op=$walletobj->Clone();
+         $op->ValidatedDeleteRecord($cert);
+         $isdel=1;
+         my $desc={};
+         push(@qmsg,'Certificate deleted due application deleted: '.
+                       $cert->{name});
+      }
+
       if (!$isdel){
          my $ok=$self->itil::lib::Listedit::handleCertExpiration(
                                                $walletobj,$cert,$dataobj,$rec,
