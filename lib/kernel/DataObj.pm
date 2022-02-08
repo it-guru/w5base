@@ -151,7 +151,7 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
                                        # recently modified.
          if (my $lastqcheck=$self->getField("lastqcheck")){
             $flt[1]->{cistatusid}=[6];        # check of cistatus=6 is only
-            $flt[1]->{mdate}=">now-28d";      # posible, if qcheck is
+            $flt[1]->{mdate}=">now-56d";      # posible, if qcheck is
             $flt[1]->{lastqcheck}="<now-7d";  # lastqcheckBased - these
          }                                    # records are only checked once
       }                                       # a week
