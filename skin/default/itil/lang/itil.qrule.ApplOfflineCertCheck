@@ -3,4 +3,5 @@
    en=>'Check of certificates'},
 'Certificate expires in a few days'=>{de=>'Zertifikat verfällt in wenigen Tagen'},
 'Certificate has expired'=>{de=>'Zertifikat ist abgelaufen'},
-'Certificate deleted due long expiration'=>{de=>'Zertifikat wegen langen Ablaufs gelöscht'}
+'Certificate deleted due long expiration'=>{de=>'Zertifikat wegen langen Ablaufs gelöscht'},
+'Certificate deleted due application deleted'=>{de=>'Zertifikat wengen nicht mehr aktiver Anwendung gelöscht'},
