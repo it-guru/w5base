@@ -90,7 +90,7 @@ sub CloudAreaSync
    {
       my %otcpname;
       my $itcloud="OTC";
-      $otcpro->SetFilter({lastmondate=>">now-14d"});
+      $otcpro->SetFilter({lastmondate=>">now-28d"});
       foreach my $otcprorec ($otcpro->getHashList(qw(
                               name cluster id applid appl supportid
                               domain fullname
@@ -254,16 +254,16 @@ sub CloudAreaSync
          my $updrec;
          my $d=CalcDateDuration($a->{lastmondate},NowStamp("en"));
          if (defined($d)){
-            if ($d->{days}>6){
-               if ($currec->{cistatusid}!=6){
-                  $updrec->{cistatusid}=6;   # auf veraltet settzen
-               }
-            }
-            else{
-               if ($currec->{cistatusid}>5){ # reaktivieren einer bereits
-                  $updrec->{cistatusid}=3;   # als veraltet markieren CloudArea
-               }                             # (mit Nachfrage beim AG DV)
-            }
+            #if ($d->{days}>6){
+            #   if ($currec->{cistatusid}!=6){
+            #      $updrec->{cistatusid}=6;   # auf veraltet settzen
+            #   }
+            #}
+            #else{
+            #   if ($currec->{cistatusid}>5){ # reaktivieren einer bereits
+            #      $updrec->{cistatusid}=3;   # als veraltet markieren CloudArea
+            #   }                             # (mit Nachfrage beim AG DV)
+            #}
 
             if ($currec->{srcsys} ne $a->{srcsys}){
                $updrec->{srcsys}=$a->{srcsys};
