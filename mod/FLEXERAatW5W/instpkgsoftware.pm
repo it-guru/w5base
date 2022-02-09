@@ -43,6 +43,8 @@ sub new
                 label         =>'Installation ID',
                 dataobjattr   =>'id'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Linenumber(
                 name          =>'linenumber',
                 label         =>'No.'),
@@ -57,6 +59,12 @@ sub new
                 label         =>'Product Title',
                 ignorecase    =>1,
                 dataobjattr   =>'PRODUCTNAME'),
+
+      new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'Fullname',
+                dataobjattr   =>"(systemname||' - '||PUBLISHERNAME||' - '||".
+                                "PRODUCTNAME||' - '||VERSIONRAW)"),
 
       new kernel::Field::Text(
                 name          =>'publisher',
@@ -216,12 +224,12 @@ sub initSearchQuery
 
 
 
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
-#}
+sub getRecordImageUrl
+{
+   my $self=shift;
+   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+   return("../../../public/itil/load/software.jpg?".$cgi->query_string());
+}
          
 
 
