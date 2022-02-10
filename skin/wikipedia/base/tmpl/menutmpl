@@ -1,7 +1,7 @@
-<img id=ecklogo style="top:0px;left:1px;position:absolute" src="%rootpath%../../../public/base/load/ecklogobottom.jpg">
-<div id=mstart style="background:#ffffff;top:114px;width:180px;overflow:hidden;position:absolute;border-style:solid;border-width:1px;border-color:silver;border-left-style:none">
+<img id=ecklogo style="top:0px;left:1px" src="%rootpath%../../../public/base/load/ecklogobottom.jpg">
+
 %menutab%
-</div>
+
 <script language="JavaScript">
 function SwitchMenuVisible()
 {
@@ -10,27 +10,49 @@ function SwitchMenuVisible()
    var mselframe=parent.document.getElementById("mselframe");
    var topframe=parent.parent.document.getElementById("topframe");
    var ecklogo=document.getElementById("ecklogo");
+   var usercount=document.getElementById("userCount");
+
    if (m){
       if (m.style.display=="none"){
          m.style.visibility="visible";
          m.style.display="block";
+         if (usercount){
+            usercount.style.visibility="visible";
+            usercount.style.display="block";
+         }
          ecklogo.style.visibility="visible";
          ecklogo.style.display="block";
          mselframe.cols=m.oldmselframe;
-         topframe.rows=m.oldtopframe;
-         mstart.style.top=m.oldmstart;
+         if (m && m.oldtopframe){
+            topframe.rows=m.oldtopframe;
+         }
+         if (m && m.oldmstart){
+            mstart.style.top=m.oldmstart;
+         }
       }
       else{
          m.style.visibility="hidden";
          m.style.display="none";
+         if (usercount){
+            usercount.style.visibility="hidden";
+            usercount.style.display="none";
+         }
          ecklogo.style.visibility="hidden";
          ecklogo.style.display="none";
-         m.oldtopframe=topframe.rows;
+         if (topframe){
+            m.oldtopframe=topframe.rows;
+         }
          m.oldmselframe=mselframe.cols;
-         m.oldmstart=mstart.style.top;
-         topframe.rows="0,*";
+         if (mstart){
+            m.oldmstart=mstart.style.top;
+         }
+         if (topframe){
+            topframe.rows="0,*";
+         }
          mselframe.cols="25,*";
-         mstart.style.top="0px";
+         if (mstart){
+            mstart.style.top="0px";
+         }
       }
    }
 }

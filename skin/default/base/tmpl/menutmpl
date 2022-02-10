@@ -8,10 +8,16 @@ function SwitchMenuVisible()
    var mselframe=parent.document.getElementById("mselframe");
    var menutop=top.document.getElementById("fmenutop");
 
+   var usercount=document.getElementById("userCount");
+
    if (m) {
       if (m.style.display=="none") {
          m.style.visibility="visible";
          m.style.display="block";
+         if (usercount){
+            usercount.style.visibility="visible";
+            usercount.style.display="block";
+         }
          mselframe.cols=m.oldmselframe;
          menutop.style.visibility="visible";
          menutop.style.display="block";
@@ -19,6 +25,10 @@ function SwitchMenuVisible()
       else {
          m.style.visibility="hidden";
          m.style.display="none";
+         if (usercount){
+            usercount.style.visibility="hidden";
+            usercount.style.display="none";
+         }
          m.oldmselframe=mselframe.cols;
          mselframe.cols="25,*";
          menutop.style.visibility="hidden";
