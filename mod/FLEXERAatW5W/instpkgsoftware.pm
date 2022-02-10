@@ -128,6 +128,7 @@ sub new
                 name          =>'dreleasedate',
                 group         =>'support',
                 sqlorder      =>'desc',
+                dayonly       =>1,
                 label         =>'release date',
                 dataobjattr   =>'RELEASEDATE'),
 
@@ -135,6 +136,7 @@ sub new
                 name          =>'dstartoflifedate',
                 group         =>'support',
                 sqlorder      =>'desc',
+                dayonly       =>1,
                 label         =>'start of life date',
                 dataobjattr   =>'STARTOFLIFEDATE'),
 
@@ -142,6 +144,7 @@ sub new
                 name          =>'dendoflifedate',
                 group         =>'support',
                 sqlorder      =>'desc',
+                dayonly       =>1,
                 label         =>'end of life date',
                 dataobjattr   =>'ENDOFLIFEDATE'),
 
@@ -149,6 +152,7 @@ sub new
                 name          =>'dendofsalesdate',
                 group         =>'support',
                 sqlorder      =>'desc',
+                dayonly       =>1,
                 label         =>'end of sales date',
                 dataobjattr   =>'ENDOFSALESDATE'),
 
@@ -156,6 +160,7 @@ sub new
                 name          =>'dsupporteduntil',
                 group         =>'support',
                 sqlorder      =>'desc',
+                dayonly       =>1,
                 label         =>'supported until',
                 dataobjattr   =>'SUPPORTEDUNTIL'),
 
@@ -163,6 +168,7 @@ sub new
                 name          =>'dextendedsupportuntil',
                 group         =>'support',
                 sqlorder      =>'desc',
+                dayonly       =>1,
                 label         =>'extended support until',
                 dataobjattr   =>'EXTENDEDSUPPORTUNTIL'),
 
@@ -170,6 +176,7 @@ sub new
                 name          =>'swinstdate',
                 group         =>'source',
                 sqlorder      =>'desc',
+                dayonly       =>1,
                 label         =>'Inst-Date',
                 dataobjattr   =>'INSTDATE'),
 
