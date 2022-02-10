@@ -273,6 +273,10 @@ sub BorderChangeHandling
                         my $baseurl=$self->Config->Param("EventJobBaseUrl");
                         $baseurl.="/" if (!($baseurl=~m/\/$/));
                      }
+                     if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+                        $baseurl=~s/^http:/https:/i;
+                     }
+
                      my $p=$dataobj;
                      $p=~s/::/\//g;
                      $baseurl.="/auth/$p/ById/$id";
