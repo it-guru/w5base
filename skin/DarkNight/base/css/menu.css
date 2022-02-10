@@ -1,4 +1,6 @@
 @import url("menu.css?SKIN=default");
+
+
 a:link.menulink, a:visited.menulink, a:active.menulink {
    color:white;
 }

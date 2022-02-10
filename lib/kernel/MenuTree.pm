@@ -75,7 +75,12 @@ sub _TreeLine
       if (defined($control->{rootlink})){
          $d.="<a href=$control->{rootlink}>";
       }
-      $d.="<img border=0 alt=\"root\" ".
+      my $onclick="";
+      if (defined($control->{rootclick})){
+         $onclick=" onClick=\"$control->{rootclick}\" ".
+                  "style=\"cursor:pointer\" ";
+      }
+      $d.="<img border=0 id=rootimg alt=\"root\" $onclick".
           "src=\"${rootpath}../../base/load/$control->{rootimg}".
           "$control->{imgparam}\">";
       if (defined($control->{rootlink})){

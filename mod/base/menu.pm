@@ -962,7 +962,7 @@ EOF
 
 
    my $m=$self->MenuTab($rootpath,$fp,
-                        'JavaScript:SwitchMenuVisible() target=_self');
+                        'SwitchMenuVisible()');
    my $menuframe=$self->getParsedTemplate("tmpl/menutmpl",{
                                        static=>{menutab=>$m,
                                                 rootpath=>$rootpath}});
@@ -1271,7 +1271,7 @@ sub MenuTab
                      hrefclass=>'menulink',
                      imgparam =>$skinparam,
                      clipicon =>'clipicon',
-                     rootlink =>$rootlink,
+                     rootclick=>$rootlink,
                      rootpath => $rootpath);
    return($d);
 }
