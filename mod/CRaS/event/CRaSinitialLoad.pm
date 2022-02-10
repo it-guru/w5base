@@ -171,6 +171,12 @@ sub ProcessXLS
          }
          $rec{xlsrow}=$row+1;
          $rec{xlssheet}=$worksheet->get_name();
+         # process record
+         foreach my $k (keys(%rec)){
+            if ($rec{$k}=~m/^\s*"\s*$/){
+               $rec{$k}=$lastrec{$k};
+            }
+         }
          # record fixups
          if (exists($rec{ICTO}) && ($rec{ICTO}=~m/icto/i)){
             $rec{ICTO}=~s/:.*$//;
@@ -182,7 +188,8 @@ sub ProcessXLS
          $rec{ICTO}=trim($rec{ICTO});
          if ($rec{CommonName} ne ""){
             my $aurl=$self->getPersistentModuleObject("aur","itil::lnkapplurl");
-            $aurl->SetFilter({hostname=>'"'.$rec{CommonName}.'"'});
+            my $hostname=lc($rec{CommonName});
+            $aurl->SetFilter({hostname=>\$hostname});
             my @l=$aurl->getHashList(qw(applid));
             if ($#l>=0){
                $rec{applid}=$l[0]->{applid};
@@ -210,13 +217,6 @@ sub ProcessXLS
             my @l=$csteam->getHashList(qw(id));
             if ($#l>=0){
                $rec{csteamid}=$l[0]->{id};
-            }
-         }
-
-         # process record
-         foreach my $k (keys(%rec)){
-            if ($rec{$k}=~m/^\s*"\s*$/){
-               $rec{$k}=$lastrec{$k};
             }
          }
 
