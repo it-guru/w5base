@@ -186,6 +186,7 @@ sub DataCollector
          my $reqtrace=shift;
 
          if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            msg(ERROR,"got http 404 on azure::subscription call");
             return([],"200");
          }
          msg(ERROR,$reqtrace);

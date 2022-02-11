@@ -129,8 +129,20 @@ sub AZURE_CloudAreaSync
       $subsc->SetFilter({});
       my @ss=$subsc->getHashList(qw(subscriptionId id name w5baseid));
       my @s;
-      if ($#ss<6){
-         my $msg="not enough projects (5) found in Azure - sync abborted";
+      my $n=$#ss+1;
+
+      $joblog->ValidatedInsertRecord({
+         name=>'AzureSubscriptionCount',
+         event=>'AZURE_CloudAreaSync',
+         pid=>$$,
+         exitcode=>0,
+         exitmsg=>"OK",
+         exitstate=>"ok - got $n subs"
+      });
+
+      if ($n<6){
+         my $msg="not enough projects (min. 6) found in Azure (got $n) - ".
+                 "sync abborted";
          msg(ERROR,$msg);
          return({exitcode=>1,exitmsg=>$msg});
       }
