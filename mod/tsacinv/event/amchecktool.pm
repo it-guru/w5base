@@ -63,7 +63,7 @@ sub amfarmcheck
       $farmlist{uc($frec->{name})}->{amcds}++;
    }
 
-   $ecfarm->SetFilter({operational=>1,
+   $ecfarm->SetFilter({state=>'"in operation"',
                        name=>$name});
    foreach my $frec ($ecfarm->getHashList(qw(name))){
       $farmlist{uc($frec->{name})}->{ecmdb}++;
