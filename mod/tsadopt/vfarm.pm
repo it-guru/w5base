@@ -56,11 +56,10 @@ sub new
                 label         =>'Description',
                 dataobjattr   =>"description"),
 
-      new kernel::Field::Boolean(
-                name          =>'operational',
-                label         =>'operational',
-                dataobjattr   =>"case when operational='true' then ".
-                                "1 else 0 END"),
+      new kernel::Field::Text(
+                name          =>'state',
+                label         =>'State',
+                dataobjattr   =>"virtual_farm_state"),
 
       new kernel::Field::Boolean(
                 name          =>'isshared',
@@ -128,6 +127,13 @@ sub new
                 vjoinon       =>['id'=>'vfarmid'],
                 vjoindisp     =>['name','systemid','ostype','vcores','slices']),
 
+      new kernel::Field::Boolean(
+                name          =>'operational',
+                htmldetail    =>0,
+                label         =>'operational (deprecated)',
+                dataobjattr   =>"case when operational='true' then ".
+                                "1 else 0 END"),
+
       new kernel::Field::Link(
                 name          =>'teamid',
                 label         =>'team id',
@@ -141,7 +147,7 @@ sub new
    );
    $self->{use_distinct}=0;
    #$self->{useMenuFullnameAsACL}=$self->Self;
-   $self->setDefaultView(qw(name operational description));
+   $self->setDefaultView(qw(name state description));
    $self->setWorktable("view_darwin_virtual_farm");
    return($self);
 }
@@ -160,8 +166,8 @@ sub Initialize
 sub initSearchQuery
 {
    my $self=shift;
-   if (!defined(Query->Param("search_operational"))){
-     Query->Param("search_operational"=>"\"".$self->T("yes")."\"");
+   if (!defined(Query->Param("search_state"))){
+     Query->Param("search_state"=>"\"in operation\"");
    }
 }
 
