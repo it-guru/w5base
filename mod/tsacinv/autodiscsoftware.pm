@@ -60,12 +60,16 @@ sub new
                 name          =>'version',
                 label         =>'Version',
                 dataobjattr   =>"REGEXP_REPLACE(".
-                                "REGEXP_REPLACE(\"version\",'\\s.*\$',''),".
+                                "REGEXP_REPLACE(".
+                                "REGEXP_REPLACE(".
+                                "\"version\",'\\(.*\\)\\s*\$',''),".
+                                "'\\s.*\$',''),".
                                 "'\\.[0]+([0-9])','.\\1')"),
 
       new kernel::Field::Text(
                 name          =>'rawversion',
                 label         =>'Raw Version',
+                htmldetail    =>0,
                 dataobjattr   =>'"version"'),
 
       new kernel::Field::Text(
