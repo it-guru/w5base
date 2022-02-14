@@ -43,6 +43,8 @@ sub new
                 name          =>'linenumber',
                 label         =>'No.'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'Systemname',
