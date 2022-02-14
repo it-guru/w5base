@@ -88,7 +88,12 @@ sub new
                 name          =>'fullversion',
                 label         =>'full version string',
                 ignorecase    =>1,
-                dataobjattr   =>'VERSIONRAW'),
+                dataobjattr   =>"REGEXP_REPLACE(".
+                                "REGEXP_REPLACE(".
+                                "REGEXP_REPLACE(".
+                                "\"VERSIONRAW\",'\\(.*\\)\\s*\$',''),".
+                                "'\\s.*\$',''),".
+                                "'\\.[0]+([0-9])','.\\1')"),
 
       new kernel::Field::Text(
                 name          =>'classification',
