@@ -157,6 +157,22 @@ sub new
                 label         =>'UUID',
                 dataobjattr   =>'UUID'),
 
+      new kernel::Field::Text(
+                name          =>'w5systemid',
+                group         =>'w5basedata',
+                label         =>'W5BaseID',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'SYSTEMW5BASEID'),
+
+      new kernel::Field::Text(
+                name          =>'w5systemname',
+                label         =>'W5Base/logical System',
+                group         =>'w5basedata',
+                searchable    =>0,
+                vjointo       =>\'AL_TCom::system',
+                vjoinon       =>['w5systemid'=>'id'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::CDate(
                 name          =>'crdate',
                 group         =>'source',
@@ -298,7 +314,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default software vm source));
+   return(qw(header default software vm w5basedata source));
 }  
 
 1;
