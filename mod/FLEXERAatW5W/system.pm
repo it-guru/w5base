@@ -129,7 +129,9 @@ sub new
                 htmldetail    =>0,
                 vjointo       =>'FLEXERAatW5W::instpkgsoftware',
                 vjoinon       =>['id'=>'flexerasystemid'],
-                vjoindisp     =>['software','version','classification']),
+                vjoindisp     =>['software','version','classification'],
+                vjoininhash   =>['software','version','classification',
+                                 'id','scandate','fullversion']),
 
      new kernel::Field::Boolean(
                 name          =>'is_vm',
@@ -318,5 +320,58 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default software vm w5basedata source));
 }  
+
+
+
+sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
+{
+   my $self=shift;
+   my @res=();
+
+   $self->SetCurrentView(qw(name systemid instpkgsoftware));
+
+   my ($rec,$msg)=$self->getFirst();
+   if (defined($rec)){
+      do{
+#         my %e=(
+#            section=>'SYSTEMNAME',
+#            scanname=>$rec->{name}, 
+#            quality=>-50     # relativ schlecht verlässlich
+#         );
+#         push(@res,\%e);
+         foreach my $s (@{$rec->{instpkgsoftware}}){
+            # at this point, there can be nativ scandata be patched to correct
+            # scan informations!  
+            my %e=(
+               section=>'SOFTWARE',
+               scanname=>$s->{software},
+               scanextra2=>$s->{fullversion},
+               quality=>3,    # relativ schlecht (keine gute Version)
+               processable=>1,
+               backendload=>$s->{scandate},
+               autodischint=>$rec->{srcsys}.": ".$rec->{id}.
+                             ": ".$rec->{systemid}.
+                             ": ".$rec->{name}.":SOFTWARE :".$s->{id}.": ".
+                             $s->{software}
+                             
+            );
+            push(@res,\%e);
+         }
+#         foreach my $s (@{$rec->{ipaddresses}}){
+#            my %e=(
+#               section=>'IPADDR',
+#               scanname=>$s->{address},
+#               scanextra2=>$s->{physicaladdress},
+#               quality=>10,    # relativ verlässlich
+#               processable=>0  # nicht verwendbar - da AM Master!
+#            );
+#            push(@res,\%e);
+#         }
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+   return(@res);
+}
+
 
 1;
