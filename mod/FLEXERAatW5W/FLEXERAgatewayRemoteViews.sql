@@ -5,34 +5,41 @@ create materialized view "mview_FLEXERA_system"
    next sysdate+(1/24)*3
    as
 select 
-   FLEXERADEVICEID,
-   FLEXERADEVICEID flexerasystemid,
-   upper(DEVICESTATUS) DEVICESTATUS,
-   UUID,
-   TENANTID,
-   SYSTEMNAME,
-   SYSTEMOS,
-   SYSTEMOSPATCHLEVEL,
-   SYSTEMCPUCOUNT,
-   SYSTEMLOGICALCPUCOUNT,
-   SYSTEMCORECOUNT,
-   SYSTEMCPUTTYPE,
-   SYSTEMCPUSPEED,
-   SYSTEMINVHOSTTYPE,
-   SYSTEMMEMORY,
-   ASSETMODELL ASSETMODLEL,
-   ASSETSERIALNO,
-   HOSTID,
-   IPADDRLIST,
-   INVENTORYDATE,
-   HARDWAREINVENTORYDATE,
-   SERVICESINVENTORYDATE,
-   CDATE,
-   SYSTEMID "SystemID_at_Flexera",
-   BEACONID,
-   ISVM,
-   ISVMHOSTMISSING
-from dbo.customDarwinExportDevice@flexerap;
+   FlexSystem.FLEXERADEVICEID,
+   FlexSystem.FLEXERADEVICEID flexerasystemid,
+   upper(FlexSystem.DEVICESTATUS) DEVICESTATUS,
+   FlexSystem.UUID,
+   FlexSystem.TENANTID,
+   FlexSystem.SYSTEMNAME,
+   FlexSystem.SYSTEMOS,
+   FlexSystem.SYSTEMOSPATCHLEVEL,
+   FlexSystem.SYSTEMCPUCOUNT,
+   FlexSystem.SYSTEMLOGICALCPUCOUNT,
+   FlexSystem.SYSTEMCORECOUNT,
+   FlexSystem.SYSTEMCPUTTYPE,
+   FlexSystem.SYSTEMCPUSPEED,
+   FlexSystem.SYSTEMINVHOSTTYPE,
+   FlexSystem.SYSTEMMEMORY,
+   FlexSystem.ASSETMODELL ASSETMODLEL,
+   FlexSystem.ASSETSERIALNO,
+   FlexSystem.HOSTID,
+   FlexSystem.IPADDRLIST,
+   FlexSystem.INVENTORYDATE,
+   FlexSystem.HARDWAREINVENTORYDATE,
+   FlexSystem.SERVICESINVENTORYDATE,
+   FlexSystem.CDATE,
+   FlexSystem.SYSTEMID "SystemID_at_Flexera",
+   FlexSystem.BEACONID,
+   FlexSystem.ISVM,
+   FlexSystem.ISVMHOSTMISSING,
+   "itil::system".id SYSTEMW5BASEID
+from dbo.customDarwinExportDevice@flexerap FlexSystem
+   left outer join "W5I_FLEXERA__systemidmap_of"
+      on FlexSystem.FLEXERADEVICEID=
+         "W5I_FLEXERA__systemidmap_of".FLEXERASYSTEMID
+   left outer join "itil::system" 
+      on "W5I_FLEXERA__systemidmap_of".systemid=
+         "itil::system".systemid;
 
 CREATE INDEX "FLEXERA_system_id1"
    ON "mview_FLEXERA_system"(flexerasystemid) online;
