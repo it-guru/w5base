@@ -188,7 +188,8 @@ sub qcheckRecord
             misscount=>$r->{misscount},
             scanextra1=>$r->{scanextra1},
             scanextra2=>$r->{scanextra2},
-            processable=>$r->{processable}
+            processable=>$r->{processable},
+            forcesysteminst=>$r->{forcesysteminst}
          };
       }
 
@@ -282,10 +283,39 @@ sub MapAutoDiscoveryPreData
             $ad->{valid}=0;
          }
       }
+      if ($ad->{section} eq "SOFTWARE" &&
+          exists($ad->{alt})){
+         foreach my $alt (@{$ad->{alt}}){
+            $ad->{token}->{$ad->{section}."@".$alt}++;
+         } 
+      }
+      else{
+         $ad->{token}->{$ad->{section}."@".$ad->{scanname}}++;
+      }
    }
 
+
+   # Next filter: remove ads with existing token with lower quality then
+   # current quality
+   foreach my $ad (@{$AdPreData}){   
+      next if (!$ad->{valid});
+      foreach my $token (keys(%{$ad->{token}})){
+         foreach my $altad (@{$AdPreData}){   
+            next if (!$altad->{valid});
+            if (in_array($token,[keys(%{$altad->{token}})])){
+               if ($ad->{quality}>$altad->{quality}){
+                  $altad->{valid}=0; # for this altad-rec, a better ad-rec 
+                                     # (higher quality) record exists.
+               }
+            }
+         }
+      }
+   }
+
+   
+
    my %paths;
-   foreach my $ad (@{$AdPreData}){    # Level2: Mögliche Pfade detectieren
+   foreach my $ad (@{$AdPreData}){    # Level3: Mögliche Pfade detectieren
       next if (!$ad->{valid});
       my @targets=($ad->{scanname});
       if (exists($ad->{alt})){
@@ -314,6 +344,8 @@ sub MapAutoDiscoveryPreData
          }
       }
    }
+
+
    @{$AdPreData}=values(%paths);   # for the future, only use valid path recs
    #printf STDERR ("\npaths1:\n%s\n",Dumper(\%paths));
    #printf STDERR ("preData:\n%s\n",Dumper($AdPreData));
@@ -351,6 +383,17 @@ sub DiscoverData
       backendload=>$adrec->{backendload},
       autodischint=>$adrec->{autodischint}
    };
+
+   if ($adrec->{forcesysteminst}){
+      if ($adent->{disc_on_systemid} eq ""){
+         print STDERR Dumper($adrec);
+         die("missing disc_on_systemid with forcesysteminst rec");
+      }
+      else{
+        $newrec->{lnkto_system}=$adent->{disc_on_systemid};
+        $newrec->{forcesysteminst}='1';
+      }
+   }
 
    if (exists($adrec->{scanextra1})){     # scandata and scanextra1 need unique
       my $scanextra1=limitlen($adrec->{scanextra1},128,1);

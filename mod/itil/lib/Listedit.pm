@@ -1451,6 +1451,7 @@ sub validateSoftwareVersion
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+   my $silent=shift;
 
    my $version=effVal($oldrec,$newrec,"version");
    my $softwareid=effVal($oldrec,$newrec,"softwareid");
@@ -1458,7 +1459,9 @@ sub validateSoftwareVersion
    $sw->SetFilter({id=>\$softwareid});
    my ($rec,$msg)=$sw->getOnlyFirst(qw(releaseexp));
    if (!defined($rec)){
-      $self->LastMsg(ERROR,"invalid software specified");
+      if (!$silent){
+         $self->LastMsg(ERROR,"invalid software specified");
+      }
       return(undef);
    }
    my $releaseexp=$rec->{releaseexp};
@@ -1467,7 +1470,9 @@ sub validateSoftwareVersion
          my $chk;
          eval("\$chk=\$version=~m$releaseexp;");
          if ($@ ne "" || !($chk)){
-            $self->LastMsg(ERROR,"invalid software version specified");
+            if (!$silent){
+               $self->LastMsg(ERROR,"invalid software version specified");
+            }
             return(undef);
          }
       }

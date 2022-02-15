@@ -84,7 +84,6 @@ sub new
                 label         =>'discovered on SystemID',
                 dataobjattr   =>'autodiscent.discon_system'),
 
-
       new kernel::Field::SubList(
                 name          =>'recs',
                 label         =>'AutoDiscRecords',
