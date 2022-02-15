@@ -61,6 +61,28 @@ sub new
                 label         =>'AssetID',
                 dataobjattr   =>"ager"),
 
+      new kernel::Field::TextDrop(
+                name          =>'vfarm',
+                label         =>'virtual Farm',
+                vjointo       =>'tsadopt::vfarm',
+                vjoinon       =>['vfarmid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'vfarmid',
+                label         =>'vfarm id',
+                dataobjattr   =>"virtual_farm_id"),
+
+      new kernel::Field::Text(
+                name          =>'os',
+                label         =>'operating system',
+                dataobjattr   =>"operating_system"),
+
+      new kernel::Field::Text(
+                name          =>'ostype',
+                label         =>'operating system type',
+                dataobjattr   =>"operating_system_type"),
+
       new kernel::Field::Text(
                 name          =>'vcores',
                 label         =>'vcores',
@@ -77,31 +99,39 @@ sub new
                 dataobjattr   =>"dr_slices"),
 
       new kernel::Field::Text(
-                name          =>'os',
-                label         =>'operating system',
-                dataobjattr   =>"operating_system"),
-
-      new kernel::Field::Text(
-                name          =>'ostype',
-                label         =>'operating system type',
-                dataobjattr   =>"operating_system_type"),
-
-      new kernel::Field::Text(
                 name          =>'landscape',
                 label         =>'landscape',
                 dataobjattr   =>"landscape"),
 
-      new kernel::Field::TextDrop(
-                name          =>'vfarm',
-                label         =>'virtual Farm',
-                vjointo       =>'tsadopt::vfarm',
-                vjoinon       =>['vfarmid'=>'id'],
-                vjoindisp     =>'name'),
+      new kernel::Field::Text(
+                name          =>'delivery_order',
+                label         =>'DO number',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"delivery_order"),
 
-      new kernel::Field::Link(
-                name          =>'vfarmid',
-                label         =>'vfarm id',
-                dataobjattr   =>"virtual_farm_id"),
+      new kernel::Field::Text(
+                name          =>'datastoreclustername',
+                label         =>'Data store Cluster',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"datastore_cluster_name"),
+
+      new kernel::Field::Text(
+                name          =>'remark',
+                label         =>'Remark',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"remark"),
+
+      new kernel::Field::Text(
+                name          =>'datacentername',
+                htmldetail    =>'NotEmpty',
+                label         =>'Data center name',
+                dataobjattr   =>"data_center_name"),
+
+      new kernel::Field::Text(
+                name          =>'datacenternameshort',
+                label         =>'Data center shortname',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"data_center_name_short"),
 
    );
    $self->{use_distinct}=0;
