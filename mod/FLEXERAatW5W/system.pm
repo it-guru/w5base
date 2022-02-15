@@ -259,44 +259,6 @@ sub checkIfVM
 
 
 
-#sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
-#{
-#   my $self=shift;
-#   my @res=();
-#
-#   $self->SetCurrentView(qw(systemid systemname osrelease agentip software));
-#
-#   my ($rec,$msg)=$self->getFirst();
-#   if (defined($rec)){
-#      do{
-##         my %e=(
-##            section=>'SYSTEMNAME',
-##            scanname=>$rec->{systemname},
-##            quality=>0     # neutral verlässlich
-##         );
-##         push(@res,\%e);
-##         my %e=(
-##            section=>'IP',
-##            scanname=>$rec->{agentip},
-##            quality=>0     # neutral verlässlich
-##         );
-##         push(@res,\%e);
-#         foreach my $sw (@{$rec->{software}}){
-#            my %e=(
-#               section=>'SOFTWARE',
-#               scanname=>$sw->{software}, 
-#               scanextra1=>$sw->{scope},
-#               scanextra2=>$sw->{version},
-#               quality=>-10     # relativ schlecht verlässlich
-#            );
-#            push(@res,\%e);
-#         }
-#         ($rec,$msg)=$self->getNext();
-#      } until(!defined($rec));
-#   }
-#   return(@res);
-#}
-         
 
 
 sub isViewValid
@@ -328,33 +290,49 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
    my $self=shift;
    my @res=();
 
-   $self->SetCurrentView(qw(name systemid instpkgsoftware));
+   $self->SetCurrentView(qw(systemname systemid instpkgsoftware));
 
    my ($rec,$msg)=$self->getFirst();
    if (defined($rec)){
       do{
-#         my %e=(
-#            section=>'SYSTEMNAME',
-#            scanname=>$rec->{name}, 
-#            quality=>-50     # relativ schlecht verlässlich
-#         );
-#         push(@res,\%e);
+
+         #####################################################################
+         #my %e=(
+         #   section=>'SYSTEMNAME',
+         #   scanname=>$rec->{systemname}, 
+         #   quality=>-50,    # relativ schlecht verlässlich
+         #   processable=>1,
+         #   forcesysteminst=>1  # MUSS System zugeordnet sein
+         #);
+         #push(@res,\%e);
+         #####################################################################
+
+
+
+
          foreach my $s (@{$rec->{instpkgsoftware}}){
             # at this point, there can be nativ scandata be patched to correct
             # scan informations!  
+            my $version=$s->{fullversion};
+            $version=~s/-.*$//;  # remove package version
             my %e=(
                section=>'SOFTWARE',
                scanname=>$s->{software},
-               scanextra2=>$s->{fullversion},
-               quality=>3,    # relativ schlecht (keine gute Version)
+               scanextra2=>$version,
+               quality=>2,    # schlechter als AM
                processable=>1,
                backendload=>$s->{scandate},
-               autodischint=>$rec->{srcsys}.": ".$rec->{id}.
+               autodischint=>$self->Self.": ".$rec->{id}.
                              ": ".$rec->{systemid}.
                              ": ".$rec->{name}.":SOFTWARE :".$s->{id}.": ".
                              $s->{software}
-                             
             );
+            # Flexera Agent ist immer Hostbasiert installiert.
+            if ($s->{software}=~m/^FlexNet Inventory Agent/i){
+               $e{forcesysteminst}=1;
+               $e{allowautoremove}=1;
+               $e{quality}=100;  #flexera weiss am besten über flexera bescheid
+            }
             push(@res,\%e);
          }
 #         foreach my $s (@{$rec->{ipaddresses}}){

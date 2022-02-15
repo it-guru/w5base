@@ -75,6 +75,13 @@ sub new
                 label         =>'processable',
                 dataobjattr   =>'autodiscrec.cleartoprocess'),
                                                   
+      new kernel::Field::Boolean(
+                name          =>'forcesysteminst',
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'force system installed',
+                dataobjattr   =>'autodiscrec.forcesysteminst'),
+                                                  
       new kernel::Field::Text(
                 name          =>'scanname',
                 sqlorder      =>'desc',
@@ -205,6 +212,11 @@ sub new
                 name          =>'sec_sys_databossid',
                 noselect      =>'1',
                 dataobjattr   =>'system.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'allowifupdate',
+                dataobjattr   =>'if (system.allowifupdate is not null,'.
+                                'system.allowifupdate,0)'),
 
       new kernel::Field::Link(
                 name          =>'sec_sys_cistatusid',
@@ -358,6 +370,7 @@ sub Validate
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
+
 
 
    if (effChanged($oldrec,$newrec,"state")){   # statuswechsel auf
@@ -600,6 +613,66 @@ sub doTakeAutoDiscData
 }
 
 
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   my $id;
+   my $atInsert=0;
+   if (!defined($oldrec)){
+      $id=$newrec->{id};
+      $atInsert=1;
+   }
+   else{
+      $id=$oldrec->{id};
+   }
+   my $state=effVal($oldrec,$newrec,"state");
+   my $processable=effVal($oldrec,$newrec,"processable");
+   my $allowifupdate=effVal($oldrec,$newrec,"allowifupdate");
+
+   if ($id ne "" && 
+       ($state eq "1" || $state eq "") && $processable eq "1"){
+      my $opobj=$self->Clone();
+      $opobj->SetFilter({id=>\$id});
+      my ($rec)=$opobj->getOnlyFirst(qw(ALL)) ;
+      if ($rec->{state} eq "1" && $rec->{allowifupdate}){
+         my $admap=$self->getPersistentModuleObject("amap",'itil::autodiscmap');
+         $admap->SetFilter({engineid=>\$rec->{engineid},
+                            scanname=>"\"".$rec->{scanname}."\""});
+         my @admap=$admap->getHashList(qw(probability
+                                    software scanname
+                                    softwareid engineid));
+         if ($#admap==0){
+            my $systemid=$rec->{lnkto_system};
+            my $softwareid=$admap[0]->{softwareid};
+            
+            my $lnksw=$self->getPersistentModuleObject("lnksw",
+                                                   'itil::lnksoftwaresystem');
+            $lnksw->SetFilter({systemid=>\$systemid,
+                               softwareid=>\$softwareid});
+            my @cursw=$lnksw->getHashList(qw(ALL));
+            if ($#cursw==-1){
+               printf STDERR ("new ins of softwareinst OK\n");
+               # doTakeAutoDiscData muss auch da rein
+
+
+            }
+            if ($#cursw==0){
+               printf STDERR ("update and link of softwareins OK\n");
+               # doTakeAutoDiscData muss auch da rein
+
+
+
+            }
+         }
+      }
+
+   }
+}
+
+
 sub AutoDiscFormatEntry
 {
    my $self=shift;
@@ -803,52 +876,54 @@ sub AutoDiscFormatEntry
                }
             }
          }
-
          my @clustsvc;
-         if ($rec->{isclusternode} && $rec->{itclustid} ne "") {
-            my $s=getModuleObject($self->Config,'itil::lnkitclustsvc');
-            $s->SetFilter({clustid=>\$rec->{itclustid}});
-            @clustsvc=$s->getHashList(qw(fullname id));
-
-            if ($#clustsvc!=-1) {
-               $d.="<option value=''></option>";
-               $d.="<option value='newClustInst'>".
-                    $self->T('new software installation on Cluster-Services').
-                   "</option>";
-               my $oldparent=undef;
-               foreach my $swi (sort({
-                                $control->{software}->{byid}->{$a}->{fullname}
-                                 <=>
-                                $control->{software}->{byid}->{$b}->{fullname} 
-                                } keys(%{$control->{software}->{byid}}))){
-                  if ($control->{software}->{byid}->{$swi}->{typ} eq "clust"){
-                     my $foundmap=0;
-                     foreach my $me (@{$control->{admap}}){
-                        if ($adrec->{engineid} eq $me->{engineid} &&
-                            $adrec->{scanname} eq $me->{scanname} &&
-                            $control->{software}->{byid}
-                               ->{$swi}->{softwareid} eq $me->{softwareid}){
-                           $foundmap++;
-                        }
-                     }
-                     if ($foundmap){
-                        if ($oldparent ne 
-                            $control->{software}->{byid}->{$swi}->{parent}){
-                           if ($oldparent ne ""){
-                              $d.="</optgroup>";
+         if (!($adrec->{forcesysteminst})){
+            if ($rec->{isclusternode} && $rec->{itclustid} ne "") {
+               my $s=getModuleObject($self->Config,'itil::lnkitclustsvc');
+               $s->SetFilter({clustid=>\$rec->{itclustid}});
+               @clustsvc=$s->getHashList(qw(fullname id));
+           
+               if ($#clustsvc!=-1) {
+                  $d.="<option value=''></option>";
+                  $d.="<option value='newClustInst'>".
+                     $self->T('new software installation on Cluster-Services').
+                     "</option>";
+                  my $oldparent=undef;
+                  foreach my $swi (sort({
+                                 $control->{software}->{byid}->{$a}->{fullname}
+                                  <=>
+                                 $control->{software}->{byid}->{$b}->{fullname} 
+                              } keys(%{$control->{software}->{byid}}))){
+                     if ($control->{software}->{byid}->{$swi}->{typ} 
+                         eq "clust"){
+                        my $foundmap=0;
+                        foreach my $me (@{$control->{admap}}){
+                           if ($adrec->{engineid} eq $me->{engineid} &&
+                               $adrec->{scanname} eq $me->{scanname} &&
+                               $control->{software}->{byid}
+                                  ->{$swi}->{softwareid} eq $me->{softwareid}){
+                              $foundmap++;
                            }
-                           $oldparent=
-                            $control->{software}->{byid}->{$swi}->{parent};
-                           $d.="<optgroup label=\"".$oldparent."\">";
                         }
-                        $d.="<option value='$swi'>".
-                            $control->{software}->{byid}->{$swi}->{fullname}.
-                            "</option>";
+                        if ($foundmap){
+                           if ($oldparent ne 
+                               $control->{software}->{byid}->{$swi}->{parent}){
+                              if ($oldparent ne ""){
+                                 $d.="</optgroup>";
+                              }
+                              $oldparent=
+                               $control->{software}->{byid}->{$swi}->{parent};
+                              $d.="<optgroup label=\"".$oldparent."\">";
+                           }
+                           $d.="<option value='$swi'>".
+                               $control->{software}->{byid}->{$swi}->{fullname}.
+                               "</option>";
+                        }
                      }
                   }
-               }
-               if ($oldparent ne ""){
-                  $d.="</optgroup>";
+                  if ($oldparent ne ""){
+                     $d.="</optgroup>";
+                  }
                }
             }
          }

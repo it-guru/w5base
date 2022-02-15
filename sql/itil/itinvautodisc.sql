@@ -116,3 +116,4 @@ create table autodiscmap (
 #              REFERENCES hwmodel (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
+alter table autodiscrec add forcesysteminst int(0) default '0';
