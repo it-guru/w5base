@@ -185,6 +185,7 @@ sub qcheckRecord
       foreach my $r ($ad->getHashList(qw(ALL))){
          $oldrecs{$r->{id}}={
             state=>$r->{state},
+            srcload=>$r->{srcload},
             misscount=>$r->{misscount},
             scanextra1=>$r->{scanextra1},
             scanextra2=>$r->{scanextra2},
@@ -212,11 +213,18 @@ sub qcheckRecord
       #printf STDERR ("oldrecs=%s\n",Dumper(\%oldrecs));
 
       foreach my $id (keys(%oldrecs)){
-         if ($oldrecs{$id}->{misscount}>2){
+         if ($oldrecs{$id}->{misscount}>3){
             $ad->BulkDeleteRecord({id=>\$id});
          }
          else{
-            $ad->UpdateRecord({misscount=>\'misscount+1'},{id=>\$id});
+            # add misscount only, if last misscount mod is longer
+            # then x hours ago (prevent multiple QualityChecks in Frontend 
+            # as fast misscount up counting)
+            $ad->UpdateRecord({misscount=>\'misscount+1',
+                               mdate=>NowStamp("en"),
+                               srcload=>$oldrecs{$id}->{srcload}},
+                              {id=>\$id,
+                               mdate=>"<now-1h"});
          }
       }
 
