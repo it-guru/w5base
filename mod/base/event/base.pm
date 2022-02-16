@@ -36,8 +36,23 @@ sub Init
    my $self=shift;
 
    $self->RegisterEvent("UserVerified",\&UserVerified,timeout=>300);
+   $self->RegisterEvent("TableVersionCheck",\&TableVersionCheck,timeout=>300);
    return(1);
 }
+
+sub TableVersionCheck
+{
+   my $self=shift;
+
+   my $ob=getModuleObject($self->Config,"base::menu");
+
+   $ob->TableVersionCheck();
+
+
+
+   return({msg=>'OK',exitcode=>0});
+}
+
 
 sub UserVerified
 {
