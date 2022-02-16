@@ -494,6 +494,10 @@ sub doTakeAutoDiscData
                   ($exitmsg)=$swi->LastMsg();
                }
             }
+            else{
+               $exitcode=200;
+               $exitmsg="no softwareid selection";
+            }
          }
          elsif ($mapsel eq "newClustInst"){
             my $swi=getModuleObject($self->Config,
@@ -632,7 +636,7 @@ sub FinishWrite
    my $processable=effVal($oldrec,$newrec,"processable");
    my $allowifupdate=effVal($oldrec,$newrec,"allowifupdate");
 
-   if ($id ne "" && 
+   if ($id ne "" && $atInsert &&
        ($state eq "1" || $state eq "") && $processable eq "1"){
       my $opobj=$self->Clone();
       $opobj->SetFilter({id=>\$id});
@@ -654,17 +658,34 @@ sub FinishWrite
                                softwareid=>\$softwareid});
             my @cursw=$lnksw->getHashList(qw(ALL));
             if ($#cursw==-1){
-               printf STDERR ("new ins of softwareinst OK\n");
-               # doTakeAutoDiscData muss auch da rein
-
-
+               msg(INFO,"try take AutoDisc Data $rec->{id} insert to software ".
+                        "installation");
+               my ($exitcode,$exitmsg)=$opobj->doTakeAutoDiscData($rec,{
+                     state=>20
+                  },
+                  { lnkto_lnksoftware=>'newSysInst',
+                    softwareid=>$softwareid }
+               );
+               if ($exitcode!=0){
+                  msg(ERROR,"fail to take (ins) AutoDisc Data ".
+                            "autodiscrecid=$rec->{id}");
+                  msg(ERROR,"exitmsg=$exitmsg");
+               }
             }
             if ($#cursw==0){
-               printf STDERR ("update and link of softwareins OK\n");
-               # doTakeAutoDiscData muss auch da rein
-
-
-
+               my $lnksoftwareid=$cursw[0]->{id};
+               msg(INFO,"try take AutoDisc Data $rec->{id} link to software ".
+                        "installation $lnksoftwareid");
+               my ($exitcode,$exitmsg)=$opobj->doTakeAutoDiscData($rec,{
+                     state=>20
+                  },
+                  { lnkto_lnksoftware=>$lnksoftwareid }
+               );
+               if ($exitcode!=0){
+                  msg(ERROR,"fail to take (link) AutoDisc Data ".
+                            "autodiscrecid=$rec->{id}");
+                  msg(ERROR,"exitmsg=$exitmsg");
+               }
             }
          }
       }
