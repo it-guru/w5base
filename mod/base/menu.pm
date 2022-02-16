@@ -395,6 +395,8 @@ sub isAnonymousAccessValid
 sub TableVersionModifications
 {
    my $self=shift;
+   my $unattented=shift;
+
    my $buttons=
       "<input type=submit name=set value=\" force processed pointer values \">".
       "<input type=submit name=display ".
@@ -435,7 +437,8 @@ sub TableVersionModifications
       my $rec=$c{$sqlfile};
       my $bk=1;
       if (Query->Param("do") || Query->Param("set") ||
-          $self->Config->Param("W5BaseOperationMode") eq "test"){
+          $self->Config->Param("W5BaseOperationMode") eq "test" ||
+          $unattented ne ""){
          next if (!defined($rec->{dataobj}));
          my $mode="auto";
          $mode="procced" if (Query->Param("do"));
@@ -476,19 +479,22 @@ sub TableVersionModifications
    if ((Query->Param("do") || $automodify) && $errorcount==0){
       $buttons="<input type=submit value=\" OK \">";
    }
-   return(1) if ($errorcount==0 && $automodify);
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(form=>1,body=>1);
-   print $self->getParsedTemplate("tmpl/TableVersionModifications",{
-                                   static=>{
-                                       BUTTONS=>$buttons,
-                                       OPERATIONS=>$op,
-                                       LOGHEAD=>"",
-                                           LOG=>"",
-                                      LOGSTYLE=>""}
-                                  });
-   print $self->HtmlBottom(form=>1,body=>1);
-   return(undef);
+   if ($unattented eq ""){
+      return(1) if ($errorcount==0 && $automodify);
+      print $self->HttpHeader("text/html");
+      print $self->HtmlHeader(form=>1,body=>1);
+      print $self->getParsedTemplate("tmpl/TableVersionModifications",{
+                                      static=>{
+                                          BUTTONS=>$buttons,
+                                          OPERATIONS=>$op,
+                                          LOGHEAD=>"",
+                                              LOG=>"",
+                                         LOGSTYLE=>""}
+                                     });
+      print $self->HtmlBottom(form=>1,body=>1);
+      return(undef);
+   }
+   return(1);
 }
 
 sub TableVersionCreate
@@ -558,6 +564,23 @@ sub TableVersionValidate
       return(0);
    }
    return(1);
+}
+
+#
+# TableVersionCheck
+#
+sub TableVersionCheck
+{
+   my $self=shift;
+   msg(INFO,"automatic and unattended TableVersionCheck");
+
+   my $db=$self->InitTableVersionChecker();
+   if (!$self->TableVersionExists()){
+      $self->TableVersionCreate();
+   }
+   if ($self->TableVersionIsInconsistent()){
+      return($self->TableVersionModifications("unattended"));
+   }
 }
 
 #
