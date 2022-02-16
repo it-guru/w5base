@@ -39,6 +39,8 @@ sub new
                 group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'autodiscrec.id'),
+
+      new kernel::Field::RecordUrl(),
                                                   
       new kernel::Field::TextDrop(
                 name          =>'entry',
@@ -46,6 +48,16 @@ sub new
                 vjointo       =>'itil::autodiscent',
                 vjoinon       =>['entryid'=>'id'],
                 vjoindisp     =>'id'),
+                                                  
+      new kernel::Field::Link(
+                name          =>'fullname',
+                sqlorder      =>'desc',
+                group         =>'source',
+                label         =>'Fullname',
+                dataobjattr   =>"concat(autodiscrec.srcsys,'-',".
+                                "autodiscrec.section,'-',".
+                                "autodiscrec.scanname".
+                                ")"),
                                                   
       new kernel::Field::Link(
                 name          =>'entryid',
@@ -57,28 +69,28 @@ sub new
       new kernel::Field::Text(
                 name          =>'section',
                 sqlorder      =>'desc',
-                group         =>'source',
+                group         =>'state',
                 label         =>'Section',
                 dataobjattr   =>'autodiscrec.section'),
                                                   
       new kernel::Field::Text(
                 name          =>'state',
                 sqlorder      =>'desc',
-                group         =>'source',
+                group         =>'state',
                 label         =>'StateID',   # 1=erfasst ; 10= 1x  ; 20=auto; 100=fail
                 dataobjattr   =>'autodiscrec.state'),
 
       new kernel::Field::Boolean(
                 name          =>'processable',
                 sqlorder      =>'desc',
-                group         =>'source',
+                group         =>'state',
                 label         =>'processable',
                 dataobjattr   =>'autodiscrec.cleartoprocess'),
                                                   
       new kernel::Field::Boolean(
                 name          =>'forcesysteminst',
                 sqlorder      =>'desc',
-                group         =>'source',
+                group         =>'state',
                 label         =>'force system installed',
                 dataobjattr   =>'autodiscrec.forcesysteminst'),
                                                   
@@ -138,7 +150,7 @@ sub new
                 name          =>'misscount',
                 sqlorder      =>'desc',
                 precision     =>0,
-                group         =>'source',
+                group         =>'state',
                 label         =>'Miss count',
                 dataobjattr   =>'autodiscrec.misscount'),
 
@@ -339,7 +351,7 @@ sub isCopyValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default autoimport source));
+   return(qw(header default state autoimport source));
 }
 
 
@@ -347,7 +359,7 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","autoimport") if ($self->IsMemberOf("admin"));
+   return("default","autoimport","state") if ($self->IsMemberOf("admin"));
    return(undef);
 }
 

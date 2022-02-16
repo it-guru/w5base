@@ -39,7 +39,9 @@ sub new
                 group         =>'source',
                 label         =>'W5BaseID',
                 dataobjattr   =>'autodiscmap.id'),
-                                                  
+
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::TextDrop(
                 name          =>'engine',
                 htmlwidth     =>'200px',
@@ -87,9 +89,6 @@ sub new
                                  '9'],
                 sqlorder      =>'desc',
                 dataobjattr   =>'autodiscmap.probability'),
-
-
-                                                  
                                                   
       new kernel::Field::CDate(
                 name          =>'cdate',
@@ -105,9 +104,41 @@ sub new
                 label         =>'Update-Date',
                 dataobjattr   =>'autodiscmap.modifydate'),
 
+      new kernel::Field::Creator(
+                name          =>'creator',
+                group         =>'source',
+                label         =>'Creator',
+                dataobjattr   =>'autodiscmap.createuser'),
+
+      new kernel::Field::Owner(
+                name          =>'owner',
+                group         =>'source',
+                label         =>'last Editor',
+                dataobjattr   =>'autodiscmap.modifyuser'),
+
+      new kernel::Field::Editor(
+                name          =>'editor',
+                group         =>'source',
+                label         =>'Editor Account',
+                dataobjattr   =>'autodiscmap.editor'),
+
+      new kernel::Field::RealEditor(
+                name          =>'realeditor',
+                group         =>'source',
+                label         =>'real Editor Account',
+                dataobjattr   =>'autodiscmap.realeditor'),
    );
    $self->setDefaultView(qw(engine scanname software probability mdate));
    $self->setWorktable("autodiscmap");
+   $self->{history}={
+      delete=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ]
+   };
+
    return($self);
 }
 
