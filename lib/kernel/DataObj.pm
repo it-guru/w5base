@@ -5220,7 +5220,7 @@ sub DoRESTcall
    }
    else{
       my $statusline=$response->status_line;
-      $reqtrace.="Response:\n$code $statusline\n";
+      $reqtrace.="Response (".NowStamp("en")." UTC):\n$code $statusline\n";
       if ($response->decoded_content ne ""){
          $reqtrace.=$response->decoded_content."\n";
       }
