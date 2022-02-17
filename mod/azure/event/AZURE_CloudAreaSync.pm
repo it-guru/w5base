@@ -144,6 +144,10 @@ sub AZURE_CloudAreaSync
          my $msg="not enough projects (min. 6) found in Azure (got $n) - ".
                  "sync abborted";
          msg(ERROR,$msg);
+         foreach my $rec (@ss){
+            printf STDERR ("got only subscriptionId %s\n",
+                   $rec->{subscriptionId})
+         }
          return({exitcode=>1,exitmsg=>$msg});
       }
 
