@@ -95,7 +95,7 @@ sub qcheckRecord
    if ($rec->{cistatusid}>5){
       my $d=CalcDateDuration(NowStamp("en"),$rec->{mdate});
       if ($d->{days}<-14){
-         $dropAllCerts=0;
+         $dropAllCerts=1;
       }
    }
 
