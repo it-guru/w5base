@@ -233,7 +233,7 @@ sub DataCollector
                 $_->{UCinstanceUUID}=uc($_->{customProperties}->{instanceUUID});
              }
              $_->{genname}=$_->{name};
-             $_->{name}=~s/-mcm[0-9]{3,10}-[0-9]{3,20}$//;
+             #$_->{name}=~s/-mcm[0-9]{3,10}-[0-9]{3,20}$//;
              if (ref($_->{tags}) eq "ARRAY"){
                 my %h;
                 foreach my $rec (@{$_->{tags}}){
