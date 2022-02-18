@@ -61,6 +61,10 @@ sub new
                 label         =>'Name'),
 
       new kernel::Field::Text(
+                name          =>'status',
+                label         =>'Status'),
+
+      new kernel::Field::Text(
                 name          =>'accountid',
                 FieldHelpType =>'GenericConstant',
                 label         =>'AWS-AccountID'),
@@ -193,6 +197,7 @@ sub DataCollector
                foreach my $instance (@{$res->Instances}){
                   #p $instance;
                   msg(INFO,"load instance $instance->{InstanceId}");
+
                   my $cdate=$instance->{LaunchTime};
                   $cdate=~s/^(\S+)T(\S+).000Z$/$1 $2/;
                   my %tag;
@@ -212,6 +217,22 @@ sub DataCollector
                               $AWSAccount.'@'.
                               $AWSRegion,
                   };
+                  if (in_array(\@view,"status")){
+                     my $status="unknown";
+                     my $DIRes =
+                         $ec2->DescribeInstanceStatus(
+                           'IncludeAllInstances'=>1,
+                           'InstanceIds'=>[$instance->{InstanceId}]
+                     );
+                     my $InstanceStatuses=$DIRes->InstanceStatuses;
+                     if ($InstanceStatuses){
+                        foreach my $strec (@$InstanceStatuses){
+                           my $sysst=$strec->SystemStatus();
+                           $status=$sysst->Status();
+                        }
+                     }
+                     $rec->{status}=$status;
+                  }
                   if (in_array(\@view,"azone") ||
                       in_array(\@view,"azoneid")){
                      my $placement=$instance->Placement();
