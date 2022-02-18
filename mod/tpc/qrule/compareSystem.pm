@@ -128,6 +128,57 @@ sub qcheckRecord
                'set system CI-Status to disposed of waste due missing on TPC');
          }
          else{
+            if ($parrec->{ismcos}){
+               # ok, this record should be transfered to srcsys=AssetManager
+               # because for MCOS always AssetManager(TSI) is datamaster
+               my $instanceUUID=uc($parrec->{instanceUUID});
+               my $acsys=getModuleObject($self->getParent->Config,
+                         "tsacinv::system");
+               if (defined($acsys) && $acsys->Ping()){
+                  $acsys->SetFilter({
+                     srcid=>\$instanceUUID,
+                     srcsys=>\'MCOS_FCI',
+                     deleted=>\'0'
+                  });
+                  my @as=$acsys->getHashList(qw(systemid name srcsys srcid));
+                  if ($#as==0){
+                     my $amrec=$as[0];
+                     #
+                     # Validate posibility of srcsys transfer
+                     #
+                     my $systemid=$amrec->{systemid};
+                     my $name=$amrec->{name};
+                     $systemid=~s/[^a-z0-9_-]//gi;
+                     $name=~s/[^a-z0-9_-]//gi;
+                     $dataobj->SetFilter([
+                        {systemid=>$systemid},
+                        {name=>$name},
+                     ]);
+                     my @chkl=$dataobj->getHashList(qw(id));
+                     if ($#chkl!=-1){
+                        msg(ERROR,"MCOS transfer error for $rec->{id}");
+                     }
+                     else{
+                        $forcedupd->{srcsys}='AssetManager';
+                        $forcedupd->{systemid}=$amrec->{systemid};
+                        my $m="MCOS transfer record to AssetManager datamaster";
+                        push(@qmsg,$m);
+                     }
+                  }
+                  else{
+                     my $u="";
+                     if ($#as!=-1){
+                        $u="unique ";
+                     }
+                     my $m="MCOS System not ${u}identifiable in AssetManager";
+                     push(@qmsg,$m);
+                  }
+               }
+            }
+
+
+
+
             my @sysname=();
             my $sysname=lc($parrec->{name});
             $sysname=~s/\s/_/g;
