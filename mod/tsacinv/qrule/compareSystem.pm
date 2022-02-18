@@ -115,6 +115,10 @@ sub qcheckRecord
    #
    # Level 0
    #
+   # Achtung: Die Referenz auf AssetManager ist IMMER die SystemID. In srcid
+   #          ist i.d.R. die SystemID - es sei den es ist MCOS, dann ist in
+   #          srcid (W5Base) die srcid aus AssetManager (also die MCOS vmid)
+   #
    if ($rec->{systemid} ne ""){   # pruefen ob SYSTEMID von AssetManager
       $par->SetFilter({systemid=>\$rec->{systemid},
                        status=>'"!out of operation"',
@@ -187,8 +191,12 @@ sub qcheckRecord
             $forcedupd->{srcsys}="AssetManager";
             $forcedupd->{allowifupdate}="1";  # Beim Switch auf AssetManager
          }                                    # AutoUpdate auf Ja
-         if ($rec->{srcid} ne $parrec->{systemid}){
-            $forcedupd->{srcid}=$parrec->{systemid};
+         if ($parrec->{srcsys} ne "MCOS_FCI"){  # on MCOS Systems the srcid
+                                                # comes from TPC interface
+                                                # vmid from vRA tpc::system
+            if ($rec->{srcid} ne $parrec->{systemid}){
+               $forcedupd->{srcid}=$parrec->{systemid};
+            }
          }
          $forcedupd->{srcload}=NowStamp("en");
       }

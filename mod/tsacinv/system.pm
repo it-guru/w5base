@@ -787,8 +787,8 @@ sub new
                 label         =>'Source-System',
                 dataobjattr   =>'system."srcsys"'),
 
-      new kernel::Field::Text(
-                name          =>'srcid',
+      new kernel::Field::Text(                 
+                name          =>'srcid',       
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'system."srcid"'),
@@ -1178,7 +1178,7 @@ sub Import
    $self->ResetFilter();
    $self->SetFilter($flt);
    my @l=$self->getHashList(qw(systemid systemname lassignmentid status usage
-                               assetid));
+                               assetid srcsys));
    if ($#l==-1){
       $self->LastMsg(ERROR,"SystemID not found in AssetManager");
       return(undef);
@@ -1228,6 +1228,12 @@ sub Import
          $self->LastMsg(ERROR,"invoice systems are not allowed to import");
          return(undef);
       }
+      # check 0.1: srcsys
+      if ($sysrec->{srcsys}=~m/MCOS_FCI/){
+         $self->LastMsg(ERROR,"MCOS FCI systems are not allowed to import");
+         return(undef);
+      }
+    
       # check 1: Assigmenen Group registered
       if ($sysrec->{lassignmentid} eq ""){
          $self->LastMsg(ERROR,"SystemID has no Assignment Group");

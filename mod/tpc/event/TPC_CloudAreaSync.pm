@@ -287,7 +287,10 @@ sub TPC_CloudAreaSync
                                                 name));
          if (defined($mrec)){
             $sys->ResetFilter();
-            $sys->SetFilter({srcsys=>\'TPC',srcid=>\$mrec->{id}});
+            $sys->SetFilter([
+               {srcsys=>\'TPC',srcid=>\$mrec->{id}},
+               {srcsys=>\'AssetManager',srcid=>\$mrec->{id}},  # MCOS case
+            ]);
             my ($srec,$msg)=$sys->getOnlyFirst(qw(id cistatusid));
             if (!defined($srec)){
                # run import

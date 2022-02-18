@@ -125,12 +125,12 @@ sub qcheckRecord
             srcid=>[keys(%srcid)]
          },
          {
-            srcsys=>'TPC',
+            srcsys=>['TPC','AssetManager'],   # AssetManager because MCOS!
             itcloudareaid=>$rec->{id},
             cistatusid=>"<6"
          }]
       );
-      my @cursys=$sys->getHashList(qw(id srcid cistatusid));
+      my @cursys=$sys->getHashList(qw(id srcid srcsys cistatusid));
 
       my @delsys;
       my @inssys;
