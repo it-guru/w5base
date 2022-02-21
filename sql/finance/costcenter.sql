@@ -64,3 +64,4 @@ alter table costcenter add itsemteam  bigint(20)  default NULL;
 alter table costcenter add lastqcheck datetime default NULL,add key(lastqcheck);
 alter table costcenter add costcentertype char(20) not NULL,add key(costcentertype);
 alter table costcenter  add allowifupdate int(2) default 0;
+alter table costcenter add itseminbox  bigint(20)  default NULL;

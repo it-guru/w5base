@@ -56,6 +56,7 @@ sub new
    my $doclabel=$self->{doclabel};
    my $haveitsemexp="costcenter.itsem is not null ".
                     "or costcenter.itsemteam is not null ".
+                    "or costcenter.itseminbox is not null ".
                     "or costcenter.itsem2 is not null";
 
    $self->AddFields(

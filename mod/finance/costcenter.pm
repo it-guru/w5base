@@ -218,6 +218,24 @@ sub new
                 group         =>'itsem',
                 dataobjattr   =>'costcenter.itsem2'),
 
+      new kernel::Field::Contact(
+                name          =>'itseminbox',
+                group         =>'itsem',
+                label         =>'IT Servicemanagement Inbox',
+                AllowEmpty    =>1,
+                vjointo       =>'base::user',
+                vjoineditbase =>{
+                                   cistatusid=>[3,4,5],
+                                   usertyp=>\'function'
+                                },
+                vjoinon       =>['itseminboxid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'itseminboxid',
+                group         =>'itsem',
+                dataobjattr   =>'costcenter.itseminbox'),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',

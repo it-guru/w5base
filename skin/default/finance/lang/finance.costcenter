@@ -22,6 +22,7 @@
 'you are not authorized to set other persons as databoss'=>{de=>'Sie sind nicht berechtig, andere Personen als Datenverantwortlichen zu bennen'},
 'IT Servicemanagement an delivery management can not exist concurrently'=>{de=>'IT Servicemanagement und Delivery Management können nicht gleichzeit existieren'},
 'Deputy IT Servicemanager'=>{de=>'IT Servicemanager Vertreter'},
+'IT Servicemanagement Inbox'=>{de=>'IT Servicemanagement Eingangs-Postfach'},
 'invalid cost element specified'=>{de=>'ungültig Kontierungsobjekt Bezeichnung'},
 'specifing debuty only is not allowed'=>{de=>'die alleinige Angabe des Vertreters ist nicht erlaubt'},
 
