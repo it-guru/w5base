@@ -70,7 +70,7 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   if ($rec->{cistatusid}==4){
+   if ($rec->{cistatusid}<6 && $rec->{cistatusid}>2){
       if ($rec->{lastexternalseen} ne ""){
          my $lseen=$rec->{lastexternalseen};
          my $llogon=$rec->{lastlogon};
@@ -86,9 +86,11 @@ sub qcheckRecord
                if ($llogon eq ""){  # ok, cleanup
                   my $o=$dataobj->Clone();
                   $o->ValidatedUpdateRecord($rec,{
-                     cistatusid=>6,mdate=>NowStamp("en")
-                  },{userid=>\$rec->{userid}
+                        lastexternalseen=>'',
+                        cistatusid=>6,mdate=>NowStamp("en")
+                     },{userid=>\$rec->{userid}
                   });
+                  push(@qmsg,"deactivating contact entry");
                }
                else{               # error, logons without external ok
                   $dataobj->Log(ERROR,"basedata",
@@ -104,6 +106,12 @@ sub qcheckRecord
              print STDERR Dumper($rec);
          }
       }
+      else{
+         push(@qmsg,"contact never has been seen");
+      }
+   }
+   else{
+      return(undef,undef);
    }
    my @result=$self->HandleQRuleResults("None",
                  $dataobj,$rec,$checksession,
