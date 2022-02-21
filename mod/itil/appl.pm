@@ -40,6 +40,7 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    my $haveitsemexp="costcenter.itsem is not null ".
                     "or costcenter.itsemteam is not null ".
+                    "or costcenter.itseminbox is not null ".
                     "or costcenter.itsem2 is not null";
 
    $self->AddFields(
@@ -200,7 +201,9 @@ sub new
                    my %param=@_;
                    if (defined($param{current}) &&
                        $param{current}->{haveitsem}){
-                      return(1);
+                      if ($param{current}->{rawitseminboxid} eq ""){
+                         return(1);
+                      }
                    }
                    return(0);
                 },
@@ -216,6 +219,41 @@ sub new
                 dataobjattr   =>'costcenter.itsemteam'),
 
       new kernel::Field::TextDrop(
+                name          =>'itseminbox',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (defined($param{current}) &&
+                       $param{current}->{haveitsem}){
+                      if ($param{current}->{rawitseminboxid} ne ""){
+                         return(1);
+                      }
+                   }
+                   return(0);
+                },
+                group         =>'itsem',
+                readonly      =>1,
+                translation   =>'finance::costcenter',
+                label         =>'IT Servicemanagement Inbox',
+                vjointo       =>'base::user',
+                vjoinon       =>['itseminboxid'=>'userid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Interface(
+                name          =>'itseminboxid',
+                group         =>'itsem',
+                selectfix     =>1,
+                dataobjattr   =>"if (costcenter.itseminbox is null,".
+                                "costcenter.itsem,costcenter.itseminbox)"),
+
+      new kernel::Field::Interface(
+                name          =>'rawitseminboxid',
+                group         =>'itsem',
+                selectfix     =>1,
+                dataobjattr   =>"costcenter.itseminbox"),
+
+      new kernel::Field::TextDrop(
                 name          =>'itsem',
                 htmldetail    =>sub{
                    my $self=shift;
@@ -223,7 +261,9 @@ sub new
                    my %param=@_;
                    if (defined($param{current}) &&
                        $param{current}->{haveitsem}){
-                      return(1);
+                      if ($param{current}->{rawitseminboxid} eq ""){
+                         return(1);
+                      }
                    }
                    return(0);
                 },
@@ -253,7 +293,9 @@ sub new
                    my %param=@_;
                    if (defined($param{current}) &&
                        $param{current}->{haveitsem}){
-                      return(1);
+                      if ($param{current}->{rawitseminboxid} eq ""){
+                         return(1);
+                      }
                    }
                    return(0);
                 },
@@ -338,7 +380,9 @@ sub new
                 name          =>'semid',
                 wrdataobjattr =>'appl.sem',
                 dataobjattr   =>"if ($haveitsemexp,".
-                                "costcenter.itsem,appl.sem)"),
+                                "if (costcenter.itseminbox is not null,".
+                                    "costcenter.itseminbox,costcenter.itsem),".
+                                "appl.sem)"),
 
       new kernel::Field::Group(
                 name          =>'businessteam',
@@ -718,13 +762,17 @@ sub new
                 name          =>'delmgrid',
                 readonly      =>1,
                 dataobjattr   =>"if ($haveitsemexp,".
-                                "costcenter.itsem,costcenter.delmgr)"),
+                                "if (costcenter.itseminbox is not null,".
+                                    "costcenter.itseminbox,costcenter.itsem),".
+                                "costcenter.delmgr)"),
 
       new kernel::Field::Link(
                 name          =>'delmgr2id',
                 readonly      =>1,
                 dataobjattr   =>"if ($haveitsemexp,".
-                                "costcenter.itsem2,costcenter.delmgr2)"),
+                                "if (costcenter.itseminbox is not null,".
+                                    "costcenter.itseminbox,costcenter.itsem2),".
+                                "costcenter.delmgr2)"),
 
       new kernel::Field::Link(
                 name          =>'haveitsem',
@@ -765,7 +813,9 @@ sub new
       new itil::appl::Link(
                 name          =>'sem2id',
                 dataobjattr   =>"if ($haveitsemexp,".
-                                "costcenter.itsem2,appl.sem2)",
+                                "if (costcenter.itseminbox is not null,".
+                                    "costcenter.itseminbox,costcenter.itsem2),".
+                                "appl.sem2)",
                 wrdataobjattr =>'appl.sem2'),
 
 

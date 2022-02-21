@@ -32,6 +32,7 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
    my $haveitsemexp="costcenter.itsem is not null ".
                     "or costcenter.itsemteam is not null ".
+                    "or costcenter.itsemitsem is not null ".
                     "or costcenter.itsem2 is not null";
 
 
