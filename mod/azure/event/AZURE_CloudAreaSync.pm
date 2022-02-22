@@ -145,7 +145,7 @@ sub AZURE_CloudAreaSync
                  "sync abborted";
          msg(ERROR,$msg);
          foreach my $rec (@ss){
-            printf STDERR ("got only subscriptionId %s\n",
+            printf STDERR ("ERROR: got only subscriptionId %s\n",
                    $rec->{subscriptionId})
          }
          return({exitcode=>1,exitmsg=>$msg});
