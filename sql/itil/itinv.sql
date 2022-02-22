@@ -1838,3 +1838,4 @@ create table lnkapplappltag (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table asset add plandecons datetime default NULL;
+alter table accessurl add ssl_certissuerdn varchar(256) default null;
