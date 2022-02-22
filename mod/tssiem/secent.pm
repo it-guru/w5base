@@ -836,6 +836,9 @@ sub sslparsew5baseref
    my $wal=$self->getParent->getPersistentModuleObject("w5wal",
                                                        "itil::applwallet");
 
+   my $url=$self->getParent->getPersistentModuleObject("w5wal",
+                                                       "itil::lnkapplurl");
+
 
    $swi->SetFilter({
       ssl_cert_issuerdn=>'"'.$issuer.'"',
@@ -856,6 +859,20 @@ sub sslparsew5baseref
    if (defined($walrec)){
       return($walrec->{urlofcurrentrec});
    }
+
+
+   $url->SetFilter({
+      ssl_cert_issuerdn=>'"'.$issuer.'"',
+      ssl_cert_serialno=>'"'.$serial.'"'
+   });
+   my ($urlrec,$msg)=$url->getOnlyFirst(qw(urlofcurrentrec));
+   if (defined($urlrec)){
+      return($urlrec->{urlofcurrentrec});
+   }
+
+
+
+
    return(undef);
 }
 

@@ -296,13 +296,13 @@ sub new
                 label         =>'detected SSL Certificate Serial',
                 dataobjattr   =>'accessurl.ssl_certserial'),
 
-#      new kernel::Field::Text(
-#                name          =>'ssl_cert_issuerdn',
-#                readonly      =>1,
-#                xhtmldetail    =>'NotEmpty',
-#                group         =>'ssl',
-#                label         =>'detected SSL Issuer DN',
-#                dataobjattr   =>'accessurl.ssl_certissuerdn'),
+      new kernel::Field::Text(
+                name          =>'ssl_cert_issuerdn',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'ssl',
+                label         =>'detected SSL Issuer DN',
+                dataobjattr   =>'accessurl.ssl_certissuerdn'),
 
       new kernel::Field::Text(
                 name          =>'ssl_cert_signature_algo',
