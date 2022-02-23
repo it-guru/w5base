@@ -167,7 +167,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_state"))){
-     Query->Param("search_state"=>"\"in operation\"");
+     Query->Param("search_state"=>"\"!inactive\"");
    }
 }
 
