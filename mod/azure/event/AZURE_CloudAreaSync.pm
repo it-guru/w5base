@@ -148,6 +148,7 @@ sub AZURE_CloudAreaSync
             printf STDERR ("ERROR: got only subscriptionId %s\n",
                    $rec->{subscriptionId})
          }
+         msg(ERROR,"ssdump=".Dumper(\@ss));
          return({exitcode=>1,exitmsg=>$msg});
       }
 
