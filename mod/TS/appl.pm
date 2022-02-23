@@ -603,6 +603,14 @@ sub calcBaseApplicationExpertGroup
                 label=>$self->getParent->T("Business Owner IT",'TS::appl'),
                 sublabel=>$self->getParent->T("(operational)",'TS::appl')
             },
+            'SPOCITStabi'=>{
+                userid=>[],
+                email=>[],
+                sindex=>$index++,
+                phonename=>[],
+                label=>$self->getParent->T("SPOC IT Stability",'TS::vou'),
+                sublabel=>$self->getParent->T("(operational)",'TS::appl')
+            },
             'leadprmmgr'=>{
                 userid=>[],
                 email=>[],
@@ -680,8 +688,19 @@ sub calcBaseApplicationExpertGroup
                    canvasowneritid
                    leaderitid
                    leaderid
+                   spocitstabiid
       ));
       if (defined($vourec)){
+
+         my $spocitstabiid=$vourec->{spocitstabiid};
+         if (ref($spocitstabiid) ne "ARRAY"){
+            $spocitstabiid=[$spocitstabiid];
+         }
+         foreach my $uid (@{$spocitstabiid}){
+            if ($uid ne ""){
+               push(@{$a{SPOCITStabi}->{userid}},$uid);
+            }
+         }
 
          my $canvasownerbuid=$vourec->{canvasownerbuid};
          if (ref($canvasownerbuid) ne "ARRAY"){
@@ -692,6 +711,8 @@ sub calcBaseApplicationExpertGroup
                push(@{$a{opcanvasowner}->{userid}},$uid);
             }
          }
+
+
 
          my $canvasowneritid=$vourec->{canvasowneritid};
          if (ref($canvasowneritid) ne "ARRAY"){
