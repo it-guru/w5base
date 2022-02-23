@@ -10,12 +10,18 @@ use kernel::config;
 use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
-use vars qw($opt_v $opt_d $opt_h $opt_c $configname);
+use vars qw($opt_v $opt_d $opt_h $opt_c $opt_s $configname);
 $0="W5Event ".join(" ",@ARGV);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_d,
+                        'serverless'=>\$opt_s,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
+
+if ($opt_h ne ""){
+   help();
+   exit(1);
+}
 
 if ($opt_d){
    $W5V2::Debug=1;
@@ -98,8 +104,10 @@ if (!defined($W5V2::W5Server)){
 }
 my $MyClient=new RPC::Smart::Client(%ClientParam);
 if (! defined($MyClient->Connect())){
-   msg(ERROR,"can't connect to server");
-   exit(1);
+   if ($opt_s eq ""){
+      msg(ERROR,"can't connect to server");
+      exit(1);
+   }
 }
 
 my $EventController=new kernel::EventController(Config=>$curconfig);
@@ -119,3 +127,23 @@ else{
    msg(DEBUG,"result=%s",Dumper(\@bk));
    exit(0);
 }
+
+
+sub help
+{
+   printf STDERR ("Usage: W5Event [-s] [-d] [-h] -c {config} [-v] ".
+                  "{EVENTNAME}\n");
+   printf STDERR ("\n");
+   printf STDERR ("Running an event, direct in current process space. No \n");
+   printf STDERR ("call to W5Server is done and with option -s the W5Server\n");
+   printf STDERR ("is not connected at rise of event enviroment.\n");
+   printf STDERR ("\n");
+   printf STDERR ("\n");
+   printf STDERR (" -c sets the name of the config (default:w5server.conf)\n");
+   printf STDERR (" -v activates verbose mode\n");
+   printf STDERR (" -s serverless (running W5Server is not needed)\n");
+   printf STDERR (" -d starts the W5Server in debug mode (not as background!)\n");
+   printf STDERR ("\n");
+}
+
+
