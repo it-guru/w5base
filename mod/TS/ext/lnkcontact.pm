@@ -53,6 +53,8 @@ sub getPosibleRoles
                                                $self->Self),
              "spc"       =>$self->getParent->T("SPC (SAFe Programm Consultant)",
                                                $self->Self),
+             "ITstabillity"    =>$self->getParent->T("SPOC Stability",
+                                               $self->Self),
              "pm"        =>$self->getParent->T("PM (Product Manager)",
                                                $self->Self),
              "sa"        =>$self->getParent->T("SA (System Architect)",
@@ -71,6 +73,39 @@ sub getPosibleRoles
             );
    }
    return();
+}
+
+
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
+   my $parentobj=shift;
+   my $refid=shift;
+   my $app=$self->getParent();
+
+   if (defined($newrec->{roles}) && $parentobj=~m/::vou$/){
+      my $roles=$newrec->{roles};
+      $roles=[$roles] if (ref($roles) ne "ARRAY");
+      if (grep(/^ITstabillity$/,@$roles)){
+         if ($app->isRoleMultiUsed({
+               ITstabillity =>$self->getParent->T("SPOC Stability")
+               },$roles,$oldrec,$newrec,$parentobj,$refid)){
+            return(0);
+         }
+      }
+      if (in_array("ITstabillity",$roles)){
+         if (effVal($oldrec,$newrec,"target") eq "base::grp"){
+            $app->LastMsg(ERROR,
+                "role SPOC Stability cannot be assigned to groups");
+            return(0);
+         }
+      }
+   }
+
+   return(1);
 }
 
 
