@@ -150,6 +150,37 @@ sub new
                 name          =>'leaderitid',
                 dataobjattr   =>'vou.leaderit'),
 
+      new kernel::Field::Contact(
+                name          =>'spocitstabi',
+                label         =>'SPOC IT Stability',
+                readonly      =>1,
+                searchable    =>0,
+                htmldetail    =>'NotEmpty',
+                vjoinon       =>'spocitstabiid'),
+
+      new kernel::Field::Link(
+                name          =>'spocitstabiid',
+                depend        =>['contacts'],
+                onRawValue    =>sub {
+                    my $self   =shift;
+                    my $current=shift;
+                    my $appl=$self->getParent();
+                    my $spocitstabiid=undef;
+                    if (defined($current)){
+                       my $contacts=
+                            $appl->getField("contacts")->RawValue($current);
+                       foreach my $crec (@$contacts){
+                          my $roles=$crec->{roles};
+                          $roles=[$roles] if (ref($roles) ne "ARRAY");
+                          if (in_array($roles,"ITstabillity") &&
+                              $crec->{target} eq "base::user"){
+                             $spocitstabiid=$crec->{targetid};
+                          }
+                       }
+                    }
+                    return($spocitstabiid);
+                }),
+
       new kernel::Field::Text(
                 name          =>'canvasid',
                 label         =>'CanvasID',
