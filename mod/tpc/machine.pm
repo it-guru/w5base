@@ -72,6 +72,7 @@ sub new
       new kernel::Field::Text(     
             name              =>'projectId',
             searchable        =>1,
+            ODATA_filter      =>1,
             label             =>'projectId'),
 
       new kernel::Field::Text(     
@@ -195,7 +196,6 @@ sub DataCollector
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
          my $dataobjurl=$baseurl."iaas/".$dbclass;
-         #printf STDERR ("url=%s\n",$dataobjurl);
          return($dataobjurl);
       },
 
@@ -218,6 +218,12 @@ sub DataCollector
             $data=[$data];
          }
          map({
+             $_->{networkInterfaces}=$self->genReadTPChref($Authorization,
+                        $_->{_links}->{'network-interfaces'});
+            # if ($_->{networkInterfaces}->{_links}->{'cloud-accounts'}){
+            #    $_->{cloudAccounts}=$self->genReadTPChref($Authorization,
+            #       $_->{networkInterfaces}->{_links}->{'cloud-accounts'});
+            # }
              $self->ExternInternTimestampReformat($_,"createdAt");
              $self->ExternInternTimestampReformat($_,"updatedAt");
              $_->{cpucount}=$_->{customProperties}->{cpuCount};
@@ -247,6 +253,7 @@ sub DataCollector
              else{
                 $_->{ismcos}=0;
              }
+             #printf STDERR ("RAW Record %s\n",Dumper($_));
          } @$data);
          return($data);
       },

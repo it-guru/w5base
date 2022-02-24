@@ -501,6 +501,79 @@ sub Ping
 }
 
 
+sub genReadTPChref
+{
+   my $self=shift;
+   my $auth=shift;
+   my $hrefs=shift;
+   if (ref($hrefs) eq "HASH"){
+      if (exists($hrefs->{hrefs})){
+         $hrefs=$hrefs->{hrefs};
+      }
+      elsif(exists($hrefs->{href})){
+         $hrefs=$hrefs->{href};
+      }
+      else{
+         $hrefs=undef;
+      }
+   }
+   if (defined($hrefs)){
+      $hrefs=[$hrefs] if (ref($hrefs) ne "ARRAY");
+   }
+   else{
+      $hrefs=[];
+   }
+
+
+   my $dd=[];
+   foreach my $href (@$hrefs){
+      my $d=$self->CollectREST(
+         dbname=>'TPC',
+         url=>sub{
+            my $self=shift;
+            my $baseurl=shift;
+            my $apikey=shift;
+            my $apiuser=shift;
+            my $base=shift;
+            if (($baseurl=~m#/$#) && ($href=~m#^/#)){
+               $baseurl=~s#/$##;
+            }
+            my $dataobjurl=$baseurl.$href;
+            return($dataobjurl);
+         },
+         requesttoken=>$href,
+         headers=>sub{
+            my $self=shift;
+            my $baseurl=shift;
+            my $apikey=shift;
+            my $headers=['Authorization'=>$auth,
+                         'Content-Type'=>'application/json'];
+ 
+            return($headers);
+         },
+         onfail=>sub{
+            my $self=shift;
+            my $code=shift;
+            my $statusline=shift;
+            my $content=shift;
+            my $reqtrace=shift;
+    
+           # if ($code eq "404"){  # 404 bedeutet nicht gefunden
+           #    return([],"200");
+           # }
+            msg(ERROR,$reqtrace);
+            $self->LastMsg(ERROR,"unexpected data TPC response in genReadHref");
+            return(undef);
+         }
+      );
+      push(@$dd,$d);
+      #print STDERR "SubRecord:".Dumper($d);
+   }
+   return($dd);
+}
+
+
+
 
 
 
