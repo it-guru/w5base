@@ -368,7 +368,7 @@ sub Import
       }
       $self->ResetFilter();
       $self->SetFilter($flt);
-      my @l=$self->getHashList(qw(id name projectId));
+      my @l=$self->getHashList(qw(id name projectId ipaddresses));
       if ($#l==-1){
          if ($self->isDataInputFromUserFrontend()){
             $self->LastMsg(ERROR,"TPC machine not found");
@@ -447,21 +447,27 @@ sub Import
       return(undef);
    }
 
+   my %ipaddresses;
+   foreach my $iprec (@{$sysrec->{ipaddresses}}){
+      $ipaddresses{$iprec->{name}}={
+         name=>$iprec->{name}
+      };
+   }
 
    my $sysimporttempl={
       name=>[$sysrec->{name},$sysrec->{genname}],
       initialname=>$sysrec->{id},
       id=>$sysrec->{id},
       srcid=>$sysrec->{id},
-      ipaddresses=>{
-      }
+      ipaddresses=>[values(%ipaddresses)]
    };
-   if ($sysrec->{address} ne ""){
-      $sysimporttempl->{ipaddresses}=[{
-          name=>$sysrec->{address},
-          netareatag=>'CNDTAG'
-      }];
-   }
+
+   #if ($sysrec->{address} ne ""){
+   #   $sysimporttempl->{ipaddresses}=[{
+   #       name=>$sysrec->{address},
+   #       netareatag=>'CNDTAG'
+   #   }];
+   #}
 
    if ($sysrec->{projectId} ne ""){
       msg(INFO,"try to add cloudarea to system ".$sysrec->{name});
