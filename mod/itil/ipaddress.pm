@@ -721,6 +721,17 @@ sub Ipv6Expand
    my $ip=shift;
 
    my @unformat;
+
+   if (1){ # Handling for muliple 0 blocks in :: sequence
+      my @blks=split(/:/,$ip);
+      my $n=$#blks+1;
+      if ($n<8){
+         my $miss=8-$n;
+         my $addblks=":0:" x $miss;
+         $ip=~s/::/$addblks/;
+      }
+   }
+
    foreach my $okt (split(/:/,$ip)){
       push(@unformat,sprintf("%04x",hex($okt)));
    }
