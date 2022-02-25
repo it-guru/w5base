@@ -308,6 +308,22 @@ sub qcheckRecord
          else{
             if ($rec->{srcsys} eq "AssetManager"){
                #
+               # MCOS Name special handling
+               #
+               if ($parrec->{srcsys} eq "MCOS_FCI" &&
+                   ($rec->{srcid}=~m/^\S+-\S+-\S+-\S+-\S+$/)){
+                  # MCOS Systemhandling - Systemname will be take from TPC 
+                  my $m=getModuleObject($self->getParent->Config,
+                                        "tpc::machine");
+                  if (defined($m)){
+                     $m->SetFilter({id=>$rec->{srcid}});
+                     my ($tpcrec)=$m->getOnlyFirst(qw(name));
+                     if (defined($tpcrec)){
+                        $parrec->{systemname}=$tpcrec->{name};
+                     }
+                  }
+               }
+               #
                # osrelease mapping
                #
                if (!($parrec->{systemos}=~/^\s*$/)){
