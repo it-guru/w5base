@@ -1,6 +1,6 @@
-package tpc::machine;
+package tpc::ipaddress;
 #  W5Base Framework
-#  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2022  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -34,10 +34,7 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::RecordUrl(),
-
-
-      new kernel::Field::Id(     
+      new kernel::Field::Text(     
             name              =>'id',
             searchable        =>1,
             group             =>'source',
@@ -50,136 +47,31 @@ sub new
             name              =>'name',
             searchable        =>1,
             htmlwidth         =>'200px',
-            label             =>'Name'),
-
-      new kernel::Field::Text(     
-            name              =>'genname',
-            ODATA_filter      =>'name',
-            searchable        =>1,
-            htmlwidth         =>'200px',
-            label             =>'generic name'),
-
-      new kernel::Field::Text(     
-            name              =>'powerState',
-            searchable        =>1,
-            label             =>'Online-State'),
-
-      new kernel::Field::Text(     
-            name              =>'orgId',
-            searchable        =>1,
-            label             =>'orgId'),
-
-      new kernel::Field::Text(     
-            name              =>'projectId',
-            searchable        =>1,
-            ODATA_filter      =>1,
-            label             =>'projectId'),
-
-      new kernel::Field::Text(     
-            name              =>'project',
-            vjointo           =>'tpc::project',
-            vjoinon           =>['projectId'=>'id'],
-            vjoindisp         =>'name',
-            label             =>'Project'),
-
-      new kernel::Field::Text(
-                name          =>'osrelease',
-                label         =>'OS-Release'),
-
-      new kernel::Field::Text(
-                name          =>'osclass',
-                label         =>'OS-Class'),
-
-      new kernel::Field::Number(
-            name              =>'cpucount',
-            label             =>'CPU-Count'),
-
-      new kernel::Field::Number(
-            name              =>'memory',
-            label             =>'Memory',
-            unit              =>'MB'),
-
-      new kernel::Field::Boolean(
-            name              =>'ismcos',
-            searchable        =>0,
-            label             =>'MCOS'),
-
-      new kernel::Field::Text(     
-            name              =>'address',
-            ODATA_filter      =>'1',
-            searchable        =>1,
             label             =>'IP-Address'),
 
-      new kernel::Field::SubList(
-                name          =>'ipaddresses',
-                label         =>'IP-Adresses',
-                searchable    =>0,
-                vjointo       =>'tpc::ipaddress',
-                vjoinon       =>['id'=>'id'],
-                vjoindisp     =>['name','netareatag','ifname','mac']),
+      new kernel::Field::Text(
+                name          =>'dnsname',
+                label         =>'DNS-Name'),
 
-      new kernel::Field::Textarea(     
-            name              =>'description',
-            searchable        =>1,
-            label             =>'Description'),
+      new kernel::Field::Text(
+                name          =>'mac',
+                label         =>'MAC'),
 
-      new kernel::Field::Container(
-            name              =>'tags',
-            label             =>'Tags',
-            uivisible         =>1,
-            searchable        =>0,
-            group             =>'tags'),
+      new kernel::Field::Text(
+                name          =>'ifname',
+                htmlwidth     =>'250px',
+                label         =>'System Interface'),
 
-      new kernel::Field::Container(
-            name              =>'custprops',
-            label             =>'customProperties',
-            uivisible         =>sub{
-               my $self=shift;
-               return(1) if ($self->getParent->IsMemberOf("admin"));
-               return(0);
-            },
-            searchable        =>0,
-            group             =>'tags'),
+      new kernel::Field::Boolean(
+                name          =>'isprimary',
+                label         =>'is primary'),
 
-      new kernel::Field::Text(     
-            name              =>'instanceUUID',
-            searchable        =>0,
-            group             =>'source',
-            htmldetail        =>'NotEmpty',
-            label             =>'instanceUUID'),
-
-      new kernel::Field::Text(     
-            name              =>'UCinstanceUUID',
-            searchable        =>0,
-            group             =>'source',
-            htmldetail        =>'NotEmpty',
-            label             =>'UCinstanceUUID'),
-
-      new kernel::Field::Text(     
-            name              =>'vcUuid',
-            searchable        =>0,
-            group             =>'source',
-            htmldetail        =>'NotEmpty',
-            label             =>'vcUuid'),
-
-      new kernel::Field::CDate(
-            name              =>'cdate',
-            group             =>'source',
-            label             =>'Creation-Date',
-            dayonly           =>1,
-            searchable        =>0,  # das tut noch nicht
-            dataobjattr       =>'createdAt'),
-
-      new kernel::Field::MDate(
-            name              =>'mdate',
-            group             =>'source',
-            label             =>'Modification-Date',
-            dayonly           =>1,
-            searchable        =>0,  # das tut noch nicht
-            dataobjattr       =>'updatedAt'),
+      new kernel::Field::Text(
+                name          =>'netareatag',
+                label         =>'NetArea Tag'),
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name));
+   $self->setDefaultView(qw(id name mac ifname isprimary netareatag));
    return($self);
 }
 
@@ -225,39 +117,41 @@ sub DataCollector
          if (ref($data) ne "ARRAY"){
             $data=[$data];
          }
+         my @resultdata;
          map({
-             $self->ExternInternTimestampReformat($_,"createdAt");
-             $self->ExternInternTimestampReformat($_,"updatedAt");
-             $_->{cpucount}=$_->{customProperties}->{cpuCount};
-             $_->{memory}=$_->{customProperties}->{memoryInMB};
-             $_->{osclass}=$_->{customProperties}->{osType};
-             $_->{osrelease}=$_->{customProperties}->{softwareName};
-             $_->{custprops}=$_->{customProperties};
-             if (exists($_->{customProperties}->{vcUuid})){
-                $_->{vcUuid}=$_->{customProperties}->{vcUuid};
-             }
-             if (exists($_->{customProperties}->{instanceUUID})){
-                $_->{instanceUUID}=$_->{customProperties}->{instanceUUID};
-                $_->{UCinstanceUUID}=uc($_->{customProperties}->{instanceUUID});
-             }
-             $_->{genname}=$_->{name};
-             #$_->{name}=~s/-mcm[0-9]{3,10}-[0-9]{3,20}$//;
-             if (ref($_->{tags}) eq "ARRAY"){
-                my %h;
-                foreach my $rec (@{$_->{tags}}){
-                   $h{$rec->{key}}=$rec->{value} 
+             $_->{NetworkInterfaces}=$self->genReadTPChref($Authorization,
+                         $_->{_links}->{'network-interfaces'});
+             my $nifs=$_->{NetworkInterfaces};
+             $nifs=[$nifs] if (ref($nifs) ne "ARRAY");
+             foreach my $nif (@$nifs){
+                next if (!defined($nif));
+                my $addresses=$nif->{addresses};
+                $addresses=[$addresses] if (ref($addresses) ne "ARRAY");
+                foreach my $address (@$addresses){
+                   next if (!defined($address));
+                   my $iprec={
+                      id=>$_->{id},
+                      name=>$address,
+                      netareatag=>"ISLAND",
+                      isprimary=>'0',
+                      dnsname=>'???'
+                   };
+                   if (ref($nif->{customProperties}) &&
+                       exists($nif->{customProperties}->{mac_address})){
+                      $iprec->{mac}=$nif->{customProperties}->{mac_address};
+                   }
+                   if ($iprec->{name}=~m/^10\./){
+                      $iprec->{netareatag}="CNDTAG";
+                   }
+                   if ($iprec->{name} eq $_->{address}){
+                      $iprec->{isprimary}='1';
+                   }
+                   $iprec->{ifname}="eth".$nif->{deviceIndex};
+                   push(@resultdata,$iprec);
                 }
-                $_->{tags}=\%h;
              }
-             if (exists($_->{tags}->{mcos})){
-                $_->{ismcos}=1;
-             }
-             else{
-                $_->{ismcos}=0;
-             }
-             #printf STDERR ("RAW Record %s\n",Dumper($_));
          } @$data);
-         return($data);
+         return(\@resultdata);
       },
       onfail=>sub{
          my $self=shift;
