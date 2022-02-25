@@ -37,6 +37,8 @@ sub new
             htmldetail        =>'NotEmpty',
             label             =>'ProjectID'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(     
             name              =>'name',
             ignorecase        =>1,
