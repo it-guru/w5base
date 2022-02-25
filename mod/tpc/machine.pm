@@ -46,6 +46,8 @@ sub new
             align             =>'left',
             label             =>'MachineID'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(     
             name              =>'name',
             searchable        =>1,
