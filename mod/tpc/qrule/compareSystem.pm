@@ -204,18 +204,31 @@ sub qcheckRecord
             }
             push(@sysname,$parrec->{id});
 
+            #my %sysiface;
+            #my %ipaddresses;
+            #if ($parrec->{address} ne ""){
+            #   $ipaddresses{$parrec->{address}}={
+            #      name=>$parrec->{address},
+            #      netareatag=>'CNDTAG'
+            #   };
+            #}
+
             my %sysiface;
             my %ipaddresses;
-            if ($parrec->{address} ne ""){
-               $ipaddresses{$parrec->{address}}={
-                  name=>$parrec->{address},
-                  netareatag=>'CNDTAG'
-               };
+            foreach my $iprec (@{$parrec->{ipaddresses}}){
+               $ipaddresses{$iprec->{name}}=$iprec;  # name ifname
+               if ($iprec->{ifname} ne ""){
+                  $sysiface{$iprec->{ifname}}={
+                     mac=>$iprec->{mac},
+                     name=>$iprec->{ifname}
+                  };
+               }
             }
 
 
             my @sysiface;
             my @ipaddresses;
+            @sysiface=sort({$a->{name} cmp $b->{name}} values(%sysiface));
             @ipaddresses=sort({$a->{name} cmp $b->{name}} values(%ipaddresses));
 
 
@@ -225,6 +238,7 @@ sub qcheckRecord
                cpucount=>$parrec->{cpucount},
                memory=>$parrec->{memory},
                osrelease=>$parrec->{image_name},
+               sysiface=>\@sysiface,
                ipaddresses=>\@ipaddresses,
                availabilityZone=>'Any'
             );

@@ -87,6 +87,7 @@ sub DataCollector
       "machines","id",
       $filterset
    );
+   my $ip=getModuleObject($self->Config(),"itil::ipaddress");
    my $d=$self->CollectREST(
       dbname=>'TPC',
       requesttoken=>$requesttoken,
@@ -134,8 +135,11 @@ sub DataCollector
                       name=>$address,
                       netareatag=>"ISLAND",
                       isprimary=>'0',
-                      dnsname=>'???'
+                      dnsname=>''
                    };
+                   if ($iprec->{name}=~m/:/){ # v6 Handling
+                      $iprec->{name}=$ip->Ipv6Expand($iprec->{name});
+                   }
                    if (ref($nif->{customProperties}) &&
                        exists($nif->{customProperties}->{mac_address})){
                       $iprec->{mac}=$nif->{customProperties}->{mac_address};
