@@ -1,0 +1,85 @@
+#!/bin/bash
+
+DB="$1"
+shift
+
+while test $# -gt 0
+do
+    SQLTABLE="$1"
+    shift
+    KEYFIELD="$1"
+    shift
+    KEYVALUE="$1"
+    shift
+
+    if [ ! -z "$SQLTABLE" -a ! -z "$KEYFIELD" -a ! -z "$KEYVALUE" ]; then
+       mysqldump \
+                 --skip-triggers \
+                 --no-create-db --no-create-info \
+                 --where "$KEYFIELD='$KEYVALUE'" \
+                 --skip-comments --skip-disable-keys --skip-set-charset \
+                 --extended-insert -c \
+                 "$DB" "$SQLTABLE"
+                 #--extended-insert --skip-quick -c \
+    fi
+done
+
+
+
+
+
+
+
+
+
+
+
+exit 0
+
+WFHEADID=$1
+
+cat << EOF | mysql w5base
+delete from wfkey where id='$WFHEADID';
+delete from wfhead where wfheadid='$WFHEADID';
+delete from wfworkspace where wfheadid='$WFHEADID';
+delete from wfaction where wfheadid='$WFHEADID';
+EOF
+
+ssh w5basedb01 "(mysqldump \
+                 --skip-triggers \
+                 --no-create-db --no-create-info \
+                 --where \"wfheadid='$WFHEADID'\" \
+                 --extended-insert --skip-quick -c \
+                 w5base2 wfhead && \
+                 mysqldump \
+                 --skip-triggers \
+                 --no-create-db --no-create-info \
+                 --where \"id='$WFHEADID'\" \
+                 --extended-insert --skip-quick -c \
+                 w5base2 wfkey && \
+                 mysqldump \
+                 --skip-triggers \
+                 --no-create-db --no-create-info \
+                 --where \"srcwfid='$WFHEADID'\" \
+                 --extended-insert --skip-quick -c \
+                 w5base2 wfrelation && \
+                 mysqldump \
+                 --skip-triggers \
+                 --no-create-db --no-create-info \
+                 --where \"dstwfid='$WFHEADID'\" \
+                 --extended-insert --skip-quick -c \
+                 w5base2 wfrelation && \
+                 mysqldump \
+                 --skip-triggers \
+                 --no-create-db --no-create-info \
+                 --where \"wfheadid='$WFHEADID'\" \
+                 --extended-insert --skip-quick -c \
+                 w5base2 wfworkspace && \
+                 mysqldump \
+                 --skip-triggers \
+                 --no-create-db --no-create-info \
+                 --where \"wfheadid='$WFHEADID'\" \
+                 --extended-insert --skip-quick -c \
+                 w5base2 wfaction )" | mysql  -f
+
+
