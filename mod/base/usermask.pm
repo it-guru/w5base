@@ -226,16 +226,30 @@ sub Main
    my %h=();
    if (defined($setaccount)){
       my $cookie;
+
+      #my $cpath=$ENV{HTTP_REFERER};
+      #
+      # Im Falle von WebSSO wird der Cookie Path bereits vom Ref
+      #
+      my $cpath;
+      if (!($cpath=~m/$ENV{REQUEST_URI}/)){
+         $cpath=$ENV{SCRIPT_URI};
+      }
+      $cpath=~s#^http[s]{0,1}://[^/]*/#/#i;
+      $cpath=~s/[\s?].*$//;
+      $cpath=~s#/base/usermask/Main#/#i;
+      msg(INFO,"remote_user user cookie operation on $cpath");
+
       if ($setaccount eq $ENV{REAL_REMOTE_USER}){
          $cookie=Query->Cookie(
-                       -path=>'/',
+                       -path=>$cpath,
                        -name=>"remote_user",
                        -value=>'',
                        -expires=>'-1s');
       }
       else{
          $cookie=Query->Cookie(
-                       -path=>'/',
+                       -path=>$cpath,
                        -name=>"remote_user",
                        -value=>$setaccount);
          my @cleanup;
