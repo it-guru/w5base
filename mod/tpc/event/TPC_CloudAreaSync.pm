@@ -56,9 +56,10 @@ sub TPC_CloudAreaSync
        !($dep->Ping()) ||
        !($itcloudobj->Ping())){
       my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
-      return({}) if ($infoObj->NotifyInterfaceContacts($pro));
-      msg(ERROR,"not all dataobjects available");
-      return(undef);
+      if ($infoObj->NotifyInterfaceContacts($pro)){
+         return({exitcode=>0,exitmsg=>'Interface notified'});
+      }
+      return({exitcode=>1,exitmsg=>'not all dataobjects available'});
    }
 
    $itcloudobj->ResetFilter();
