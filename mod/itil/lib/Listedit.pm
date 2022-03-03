@@ -1505,37 +1505,85 @@ sub NotifyInterfaceContacts
    my $self=shift;
    my $dataobj=shift;
 
-   my @to;
-   my @cc;
-   my @bcc;
+   my $W5DATAOBJ=$dataobj->Self();
+   my $notifycnt=0;
 
-   if (exists($dataobj->{InterfaceHint})){
-      if (exists($dataobj->{InterfaceHint}->{'itil::lnkapplappl'})){
-         my $o;
-         if ($self->SelfAsParentObject() eq "itil::lnkapplappl"){
-            $o=$self;
-         }
-         $o->ResetFilter();
-         $o->SetFilter({id=>$dataobj->{InterfaceHint}->{'itil::lnkapplappl'}});
-         foreach my $ifrec ($o->getHashList(qw(fullname fromappl toappl
-                                               rawmonitor interfacescomp))){
-            printf STDERR ("Interface: %s\n",$ifrec->{fullname});
-            foreach my $crec (@{$ifrec->{interfacescomp}}){
-               foreach my $var (qw(name namealt1 namealt2)){
-                  if ($crec->{$var} ne ""){
-                     printf STDERR (" - contact $var: %s\n",$crec->{$var});
-                  }
-               }
-            }
-            printf STDERR ("---\n");
+   my $o;
+   if ($self->SelfAsParentObject() eq "itil::lnkapplappl"){
+      $o=$self;
+   }
+   else{
+      $o=getModuleObject($dataobj->Config,"itil::lnkapplappl");
+   }
+   $o->ResetFilter();
+   $o->SetFilter({
+      fromapplcistatus=>[3,4], 
+      toapplcistatus=>[3,4], 
+      cistatusid=>[3,4], 
+      interfacestag=>"0=\"W5DATAOBJ\" AND 1=\"$W5DATAOBJ\""
+   });
+   foreach my $ifrec ($o->getHashList(qw(fullname fromappl toappl
+                                         rawmonitor interfacescomp))){
+      my %notify_to;
+      my %notify_cc;
+      printf STDERR ("Interface: %s\n",$ifrec->{fullname});
+      my $useall=1;
+      foreach my $crec (@{$ifrec->{interfacescomp}}){
+         if ($crec->{objtype} eq "base::user" && $crec->{comments} ne ""){
+            $useall=0;
          }
       }
+      foreach my $crec (@{$ifrec->{interfacescomp}}){
+         if ($crec->{objtype} eq "base::user"){
+            if ($useall || 
+                (!($crec->{comments}=~m/(entwickler|developer)/i) &&
+                 !($crec->{comments}=~m/(projektleiter|manager)/i))){
+               if ($crec->{obj1id} ne ""){
+                  $notify_to{$crec->{obj1id}}++
+               }
+               if ($crec->{obj2id} ne ""){
+                  $notify_cc{$crec->{obj2id}}++
+               }
+               if ($crec->{obj3id} ne ""){
+                  $notify_cc{$crec->{obj3id}}++
+               }
+            }
+         }
+      }
+      if (!keys(%notify_to) && !keys(%notify_cc)){
+         my $app=getModuleObject($dataobj->Config,"itil::appl");
+         $app->SetFilter({id=>\$ifrec->{toapplid}});
+         my ($arec,$msg)=$app->getOnlyFirst(qw(tsmid opmid tsm2id opm2id));
+         if (defined($arec)){
+            if ($arec->{tsmid} ne ""){
+               $notify_to{$arec->{tsmid}}++
+            }
+            if ($arec->{opmid} ne ""){
+               $notify_to{$arec->{opmid}}++
+            }
+            if ($arec->{tsm2id} ne ""){
+               $notify_cc{$arec->{tsm2id}}++
+            }
+            if ($arec->{opm2id} ne ""){
+               $notify_cc{$arec->{opm2id}}++
+            }
+         }
+      }
+      my @notify_to=keys(%notify_to);
+      my @notify_cc;
+      foreach my $uid (keys(%notify_cc)){
+         if (!in_array(\@notify_to,$uid)){
+            push(@notify_cc,$uid);
+         }
+      }
+      if (($#notify_to!=-1 || $#notify_cc!=-1) && $dataobj->LastMsg()){
+         printf STDERR ("Notify To:%s\n",join(", ",@notify_to));
+         printf STDERR ("Notify CC:%s\n",join(", ",@notify_cc));
+         printf STDERR ("%s\n",join("\n",$dataobj->LastMsg()));
+         $notifycnt++;
+      }
    }
-
-   if ($dataobj->LastMsg()){
-      printf STDERR ("%s\n",join("\n",$dataobj->LastMsg()));
-   }
-   return(1);
+   return($notifycnt);
 }
 
 
