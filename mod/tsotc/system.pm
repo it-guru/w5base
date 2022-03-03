@@ -182,10 +182,6 @@ sub new
    $self->setDefaultView(qw(name state projectname cpucount memory
                             id availability_zone cdate ));
    $self->setWorktable("otc4darwin_server_vw");
-   $self->{InterfaceHint}={
-      'itil::lnkapplappl'=>['15590342390001'],
-      'itil::appl'=>['15222383970003']
-   };
    return($self);
 }
 

@@ -92,10 +92,6 @@ sub new
    );
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name mdate));
-   $self->{InterfaceHint}={
-      'itil::lnkapplappl'=>['15590342390001'],
-      'itil::appl'=>['15222383970003']
-   };
 
    return($self);
 }
