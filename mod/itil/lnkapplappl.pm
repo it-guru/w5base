@@ -210,7 +210,7 @@ sub new
                 vjoinon       =>['fromapplcistatus'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'fromapplcistatus',
                 label         =>'from Appl CI-Status',
                 dataobjattr   =>'fromappl.cistatus'),
@@ -225,7 +225,7 @@ sub new
                 vjoinon       =>['toapplcistatus'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'toapplcistatus',
                 label         =>'to Appl CI-Status',
                 dataobjattr   =>'toappl.cistatus'),
