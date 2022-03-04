@@ -64,15 +64,28 @@ sub CapeICTOimport
    my $nicto=keys(%icto);
    msg(INFO,"found  $nicto ictos");
    my $agrp=getModuleObject($self->Config,"itil::applgrp");
-   return({}) if ($agrp->isSuspended());
+   if ($agrp->isSuspended()){
+      return({exitcode=>'100',exitmsg=>'suspended itil::applgrp'});
+   }
    my $m=getModuleObject($self->Config,"base::mandator");
-   return({}) if ($m->isSuspended());
+   if ($m->isSuspended()){
+      return({exitcode=>'100',exitmsg=>'suspended base::mandator'});
+   }
    my $grp=getModuleObject($self->Config,"base::grp");
-   return({}) if ($grp->isSuspended());
+   if ($grp->isSuspended()){
+      return({exitcode=>'100',exitmsg=>'suspended base::grp'});
+   }
    my $i=getModuleObject($self->Config,"tscape::archappl");
-   return({}) if ($i->isSuspended());
+   if ($i->isSuspended()){
+      return({exitcode=>'100',exitmsg=>'suspended tscape::archappl'});
+   }
    my $la=getModuleObject($self->Config,"itil::lnkapplgrpappl");
-   return({}) if ($la->isSuspended());
+   if ($la->isSuspended()){
+      return({exitcode=>'100',exitmsg=>'suspended itil::lnkapplgrpappl'});
+   }
+   if (!$i->Ping()){
+      return({exitcode=>'101',exitmsg=>'tscape::archappl not reachable'});
+   }
 
 
    my $iname=$i->Self();
@@ -148,21 +161,27 @@ sub CapeICTOimport
          }
       }
    }
-   $agrp->ResetFilter();
-   $agrp->SetFilter({'srcload'=>"<\"$start\"",srcsys=>\$iname});
-   $agrp->SetCurrentView(qw(ALL));
-   my $opagrp=$agrp->Clone();
-
-   my ($arec,$msg)=$agrp->getFirst(unbuffered=>1);
-   if (defined($arec)){
-      do{
-         $opagrp->ValidatedUpdateRecord($arec,{cistatusid=>6},{
-            id=>\$arec->{id}
-         });
-         ($arec,$msg)=$agrp->getNext();
-      }until(!defined($arec));
+   if ($c<10){
+      return({exitcode=>1,
+              exitmsg=>'skipped cleanup due to few import records'});
    }
-   $la->BulkDeleteRecord({'srcload'=>"<\"$start\"",srcsys=>\$iname});
+   else{
+      $agrp->ResetFilter();
+      $agrp->SetFilter({'srcload'=>"<\"$start\"",srcsys=>\$iname});
+      $agrp->SetCurrentView(qw(ALL));
+      my $opagrp=$agrp->Clone();
+
+      my ($arec,$msg)=$agrp->getFirst(unbuffered=>1);
+      if (defined($arec)){
+         do{
+            $opagrp->ValidatedUpdateRecord($arec,{cistatusid=>6},{
+               id=>\$arec->{id}
+            });
+            ($arec,$msg)=$agrp->getNext();
+         }until(!defined($arec));
+      }
+      $la->BulkDeleteRecord({'srcload'=>"<\"$start\"",srcsys=>\$iname});
+   }
    return({exitcode=>0});
 }
 
