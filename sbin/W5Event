@@ -125,6 +125,23 @@ if ($#bk==-1){
 else{
    msg(DEBUG,"Event '%s' processed at %d Handlers",$event,$#bk);
    msg(DEBUG,"result=%s",Dumper(\@bk));
+   foreach my $bkrec (@bk){
+      my $exitcode;
+      if (!ref($bkrec)){
+         $exitcode="(miss result hash)";
+      }
+      elsif(!exists($bkrec->{exitcode})){
+         $exitcode="(undef)";
+      }
+      else{
+         $exitcode=$bkrec->{exitcode};
+      }
+      $exitcode="(undef)" if (!defined($exitcode));
+      my $exitmsg=$bkrec->{exitmsg};
+      if ($exitcode ne "0"){
+         msg(ERROR,"exitcode $exitcode: $exitmsg");
+      }
+   }
    exit(0);
 }
 
