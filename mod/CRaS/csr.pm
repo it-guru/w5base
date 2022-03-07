@@ -739,8 +739,15 @@ sub Validate
 
    if ($self->isDataInputFromUserFrontend()){
       if (!defined($oldrec) && effVal($oldrec,$newrec,'sslcert') eq '') {
-         $self->LastMsg(ERROR,"no csr file specified");
-         return(0);
+         # Wenn kein sslcert angegeben, dann MUSS alterativ 
+         # name, replacedrefno und spassword vorhanden sein. In diesem
+         # Fall wäre es dann eine Erneuerung eines Certs aus der XLS
+         if ($newrec->{name} eq "" ||
+             $newrec->{replacedrefno} eq "" ||
+             $newrec->{spassword} eq ""){
+            $self->LastMsg(ERROR,"no csr file specified");
+            return(0);
+         }
       }
    }
    if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4"){
@@ -870,6 +877,8 @@ sub FinishWrite
       $newrec{name}=$oldrec->{name};
       $newrec{sslcert}=$oldrec->{sslcert} if ($oldrec->{sslcert} ne "");
       $newrec{ssslcert}=$oldrec->{ssslcert};
+      $newrec{sslcertcommon}=$oldrec->{sslcertcommon};
+      $newrec{sslcertorg}=$oldrec->{sslcertorg};
       $newrec{replacedrefno}=$oldrec->{refno};
       $newrec{spassword}=$oldrec->{spassword};
       $newrec{state}="1";
