@@ -862,7 +862,21 @@ sub SkinSwitcher
       $skinlabel="Default System" if ($skinno==0);
       $skinname="" if ($skinno==0);
       $skinlabel=~s/^(\S)/uc($1)/ge;
-      my $onclick="setSkin('".$skinname."');";
+
+      my $cpath;
+      if (!($cpath=~m/$ENV{REQUEST_URI}/)){
+         $cpath=$ENV{SCRIPT_URI};
+      }
+      $cpath=~s#^http[s]{0,1}://[^/]*/#/#i;
+      $cpath=~s/[\s?].*$//;
+
+      $cpath="/w5base-devnull.telekom.de/darwin/auth/base/menu/SkinSwitcher";
+      $cpath=~s#/[^/]+/base/menu/SkinSwitcher#/#i;
+      $cpath="/";
+      # funktioniert irgendwie noch nicht
+
+
+      my $onclick="setSkin('".$skinname."','".$cpath."');";
       my $pref="";
       my $post="";
       if ($skinname eq Query->Cookie("W5SKIN")){
