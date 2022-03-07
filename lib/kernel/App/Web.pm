@@ -2124,7 +2124,7 @@ sub findtemplvar
          if (in_array(\@param,"personalview")){
             $d.="<option value=\"PERSONAL\"";
             $d.=" selected" if ($oldval eq "PERSONAL");
-            $d.=">".$self->T('only assinged to personal me').
+            $d.=">".$self->T('only assigned to personal me').
                 "</option>";
          }
          if (in_array(\@param,"teamusercontrol")){

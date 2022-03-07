@@ -1,4 +1,4 @@
 
  %chart1%
 
-The count of applications mesures the application whitch response team or business team is assinged to group '%statname%' or any of its subgroups. Only Config-Items in CI-Status "installed/active" are counted.
+The count of applications mesures the application whitch response team or business team is assigned to group '%statname%' or any of its subgroups. Only Config-Items in CI-Status "installed/active" are counted.

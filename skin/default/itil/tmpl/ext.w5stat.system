@@ -1,7 +1,7 @@
 
  %chart1%
 
-The count of administrated logical systems mesures the systems which admin-team is assinged to group '%statname%' or any of its subgroups. Only Config-Items in CI-Status "installed/active" are counted.
+The count of administrated logical systems mesures the systems which admin-team is assigned to group '%statname%' or any of its subgroups. Only Config-Items in CI-Status "installed/active" are counted.
 
 
 
