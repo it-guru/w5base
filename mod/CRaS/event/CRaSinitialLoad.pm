@@ -237,6 +237,14 @@ sub ProcessXLS
                srcid=>$srcid,
                srcload=>NowStamp("en")
             );
+            if ($rec{'Gültig bis'} ne "" &&
+                ($rec{'Gültig bis'}=~m/^[0-9]{4}-[0-9]+-[0-9]+$/)){
+               $csrrec{ssslenddate}=$rec{'Gültig bis'}." 12:00:00";
+            }
+            if ($rec{'Ausgestellt am'} ne "" &&
+                ($rec{'Ausgestellt am'}=~m/^[0-9]{4}-[0-9]+-[0-9]+$/)){
+               $csrrec{ssslstartdate}=$rec{'Ausgestellt am'}." 12:00:00";
+            }
             if ($rec{SharePointLfdNr} ne ""){
                $csrrec{comments}.="\n" if ($csrrec{comments} ne "");
                $csrrec{comments}.="SharePoint Laufende-Nummer: ".
