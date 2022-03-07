@@ -1,2 +1,2 @@
-'itil::qrule::CheckApplCloudAreas'=>{de=>'Überprüfung der zugeordneten CloudAreas',en=>'Check of assinged cloud areas'},
-'assinged cloud areas need to be activated'=>{de=>'Zugeordnete CloudAreas müssen aktviert werden'},
+'itil::qrule::CheckApplCloudAreas'=>{de=>'Überprüfung der zugeordneten CloudAreas',en=>'Check of assigned cloud areas'},
+'assigned cloud areas need to be activated'=>{de=>'Zugeordnete CloudAreas müssen aktviert werden'},

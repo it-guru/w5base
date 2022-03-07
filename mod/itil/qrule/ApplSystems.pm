@@ -11,7 +11,7 @@ at least 1 logical system linked. If there are no logical systems assigned,
 this will produce an error.
 In some cases (applications which ships licenses f.e.) you can set the
 flag "application has no systems". In this case, this rule produces an
-error, if logical systems are assinged.
+error, if logical systems are assigned.
 
 =head3 IMPORTS
 

@@ -6,7 +6,7 @@ package itil::qrule::CheckApplCloudAreas;
 
 =head3 PURPOSE
 
-Validate if there are CloudAreas assinged to current application with CI-Status
+Validate if there are CloudAreas assigned to current application with CI-Status
 "available/in project" for a time longer then 6 weeks.
 
 =head3 IMPORTS
@@ -14,7 +14,7 @@ Validate if there are CloudAreas assinged to current application with CI-Status
 NONE
 
 =head3 HINTS
-If there are cloud areas assinged to the application, the are need to 
+If there are cloud areas assigned to the application, the are need to 
 be set as "installed/active" from the application write enabled team
 to document the areas as used.
 
@@ -118,7 +118,7 @@ sub qcheckRecord
 
    if ($#needToAct!=-1){
       $errorlevel=3;
-      my $msg="assinged cloud areas need to be activated";
+      my $msg="assigned cloud areas need to be activated";
       push(@dataissue,$msg);
       push(@qmsg,$msg.":"); # add : to get a correct translation
       push(@qmsg,@needToAct);

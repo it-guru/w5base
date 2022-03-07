@@ -6,7 +6,7 @@ package itil::qrule::CheckCloudCloudAreas;
 
 =head3 PURPOSE
 
-Validate if there are CloudAreas assinged to valid application with CI-Status
+Validate if there are CloudAreas assigned to valid application with CI-Status
 "available/in project" for a time longer then 8 weeks.
 
 =head3 IMPORTS
@@ -14,7 +14,7 @@ Validate if there are CloudAreas assinged to valid application with CI-Status
 NONE
 
 =head3 HINTS
-If there are cloud areas assinged, the are need to 
+If there are cloud areas assigned, the are need to 
 be set as "installed/active" from the application write enabled team
 to document the areas as used.
 

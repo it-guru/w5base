@@ -10,6 +10,6 @@
 'fieldgroup.services'=>{de=>'Cluster Services',
                         en=>'Cluster Services'},
 'fieldgroup.notassignedbackups'=>{de=>'Cluster zugeordnete Backup-Jobs',
-                                  en=>'Cluster assinged backup jobs'},
+                                  en=>'Cluster assigned backup jobs'},
 'Systems'=>{de=>'Systeme'},
 'cluster has been successfuly imported'=>{de=>'Cluster wurde erfolgreich importiert'},

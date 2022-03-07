@@ -1,4 +1,4 @@
 
  %chart1%
 
-The count of software instance (f.e. database or applicationservers) mesures the instances whitch guardian-team is assinged to group '%statname%' or any of its subgroups. Only Config-Items in CI-Status "installed/active" are counted.
+The count of software instance (f.e. database or applicationservers) mesures the instances whitch guardian-team is assigned to group '%statname%' or any of its subgroups. Only Config-Items in CI-Status "installed/active" are counted.

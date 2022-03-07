@@ -1,7 +1,7 @@
 
  %chart2%
 
-The count of operationally supported logical systems mesures the systems which businessteam of related application is assinged to group '%statname%' or any of its subgroups. Only Config-Items in CI-Status "installed/active" are counted.
+The count of operationally supported logical systems mesures the systems which businessteam of related application is assigned to group '%statname%' or any of its subgroups. Only Config-Items in CI-Status "installed/active" are counted.
 
 
 

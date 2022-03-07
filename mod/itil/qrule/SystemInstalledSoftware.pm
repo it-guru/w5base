@@ -93,7 +93,7 @@ sub qcheckRecord
    if (ref($rec->{swinstances}) eq "ARRAY"){
       foreach my $swi (@{$rec->{swinstances}}){
          if ($swi->{softwareinstname} eq ""){ # this is a instance with no
-            $swneeded{$swi->{swnature}}++;    # assinged software installation
+            $swneeded{$swi->{swnature}}++;    # assigned software installation
          }
          my $techdatavalid=0;
 
