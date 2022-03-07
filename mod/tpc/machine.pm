@@ -145,7 +145,6 @@ sub new
 
       new kernel::Field::Text(     
             name              =>'instanceUUID',
-            searchable        =>0,
             group             =>'source',
             htmldetail        =>'NotEmpty',
             label             =>'instanceUUID'),
