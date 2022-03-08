@@ -751,6 +751,11 @@ sub Validate
       }
    }
    if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4"){
+      if (effVal($oldrec,$newrec,"ssslcert") eq ""){
+         $self->LastMsg(ERROR,
+                "sigend state only allowed with singed cert file");
+         return(0);
+      }
       $newrec->{sslexpnotify1}=undef;
       $newrec->{sslexpnotify2}=undef;
    }
