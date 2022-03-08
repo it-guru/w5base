@@ -552,7 +552,9 @@ sub Validate
          $u->SetFilter({userid=>\$userid});
          my ($urec,$msg)=$u->getOnlyFirst(qw(cistatusid usertyp));
          if (!defined($urec) || (
-              $urec->{usertyp} ne "user" && $urec->{usertyp} ne "service" 
+              $urec->{usertyp} ne "user" && 
+              $urec->{usertyp} ne "service"  &&
+              $urec->{usertyp} ne "function"
              ) || $urec->{cistatusid} ne "4"){
             $newrec->{fwdtargetid}="1";
             $newrec->{fwdtarget}="base::grp";
