@@ -143,7 +143,7 @@ sub SendMyJobs
                                   "$bold1$msg$bold0</div>",$dur->{days});
                      push(@emailprefix,$emailprefix);
                      if ($baseurl ne ""){
-                        my $lang="?HTTP_ACCEPT_LANGUAGE=$userlang";
+                        my $lang="/$userlang";
                         my $imgtitle="current state of workflow";
                         my $emailpostfix=
                                "<img title=\"$imgtitle\" class=status border=0 ".
