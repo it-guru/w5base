@@ -112,12 +112,11 @@ sub getSqlFrom
    my @filter=@_;
 
    if ($mode eq "select" && $#filter==0 && ref($filter[0]) eq "HASH" &&
-       keys(%{$filter[0]})==1 && exists($filter[0]->{start_up_id}) &&
-       (($filter[0]->{start_up_id}=~m/^\d+$/) || 
-         ref($filter[0]->{start_up_id}))){
+       keys(%{$filter[0]})==1 && exists($filter[0]->{start_up_id})){
       my $start_up_id=$filter[0]->{start_up_id};
       $start_up_id=$start_up_id->[0] if (ref($start_up_id) eq "ARRAY");
       $start_up_id=$$start_up_id     if (ref($start_up_id) eq "SCALAR");
+      $start_up_id="UNDEF" if ($start_up_id eq "");
       my $from=<<EOF;
 
 (SELECT    
