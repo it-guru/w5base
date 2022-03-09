@@ -106,7 +106,7 @@ sub new
                                }
                             }
                             if ($current->{rawstate} eq "5"){
-                               if (!in_array($st,[qw(2 5 3)])){
+                               if (!in_array($st,[qw(5 6)])){
                                   next;
                                }
                             }
@@ -258,6 +258,15 @@ sub new
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>'csr.sslcertorg'),
 
+      new kernel::Field::SubList(
+                name          =>'followupcsr',
+                label         =>'followup CSR',
+                group         =>'followupcsr',
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'CRaS::csr',
+                vjoinon       =>['refno'=>'replacedrefno'],
+                vjoindisp     =>['name','refno','state']),
+
       new kernel::Field::Text(
                 name          =>'editrefno',
                 label         =>'CA Reference No.',
@@ -268,6 +277,7 @@ sub new
                 name          =>'refno',
                 label         =>'CA Reference No.',
                 htmldetail    =>'NotEmpty',
+                htmlwidth     =>'60',
                 group         =>'detail',
                 selectfix     =>1,
                 dataobjattr   =>'csr.refno'),
@@ -601,6 +611,9 @@ sub isViewValid
    if ($rec->{rawstate}==1 || $rec->{rawstate}==2 ||
        $rec->{rawstate}==3){
       push(@l,qw(caref));
+   }
+   if ($rec->{rawstate}==5 || $rec->{rawstate}==6){
+      push(@l,qw(followupcsr));
    }
    return(@l);
 }
@@ -1131,7 +1144,7 @@ sub doNotify
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default caref detail source));
+   return(qw(header default followupcsr caref detail source));
 }
 
 
