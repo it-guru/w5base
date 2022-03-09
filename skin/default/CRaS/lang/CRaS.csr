@@ -18,6 +18,10 @@
   de=>'Zertifikat',
   en=>'Certificate'
 },
+'fieldgroup.followupcsr'=>{
+  de=>'Nachfolge-Zertifikat',
+  en=>'Followup-Certificate'
+},
 'related application'=>{de=>'zugeordnete Anwendung'},
 'certificate request'=>{de=>'Zertifikats Request'},
 'Certificate state'=>{de=>'Zertifikats-Status'},
