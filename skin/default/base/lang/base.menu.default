@@ -12,8 +12,6 @@
 'Tools.workflow.key'=>{de=>'Key-Index',en=>'Key-Index'},
 'Tools.workflow.ws'=>{de=>'pers. Workspace',en=>'pers. Workspace'},
 'Tools.workflow.ws.new'=>{de=>'Neueingabe',en=>'New'},
-'Tools.workflow.repjob'=>{de=>'Report Job',en=>'Report Job'},
-'Tools.workflow.repjob.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.workflownew'=>{de=>'Neuen Workflow starten',en=>'start workflow'},
 'Tools.workproc'=>{de=>'Arbeitsprozess',en=>'Workprocess'},
 'Tools.workproc.new'=>{de=>'Neueingabe',en=>'New'},

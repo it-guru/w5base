@@ -38,11 +38,6 @@ sub getControlData
    my $app=$self->getParent();
 
    return({
-           'base::reportjob'=>{target=>'name',
-                                 mode  =>[
-                                     'valuechange'=>'base::reportjob',
-                                 ],
-                                }
           });
 
 }

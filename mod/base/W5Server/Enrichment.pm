@@ -111,7 +111,6 @@ sub processConsoleCommand
    my $cons=shift;
    my $client=shift;
    my $command=shift;
-   my $reportjob=$reporter->{reportjob};
 
    if ($command eq ""){
    }
@@ -136,17 +135,6 @@ sub processConsoleCommand
    #elsif ($command eq "exit"){
    #   close($client);
    #}
-   elsif ($command eq "status"){
-      my %d=%$reporter;
-      delete($d{reportjob});
-      my $d=Dumper(\%d);
-      $d=~s/^.*?{/{/;
-      printf $client ("status: %s\n",$d);
-      printf $client ("Loaded modules:\n");
-      foreach my $module (sort(keys(%{$reportjob->{Reporter}}))){
-         printf $client ("- %s\n",$module);
-      }
-   }
    elsif ($command eq "shutdown"){
       $self->Shutdown();
       exit(0);

@@ -287,11 +287,6 @@ sub Init
                       "base::signedfile",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("sysadm.reportjob",
-                      "base::reportjob",
-                      func=>'Main',
-                      defaultacl=>['valid_user']);
-
    $self->RegisterObj("sysadm.history",
                       "base::history",
                       func=>'Main',
