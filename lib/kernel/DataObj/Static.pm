@@ -139,19 +139,49 @@ sub getFirst
                      sort({lc($a->{ostring}) cmp lc($b->{ostring})} @orderbuf)
                      )];
 
+
+   printf STDERR ("fifi skip=%s\n",$self->{_LimitStart});
+   my $LimitStart=$self->{_LimitStart};
+   $LimitStart=0 if ($LimitStart eq "");
+   $LimitStart=1 if ($LimitStart<1);
+   
+   $self->{resultRecCnt}=1;
+
+   # LimitStart=1 means starting with 1st record
+
+
    $self->{'Pointer'}=shift(@{$self->{'Index'}});
    return(undef) if (!defined($self->{'Pointer'}));
+
+   my $cdata=$self->{CurrentData};
+
    while(!($self->CheckFilter()) && 
-         defined($self->{CurrentData}->[$self->{'Index'}->[$self->{'Pointer'}]])){ 
+         defined($cdata->[$self->{'Index'}->[$self->{'Pointer'}]])){ 
       $self->{'Pointer'}=shift(@{$self->{'Index'}});
       return(undef) if (!defined($self->{'Pointer'}));
    }
+   while($LimitStart>1){
+      $self->{'Pointer'}=shift(@{$self->{'Index'}});
+      return(undef) if (!defined($self->{'Pointer'}));
+      while(!($self->CheckFilter()) && 
+            defined($cdata->[$self->{'Index'}->[$self->{'Pointer'}]])){ 
+         $self->{'Pointer'}=shift(@{$self->{'Index'}});
+         return(undef) if (!defined($self->{'Pointer'}));
+      }
+      $LimitStart--;
+   }
+
+   $self->{resultRecCnt}++;
+   return(undef) if (!defined($self->{'Pointer'}));
    return($self->tieRec());
 }
 
 sub getNext
 {
    my $self=shift;
+   return(undef) if ($self->{_Limit}>0 && 
+                     $self->{resultRecCnt}>$self->{_Limit});
+   $self->{resultRecCnt}++;
    $self->{'Pointer'}=shift(@{$self->{'Index'}});
    return(undef) if (!defined($self->{'Pointer'}));
 
