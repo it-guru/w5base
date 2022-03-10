@@ -431,11 +431,9 @@ sub getSqlSelect
    my $drivername=defined($self->{DB}) ? $self->{DB}->DriverName():undef;
    my @cmd;
    #return(undef) if ($#from==-1 || $from[0] eq "");
+   my $dropLimitStart=0;
    foreach my $from (@from){
       my $cmd="select "; 
-      #if ($limitnum>0){  # not good - it reduces performance in some cases!
-      #   $cmd.=" /*+ FIRST_ROWS(".($limitnum).") */ ";
-      #}
       $cmd.=$distinct.join(",",@fields);
       if ($from ne ""){
          $cmd.=" from $from";
@@ -452,12 +450,20 @@ sub getSqlSelect
       # Limit Handling
       #
       if ($limitnum>0 && !$self->{_UseSoftLimit}){
-
+         my $limitstart=$self->{_LimitStart};
+         $limitstart=1 if ($limitstart eq "");
+         $limitstart=1 if ($limitstart<1);
+         # LimitStart=1 means starting with the 1st record
          if ($drivername eq "mysql"){
-            $cmd.=" limit $limitnum";
+            $limitstart--;    # MySQL starts with record 0
+            my $limitstring=$limitstart.",".$limitnum;
+            $cmd.=" limit $limitstring";
+            $dropLimitStart++;
          }
          if ($drivername eq "oracle"){
-            $cmd="select * from ($cmd) where ROWNUM<=$limitnum";
+            my $limitstring="ROWNUM>=$limitstart AND ROWNUM<=$limitnum";
+            $dropLimitStart++;
+            $cmd="select * from ($cmd) where $limitstring";
          }
       }
       my $disp=$cmd;
@@ -470,6 +476,9 @@ sub getSqlSelect
          $cmd.=" with ur" if ($self->{use_dirtyread}==1);
       }
       push(@cmd,$cmd);
+   }
+   if ($dropLimitStart){
+      delete($self->{_LimitStart});
    }
    if ($#cmd>0){
       map({$_="(".$_.")"} @cmd);
@@ -977,13 +986,19 @@ sub getFirst
       my $msg=sprintf("%s:time=%0.4fsec;mod=$p",NowStamp(),$t);
       $msg.=";user=$ENV{REMOTE_USER}" if ($ENV{REMOTE_USER} ne "");
       $self->Log(INFO,"sqlread",$sqlcmd[0]." ($msg)");
+      my $limitreached=0;
       if ($self->{_LimitStart}>1){
          for(my $c=0;$c<$self->{_LimitStart};$c++){
             my ($temprec,$error)=$self->{DB}->fetchrow();
-            last if (!defined($temprec));
+            if (!defined($temprec)){
+               $limitreached++;
+            }
          }
       }
-      my ($temprec,$error)=$self->{DB}->fetchrow();
+      my ($temprec,$error);
+      if (!$limitreached){
+         ($temprec,$error)=$self->{DB}->fetchrow();
+      }
       if ($error){
          $self->LastMsg(ERROR,$self->{DB}->getErrorMsg());
          return(undef,$self->{DB}->getErrorMsg());
