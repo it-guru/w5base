@@ -3446,7 +3446,8 @@ sub Result
       if (defined($param{Limit}) && $uselimit eq ''){
          $uselimit=$param{Limit};
       }
-      if ($format eq "JSONP" || $format eq "nativeJSONP"){
+      if ($format eq "JSONP" || $format eq "nativeJSONP" ||
+          $format eq "nativeJSON"){
          $self->Limit($uselimit,$uselimitstart,0);
       }
       else{
