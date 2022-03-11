@@ -140,7 +140,6 @@ sub getFirst
                      )];
 
 
-   printf STDERR ("fifi skip=%s\n",$self->{_LimitStart});
    my $LimitStart=$self->{_LimitStart};
    $LimitStart=0 if ($LimitStart eq "");
    $LimitStart=1 if ($LimitStart<1);
