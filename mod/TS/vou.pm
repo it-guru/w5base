@@ -564,7 +564,9 @@ sub Validate
             }
          }
          $canvasid=uc($canvasid);
-         if (!($canvasid=~m/^C[0-9]{2,3}$/)){
+         if ((!($canvasid=~m/^C[0-9]{2,3}$/) &&
+              !($canvasid=~m/^[A-Z]{1,3}$/)) ||
+             length($canvasid)>4){
             $self->LastMsg(ERROR,"invalid format of CanvasID");
             return(0);
          }
@@ -936,7 +938,7 @@ sub isWriteValid
 
 
    if (in_array(\@l,"ALL")){
-      @l=("default","vouattr","comments","canvas","contacts","subvous");
+      @l=("default","vouattr","comments","contacts","subvous");
    }
 
    return(@l);
