@@ -134,7 +134,7 @@ sub TPC_CloudAreaSync
             id=>$rec->{id},
             name=>$rec->{name},
          };
-         if ($rec->{applid}=~m/^[0-9]{3,20}$/){
+         if ($rec->{applid}=~m/^[0-9]{2,20}$/){
             $crec->{applid}=$rec->{applid};
          }
          push(@s,$crec);
