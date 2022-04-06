@@ -54,11 +54,14 @@ sub new
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
+                   my $fo=$self->getParent->getField("refid");
+                   my $refid=$fo->RawValue($current);
                    my $fo=$self->getParent->getField("article");
                    my $a=$fo->RawValue($current);
-                   return("ACL(".$current->{aclid}."):".$a);
+                   $a=TextShorter($a,40,["INDICATED"]);
+                   return("FAQ:$refid ACL(".$current->{aclid}."):".$a);
                 },
-                label         =>'FAQ Shortdescription'),
+                label         =>'FAQ ACL Shortdescription'),
       insertafter=>['aclparentobj']
    );
 
