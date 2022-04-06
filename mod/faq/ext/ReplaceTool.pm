@@ -40,7 +40,7 @@ sub getControlRecord
              dataobj      =>'faq::acl',
              target       =>'acltargetname',
              idfield      =>'acltargetid',
-             targetlabel  =>'aclid',
+             targetlabel  =>'fullname',
              baseflt      =>{aclparentobj=>\'faq::article',
                              acltarget=>\'base::user'}
            },
@@ -49,7 +49,7 @@ sub getControlRecord
              dataobj      =>'faq::acl',
              target       =>'acltargetname',
              idfield      =>'acltargetid',
-             targetlabel  =>'aclid',
+             targetlabel  =>'fullname',
              baseflt      =>{aclparentobj=>\'faq::article',
                              acltarget=>\'base::grp'}
            }
