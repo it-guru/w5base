@@ -789,8 +789,9 @@ sub doSoftwareExpressionValidate
    my $limit=50;
 
    $param->{name}=~s/[\*\s\?,'"]//g;
+   $param->{id}=~s/[\*\s\?,'"]//g;
 
-   if (length($param->{name})<2){
+   if (length($param->{name})<2 && length($param->{id})<2){
       return({
          exitcode=>100,
          exitmsg=>"'name' filter not specific enough"
@@ -798,7 +799,18 @@ sub doSoftwareExpressionValidate
    }
 
    $self->ResetFilter();
-   $self->SetFilter({name=>"*".$param->{name}."*",cistatusid=>[3,4,5]});
+
+   my %flt=();
+
+   if ($param->{name} ne ""){
+      $flt{name}="*".$param->{name}."*";
+      $flt{cistatusid}=[3,4,5];
+   }
+   if ($param->{id} ne ""){
+      $flt{id}=\$param->{id};
+   }
+
+   $self->SetFilter(\%flt);
    $self->Limit($limit+1);
    my @l=$self->getHashList(qw(name id cistatusid urlofcurrentrec releaseexp));
    
