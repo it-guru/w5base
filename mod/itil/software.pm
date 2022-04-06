@@ -746,6 +746,96 @@ sub isCopyValid
 }
 
 
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   my @l=$self->SUPER::getValidWebFunctions(@_);
+   push(@l,"SoftwareExpressionValidate");
+   return(@l);
+}
+
+
+sub SoftwareExpressionValidate
+{
+   my $self=shift;
+
+   return(
+      $self->simpleRESTCallHandler(
+         {
+            name=>{
+               typ=>'STRING',
+               path=>0,
+               init=>'Apache_WebServer'
+            },
+            version=>{
+               typ=>'STRING',
+               path=>1,
+               init=>'1.2.3'
+            },
+            id=>{
+               typ=>'STRING'
+            },
+         },undef,\&doSoftwareExpressionValidate,@_)
+   );
+}
+
+
+sub doSoftwareExpressionValidate
+{
+   my $self=shift;
+   my $param=shift;
+   my $r={};
+   my $limit=50;
+
+   $param->{name}=~s/[\*\s\?,'"]//g;
+
+   if (length($param->{name})<2){
+      return({
+         exitcode=>100,
+         exitmsg=>"'name' filter not specific enough"
+      });
+   }
+
+   $self->ResetFilter();
+   $self->SetFilter({name=>"*".$param->{name}."*",cistatusid=>[3,4,5]});
+   $self->Limit($limit+1);
+   my @l=$self->getHashList(qw(name id cistatusid urlofcurrentrec releaseexp));
+   
+   $r->{data}=\@l;
+   if ($#l>=$limit){
+      $r->{ResultIncomplete}=1;
+      $r->{data}=[@l[0..($limit-1)]];
+   }
+   if ($param->{version} ne ""){
+      $r->{version}=$param->{version};
+      foreach my $rec (@{$r->{data}}){
+         my $chkrec={
+            softwareid=>$rec->{id},
+            version=>$param->{version}
+         };
+         my $chk=$self->validateSoftwareVersion(undef,$chkrec,1);
+         $chk="0" if (!$chk);
+         $rec->{releaseexp_version_match}=$chk;
+      }
+   }
+  
+
+
+
+
+
+   return({
+      result=>$r,
+      exitcode=>0,
+      exitmsg=>'OK'
+   });
+}
+
+
+
+
+
 
 
 1;
