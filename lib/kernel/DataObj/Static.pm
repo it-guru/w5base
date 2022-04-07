@@ -196,11 +196,16 @@ sub Rows
 {
    my $self=shift;
 
-#   if (exists($self->{Index})){
-#      return($#{$self->{Index}});
-#   }
+   $self->{resultRecCnt}=0;
 
-   return(undef);
+   my $cdata=$self->{CurrentData};
+   for(my $c=0;$c<=$#{$cdata};$c++){
+      $self->{'Pointer'}=$c;
+      if ($self->CheckFilter()){
+         $self->{resultRecCnt}++;
+      }
+   }
+   return($self->{resultRecCnt});
 }
 
 sub CheckFilter
