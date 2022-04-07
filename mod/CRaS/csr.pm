@@ -389,11 +389,28 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'csr.ssslenddate'),
 
+      new kernel::Field::Link(
+                name          =>'ssslcertfilename',
+                label         =>'Download-Filename signed certificate',
+                depend        =>['name'],
+                onRawValue    =>sub {
+                    my $self   =shift;
+                    my $current=shift;
+                    my $fld=$self->getParent->getField("name");
+                    my $name=lc($fld->RawValue($current));
+                    $name=~s/\s*//g;
+                    $name=~s/[^a-z0-9_.-]//gi;
+                    $name="SingedCert" if ($name eq "");
+                    return($name.".pem");
+                }),
+  
+
       new kernel::Field::File(
                 name          =>'ssslcert',
                 label         =>'signed certificate',
                 group         =>['detail'],
                 types         =>['pem'],
+                filename      =>'ssslcertfilename',
                 maxsize       =>65533,
                 readonly      =>1,
                 searchable    =>0,
@@ -863,14 +880,13 @@ sub Validate
          $self->LastMsg(ERROR,"signed cert in invalid format");
          return(0);      
       }
-      $newrec->{ssslstartdate}=$x509->{startdate};
-      $newrec->{ssslenddate}=$x509->{enddate};
-      $newrec->{ssslissuerdn}=$x509->{ssslissuerdn};
-      if ($x509->can("serial")){
-         $newrec->{ssslserialno}=$x509->serial();
-      }
-      if ($x509->can("issuer")){
-         $newrec->{ssslissuerdn}=$x509->issuer();
+      else{
+         $newrec->{ssslstartdate}=$x509->{startdate};
+         $newrec->{ssslstartdate}=$x509->{startdate};
+         $newrec->{ssslenddate}=$x509->{enddate};
+         $newrec->{ssslissuerdn}=$x509->{ssslissuerdn};
+         $newrec->{ssslserialno}=$x509->{ssslserialno};
+         $newrec->{ssslissuerdn}=$x509->{ssslissuerdn};
       }
    }
 
