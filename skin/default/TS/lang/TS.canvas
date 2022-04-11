@@ -10,3 +10,4 @@
 'responsible organisation'=>{de=>'verantwortliche Organisation'},
 'invalid format of CanvasID'=>{de=>'ungültiges Format der CanvasID'},
 'Applications'=>{de=>'Anwendungen'},
+'Name field not sufficient filled'=>{de=>'"Name" Feld nicht ausreichend befüllt'},
