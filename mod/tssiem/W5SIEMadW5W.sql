@@ -142,6 +142,8 @@ create or replace synonym W5I.W5SIEM_secent_of for "W5SIEM_secent_of";
 
 -- drop table "W5SIEM_secscanruntime";
 create table "W5SIEM_secscanruntime" (
+   stype       VARCHAR2(128),
+   program     VARCHAR2(128),
    lastrun     DATE not null,
    exitcode    INT
 );
