@@ -45,7 +45,7 @@ CREATE INDEX "W5SIEM_secscan_i3"
 create table "W5SIEM_secent" (
    id                   INTEGER not null,
    ref                  VARCHAR2(32) not null,
-   ipaddress            VARCHAR2(45) not null,
+   ipaddress            VARCHAR2(4000) not null, -- Eigentlich das "Target"
    tracking_method      VARCHAR2(40),
    osname               VARCHAR2(128),
    dns                  VARCHAR2(256),
