@@ -62,16 +62,30 @@ sub new
                 dataobjattr   =>'businessprocess.customer'),
    
       new kernel::Field::Text(
-                name          =>'name',
+                name          =>'shortname',
                 htmlwidth     =>'250px',
+                maxlength     =>99,
+                htmleditwidth =>'200px',
                 label         =>'Shortname',
                 dataobjattr   =>'businessprocess.name'),
 
       new kernel::Field::Text(
-                name          =>'fullname',
+                name          =>'name',
                 htmlwidth     =>'250px',
                 label         =>'Name',
                 dataobjattr   =>'businessprocess.fullname'),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                htmlwidth     =>'550px',
+                readonly      =>1,
+                htmldetail    =>0,
+                label         =>'full qualified process name',
+                dataobjattr   =>"concat(businessprocess.name,".
+                                "if (businessprocess.fullname is not null and ".
+                                "businessprocess.fullname<>'',':',''),".
+                                "businessprocess.fullname,'\@',".
+                                "customer.fullname)"),
 
       new kernel::Field::Text(
                 name          =>'selector',
@@ -79,8 +93,11 @@ sub new
                 readonly      =>1,
                 htmldetail    =>0,
                 label         =>'Selector',
-                dataobjattr   =>'concat(businessprocess.name,"@",'.
-                                'customer.fullname)'),
+                dataobjattr   =>"concat(businessprocess.name,".
+                                "if (businessprocess.fullname is not null and ".
+                                "businessprocess.fullname<>'',':',''),".
+                                "businessprocess.fullname,'\@',".
+                                "customer.fullname)"),
 
       new kernel::Field::Select(
                 name          =>'cistatus',
@@ -353,7 +370,7 @@ sub new
                 dataobjattr   =>'businessprocessacl.aclmode'),
 
    );
-   $self->setDefaultView(qw(linenumber selector cistatus importance));
+   $self->setDefaultView(qw(linenumber fullname cistatus importance));
    $self->setWorktable("businessprocess");
    $self->{history}={
       update=>[
@@ -364,7 +381,7 @@ sub new
    $self->{workflowlink}={ workflowkey=>[id=>'affectedbusinessprocessid']
                          };
    $self->{use_distinct}=1;
-   $self->{CI_Handling}={uniquename=>"name",
+   $self->{CI_Handling}={uniquename=>"shortname",
                          activator=>["admin","w5base.crm.businessprocess"],
                          uniquesize=>100};
    return($self);
@@ -492,9 +509,9 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   if ((!defined($oldrec) || defined($newrec->{name})) &&
-       $newrec->{name}=~m/^\s*$/){
-      $self->LastMsg(ERROR,"invalid name specified");
+   if ((!defined($oldrec) || defined($newrec->{shortname})) &&
+       $newrec->{shortname}=~m/^\s*$/){
+      $self->LastMsg(ERROR,"invalid shortname specified");
       return(0);
    }
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
@@ -527,7 +544,32 @@ sub Validate
       $self->LastMsg(ERROR,"invalid or no customer specified");
       return(0);
    }
-   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));
+
+   #my $name=effVal($oldrec,$newrec,"name");
+   #
+   #if ($name eq ""){
+   #   $newrec->{name}=\undef;
+   #}
+
+
+
+   my $shortname=effVal($oldrec,$newrec,"shortname");
+   if ($shortname eq ""){
+      $newrec->{shortname}=\undef;
+   }
+   else{
+      my $n2=$shortname;
+      $n2=~s/://g;
+      if ($n2 ne $shortname){
+         $newrec->{shortname}=$n2;
+      }
+   }
+
+
+
+
+
+   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"shortname"));
 
    return(1);
 }

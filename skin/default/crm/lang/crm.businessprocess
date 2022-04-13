@@ -8,7 +8,8 @@
 'Customer'=>{de=>'Kunde'},
 'Shortname'=>{de=>'Kurzbezeichnung'},
 'parent business process'=>{de=>'Eltern-Geschäftsprozess'},
-'Selector'=>{de=>'vollqualifizierte Prozessbezeichnung'},
+'Selector'=>{de=>'Prozess Selektor'},
+'full qualified process name'=>{de=>'vollqualifizierte Prozessbezeichnung'},
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Process Owner'=>{de=>'Prozesseigentümer'},
 'Deputy Process Owner'=>{de=>'Prozesseigentümer Vertreter'},
@@ -48,5 +49,6 @@
 'RODManager2'=>{ de=>'Orderprozessmanager Vertreter', en=>'Order-Manager deputy'},
 'RLIManager'=>{ de=>'Lizenzprozessmanager', en=>'License-Manager'},
 'RLIManager2'=>{ de=>'Lizenzprozessmanager Vertreter', en=>'License-Manager deputy'},
+'invalid shortname specified'=>{de=>'ungültige Kurzbezeichnung'},
 
 
