@@ -97,3 +97,4 @@
 'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},
 'missing subject'=>{de=>'kein Betreff'},
 'missing mail text'=>{de=>'kein Nachrichtentext'},
+"eventend can't be sooner as eventstart"=>{de=>"Ereignisende kann nicht vor dem Ereignisbegin liegen"},

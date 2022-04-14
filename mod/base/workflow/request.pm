@@ -1225,7 +1225,7 @@ sub nativProcess
       return(0);
    }
    elsif($op eq "wffine"){
-      if ($self->getParent->getParent->Action->StoreRecord(
+      if (my $aid=$self->getParent->getParent->Action->StoreRecord(
           $WfRec->{id},"wffine",
           {translation=>'base::workflow::request'},"",undef)){
          my $nextstep=$self->getParent->getStepByShortname("finish");
@@ -1239,9 +1239,14 @@ sub nativProcess
          if ($WfRec->{eventend} eq ""){
             $store->{eventend}=NowStamp("en");
          }
-         $self->StoreRecord($WfRec,$store);
-         $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
-         $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         if ($self->StoreRecord($WfRec,$store)){
+            $self->getParent->getParent->CleanupWorkspace($WfRec->{id});
+            $self->PostProcess("SaveStep.".$op,$WfRec,$actions);
+         }
+         else{
+            # delete Action Record, becaus StoreRecord not successfully
+            $self->getParent->getParent->Action->BulkDeleteRecord({id=>\$aid});
+         }
          return(1);
       }
    }
