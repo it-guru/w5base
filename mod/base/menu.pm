@@ -223,7 +223,7 @@ sub getValidWebFunctions
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(),
           "root","mobile","menutop","menuframe","msel","TableVersionChecker",
-          "LoginFail","IllegalTokenAccess","SkinSwitcher");
+          "LoginFail","IllegalTokenAccess","SkinSwitcher","setSkin");
 }
 
 #####################################################################
@@ -863,20 +863,8 @@ sub SkinSwitcher
       $skinname="" if ($skinno==0);
       $skinlabel=~s/^(\S)/uc($1)/ge;
 
-      my $cpath;
-      if (!($cpath=~m/$ENV{REQUEST_URI}/)){
-         $cpath=$ENV{SCRIPT_URI};
-      }
-      $cpath=~s#^http[s]{0,1}://[^/]*/#/#i;
-      $cpath=~s/[\s?].*$//;
 
-      $cpath="/w5base-devnull.telekom.de/darwin/auth/base/menu/SkinSwitcher";
-      $cpath=~s#/[^/]+/base/menu/SkinSwitcher#/#i;
-      $cpath="/";
-      # funktioniert irgendwie noch nicht
-
-
-      my $onclick="setSkin('".$skinname."','".$cpath."');";
+      my $onclick="setSkin('".$skinname."');";
       my $pref="";
       my $post="";
       if ($skinname eq Query->Cookie("W5SKIN")){
@@ -909,6 +897,12 @@ sub SkinSwitcher
    print ("</body>");
    print ("</html>");
 }
+
+
+
+
+
+
 
 sub IllegalTokenAccess
 {
@@ -1413,6 +1407,64 @@ sub processSubs
    $path=~s/\./\//g;
    $m->{href}=$self->{hrefbase}."msel/$path";
 }
+
+
+sub setSkin
+{
+   my $self=shift;
+
+   return(
+      $self->simpleRESTCallHandler(
+         {
+            name=>{
+               typ=>'STRING'
+            }
+         },undef,\&doSetSkin,@_)
+   );
+}
+
+sub doSetSkin
+{
+   my $self=shift;
+   my $param=shift;
+   my $r={};
+
+   my $newskin=$param->{name};
+
+   my $cookie;
+
+   my $cpath;
+   if (!($cpath=~m/$ENV{REQUEST_URI}/)){
+      $cpath=$ENV{SCRIPT_URI};
+   }
+   $cpath=~s#^http[s]{0,1}://[^/]*/#/#i;
+   $cpath=~s/[\s?].*$//;
+   $cpath=~s#/(public|auth)/base/menu/setSkin#/#i;
+   #msg(INFO,"setSkin '$newskin' user cookie operation on $cpath");
+
+   if ($newskin ne ""){
+      $cookie=Query->Cookie(
+                    -path=>$cpath,
+                    -name=>"W5SKIN",
+                    -value=>$newskin);
+   }
+   else{
+      $cookie=Query->Cookie(
+                    -path=>$cpath,
+                    -name=>"W5SKIN",
+                    -value=>$newskin);
+   }
+
+
+
+   return($cookie,{
+      exitcode=>0,
+      exitmsg=>'OK'
+   });
+}
+
+
+
 
 
 
