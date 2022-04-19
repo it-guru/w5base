@@ -72,12 +72,12 @@ sub CapeCanvasHubimport
                                         id 
                                         respvorg  orgarea organisation
                                         canvas))){
-      next if ($irec->{canvas}=~m/^C99 /); # No Canvas dummy records
+      next if ($irec->{canvas}=~m/^C99\s/); # No Canvas dummy records
       next if ($irec->{canvas} eq "");
       $c++;
       my $icto=$irec->{archapplid};
       my $ictoid=$irec->{id};
-      my ($canvasidstr)=$irec->{canvas}=~m/^(C[0-9]{1,3})\s+/;
+      my ($canvasidstr)=$irec->{canvas}=~m/^(\S{1,6})\s+/;
       my ($hubshort)=$irec->{organisation}=~m/^E-HUB-[0-9]+\s+(\S{2,4})\s+/;
       if ($hubshort eq ""){
          ($hubshort)=$irec->{organisation}=~m/^(\S{3})\s+/;
