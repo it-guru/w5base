@@ -2231,9 +2231,15 @@ sub _simpleRESTCallHandler_SendResult
    my $self=shift;
    my $directCall=shift;
    my $result=shift;
+   my $cookie;
 
-   #printf STDERR ("HTTP_ACCEPT_CHARSET=%s\n",$ENV{HTTP_ACCEPT_CHARSET});
-
+   if (ref($result) eq "CGI::Cookie"){  # if 1st result parameter is a 
+      $cookie=$result;                  # CGI::Cookie object, it will tread
+      $result=shift;                    # as cookie set request.
+   }
+   if ($cookie){
+      printf("Set-Cookie: %s\n",$cookie->as_string);
+   }
    if (!$directCall){
       my @accept=split(/\s*,\s*/,lc($ENV{HTTP_ACCEPT}));
       if (in_array(\@accept,["application/json","text/javascript"])){
@@ -2316,8 +2322,8 @@ sub simpleRESTCallHandler
                   }));
                }
             }
-            my $result=&{$f}($self,$q);
-            return($self->_simpleRESTCallHandler_SendResult(0,$result));
+            my @result=&{$f}($self,$q);
+            return($self->_simpleRESTCallHandler_SendResult(0,@result));
          }
       }
       else{
