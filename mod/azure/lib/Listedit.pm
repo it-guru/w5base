@@ -351,4 +351,41 @@ sub genReadAzureId
 
 
 
+
+
+
+sub Ping
+{
+   my $self=shift;
+
+   my $errors;
+   my $d;
+   # Ping is for checking backend connect, without any error displaying ...
+   {
+      open local(*STDERR), '>', \$errors;
+      eval('
+         my $Authorization=$self->getAzureAuthorizationToken();
+         $d=$Authorization;
+      ');
+   }
+   if (!defined($d) && !$self->LastMsg()){
+      $self->LastMsg(ERROR,"bad Ping on Azure");
+   }
+   if (!$self->LastMsg()){
+      if ($errors){
+         my $gc=globalContext();  # and errors are silent transfered to LastMsg
+         $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
+         foreach my $emsg (split(/[\n\r]+/,$errors)){
+            push(@{$gc->{LastMsg}},$emsg);
+         }
+      }
+   }
+
+   return(0) if (!defined($d));
+   return(1);
+
+}
+
+
+
 1;
