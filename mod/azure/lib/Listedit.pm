@@ -58,6 +58,13 @@ sub ExternInternTimestampReformat
 sub getAzureAuthorizationToken
 {
    my $self=shift;
+   my $param=shift;
+   my $resource="https://management.core.windows.net/";
+   if (ref($param) eq "HASH"){
+      if (exists($param->{resource})){
+         $resource=$param->{resource};
+      }
+   }
 
    $W5V2::Cache->{GLOBAL}={} if (!exists($W5V2::Cache->{GLOBAL}));
    my $gc=$W5V2::Cache->{GLOBAL};
@@ -89,7 +96,7 @@ sub getAzureAuthorizationToken
                grant_type    => 'client_credentials',
                client_id     => $apiuser,
                client_secret => $apikey,
-               resource      => 'https://management.core.windows.net/',
+               resource      => $resource,
                tenant        => $base
             );
             my $qstr=kernel::cgi::Hash2QueryString(%qparam);
