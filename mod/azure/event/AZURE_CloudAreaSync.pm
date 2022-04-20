@@ -29,7 +29,22 @@ sub Init
 
    $self->RegisterEvent("AZURE_CloudAreaSync","AZURE_CloudAreaSync");
    $self->RegisterEvent("AZURE_QualityCheck","AZURE_QualityCheck");
+   $self->RegisterEvent("AZURE_CreateNewSecret","AZURE_CreateNewSecret");
    return(1);
+}
+
+sub AZURE_CreateNewSecret
+{
+   my $self=shift;
+   my $subsc=getModuleObject($self->Config,"azure::subscription");
+
+   my $newSecrect=$subsc->createNewSecret();
+   if ($newSecrect ne "" && !($newSecrect=~m/"/)){
+      printf("new secret:\n");
+      printf("DATAOBJPASS[AZURE]=\"%s\"\n",$newSecrect);
+      return({exitcode=>'0'});
+   }
+   return({exitcode=>'0',exitmsg=>'Fail to create a new Azure secret'});
 }
 
 sub AZURE_QualityCheck
