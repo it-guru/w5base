@@ -1125,6 +1125,58 @@ sub initSearchQuery
 }
 
 
+sub HandleUserVote
+{
+   my $self=shift;
+   my $faqrec=shift;
+   my $voteval=shift;
+
+
+   if ($voteval<0){
+      printf STDERR ("HandleUserVote($voteval):\n%s\n",Dumper($faqrec));
+      if ($faqrec->{ownerid}>0){
+        my $emailto;
+        my $user=getModuleObject($self->Config,"base::user");
+        $user->SetFilter({userid=>\$faqrec->{ownerid}});
+        my ($urec,$msg)=$user->getOnlyFirst(qw(email fullname lastlang));
+        if (defined($urec) && $urec->{fullname} ne ""){
+           $emailto=$urec->{email};
+        }
+        if (defined($urec) && $urec->{lastlang} ne ""){
+           $ENV{HTTP_FORCE_LANGUAGE}=$urec->{lastlang};
+        }
+        my $wfa=getModuleObject($self->Config,"base::workflowaction");
+        #my $subject="FAQ: ".$faqrec->{name};
+        my $subject=$self->T("bad faq article vote");
+
+
+
+        if ($emailto ne ""){
+
+           my $tmpl=$self->getParsedTemplate("tmpl/VoteNotify",{
+              static=>{
+                 FAQNAME=>$faqrec->{name}
+              }
+           });
+           $wfa->Notify( "WARN",$subject,$tmpl,
+              emailfrom=>"\"W5Base-Notify\" <>",
+              emailto=>$emailto,
+              dataobj=>'faq::article',
+              dataobjid=>$faqrec->{faqid},
+              emailbcc=>[
+                 11634953080001,   # HV
+              ],
+              emailcategory =>['faq',
+                               'faq::article',
+                               'badvote']
+           );
+        }
+        delete($ENV{HTTP_FORCE_LANGUAGE});
+      }
+   }
+}
+
+
 
 
 
