@@ -267,7 +267,7 @@ sub getClientAddrIdString
       }
    }
    if (defined($addr)){  # sec hack - HTTP_X_FORWARDED_FOR is not 100% safe!
-      $addr=~s/[^0-9a-fA-F:. ()]/_/g;
+      $addr=~s/[^0-9a-fA-F:. (),;]/_/g;
    }
    return($addr);
 }
