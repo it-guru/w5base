@@ -763,8 +763,8 @@ sub syncToGroups
             }
             if (defined($fnd)){
                my $upd={};
-               if ($fnd->{cistatusid} ne "4"){
-                  $upd->{cistatusid}=4; 
+               if ($fnd->{cistatusid} ne $cistatus){
+                  $upd->{cistatusid}=$cistatus; 
                }
                my $cname=$fnd->{name};
                $cname=~s/\[\d+\]$//;
@@ -810,7 +810,7 @@ sub syncToGroups
          foreach my $r (@inslist){
             my $subgrpid=$grp->ValidatedInsertRecord({
                name=>$r->{name},
-               cistatusid=>4,
+               cistatusid=>$cistatus,
                parentid=>$grpid,
                is_projectgrp=>1,
                srcsys=>"TS::subvou",
