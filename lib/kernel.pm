@@ -250,6 +250,8 @@ sub getClientAddrIdString
        $ENV{HTTP_X_FORWARDED_FOR} ne ""){
       if ($realclientendpoint){
          $addr=$ENV{HTTP_X_FORWARDED_FOR};
+         $addr=~s/[,;].*$//;  # use only first IP - if HTTP_X_FORWARDED_FOR is
+                              # a path (multiple RevProxys in path)
       }
       else{
          if ($ENV{HTTP_X_FORWARDED_FOR} ne $ENV{REMOTE_ADDR}){
