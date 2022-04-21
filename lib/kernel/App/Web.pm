@@ -41,7 +41,8 @@ sub RunWebApp
 
    binmode(STDOUT,':raw');
    binmode(STDERR,':raw');
-   if (!defined($ENV{REMOTE_USER}) || $ENV{REMOTE_USER} eq ""){
+   if (!defined($ENV{REMOTE_USER}) || $ENV{REMOTE_USER} eq "" ||
+        $ENV{REMOTE_USER} eq "anonymous"){
       if ($ENV{HTTP_X_API_KEY} ne ""){
          my $ua=getModuleObject($instdir,$configname,"base::useraccount");
          $ua->SetFilter({apitoken=>\$ENV{HTTP_X_API_KEY}});
