@@ -183,7 +183,15 @@ sub vote
    my @p=split(/\//,$p);
    
    my $parentobj=$p[1]."::".$p[2];
+   my $pobj=getModuleObject($self->Config,$parentobj);
+   if (!defined($pobj)){
+      die("uservote::vote pobj $parentobj can not be created");
+   }
    my $refid=$p[3];
+   $refid=~s/[^0-9a-z_+-]//gi;
+   if ($refid eq ""){
+      die("uservote::vote pobj $parentobj refid missing");
+   }
 
    my $userid=$self->getCurrentUserId();
    my $logstamp=$self->getLogStamp();
@@ -214,6 +222,20 @@ sub vote
             #printf STDERR ("fifi parentobj=$parentobj\n");
             #printf STDERR ("fifi refid=$refid\n");
             #printf STDERR ("fifi voteval=$voteval\n");
+
+            if ($pobj->can("HandleUserVote")){
+               my $idfield=$pobj->IdField();
+               if (defined($idfield)){
+                  $pobj->SetFilter({$idfield->Name=>\$refid});
+                  my ($voterec,$msg)=$pobj->getOnlyFirst(qw(ALL));
+                  if (!defined($voterec)){
+                     die("uservote::vote - prec missing $parentobj '$refid'");
+                  }
+                  $pobj->HandleUserVote($voterec,$voteval);
+               }
+            }
+
+
             if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
                $self->ValidatedInsertRecord({
                   parentobj=>$parentobj,
