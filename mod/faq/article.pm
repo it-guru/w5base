@@ -1045,8 +1045,12 @@ sub ById
          my $s=$self->Self();
          $s=~s/::/\//g;
          $self->HtmlGoto("../../../../auth/$s/Detail",
-                         post=>{$idname=>$val,
+                         get=>{$idname=>$val,
                                 ModeSelectCurrentMode=>'FView'}); 
+         # HtmlGoto on get is needed, because a direct post in SSO
+         # enviroment is not working to POSTs (it will redirected with
+         # a location tag in header - and this will results in a GET - no
+         # matter if form from HtmlGoto hast method=post
          return();
       }
    }
