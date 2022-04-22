@@ -1573,22 +1573,29 @@ sub HtmlGoto
    my $target=shift;
    my %param=@_;
    print $self->HttpHeader("text/html");
+   my $method="POST";
+   if (exists($param{get})){
+      $method="GET";
+   }
+
    print <<EOF;
 <!DOCTYPE HTML>
 <html>
 <head><title>... redirecting ...</title></head>
 <body onload=document.forms[0].submit()>
-<form method=post action="$target">
+<form method=$method action="$target">
 EOF
-   if (defined($param{post})){
-      foreach my $k (keys(%{$param{post}})){
-         if ($k=~m/^[a-z0-9_-]+$/i){  # forward only allowed param names
-            my $paramval=$param{post}->{$k};
-            $paramval=~s/"/&quot;/g;
-            my $paramname=$k;
-            $paramname=~s/"/&quot;/g;
-            printf("<input type=hidden name=\"%s\" value=\"%s\">",
-                   $paramname,$paramval);
+   foreach my $qmethod (qw(post get)){
+      if (defined($param{$qmethod})){
+         foreach my $k (keys(%{$param{$qmethod}})){
+            if ($k=~m/^[a-z0-9_-]+$/i){  # forward only allowed param names
+               my $paramval=$param{$qmethod}->{$k};
+               $paramval=~s/"/&quot;/g;
+               my $paramname=$k;
+               $paramname=~s/"/&quot;/g;
+               printf("<input type=hidden name=\"%s\" value=\"%s\">",
+                      $paramname,$paramval);
+            }
          }
       }
    }
