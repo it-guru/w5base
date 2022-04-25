@@ -2095,9 +2095,6 @@ sub Detail
    my $self=shift;
    my %param=@_;
 
-printf STDERR ("fifi Detail URI='$ENV{SCRIPT_URI}' $ENV{REQUEST_METHOD}\n");
- 
-
    if ($ENV{REQUEST_METHOD} eq "GET"){  # try to convert GET to POST
       my %param=Query->MultiVars();
       delete($param{MOD});  # MOD and FUNC are genered from W5Base-Kernel - this
