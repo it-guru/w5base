@@ -1177,6 +1177,8 @@ sub getRecordHtmlDetailHeader
       $delstate="<p><font size=+1><blink><b>".$self->T("deleted").
                 ":</b></blink></font></p>";
    }
+   $wfname=~s/%/\\%/g;
+   $name=~s/%/\\%/g;
    $H.=<<EOF;
 <table width="100%" height="100%" border=0>
 <tr><td align="left">

@@ -433,6 +433,7 @@ EOF
       }
       if ($self->getParent->getParent->can("getRecordHeader")){
          $headerval=$self->getParent->getParent->getRecordHeader($rec);
+
       }
       my $H="";
       $headerval='%objecttitle%' if ($headerval eq "");
@@ -445,6 +446,8 @@ EOF
          $H=$self->getParent->getParent->getRecordHtmlDetailHeader($rec);
       }
       else{ 
+         $headerval=~s/%/\\%/g;   # quote percent chars
+         $s=~s/%/\\%/g;
          $H="<h1 class=detailtoplineobj>$s:</h1>".
             "<h2 class=detailtoplinename>$headerval</h2>";
          $recordimg=$self->getParent->getParent->getRecordImageUrl($rec);
@@ -532,8 +535,10 @@ function setTitle()
                                                                     // not work
          }
       } 
-      parent.document.title=t.innerHTML;
-      document.title=t.innerHTML;
+      var unquotedTitle=t.innerHTML;                        // unquote amberand
+      unquotedTitle=unquotedTitle.replaceAll(/&amp;/g,'&'); // for title tag
+      parent.document.title=unquotedTitle;
+      document.title=unquotedTitle;
    }
    if ("$dragname"!=""){
       var toplineimage=document.getElementById("toplineimage");
