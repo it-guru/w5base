@@ -559,7 +559,7 @@ sub Validate
    }
    else{
       my $n2=$shortname;
-      $n2=~s/://g;
+      $n2=~s/[^a-z0-9 _-]//gi;
       if ($n2 ne $shortname){
          $newrec->{shortname}=$n2;
       }
