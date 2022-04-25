@@ -494,8 +494,14 @@ sub calcBaseApplicationExpertGroup
 {
    my $self=shift;
    my $rec=shift;
+   my $applrec;
 
    my $appl=$self->getParent;
+
+   my $addappl=$appl->Clone();
+   $addappl->SetFilter({id=>\$rec->{id}});
+   my ($applrec)=$addappl->getOnlyFirst(qw(name cistatusid opmode));
+   
 
    my $user=getModuleObject($self->getParent->Config,"base::user");
    my $index=0;
@@ -780,13 +786,21 @@ sub calcBaseApplicationExpertGroup
             push(@{$a{leadprmmgr}->{userid}},$mgmtrec->{leadprmmgrid});
          }
          else{
-            push(@{$a{leadprmmgr}->{userid}},14111237770001);
+            if (($m=~m/^DTAG\.GHQ\.VTI\.DTIT(\.|$)/i) &&
+                $applrec->{cistatusid} eq "4" &&
+                $applrec->{opmode} eq "prod"){ 
+               push(@{$a{leadprmmgr}->{userid}},14111237770001);
+            }
          }
          if ($mgmtrec->{leadinmmgrid} ne ""){
             push(@{$a{leadinmmgr}->{userid}},$mgmtrec->{leadinmmgrid});
          }
          else{
-            push(@{$a{leadinmmgr}->{userid}},13581667950003);
+            if (($m=~m/^DTAG\.GHQ\.VTI\.DTIT(\.|$)/i) &&
+                $applrec->{cistatusid} eq "4" &&
+                $applrec->{opmode} eq "prod"){ 
+               push(@{$a{leadinmmgr}->{userid}},13581667950003);
+            }
          }
       }
    }
@@ -802,7 +816,11 @@ sub calcBaseApplicationExpertGroup
             push(@{$a{chmmgr}->{userid}},$chmrec->{chmgrfmbid});
          }
          else{
-            push(@{$a{chmmgr}->{userid}},13721598690001);
+            if (($m=~m/^DTAG\.GHQ\.VTI\.DTIT(\.|$)/i) &&
+                $applrec->{cistatusid} eq "4" &&
+                $applrec->{opmode} eq "prod"){ 
+               push(@{$a{chmmgr}->{userid}},13721598690001);
+            }
          }
       }
    }
