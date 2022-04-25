@@ -717,6 +717,31 @@ sub initSearchQuery
 }
 
 
+sub prepUploadRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   if (!exists($newrec->{id}) || $newrec->{id} eq ""){
+      if (exists($newrec->{customer}) && $newrec->{customer} ne "" &&
+          exists($newrec->{shortname}) && $newrec->{shortname} ne ""){
+         my $customer=$newrec->{customer};
+         my $shortname=$newrec->{shortname};
+         my $opobj=$self->Clone();
+         $opobj->SetFilter({customer=>[$customer],shortname=>[$shortname]});
+         my ($rec,$msg)=$opobj->getOnlyFirst(qw(id));
+         if (defined($rec)){
+            $newrec->{id}=$rec->{id};
+         }
+      }
+   }
+
+
+   return(1);
+}
+
+
+
 
 
 1;
