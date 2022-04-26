@@ -2,6 +2,7 @@
 'UserFullname'=>{ de=>'Kontakt-Name'},
 'Role'=>{ de=>'Rolle'},
 'Roles'=>{ de=>'Rollen'},
+'RPatchReportRcv'=>{ de=>'Patch-Report-Empfänger', en=>'Patch-Report-Receiver'},
 'RReportReceive'=>{ de=>'Report-Empfänger', en=>'Report-Receiver'},
 'RAdmin'=>{ de=>'Org-Administrator', en=>'Org-Administrator'},
 'RDataAdmin'=>{ de=>'Daten-Administrator', en=>'Data-Administrator'},
