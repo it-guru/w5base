@@ -100,64 +100,97 @@ sub getVRealizeAuthorizationToken
                          'Accept'=>'application/json'];
             return($headers);
          },
+         #success=>sub{  # DataReformaterOnSucces
+         #   my $self=shift;
+         #   my $data=shift;
+         #   if (ref($data) eq "HASH" && exists($data->{content})){
+         #      $data=$data->{content};
+         #   }
+         #   if (ref($data) ne "ARRAY"){
+         #      $data=[$data];
+         #   }
+         #   return($data);
+         #},
+         onfail=>sub{
+            my $self=shift;
+            my $code=shift;
+            my $statusline=shift;
+            my $content=shift;
+            my $reqtrace=shift;
+
+            if ($code eq "400"){  # 400 logon Fehler
+               if ($content=~m/Invalid username or password/i){
+                  $self->LastMsg(ERROR,"invalid username or password - ".
+                                       "authentication refused");
+               }
+               return([],$code);
+            }
+           # msg(ERROR,$reqtrace);
+           # $self->LastMsg(ERROR,"unexpected data TPC project response");
+            return(undef);
+         }
       );
       if (ref($pred) ne "HASH"){
          die("Request for preaccess_token failed");
       }
       my $refresh_token=$pred->{refresh_token};
-
-      my $d=$self->CollectREST(
-         method=>'POST',
-         dbname=>'TPC',
-         requesttoken=>'AuthLevel2',
-         url=>sub{
-            my $self=shift;
-            my $baseurl=shift;
-            my $apikey=shift;
-            $baseurl.="/"  if (!($baseurl=~m/\/$/));
-            my $dataobjurl=$baseurl."iaas/api/login";
-            return($dataobjurl);
-         },
-         content=>sub{
-            my $self=shift;
-            my $baseurl=shift;
-            my $apikey=shift;
-            my $apiuser=shift;
-            my $json=new JSON;
+      if ($refresh_token ne ""){
+         my $d=$self->CollectREST(
+            method=>'POST',
+            dbname=>'TPC',
+            requesttoken=>'AuthLevel2',
+            url=>sub{
+               my $self=shift;
+               my $baseurl=shift;
+               my $apikey=shift;
+               $baseurl.="/"  if (!($baseurl=~m/\/$/));
+               my $dataobjurl=$baseurl."iaas/api/login";
+               return($dataobjurl);
+            },
+            content=>sub{
+               my $self=shift;
+               my $baseurl=shift;
+               my $apikey=shift;
+               my $apiuser=shift;
+               my $json=new JSON;
+        
+               $json->utf8(1);
+               $json->property(utf8=>1);
+               my $postd=$json->encode({
+                  refreshToken=>$refresh_token
+               });
+               return($postd);
+            },
+            headers=>sub{
+               my $self=shift;
+               my $baseurl=shift;
+               my $apikey=shift;
+               my $headers=['Content-Type'=>'application/json',
+                            'Accept'=>'application/json'];
+               return($headers);
+            },
+         );
+         if (ref($d) ne "HASH"){
+            die("Request for access_token failed");
+         }
+         my $cacheTPCauthRec={
+            Authorization=>$d->{tokenType}." ".$d->{token}
+         };
      
-            $json->utf8(1);
-            $json->property(utf8=>1);
-            my $postd=$json->encode({
-               refreshToken=>$refresh_token
-            });
-            return($postd);
-         },
-         headers=>sub{
-            my $self=shift;
-            my $baseurl=shift;
-            my $apikey=shift;
-            my $headers=['Content-Type'=>'application/json',
-                         'Accept'=>'application/json'];
-            return($headers);
-         },
-      );
-      if (ref($d) ne "HASH"){
-         die("Request for access_token failed");
-      }
-
-      my $cacheTPCauthRec={
-         Authorization=>$d->{tokenType}." ".$d->{token}
-      };
+         my $Authorization=$d->{tokenType}." ".$d->{token};
      
-      my $Authorization=$d->{tokenType}." ".$d->{token};
-     
-      if (exists($d->{expires_inx})){
-         $cacheTPCauthRec->{Expiration}=time()+$d->{expires_in}-600;
+         if (exists($d->{expires_inx})){
+            $cacheTPCauthRec->{Expiration}=time()+$d->{expires_in}-600;
+         }
+         else{
+            $cacheTPCauthRec->{Expiration}=time()+600;
+         }
+         $gc->{$gckey}=$cacheTPCauthRec;
       }
       else{
-         $cacheTPCauthRec->{Expiration}=time()+600;
+         $self->LastMsg(ERROR,"missing valid refresh_token for authorisation");
       }
-      $gc->{$gckey}=$cacheTPCauthRec;
+
    }
   
    return($gc->{$gckey}->{Authorization});
@@ -442,48 +475,49 @@ sub Ping
    my $d;
    # Ping is for checking backend connect, without any error displaying ...
    {
-      open local(*STDERR), '>', \$errors;
+    #  open local(*STDERR), '>', \$errors;
       eval('
          my $Authorization=$self->getVRealizeAuthorizationToken();
+         if ($Authorization ne ""){
+            $d=$self->CollectREST(
+               dbname=>"TPC",
+               url=>sub{
+                  my $self=shift;
+                  my $baseurl=shift;
+                  my $apikey=shift;
+                  $baseurl.="/"  if (!($baseurl=~m/\/$/));
+                  my $dataobjurl=$baseurl."iaas/deployments";
+                  $dataobjurl.="?top=2";
+                  return($dataobjurl);
+               },
+               headers=>sub{
+                  my $self=shift;
+                  my $baseurl=shift;
+                  my $apikey=shift;
+                  my $headers=["Authorization"=>$Authorization,
+                               "Content-Type"=>"application/json"];
         
-         $d=$self->CollectREST(
-            dbname=>"TPC",
-            url=>sub{
-               my $self=shift;
-               my $baseurl=shift;
-               my $apikey=shift;
-               $baseurl.="/"  if (!($baseurl=~m/\/$/));
-               my $dataobjurl=$baseurl."iaas/deployments";
-               $dataobjurl.="?top=2";
-               return($dataobjurl);
-            },
-            headers=>sub{
-               my $self=shift;
-               my $baseurl=shift;
-               my $apikey=shift;
-               my $headers=["Authorization"=>$Authorization,
-                            "Content-Type"=>"application/json"];
+                  return($headers);
+               },
+               onfail=>sub{
+                  my $self=shift;
+                  my $code=shift;
+                  my $statusline=shift;
+                  my $content=shift;
+                  my $reqtrace=shift;
         
-               return($headers);
-            },
-            onfail=>sub{
-               my $self=shift;
-               my $code=shift;
-               my $statusline=shift;
-               my $content=shift;
-               my $reqtrace=shift;
+                  my $gc=globalContext(); 
+                  $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
+                  push(@{$gc->{LastMsg}},"ERROR: ".$statusline);
         
-               my $gc=globalContext(); 
-               $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
-               push(@{$gc->{LastMsg}},"ERROR: ".$statusline);
-        
-               return(undef);
-            }
-         );
+                  return(undef);
+               }
+            );
+         }
       ');
    }
    if (!defined($d) && !$self->LastMsg()){
-      $self->LastMsg(ERROR,"bad Ping on TPC");
+      $self->LastMsg(ERROR,"fail to REST Ping to TPC");
    }
    if (!$self->LastMsg()){
       if ($errors){
