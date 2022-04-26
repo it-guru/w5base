@@ -214,17 +214,34 @@ sub qcheckRecord
 
       foreach my $id (keys(%oldrecs)){
          if ($oldrecs{$id}->{misscount}>3){
-            $ad->BulkDeleteRecord({id=>\$id});
+            $ad->ResetFilter();
+            $ad->SetFilter({id=>\$id});
+            my ($oldadrec,$msg)=$ad->getOnlyFirst(qw(ALL));
+            if (defined($oldadrec)){
+               $ad->ValidatedDeleteRecord($oldadrec);
+            }
          }
          else{
             # add misscount only, if last misscount mod is longer
             # then x hours ago (prevent multiple QualityChecks in Frontend 
-            # as fast misscount up counting)
-            $ad->UpdateRecord({misscount=>\'misscount+1',
-                               mdate=>NowStamp("en"),
-                               srcload=>$oldrecs{$id}->{srcload}},
-                              {id=>\$id,
-                               mdate=>"<now-1h"});
+            # as fast misscount up counting).
+            # - this misscount braker only in prod enviroments - for better 
+            #   testing of this feature
+
+            if ($dataobj->Config->Param("W5BaseOperationMode") eq "normal"||
+                $dataobj->Config->Param("W5BaseOperationMode") eq "online"){
+               $ad->UpdateRecord({misscount=>\'misscount+1',
+                                  mdate=>NowStamp("en"),
+                                  srcload=>$oldrecs{$id}->{srcload}},
+                                 {id=>\$id,
+                                  mdate=>"<now-1h"});
+            }
+            else{
+               $ad->UpdateRecord({misscount=>\'misscount+1',
+                                  mdate=>NowStamp("en"),
+                                  srcload=>$oldrecs{$id}->{srcload}},
+                                 {id=>\$id});
+            }
          }
       }
 

@@ -2856,7 +2856,6 @@ sub ValidatedDeleteRecordTransactionless
 {
    my $self=shift;
    my $oldrec=shift;
-
    $self->doInitialize();
    my $bak=undef;
    if ($self->ValidateDelete($oldrec)){

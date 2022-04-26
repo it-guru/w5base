@@ -705,6 +705,42 @@ sub FinishWrite
    }
 }
 
+sub FinishDelete
+{
+   my $self=shift;
+   my $oldrec=shift;
+
+   if ($oldrec->{lnkto_lnksoftware} ne ""){
+      my $allowcleanup=1;
+      my $systemid=$oldrec->{lnkto_system};
+      if ($systemid ne ""){
+         my $sys=getModuleObject($self->Config,"itil::system");
+         $sys->SetFilter({id=>\$systemid});
+         my ($sysrec)=$sys->getOnlyFirst(qw(allowifupdate));
+         if (defined($sysrec)){
+            $allowcleanup=0;
+            if ($sysrec->{allowifupdate}){
+               $allowcleanup=1;
+            }
+         }
+      }
+      if ($allowcleanup){
+         my $lnks=getModuleObject($self->Config,"itil::lnksoftwaresystem");
+         $lnks->SetFilter({id=>\$oldrec->{lnkto_lnksoftware}});
+         my @l=$lnks->getHashList(qw(ALL));
+         if ($#l==0){
+            foreach my $rec (@l){
+               $lnks->ValidatedDeleteRecord($rec);
+            }
+         }
+      }
+   }
+
+   return(1);
+}
+
+
+
 
 sub AutoDiscFormatEntry
 {
