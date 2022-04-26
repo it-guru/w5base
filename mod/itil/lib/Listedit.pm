@@ -1526,47 +1526,51 @@ sub NotifyInterfaceContacts
                                          rawmonitor interfacescomp))){
       my %notify_to;
       my %notify_cc;
-      printf STDERR ("Interface: %s\n",$ifrec->{fullname});
       my $useall=1;
       foreach my $crec (@{$ifrec->{interfacescomp}}){
          if ($crec->{objtype} eq "base::user" && $crec->{comments} ne ""){
             $useall=0;
          }
       }
-      foreach my $crec (@{$ifrec->{interfacescomp}}){
-         if ($crec->{objtype} eq "base::user"){
-            if ($useall || 
-                (!($crec->{comments}=~m/(entwickler|developer)/i) &&
-                 !($crec->{comments}=~m/(projektleiter|manager)/i))){
-               if ($crec->{obj1id} ne ""){
-                  $notify_to{$crec->{obj1id}}++
+      my @wordtags=(
+         ["support contact","support kontakt"],
+         ["technical contact","technischer ansprechpartner"],
+         ["project manager","projekt leiter"],
+         ["developer","entwickler"]
+      );
+
+
+      TARGETFOUND: foreach my $wordtags (@wordtags){
+         my @wordstrings;
+         foreach my $word (@$wordtags){
+            push(@wordstrings,$word);
+            $word=~s/\s//g;
+            push(@wordstrings,$word);
+         }
+         foreach my $crec (@{$ifrec->{interfacescomp}}){
+            if ($crec->{objtype} eq "base::user"){
+               my $wordtagfound=0;
+               foreach my $wordtag (@wordstrings){
+                  my $qwordtag=quotemeta($wordtag);
+                  if ($crec->{comments}=~m/$qwordtag/i){
+                     $wordtagfound++;
+                  }
                }
-               if ($crec->{obj2id} ne ""){
-                  $notify_cc{$crec->{obj2id}}++
-               }
-               if ($crec->{obj3id} ne ""){
-                  $notify_cc{$crec->{obj3id}}++
+               if ($useall || $wordtagfound){
+                  if ($crec->{obj1id} ne ""){
+                     $notify_to{$crec->{obj1id}}++
+                  }
+                  if ($crec->{obj2id} ne ""){
+                     $notify_cc{$crec->{obj2id}}++
+                  }
+                  if ($crec->{obj3id} ne ""){
+                     $notify_cc{$crec->{obj3id}}++
+                  }
                }
             }
          }
-      }
-      if (!keys(%notify_to) && !keys(%notify_cc)){
-         my $app=getModuleObject($dataobj->Config,"itil::appl");
-         $app->SetFilter({id=>\$ifrec->{toapplid}});
-         my ($arec,$msg)=$app->getOnlyFirst(qw(tsmid opmid tsm2id opm2id));
-         if (defined($arec)){
-            if ($arec->{tsmid} ne ""){
-               $notify_to{$arec->{tsmid}}++
-            }
-            if ($arec->{opmid} ne ""){
-               $notify_to{$arec->{opmid}}++
-            }
-            if ($arec->{tsm2id} ne ""){
-               $notify_cc{$arec->{tsm2id}}++
-            }
-            if ($arec->{opm2id} ne ""){
-               $notify_cc{$arec->{opm2id}}++
-            }
+         if (keys(%notify_to)){
+            last TARGETFOUND;
          }
       }
       my @notify_to=keys(%notify_to);
@@ -1576,10 +1580,29 @@ sub NotifyInterfaceContacts
             push(@notify_cc,$uid);
          }
       }
-      if (($#notify_to!=-1 || $#notify_cc!=-1) && $dataobj->LastMsg()){
-         printf STDERR ("Notify To:%s\n",join(", ",@notify_to));
-         printf STDERR ("Notify CC:%s\n",join(", ",@notify_cc));
-         printf STDERR ("%s\n",join("\n",$dataobj->LastMsg()));
+      my $wfa=getModuleObject($self->Config,"base::workflowaction");
+      if (defined($wfa) &&
+          ($#notify_to!=-1 || $#notify_cc!=-1) && $dataobj->LastMsg()){
+         my $subject="interface connect: ".$ifrec->{fullname};
+
+         my $tmpl="There are communication problems on interface ...\n\n".
+                  "<b>".$ifrec->{fullname}."</b>\n\n".
+                  "... with a W5Base system. Available references are:\n\n".
+                  "<font color=red>".join("\n",$dataobj->LastMsg())."\n".
+                  "</font color=red>".
+                  "\nThis mail is automaticly generated. ".
+                  "Please do what is necessary to restore the ".
+                  "accessibility of the application interface.\n";
+         $wfa->Notify("ERROR",$subject,$tmpl,
+            emailto=>\@notify_to,
+            emailcc=>\@notify_cc,
+            dataobj=>"itil::lnkapplappl",
+            dataobjid=>$ifrec->{id},
+            emailcategory =>['W5BaseInterfaces'],
+            emailbcc=>[
+               11634953080001, # HV
+            ]
+         );
          $notifycnt++;
       }
    }
