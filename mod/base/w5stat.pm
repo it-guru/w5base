@@ -715,8 +715,23 @@ sub getValidWebFunctions
 sub ShowEntry
 {
    my $self=shift;
-   my $requestid=Query->Param("id");
-   my $requesttag=Query->Param("tag");
+   my $id=shift;
+   my $tag=shift;
+
+   my $requestid;
+   my $requesttag;
+   if ($id ne ""){
+      $requestid=$id;
+      if (defined($tag)){
+         $requesttag=$tag;
+      }
+   }
+   else{
+      $requestid=Query->Param("id");
+      $requesttag=Query->Param("tag");
+   }
+
+
    my ($rmod,$rtag)=$requesttag=~m/^(.*)::([^:]+)$/;
    my $title=$self->T("W5Base Statistic Presenter");
    my $subtitle=$self->T($requesttag."::LONG",$rmod);
@@ -809,7 +824,7 @@ EOF
                          }
             
                          $htmlReport.="<hr style=\"width:50%;margin-top:40px;".
-                                      "margin-bottom:20px\">".
+                                      "margin-bottom:20px;page-break-before:always\">".
                                       "<div class=chartsublabel ".
                                       "style=\"margin-bottom:20px\">".
                                       $subtitle."</div>";
