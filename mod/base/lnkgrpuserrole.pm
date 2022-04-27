@@ -112,7 +112,7 @@ sub new
                                  'RBackoffice',                # orgrole
                                  'RQManager',                  
                                  'RReportReceive',
-                                 'RPatchReportRcv',
+                                 'RTechReportRcv',
                                  'RAuditor',
                                  'RMonitor',
                                  'RControlling',
