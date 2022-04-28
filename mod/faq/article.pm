@@ -174,7 +174,7 @@ sub new
                 name          =>'viewfreq',
                 readonly      =>1,
                 group         =>'sig',
-                label         =>'View frequeny',
+                label         =>'View frequency',
                 dataobjattr   =>'faq.viewfreq'),
 
       new kernel::Field::Owner(

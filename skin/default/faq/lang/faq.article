@@ -23,7 +23,7 @@
 'further FAQ-articles'=>{de=>'Weitere ähnliche oder weiterführende FAQ-Artikel'},
 'related FAQ-articles'=>{de=>'In Beziehung stehende FAQ-Artikel'},
 'View count'=>{de=>'Anzahl Vollbild Aufrufe'},
-'View frequeny'=>{de=>'Vollbild Aufrufe Häufung'},
+'View frequency'=>{de=>'Vollbild Aufrufe Häufung'},
 'View last'=>{de=>'letzter Vollbild Aufruf'},
 'View last by author'=>{de=>'letzte Sichtung durch Author'},
 'raw data'=>{de=>'Rohdaten'},
