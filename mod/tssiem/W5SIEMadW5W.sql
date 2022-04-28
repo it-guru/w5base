@@ -45,7 +45,7 @@ CREATE INDEX "W5SIEM_secscan_i3"
 create table "W5SIEM_secent" (
    id                   INTEGER not null,
    ref                  VARCHAR2(32) not null,
-   ipaddress            VARCHAR2(4000) not null, -- Eigentlich das "Target"
+   ipaddress            VARCHAR2(3000) not null, -- Eigentlich das "Target"
    tracking_method      VARCHAR2(40),
    osname               VARCHAR2(128),
    dns                  VARCHAR2(256),
@@ -89,12 +89,6 @@ CREATE INDEX "W5SIEM_secent_i0"
 
 CREATE INDEX "W5SIEM_secent_i1"
    ON "W5SIEM_secent" (ipaddress) online;
-
-CREATE INDEX "W5SIEM_secent_i2"
-   ON "W5SIEM_secent" (launch_datetime) online;
-
-CREATE INDEX "W5SIEM_secent_i3"
-   ON "W5SIEM_secent" (id) online;
 
 CREATE INDEX "W5SIEM_secent_i3"
    ON "W5SIEM_secent" (pci_vuln) online;
