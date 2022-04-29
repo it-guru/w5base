@@ -54,8 +54,11 @@ sub CloudAreaSync
    if (!($appans->Ping()) ||
        !($otcpro->Ping()) ||
        !($itcloudobj->Ping())){
-      msg(ERROR,"not all dataobjects available");
-      return(undef);
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      if ($infoObj->NotifyInterfaceContacts($otcpro)){
+         return({exitcode=>0,exitmsg=>'Interface notified'});
+      }
+      return({exitcode=>1,exitmsg=>'not all dataobjects available'});
    }
 
    $appans->SetFilter({
