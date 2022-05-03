@@ -1,0 +1,11 @@
+'SIMon::lnkmonpkgrec'=>{
+de=>'SIMon: Installationsüberwachungsdatensatz',
+en=>'SIMon: Installation monitoring record'
+},
+'TARGET.'=>{de=>'ungeklärt',en=>'undefined'},
+'TARGET.RECO'=>{de=>'empfohlen',en=>'recommented'},
+'TARGET.MAND'=>{de=>'zwingend',en=>'mandatory'},
+'TARGET.NEDL'=>{de=>'unnötig',en=>'needless'},
+'target state'=>{de=>'Zielzustand'},
+'installation monitoring start'=>{de=>'Installationsmonitoring Begin'},
+
