@@ -1,0 +1,10 @@
+'SIMon::monpkg'=>{
+de=>'SIMon: Installations-Packet',
+en=>'SIMon: Installation-Package'
+},
+'fieldgroup.software'=>{
+de=>'Software-Zuordnungen',
+en=>'Software-Assignments'
+},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'logical system restriction'=>{de=>'logisches System Einschränkung'},
