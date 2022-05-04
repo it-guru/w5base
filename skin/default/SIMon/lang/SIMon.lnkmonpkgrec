@@ -8,4 +8,7 @@ en=>'SIMon: Installation monitoring record'
 'TARGET.NEDL'=>{de=>'unnötig',en=>'needless'},
 'target state'=>{de=>'Zielzustand'},
 'installation monitoring start'=>{de=>'Installationsmonitoring Begin'},
+'current installation state'=>{de=>'aktueller Installations Status'},
+'INSTSTATE.INSTALLED'=>{de=>'installiert',en=>'installed'},
+'INSTSTATE.NOTFOUND'=>{de=>'nicht gefunden',en=>'not found'},
 
