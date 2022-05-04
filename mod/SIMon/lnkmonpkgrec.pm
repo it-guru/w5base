@@ -61,6 +61,17 @@ sub new
                 dataobjattr   =>'system.id',
                 wrdataobjattr =>'lnksimonpkgrec.system'),
 
+      new kernel::Field::Text(
+                name          =>'applicationnames',
+                label         =>'Applicationnames',
+                xhtmldetail    =>0,
+                readonly      =>1,
+                translation   =>'itil::system',
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['systemid'=>'systemid'],
+                vjoindisp     =>['appl']),
+
       new kernel::Field::TextDrop(
                 name          =>'monpkg',
                 htmlwidth     =>'250px',
@@ -114,6 +125,16 @@ sub new
                 name          =>'rawreqtarget',
                 label         =>'raw request target',
                 dataobjattr   =>'lnksimonpkgrec.reqtarget'),
+
+      new kernel::Field::Text(
+                name          =>'curinststate',
+                label         =>'current installation state',
+                transprefix   =>'INSTSTATE.',
+                depend        =>['reqtarget'],
+                readonly      =>1,
+                background    =>\&getCurInstStateColor,
+                value         =>[qw(INSTALLED NOTFOUND)],
+                dataobjattr   =>getCurInstStateSql()),
 
       new kernel::Field::Text(
                 name          =>'comments',
@@ -177,9 +198,41 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'lnksimonpkgrec.realeditor'),
    );
-   $self->setDefaultView(qw(system monpkg reqtarget cdate));
+   $self->setDefaultView(qw(system monpkg reqtarget curinststate cdate));
    $self->setWorktable("lnksimonpkgrec");
    return($self);
+}
+
+sub getCurInstStateColor
+{
+   my ($self,$FormatAs,$current)=@_;
+
+   my $st=$self->RawValue($current);
+   my $fld=$self->getParent->getField("reqtarget");
+
+   my $reqtarget=$fld->RawValue($current);
+   my $color="green";
+   if ($reqtarget eq "MAND" && $st ne "INSTALLED"){
+      $color="red";
+   }
+   $color=undef if ($color eq "green" && $reqtarget ne "MAND");
+
+   return($color);
+}
+
+sub getCurInstStateSql
+{
+   my $d=<<EOF;
+select if (count(*)>0,'INSTALLED','NOTFOUND') 
+from lnksoftwaresystem lnksoftsys 
+   join lnksimonpkgsoftware lnksimonpkgsoft 
+      on lnksimonpkgsoft.software=lnksoftsys.software 
+where system.id=lnksoftsys.system 
+   and lnksimonpkgsoft.simonpkg=simonpkg.id
+EOF
+   $d=~s/\n/ /g;
+   $d=~s/  / /g;
+   return("(".$d.")");
 }
 
 
