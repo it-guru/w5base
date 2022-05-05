@@ -111,7 +111,9 @@ sub new
                                }
                             }
                             if ($current->{rawstate} eq "4"){
-                               if ($current->{refno} ne ""){
+                               if ($current->{refno} ne "" &&
+                                   ($current->{applid} ne "" &&
+                                    $current->{applid} ne "0")){
                                   if (!in_array($st,[qw(4 5 6)])){
                                      next;
                                   }
@@ -716,6 +718,8 @@ sub Validate
    #   return(0);
    #}
 
+   my $csteamaccess=0;
+
    if (!defined($oldrec)){
       if (!exists($newrec->{state}) && !exists($newrec->{rawstate})){
          $newrec->{state}=1;
@@ -740,9 +744,14 @@ sub Validate
       else{
          $csteam->SetFilter({});
       }
-      my @l=$csteam->getHashList(qw(orgarea id));
+      my @l=$csteam->getHashList(qw(orgarea grpid id));
       if ($#l>=0){
          $newrec->{csteamid}=$l[0]->{id}; 
+         if ($l[0]->{grpid} ne ""){
+            if ($self->IsMemberOf([$l[0]->{grpid}])){
+               $csteamaccess++;
+            }
+         }
       }
    }
    if (!defined($oldrec) && !defined($newrec->{csteamid})){
@@ -762,8 +771,11 @@ sub Validate
       }
       if (!$self->itil::lib::Listedit::isWriteOnApplValid(
                                           $newrec->{applid},"technical")) {
-         $self->LastMsg(ERROR,"no write access on specified application");
-         return(0);
+         my $csteamid=effVal($oldrec,$newrec,"csteamid");
+         if (!$csteamaccess){
+            $self->LastMsg(ERROR,"no write access on specified application");
+            return(0);
+         }
       }
    }
 
