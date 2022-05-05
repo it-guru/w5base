@@ -36,6 +36,7 @@ sub SIMonRefresh
 {
    my $self=shift;
    my %param=@_;
+   my %exprCode;
 
    my $StreamDataobj="SIMon::lnkmonpkgrec";
    my @datastreamview=qw(id systemid monpkgid system monpkg rawreqtarget
@@ -46,10 +47,20 @@ sub SIMonRefresh
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
    my $opobj=$datastream->Clone();
 
-   $datastream->SetFilter([
-     {id=>\undef},
-     {needrefresh=>\'1'}
-   ]);
+   if (exists($param{debug}) &&
+       $param{debug} ne ""){
+      $datastream->SetFilter([
+        {id=>$param{debug}},
+        {system=>$param{debug}}
+      ]);
+
+   }
+   else{
+      $datastream->SetFilter([
+        {id=>\undef},
+        {needrefresh=>\'1'}
+      ]);
+   }
 
    my $opmode=$self->getParent->Config->Param("W5BaseOperationMode");
    $datastream->SetCurrentView(@datastreamview);
@@ -69,9 +80,14 @@ sub SIMonRefresh
             $system->ResetFilter();
             $system->SetFilter({id=>\$rec->{systemid}});
             my ($sysrec)=$system->getOnlyFirst(qw(ALL));
-            my $p=new Text::ParseWhere();
-            if (my $pcode=$p->compileExpression($rec->{monpkgrestriction})){
-               if (&{$pcode}($sysrec)){
+            if (!exists($exprCode{$rec->{monpkgid}})){
+               my $p=new Text::ParseWhere();
+               if (my $pcode=$p->compileExpression($rec->{monpkgrestriction})){
+                  $exprCode{$rec->{monpkgid}}=$pcode;
+               }
+            }
+            if (exists($exprCode{$rec->{monpkgid}})){
+               if (&{$exprCode{$rec->{monpkgid}}}($sysrec)){
                   $newtarget=$rec->{monpkgrestrictarget};
                }
             }
