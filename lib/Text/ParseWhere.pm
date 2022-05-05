@@ -37,6 +37,45 @@ sub __like
    return(0);
 }
 
+
+sub __slike
+{
+   my $v1=shift;
+   my $subname=shift;
+   my $v2=shift;
+
+   return(0) if (ref($v1) ne "HASH" && ref($v1) ne "ARRAY");
+
+   my $found=0;
+   if (ref($v1) eq "ARRAY"){
+      foreach my $rec (@{$v1}){
+         if (ref($rec) eq "HASH"){
+            if (exists($rec->{$subname})){
+               my $match=__like($rec->{$subname},$v2);
+               if ($match){
+                  return(1);
+               }
+            }
+         }
+      }
+   }
+   if (ref($v1) eq "HASH"){
+      if (exists($v1->{$subname})){
+         my $match=__like($v1->{$subname},$v2);
+         if ($match){
+            return(1);
+         }
+      }
+   }
+   return(0);
+}
+
+
+
+
+
+
+
 sub _parseWords($$)
 {
    my $self=shift;
@@ -89,16 +128,20 @@ sub _classifyElements
       elsif ($w=~m/^'.*'$/){
          push(@e,{'type'=>'CONST','val'=>$w});
       }
-      elsif ($w=~m/^[a-z0-9]+$/i){
+      elsif ($w=~m/^[a-z0-9_]+$/i){
          push(@e,{'type'=>'VARNAME','name'=>$w,
                   'val'=>"\$H->{'$w'}"});
+      }
+      elsif (my ($varname,$subname)=$w=~m/^([a-z0-9_]+)\.([a-z0-9_]+)$/i){
+         push(@e,{'type'=>'VARNAME','name'=>$varname,'subname'=>$subname,
+                  'val'=>"\$H->{'$varname'}"});
       }
       else{
          push(@e,{'type'=>'INVALID'});
       }
       $e[$#e]->{'orig'}=$w;
    }
-#printf STDERR ("e=%s\n",Dumper(\@e));
+   #printf STDERR ("DEBUG: Elements=%s\n",Dumper(\@e));
    return(@e);
 }
 
@@ -106,22 +149,46 @@ sub _checkSyn
 {
    my $self=shift;
    my $e=shift;
-
+   for(my $pos=0;$pos<=$#{$e};$pos++){
+      if ($e->[$pos]->{'type'} eq "INVALID"){
+         my $f;
+         $self->errString("word or string at position ".$pos.
+                          " invalid or not processable");
+         return(undef);
+      }
+   }
    for(my $pos=0;$pos<=$#{$e};$pos++){
       if ($pos==0 && $e->[$pos]->{'type'} eq "COM"){
          $self->errString("operation at first command");
          return(undef);
       }
       if ($e->[$pos]->{'type'} eq "COM" && $e->[$pos]->{'name'} eq "like"){
-         my $f={'type'=>'FUNC',name=>'like',
+         my $f;
+         if (exists($e->[$pos-1]->{'subname'})){
+            $f={'type'=>'FUNC',name=>'like',
+                val=>"Text::ParseWhere::__slike(".
+                                                 $e->[$pos-1]->{'val'}.
+                                               ",'".
+                                                 $e->[$pos-1]->{'subname'}."',".
+                                                 $e->[$pos+1]->{'val'}.")"};
+         }
+         else{
+            $f={'type'=>'FUNC',name=>'like',
                 val=>"Text::ParseWhere::__like(".$e->[$pos-1]->{'val'}.",".
                                                  $e->[$pos+1]->{'val'}.")"};
+         }
          splice(@{$e},$pos+1,1);
          #splice(@{$e},$pos+1,1);
          $e->[$pos]=$f;
          splice(@{$e},$pos-1,1);
       }
-
+      if ($e->[$pos]->{'type'} eq "COM" && $e->[$pos]->{'name'} eq "="){
+         my $f;
+         if (exists($e->[$pos-1]->{'subname'})){
+            $self->errString("equal operation not allowed on sub attributes");
+            return(undef);
+         }
+      }
    }
    return(1);
 }
@@ -158,6 +225,7 @@ sub fltHashFromExpression
    # Pass1: parse words
    #
    my @w=$self->_parseWords($WhereExp);
+
 
 
    #
@@ -235,6 +303,10 @@ sub compileExpression
    # Pass1: parse words
    #
    my @w=$self->_parseWords($WhereExp);
+   if ($WhereExp ne "" && $#w==-1){
+      $self->errString("syntax error - can not parse words");
+      return(undef); 
+   }
 
    #
    # Pass2: classify element list
@@ -280,7 +352,7 @@ sub compileExpression
       }
       $cmd.=")};";
       $self->Code($cmd);
-      #printf STDERR ("fifi cmd=$cmd\n"); 
+      #printf STDERR ("DEBUG src: $cmd\n"); 
      
       my $match=eval($cmd);
       $self->errString($@) if ($self->errString() eq "" && $@ ne "");
