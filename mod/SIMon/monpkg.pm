@@ -294,13 +294,15 @@ sub Validate
    if ($rest ne ""){
       my $p=new Text::ParseWhere();
       if (!defined($p->compileExpression($rest))){
-         $self->LastMsg(ERROR,"invalid restriction expression");
+         if ($p->errString()){
+            $self->LastMsg(ERROR,$p->errString());
+         }
+         else{
+            $self->LastMsg(ERROR,"invalid restriction expression");
+         }
          return(undef);
       }
    }
-
-
-
 
 
 
@@ -415,6 +417,15 @@ sub isWriteValid
       }
    }
    return(undef);
+}
+
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
 }
 
 
