@@ -480,7 +480,8 @@ sub NotifyUser
    my $self=shift;
    my $lrec=shift;
 
-   if ($lrec->{usertyp} eq "user"){   # the relation effects on an real user
+   if ($lrec->{usertyp} eq "user" ||
+       $lrec->{usertyp} eq "service"){   # the relation effects on an real user
       my %admins;
       foreach my $arec ($self->getAdmins()){
          next if ($arec->{banalprotect});

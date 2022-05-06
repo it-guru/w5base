@@ -358,6 +358,8 @@ sub new
       new kernel::Field::Date(
                 name          =>'grpmdate',
                 label         =>'Group Modification-Date',
+                htmldetail    =>0,
+                readonly      =>1,
                 dataobjattr   =>'grp.modifydate'),
 
       new kernel::Field::Interface(
@@ -404,6 +406,8 @@ sub new
       new kernel::Field::Date(
                 name          =>'usermdate',
                 label         =>'Contact Modification-Date',
+                htmldetail    =>0,
+                readonly      =>1,
                 dataobjattr   =>'contact.modifydate'),
 
       new kernel::Field::Interface(
