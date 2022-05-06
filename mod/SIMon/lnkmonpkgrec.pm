@@ -47,7 +47,7 @@ sub new
                                                  
       new kernel::Field::TextDrop(
                 name          =>'system',
-                htmlwidth     =>'250px',
+                htmlwidth     =>'150px',
                 label         =>'System',
                 vjointo       =>'itil::system',
                 vjoinon       =>['systemid'=>'id'],
@@ -101,14 +101,14 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'simonpkg.restriction'),
 
-
       new kernel::Field::Link(
                 name          =>'needrefresh',
                 label         =>'kg Restriction',
                 readonly      =>1,
-                dataobjattr   =>"if (lnksimonpkgrec.modifydate<simonpkg.modifydate,1,0)"),
-
-
+                dataobjattr   =>"if (".
+                                "lnksimonpkgrec.modifydate<".
+                                "simonpkg.modifydate,".
+                                "1,0)"),
 
       new kernel::Field::Select(
                 name          =>'reqtarget',
@@ -126,7 +126,7 @@ sub new
                 label         =>'raw request target',
                 dataobjattr   =>'lnksimonpkgrec.reqtarget'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Select(
                 name          =>'curinststate',
                 label         =>'current installation state',
                 transprefix   =>'INSTSTATE.',
@@ -136,11 +136,88 @@ sub new
                 value         =>[qw(INSTALLED NOTFOUND)],
                 dataobjattr   =>getCurInstStateSql()),
 
-      new kernel::Field::Text(
-                name          =>'comments',
-                searchable    =>0,
-                label         =>'Comments',
-                dataobjattr   =>'lnksimonpkgrec.comments'),
+      new kernel::Field::Select(
+                name          =>'exception',
+                label         =>'exception from target state',
+                transprefix   =>'EXCEPTION.',
+                value         =>[qw(REQUESTED ACCEPTED REJECTED EXPIRED)],
+                selectfix     =>1,
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"if (lnksimonpkgrec.exceptreqtxt<>'',".
+                                "if (exceptstate='ACCEPT','ACCEPTED',".
+                                "if (exceptstate='REJECT','REJECTED','REQUESTED')),".
+                                "NULL)"),
+
+#      new kernel::Field::Text(
+#                name          =>'comments',
+#                searchable    =>0,
+#                label         =>'Comments',
+#                dataobjattr   =>'lnksimonpkgrec.comments'),
+
+      new kernel::Field::Textarea(
+                name          =>'exceptreqtxt',
+                group         =>'exceptionreq',
+                label         =>'exception request justification',
+                dataobjattr   =>'lnksimonpkgrec.exceptreqtxt'),
+
+      new kernel::Field::Date(
+                name          =>'exceptreqdate',
+                group         =>'exceptionreq',
+                htmldetail    =>'NotEmpty',
+                label         =>'exception request date',
+                dataobjattr   =>'lnksimonpkgrec.exceptreqdate'),
+
+      new kernel::Field::Contact(
+                name          =>'exceptrequestor',
+                group         =>'exceptionreq',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                label         =>'exception requestor',
+                vjoinon       =>['exceptrequestorid'=>'userid']),
+
+      new kernel::Field::Link(
+                name          =>'exceptrequestorid',
+                group         =>'exceptionreq',
+                label         =>'exception requestor ID',
+                dataobjattr   =>'lnksimonpkgrec.exceptrequestor'),
+
+      new kernel::Field::Select(
+                name          =>'exceptstate',
+                label         =>'exception approve state',
+                transprefix   =>'APPR.',
+                value         =>[qw(ACCEPT REJECT)],
+                group         =>'exceptionappr',
+                allownative   =>1,
+                useNullEmpty  =>1,
+                dataobjattr   =>'lnksimonpkgrec.exceptstate'),
+
+      new kernel::Field::Textarea(
+                name          =>'exceptrejecttxt',
+                group         =>'exceptionappr',
+                label         =>'exception approver explanation',
+                dataobjattr   =>'lnksimonpkgrec.exceptrejecttxt'),
+
+      new kernel::Field::Date(
+                name          =>'exceptapprdate',
+                group         =>'exceptionappr',
+                htmldetail    =>'NotEmpty',
+                label         =>'exception approve/reject date',
+                dataobjattr   =>'lnksimonpkgrec.exceptapprdate'),
+                                                   
+      new kernel::Field::Contact(
+                name          =>'exceptapprover',
+                group         =>'exceptionappr',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                label         =>'exception approver',
+                vjoinon       =>['exceptrequestorid'=>'userid']),
+
+      new kernel::Field::Link(
+                name          =>'exceptapproverid',
+                label         =>'exception approver ID',
+                group         =>'exceptionappr',
+                dataobjattr   =>'lnksimonpkgrec.exceptapprover'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -198,7 +275,7 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'lnksimonpkgrec.realeditor'),
    );
-   $self->setDefaultView(qw(system monpkg reqtarget curinststate cdate));
+   $self->setDefaultView(qw(system monpkg reqtarget curinststate exception cdate));
    $self->setWorktable("lnksimonpkgrec");
    return($self);
 }
@@ -292,7 +369,7 @@ sub isQualityCheckValid
 sub getDetailBlockPriority
 {  
    my $self=shift;
-   return(qw(header default source));
+   return(qw(header default exceptionreq exceptionappr source));
 }
 
 
@@ -310,7 +387,28 @@ sub Validate
          $self->LastMsg(ERROR,"no access");
          return(undef);
       }
+      my $userid=$self->getCurrentUserId();
+      if (effChanged($oldrec,$newrec,"exceptrejecttxt") ||
+          effChanged($oldrec,$newrec,"exceptstate")){
+         $newrec->{exceptapproverid}=$userid;
+         $newrec->{exceptapprdate}=NowStamp("en");
+      }
+      if (effChanged($oldrec,$newrec,"exceptreqtxt")){
+         if (effVal($oldrec,$newrec,"exceptreqtxt") eq ""){
+            $newrec->{exceptrequestorid}=undef;
+            $newrec->{exceptreqdate}=undef;
+         }
+         else{
+            $newrec->{exceptrequestorid}=$userid;
+            $newrec->{exceptreqdate}=NowStamp("en");
+         }
+         $newrec->{exceptstate}=undef;
+         $newrec->{exceptrejecttxt}=undef;
+         $newrec->{exceptapproverid}=undef;
+         $newrec->{exceptapprdate}=undef;
+      }
    }
+
 
 
    return(1);
@@ -321,7 +419,17 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   my @l=qw(default header source);
+
+   if ($self->IsMemberOf("admin")){ # Schreibzugriff auf logisches system
+      push(@l,"exceptionreq");
+   }
+
+   if ($rec->{exception} ne ""){
+      push(@l,"exceptionappr");
+   }
+
+   return(@l);
 }
 
 
@@ -330,7 +438,7 @@ sub isWriteValid
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my @editgroup=("default");
+   my @editgroup=("exceptionreq","exceptionappr");
 
    return(@editgroup) if (!defined($oldrec) && !defined($newrec));
    my $monpkgid=$oldrec->{monpkgid};
