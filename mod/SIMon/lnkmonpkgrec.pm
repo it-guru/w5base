@@ -24,6 +24,7 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::Field::TextURL;
 use kernel::CIStatusTools;
+use itil::system;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
@@ -59,6 +60,7 @@ sub new
                 name          =>'systemid',
                 label         =>'System ID',
                 dataobjattr   =>'system.id',
+                selectfix     =>1,
                 wrdataobjattr =>'lnksimonpkgrec.system'),
 
       new kernel::Field::Text(
@@ -100,6 +102,11 @@ sub new
                 label         =>'MonPkg Restriction',
                 readonly      =>1,
                 dataobjattr   =>'simonpkg.restriction'),
+
+      new kernel::Field::Link(
+                name          =>'managergrpid',
+                selectfix     =>1,
+                dataobjattr   =>'simonpkg.managergrpid'),
 
       new kernel::Field::Link(
                 name          =>'needrefresh',
@@ -146,14 +153,19 @@ sub new
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"if (lnksimonpkgrec.exceptreqtxt<>'',".
                                 "if (exceptstate='ACCEPT','ACCEPTED',".
-                                "if (exceptstate='REJECT','REJECTED','REQUESTED')),".
+                                "if (exceptstate='REJECT','REJECTED',".
+                                "'REQUESTED')),".
                                 "NULL)"),
 
-#      new kernel::Field::Text(
-#                name          =>'comments',
-#                searchable    =>0,
-#                label         =>'Comments',
-#                dataobjattr   =>'lnksimonpkgrec.comments'),
+      new kernel::Field::Text(
+                name          =>'comments',
+                searchable    =>0,
+                htmldetail    =>0,
+                readonly      =>1,
+                uploadable    =>0,
+                htmlwidth     =>"500px",
+                label         =>'Comments',
+                dataobjattr   =>'lnksimonpkgrec.comments'),
 
       new kernel::Field::Textarea(
                 name          =>'exceptreqtxt',
@@ -164,6 +176,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'exceptreqdate',
                 group         =>'exceptionreq',
+                readonly      =>1,
                 htmldetail    =>'NotEmpty',
                 label         =>'exception request date',
                 dataobjattr   =>'lnksimonpkgrec.exceptreqdate'),
@@ -190,7 +203,9 @@ sub new
                 group         =>'exceptionappr',
                 allownative   =>1,
                 useNullEmpty  =>1,
-                dataobjattr   =>'lnksimonpkgrec.exceptstate'),
+                wrdataobjattr =>'lnksimonpkgrec.exceptstate',
+                dataobjattr   =>"if (lnksimonpkgrec.exceptstate is null,".
+                                "'REQUESTED',lnksimonpkgrec.exceptstate)"),
 
       new kernel::Field::Textarea(
                 name          =>'exceptrejecttxt',
@@ -202,6 +217,8 @@ sub new
                 name          =>'exceptapprdate',
                 group         =>'exceptionappr',
                 htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                uploadable    =>0,
                 label         =>'exception approve/reject date',
                 dataobjattr   =>'lnksimonpkgrec.exceptapprdate'),
                                                    
@@ -211,13 +228,109 @@ sub new
                 htmldetail    =>'NotEmpty',
                 readonly      =>1,
                 label         =>'exception approver',
-                vjoinon       =>['exceptrequestorid'=>'userid']),
+                vjoinon       =>['exceptapproverid'=>'userid']),
+
+      new kernel::Field::TextDrop(
+                name          =>'managergrp',
+                htmlwidth     =>'300px',
+                group         =>'exceptionappr',
+                label         =>'posible exception approver group',
+                vjointo       =>'base::grp',
+                readonly      =>1,
+                vjoinon       =>['managergrpid'=>'grpid'],
+                vjoindisp     =>'fullname'),
 
       new kernel::Field::Link(
                 name          =>'exceptapproverid',
                 label         =>'exception approver ID',
                 group         =>'exceptionappr',
                 dataobjattr   =>'lnksimonpkgrec.exceptapprover'),
+
+      new kernel::Field::Link(
+                name          =>'mandatorid',
+                dataobjattr   =>'system.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'system.databoss'),
+
+      new kernel::Field::Link(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                dataobjattr   =>'system.cistatus'),
+
+      new kernel::Field::Link(
+                name          =>'admid',
+                dataobjattr   =>'system.adm'),
+
+      new kernel::Field::Link(
+                name          =>'adm2id',
+                dataobjattr   =>'system.adm2'),
+
+      new kernel::Field::Link(
+                name          =>'adminteamid',
+                selectfix     =>1,
+                dataobjattr   =>'system.admteam'),
+
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemsectarget',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemsectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemsecroles',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemlnkcontact.croles'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemmandatorid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.mandator'),
+
+      new kernel::Field::Link(
+                name          =>'secsystembusinessteamid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.businessteam'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemtsmid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.tsm'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemtsm2id',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.tsm2'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemopmid',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.opm'),
+
+      new kernel::Field::Link(
+                name          =>'secsystemopm2id',
+                noselect      =>'1',
+                dataobjattr   =>'secsystemappl.opm2'),
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -280,6 +393,14 @@ sub new
    return($self);
 }
 
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+   return(itil::system::SecureSetFilter($self,@flt));
+}
+
 sub getCurInstStateColor
 {
    my ($self,$FormatAs,$current)=@_;
@@ -336,7 +457,20 @@ sub getSqlFrom
 
    my $from="system cross join simonpkg left outer join lnksimonpkgrec ".
             "on (lnksimonpkgrec.simonpkg=simonpkg.id and ".
-            "    lnksimonpkgrec.system=system.id) ";
+            "    lnksimonpkgrec.system=system.id) ".
+          "left outer join lnkcontact ".
+          "on lnkcontact.parentobj='itil::system' ".
+          "and system.id=lnkcontact.refid  ".
+          "left outer join lnkapplsystem as secsystemlnkapplsystem ".
+          "on system.id=secsystemlnkapplsystem.system ".
+          "left outer join appl as secsystemappl ".
+          "on secsystemlnkapplsystem.id=secsystemappl.id ".
+             "and secsystemappl.cistatus<6 ".
+          "left outer join lnkcontact secsystemlnkcontact ".
+          "on secsystemlnkcontact.parentobj='itil::system' ".
+          "and system.id=secsystemlnkcontact.refid ".
+          "left outer join costcenter secsystemcostcenter ".
+          "on secsystemappl.conumber=secsystemcostcenter.name ";
 
 #   my $from="$worktable join simonpkg ".
 #            "on lnksimonpkgrec.simonpkg=simonpkg.id ";
@@ -383,24 +517,56 @@ sub Validate
    my $monpkgid=effVal($oldrec,$newrec,"monpkgid");
 
    if ($self->isDataInputFromUserFrontend()){
-      if (!$self->isWriteOnMonPkgValid($monpkgid,"software")){
+      my $systemid=effVal($oldrec,$newrec,"systemid");
+      my $managergrpid=effVal($oldrec,$newrec,"managergrpid");
+      my $sobj=$self->getPersistentModuleObject("itil::system");
+      if (!$sobj->isWriteOnFieldGroupValid($systemid,"default") &&
+          !$self->IsMemberOf($managergrpid)){
          $self->LastMsg(ERROR,"no access");
          return(undef);
       }
       my $userid=$self->getCurrentUserId();
+      if (effChanged($oldrec,$newrec,"exceptreqtxt")){
+         if (effVal($oldrec,$newrec,"exceptapproverid") ne ""){
+            $newrec->{comments}=
+                   effVal($oldrec,$newrec,"comments").
+                   (effVal($oldrec,$newrec,"comments") ne "" ? "\n":'').
+                   NowStamp("en").";".$ENV{REMOTE_USER}.";".
+                   "approve/reject reset\n";
+         }
+         $newrec->{exceptapproverid}=undef;
+         $newrec->{exceptapprdate}=undef;
+      }
       if (effChanged($oldrec,$newrec,"exceptrejecttxt") ||
           effChanged($oldrec,$newrec,"exceptstate")){
          $newrec->{exceptapproverid}=$userid;
          $newrec->{exceptapprdate}=NowStamp("en");
+         $newrec->{comments}=
+                effVal($oldrec,$newrec,"comments").
+                (effVal($oldrec,$newrec,"comments") ne "" ? "\n":'').
+                NowStamp("en").";".$ENV{REMOTE_USER}.";".
+                "approve/reject\n";
       }
       if (effChanged($oldrec,$newrec,"exceptreqtxt")){
          if (effVal($oldrec,$newrec,"exceptreqtxt") eq ""){
+            if (effVal($oldrec,$newrec,"exceptrequestorid") ne ""){
+               $newrec->{comments}=
+                      effVal($oldrec,$newrec,"comments").
+                      (effVal($oldrec,$newrec,"comments") ne "" ? "\n":'').
+                      NowStamp("en").";".$ENV{REMOTE_USER}.";".
+                      "exception reset\n";
+            }
             $newrec->{exceptrequestorid}=undef;
             $newrec->{exceptreqdate}=undef;
          }
          else{
             $newrec->{exceptrequestorid}=$userid;
             $newrec->{exceptreqdate}=NowStamp("en");
+            $newrec->{comments}=
+                   effVal($oldrec,$newrec,"comments").
+                   (effVal($oldrec,$newrec,"comments") ne "" ? "\n":'').
+                   NowStamp("en").";".$ENV{REMOTE_USER}.";".
+                   "exception request\n";
          }
          $newrec->{exceptstate}=undef;
          $newrec->{exceptrejecttxt}=undef;
@@ -408,8 +574,6 @@ sub Validate
          $newrec->{exceptapprdate}=undef;
       }
    }
-
-
 
    return(1);
 }
@@ -421,13 +585,18 @@ sub isViewValid
    my $rec=shift;
    my @l=qw(default header source);
 
-   if ($self->IsMemberOf("admin")){ # Schreibzugriff auf logisches system
-      push(@l,"exceptionreq");
+   if ($rec->{managergrpid} ne "" &&
+       $rec->{systemid} ne ""){# Schreibzugriff auf logisches system
+      my $sobj=$self->getPersistentModuleObject("itil::system");
+      if ($sobj->isWriteOnFieldGroupValid($rec->{systemid},"default")){
+          push(@l,"exceptionreq");
+      }
+      if ($rec->{exception} ne ""){
+         push(@l,"exceptionreq");
+         push(@l,"exceptionappr");
+      }
    }
 
-   if ($rec->{exception} ne ""){
-      push(@l,"exceptionappr");
-   }
 
    return(@l);
 }
@@ -438,31 +607,24 @@ sub isWriteValid
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my @editgroup=("exceptionreq","exceptionappr");
 
-   return(@editgroup) if (!defined($oldrec) && !defined($newrec));
-   my $monpkgid=$oldrec->{monpkgid};
-   return(@editgroup) if ($self->IsMemberOf("admin"));
-   return(@editgroup) if ($self->isWriteOnMonPkgValid($monpkgid,"software"));
+   my @wrgrp=();
 
-   return(undef);
-}
-
-
-sub isWriteOnMonPkgValid
-{
-   my $self=shift;
-   my $monpkgid=shift;
-   my $group=shift;
-
-   my $monpkg=$self->getPersistentModuleObject("SIMon::monpkg");
-   $monpkg->SetFilter({id=>\$monpkgid});
-   my ($arec,$msg)=$monpkg->getOnlyFirst(qw(ALL));
-   my @g=$monpkg->isWriteValid($arec);
-   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
-      return(1);
+   if (defined($oldrec)){
+      my $systemid=effVal($oldrec,$newrec,"systemid");
+      my $managergrpid=effVal($oldrec,$newrec,"managergrpid");
+      if ($managergrpid ne "" && $systemid ne ""){
+         my $sobj=$self->getPersistentModuleObject("itil::system");
+         if ($sobj->isWriteOnFieldGroupValid($systemid,"default")){
+            push(@wrgrp,"exceptionreq");
+         }
+         if ($self->IsMemberOf($managergrpid)){
+            push(@wrgrp,"exceptionappr");
+         }
+      }
    }
-   return(0);
+
+   return(@wrgrp);
 }
 
 
