@@ -1021,7 +1021,8 @@ sub Validate
    my $newrec=shift;
    my $orgrec=shift;
 
-   if (effChanged($oldrec,$newrec,"ictoid")){
+   if ((effVal($oldrec,$newrec,"ictoid") ne "" && $oldrec->{ictono} eq "") ||
+       effChanged($oldrec,$newrec,"ictoid")){
       my $ictoid=effVal($oldrec,$newrec,"ictoid");
       my $o=getModuleObject($self->Config,"tscape::archappl");
       if (!defined($o)){
