@@ -812,7 +812,7 @@ sub effChanged
    my $newrec=shift;
    my $var=shift;
    if (defined($newrec) && exists($newrec->{$var})){
-      if (defined($oldrec) && $newrec->{$var} ne $oldrec->{$var}){
+      if (defined($oldrec) || $newrec->{$var} ne $oldrec->{$var}){
          return(1);
       }
    }
