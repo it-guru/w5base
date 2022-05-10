@@ -123,9 +123,9 @@ sub new
                 group         =>'contacts'),
 
       new kernel::Field::Textarea(
-                name          =>'comments',
+                name          =>'notifycomments',
                 group         =>'misc',
-                label         =>'Comments',
+                label         =>'notify comments',
                 dataobjattr   =>'simonpkg.comments'),
 
       new kernel::Field::Container(

@@ -45,6 +45,8 @@ sub new
                 label         =>'LinkID',
                 searchable    =>0,
                 dataobjattr   =>'lnksimonpkgrec.id'),
+
+      new kernel::Field::RecordUrl(),
                                                  
       new kernel::Field::TextDrop(
                 name          =>'system',
@@ -167,6 +169,15 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'lnksimonpkgrec.comments'),
 
+      new kernel::Field::Date(
+                name          =>'notifydate',
+                group         =>'exceptionreq',
+                readonly      =>1,
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'installation request notification',
+                dataobjattr   =>'lnksimonpkgrec.notifydate'),
+
       new kernel::Field::Textarea(
                 name          =>'exceptreqtxt',
                 group         =>'exceptionreq',
@@ -239,6 +250,11 @@ sub new
                 readonly      =>1,
                 vjoinon       =>['managergrpid'=>'grpid'],
                 vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'notifycomments',
+                label         =>'notify comments',
+                dataobjattr   =>'simonpkg.comments'),
 
       new kernel::Field::Link(
                 name          =>'exceptapproverid',
