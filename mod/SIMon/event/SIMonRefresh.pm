@@ -32,6 +32,152 @@ sub new
 }
 
 
+sub Init
+{
+   my $self=shift;
+
+
+   $self->RegisterEvent("SIMonRefresh","SIMonRefresh");
+   $self->RegisterEvent("SIMonNotify","SIMonNotify");
+   return(1);
+}
+
+
+
+
+sub SIMonNotify
+{
+   my $self=shift;
+   my %param=@_;
+
+   my $wfa=getModuleObject($self->Config,"base::workflowaction");
+   my $user=getModuleObject($self->Config,"base::user");
+
+   my $StreamDataobj="SIMon::lnkmonpkgrec";
+   my $datastream=getModuleObject($self->Config,$StreamDataobj);
+   my $opobj=$datastream->Clone();
+
+   $datastream->SetFilter({
+      cistatusid=>[3,4],
+      cdate=>"<now-1d",
+      reqtarget=>['RECO','MAND'],
+      curinststate=>\'NOTFOUND',
+      notifydate=>\undef
+   });
+
+
+
+   $datastream->SetCurrentView("ALL");
+   $datastream->SetCurrentOrder("cdate");
+   my ($rec,$msg)=$datastream->getFirst();
+   my $c=0;
+   if (defined($rec)){
+      NREADLOOP: do{
+         $c++;
+         my %notifyparam;
+         msg(INFO,"($c) ipkg:".$rec->{monpkgid}.
+                  " on sys:".$rec->{system}." req=".$rec->{reqtarget}.
+                  " curstate=".$rec->{curinststate});
+         my %emailto; 
+         my %emailcc; 
+         if ($rec->{admid} ne ""){
+            $emailto{$rec->{admid}}++;
+            $emailcc{$rec->{adm2id}}++ if ($rec->{adm2id} ne "");
+            $emailcc{$rec->{databossid}}++ if ($rec->{databossid} ne "");
+         }
+         else{
+            $emailto{$rec->{databossid}}++ if ($rec->{databossid} ne "");
+            $emailcc{$rec->{adm2id}}++ if ($rec->{adm2id} ne "");
+            $emailcc{$rec->{admid}}++ if ($rec->{admid} ne "");
+         }
+         my @emailto=keys(%emailto);
+         my @emailcc;
+
+         foreach my $userid (keys(%emailcc)){
+            push(@emailcc,$userid) if (!in_array($userid,\@emailto));
+         }
+         $user->ResetFilter();
+         $user->SetFilter({userid=>\@emailto});
+         my ($urec,$msg)=$user->getOnlyFirst(qw(fullname talklang));
+         if (defined($urec)){
+            $notifyparam{emailto}=\@emailto;
+            $notifyparam{emailcc}=\@emailcc;
+            $notifyparam{emailbcc}=[qw(11634953080001)];
+            my $lastlang;
+            if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
+               $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+            }
+            if ($urec->{talklang} ne ""){
+               $ENV{HTTP_FORCE_LANGUAGE}=$urec->{talklang};
+            }
+            my $subject=$rec->{monpkg};
+            $subject.=" ";
+            $subject.=$opobj->T("on");
+            $subject.=" ";
+            $subject.=$rec->{system};
+            $subject.=" ";
+            if ($rec->{reqtarget} eq "MAND"){
+               $subject.=$opobj->T("mandatory");
+            }
+            else{
+               $subject.=$opobj->T("recommended");
+            }
+
+            my $text="";
+
+            $text.=$opobj->T("The installation package");
+            $text.=$opobj->T("needs to be installed");
+            $text.=$opobj->T("should be installed");
+            $text.=$opobj->T("on logical system");
+
+            $text.="System: ".$rec->{system}."\n\n";
+            $text.="Installationpackage: ".$rec->{monpkg}."\n\n";
+            $text.="Target: ".$rec->{monpkgrestrictarget}."\n\n";
+            if ($rec->{reqtarget} eq "MAND"){
+               $text.=$opobj->T("If there are reasons, why the software can not be installed or you would not install the software, you can write a exception justification at");
+               $text.="\n";
+               $text.=$rec->{urlofcurrentrec}."\n";
+               $text.="\n";
+            }
+            my $notifycomments=extractLangEntry($rec->{notifycomments},
+                                                $urec->{talklang});
+            if ($notifycomments ne ""){
+               $text.="\n";
+               $text.=$notifycomments."\n\n";
+            }
+            my $mode="INFO";
+            if ($rec->{reqtarget} eq "MAND"){
+               $mode="WARN";
+            } 
+            $wfa->Notify($mode,$subject,$text,%notifyparam); 
+           
+           
+            my $bk=$opobj->ValidatedUpdateRecord($rec,{
+               mdate=>$rec->{mdate},
+               notifydate=>NowStamp("en")
+            },{id=>\$rec->{id}});
+
+            if (defined($lastlang)){
+               $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+            }
+            else{
+               delete($ENV{HTTP_FORCE_LANGUAGE});
+            }
+         }
+
+
+         ($rec,$msg)=$datastream->getNext();
+         if (defined($msg)){
+            msg(ERROR,"db record problem: %s",$msg);
+            return({exitcode=>1,msg=>$msg});
+         }
+      }until(!defined($rec) || $c>5000);
+   }
+   return({exitcode=>0,exitmsg=>'ok'});
+}
+
+
+
 sub SIMonRefresh
 {
    my $self=shift;
@@ -107,16 +253,12 @@ sub SIMonRefresh
             },{id=>\$rec->{id}});
          }
 
-         if ($c>5000){
-            last;
-         }
-
          ($rec,$msg)=$datastream->getNext();
          if (defined($msg)){
             msg(ERROR,"db record problem: %s",$msg);
             return({exitcode=>1,msg=>$msg});
          }
-      }until(!defined($rec));
+      }until(!defined($rec) || $c>5000);
    }
 
 

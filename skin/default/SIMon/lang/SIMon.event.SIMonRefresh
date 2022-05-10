@@ -1,0 +1,4 @@
+'If there are reasons, why the software can not be installed or you would not install the software, you can write a exception justification at'=>{de=>'Falls es Gründe gibt, warum Sie die Software nicht installieren können oder möchten, können Sie eine Ausnahmeregelung erfassen:'},
+'on'=>{de=>'auf'},
+'mandatory'=>{de=>'notwendig'},
+'recommended'=>{de=>'empfohlen'},
