@@ -71,7 +71,12 @@ sub new
                 label         =>'CI-StateID',
                 dataobjattr   =>'simonpkg.cistatus'),
 
-      new kernel::Field::Databoss(),
+
+      #new kernel::Field::Databoss(),
+
+      new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'simonpkg.databoss'),
 
       new kernel::Field::Select(
                 name          =>'restrictarget',
@@ -81,14 +86,24 @@ sub new
                 value         =>[qw(MAND RECO)],
                 dataobjattr   =>'simonpkg.restrictarget'),
 
+      new kernel::Field::TextDrop(
+                name          =>'managergrp',
+                htmlwidth     =>'300px',
+                label         =>'exception approver group',
+                vjointo       =>'base::grp',
+                AllowEmpty    =>1,
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoinon       =>['managergrpid'=>'grpid'],
+                vjoindisp     =>'fullname'),
+
+      new kernel::Field::Link(
+                name          =>'managergrpid',
+                dataobjattr   =>'simonpkg.managergrpid'),
+
       new kernel::Field::Textarea(
                 name          =>'restriction',
                 label         =>'logical system restriction',
                 dataobjattr   =>'simonpkg.restriction'),
-
-      new kernel::Field::Link(
-                name          =>'databossid',
-                dataobjattr   =>'simonpkg.databoss'),
 
       new kernel::Field::SubList(
                 name          =>'software',
