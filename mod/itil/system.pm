@@ -2088,12 +2088,11 @@ sub getSqlFrom
           "left outer join lnkapplsystem as secsystemlnkapplsystem ".
           "on $worktable.id=secsystemlnkapplsystem.system ".
           "left outer join appl as secsystemappl ".
-          "on secsystemlnkapplsystem.id=secsystemappl.id and secsystemappl.cistatus<6 ".
-
+          "on secsystemlnkapplsystem.id=secsystemappl.id ".
+             "and secsystemappl.cistatus<6 ".
           "left outer join lnkcontact secsystemlnkcontact ".
-          "on secsystemlnkcontact.parentobj='itil::appl' ".
+          "on secsystemlnkcontact.parentobj='itil::system' ".
           "and system.id=secsystemlnkcontact.refid ".
-
           "left outer join costcenter secsystemcostcenter ".
           "on secsystemappl.conumber=secsystemcostcenter.name ";
 
