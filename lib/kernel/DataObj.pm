@@ -1270,6 +1270,25 @@ sub isWriteValid
    return();  # ALL means all groups - else return list of fieldgroups
 }
 
+sub isWriteOnFieldGroupValid
+{
+   my $self=shift;
+   my $idval=shift;
+   my $group=shift;
+
+   my $idfield=$self->IdField();
+   $idval=~s/[\*\? ]//g;
+   if (defined($idfield) && $idval ne ""){
+      $self->SetFilter({$idfield->Name()=>\$idval});
+      my ($crec,$msg)=$self->getOnlyFirst(qw(ALL));
+      my @g=$self->isWriteValid($crec);
+      if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+         return(1);
+      }
+   }
+   return(0);
+}
+
 sub isCopyValid
 {
    my $self=shift;
