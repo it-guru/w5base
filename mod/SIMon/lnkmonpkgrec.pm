@@ -148,14 +148,17 @@ sub new
                 name          =>'exception',
                 label         =>'exception from target state',
                 transprefix   =>'EXCEPTION.',
-                value         =>[qw(REQUESTED ACCEPTED REJECTED EXPIRED)],
+                value         =>[qw(REQUESTED ACCEPTED REJECTED EXPIRED
+                                    AUTOACCEPT)],
                 selectfix     =>1,
                 readonly      =>1,
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"if (lnksimonpkgrec.exceptreqtxt<>'',".
+                                "if (simonpkg.managergrpid is null,".
+                                "'AUTOACCEPT',".
                                 "if (exceptstate='ACCEPT','ACCEPTED',".
                                 "if (exceptstate='REJECT','REJECTED',".
-                                "'REQUESTED')),".
+                                "'REQUESTED'))),".
                                 "NULL)"),
 
       new kernel::Field::Text(
@@ -405,7 +408,8 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'lnksimonpkgrec.realeditor'),
    );
-   $self->setDefaultView(qw(system monpkg reqtarget curinststate exception cdate));
+   $self->setDefaultView(qw(system monpkg reqtarget 
+                            curinststate exception cdate));
    $self->setWorktable("lnksimonpkgrec");
    return($self);
 }
@@ -594,6 +598,14 @@ sub Validate
    if (effChanged($oldrec,$newrec,"rawreqtarget")){  # Change Targetstate
       $newrec->{notifydate}=undef;
    }
+   my $exceptreqtxt=effVal($oldrec,$newrec,"exceptreqtxt");
+   if ($exceptreqtxt ne ""){
+      if (length($exceptreqtxt)<20){
+         $self->LastMsg(ERROR,"exception request justification ".
+                              "not detailed enouth");
+         return(undef);
+      }
+   }
 
    return(1);
 }
@@ -605,13 +617,12 @@ sub isViewValid
    my $rec=shift;
    my @l=qw(default header source);
 
-   if ($rec->{managergrpid} ne "" &&
-       $rec->{systemid} ne ""){# Schreibzugriff auf logisches system
+   if ($rec->{systemid} ne ""){# Schreibzugriff auf logisches system
       my $sobj=$self->getPersistentModuleObject("itil::system");
       if ($sobj->isWriteOnFieldGroupValid($rec->{systemid},"default")){
           push(@l,"exceptionreq");
       }
-      if ($rec->{exception} ne ""){
+      if ($rec->{exception} ne "" && $rec->{managergrpid} ne ""){
          push(@l,"exceptionreq");
          push(@l,"exceptionappr");
       }
@@ -632,14 +643,17 @@ sub isWriteValid
 
    if (defined($oldrec)){
       my $systemid=effVal($oldrec,$newrec,"systemid");
+      my $reqtarget=effVal($oldrec,$newrec,"reqtarget");
       my $managergrpid=effVal($oldrec,$newrec,"managergrpid");
-      if ($managergrpid ne "" && $systemid ne ""){
+      if ($systemid ne "" && $reqtarget eq "MAND"){
          my $sobj=$self->getPersistentModuleObject("itil::system");
          if ($sobj->isWriteOnFieldGroupValid($systemid,"default")){
             push(@wrgrp,"exceptionreq");
          }
-         if ($self->IsMemberOf($managergrpid)){
-            push(@wrgrp,"exceptionappr");
+         if ($managergrpid ne ""){
+            if ($self->IsMemberOf($managergrpid)){
+               push(@wrgrp,"exceptionappr");
+            }
          }
       }
    }
