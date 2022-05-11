@@ -62,6 +62,7 @@ sub SIMonNotify
       cdate=>"<now-1d",     # das muss in der Prod min. 14 Tage sein
       reqtarget=>['RECO','MAND'],
       curinststate=>\'NOTFOUND',
+      exceptreqtxt=>'',     # noch keine Ausnahme beantragt
       needrefresh=>\'0',    # notwendig falls die rules angepasst wurden
       notifydate=>\undef
    });
