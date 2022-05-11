@@ -59,9 +59,10 @@ sub SIMonNotify
 
    $datastream->SetFilter({
       cistatusid=>[3,4],
-      cdate=>"<now-1d",
+      cdate=>"<now-1d",     # das muss in der Prod min. 14 Tage sein
       reqtarget=>['RECO','MAND'],
       curinststate=>\'NOTFOUND',
+      needrefresh=>\'0',    # notwendig falls die rules angepasst wurden
       notifydate=>\undef
    });
 
@@ -126,13 +127,23 @@ sub SIMonNotify
             my $text="";
 
             $text.=$opobj->T("The installation package");
-            $text.=$opobj->T("needs to be installed");
-            $text.=$opobj->T("should be installed");
+            $text.=" ";
+            $text.="<b>";
+            $text.=$rec->{monpkg};
+            $text.="</b>";
+            $text.=" ";
+            if ($rec->{monpkgrestrictarget} eq "MAND"){
+               $text.=$opobj->T("needs to be installed");
+               $text.="<b>(mandatory)</b>";
+            }
+            else{
+               $text.=$opobj->T("should be installed");
+               $text.="<b>(recomented)</b>";
+            }
+            $text.=" ";
             $text.=$opobj->T("on logical system");
-
-            $text.="System: ".$rec->{system}."\n\n";
-            $text.="Installationpackage: ".$rec->{monpkg}."\n\n";
-            $text.="Target: ".$rec->{monpkgrestrictarget}."\n\n";
+            $text.=" ";
+            $text.="<b>".$rec->{system}."</b>.\n\n";
             if ($rec->{reqtarget} eq "MAND"){
                $text.=$opobj->T("If there are reasons, why the software can not be installed or you would not install the software, you can write a exception justification at");
                $text.="\n";
@@ -238,7 +249,6 @@ sub SIMonRefresh
                }
             }
          }
-
          if ($rec->{id} eq ""){
             my $bk=$opobj->ValidatedInsertRecord({
                monpkgid=>$rec->{monpkgid},
