@@ -82,8 +82,9 @@ sub new
                 name          =>'restrictarget',
                 label         =>'target state',
                 transprefix   =>'TARGET.',
+                htmleditwidth =>'200px',
                 translation   =>'SIMon::lnkmonpkgrec',
-                value         =>[qw(MAND RECO)],
+                value         =>[qw(MAND RECO MONI)],
                 dataobjattr   =>'simonpkg.restrictarget'),
 
       new kernel::Field::TextDrop(

@@ -68,7 +68,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'applicationnames',
                 label         =>'Applicationnames',
-                xhtmldetail    =>0,
                 readonly      =>1,
                 translation   =>'itil::system',
                 vjointo       =>'itil::lnkapplsystem',
@@ -123,7 +122,7 @@ sub new
                 name          =>'reqtarget',
                 label         =>'target state',
                 transprefix   =>'TARGET.',
-                value         =>[qw(MAND NEDL RECO)],
+                value         =>[qw(MAND NEDL RECO MONI)],
                 allownative   =>1,
                 allowempty    =>1,
                 readonly      =>1,
@@ -168,15 +167,6 @@ sub new
                 htmlwidth     =>"500px",
                 label         =>'Comments',
                 dataobjattr   =>'lnksimonpkgrec.comments'),
-
-      new kernel::Field::Date(
-                name          =>'notifydate',
-                group         =>'exceptionreq',
-                readonly      =>1,
-                htmldetail    =>0,
-                searchable    =>0,
-                label         =>'installation request notification',
-                dataobjattr   =>'lnksimonpkgrec.notifydate'),
 
       new kernel::Field::Textarea(
                 name          =>'exceptreqtxt',
@@ -351,6 +341,7 @@ sub new
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
+                htmldetail    =>'0',
                 label         =>'Creator',
                 dataobjattr   =>'lnksimonpkgrec.createuser'),
                                    
@@ -385,6 +376,16 @@ sub new
                 group         =>'source',
                 label         =>'installation monitoring start',
                 dataobjattr   =>'lnksimonpkgrec.createdate'),
+
+      new kernel::Field::Date(
+                name          =>'notifydate',
+                group         =>'exceptionreq',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'installation request notification',
+                group         =>'source',
+                dataobjattr   =>'lnksimonpkgrec.notifydate'),
+
                                                 
       new kernel::Field::MDate(
                 name          =>'mdate',
@@ -589,6 +590,9 @@ sub Validate
          $newrec->{exceptapproverid}=undef;
          $newrec->{exceptapprdate}=undef;
       }
+   }
+   if (effChanged($oldrec,$newrec,"rawreqtarget")){  # Change Targetstate
+      $newrec->{notifydate}=undef;
    }
 
    return(1);
