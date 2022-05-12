@@ -1687,7 +1687,8 @@ sub Validate
 
    my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
 
-   if ($cistatusid eq "4" || $cistatusid eq "3"){
+   if ($self->isDataInputFromUserFrontend() &&
+       ($cistatusid eq "4" || $cistatusid eq "3")){
       my $applid=effVal($oldrec,$newrec,"applid");
       if (effChanged($oldrec,$newrec,"applid") || 
           effChanged($oldrec,$newrec,"cistatusid")){
