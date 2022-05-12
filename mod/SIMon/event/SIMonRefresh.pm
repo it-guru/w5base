@@ -215,8 +215,8 @@ sub SIMonRefresh
    }
    else{
       $datastream->SetFilter([
-        {id=>\undef},
-        {needrefresh=>\'1'}
+        {id=>\undef,systemcdate=>"<now-14d"},
+        {needrefresh=>\'1',systemcdate=>"<now-14d"}
       ]);
    }
 
