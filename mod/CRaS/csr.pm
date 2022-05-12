@@ -944,17 +944,19 @@ sub FinishWrite
       }
    }
 
-   if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4"){
-      # notify requestor about new signed cert
-      my $csrid=effVal($oldrec,$newrec,"id");
-      $self->doNotify($csrid,"CERTSIGNED");
-   }
-
-   if ((!defined($oldrec) || effChanged($oldrec,$newrec,"state")) && 
-       $newrec->{state} eq "1"){
-      # notify service team abount new request
-      my $csrid=effVal($oldrec,$newrec,"id");
-      $self->doNotify($csrid,"NEWCERT");
+   if ($self->isDataInputFromUserFrontend()){
+      if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4"){
+         # notify requestor about new signed cert
+         my $csrid=effVal($oldrec,$newrec,"id");
+         $self->doNotify($csrid,"CERTSIGNED");
+      }
+     
+      if ((!defined($oldrec) || effChanged($oldrec,$newrec,"state")) && 
+          $newrec->{state} eq "1"){
+         # notify service team abount new request
+         my $csrid=effVal($oldrec,$newrec,"id");
+         $self->doNotify($csrid,"NEWCERT");
+      }
    }
 
 
