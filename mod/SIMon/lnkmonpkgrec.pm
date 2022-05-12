@@ -662,6 +662,76 @@ sub isWriteValid
 }
 
 
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+
+   if (my $exceptreqtxt=effChangedVal($oldrec,$newrec,"exceptreqtxt")){
+      if ($exceptreqtxt ne ""){
+         my $managergrpid=effVal($oldrec,$newrec,"managergrpid");
+         if ($managergrpid ne ""){
+            my $sendmail=1;
+            my $userid=$self->getCurrentUserId();
+            my @l=$self->getMembersOf($managergrpid,
+               "RMember",
+               "direct"
+            );
+            my @emailto;
+            foreach my $uid (@l){
+               if ($userid eq $uid){
+                  $sendmail=0;         # current user is in managergrp
+               }
+               else{
+                  push(@emailto,$uid);
+               }
+            }
+            if ($sendmail && $#emailto!=-1){
+               my %notifyparam;
+               my %notifycontrol;
+
+               $notifyparam{emailfrom}=$userid;
+               $notifyparam{emailfromfake}=1;  # prevent OutOffOffice Mails 
+               $notifyparam{emailto}=\@emailto;
+               $notifyparam{emailbcc}=['11634953080001'];
+               $self->NotifyLangContacts($oldrec,$newrec,
+                  \%notifyparam,\%notifycontrol,
+                  sub{
+                     my $self=shift;
+                     my $notifyparam=shift;
+                     my $notifycontrol=shift;
+                     my $subject=$self->T("exception approve request");
+                     my $text;
+                     $subject.=": ".effVal($oldrec,$newrec,"system");
+                     $text.=
+                       $self->T("Requirement to exception non-installation of");
+                     $text.="\n";
+                     $text.=effVal($oldrec,$newrec,"monpkg");
+                     $text.=" ";
+                     $text.=$self->T("on");
+                     $text.=" ";
+                     $text.=effVal($oldrec,$newrec,"system");
+                     $text.=".";
+                     $text.="\n";
+                     $text.="\n---\n";
+                     $text.=$self->T("Justification").":\n";
+                     $text.=effVal($oldrec,$newrec,"exceptreqtxt");
+                     $text.="\n---\n";
+                     return($subject,$text); 
+                  }
+               ); 
+            }
+         }
+      }
+   }
+   return($bak);
+}
+
+
+
+
 
 
 

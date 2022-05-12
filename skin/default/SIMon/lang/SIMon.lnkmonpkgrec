@@ -40,3 +40,7 @@ en=>'exception approval',
 'exception approver'=>{de=>'Ausnahme Genehmiger'},
 'posible exception approver group'=>{de=>'mögliche Ausnahmengenehmigungsgruppe'},
 'installation request notification'=>{de=>'Installationsaufforderung'},
+'exception approve request'=>{de=>'Ausnahmegenehmigungsanforderung'},
+'Justification'=>{de=>'Begründung'},
+'Requirement to exception non-installation of'=>{de=>'Anforderung zur Ausnahme Nichtinstallation von'},
+'on'=>{de=>'auf'}
