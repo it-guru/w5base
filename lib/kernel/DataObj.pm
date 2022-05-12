@@ -2344,10 +2344,110 @@ sub getWriteAuthorizedContacts
 }
 
 
+sub NotifyLangContacts
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $notifyparam=shift;
+   my $notifycontrol=shift;
+   my $gentext=shift;               # function callback to get subject/text
+   my %notifyparam=%$notifyparam;
+
+   my $subject;
+   my $text;
+
+   my $langSplit=$notifyparam{langsplit};      # bisher die einig unterstützt
+   if (!in_array($langSplit,[qw(langsplit)])){ # sprachabhängige Behandlung
+      $langSplit="langsplit";
+   }
+
+   my $idfield=$self->IdField();
+   if (defined($idfield)){
+      my $id=$idfield->RawValue($oldrec);
+      if ($id ne ""){
+         if (!exists($notifyparam{dataobj})){
+            $notifyparam{dataobj}=$self->Self;
+         }
+         if (!exists($notifyparam{dataobjid})){
+            $notifyparam{dataobjid}=$id;
+         }
+      }
+   }
+   my %userid;
+   my @emailto;
+   my @emailcc;
+   if (ref($notifyparam{emailto}) eq "ARRAY"){
+      @emailto=@{$notifyparam{emailto}};
+      foreach my $uid (@{$notifyparam{emailto}}){
+         $userid{$uid}++;
+      }
+   }
+   if (ref($notifyparam{emailcc}) eq "ARRAY"){
+      @emailcc=@{$notifyparam{emailcc}};
+      foreach my $uid (@{$notifyparam{emailcc}}){
+         $userid{$uid}++;
+      }
+   }
+   my %talklang;
+   my $resbuf;
+   my $user=getModuleObject($self->Config,"base::user");
+   $user->SetFilter({userid=>[keys(%userid)],cistatusid=>\'4'});
+   foreach my $urec ($user->getHashList(qw(fullname talklang email))){
+      $resbuf->{$urec->{userid}}->{fullname}=$urec->{fullname};
+      $resbuf->{$urec->{userid}}->{talklang}=$urec->{talklang};
+      $resbuf->{$urec->{userid}}->{email}=$urec->{email};
+      $talklang{$urec->{talklang}}++; 
+   }
+
+   my $lastlang;
+   if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
+      $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+   }
+   foreach my $lang (keys(%talklang)){
+      $ENV{HTTP_FORCE_LANGUAGE}=$lang;
+      my @cleanemailto;
+      my @cleanemailcc;
+      foreach my $uid (@emailto){
+         if ((exists($resbuf->{$uid}) && $resbuf->{$uid}->{talklang} eq $lang) ||
+             !exists($resbuf->{$uid})){
+            push(@cleanemailto,$uid);
+         }
+      }
+      $notifyparam{emailto}=\@cleanemailto;
+      foreach my $uid (@emailcc){
+         if ((exists($resbuf->{$uid}) && $resbuf->{$uid}->{talklang} eq $lang) ||
+             !exists($resbuf->{$uid})){
+            push(@cleanemailcc,$uid);
+         }
+      }
+      $notifyparam{emailcc}=\@cleanemailcc;
+     
+      my ($subject,$text)=&{$gentext}($self,\%notifyparam,$notifycontrol);
+     
+      my $mode=$notifycontrol->{mode};
+      $mode="INFO" if ($mode eq "");
+     
+      if (defined($subject) && defined($text)){
+         if (!defined($notifycontrol->{wfact})){
+            $notifycontrol->{wfact}=getModuleObject($self->Config,
+                                                    "base::workflowaction");
+         }
+         $notifycontrol->{wfact}->Notify($mode,$subject,$text,%notifyparam);
+      }
+   }
+   if (defined($lastlang)){
+      $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
+   }
+   else{
+      delete($ENV{HTTP_FORCE_LANGUAGE});
+   }
+}
+
+
 
 
 sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
-
 {                                   # with write role
    my $self=shift;
    my $oldrec=shift;
