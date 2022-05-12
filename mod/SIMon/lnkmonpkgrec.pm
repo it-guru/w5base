@@ -381,6 +381,12 @@ sub new
                 dataobjattr   =>'lnksimonpkgrec.createdate'),
 
       new kernel::Field::Date(
+                name          =>'systemcdate',
+                group         =>'source',
+                label         =>'system creation-date',
+                dataobjattr   =>'system.createdate'),
+
+      new kernel::Field::Date(
                 name          =>'notifydate',
                 group         =>'exceptionreq',
                 readonly      =>1,
