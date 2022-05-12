@@ -776,9 +776,14 @@ sub Notify
                $user->ResetFilter();
                $user->SetFilter({userid=>\$param{$target}->[$c],
                                  cistatusid=>"<6"});
-               my ($urec)=$user->getOnlyFirst(qw(email));
+               my ($urec)=$user->getOnlyFirst(qw(fullname email));
                if (defined($urec)){
-                  $param{$target}->[$c]=$urec->{email};
+                  if ($target eq "emailfrom" && $param{$target."fake"}){
+                     $param{$target}->[$c]="\"".$urec->{fullname}."\" <>";
+                  }
+                  else{
+                     $param{$target}->[$c]=$urec->{email};
+                  }
                }
                else{
                   $param{$target}->[$c]=undef;
