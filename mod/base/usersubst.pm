@@ -70,6 +70,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'userid',
+                selectfix     =>1,
                 label         =>'UserId',
                 dataobjattr   =>'usersubst.userid'),
 
@@ -106,7 +107,31 @@ sub getSqlFrom
 }
 
 
+sub Validate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $origrec=shift;
 
+   my $userid=effVal($oldrec,$newrec,"userid");
+   my $olduserid=$userid;
+   if (defined($oldrec)){
+      $olduserid=$oldrec->{userid};
+   }
+
+   if (!$self->IsMemberOf("admin")){
+      my $curuserid=$self->getCurrentUserId();
+      if ($userid ne $curuserid || $userid ne $olduserid){
+         $self->LastMsg(ERROR,
+                        "you are not authorized to create or modifiy ".
+                        "this user substitution");
+         return(0);
+      }
+   }
+
+   return(1);
+}
 
 
 sub isViewValid
@@ -120,8 +145,9 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-#   msg(INFO,"isWriteValid in $self");
-   return("ALL");
+   return("ALL") if (!defined($rec));
+   my $userid=$self->getCurrentUserId();
+   return(undef) if ($userid ne $rec->{userid});
 }
 
 
