@@ -6,4 +6,4 @@
 '1'=>{de=>'ja',en=>'yes'},
 '0'=>{de=>'nein',en=>'no'},
 'fieldgroup.default'=>{de=>'Vertreterregelung',en=>'Substitiution'},
-
+'you are not authorized to create or modifiy this user substitution'=>{de=>'Sie sind nicht berechtigt, diese Vertreterregelung zu erzeugen oder zu verändern'},
