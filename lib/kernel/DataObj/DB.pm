@@ -956,7 +956,12 @@ sub getFirst
       $self->{isInitalized}=0;
       my $msg=$self->T("no database connection or invalid database handle");
       if ($self->isSuspended()){
-         $msg=$self->T("database connection temporary suspended");
+         if ($self->isDataInputFromUserFrontend()){
+            $msg=$self->T("database connection temporary suspended");
+         }
+         else{
+            return(undef);
+         }
       }
       $self->LastMsg(ERROR,$msg);
       return(undef,msg(ERROR,$msg));

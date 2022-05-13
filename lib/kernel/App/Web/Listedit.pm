@@ -2651,6 +2651,13 @@ sub Welcome
 {
    my $self=shift;
 
+   if ($self->isSuspended()){
+      if (!$self->LastMsg()){
+         $self->LastMsg(ERROR,"access to this object is currently suspended")
+      }
+      print($self->notAvailable($self->T($self->Self,$self->Self)));
+      return(undef);
+   }
    if (!$self->Ping()){
       print($self->notAvailable($self->T($self->Self,$self->Self)));
       return(undef);

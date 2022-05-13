@@ -830,7 +830,7 @@ CREATE TABLE objblacklist (
   id                   bigint(20),
   objtype              varchar(40) NOT NULL,
   field                varchar(40) NOT NULL default '',
-  status               tinyint(2),
+  status               tinyint(2), limitstart datetime,
   expiration           datetime,replpartnerid        bigint(20) NOT NULL,
   comments             longtext default NULL,
   createdate           datetime NOT NULL default '0000-00-00 00:00:00',
