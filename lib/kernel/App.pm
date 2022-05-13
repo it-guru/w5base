@@ -568,6 +568,7 @@ sub isSuspended
        $o->BackendSessionName("BlackListHandling");
        $o->SetFilter({
           status=>\'1',
+          limitstart=>[undef,"<now"],
           expiration=>[undef,">now"]
        });
        $o->SetCurrentView(qw(objtype field));

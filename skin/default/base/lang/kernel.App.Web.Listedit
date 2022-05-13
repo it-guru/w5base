@@ -42,3 +42,4 @@
 'hide item'=>{de=>'Element verstecken'},
 'delete operation on invalid record'=>{de=>'Datensatz Lösch-Versuch auf ungültigem Datensatz'},
 'Modify operations are only alowed by Method POST'=>{de=>'Modify-Operationen sind nur mit Methode POST zulässig'},
+'access to this object is currently suspended'=>{de=>'Der Zugriff auf dieses Objekt ist derzeit ausgesetzt'},

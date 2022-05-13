@@ -67,6 +67,14 @@ sub new
                 dataobjattr   =>'objblacklist.status'),
 
       new kernel::Field::Date(
+                name          =>'limitstart',
+                label         =>'start of blocking',
+                dataobjattr   =>"if (objblacklist.limitstart is null,".
+                                "objblacklist.createdate,".
+                                "objblacklist.limitstart)",
+                wrdataobjattr =>'objblacklist.limitstart'),
+                                                  
+      new kernel::Field::Date(
                 name          =>'expiration',
                 label         =>'Expiration-Date',
                 dataobjattr   =>'objblacklist.expiration'),
@@ -116,7 +124,7 @@ sub new
 
    );
    $self->setDefaultView(qw(linenumber replpartner objtype
-                            field status expiration));
+                            field status limitstart expiration));
    $self->setWorktable("objblacklist");
    return($self);
 }
@@ -164,9 +172,18 @@ sub Validate
    my $expiration=trim(effVal($oldrec,$newrec,"expiration"));
    if (defined($expiration) && (effVal($oldrec,$newrec,"status")==1)) {
       my $d=CalcDateDuration(NowStamp('en'),$expiration);
-      if ($d->{totalminutes}<60) {
+      if ($d->{totalminutes}<9) {
          $self->LastMsg(ERROR,
                    "Expiration-Date must be at least 1h in the future");
+         return(undef);
+      }
+   }
+   my $limitstart=effVal($oldrec,$newrec,"limitstart");
+   my $expiration=effVal($oldrec,$newrec,"expiration");
+   if ($limitstart ne "" && $expiration ne ""){
+      my $d=CalcDateDuration($limitstart,$expiration);
+      if ($d->{totalseconds}<=0){
+         $self->LastMsg(ERROR,"begin after end not allowed");
          return(undef);
       }
    }
