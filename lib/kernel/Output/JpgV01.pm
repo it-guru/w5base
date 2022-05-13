@@ -134,7 +134,7 @@ sub ProcessLine
       $headerval=$f->RawValue($rec);
    }
    else{
-      $headerval='%objecttitle%';
+      $headerval='';
    }
    $self->{dtp}->NewPage(format=>'A4',headerval=>"$headerval");
    $self->{dtp}->WriteLine($s.": ".$headerval,
