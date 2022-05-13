@@ -309,7 +309,8 @@ sub HandleCIStatus
          if ($newrec->{cistatusid}>2 || $newrec->{cistatusid}==0){
             if (!$self->isActivator($oldrec,$newrec,%param)){
                $self->LastMsg(ERROR,"you are not authorized to create ".
-                                    "items with this state");
+                                    "items with this state - ".
+                                    "please try to use \"on order\"");
                return(0);
             }
          }
@@ -318,7 +319,8 @@ sub HandleCIStatus
          if (!defined($oldrec) && $newrec->{cistatusid}==0){
             if (!$self->isActivator($oldrec,$newrec,%param)){
                $self->LastMsg(ERROR,"you are not authorized to set ".
-                                    "this state");
+                                    "this state - ".
+                                    "please try to use 'on order'");
                return(0);
             }
          }
