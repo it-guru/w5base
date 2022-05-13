@@ -47,7 +47,7 @@ The documentation of a measure does not protect against possible incidents. A me
 'invalid detail description for measure'=>{de=>'ungültige Detailbeschreibung der Maßname'},
 'planned start'=>{de=>'Geplanter Beginn'},
 'planned end'=>{de=>'Geplantes Ende'},
-'planned end must be behind planned start'=>{de=>'Geplantes Ende muss nach dem geplanten Begin liegen'},
+'planned end must be behind planned start'=>{de=>'Geplantes Ende muss nach dem geplanten Beginn liegen'},
 'it is not allowed to delete this entry'=>{de=>'Es ist nicht erlaubt, diesen Eintrag zu löschen'},
 'planned start to far in the past'=>{de=>'Geplanter Beginn zu weit in der Vergangenheit'},
 'planned end to far in the future'=>{de=>'Geplantes Ende zu weit in der Zukunft'},

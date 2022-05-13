@@ -7,7 +7,7 @@
 'Inst-Date'=>{de=>'Installationsdatum'},
 'Classification'=>{de=>'Klassifikation'},
 'release date'=>{de=>'Veröffentlichungsdatum'},
-'start of life date'=>{de=>'Begin Lifecycle'},
+'start of life date'=>{de=>'Beginn Lifecycle'},
 'end of life date'=>{de=>'Ende Lifecycle'},
 'end of sales date'=>{de=>'Verkaufsende'},
 'supported until'=>{de=>'Support bis'},
