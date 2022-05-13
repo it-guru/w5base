@@ -6,8 +6,8 @@
     de=>"Sie sind nur berechtigt, Daten im Status 'bestellt/angefordert' oder 'reserviert' hinzuzufügen"},
 'you are not authorized to set this state'=>{
     de=>'Sie sind nicht berechtigt, diesen Status zu setzen'},
-'you are not authorized to create items with this state'=>{
-    de=>'Sie sind nicht berechtigt, Einträge in diesem Status zu erzeugen'},
+'you are not authorized to create items with this state - please try to use "on order"'=>{
+    de=>'Sie sind nicht berechtigt, Einträge in diesem Status zu erzeugen - bitte versuchen Sie "bestellt/angefordert" zu verwenden'},
 'current state of the requested CI'=>{
     de=>'aktueller Status des angeforderten CI'},
 "Request to activate '\%s' in module '\%s'"=>{
