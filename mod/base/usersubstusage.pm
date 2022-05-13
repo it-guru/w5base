@@ -96,18 +96,5 @@ sub isWriteValid
    return("ALL");
 }
 
-sub findtemplvar
-{
-   my $self=shift;
-   my ($opt,$var,@param)=@_;
-   my $fieldbase=$self->getFieldHash();
- 
-   if ($var eq "objecttitle"){
-      return($opt->{current}->{account});
-   }
-
-   return($self->SUPER::findtemplvar($opt,$var,@param));
-}
-
 
 1;

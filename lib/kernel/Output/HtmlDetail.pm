@@ -436,7 +436,6 @@ EOF
 
       }
       my $H="";
-      $headerval='%objecttitle%' if ($headerval eq "");
       my $s=$self->getParent->getParent->T($self->getParent->getParent->Self,
                                            $self->getParent->getParent->Self);
       my $recordimg=$self->getParent->getParent->getRecordImageUrl($rec);
