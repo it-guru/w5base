@@ -508,6 +508,20 @@ sub new
                 label         =>'planned deconstruction date',
                 dataobjattr   =>'asset.plandecons'),
 
+      new kernel::Field::Date(
+                name          =>'notifyplandecons1',
+                group         =>'financeco',
+                uivisible     =>0,
+                label         =>'notify1 planned deconstruction date',
+                dataobjattr   =>'asset.notifyplandecons1'),
+
+      new kernel::Field::Date(
+                name          =>'notifyplandecons2',
+                group         =>'financeco',
+                uivisible     =>0,
+                label         =>'notify2 planned deconstruction date',
+                dataobjattr   =>'asset.notifyplandecons2'),
+
       new kernel::Field::Select(
                 name          =>'denyupselect',
                 label         =>'it is posible to refresh hardware',

@@ -1839,3 +1839,4 @@ create table lnkapplappltag (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table asset add plandecons datetime default NULL;
 alter table accessurl add ssl_certissuerdn varchar(256) default null;
+alter table asset add notifyplandecons1 datetime default NULL,add notifyplandecons2 datetime default NULL;
