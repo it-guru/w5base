@@ -168,7 +168,6 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'allowuncleanseq',
                 group         =>'rootcontrol',
-                readonly      =>1,
                 label         =>'allow unclean sequences and ci state checking',
                 dataobjattr   =>'itcloud.allowuncleanseq'),
 

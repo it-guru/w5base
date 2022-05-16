@@ -311,6 +311,13 @@ sub new
                 label         =>'W5Base Cloud ID',
                 dataobjattr   =>'qitcloudarea.itcloud'),
 
+      new kernel::Field::Interface(
+                name          =>'allowuncleanseq',
+                translation   =>'itil::itcloud',
+                readonly      =>1,
+                label         =>'allow unclean sequences and ci state checking',
+                dataobjattr   =>'itcloud.allowuncleanseq'),
+
       new kernel::Field::IssueState(),
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),

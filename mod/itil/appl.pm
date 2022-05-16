@@ -575,7 +575,7 @@ sub new
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['fullname','cistatus'],
                 vjoininhash   =>['fullname','cistatusid',
-                                 'id','mdate','cdate']),
+                                 'id','mdate','cdate','allowuncleanseq']),
 
       new kernel::Field::SubList(
                 name          =>'businessservices',
