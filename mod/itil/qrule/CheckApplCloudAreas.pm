@@ -21,6 +21,9 @@ to document the areas as used.
 If the cloud areas are assigned to the application in a wrong way, you
 have to contact the cloud-admins to fix this mistake.
 
+If "unclean processes" are allowed with a cloud, the activation of 
+a CloudArea after a few weeks then does not matter.
+
 
 [de:]
 
@@ -32,6 +35,9 @@ wirklich von der Anwendung verwendet werden.
 Falls die CloudAreas fälschlicher Weise der Anwendungen zugeordnet
 wurden, muß Kontakt mit den Cloud-Admins aufgenommen werden, damit
 diese den Fehler korrigieren.
+
+Wenn bei einer Cloud "unsaubere Prozesse" zugelassen sind, ist die
+Aktivierung einer CloudArea nach einigen Wochen dann egal.
 
 
 =cut
@@ -107,11 +113,16 @@ sub qcheckRecord
       foreach my $crec (@{$rec->{itcloudareas}}){
          if ($crec->{cistatusid}!=4 && $crec->{cistatusid}<5){
             my $t=CalcDateDuration($crec->{mdate},$now,"GMT");
-            if (!defined($t) || $t->{totaldays}>(6*7)){ # 6 weeks
-               push(@needToAct,$crec->{fullname});
+            if (!defined($t) || $t->{totaldays}>(2*7)){ # 2 weeks
+               if ($crec->{allowuncleanseq}){
+                  if ($t->{totaldays}<(10*7)){ # 10 weeks
+                     push(@needToAct,$crec->{fullname});
+                  }
+               }
+               else{
+                  push(@needToAct,$crec->{fullname});
+               }
             }
-          #  print STDERR Dumper($crec);
-          #  print STDERR Dumper($t);
          }
       }
    } 

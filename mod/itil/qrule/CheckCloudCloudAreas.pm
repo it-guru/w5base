@@ -21,6 +21,10 @@ to document the areas as used.
 If the cloud areas are assigned to the application in a wrong way, you
 have to contact the cloud-admins to fix this mistake.
 
+If "unclean processes" are permitted for a cloud, then only a minimal 
+only a minimal check of the CI status of the cloud areas or the 
+applications or the applications listed therein is performed.
+
 
 [de:]
 
@@ -28,6 +32,9 @@ Wenn einer Anwendung CloudAreas zugewiesen sind, müssen diese
 von den Schreibberechtigten der Anwendung als "installiert/aktiv"
 markiert werden, damit dokumentiert ist das diese Areas auch
 wirklich von der Anwendung verwendet werden.
+Sind bei einer Cloud "unsaubere Prozesse" zugelassen, dann wird
+nur noch eine minimale Prüfung des CI-Status der CloudAreas 
+bzw. der darin aufgeführten Anwendungen durchgeführt.
 
 =cut
 #######################################################################
@@ -87,14 +94,16 @@ sub qcheckRecord
    if (ref($rec->{cloudareas}) eq "ARRAY"){
       my $appl=getModuleObject($self->getParent->Config,"itil::appl");
       foreach my $crec (@{$rec->{cloudareas}}){
-         if ($crec->{cistatusid}==3){
-            my $t=CalcDateDuration($crec->{mdate},$now,"GMT");
-            if (!defined($t) || $t->{totaldays}>(8*7)){ # 6 weeks
-               my $msg="CloudArea has not been activated: ".
-                       $crec->{fullname};
-               push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+         if (!($rec->{allowuncleanseq})){
+            if ($crec->{cistatusid}==3){
+               my $t=CalcDateDuration($crec->{mdate},$now,"GMT");
+               if (!defined($t) || $t->{totaldays}>(8*7)){ # 6 weeks
+                  my $msg="CloudArea has not been activated: ".
+                          $crec->{fullname};
+                  push(@qmsg,$msg);
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
          if ($crec->{applid} ne ""){
@@ -115,12 +124,15 @@ sub qcheckRecord
                   push(@dataissue,$msg);
                   $errorlevel=3 if ($errorlevel<3);
                }
-               if ($arec->{cistatusid}<3){
-                  my $msg="application not active or available in CloudArea: ".
-                          $crec->{fullname};
-                  push(@qmsg,$msg);
-                  push(@dataissue,$msg);
-                  $errorlevel=3 if ($errorlevel<3);
+               if (!($rec->{allowuncleanseq})){
+                  if ($arec->{cistatusid}<3){
+                     my $msg=
+                         "application not active or available in CloudArea: ".
+                         $crec->{fullname};
+                     push(@qmsg,$msg);
+                     push(@dataissue,$msg);
+                     $errorlevel=3 if ($errorlevel<3);
+                  }
                }
             }
          }
