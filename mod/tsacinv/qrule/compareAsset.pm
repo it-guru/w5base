@@ -464,7 +464,8 @@ sub qcheckRecord
                ################################################################
                # handling for plandecons, notifyplandecons1, notifyplandecons2
                #$rec->{eohs}="2022-01-31 22:00:00";
-               if ($parrec->{ishousing} && $rec->{eohs} ne ""){
+               if ($parrec->{ishousing} && $rec->{eohs} ne "" &&
+                   $rec->{plandecons} eq ""){
                   my $deohs=CalcDateDuration(NowStamp("en"),$rec->{eohs});
                   msg(INFO,"delta days eohs: ".$deohs->{totaldays});
                   if ($deohs->{totaldays}<90){
