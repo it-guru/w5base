@@ -83,7 +83,8 @@ sub new
                                   deleted=>\'0'}],
                 weblinkto     =>'none',
                 vjoindisp     =>'systemname',
-                label         =>'Systemname'),
+                group         =>'systems',
+                label         =>'Systemnames'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
@@ -93,7 +94,8 @@ sub new
                                   deleted=>\'0'}],
                 weblinkto     =>'none',
                 vjoindisp     =>'systemid',
-                label         =>'SystemID'),
+                group         =>'systems',
+                label         =>'SystemIDs'),
 
       new kernel::Field::Date(
                 name          =>'install',
@@ -118,6 +120,7 @@ sub new
                 name          =>'conumber',
                 label         =>'CO-Number',
                 size          =>'15',
+                htmldetail    =>'NotEmpty',
                 weblinkto     =>'tsacinv::costcenter',
                 weblinkon     =>['lcostcenterid'=>'id'],
                 dataobjattr   =>'"conumber"'),
@@ -170,13 +173,39 @@ sub new
                 label         =>'Nature',
                 dataobjattr   =>'"assetnature"'),
 
+      new kernel::Field::Boolean(
+                name          =>'ishousing',
+                label         =>'is HOUSING Asset',
+                vjointo       =>\'tsacinv::system',
+                vjoinon       =>['lassetid'=>'lassetid'],
+                vjoinbase     =>[{status=>"\"!out of operation\"",
+                                  usage=>\'INVOICE_ONLY',
+                                  deleted=>\'0'}],
+                searchable    =>0,
+                prepRawValue  =>sub{
+                   my $self=shift;
+                   my $d=shift;
+                   my $current=shift;
+                   if (!defined($d)){
+                      $d="0";
+                   }
+                   elsif ($d eq "0"){
+                      $d="0";
+                   }
+                   else{
+                      $d="1";
+                   }
+                   return($d);
+                },
+                vjoindisp     =>'usage'),
+
       new kernel::Field::Import( $self,
                 weblinkto     =>\'tsacinv::model',
                 vjointo       =>\'tsacinv::model',
                 vjoinon       =>['lmodelid'=>'lmodelid'],
                 weblinkon     =>['lmodelid'=>'lmodelid'],
                 prefix        =>'model',
-                group         =>'default',
+                group         =>'hwparam',
                 fields        =>['name']),
 
       new kernel::Field::Float(
@@ -184,23 +213,27 @@ sub new
                 label         =>'Asset Memory',
                 unit          =>'MB',
                 precision     =>'0',
+                group         =>'hwparam',
                 dataobjattr   =>'"memory"'),
 
       new kernel::Field::Text(
                 name          =>'cputype',
                 label         =>'Asset CPU type',
+                group         =>'hwparam',
                 dataobjattr   =>'"cputype"'),
 
       new kernel::Field::Float(
                 name          =>'cpucount',
                 label         =>'Asset CPU count',
                 precision     =>'0',
+                group         =>'hwparam',
                 dataobjattr   =>'"cpucount"'),
 
       new kernel::Field::Number(
                 name          =>'cpumaxsup',
                 htmldetail    =>0,
                 label         =>'Asset max. CPU count supported',
+                group         =>'hwparam',
                 dataobjattr   =>'"cpumaxsup"'),
 
       new kernel::Field::Float(
@@ -208,12 +241,14 @@ sub new
                 label         =>'Asset CPU speed',
                 unit          =>'Hz',
                 precision     =>'0',
+                group         =>'hwparam',
                 dataobjattr   =>'"cpuspeed"'),
 
       new kernel::Field::Float(
                 name          =>'corecount',
                 label         =>'Asset Core count',
                 precision     =>'0',
+                group         =>'hwparam',
                 dataobjattr   =>'"corecount"'),
 
       new kernel::Field::Text(
@@ -231,6 +266,7 @@ sub new
                 name          =>'systemsonasset',
                 label         =>'Systems on Asset',
                 precision     =>'0',
+                group         =>'systems',
                 searchable    =>0,
                 depend        =>[qw(lassetid)],
                 onRawValue    =>\&CalcSystemsOnAsset),
@@ -491,12 +527,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-System',
                 dataobjattr   =>'"srcsys"'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-Id',
                 dataobjattr   =>'"srcid"'),
 
@@ -688,7 +726,8 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default location maint finanz components source));
+   return(qw(header default systems hwparam 
+             location maint finanz components source));
 }
 
 
