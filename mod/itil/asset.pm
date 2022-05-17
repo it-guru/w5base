@@ -1311,9 +1311,18 @@ sub Validate
          }
       }
    }
-   
+
    if (effChanged($oldrec,$newrec,"eohs")){  # reset refreshinfo if eohs changed
-      foreach my $var (qw(refreshinfo3 refreshinfo2 refreshinfo1)){
+      foreach my $var (qw(refreshinfo3 refreshinfo2 refreshinfo1
+                          notifyplandecons1 notifyplandecons2)){
+         my $cur=effVal($oldrec,$newrec,$var);
+         if ($cur ne ""){
+            $newrec->{$var}=undef;
+         }
+      }
+   }
+   if (effChanged($oldrec,$newrec,"plandecons")){  # reset notifypland
+      foreach my $var (qw(notifyplandecons1 notifyplandecons2)){
          my $cur=effVal($oldrec,$newrec,$var);
          if ($cur ne ""){
             $newrec->{$var}=undef;
