@@ -288,7 +288,9 @@ textarea.multilinehtml{
    height:250px;
    width:100%;
    margin:0px;
-   padding:0px;
+   padding:2px;
+   padding-left:5px;
+   padding-right:5px;
    font-weight:300;
    color:black;
    background:#ffffff;
@@ -299,7 +301,9 @@ textarea.multilinetext{
    height:96px;
    width:100%;
    margin:0px;
-   padding:0px;
+   padding:2px;
+   padding-left:5px;
+   padding-right:5px;
    font-weight:300;
    font-family:monospace,Courier New,Adobe Courier,Courier;
    font-size:11px;
@@ -312,7 +316,9 @@ textarea.multilinetext[enabled]{
    height:96px;
    width:100%;
    margin:0px;
-   padding:0px;
+   padding:2px;
+   padding-left:5px;
+   padding-right:5px;
    font-weight:300;
    font-family:monospace,Courier New,Adobe Courier,Courier;
    font-size:11px;
@@ -325,7 +331,9 @@ textarea.multilinetext[disabled]{
    height:96px;
    width:100%;
    margin:0px;
-   padding:0px;
+   padding:2px;
+   padding-left:5px;
+   padding-right:5px;
    font-weight:300;
    font-family:monospace,Courier New,Adobe Courier,Courier;
    font-size:11px;
