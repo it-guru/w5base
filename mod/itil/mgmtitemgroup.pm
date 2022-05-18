@@ -157,6 +157,7 @@ sub new
                    return(0);
                 },
                 group         =>'rundownreq',
+                uploadable    =>0,
                 label         =>'CI-RunDown request description',
                 dataobjattr   =>'mgmtitemgroup.rundowncomment'),
                                                    
@@ -362,7 +363,7 @@ sub isWriteValid
    my $rec=shift;
 
    my $userid=$self->getCurrentUserId();
-   return("default") if (!defined($rec));
+   return("default","comments") if (!defined($rec));
 
 
    my $databossedit=0;
