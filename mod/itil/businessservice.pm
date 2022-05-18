@@ -124,9 +124,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
-                dataobjattr   =>"if ($worktable.cistatus is null,".
-                                "4,$worktable.cistatus)", # hack for autogen
-                wrdataobjattr =>"$worktable.cistatus"),   # (entire) services
+                dataobjattr   =>"$worktable.cistatus"),
 
       new kernel::Field::Select(
                 name          =>'nature',
@@ -1864,8 +1862,7 @@ sub getBSfullnameSQL
          "concat($applname,if ($worktable.shortname is null or ".
          "$worktable.shortname='',':',".
          "concat(':',$worktable.shortname,':')))),".
-         "if ($worktable.name is null,'[ENTIRE]',".
-         "$worktable.name))";
+         "$worktable.name)";
 
    return($d);
 }
@@ -1907,26 +1904,26 @@ sub HandleInfoAboSubscribe
 
 
 
-sub preProcessReadedRecord
-{
-   my $self=shift;
-   my $rec=shift;
-
-   if (!defined($rec->{id}) && $rec->{parentid} ne ""){
-      my $o=$self->Clone();
-      my $oldcontext=$W5V2::OperationContext;
-      $W5V2::OperationContext="QualityCheck";
-      $o->BackendSessionName("preProcessReadedRecord"); # prevent sesssion reuse
-                                                  # on sql cached_connect
-      my ($id)=$o->ValidatedInsertRecord({applid=>$rec->{parentid}});
-      $W5V2::OperationContext=$oldcontext;
-      $rec->{id}=$id;
-      $rec->{cistatusid}='4';
-      $rec->{replkeypri}="1970-01-01 00:00:00";
-      $rec->{replkeysec}=$id;
-   }
-   return(undef);
-}
+#sub preProcessReadedRecord
+#{
+#   my $self=shift;
+#   my $rec=shift;
+#
+#   if (!defined($rec->{id}) && $rec->{parentid} ne ""){
+#      my $o=$self->Clone();
+#      my $oldcontext=$W5V2::OperationContext;
+#      $W5V2::OperationContext="QualityCheck";
+#      $o->BackendSessionName("preProcessReadedRecord"); # prevent sesssion reuse
+#                                                  # on sql cached_connect
+#      my ($id)=$o->ValidatedInsertRecord({applid=>$rec->{parentid}});
+#      $W5V2::OperationContext=$oldcontext;
+#      $rec->{id}=$id;
+#      $rec->{cistatusid}='4';
+#      $rec->{replkeypri}="1970-01-01 00:00:00";
+#      $rec->{replkeysec}=$id;
+#   }
+#   return(undef);
+#}
 
 
 
@@ -1978,7 +1975,7 @@ sub getSqlFrom
    }
    else{
       $from.="((select $basefields ".
-             "from appl left outer join businessservice ".
+             "from appl join businessservice ".
              "on appl.id=businessservice.appl ".
              "left outer join lnkcontact ".
              "on lnkcontact.parentobj='itil::appl' and ".
@@ -2039,16 +2036,6 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   my $autogenmode=0;
-
-   if (!defined($oldrec) && 
-       ( (keys(%$newrec)==1 && defined($newrec->{applid})) ||
-         $W5V2::OperationContext eq "W5Server" ||
-         $W5V2::OperationContext eq "W5Replicate" ||
-         $W5V2::OperationContext eq "QualityCheck")){
-      $autogenmode++;
-   }
-
    foreach my $f (qw(occreactiontimelevel occtotaltimelevel)){
      if (exists($newrec->{$f}) &&
          effVal($oldrec,$newrec,$f)<0 ){
@@ -2090,10 +2077,6 @@ sub Validate
       $newrec->{shortname}=$sn;
    }
 
-   if (effVal($oldrec,$newrec,"name") eq "[ENTIRE]" ||
-       effVal($oldrec,$newrec,"name") eq ""){
-      $newrec->{name}=undef;
-   }
    if (effVal($oldrec,$newrec,"name")=~m/[:\]\[]/){
       $self->LastMsg(ERROR,"invalid service name specified");
       return(0);
@@ -2133,7 +2116,7 @@ sub Validate
                "application only allowed on gerneric Business Service");
          return(0);
       }
-      if ($self->isDataInputFromUserFrontend() && !$autogenmode){
+      if ($self->isDataInputFromUserFrontend()){
          if (!$self->isParentWriteable($applid)){
             $self->LastMsg(ERROR,"no write access to specified application");
             return(0);
