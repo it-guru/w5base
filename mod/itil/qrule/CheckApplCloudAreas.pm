@@ -115,7 +115,7 @@ sub qcheckRecord
             my $t=CalcDateDuration($crec->{cdate},$now,"GMT");
             if (!defined($t) || $t->{totaldays}>(2*7)){ # 2 weeks
                if ($crec->{allowuncleanseq}){
-                  if ($t->{totaldays}>(10*7)){ # 10 weeks
+                  if ($t->{totaldays}<(10*7)){ # 10 weeks
                      push(@needToAct,$crec->{fullname});
                   }
                }
