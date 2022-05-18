@@ -112,7 +112,7 @@ sub qcheckRecord
    if (ref($rec->{itcloudareas}) eq "ARRAY"){
       foreach my $crec (@{$rec->{itcloudareas}}){
          if ($crec->{cistatusid}!=4 && $crec->{cistatusid}<5){
-            my $t=CalcDateDuration($crec->{mdate},$now,"GMT");
+            my $t=CalcDateDuration($crec->{cdate},$now,"GMT");
             if (!defined($t) || $t->{totaldays}>(2*7)){ # 2 weeks
                if ($crec->{allowuncleanseq}){
                   if ($t->{totaldays}<(10*7)){ # 10 weeks
