@@ -77,6 +77,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'shortname',
                 sqlorder      =>'desc',
+                htmldetail    =>'NotEmptyOrEdit',
                 searchable    =>0,
                 htmleditwidth =>'50px',
                 explore       =>300,
@@ -133,7 +134,7 @@ sub new
                 },
                 jsonchanged   =>\&getOnChangedScript,
                 jsoninit      =>\&getOnChangedScript,
-                value         =>[undef,'SVC','IT-S','ES','TR'],
+                value         =>[undef,'SVC','PC','BC'],
                 dataobjattr   =>"$worktable.nature"),
 
       new kernel::Field::Interface(
@@ -263,176 +264,176 @@ sub new
                 vjoindisp     =>'mgmtitemgroup'),
 
 
-      new kernel::Field::TimeSpans(
-                name          =>'supportReq',
-                label         =>'requested service times',
-                uploadable    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                htmldetail    =>0,
-                tspantype     =>['R','K'],
-                tspanlegend   =>1,
-                tspantypeproc =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-                   my $blk=shift;
-                   $blk->[4]="transparent";
-                   if ($blk->[2] eq "on"){
-                      $blk->[4]="blue";
-                      $blk->[4]="blue" if ($blk->[3] eq "K");
-                      $blk->[4]="yellow" if ($blk->[3] eq "R");
-                   }
-                   if ($blk->[2] eq "off"){
-                      $blk->[4]="red";
-                   }
-                },
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $id=$current->{id};
-                   my $st={};
-                   $self->getParent->LoadTreeSPCheck($st,
-                                    "itil::businessservice",$id);
-                   return(
-                      dumpSpanSet(
-                         {},
-                         'K',$st->{tree}->{entry}->{DirectSS}->{supportK},
-                         'R',$st->{tree}->{entry}->{DirectSS}->{supportR})
-                   );
-                }),
+#      new kernel::Field::TimeSpans(
+#                name          =>'supportReq',
+#                label         =>'requested service times',
+#                uploadable    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                htmldetail    =>0,
+#                tspantype     =>['R','K'],
+#                tspanlegend   =>1,
+#                tspantypeproc =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#                   my $blk=shift;
+#                   $blk->[4]="transparent";
+#                   if ($blk->[2] eq "on"){
+#                      $blk->[4]="blue";
+#                      $blk->[4]="blue" if ($blk->[3] eq "K");
+#                      $blk->[4]="yellow" if ($blk->[3] eq "R");
+#                   }
+#                   if ($blk->[2] eq "off"){
+#                      $blk->[4]="red";
+#                   }
+#                },
+#                onRawValue    =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $id=$current->{id};
+#                   my $st={};
+#                   $self->getParent->LoadTreeSPCheck($st,
+#                                    "itil::businessservice",$id);
+#                   return(
+#                      dumpSpanSet(
+#                         {},
+#                         'K',$st->{tree}->{entry}->{DirectSS}->{supportK},
+#                         'R',$st->{tree}->{entry}->{DirectSS}->{supportR})
+#                   );
+#                }),
+#
+#
+#      new kernel::Field::TimeSpans(
+#                name          =>'supportTreeCheck',
+#                htmldetail    =>0,
+#                uploadable    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                label         =>'aggregated service times tree',
+#                tspantype     =>{'k'=>'core replaced by border time',
+#                                 ''=>'',
+#                                 'r'=>'border replaced by core time',
+#                                 'K'=>'continuous core time',
+#                                 'R'=>'continuous border time'},
+#                tspanlegend   =>1,
+#                tspantypeproc =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#                   my $blk=shift;
+#                   $blk->[4]="transparent";
+#                   if ($blk->[2] eq "on" || $blk->[2] eq "legend"){
+#                      $blk->[4]="blue";
+##                      $blk->[4]="lightblue" if ($blk->[3] eq "k");
+#                      $blk->[4]="lightyellow" if ($blk->[3] eq "r");
+#                      $blk->[4]="yellow" if ($blk->[3] eq "R");
+#                   }
+#                   if ($blk->[2] eq "off" || $blk->[3] eq ""){
+#                      $blk->[4]="red";
+#                   }
+#                },
+#                onRawValue    =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $id=$current->{id};
+#                   my $st={};
+#                   $self->getParent->LoadTreeSPCheck($st,
+#                                    "itil::businessservice",$id);
+#                   return(
+#                      dumpSpanSet({},
+#                         'r'=>$st->{tree}->{entry}->{CorelSS}->{supportr},
+#                         'k'=>$st->{tree}->{entry}->{CorelSS}->{supportk},
+#                         'K'=>$st->{tree}->{entry}->{CorelSS}->{supportK},
+#                         'R'=>$st->{tree}->{entry}->{CorelSS}->{supportR})
+#                   );
+#                }),
+#
+#
+#      new kernel::Field::TimeSpans(
+#                name          =>'serivceReq',
+#                label         =>'requested service times',
+#                htmldetail    =>0,
+#                uploadable    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                tspantype     =>['R','K'],
+#                tspanlegend   =>1,
+#                tspantypeproc =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#                   my $blk=shift;
+#                   $blk->[4]="transparent";
+#                   if ($blk->[2] eq "on"){
+#                      $blk->[4]="blue";
+#                      $blk->[4]="blue" if ($blk->[3] eq "K");
+#                      $blk->[4]="yellow" if ($blk->[3] eq "R");
+#                   }
+#                   if ($blk->[2] eq "off"){
+#                      $blk->[4]="red";
+#                   }
+#                },
+#                onRawValue    =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $id=$current->{id};
+#                   my $st={};
+#                   $self->getParent->LoadTreeSPCheck($st,
+#                                    "itil::businessservice",$id);
+#                   return(
+#                      dumpSpanSet(
+#                         {},
+#                         'K',$st->{tree}->{entry}->{DirectSS}->{serivceK},
+#                         'R',$st->{tree}->{entry}->{DirectSS}->{serivceR})
+#                   );
+#                }),
 
 
-      new kernel::Field::TimeSpans(
-                name          =>'supportTreeCheck',
-                htmldetail    =>0,
-                uploadable    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                label         =>'aggregated service times tree',
-                tspantype     =>{'k'=>'core replaced by border time',
-                                 ''=>'',
-                                 'r'=>'border replaced by core time',
-                                 'K'=>'continuous core time',
-                                 'R'=>'continuous border time'},
-                tspanlegend   =>1,
-                tspantypeproc =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-                   my $blk=shift;
-                   $blk->[4]="transparent";
-                   if ($blk->[2] eq "on" || $blk->[2] eq "legend"){
-                      $blk->[4]="blue";
-                      $blk->[4]="lightblue" if ($blk->[3] eq "k");
-                      $blk->[4]="lightyellow" if ($blk->[3] eq "r");
-                      $blk->[4]="yellow" if ($blk->[3] eq "R");
-                   }
-                   if ($blk->[2] eq "off" || $blk->[3] eq ""){
-                      $blk->[4]="red";
-                   }
-                },
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $id=$current->{id};
-                   my $st={};
-                   $self->getParent->LoadTreeSPCheck($st,
-                                    "itil::businessservice",$id);
-                   return(
-                      dumpSpanSet({},
-                         'r'=>$st->{tree}->{entry}->{CorelSS}->{supportr},
-                         'k'=>$st->{tree}->{entry}->{CorelSS}->{supportk},
-                         'K'=>$st->{tree}->{entry}->{CorelSS}->{supportK},
-                         'R'=>$st->{tree}->{entry}->{CorelSS}->{supportR})
-                   );
-                }),
-
-
-      new kernel::Field::TimeSpans(
-                name          =>'serivceReq',
-                label         =>'requested service times',
-                htmldetail    =>0,
-                uploadable    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                tspantype     =>['R','K'],
-                tspanlegend   =>1,
-                tspantypeproc =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-                   my $blk=shift;
-                   $blk->[4]="transparent";
-                   if ($blk->[2] eq "on"){
-                      $blk->[4]="blue";
-                      $blk->[4]="blue" if ($blk->[3] eq "K");
-                      $blk->[4]="yellow" if ($blk->[3] eq "R");
-                   }
-                   if ($blk->[2] eq "off"){
-                      $blk->[4]="red";
-                   }
-                },
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $id=$current->{id};
-                   my $st={};
-                   $self->getParent->LoadTreeSPCheck($st,
-                                    "itil::businessservice",$id);
-                   return(
-                      dumpSpanSet(
-                         {},
-                         'K',$st->{tree}->{entry}->{DirectSS}->{serivceK},
-                         'R',$st->{tree}->{entry}->{DirectSS}->{serivceR})
-                   );
-                }),
-
-
-      new kernel::Field::TimeSpans(
-                name          =>'serivceTreeCheck',
-                htmldetail    =>0,
-                uploadable    =>0,
-                readonly      =>1,
-                searchable    =>0,
-                label         =>'aggregated service times tree',
-                tspantype     =>{'k'=>'core replaced by border time',
-                                 ''=>'',
-                                 'r'=>'border replaced by core time',
-                                 'K'=>'continuous core time',
-                                 'R'=>'continuous border time'},
-                tspanlegend   =>1,
-                tspantypeproc =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-                   my $blk=shift;
-                   $blk->[4]="transparent";
-                   if ($blk->[2] eq "on" || $blk->[2] eq "legend"){
-                      $blk->[4]="blue";
-                      $blk->[4]="lightblue" if ($blk->[3] eq "k");
-                      $blk->[4]="lightyellow" if ($blk->[3] eq "r");
-                      $blk->[4]="yellow" if ($blk->[3] eq "R");
-                   }
-                   if ($blk->[2] eq "off" || $blk->[3] eq ""){
-                      $blk->[4]="red";
-                   }
-                },
-                onRawValue    =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $id=$current->{id};
-                   my $st={};
-                   $self->getParent->LoadTreeSPCheck($st,
-                                    "itil::businessservice",$id);
-                   return(
-                      dumpSpanSet({},
-                         'r'=>$st->{tree}->{entry}->{CorelSS}->{serivcer},
-                         'k'=>$st->{tree}->{entry}->{CorelSS}->{serivcek},
-                         'K'=>$st->{tree}->{entry}->{CorelSS}->{serivceK},
-                         'R'=>$st->{tree}->{entry}->{CorelSS}->{serivceR})
-                   );
-                }),
+#      new kernel::Field::TimeSpans(
+#                name          =>'serivceTreeCheck',
+#                htmldetail    =>0,
+#                uploadable    =>0,
+#                readonly      =>1,
+#                searchable    =>0,
+#                label         =>'aggregated service times tree',
+#                tspantype     =>{'k'=>'core replaced by border time',
+#                                 ''=>'',
+#                                 'r'=>'border replaced by core time',
+#                                 'K'=>'continuous core time',
+##                                 'R'=>'continuous border time'},
+#                tspanlegend   =>1,
+#                tspantypeproc =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#                   my $blk=shift;
+#                   $blk->[4]="transparent";
+#                   if ($blk->[2] eq "on" || $blk->[2] eq "legend"){
+#                      $blk->[4]="blue";
+#                      $blk->[4]="lightblue" if ($blk->[3] eq "k");
+#                      $blk->[4]="lightyellow" if ($blk->[3] eq "r");
+#                      $blk->[4]="yellow" if ($blk->[3] eq "R");
+#                   }
+#                   if ($blk->[2] eq "off" || $blk->[3] eq ""){
+#                      $blk->[4]="red";
+#                   }
+#                },
+#                onRawValue    =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $id=$current->{id};
+#                   my $st={};
+#                   $self->getParent->LoadTreeSPCheck($st,
+#                                    "itil::businessservice",$id);
+#                   return(
+#                      dumpSpanSet({},
+#                         'r'=>$st->{tree}->{entry}->{CorelSS}->{serivcer},
+#                         'k'=>$st->{tree}->{entry}->{CorelSS}->{serivcek},
+#                         'K'=>$st->{tree}->{entry}->{CorelSS}->{serivceK},
+#                         'R'=>$st->{tree}->{entry}->{CorelSS}->{serivceR})
+#                   );
+#                }),
 
 
       new kernel::Field::Text(
@@ -443,15 +444,6 @@ sub new
                 uploadable    =>0,
                 searchable    =>0,
                 htmldetail    =>0,
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-
-                   return(1) if (defined($current));
-                   return(0);
-                },
                 readonly      =>1,
                 vjoinbase     =>{'lnkfrom'=>'<now',
                                  'lnkto'=>'>now OR [EMPTY]',
@@ -1373,7 +1365,7 @@ if (s && dboss && appl ){
    else{
       appl.disabled=true;
    }
-   if (v=="SVC"){
+   if (v=="SVC" || v=='PC' || v=='BC'){
       dboss.disabled=false;
    }
    else{
