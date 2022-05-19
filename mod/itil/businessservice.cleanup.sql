@@ -6,4 +6,5 @@ from businessservice
 where appl.cistatus>5;
 update businessservice set nature='SVC' 
 where nature='IT-S' or nature='ES' or nature='TR';
+alter table lnkbscomp add varikey bigint(20)  default NULL;
 
