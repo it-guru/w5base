@@ -66,21 +66,111 @@ sub new
                 vjoinon       =>['businessserviceid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Text(
-                name          =>'lnkpos',
+      new kernel::Field::Select(
+                name          =>'variant',
                 label         =>'Pos',
                 htmlwidth     =>'50',
                 htmleditwidth =>'30px',
+                allownative   =>1,
+                selectfix     =>1,
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @lst;
+                   my $app=$self->getParent();
+                   my $businessserviceid;
+                   if (defined($current)){
+                      $businessserviceid=$current->{businessserviceid};
+                   }
+                   else{
+                      $businessserviceid=Query->Param('businessserviceid');
+                   }
+                   if ($businessserviceid ne ""){
+                      my $max=0;
+                      my $op=$app->Clone();
+                      $op->SetFilter({businessserviceid=>\$businessserviceid});
+                      my @l=$op->getHashList(qw(sortkey variant lnkpos id));
+                      foreach my $rec (@l){
+                         $max=$rec->{variant} if ($rec->{variant}>$max);
+                      }
+                      $max++;
+                      foreach(my $cc=1;$cc<=$max;$cc++){
+                         push(@lst,$cc,$cc);
+                      }
+                   }
+                   return(@lst);
+                },
+                dataobjattr   =>'lnkbscomp.varikey'),
+
+      new kernel::Field::Select(
+                name          =>'lnkpos',
+                label         =>'Pos',
+                htmlwidth     =>'50',
+                allownative   =>1,
+                htmleditwidth =>'30px',
+                getPostibleValues=>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my @lst;
+                   my $app=$self->getParent();
+                   my $businessserviceid;
+                   if (defined($current)){
+                      $businessserviceid=$current->{businessserviceid};
+                   }
+                   else{
+                      $businessserviceid=Query->Param('businessserviceid');
+                   }
+                   if ($businessserviceid ne ""){
+                      my $max=0;
+                      my $op=$app->Clone();
+                      $op->SetFilter({businessserviceid=>\$businessserviceid});
+                      my @l=$op->getHashList(qw(sortkey variant lnkpos id));
+                      foreach my $rec (@l){
+                         $max=$rec->{lnkpos} if ($rec->{lnkpos}>$max);
+                      }
+                      $max++;
+                      foreach(my $cc=1;$cc<=$max;$cc++){
+                         push(@lst,$cc,$cc);
+                      }
+                   }
+                   return(@lst);
+                },
                 dataobjattr   =>'lnkbscomp.lnkpos'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Htmlarea(
                 name          =>'sortkey',
-                label         =>'SortKey',
-                dataobjattr   =>'lnkbscomp.sortkey'),
+                label         =>' ',
+                uivisible     =>0,
+                htmlwidth     =>'50px',
+                prepRawValue  =>sub{
+                   my $self=shift;
+                   my $d=shift;
+                   my $current=shift;
+                   my $app=$self->getParent();
+                   my $c=$app->Context();
+                   my ($variant,$lnkpos)=split(/\//,$d);
+                   $d=~s/^0+//g;
+                   $d=~s/\// /g;
+                   $d=~s/ 0+/ /g;
+                   if ($c->{lastvariant} ne $current->{variant}){
+                      $d=sprintf("%-2d -->%2d",$variant,$lnkpos);
+                   }
+                   else{
+                      $d=sprintf("%-2s +->%2d","",$lnkpos);
+                   }
+                   $d="<xmp>".$d."</xmp>";
+                   $c->{lastvariant}=$current->{variant};
+                   return($d);
+                },
+                dataobjattr   =>"concat(LPAD(lnkbscomp.varikey,4,'0'),".
+                                "'/',".
+                                "LPAD(lnkbscomp.lnkpos,4,'0'))"),
 
       new kernel::Field::Select(
                 name          =>'objtype',
                 label         =>'Component type',
+                selectfix     =>1,
+                default       =>'itil::businessservice',
                 getPostibleValues=>sub{
                    my $self=shift;
                    my @l;
@@ -95,7 +185,7 @@ sub new
 
       new kernel::Field::MultiDst (
                 name          =>'name',
-                htmlwidth     =>'200',
+                htmlwidth     =>'300',
                 selectivetyp  =>1,
                 dst           =>$dst,
                 vjoineditbase =>$vjoineditbase,
@@ -108,39 +198,6 @@ sub new
                 label         =>'Object1 ID',
                 dataobjattr   =>'lnkbscomp.obj1id'),
 
-      new kernel::Field::MultiDst (
-                name          =>'namealt1',
-                htmlwidth     =>'200',
-                htmleditwidth =>'200',
-                selectivetyp  =>1,
-                dst           =>$dst,
-                vjoineditbase =>$vjoineditbase,
-                label         =>'Redundance 1',
-                dsttypfield   =>'objtype',
-                dstidfield    =>'obj2id'),
-
-      new kernel::Field::Link(
-                name          =>'obj2id',
-                label         =>'Object2 ID',
-                dataobjattr   =>'lnkbscomp.obj2id'),
-
-      new kernel::Field::MultiDst (
-                name          =>'namealt2',
-                htmlwidth     =>'200',
-                htmleditwidth =>'200',
-                selectivetyp  =>1,
-                dst           =>$dst,
-                vjoineditbase =>$vjoineditbase,
-                label         =>'Redundance 2',
-                dsttypfield   =>'objtype',
-                dstidfield    =>'obj3id'),
-
-      new kernel::Field::Link(
-                name          =>'obj3id',
-                label         =>'Object3 ID',
-                dataobjattr   =>'lnkbscomp.obj3id'),
-
-
       new kernel::Field::Text(
                 name          =>'comments',
                 label         =>'Comments',
@@ -148,21 +205,14 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'xcomments',
-                label         =>'Comments and Redundance',
+                label         =>'Comments shorted',
                 uploadable    =>0,
-                depend        =>['comments','namealt1','namealt2'],
+                readonly      =>1,
+                depend        =>['comments'],
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
-                   my $f1=$self->getParent->getField("namealt1");
-                   my $f2=$self->getParent->getField("namealt2");
-                   my $v1=$f1->RawValue($current);
-                   my $v2=$f2->RawValue($current);
                    my $c;
-                   $c.="|$v1" if ($v1 ne "");
-                   $c.="\n" if ($c ne "");
-                   $c.="|$v2" if ($v2 ne "");
-                   $c.="\n---\n" if ($c ne "");
                    $c.=$current->{comments};
                    return($c);
                 }), 
@@ -255,20 +305,6 @@ sub Validate
       $self->LastMsg(ERROR,"no primary element specified");
       return(0);
    }
-   if (exists($newrec->{lnkpos})){
-      if ($newrec->{lnkpos} ne ""){
-         if ($newrec->{lnkpos}<1){
-            $newrec->{lnkpos}=1;
-         }
-         if ($newrec->{lnkpos}>99){
-            $newrec->{lnkpos}=99;
-         }
-         $newrec->{lnkpos}=sprintf("%02d",$newrec->{lnkpos});
-      }
-      else{
-         $newrec->{lnkpos}=undef;  # allow multiple lines without lnkpos
-      }
-   }
    my $businessserviceid=effVal($oldrec,$newrec,"businessserviceid");
    my $objtype=effVal($oldrec,$newrec,"objtype");
    if ($objtype eq "itil::businessservice"){
@@ -306,6 +342,68 @@ sub isWriteValid
    return("default") if ($self->checkWriteValid($rec));
    return(undef);
 }
+
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+
+   my $op=$self->Clone();
+   my $businessserviceid=effVal($oldrec,$newrec,"businessserviceid");
+
+   $op->SetFilter({businessserviceid=>\$businessserviceid});
+   my @l=$op->getHashList(qw(sortkey variant lnkpos id));
+   my @oplist;
+
+   my @u;
+   foreach my $r (@l){
+      push(@u,{id=>$r->{id},variant=>$r->{variant},
+               lnkpos=>$r->{lnkpos},sortkey=>$r->{sortkey}});
+   }
+
+   my $variant=0;
+   my $lnkpos=0;
+
+
+   for(my $c=0;$c<=$#u;$c++){
+      if ($u[$c]->{variant}==$variant+1){
+         $variant++;
+         $lnkpos=0;
+      }
+      $lnkpos++;
+      if ($u[$c]->{variant} ne $variant){
+         $u[$c]->{variant}=$variant;
+      }
+      if ($u[$c]->{lnkpos} ne $lnkpos){
+         $u[$c]->{lnkpos}=$lnkpos;
+      }
+   }
+   for(my $c=0;$c<=$#u;$c++){
+      #printf STDERR ("lnkpos %s -> %s\n",$l[$c]->{lnkpos},$u[$c]->{lnkpos});
+      #printf STDERR ("variant %s -> %s\n",$l[$c]->{variant},$u[$c]->{variant});
+      if (($u[$c]->{lnkpos}!=$l[$c]->{lnkpos}) ||
+          ($u[$c]->{variant}!=$l[$c]->{variant})){
+         my $bk=$op->UpdateRecord({
+             variant=>$u[$c]->{variant},
+             lnkpos=>$u[$c]->{lnkpos}
+         },{id=>\$u[$c]->{id}});
+         msg(INFO,"renum lnkbscom $bk");
+      }
+   }
+
+
+
+#print STDERR Dumper(\@l);
+#print STDERR Dumper(\@u);
+
+
+
+   return($bak);
+}
+
 
 sub checkWriteValid
 {

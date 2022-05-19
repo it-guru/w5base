@@ -1,28 +1,18 @@
 <div class=editframe>
    <table class=editframe>
       <tr>
-         <td class=fname width=10%>%objtype(label)%:</td>
-         <td class=finput colspan=3>%objtype(sublistedit)%</td>
+         <td class=fname colspan=1 width=30%>%name(label)%:</td>
+         <td class=finput colspan=2>%objtype(sublistedit)%</td>
+         <td class=finput colspan=1 width=25%></td>
       </tr>
       <tr>
-         <td class=fname width=10%>%name(label)%:</td>
-         <td class=finput colspan=3>%name(sublistedit)%</td>
-      </tr>
-      <tr>
-         <td class=fname width=10%>%namealt1(label)%:</td>
-         <td class=finput width=40%>%namealt1(sublistedit)%</td>
-         <td class=fname width=10%>%namealt2(label)%:</td>
-         <td class=finput width=40%>%namealt2(sublistedit)%</td>
-      </tr>
-      <tr>
-         <td class=fname width=10%>%comments(label)%:</td>
-         <td class=finput colspan=2>%comments(sublistedit)%</td>
-         <td class=fname nowrap>
+         <td class=fname colspan=1 nowrap>
             <table cellspacing=0 cellpadding=0 border=0>
-            <tr><td class=finput>Seq.Pos.:</td>
-                <td>%lnkpos(sublistedit)%</td></tr>
+            <tr><td class=finput>Variante/Pos:</td>
+                <td>%variant(sublistedit)%&nbsp;/&nbsp;%lnkpos(sublistedit)%</td></tr>
             </table>
          </td>
+         <td class=finput colspan=3>%name(sublistedit)%</td>
       </tr>
    </table>
 </div>

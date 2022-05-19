@@ -642,7 +642,7 @@ sub new
                 vjointo       =>'itil::lnkbscomp',
                 allowcleanup  =>1,
                 vjoinon       =>['id'=>'businessserviceid'],
-                vjoindisp     =>['lnkpos','name',"xcomments"],
+                vjoindisp     =>['sortkey','name',"xcomments"],
                 vjoininhash   =>['sortkey','lnkpos','id','objtype',
                                  'obj1id','obj2id','obj3id','comments']),
 

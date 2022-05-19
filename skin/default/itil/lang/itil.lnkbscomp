@@ -3,6 +3,6 @@
 'Component type'=>{de=>'Komponententyp'},
 'Redundance 1'=>{de=>'Redundanz 1'},
 'Redundance 2'=>{de=>'Redundanz 2'},
-'Comments and Redundance'=>{de=>'Bemerkungen und Redundanzen'},
+'Comments shorted'=>{de=>'verkürzte Bemerkungen'},
 'no primary element specified'=>{de=>'keine primäre Komponente angegeben'},
 'upper Businessservice name'=>{de=>'übergeordneter Businessservice'},
