@@ -44,17 +44,8 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
-                sqlorder      =>'desc',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-
-                   return(1) if (defined($current));
-                   return(0);
-                },
                 label         =>'W5BaseID',
+                group         =>'source',
                 dataobjattr   =>"$worktable.id"),
 
       new kernel::Field::RecordUrl(),
@@ -261,15 +252,7 @@ sub new
                 label         =>'central managed CI groups',
                 vjointo       =>'itil::lnkmgmtitemgroup',
                 searchable    =>1,
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   my $current=$param{current};
-
-                   return(1) if (defined($current));
-                   return(0);
-                },
+                htmldetail    =>'NotEmpty',
                 readonly      =>1,
                 vjoinbase     =>{'lnkfrom'=>'<now',
                                  'lnkto'=>'>now OR [EMPTY]',
@@ -481,152 +464,151 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'description',
                 explore       =>10000,
-                group         =>'desc',
                 label         =>'Business Service Description',
                 dataobjattr   =>"$worktable.description"),
 
-      new kernel::Field::Date(
-                name          =>'validfrom',
-                group         =>'desc',
-                label         =>'Duration Start',
-                dataobjattr   =>"$worktable.validfrom"),
-
-      new kernel::Field::Date(
-                name          =>'validto',
-                group         =>'desc',
-                label         =>'Duration End',
-                dataobjattr   =>"$worktable.validto"),
-
-      new kernel::Field::Select(
-                name          =>'reviewperiod',
-                group         =>'desc',
-                label         =>'Review-period',
-                transprefix   =>'REVIEW.',
-                value         =>['','WEEK','MONTH','QUARTER','YEAR'],
-                htmleditwidth =>'150px',
-                dataobjattr   =>$worktable.'.reviewperiod'),
-
-      new kernel::Field::Text(
-                name          =>'version',
-                group         =>'desc',
-                label         =>'Version',
-                htmleditwidth =>'80px',
-                dataobjattr   =>"$worktable.version"),
-
-      new kernel::Field::TextDrop(
-                name          =>'servicesupport',
-                label         =>'demanded Service&Support Class',
-                group         =>'desc',
-                vjointo       =>'itil::servicesupport',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['servicesupportid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'servicesupportid',
-                group         =>'desc',
-                dataobjattr   =>"$worktable.servicesupport"),
-
-      new kernel::Field::TextDrop(
-                name          =>'implservicesupport',
-                label         =>'implemented Service&Support Class',
-                group         =>'desc',
-                vjointo       =>'itil::servicesupport',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['implservicesupportid'=>'id'],
-                vjoindisp     =>'name'),
-
-      new kernel::Field::TimeSpans(
-                name          =>'implserivcetimes',
-                label         =>'implemented service times',
-                group         =>'desc',
-                readonly      =>1,
-                htmldetail    =>0,
-                tspantypeproc =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-                   my $blk=shift;
-                   $blk->[4]="transparent";
-                   if ($blk->[2] eq "on"){
-                      $blk->[4]="blue";
-                      $blk->[4]="blue" if ($blk->[3] eq "k");
-                      $blk->[4]="yellow" if ($blk->[3] eq "r");
-                   }
-                   if ($blk->[2] eq "off"){
-                      $blk->[4]="red";
-                   }
-                },
-                vjointo       =>'itil::servicesupport',
-                vjoinon       =>['implservicesupportid'=>'id'],
-                vjoindisp     =>'serivce'),
-
-      new kernel::Field::TimeSpans(
-                name          =>'implsupporttimes',
-                label         =>'implemented support times',
-                group         =>'desc',
-                readonly      =>1,
-                htmldetail    =>0,
-                tspantypeproc =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
-                   my $blk=shift;
-                   $blk->[4]="transparent";
-                   if ($blk->[2] eq "on"){
-                      $blk->[4]="blue";
-                      $blk->[4]="blue" if ($blk->[3] eq "k");
-                      $blk->[4]="yellow" if ($blk->[3] eq "r");
-                   }
-                   if ($blk->[2] eq "off"){
-                      $blk->[4]="red";
-                   }
-                },
-                vjointo       =>'itil::servicesupport',
-                vjoinon       =>['implservicesupportid'=>'id'],
-                vjoindisp     =>'support'),
-
-      new kernel::Field::Link(
-                name          =>'implservicesupportid',
-                group         =>'desc',
-                dataobjattr   =>"$worktable.implservicesupport"),
-
-
-      new kernel::Field::Duration(
-                name          =>'occreactiontime',
-                group         =>'desc',
-                visual        =>'hh:mm',
-                unit          =>'hh:mm',
-                label         =>'target occurrence reaction time',
-                align         =>'right',
-                searchable    =>0,
-                dataobjattr   =>$worktable.'.occreactiontime'),
-
-      new kernel::Field::Percent(
-                name          =>'occreactiontimelevel',
-                group         =>'desc',
-                label         =>'reaction time degree of attainment',
-                searchable    =>0,
-                precision     =>0,
-                dataobjattr   =>$worktable.'.occreactiontimelevel'),
-
-      new kernel::Field::Duration(
-                name          =>'occtotaltime',
-                group         =>'desc',
-                visual        =>'hh:mm',
-                unit          =>'hh:mm',
-                label         =>'target occurrence total treatment time',
-                align         =>'right',
-                searchable    =>0,
-                dataobjattr   =>$worktable.'.occtotaltime'),
-
-      new kernel::Field::Percent(
-                name          =>'occtotaltimelevel',
-                group         =>'desc',
-                label         =>'treatment time degree of attainment',
-                searchable    =>0,
-                precision     =>0,
-                dataobjattr   =>$worktable.'.occtotaltimelevel'),
+#      new kernel::Field::Date(
+#                name          =>'validfrom',
+#                group         =>'desc',
+#                label         =>'Duration Start',
+#                dataobjattr   =>"$worktable.validfrom"),
+#
+#      new kernel::Field::Date(
+#                name          =>'validto',
+#                group         =>'desc',
+#                label         =>'Duration End',
+#                dataobjattr   =>"$worktable.validto"),
+#
+#      new kernel::Field::Select(
+#                name          =>'reviewperiod',
+#                group         =>'desc',
+#                label         =>'Review-period',
+#                transprefix   =>'REVIEW.',
+#                value         =>['','WEEK','MONTH','QUARTER','YEAR'],
+#                htmleditwidth =>'150px',
+#                dataobjattr   =>$worktable.'.reviewperiod'),
+#
+#      new kernel::Field::Text(
+#                name          =>'version',
+#                group         =>'desc',
+#                label         =>'Version',
+#                htmleditwidth =>'80px',
+#                dataobjattr   =>"$worktable.version"),
+#
+#      new kernel::Field::TextDrop(
+#                name          =>'servicesupport',
+#                label         =>'demanded Service&Support Class',
+#                group         =>'desc',
+#                vjointo       =>'itil::servicesupport',
+#                vjoineditbase =>{'cistatusid'=>[3,4]},
+#                vjoinon       =>['servicesupportid'=>'id'],
+#                vjoindisp     =>'name'),
+#
+#      new kernel::Field::Link(
+#                name          =>'servicesupportid',
+#                group         =>'desc',
+#                dataobjattr   =>"$worktable.servicesupport"),
+#
+#      new kernel::Field::TextDrop(
+#                name          =>'implservicesupport',
+#                label         =>'implemented Service&Support Class',
+#                group         =>'desc',
+#                vjointo       =>'itil::servicesupport',
+#                vjoineditbase =>{'cistatusid'=>[3,4]},
+#                vjoinon       =>['implservicesupportid'=>'id'],
+#                vjoindisp     =>'name'),
+#
+#      new kernel::Field::TimeSpans(
+#                name          =>'implserivcetimes',
+#                label         =>'implemented service times',
+#                group         =>'desc',
+#                readonly      =>1,
+#                htmldetail    =>0,
+#                tspantypeproc =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#                   my $blk=shift;
+#                   $blk->[4]="transparent";
+#                   if ($blk->[2] eq "on"){
+#                      $blk->[4]="blue";
+#                      $blk->[4]="blue" if ($blk->[3] eq "k");
+#                      $blk->[4]="yellow" if ($blk->[3] eq "r");
+#                   }
+#                   if ($blk->[2] eq "off"){
+#                      $blk->[4]="red";
+#                   }
+#                },
+#                vjointo       =>'itil::servicesupport',
+#                vjoinon       =>['implservicesupportid'=>'id'],
+#                vjoindisp     =>'serivce'),
+#
+#      new kernel::Field::TimeSpans(
+#                name          =>'implsupporttimes',
+#                label         =>'implemented support times',
+#                group         =>'desc',
+#                readonly      =>1,
+#                htmldetail    =>0,
+#                tspantypeproc =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#                   my $blk=shift;
+#                   $blk->[4]="transparent";
+#                   if ($blk->[2] eq "on"){
+#                      $blk->[4]="blue";
+#                      $blk->[4]="blue" if ($blk->[3] eq "k");
+#                      $blk->[4]="yellow" if ($blk->[3] eq "r");
+#                   }
+#                   if ($blk->[2] eq "off"){
+#                      $blk->[4]="red";
+#                   }
+#                },
+#                vjointo       =>'itil::servicesupport',
+#                vjoinon       =>['implservicesupportid'=>'id'],
+#                vjoindisp     =>'support'),
+#
+#      new kernel::Field::Link(
+#                name          =>'implservicesupportid',
+#                group         =>'desc',
+#                dataobjattr   =>"$worktable.implservicesupport"),
+#
+#
+#      new kernel::Field::Duration(
+#                name          =>'occreactiontime',
+#                group         =>'desc',
+#                visual        =>'hh:mm',
+#                unit          =>'hh:mm',
+#                label         =>'target occurrence reaction time',
+#                align         =>'right',
+#                searchable    =>0,
+#                dataobjattr   =>$worktable.'.occreactiontime'),
+#
+#      new kernel::Field::Percent(
+#                name          =>'occreactiontimelevel',
+#                group         =>'desc',
+#                label         =>'reaction time degree of attainment',
+#                searchable    =>0,
+#                precision     =>0,
+#                dataobjattr   =>$worktable.'.occreactiontimelevel'),
+#
+#      new kernel::Field::Duration(
+#                name          =>'occtotaltime',
+#                group         =>'desc',
+#                visual        =>'hh:mm',
+#                unit          =>'hh:mm',
+#                label         =>'target occurrence total treatment time',
+#                align         =>'right',
+#                searchable    =>0,
+#                dataobjattr   =>$worktable.'.occtotaltime'),
+#
+#      new kernel::Field::Percent(
+#                name          =>'occtotaltimelevel',
+#                group         =>'desc',
+#                label         =>'treatment time degree of attainment',
+#                searchable    =>0,
+#                precision     =>0,
+#                dataobjattr   =>$worktable.'.occtotaltimelevel'),
 
 
      new kernel::Field::Container(
@@ -649,6 +631,7 @@ sub new
                 name          =>'upperservice',
                 label         =>'upper service',
                 group         =>'uservicecomp',
+                htmldetail    =>'NotEmpty',
                 searchable    =>0,
                 vjointo       =>'itil::lnkbscomp',
                 allowcleanup  =>1,
@@ -698,6 +681,7 @@ sub new
                 name          =>'businessprocesses',
                 label         =>'involved in Businessprocesses',
                 group         =>'businessprocesses',
+                htmldetail    =>'NotEmpty',
                 vjointo       =>'itil::lnkbprocessbservice',
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>['businessprocess','customer']),
@@ -721,180 +705,180 @@ sub new
 
 
 
-      new kernel::Field::MatrixHeader(
-                name          =>'slamatrix',
-                group         =>'sla',
-                label         =>[undef,
-                                 'requested',
-                                 'current',
-                                 'implemented',
-                         #        'threshold fact. warn',
-                         #        'threshold warn',
-                         #        'threshold fact. crit',
-                         #        'threshold crit'
-                                 ]),
+#      new kernel::Field::MatrixHeader(
+#                name          =>'slamatrix',
+#                group         =>'sla',
+#                label         =>[undef,
+#                                 'requested',
+#                                 'current',
+#                                 'implemented',
+#                         #        'threshold fact. warn',
+#                         #        'threshold warn',
+#                         #        'threshold fact. crit',
+#                         #        'threshold crit'
+#                                 ]),
+#
+#      new kernel::Field::Duration(
+#                name          =>'requ_mtbf',
+#                group         =>'sla',
+#                visual        =>'hh:mm',
+#                label         =>'MTBF in h',
+#                align         =>'right',
+#                searchable    =>0,
+#                extLabelPostfix=>\&extLabelPostfixRequested,
+#                dataobjattr   =>$worktable.'.requ_mtbf'),
+#
+#      new kernel::Field::Duration(
+#                name          =>'curr_mtbf',
+#                group         =>'sla',
+#                visual        =>'hh:mm',
+#                searchable    =>0,
+#                label         =>'MTBF in h',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixCurrent,
+#                dataobjattr   =>$worktable.'.curr_mtbf'),
 
-      new kernel::Field::Duration(
-                name          =>'requ_mtbf',
-                group         =>'sla',
-                visual        =>'hh:mm',
-                label         =>'MTBF in h',
-                align         =>'right',
-                searchable    =>0,
-                extLabelPostfix=>\&extLabelPostfixRequested,
-                dataobjattr   =>$worktable.'.requ_mtbf'),
-
-      new kernel::Field::Duration(
-                name          =>'curr_mtbf',
-                group         =>'sla',
-                visual        =>'hh:mm',
-                searchable    =>0,
-                label         =>'MTBF in h',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixCurrent,
-                dataobjattr   =>$worktable.'.curr_mtbf'),
-
-      new kernel::Field::Duration(
-                name          =>'impl_mtbf',
-                group         =>'sla',
-                visual        =>'hh:mm',
-                searchable    =>0,
-                label         =>'MTBF in h',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixImplemented,
-                dataobjattr   =>$worktable.'.impl_mtbf'),
-
-      #new kernel::Field::Number(
-      #          name          =>'threshold_fact_warn_mtbf',
-      #          group         =>'sla',
-      #          default       =>sub{
-      #             my $self=shift;
-      #             my $current=shift;
-      #             my $mode=shift;
-      #
-      #            return(undef) if ($mode eq "edit");
-      #            return('0.97')
-      #         },
-      #         background    =>\&calcBackgroundFlagColor,
-      #         editrange     =>[0.01,5.0],
-      #         precision     =>2, 
-      #         label         =>'MTBF',
-      #         align         =>'right',
-      #         extLabelPostfix=>\&extLabelPostfixTHfactWarn,
-      #         dataobjattr   =>$worktable.'.th_warn_mtbf'),
-
-      #new kernel::Field::Duration(
-      #         name          =>'threshold_warn_mtbf',
-      #         group         =>'sla',
-      #         background    =>\&calcBackgroundFlagColor,
-      #         precision     =>2, 
-      #         visual        =>'hh:mm',
-      #         readonly      =>1,
-      #         label         =>'MTBF',
-      #         align         =>'right',
-      #         extLabelPostfix=>\&extLabelPostfixTHWarn,
-      #         dataobjattr   =>"$worktable.impl_mtbf*".
-      #                         "if ($worktable.th_warn_mtbf is null,0.97,".
-      #                         "$worktable.th_warn_mtbf)"),
-
-      #new kernel::Field::Number(
-      #         name          =>'threshold_fact_crit_mtbf',
-      #         group         =>'sla',
-      #         default       =>sub{
-      #            my $self=shift;
-      #            my $current=shift;
-      #            my $mode=shift;
-      #
-      #            return(undef) if ($mode eq "edit");
-      #            return('0.92')
-      #         },
-      #         background    =>\&calcBackgroundFlagColor,
-      #         editrange     =>[0.01,5.0],
-      #         precision     =>2,
-      #         label         =>'MTBF',
-      #         align         =>'right',
-      #         extLabelPostfix=>\&extLabelPostfixTHfactCrit,
-      #         dataobjattr   =>$worktable.'.th_crit_mtbf'),
-
-
-
-      #new kernel::Field::Duration(
-      #         name          =>'threshold_crit_mtbf',
-      #         group         =>'sla',
-      #         background    =>\&calcBackgroundFlagColor,
-      #         depend        =>['threshold_crit_mtbf'],
-      #         precision     =>2, 
-      #         readonly      =>1,
-      #         visual        =>'hh:mm',
-      #         label         =>'MTBF',
-      #         align         =>'right',
-      #         extLabelPostfix=>\&extLabelPostfixTHCrit,
-      #         dataobjattr   =>"$worktable.impl_mtbf*".
-      #                         "if ($worktable.th_crit_mtbf is null,0.92,".
-      #                         "$worktable.th_crit_mtbf)"),
-
-      new kernel::Field::Duration(
-                name          =>'requ_ttr',
-                group         =>'sla',
-                visual        =>'hh:mm',
-                searchable    =>0,
-                label         =>'TTR in h',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixRequested,
-                dataobjattr   =>$worktable.'.requ_ttr'),
-
-      new kernel::Field::Duration(
-                name          =>'curr_ttr',
-                group         =>'sla',
-                visual        =>'hh:mm',
-                searchable    =>0,
-                label         =>'TTR in h',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixCurrent,
-                dataobjattr   =>$worktable.'.curr_ttr'),
-
-      new kernel::Field::Duration(
-                name          =>'impl_ttr',
-                group         =>'sla',
-                visual        =>'hh:mm',
-                searchable    =>0,
-                label         =>'TTR in h',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixImplemented,
-                dataobjattr   =>$worktable.'.impl_ttr'),
-
-      #new kernel::Field::Number(
-      #         name          =>'threshold_fact_warn_ttr',
-      #         group         =>'sla',
-      #         default       =>sub{
-      #            my $self=shift;
-      #            my $current=shift;
-      #            my $mode=shift;
-      #
-      #            return(undef) if ($mode eq "edit");
-      #            return('0.97')
-      #         },
-      #         background    =>\&calcBackgroundFlagColor,
-      #         editrange     =>[0.01,5.0],
-      #         precision     =>2, 
-      #         label         =>'TTR',
-      #         align         =>'right',
-      #         extLabelPostfix=>\&extLabelPostfixTHfactWarn,
-      #         dataobjattr   =>$worktable.'.th_warn_ttr'),
-
-      #new kernel::Field::Duration(
-      #         name          =>'threshold_warn_ttr',
-      #         group         =>'sla',
-      #         background    =>\&calcBackgroundFlagColor,
-      #         depend        =>['threshold_fact_warn_ttr'],
-      #         readonly      =>1,
-      #         visual        =>'hh:mm',
-      #         label         =>'TTR',
-      #         align         =>'right',
-      #         extLabelPostfix=>\&extLabelPostfixTHWarn,
-      #         dataobjattr   =>"$worktable.impl_ttr*".
-      #                         "if ($worktable.th_warn_ttr is null,0.97,".
-      #                         "$worktable.th_warn_ttr)"),
+#      new kernel::Field::Duration(
+#                name          =>'impl_mtbf',
+#                group         =>'sla',
+#                visual        =>'hh:mm',
+#                searchable    =>0,
+#                label         =>'MTBF in h',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixImplemented,
+#                dataobjattr   =>$worktable.'.impl_mtbf'),
+#
+#      #new kernel::Field::Number(
+#      #          name          =>'threshold_fact_warn_mtbf',
+#      #          group         =>'sla',
+#      #          default       =>sub{
+#      #             my $self=shift;
+#      #             my $current=shift;
+#      #             my $mode=shift;
+#      #
+#      #            return(undef) if ($mode eq "edit");
+#      #            return('0.97')
+#      #         },
+#      #         background    =>\&calcBackgroundFlagColor,
+#      #         editrange     =>[0.01,5.0],
+#      #         precision     =>2, 
+#      #         label         =>'MTBF',
+#      #         align         =>'right',
+#      #         extLabelPostfix=>\&extLabelPostfixTHfactWarn,
+#      #         dataobjattr   =>$worktable.'.th_warn_mtbf'),
+#
+#      #new kernel::Field::Duration(
+#      #         name          =>'threshold_warn_mtbf',
+#      #         group         =>'sla',
+#      #         background    =>\&calcBackgroundFlagColor,
+#      #         precision     =>2, 
+#      #         visual        =>'hh:mm',
+#      #         readonly      =>1,
+#      #         label         =>'MTBF',
+#      #         align         =>'right',
+#      #         extLabelPostfix=>\&extLabelPostfixTHWarn,
+#      #         dataobjattr   =>"$worktable.impl_mtbf*".
+#      #                         "if ($worktable.th_warn_mtbf is null,0.97,".
+#      #                         "$worktable.th_warn_mtbf)"),
+#
+#      #new kernel::Field::Number(
+#      #         name          =>'threshold_fact_crit_mtbf',
+#      #         group         =>'sla',
+#      #         default       =>sub{
+#      #            my $self=shift;
+#      #            my $current=shift;
+#      #            my $mode=shift;
+#      #
+#      #            return(undef) if ($mode eq "edit");
+#      #            return('0.92')
+#      #         },
+#      #         background    =>\&calcBackgroundFlagColor,
+#      #         editrange     =>[0.01,5.0],
+#      #         precision     =>2,
+#      #         label         =>'MTBF',
+#      #         align         =>'right',
+#      #         extLabelPostfix=>\&extLabelPostfixTHfactCrit,
+#      #         dataobjattr   =>$worktable.'.th_crit_mtbf'),
+#
+#
+#
+#      #new kernel::Field::Duration(
+#      #         name          =>'threshold_crit_mtbf',
+#      #         group         =>'sla',
+#      #         background    =>\&calcBackgroundFlagColor,
+#      #         depend        =>['threshold_crit_mtbf'],
+#      #         precision     =>2, 
+#      #         readonly      =>1,
+#      #         visual        =>'hh:mm',
+#      #         label         =>'MTBF',
+#      #         align         =>'right',
+#      #         extLabelPostfix=>\&extLabelPostfixTHCrit,
+#      #         dataobjattr   =>"$worktable.impl_mtbf*".
+#      #                         "if ($worktable.th_crit_mtbf is null,0.92,".
+#      #                         "$worktable.th_crit_mtbf)"),
+#
+#      new kernel::Field::Duration(
+#                name          =>'requ_ttr',
+#                group         =>'sla',
+#                visual        =>'hh:mm',
+#                searchable    =>0,
+#                label         =>'TTR in h',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixRequested,
+#                dataobjattr   =>$worktable.'.requ_ttr'),
+#
+#      new kernel::Field::Duration(
+#                name          =>'curr_ttr',
+#                group         =>'sla',
+#                visual        =>'hh:mm',
+#                searchable    =>0,
+#                label         =>'TTR in h',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixCurrent,
+#                dataobjattr   =>$worktable.'.curr_ttr'),
+#
+#      new kernel::Field::Duration(
+#                name          =>'impl_ttr',
+#                group         =>'sla',
+#                visual        =>'hh:mm',
+#                searchable    =>0,
+#                label         =>'TTR in h',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixImplemented,
+#                dataobjattr   =>$worktable.'.impl_ttr'),
+#
+#      #new kernel::Field::Number(
+#      #         name          =>'threshold_fact_warn_ttr',
+#      #         group         =>'sla',
+#      #         default       =>sub{
+#      #            my $self=shift;
+#      #            my $current=shift;
+#      #            my $mode=shift;
+#      #
+#      #            return(undef) if ($mode eq "edit");
+#      #            return('0.97')
+#      #         },
+#      #         background    =>\&calcBackgroundFlagColor,
+#      #         editrange     =>[0.01,5.0],
+#      #         precision     =>2, 
+#      #         label         =>'TTR',
+#      #         align         =>'right',
+#      #         extLabelPostfix=>\&extLabelPostfixTHfactWarn,
+#      #         dataobjattr   =>$worktable.'.th_warn_ttr'),
+#
+#      #new kernel::Field::Duration(
+#      #         name          =>'threshold_warn_ttr',
+#      #         group         =>'sla',
+#      #         background    =>\&calcBackgroundFlagColor,
+#      #         depend        =>['threshold_fact_warn_ttr'],
+#      #         readonly      =>1,
+#      #         visual        =>'hh:mm',
+#      #         label         =>'TTR',
+#      #         align         =>'right',
+#      #         extLabelPostfix=>\&extLabelPostfixTHWarn,
+#      #         dataobjattr   =>"$worktable.impl_ttr*".
+#      #                         "if ($worktable.th_warn_ttr is null,0.97,".
+#      #                         "$worktable.th_warn_ttr)"),
 
       #new kernel::Field::Number(
       #         name          =>'threshold_fact_crit_ttr',
@@ -928,335 +912,335 @@ sub new
       #                         "if ($worktable.th_crit_ttr is null,0.92,".
       #                         "$worktable.th_crit_ttr)"),
 
-      new kernel::Field::MatrixHeader(
-                name          =>'monimatrix',
-                group         =>'moni',
-                label         =>[undef,
-                                 'requested',
-                                 'current',
-                                 'implemented',
-                                 'threshold fact. warn',
-                                 'threshold warn',
-                                 'threshold fact. crit',
-                                 'threshold crit'
-                                ]),
+#      new kernel::Field::MatrixHeader(
+#                name          =>'monimatrix',
+#                group         =>'moni',
+#                label         =>[undef,
+#                                 'requested',
+#                                 'current',
+#                                 'implemented',
+#                                 'threshold fact. warn',
+#                                 'threshold warn',
+#                                 'threshold fact. crit',
+#                                 'threshold crit'
+#                                ]),
+#
+#      new kernel::Field::Percent(
+#                name          =>'requ_avail_p',
+#                precision     =>2,
+#                group         =>'moni',
+#                searchable    =>0,
+#                label         =>'avalability in %',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixRequested,
+#                dataobjattr   =>$worktable.'.requ_avail_p'),
+#
+#      new kernel::Field::Percent(
+#                name          =>'curr_avail_p',
+#                precision     =>2,
+#                group         =>'moni',
+#                searchable    =>0,
+#                label         =>'avalability in %',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixCurrent,
+#                dataobjattr   =>$worktable.'.curr_avail_p'),
+#
+#      new kernel::Field::Percent(
+#                name          =>'impl_avail_p',
+#                precision     =>2,
+#                group         =>'moni',
+#                searchable    =>0,
+#                label         =>'avalability in %',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixImplemented,
+#                dataobjattr   =>$worktable.'.impl_avail_p'),
 
-      new kernel::Field::Percent(
-                name          =>'requ_avail_p',
-                precision     =>2,
-                group         =>'moni',
-                searchable    =>0,
-                label         =>'avalability in %',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixRequested,
-                dataobjattr   =>$worktable.'.requ_avail_p'),
+#      new kernel::Field::Number(
+#                name          =>'threshold_fact_warn_avail',
+#                group         =>'moni',
+#                precision     =>2, 
+#                default       =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#
+#                   return(undef) if ($mode eq "edit");
+#                   return('0.97')
+#                },
+#                background    =>\&calcBackgroundFlagColor,
+#                editrange     =>[0.01,5.0],
+#                label         =>'avalability',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
+#                dataobjattr   =>$worktable.'.th_warn_avail'),
 
-      new kernel::Field::Percent(
-                name          =>'curr_avail_p',
-                precision     =>2,
-                group         =>'moni',
-                searchable    =>0,
-                label         =>'avalability in %',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixCurrent,
-                dataobjattr   =>$worktable.'.curr_avail_p'),
+#      new kernel::Field::Percent(
+#                name          =>'threshold_warn_avail',
+#                group         =>'moni',
+#                depend        =>['threshold_fact_warn_avail'],
+#                precision     =>2, 
+#                readonly      =>1,
+#                background    =>\&calcBackgroundFlagColor,
+#                label         =>'avalability',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHWarn,
+#                dataobjattr   =>"$worktable.impl_avail_p*".
+#                                "if ($worktable.th_warn_avail is null,0.97,".
+#                                "$worktable.th_warn_avail)"),
 
-      new kernel::Field::Percent(
-                name          =>'impl_avail_p',
-                precision     =>2,
-                group         =>'moni',
-                searchable    =>0,
-                label         =>'avalability in %',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixImplemented,
-                dataobjattr   =>$worktable.'.impl_avail_p'),
+#      new kernel::Field::Number(
+#                name          =>'threshold_fact_crit_avail',
+#                group         =>'moni',
+#                precision     =>2, 
+#                default       =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#
+#                   return(undef) if ($mode eq "edit");
+#                   return('0.92')
+#                },
+#                background    =>\&calcBackgroundFlagColor,
+#                editrange     =>[0.01,5.0],
+#                label         =>'avalability',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
+#                dataobjattr   =>$worktable.'.th_crit_avail'),
 
-      new kernel::Field::Number(
-                name          =>'threshold_fact_warn_avail',
-                group         =>'moni',
-                precision     =>2, 
-                default       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
+#      new kernel::Field::Percent(
+#                name          =>'threshold_crit_avail',
+#                group         =>'moni',
+#                precision     =>2, 
+#                background    =>\&calcBackgroundFlagColor,
+#                depend        =>['threshold_fact_crit_avail'],
+#                readonly      =>1,
+#                label         =>'avalability',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHCrit,
+#                dataobjattr   =>"$worktable.impl_avail_p*".
+#                                "if ($worktable.th_crit_avail is null,0.92,".
+#                                "$worktable.th_crit_avail)"),
 
-                   return(undef) if ($mode eq "edit");
-                   return('0.97')
-                },
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                label         =>'avalability',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
-                dataobjattr   =>$worktable.'.th_warn_avail'),
+#      new kernel::Field::Number(
+#                name          =>'requ_respti',
+#                group         =>'moni',
+#                label         =>'responsetime in ms',
+#                unit          =>'ms',
+#                align         =>'right',
+#                searchable    =>0,
+#                extLabelPostfix=>\&extLabelPostfixRequested,
+#                dataobjattr   =>$worktable.'.requ_respti'),
 
-      new kernel::Field::Percent(
-                name          =>'threshold_warn_avail',
-                group         =>'moni',
-                depend        =>['threshold_fact_warn_avail'],
-                precision     =>2, 
-                readonly      =>1,
-                background    =>\&calcBackgroundFlagColor,
-                label         =>'avalability',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
-                dataobjattr   =>"$worktable.impl_avail_p*".
-                                "if ($worktable.th_warn_avail is null,0.97,".
-                                "$worktable.th_warn_avail)"),
+#      new kernel::Field::Number(
+#                name          =>'curr_respti',
+#                group         =>'moni',
+#                label         =>'responsetime in ms',
+#                unit          =>'ms',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixCurrent,
+#                dataobjattr   =>$worktable.'.curr_respti'),
 
-      new kernel::Field::Number(
-                name          =>'threshold_fact_crit_avail',
-                group         =>'moni',
-                precision     =>2, 
-                default       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
+#      new kernel::Field::Number(
+#                name          =>'impl_respti',
+#                group         =>'moni',
+#                searchable    =>0,
+#                label         =>'responsetime in ms',
+#                unit          =>'ms',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixImplemented,
+#                dataobjattr   =>$worktable.'.impl_respti'),
 
-                   return(undef) if ($mode eq "edit");
-                   return('0.92')
-                },
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                label         =>'avalability',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
-                dataobjattr   =>$worktable.'.th_crit_avail'),
+#      new kernel::Field::Number(
+#                name          =>'threshold_fact_warn_respti',
+#                group         =>'moni',
+#                default       =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#
+#                   return(undef) if ($mode eq "edit");
+#                   return('1.50')
+#                },
+#                background    =>\&calcBackgroundFlagColor,
+#                precision     =>2, 
+#                editrange     =>[0.01,5.0],
+#                label         =>'responsetime',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
+#                dataobjattr   =>$worktable.'.th_warn_respti'),
 
-      new kernel::Field::Percent(
-                name          =>'threshold_crit_avail',
-                group         =>'moni',
-                precision     =>2, 
-                background    =>\&calcBackgroundFlagColor,
-                depend        =>['threshold_fact_crit_avail'],
-                readonly      =>1,
-                label         =>'avalability',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
-                dataobjattr   =>"$worktable.impl_avail_p*".
-                                "if ($worktable.th_crit_avail is null,0.92,".
-                                "$worktable.th_crit_avail)"),
+#      new kernel::Field::Number(
+#                name          =>'threshold_warn_respti',
+#                group         =>'moni',
+#                background    =>\&calcBackgroundFlagColor,
+#                depend        =>['threshold_fact_warn_respti'],
+#                unit          =>'ms',
+#                readonly      =>1,
+#                label         =>'responsetime',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHWarn,
+#                dataobjattr   =>"$worktable.impl_respti*".
+#                                "if ($worktable.th_warn_respti is null,1.50,".
+#                                "$worktable.th_warn_respti)"),
 
-      new kernel::Field::Number(
-                name          =>'requ_respti',
-                group         =>'moni',
-                label         =>'responsetime in ms',
-                unit          =>'ms',
-                align         =>'right',
-                searchable    =>0,
-                extLabelPostfix=>\&extLabelPostfixRequested,
-                dataobjattr   =>$worktable.'.requ_respti'),
+#      new kernel::Field::Number(
+#                name          =>'threshold_fact_crit_respti',
+#                group         =>'moni',
+#                default       =>sub{
+#                   my $self=shift;
+#                   my $current=shift;
+#                   my $mode=shift;
+#
+#                   return(undef) if ($mode eq "edit");
+#                   return('1.80')
+#                },
+#                background    =>\&calcBackgroundFlagColor,
+#                editrange     =>[0.01,5.0],
+#                precision     =>2, 
+#                label         =>'responsetime',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
+#                dataobjattr   =>$worktable.'.th_crit_respti'),
 
-      new kernel::Field::Number(
-                name          =>'curr_respti',
-                group         =>'moni',
-                label         =>'responsetime in ms',
-                unit          =>'ms',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixCurrent,
-                dataobjattr   =>$worktable.'.curr_respti'),
+#      new kernel::Field::Number(
+#                name          =>'threshold_crit_respti',
+#                group         =>'moni',
+#                background    =>\&calcBackgroundFlagColor,
+#                label         =>'responsetime',
+#                depend        =>['threshold_fact_crit_respti'],
+#                unit          =>'ms',
+#                readonly      =>1,
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHCrit,
+#                dataobjattr   =>"$worktable.impl_respti*".
+#                                "if ($worktable.th_crit_respti is null,1.80,".
+#                                "$worktable.th_crit_respti)"),
 
-      new kernel::Field::Number(
-                name          =>'impl_respti',
-                group         =>'moni',
-                searchable    =>0,
-                label         =>'responsetime in ms',
-                unit          =>'ms',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixImplemented,
-                dataobjattr   =>$worktable.'.impl_respti'),
+#      new kernel::Field::Percent(
+#                name          =>'requ_perf',
+#                group         =>'moni',
+#                label         =>'performance in %',
+#                align         =>'right',
+#                default       =>'95',
+#                searchable    =>0,
+#                extLabelPostfix=>\&extLabelPostfixRequested,
+#                dataobjattr   =>$worktable.'.requ_perf'),
 
-      new kernel::Field::Number(
-                name          =>'threshold_fact_warn_respti',
-                group         =>'moni',
-                default       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
+#      new kernel::Field::Percent(
+#                name          =>'curr_perf',
+#                group         =>'moni',
+#                default       =>'95',
+#                label         =>'performance in %',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixCurrent,
+#                dataobjattr   =>$worktable.'.curr_perf'),
 
-                   return(undef) if ($mode eq "edit");
-                   return('1.50')
-                },
-                background    =>\&calcBackgroundFlagColor,
-                precision     =>2, 
-                editrange     =>[0.01,5.0],
-                label         =>'responsetime',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
-                dataobjattr   =>$worktable.'.th_warn_respti'),
+#      new kernel::Field::Percent(
+#                name          =>'impl_perf',
+#                group         =>'moni',
+#                searchable    =>0,
+#                readonly      =>1,
+#                label         =>'performance in %',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixImplemented,
+#                dataobjattr   =>$worktable.'.impl_perf'),
 
-      new kernel::Field::Number(
-                name          =>'threshold_warn_respti',
-                group         =>'moni',
-                background    =>\&calcBackgroundFlagColor,
-                depend        =>['threshold_fact_warn_respti'],
-                unit          =>'ms',
-                readonly      =>1,
-                label         =>'responsetime',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
-                dataobjattr   =>"$worktable.impl_respti*".
-                                "if ($worktable.th_warn_respti is null,1.50,".
-                                "$worktable.th_warn_respti)"),
+#      new kernel::Field::Number(
+#                name          =>'threshold_fact_warn_perf',
+#                group         =>'moni',
+#                readonly      =>1,
+#                background    =>\&calcBackgroundFlagColor,
+#                editrange     =>[0.01,5.0],
+#                precision     =>2, 
+#                label         =>'performance',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
+#                dataobjattr   =>$worktable.'.th_warn_perf'),
 
-      new kernel::Field::Number(
-                name          =>'threshold_fact_crit_respti',
-                group         =>'moni',
-                default       =>sub{
-                   my $self=shift;
-                   my $current=shift;
-                   my $mode=shift;
+#      new kernel::Field::Number(
+#                name          =>'threshold_warn_perf',
+#                group         =>'moni',
+#                readonly      =>1,
+#                background    =>\&calcBackgroundFlagColor,
+#                depend        =>['threshold_fact_warn_perf'],
+#                precision     =>2, 
+#                label         =>'performance',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHWarn,
+#                dataobjattr   =>"NULL"),
 
-                   return(undef) if ($mode eq "edit");
-                   return('1.80')
-                },
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                precision     =>2, 
-                label         =>'responsetime',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
-                dataobjattr   =>$worktable.'.th_crit_respti'),
+#      new kernel::Field::Number(
+#                name          =>'threshold_fact_crit_perf',
+#                group         =>'moni',
+#                readonly      =>1,
+#                background    =>\&calcBackgroundFlagColor,
+#                editrange     =>[0.01,5.0],
+#                precision     =>2, 
+#                label         =>'performance',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
+#                dataobjattr   =>$worktable.'.th_crit_perf'),
+#
+#      new kernel::Field::Number(
+#                name          =>'threshold_crit_perf',
+#                group         =>'moni',
+#                readonly      =>1,
+#                depend        =>['threshold_fact_crit_perf'],
+#                background    =>\&calcBackgroundFlagColor,
+#                precision     =>2, 
+#                label         =>'performance',
+#                align         =>'right',
+#                extLabelPostfix=>\&extLabelPostfixTHCrit,
+#                dataobjattr   =>"NULL"),
 
-      new kernel::Field::Number(
-                name          =>'threshold_crit_respti',
-                group         =>'moni',
-                background    =>\&calcBackgroundFlagColor,
-                label         =>'responsetime',
-                depend        =>['threshold_fact_crit_respti'],
-                unit          =>'ms',
-                readonly      =>1,
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
-                dataobjattr   =>"$worktable.impl_respti*".
-                                "if ($worktable.th_crit_respti is null,1.80,".
-                                "$worktable.th_crit_respti)"),
+#      new kernel::Field::Textarea(
+#                name          =>'slacomments',
+#                group         =>'monicomments',
+#                label         =>'comments for alternate thresholds',
+#                dataobjattr   =>$worktable.'.slacomments'),
 
-      new kernel::Field::Percent(
-                name          =>'requ_perf',
-                group         =>'moni',
-                label         =>'performance in %',
-                align         =>'right',
-                default       =>'95',
-                searchable    =>0,
-                extLabelPostfix=>\&extLabelPostfixRequested,
-                dataobjattr   =>$worktable.'.requ_perf'),
+#      new kernel::Field::Number(
+#                name          =>'reproacht',
+#                group         =>'reporting',
+#                label         =>'reproach-time',
+#                unit          =>'days',
+#                align         =>'right',
+#                dataobjattr   =>$worktable.'.reproacht'),
 
-      new kernel::Field::Percent(
-                name          =>'curr_perf',
-                group         =>'moni',
-                default       =>'95',
-                label         =>'performance in %',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixCurrent,
-                dataobjattr   =>$worktable.'.curr_perf'),
+#      new kernel::Field::Select(
+#                name          =>'durationtoav',
+#                group         =>'reporting',
+#                label         =>'Duration to availability',
+#                value         =>['','24:00'],
+#                htmleditwidth =>'90px',
+#                dataobjattr   =>$worktable.'.durationtoav'),
 
-      new kernel::Field::Percent(
-                name          =>'impl_perf',
-                group         =>'moni',
-                searchable    =>0,
-                readonly      =>1,
-                label         =>'performance in %',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixImplemented,
-                dataobjattr   =>$worktable.'.impl_perf'),
-
-      new kernel::Field::Number(
-                name          =>'threshold_fact_warn_perf',
-                group         =>'moni',
-                readonly      =>1,
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                precision     =>2, 
-                label         =>'performance',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactWarn,
-                dataobjattr   =>$worktable.'.th_warn_perf'),
-
-      new kernel::Field::Number(
-                name          =>'threshold_warn_perf',
-                group         =>'moni',
-                readonly      =>1,
-                background    =>\&calcBackgroundFlagColor,
-                depend        =>['threshold_fact_warn_perf'],
-                precision     =>2, 
-                label         =>'performance',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHWarn,
-                dataobjattr   =>"NULL"),
-
-      new kernel::Field::Number(
-                name          =>'threshold_fact_crit_perf',
-                group         =>'moni',
-                readonly      =>1,
-                background    =>\&calcBackgroundFlagColor,
-                editrange     =>[0.01,5.0],
-                precision     =>2, 
-                label         =>'performance',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHfactCrit,
-                dataobjattr   =>$worktable.'.th_crit_perf'),
-
-      new kernel::Field::Number(
-                name          =>'threshold_crit_perf',
-                group         =>'moni',
-                readonly      =>1,
-                depend        =>['threshold_fact_crit_perf'],
-                background    =>\&calcBackgroundFlagColor,
-                precision     =>2, 
-                label         =>'performance',
-                align         =>'right',
-                extLabelPostfix=>\&extLabelPostfixTHCrit,
-                dataobjattr   =>"NULL"),
-
-      new kernel::Field::Textarea(
-                name          =>'slacomments',
-                group         =>'monicomments',
-                label         =>'comments for alternate thresholds',
-                dataobjattr   =>$worktable.'.slacomments'),
-
-      new kernel::Field::Number(
-                name          =>'reproacht',
-                group         =>'reporting',
-                label         =>'reproach-time',
-                unit          =>'days',
-                align         =>'right',
-                dataobjattr   =>$worktable.'.reproacht'),
-
-      new kernel::Field::Select(
-                name          =>'durationtoav',
-                group         =>'reporting',
-                label         =>'Duration to availability',
-                value         =>['','24:00'],
-                htmleditwidth =>'90px',
-                dataobjattr   =>$worktable.'.durationtoav'),
-
-      new kernel::Field::Select(
-                name          =>'repoperiod',
-                group         =>'reporting',
-                label         =>'Reporting-period',
-                value         =>['','24:00'],
-                htmleditwidth =>'90px',
-                dataobjattr   =>$worktable.'.repoperiod'),
-
-      new kernel::Field::Duration(
-                name          =>'mperiod',
-                group         =>'reporting',
-                label         =>'Measure-period',
-                visual        =>'hh:mm',
-                dataobjattr   =>$worktable.'.mperiod'),
-
-      new kernel::Field::Textarea(
-                name          =>'commentsrm',
-                group         =>'reporting',
-                label         =>'Remarks on measurement procedures and reporting',
-                dataobjattr   =>$worktable.'.commentsrm'),
-
-      new kernel::Field::Textarea(
-                name          =>'commentsperf',
-                group         =>'reporting',
-                label         =>'Performance-description',
-                dataobjattr   =>$worktable.'.commentsperf'),
+#      new kernel::Field::Select(
+#                name          =>'repoperiod',
+#                group         =>'reporting',
+#                label         =>'Reporting-period',
+#                value         =>['','24:00'],
+#                htmleditwidth =>'90px',
+#                dataobjattr   =>$worktable.'.repoperiod'),
+#
+#      new kernel::Field::Duration(
+#                name          =>'mperiod',
+#                group         =>'reporting',
+#                label         =>'Measure-period',
+#                visual        =>'hh:mm',
+#                dataobjattr   =>$worktable.'.mperiod'),
+#
+#      new kernel::Field::Textarea(
+#                name          =>'commentsrm',
+#                group         =>'reporting',
+#                label         =>'Remarks on measurement procedures and reporting',
+#                dataobjattr   =>$worktable.'.commentsrm'),
+#
+#      new kernel::Field::Textarea(
+#                name          =>'commentsperf',
+#                group         =>'reporting',
+#                label         =>'Performance-description',
+#                dataobjattr   =>$worktable.'.commentsperf'),
 
 
       new kernel::Field::FileList(
@@ -1268,12 +1252,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-System',
                 dataobjattr   =>$worktable.'.srcsys'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-Id',
                 dataobjattr   =>$worktable.'.srcid'),
 
@@ -1407,442 +1393,442 @@ sub jsExploreFormatLabelMethod
 
 
 
-sub calcBackgroundFlagColor
-{
-   my $self=shift;
-   my $FormatAs=shift;
-   my $current=shift;
-
-   my $depname=$self->Name();
-   if (!($depname=~m/^threshold_fact_/)){
-      $depname=~s/^threshold_/threshold_fact_/;
-   }  
-   my $depfield=$self->getParent->getField($depname,$current);
-
-   my $def=$depfield->default($FormatAs);
-
-   my $cur=$depfield->RawValue($current);
-
-   $cur=$def if ($cur eq "");
-
-   # korrektur der Färbungen (mittlerweilen sehr komplex) Requ:
-   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14127566190001
-
-   if ($depname eq "threshold_fact_warn_mtbf" ||
-       $depname eq "threshold_fact_warn_ttr"  ||
-       $depname eq "threshold_fact_warn_avail"){
-      if ($cur>=0.92 && $cur<0.97){
-         return("yellow");
-      }
-      elsif($cur<0.92){
-         return("red");
-      }
-      elsif($cur>1.00){
-         return("red");
-      }
-   }
-   elsif ($depname eq "threshold_fact_crit_mtbf" ||
-          $depname eq "threshold_fact_crit_ttr"  ||
-          $depname eq "threshold_fact_crit_avail"){
-      if($cur<0.92){
-         return("red");
-      }
-      elsif($cur>1.00){
-         return("red");
-      }
-   }
-   elsif ($depname eq "threshold_fact_warn_respti"){
-      if ($cur>1.50 && $cur<=1.80){
-         return("yellow");
-      }
-      elsif($cur<1.00){
-         return("red");
-      }
-      elsif($cur>1.80){
-         return("red");
-      }
-   }
-   elsif ($depname eq "threshold_fact_crit_respti"){
-      if($cur<1.00){
-         return("red");
-      }
-      elsif($cur>1.80){
-         return("red");
-      }
-   }
-   else{
-      my $delta=abs($def-$cur);
-      if ($delta>0 && $def>0){
-         my $p=(100*$delta)/$def;
-         if ($p>10){
-            return("red");
-         }elsif ($p>5){
-            return("yellow");
-         }
-      }
-   }
-   return("");
-}
-
-
-sub LoadTreeSPCheck
-{
-   my $self=shift;
-   my $st=shift;
-   my $dataobj=shift;
-   my $id=shift;
-   my $p=shift;
-
-   $st->{tree}={} if (!defined($st->{tree}));
-
-   $p=$st->{tree} if (!defined($p));
-   $p->{level}=0  if (!exists($p->{level}));
-
-   #######################################################################
-   # root record laden
-   #######################################################################
-
-   my $o=$self->getPersistentModuleObject("TreeBproc".$dataobj,$dataobj);
-
-   $o->SetFilter({id=>\$id});
-   my ($r)=$o->getOnlyFirst(qw(servicesupportid name));
-
-   my $entry="${dataobj}::${id}";
-   $st->{entry}->{$entry}={name=>$r->{name}};
-   if ($r->{servicesupportid} ne ""){
-      my $sspid=$r->{servicesupportid};
-      if (!exists($st->{servicesupport}->{$sspid})){
-         $st->{servicesupport}->{$sspid}={};
-      }
-      $st->{entry}->{$entry}->{servicesupport}=
-                $st->{servicesupport}->{$sspid};
-   }
-   $p->{entry}=$st->{entry}->{$entry};
-   #$p->{entry}=$entry;
-
-   #######################################################################
-   # subtree recursive load 
-   #######################################################################
-   foreach my $srec (@{$r->{servicecomp}}){
-       if ($srec->{objtype} eq "itil::businessservice" ||
-           $srec->{objtype} eq "itil::appl"){
-          $p->{child}=[] if (!defined($p->{child}));
-          my @crec={level=>$p->{level}+1};
-          push(@{$p->{child}},\@crec);
-          $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj1id},
-                                 $p->{child}->[$#{$p->{child}}]->[0]);
-          if ($srec->{obj2id} ne ""){
-             push(@crec,{level=>$p->{level}+1});
-             $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj2id},
-                                    $p->{child}->[$#{$p->{child}}]->[1]);
-          }
-          if ($srec->{obj3id} ne ""){
-             push(@crec,{level=>$p->{level}+1});
-             $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj3id},
-                                    $p->{child}->[$#{$p->{child}}]->[2]);
-          }
-       }
-   }
-   #######################################################################
-   # generate service support datastructure
-   #######################################################################
-   if ($p->{level}==0){ # load details of Service&Support Clases
-      my @sspid=keys(%{$st->{servicesupport}});
-      my $dataobj="itil::servicesupport"; 
-      my $o=$self->getPersistentModuleObject("TreeBproc".$dataobj,$dataobj);
-      $o->SetFilter({id=>\@sspid});
-      foreach my $srec ($o->getHashList(qw(serivce
-                                           support name))){
-         $st->{servicesupport}->{$srec->{id}}->{serivceestring}=
-              $srec->{serivce};
-         $st->{servicesupport}->{$srec->{id}}->{supportstring}=
-              $srec->{support};
-         $st->{servicesupport}->{$srec->{id}}->{name}=
-              $srec->{name};
-         foreach my $t (qw(serivce support)){
-            my @fval=();
-            foreach my $blk (split(/\+/,$srec->{$t})){
-               if (my ($n,$d)=$blk=~m/^(\d+)\((.*)\)$/){
-                  foreach my $seg (split(/,/,$d)){
-                     if (my ($label,$starth,$startm,$endh,$endm)=$seg=~
-                         m/^\s*([a-z]{0,1})(\d+):(\d+)-(\d+):(\d+)\s*$/i){
-                        $label="K" if ($label eq "");
-                        push(@{$fval[$n]},{
-                           label=>$label,
-                           starth=>int($starth),startm=>int($startm),
-                           endh=>int($endh),endm=>int($endm)
-                        });
-                     }
-                  }
-               }
-            }
-            $st->{servicesupport}->{$srec->{id}}->{"${t}struct"}=\@fval;
-         }
-      }
-      $self->ServiceTreeCorelation($st);
-   }
-}
+#sub calcBackgroundFlagColor
+#{
+#   my $self=shift;
+#   my $FormatAs=shift;
+#   my $current=shift;
+#
+#   my $depname=$self->Name();
+#   if (!($depname=~m/^threshold_fact_/)){
+#      $depname=~s/^threshold_/threshold_fact_/;
+#   }  
+#   my $depfield=$self->getParent->getField($depname,$current);
+#
+#   my $def=$depfield->default($FormatAs);
+#
+#   my $cur=$depfield->RawValue($current);
+#
+#   $cur=$def if ($cur eq "");
+#
+#   # korrektur der Färbungen (mittlerweilen sehr komplex) Requ:
+#   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14127566190001
+#
+#   if ($depname eq "threshold_fact_warn_mtbf" ||
+#       $depname eq "threshold_fact_warn_ttr"  ||
+#       $depname eq "threshold_fact_warn_avail"){
+#      if ($cur>=0.92 && $cur<0.97){
+#         return("yellow");
+#      }
+#      elsif($cur<0.92){
+#         return("red");
+#      }
+#      elsif($cur>1.00){
+#         return("red");
+#      }
+#   }
+#   elsif ($depname eq "threshold_fact_crit_mtbf" ||
+#          $depname eq "threshold_fact_crit_ttr"  ||
+#          $depname eq "threshold_fact_crit_avail"){
+#      if($cur<0.92){
+#         return("red");
+#      }
+#      elsif($cur>1.00){
+#         return("red");
+#      }
+#   }
+#   elsif ($depname eq "threshold_fact_warn_respti"){
+#      if ($cur>1.50 && $cur<=1.80){
+#         return("yellow");
+#      }
+#      elsif($cur<1.00){
+#         return("red");
+#      }
+#      elsif($cur>1.80){
+#         return("red");
+#      }
+#   }
+#   elsif ($depname eq "threshold_fact_crit_respti"){
+#      if($cur<1.00){
+#         return("red");
+#      }
+#      elsif($cur>1.80){
+#         return("red");
+#      }
+#   }
+#   else{
+#      my $delta=abs($def-$cur);
+#      if ($delta>0 && $def>0){
+#         my $p=(100*$delta)/$def;
+#         if ($p>10){
+#            return("red");
+#         }elsif ($p>5){
+#            return("yellow");
+#         }
+#      }
+#   }
+#   return("");
+#}
 
 
-sub ServiceTreeCorelation
-{
-   my $self=shift;
-   my $st=shift;
-   my $p=shift;
-
-   $p=$st->{tree} if (!defined($p));
-
-   my @dsets=(
-      "serivceK",   # ServiceZeit Fragmente Kernzeit
-      "serivceR",   # ServiceZeit Fragmente Randzeit
-      "supportK",   # SupportZeit Fragmente Kernzeit
-      "supportR"    # SupportZeit Fragmente Randzeit
-   );
-   my @allsets=(
-      @dsets,       # alle direkt ermittelbaren Sets
-      "supportk",  # Kernzeit muß Randzeit ersetzen
-      "supportr",  # Randzeit muß Kernzeit ersetzen
-      "serivcek",  # Kernzeit muß Randzeit ersetzen
-      "serivcer",  # Randzeit muß Kernzeit ersetzen
-   );
-   my %DirectSS;
-   map({$DirectSS{$_}=createSpanSet()} @dsets);
-   if (exists($p->{entry}->{servicesupport})){
-      $DirectSS{'serivceK'}=
-         createSpanSet('K','serivce',$p->{entry}->{servicesupport});
-      $DirectSS{'serivceR'}=
-         createSpanSet('R','serivce',$p->{entry}->{servicesupport});
-      $DirectSS{'supportK'}=
-         createSpanSet('K','support',$p->{entry}->{servicesupport});
-      $DirectSS{'supportR'}=
-         createSpanSet('R','support',$p->{entry}->{servicesupport});
-   }
-   $p->{entry}->{DirectSS}=\%DirectSS;
-
-   my %CorelSS;
-   map({$CorelSS{$_}=createSpanSet()} @allsets);
-
-   foreach my $set (@dsets){ # negation
-      $CorelSS{$set}=$CorelSS{$set}->complement();
-   }
-   
-
-  # $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportK});
-  # $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportR});
-  # $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceK});
-  # $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceR});
-
-   if (exists($p->{child})){
-      foreach my $c (@{$p->{child}}){
-         my %cs;
-         map({$cs{$_}=createSpanSet()} @allsets);
-         # aller redundanzen müssen serive und Support Zeiten maessig
-         # Oder verknüpft werden
-         foreach my $altc (@$c){  # alternativen durchgehen und corelieren
-            if (!exists($altc->{CorelSS})){
-               $self->ServiceTreeCorelation($st,$altc);
-            }
-            foreach my $set (@dsets){
-               $cs{$set}=$cs{$set}->union($altc->{entry}->{CorelSS}->{$set});
-            }
-            $CorelSS{supportr}=$CorelSS{supportr}->union(
-                                   $altc->{entry}->{CorelSS}->{supportr});
-            $CorelSS{supportr}=$CorelSS{supportr}->union(
-                                   $altc->{entry}->{CorelSS}->{supportk});
-
-            $CorelSS{supportk}=$CorelSS{supportk}->union(
-                                   $altc->{entry}->{CorelSS}->{supportk});
-
-            $CorelSS{supportk}=$CorelSS{supportk}->union(
-                                   $altc->{entry}->{CorelSS}->{supportr});
-
-            $CorelSS{serivcer}=$CorelSS{serivcer}->union(
-                                   $altc->{entry}->{CorelSS}->{serivcer});
-            $CorelSS{serivcer}=$CorelSS{serivcer}->union(
-                                   $altc->{entry}->{CorelSS}->{serivcek});
-
-            $CorelSS{serivcek}=$CorelSS{serivcek}->union(
-                                   $altc->{entry}->{CorelSS}->{serivcek});
-            $CorelSS{serivcek}=$CorelSS{serivcek}->union(
-                                   $altc->{entry}->{CorelSS}->{serivcer});
-         }
-         $CorelSS{supportr}=$CorelSS{supportr}->union($cs{supportK});
-         $CorelSS{supportk}=$CorelSS{supportk}->union($cs{supportR});
-         $CorelSS{serivcer}=$CorelSS{serivcer}->union($cs{serivceK});
-         $CorelSS{serivcek}=$CorelSS{serivcek}->union($cs{serivceR});
-
-
-         # jedes Child ergebnis per AND Operation an das CorelSS hinzufügen
-         foreach my $set (@dsets){
-            $CorelSS{$set}=$CorelSS{$set}->intersection($cs{$set});
-         }
-      }
-   }
-
-   $CorelSS{supportr}=$CorelSS{supportr}->intersection($DirectSS{supportR});
-   $CorelSS{supportk}=$CorelSS{supportk}->intersection($DirectSS{supportK});
-   $CorelSS{serivcer}=$CorelSS{serivcer}->intersection($DirectSS{serivceR});
-   $CorelSS{serivcek}=$CorelSS{serivcek}->intersection($DirectSS{serivceK});
+#sub LoadTreeSPCheck
+#{
+#   my $self=shift;
+#   my $st=shift;
+#   my $dataobj=shift;
+#   my $id=shift;
+#   my $p=shift;
+#
+#   $st->{tree}={} if (!defined($st->{tree}));
+#
+#   $p=$st->{tree} if (!defined($p));
+#   $p->{level}=0  if (!exists($p->{level}));
+#
+#   #######################################################################
+#   # root record laden
+#   #######################################################################
+#
+#   my $o=$self->getPersistentModuleObject("TreeBproc".$dataobj,$dataobj);
+#
+#   $o->SetFilter({id=>\$id});
+#   my ($r)=$o->getOnlyFirst(qw(servicesupportid name));
+#
+#   my $entry="${dataobj}::${id}";
+#   $st->{entry}->{$entry}={name=>$r->{name}};
+#   if ($r->{servicesupportid} ne ""){
+#      my $sspid=$r->{servicesupportid};
+#      if (!exists($st->{servicesupport}->{$sspid})){
+#         $st->{servicesupport}->{$sspid}={};
+#      }
+#      $st->{entry}->{$entry}->{servicesupport}=
+#                $st->{servicesupport}->{$sspid};
+#   }
+#   $p->{entry}=$st->{entry}->{$entry};
+#   #$p->{entry}=$entry;
+#
+#   #######################################################################
+#   # subtree recursive load 
+#   #######################################################################
+#   foreach my $srec (@{$r->{servicecomp}}){
+#       if ($srec->{objtype} eq "itil::businessservice" ||
+#           $srec->{objtype} eq "itil::appl"){
+#          $p->{child}=[] if (!defined($p->{child}));
+#          my @crec={level=>$p->{level}+1};
+#          push(@{$p->{child}},\@crec);
+#          $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj1id},
+#                                 $p->{child}->[$#{$p->{child}}]->[0]);
+#          if ($srec->{obj2id} ne ""){
+#             push(@crec,{level=>$p->{level}+1});
+#             $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj2id},
+#                                    $p->{child}->[$#{$p->{child}}]->[1]);
+#          }
+#          if ($srec->{obj3id} ne ""){
+#             push(@crec,{level=>$p->{level}+1});
+#             $self->LoadTreeSPCheck($st,$srec->{objtype},$srec->{obj3id},
+#                                    $p->{child}->[$#{$p->{child}}]->[2]);
+#          }
+#       }
+#   }
+#   #######################################################################
+#   # generate service support datastructure
+#   #######################################################################
+#   if ($p->{level}==0){ # load details of Service&Support Clases
+#      my @sspid=keys(%{$st->{servicesupport}});
+#      my $dataobj="itil::servicesupport"; 
+#      my $o=$self->getPersistentModuleObject("TreeBproc".$dataobj,$dataobj);
+#      $o->SetFilter({id=>\@sspid});
+#      foreach my $srec ($o->getHashList(qw(serivce
+#                                           support name))){
+#         $st->{servicesupport}->{$srec->{id}}->{serivceestring}=
+#              $srec->{serivce};
+#         $st->{servicesupport}->{$srec->{id}}->{supportstring}=
+#              $srec->{support};
+#         $st->{servicesupport}->{$srec->{id}}->{name}=
+#              $srec->{name};
+#         foreach my $t (qw(serivce support)){
+#            my @fval=();
+#            foreach my $blk (split(/\+/,$srec->{$t})){
+#               if (my ($n,$d)=$blk=~m/^(\d+)\((.*)\)$/){
+#                  foreach my $seg (split(/,/,$d)){
+#                     if (my ($label,$starth,$startm,$endh,$endm)=$seg=~
+#                         m/^\s*([a-z]{0,1})(\d+):(\d+)-(\d+):(\d+)\s*$/i){
+#                        $label="K" if ($label eq "");
+#                        push(@{$fval[$n]},{
+#                           label=>$label,
+#                           starth=>int($starth),startm=>int($startm),
+#                           endh=>int($endh),endm=>int($endm)
+#                        });
+#                     }
+#                  }
+#               }
+#            }
+#            $st->{servicesupport}->{$srec->{id}}->{"${t}struct"}=\@fval;
+#         }
+#      }
+#      $self->ServiceTreeCorelation($st);
+#   }
+#}
 
 
+#sub ServiceTreeCorelation
+#{
+#   my $self=shift;
+#   my $st=shift;
+#   my $p=shift;
+#
+#   $p=$st->{tree} if (!defined($p));
+#
+#   my @dsets=(
+#      "serivceK",   # ServiceZeit Fragmente Kernzeit
+#      "serivceR",   # ServiceZeit Fragmente Randzeit
+#      "supportK",   # SupportZeit Fragmente Kernzeit
+#      "supportR"    # SupportZeit Fragmente Randzeit
+#   );
+#   my @allsets=(
+#      @dsets,       # alle direkt ermittelbaren Sets
+#      "supportk",  # Kernzeit muß Randzeit ersetzen
+#      "supportr",  # Randzeit muß Kernzeit ersetzen
+#      "serivcek",  # Kernzeit muß Randzeit ersetzen
+#      "serivcer",  # Randzeit muß Kernzeit ersetzen
+#   );
+#   my %DirectSS;
+#   map({$DirectSS{$_}=createSpanSet()} @dsets);
+#   if (exists($p->{entry}->{servicesupport})){
+#      $DirectSS{'serivceK'}=
+#         createSpanSet('K','serivce',$p->{entry}->{servicesupport});
+#      $DirectSS{'serivceR'}=
+#         createSpanSet('R','serivce',$p->{entry}->{servicesupport});
+#      $DirectSS{'supportK'}=
+#         createSpanSet('K','support',$p->{entry}->{servicesupport});
+#      $DirectSS{'supportR'}=
+#         createSpanSet('R','support',$p->{entry}->{servicesupport});
+#   }
+#   $p->{entry}->{DirectSS}=\%DirectSS;
+#
+#   my %CorelSS;
+#   map({$CorelSS{$_}=createSpanSet()} @allsets);
+#
+#   foreach my $set (@dsets){ # negation
+#      $CorelSS{$set}=$CorelSS{$set}->complement();
+#   }
+#   
+#
+#  # $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportK});
+#  # $CorelSS{supportKR}=$CorelSS{supportKR}->union($CorelSS{supportR});
+#  # $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceK});
+#  # $CorelSS{serivceKR}=$CorelSS{serivceKR}->union($CorelSS{serivceR});
+#
+#   if (exists($p->{child})){
+#      foreach my $c (@{$p->{child}}){
+#         my %cs;
+#         map({$cs{$_}=createSpanSet()} @allsets);
+#         # aller redundanzen müssen serive und Support Zeiten maessig
+#         # Oder verknüpft werden
+#         foreach my $altc (@$c){  # alternativen durchgehen und corelieren
+#            if (!exists($altc->{CorelSS})){
+#               $self->ServiceTreeCorelation($st,$altc);
+#            }
+#            foreach my $set (@dsets){
+#               $cs{$set}=$cs{$set}->union($altc->{entry}->{CorelSS}->{$set});
+#            }
+#            $CorelSS{supportr}=$CorelSS{supportr}->union(
+#                                   $altc->{entry}->{CorelSS}->{supportr});
+#            $CorelSS{supportr}=$CorelSS{supportr}->union(
+#                                   $altc->{entry}->{CorelSS}->{supportk});
+#
+#            $CorelSS{supportk}=$CorelSS{supportk}->union(
+#                                   $altc->{entry}->{CorelSS}->{supportk});
+#
+#            $CorelSS{supportk}=$CorelSS{supportk}->union(
+#                                   $altc->{entry}->{CorelSS}->{supportr});
+#
+#            $CorelSS{serivcer}=$CorelSS{serivcer}->union(
+#                                   $altc->{entry}->{CorelSS}->{serivcer});
+#            $CorelSS{serivcer}=$CorelSS{serivcer}->union(
+#                                   $altc->{entry}->{CorelSS}->{serivcek});
+#
+#            $CorelSS{serivcek}=$CorelSS{serivcek}->union(
+#                                   $altc->{entry}->{CorelSS}->{serivcek});
+#            $CorelSS{serivcek}=$CorelSS{serivcek}->union(
+#                                   $altc->{entry}->{CorelSS}->{serivcer});
+#         }
+#         $CorelSS{supportr}=$CorelSS{supportr}->union($cs{supportK});
+#         $CorelSS{supportk}=$CorelSS{supportk}->union($cs{supportR});
+#         $CorelSS{serivcer}=$CorelSS{serivcer}->union($cs{serivceK});
+#         $CorelSS{serivcek}=$CorelSS{serivcek}->union($cs{serivceR});
+#
+#
+#         # jedes Child ergebnis per AND Operation an das CorelSS hinzufügen
+#         foreach my $set (@dsets){
+#            $CorelSS{$set}=$CorelSS{$set}->intersection($cs{$set});
+#         }
+#      }
+#   }
+#
+#   $CorelSS{supportr}=$CorelSS{supportr}->intersection($DirectSS{supportR});
+#   $CorelSS{supportk}=$CorelSS{supportk}->intersection($DirectSS{supportK});
+#   $CorelSS{serivcer}=$CorelSS{serivcer}->intersection($DirectSS{serivceR});
+#   $CorelSS{serivcek}=$CorelSS{serivcek}->intersection($DirectSS{serivceK});
+#
+#
+#
+#   foreach my $set (@dsets){ # join DirectSS as base for CorelSS
+#      $CorelSS{$set}=$CorelSS{$set}->intersection($DirectSS{$set});
+#   }
+#
+#   $p->{entry}->{CorelSS}=\%CorelSS;
+#}
 
-   foreach my $set (@dsets){ # join DirectSS as base for CorelSS
-      $CorelSS{$set}=$CorelSS{$set}->intersection($DirectSS{$set});
-   }
-
-   $p->{entry}->{CorelSS}=\%CorelSS;
-}
-
-sub createSpanSet
-{
-   my $type=shift;       # K|R
-   my $block=shift;     
-   my $ssentry=shift;    # service support entry
-
-   my $spanset= DateTime::SpanSet->from_spans( spans => []);
-   return($spanset) if (!defined($type));
-
-   if (exists($ssentry->{$block."struct"})){
-      #print STDERR "X($block):\n";
-      my $e=$ssentry->{$block."struct"};
-      for(my $t=0;$t<=7;$t++){
-         foreach my $tspanrec (@{$e->[$t]}){
-            if ($type eq $tspanrec->{label} ||
-                ($type eq "K" && exists($tspanrec->{label}) &&
-                 $tspanrec->{label} eq "")){
-               my $needsubstract1=1;
-               my $starth=$tspanrec->{starth}; 
-               my $startm=$tspanrec->{startm}; 
-               my $endh=$tspanrec->{endh}; 
-               my $endm=$tspanrec->{endm}; 
-               if ($endh==24 && $endm==0){
-                  $needsubstract1=0;
-                  $endh=23;
-                  $endm=59;
-               }
-               my $start=new DateTime( year=>1999,
-                                       month=>1,
-                                       day=>$t+1,
-                                       hour=>$starth,
-                                       minute=>$startm);
-               my $end  =new DateTime( year=>1999,
-                                       month=>1,
-                                       day=>$t+1,
-                                       hour=>$endh,
-                                       minute=>$endm);
-               if ($needsubstract1){ # 24:00 -> 23:59 mapping
-                  $end->subtract_duration(
-                     new DateTime::Duration(
-                        minutes=>1
-                     )
-                  );
-               }
-               my $span=DateTime::Span->from_datetimes(
-                  start=>$start,
-                  end=>$end
-               );
-               $spanset=$spanset->union($span);
-            }
-         }
-      }
-   }
-   return($spanset);
-}
-
-sub dumpSpanSet
-{
-   my $param=shift;
-   my @p=@_;
-
-   my @week;
-   while(my $tt=shift(@p)){
-      my $s=shift(@p);
-      if (defined($s)){
-         for(my $t=0;$t<=7;$t++){
-            $week[$t]=[] if (!defined($week[$t]));
-            my $t1=DateTime->new(year=>1999,month=>1,day=>$t+1,
-                                 hour=>0,minute=>0,second=>0);
-            my $t2=DateTime->new(year=>1999,month=>1,day=>$t+1,
-                                 hour=>23,minute=>59,second=>59);
-            my $dayspan=DateTime::Span->from_datetimes(start=>$t1,end=>$t2);
-            my $day=$s->intersection($dayspan);
-            my $i=$day->iterator();
-            my @day;
-            while (my $dt=$i->next()){
-               my $start=$dt->start();
-               my $end=$dt->end();
-               $end->add_duration(
-                  new DateTime::Duration(
-                     minutes=>1
-                  )
-               );
-               my $endh=$end->hour();
-               my $endm=$end->minute();
-               if ($endh==0 && $endm==0){
-                  $endh=24;
-               }
-               push(@{$week[$t]},sprintf("%s%02d:%02d-%02d:%02d",$tt,
-                                 $start->hour(),$start->minute(),
-                                 $endh,$endm));
-            }
-         }
-      }
-   }
-   my @st;
-   for(my $t=0;$t<=7;$t++){
-     my $w=$week[$t];
-     $w=[] if (!defined($w));
-     $st[$t]=$t."(".join(",",@$w).")";
-   }
-   return(join("+",@st));
-}
-
-
+#sub createSpanSet
+#{
+#   my $type=shift;       # K|R
+#   my $block=shift;     
+#   my $ssentry=shift;    # service support entry
+#
+#   my $spanset= DateTime::SpanSet->from_spans( spans => []);
+#   return($spanset) if (!defined($type));
+#
+#   if (exists($ssentry->{$block."struct"})){
+#      #print STDERR "X($block):\n";
+#      my $e=$ssentry->{$block."struct"};
+#      for(my $t=0;$t<=7;$t++){
+#         foreach my $tspanrec (@{$e->[$t]}){
+#            if ($type eq $tspanrec->{label} ||
+#                ($type eq "K" && exists($tspanrec->{label}) &&
+#                 $tspanrec->{label} eq "")){
+#               my $needsubstract1=1;
+#               my $starth=$tspanrec->{starth}; 
+#               my $startm=$tspanrec->{startm}; 
+#               my $endh=$tspanrec->{endh}; 
+#               my $endm=$tspanrec->{endm}; 
+#               if ($endh==24 && $endm==0){
+#                  $needsubstract1=0;
+#                  $endh=23;
+#                  $endm=59;
+#               }
+#               my $start=new DateTime( year=>1999,
+#                                       month=>1,
+#                                       day=>$t+1,
+#                                       hour=>$starth,
+#                                       minute=>$startm);
+#               my $end  =new DateTime( year=>1999,
+#                                       month=>1,
+#                                       day=>$t+1,
+#                                       hour=>$endh,
+#                                       minute=>$endm);
+#               if ($needsubstract1){ # 24:00 -> 23:59 mapping
+#                  $end->subtract_duration(
+#                     new DateTime::Duration(
+#                        minutes=>1
+#                     )
+#                  );
+#               }
+#               my $span=DateTime::Span->from_datetimes(
+#                  start=>$start,
+#                  end=>$end
+#               );
+#               $spanset=$spanset->union($span);
+#            }
+#         }
+#      }
+#   }
+#   return($spanset);
+#}
+#
+#sub dumpSpanSet
+#{
+#   my $param=shift;
+#   my @p=@_;
+#
+#   my @week;
+#   while(my $tt=shift(@p)){
+#      my $s=shift(@p);
+#      if (defined($s)){
+#         for(my $t=0;$t<=7;$t++){
+#            $week[$t]=[] if (!defined($week[$t]));
+#            my $t1=DateTime->new(year=>1999,month=>1,day=>$t+1,
+#                                 hour=>0,minute=>0,second=>0);
+#            my $t2=DateTime->new(year=>1999,month=>1,day=>$t+1,
+#                                 hour=>23,minute=>59,second=>59);
+#            my $dayspan=DateTime::Span->from_datetimes(start=>$t1,end=>$t2);
+#            my $day=$s->intersection($dayspan);
+#            my $i=$day->iterator();
+#            my @day;
+#            while (my $dt=$i->next()){
+#               my $start=$dt->start();
+#               my $end=$dt->end();
+#               $end->add_duration(
+#                  new DateTime::Duration(
+#                     minutes=>1
+#                  )
+#               );
+#               my $endh=$end->hour();
+#               my $endm=$end->minute();
+#               if ($endh==0 && $endm==0){
+#                  $endh=24;
+#               }
+#               push(@{$week[$t]},sprintf("%s%02d:%02d-%02d:%02d",$tt,
+#                                 $start->hour(),$start->minute(),
+#                                 $endh,$endm));
+#            }
+#         }
+#      }
+#   }
+#   my @st;
+#   for(my $t=0;$t<=7;$t++){
+#     my $w=$week[$t];
+#     $w=[] if (!defined($w));
+#     $st[$t]=$t."(".join(",",@$w).")";
+#   }
+#   return(join("+",@st));
+#}
 
 
 
-sub extLabelPostfixRequested
-{
-   my $self=shift;
-   return(" - ".$self->getParent->T("requested"));
-}
-
-sub extLabelPostfixImplemented
-{
-   my $self=shift;
-   return(" - ".$self->getParent->T("implemented"));
-}
-
-sub extLabelPostfixCurrent
-{
-   my $self=shift;
-   return(" - ".$self->getParent->T("current"));
-}
-
-sub extLabelPostfixTHCrit
-{
-   my $self=shift;
-   return(" - ".$self->getParent->T("threshold crit"));
-}
-
-sub extLabelPostfixTHWarn
-{
-   my $self=shift;
-   return(" - ".$self->getParent->T("threshold warn"));
-}
 
 
-sub extLabelPostfixTHfactCrit
-{
-   my $self=shift;
-   return(" - ".$self->getParent->T("threshold fact. crit"));
-}
-
-sub extLabelPostfixTHfactWarn
-{
-   my $self=shift;
-   return(" - ".$self->getParent->T("threshold fact. warn"));
-}
+#sub extLabelPostfixRequested
+#{
+#   my $self=shift;
+#   return(" - ".$self->getParent->T("requested"));
+#}
+#
+#sub extLabelPostfixImplemented
+#{
+#   my $self=shift;
+#   return(" - ".$self->getParent->T("implemented"));
+#}
+#
+#sub extLabelPostfixCurrent
+#{
+#   my $self=shift;
+#   return(" - ".$self->getParent->T("current"));
+#}
+#
+#sub extLabelPostfixTHCrit
+#{
+#   my $self=shift;
+#   return(" - ".$self->getParent->T("threshold crit"));
+#}
+#
+#sub extLabelPostfixTHWarn
+#{
+#   my $self=shift;
+#   return(" - ".$self->getParent->T("threshold warn"));
+#}
+#
+#
+#sub extLabelPostfixTHfactCrit
+#{
+#   my $self=shift;
+#   return(" - ".$self->getParent->T("threshold fact. crit"));
+#}
+#
+#sub extLabelPostfixTHfactWarn
+#{
+#   my $self=shift;
+#   return(" - ".$self->getParent->T("threshold fact. warn"));
+#}
 
 
 
@@ -2036,36 +2022,6 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-   foreach my $f (qw(occreactiontimelevel occtotaltimelevel)){
-     if (exists($newrec->{$f}) &&
-         effVal($oldrec,$newrec,$f)<0 ){
-        $newrec->{$f}=0;
-     }
-     if (exists($newrec->{$f}) &&
-         effVal($oldrec,$newrec,$f)>100 ){
-        $newrec->{$f}=100;
-     }
-   }
-
-   if (exists($newrec->{version}) && $newrec->{version} ne ""){
-      if (!($newrec->{version}=~m/^\d{1,2}(\.\d{1,2}){0,4}$/)){
-         $self->LastMsg(ERROR,"invalid version string");
-         return(0);
-      }
-   }
-
-   my $validto=effVal($oldrec,$newrec,"validto");
-   my $validfrom=effVal($oldrec,$newrec,"validfrom");
-   if ($validto ne "" && $validfrom ne ""){
-      my $duration=CalcDateDuration($validfrom,$validto);
-      if ($duration->{totalseconds}<0){
-         $self->LastMsg(ERROR,"validto can't be sooner as validfrom");
-         return(0);
-      }
-   }
-
-
-
    if (!defined($oldrec) && defined($newrec->{name})
        && ($newrec->{name}=~m/^\s*$/)){
       $self->LastMsg(ERROR,"invalid service name specified");
@@ -2214,9 +2170,6 @@ sub isViewValid
       push(@l,qw(contacts desc uservicecomp servicecomp grprelations
                  attachments reporting sla moni monicomments));
    }
-   if (defined($rec) && $rec->{nature} eq "SVC"){
-      @l=grep(!/^grprelations$/,@l);
-   }
    push(@l,qw(businessprocesses source));
    return(@l);
 }
@@ -2295,152 +2248,152 @@ sub initSearchQuery
 }
 
 
-sub getHtmlDetailPages
-{
-   my $self=shift;
-   my ($p,$rec)=@_;
+#sub getHtmlDetailPages
+#{
+#   my $self=shift;
+#   my ($p,$rec)=@_;
+#
+#   return($self->SUPER::getHtmlDetailPages($p,$rec)) if (!defined($rec));
+#
+#   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
+#   if ($rec->{nature} ne ""){
+#      push(@l,"TView"=>$self->T("Tree View"));
+#   }
+#   return(@l);
+#}
 
-   return($self->SUPER::getHtmlDetailPages($p,$rec)) if (!defined($rec));
-
-   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
-   if ($rec->{nature} ne ""){
-      push(@l,"TView"=>$self->T("Tree View"));
-   }
-   return(@l);
-}
-
-sub getHtmlDetailPageContent
-{
-   my $self=shift;
-   my ($p,$rec)=@_;
-   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView");
-
-   my $page;
-   my $idname=$self->IdField->Name();
-   my $idval=$rec->{$idname};
-
-   if ($p eq "TView"){
-      Query->Param("$idname"=>$idval);
-      $idval="NONE" if ($idval eq "");
-
-      my $q=new kernel::cgi({});
-      $q->Param("$idname"=>$idval);
-      my $urlparam=$q->QueryString();
-      $page="<link rel=\"stylesheet\" ".
-            "href=\"../../../static/lytebox/lytebox.css\" ".
-            "type=\"text/css\" media=\"screen\" />";
-
-      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
-            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
-            "src=\"TreeView?$urlparam\"></iframe>";
-   }
-   $page.=$self->HtmlPersistentVariables($idname);
-   return($page);
-}
-
-
-sub getValidWebFunctions
-{
-   my $self=shift;
-
-   return($self->SUPER::getValidWebFunctions(@_),"TreeView");
-}
-
-sub TreeView   
-{
-   my $self=shift;
-
-   my %flt=$self->getSearchHash();
-   $self->ResetFilter();
-   $self->SecureSetFilter(\%flt);
-   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+#sub getHtmlDetailPageContent
+#{
+#   my $self=shift;
+#   my ($p,$rec)=@_;
+#   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView");
+#
+#   my $page;
+#   my $idname=$self->IdField->Name();
+#   my $idval=$rec->{$idname};
+#
+#   if ($p eq "TView"){
+#      Query->Param("$idname"=>$idval);
+#      $idval="NONE" if ($idval eq "");
+#
+#      my $q=new kernel::cgi({});
+#      $q->Param("$idname"=>$idval);
+#      my $urlparam=$q->QueryString();
+#      $page="<link rel=\"stylesheet\" ".
+#            "href=\"../../../static/lytebox/lytebox.css\" ".
+#            "type=\"text/css\" media=\"screen\" />";
+#
+#      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+#            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+#            "src=\"TreeView?$urlparam\"></iframe>";
+#   }
+#   $page.=$self->HtmlPersistentVariables($idname);
+#   return($page);
+#}
 
 
-   print $self->HttpHeader();
-   print $self->HtmlHeader(
-                           title=>"TeamView",
-                           js=>['toolbox.js'],
-                           style=>['default.css','work.css',
-                                   'kernel.App.Web.css',
-                                   'Output.HtmlDetail.css']);
-   if (defined($rec)){
-      printf("<div id=\"HtmlDetail\"><div style=\"padding:5px\">".
-             "<br><h2>%s :</h2><br>%s<br>",
-             $self->T("Businessservice tree analyse"),
-             $self->getField("fullname")->
-                FormatedDetail($rec,"HtmlV01"));
+#sub getValidWebFunctions
+#{
+#   my $self=shift;
+#
+#   return($self->SUPER::getValidWebFunctions(@_),"TreeView");
+#}
 
-      print("<table width=100%>");
-
-      printf("<tr><td>");
-      printf("<hr>");
-      printf("<h1>".$self->T("Support times")."</h1>");
-      printf("<h3>".$self->T("requested support times")."</h1> (%s)",
-             $self->getField("servicesupport")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("%s",
-             $self->getField("supportReq")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("</td></tr>");
-      
-
-      printf("<tr><td>");
-      printf("<h3>".$self->T("implemented support times")."</h1> (%s)",
-             $self->getField("implservicesupport")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("<br>%s",
-             $self->getField("implsupporttimes")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("</td></tr>");
-      
-
-      printf("<tr><td>");
-      printf("<h3>".$self->T("aggregated support times tree")."</h1>");
-      printf("%s",
-             $self->getField("supportTreeCheck")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("</td></tr>");
-      printf("</table>");
-
-
-      print("<table width=100%>");
-
-      printf("<tr><td>");
-      printf("<hr>");
-      printf("<h1>".$self->T("Service times")."</h1>");
-      printf("<h3>".$self->T("requested service times")."</h1> (%s)",
-             $self->getField("servicesupport")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("%s",
-             $self->getField("serivceReq")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("</td></tr>");
-      
-      printf("<tr><td>");
-      printf("<h3>".$self->T("implemented service times")."</h1> (%s)",
-             $self->getField("implservicesupport")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("<br>%s",
-             $self->getField("implserivcetimes")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("</td></tr>");
-      
-
-      printf("<tr><td>");
-      printf("<h3>".$self->T("aggregated service times tree")."</h1>");
-      printf("%s",
-             $self->getField("serivceTreeCheck")->
-                FormatedDetail($rec,"HtmlDetail"));
-      printf("</td></tr>");
-      printf("</table>");
-
-
-      printf("</div></div>");
-
-   }
-   print $self->HtmlBottom(body=>1,form=>1);
-
-}
+#sub TreeView   
+#{
+#   my $self=shift;
+#
+#   my %flt=$self->getSearchHash();
+#   $self->ResetFilter();
+#   $self->SecureSetFilter(\%flt);
+#   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+#
+#
+#   print $self->HttpHeader();
+#   print $self->HtmlHeader(
+#                           title=>"TeamView",
+#                           js=>['toolbox.js'],
+#                           style=>['default.css','work.css',
+#                                   'kernel.App.Web.css',
+#                                   'Output.HtmlDetail.css']);
+#   if (defined($rec)){
+#      printf("<div id=\"HtmlDetail\"><div style=\"padding:5px\">".
+#             "<br><h2>%s :</h2><br>%s<br>",
+#             $self->T("Businessservice tree analyse"),
+#             $self->getField("fullname")->
+#                FormatedDetail($rec,"HtmlV01"));
+#
+#      print("<table width=100%>");
+#
+#      printf("<tr><td>");
+#      printf("<hr>");
+#      printf("<h1>".$self->T("Support times")."</h1>");
+#      printf("<h3>".$self->T("requested support times")."</h1> (%s)",
+#             $self->getField("servicesupport")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("%s",
+#             $self->getField("supportReq")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("</td></tr>");
+#      
+#
+#      printf("<tr><td>");
+#      printf("<h3>".$self->T("implemented support times")."</h1> (%s)",
+#             $self->getField("implservicesupport")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("<br>%s",
+#             $self->getField("implsupporttimes")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("</td></tr>");
+#      
+#
+#      printf("<tr><td>");
+#      printf("<h3>".$self->T("aggregated support times tree")."</h1>");
+#      printf("%s",
+#             $self->getField("supportTreeCheck")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("</td></tr>");
+#      printf("</table>");
+#
+#
+#      print("<table width=100%>");
+#
+#      printf("<tr><td>");
+#      printf("<hr>");
+#      printf("<h1>".$self->T("Service times")."</h1>");
+#      printf("<h3>".$self->T("requested service times")."</h1> (%s)",
+#             $self->getField("servicesupport")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("%s",
+#             $self->getField("serivceReq")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("</td></tr>");
+#      
+#      printf("<tr><td>");
+#      printf("<h3>".$self->T("implemented service times")."</h1> (%s)",
+#             $self->getField("implservicesupport")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("<br>%s",
+#             $self->getField("implserivcetimes")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("</td></tr>");
+#      
+#
+#      printf("<tr><td>");
+#      printf("<h3>".$self->T("aggregated service times tree")."</h1>");
+#      printf("%s",
+#             $self->getField("serivceTreeCheck")->
+#                FormatedDetail($rec,"HtmlDetail"));
+#      printf("</td></tr>");
+#      printf("</table>");
+#
+#
+#      printf("</div></div>");
+#
+#   }
+#   print $self->HtmlBottom(body=>1,form=>1);
+#
+#}
 
 
 
