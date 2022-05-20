@@ -73,8 +73,7 @@ sub new
                 label         =>'Business process',
                 vjointo       =>'itil::businessprocess',
                 vjoinon       =>['bprocessid'=>'id'],
-                vjoindisp     =>'name',
-                dataobjattr   =>'businessprocess.name'),
+                vjoindisp     =>'fullname'),
                                                    
       new kernel::Field::TextDrop(
                 name          =>'businessservice',
