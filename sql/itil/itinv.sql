@@ -1474,7 +1474,7 @@ drop table lnkbprocesssystem;
 rename table lnkbprocessappl to lnkbprocessbusinessservice;
 alter table lnkbprocessbusinessservice add businessservice bigint(20) NOT NULL;
 set FOREIGN_KEY_CHECKS=0;
-alter table lnkbprocessbusinessservice add FOREIGN KEY fk_bs (businessservice) REFERENCES businessservice (id) ON DELETE CASCADE;
+alter table lnkbprocessbusinessservice add FOREIGN KEY fk_bs (businessservice) REFERENCES businessservice (id) ON DELETE CASCADE; alter table lnkbprocessbusinessservice add unique key (bprocess,businessservice);
 set FOREIGN_KEY_CHECKS=1;
 alter table businessservice add databoss  bigint(20);
 alter table businessservice add mandator  bigint(20);
