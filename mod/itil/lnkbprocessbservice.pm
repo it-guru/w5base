@@ -40,8 +40,33 @@ sub new
                 name          =>'id',
                 label         =>'LinkID',
                 searchable    =>0,
+                group         =>'source',
                 dataobjattr   =>'lnkbprocessbusinessservice.id'),
+
+      new kernel::Field::RecordUrl(),
                                                  
+      new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'fullqualified relation name',
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $fullname;
+
+                   my $fo=$self->getParent->getField("businessprocess");
+                   my $f=$fo->RawValue($current);
+
+                   $fullname.=$f;
+
+                   $fullname.=" -> ";
+
+                   my $fo=$self->getParent->getField("businessservice");
+                   my $f=$fo->RawValue($current);
+
+                   $fullname.=$f;
+                   return($fullname);
+                }),
+
       new kernel::Field::TextDrop(
                 name          =>'businessprocess',
                 htmlwidth     =>'250px',
@@ -58,6 +83,24 @@ sub new
                 vjoinon       =>['businessserviceid'=>'id'],
                 vjoindisp     =>'fullname'),
                                                    
+      new kernel::Field::Select(
+                name          =>'bprocesscistatus',
+                group         =>'bprocessinfo',
+                label         =>'Business Process CI-State',
+                vjointo       =>'base::cistatus',
+                readonly      =>1,
+                vjoinon       =>['bprocesscistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Select(
+                name          =>'bservicecistatus',
+                group         =>'bserviceinfo',
+                label         =>'BusinessService CI-State',
+                vjointo       =>'base::cistatus',
+                readonly      =>1,
+                vjoinon       =>['bservicecistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 searchable    =>0,
@@ -128,15 +171,12 @@ sub new
                 group         =>'bprocessinfo',
                 dataobjattr   =>'businessprocess.mandator'),
 
-      new kernel::Field::Select(
-                name          =>'bprocesscistatus',
+      new kernel::Field::Link(
+                name          =>'bsmandatorid',
+                label         =>'BusinessServiceMandatorID',
                 group         =>'bprocessinfo',
-                label         =>'Business Process CI-State',
-                vjointo       =>'base::cistatus',
-                readonly      =>1,
-                vjoinon       =>['bprocesscistatusid'=>'id'],
-                vjoindisp     =>'name'),
-                                                  
+                dataobjattr   =>'businessservice.mandator'),
+
       new kernel::Field::Link(
                 name          =>'bprocessbprocessid',
                 label         =>'BusinessprocessID',
@@ -145,7 +185,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'customer',
-                label         =>'Customer',
+                label         =>'Organisation/Customer',
                 readonly      =>1,
                 group         =>'bprocessinfo',
                 translation   =>'crm::businessprocess',
@@ -156,7 +196,12 @@ sub new
                                                    
       new kernel::Field::Link(
                 name          =>'bprocesscistatusid',
-                label         =>'ApplCiStatusID',
+                label         =>'BusinessProcessStatusID',
+                dataobjattr   =>'businessprocess.cistatus'),
+
+      new kernel::Field::Link(
+                name          =>'bservicecistatusid',
+                label         =>'BusinessServiceStatusID',
                 dataobjattr   =>'businessprocess.cistatus'),
 
       new kernel::Field::Link(
@@ -173,7 +218,7 @@ sub new
                                                    
       new kernel::Field::Link(
                 name          =>'businessserviceid',
-                label         =>'SystemId',
+                label         =>'BusinessServiceID',
                 dataobjattr   =>'lnkbprocessbusinessservice.businessservice'),
 
       new kernel::Field::Link(
@@ -277,8 +322,25 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default eventnotification misc bprocessinfo applinfo ));
+   return(qw(header default eventnotification misc bprocessinfo 
+             bserviceinfo applinfo source ));
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_bprocesscistatus"))){
+     Query->Param("search_bprocesscistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+   if (!defined(Query->Param("search_bservicecistatus"))){
+     Query->Param("search_bservicecistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 
 

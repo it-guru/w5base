@@ -52,8 +52,12 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
+
    return("header","default") if (!defined($rec));
-   return("ALL");
+   my @l=$self->SUPER::isViewValid($rec);
+   push(@l,"businessservices") if (in_array("default",\@l));
+   
+   return(@l);
 }
 
 sub isWriteValid
@@ -68,8 +72,12 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default procroles procdesc subproc applications 
-             businessservices acl misc source));
+   my $rec=shift;
+   my @l=$self->SUPER::getDetailBlockPriority($rec);
+printf STDERR ("f1:@l\n");
+   array_insert(\@l,"subproc","businessservices");
+printf STDERR ("f2:@l\n");
+   return(@l);
 }
 
 
