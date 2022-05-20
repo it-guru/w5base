@@ -501,7 +501,7 @@ sub new
                 },
                 dataobjattr   =>'ipaddress.addresstyp'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'cistatusid',
                 label         =>'CI-StateID',
                 dataobjattr   =>'ipaddress.cistatus'),
