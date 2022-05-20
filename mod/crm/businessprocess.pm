@@ -51,9 +51,9 @@ sub new
 
      new kernel::Field::TextDrop(
                 name          =>'customer',
-                label         =>'Customer',
+                label         =>'Organisation/Customer',
                 vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoineditbase =>{'cistatusid'=>[3,4],'is_org'=>1},
                 vjoinon       =>['customerid'=>'grpid'],
                 vjoindisp     =>'fullname'),
 
@@ -144,6 +144,7 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoinon       =>['pbusinessprocessid'=>'id'],
                 AllowEmpty    =>1,
+                htmldetail    =>'NotEmptyOrEdit',
                 vjoindisp     =>'selector'),
 
       new kernel::Field::Link(
@@ -256,6 +257,7 @@ sub new
                 name          =>'subproc',
                 label         =>'subproc',
                 readonly      =>1,
+                htmldetail    =>'NotEmpty',
                 group         =>'subproc',
                 vjointo       =>'crm::businessprocess',
                 vjoinon       =>['id'=>'pbusinessprocessid'],
@@ -690,14 +692,18 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
-   return("ALL");
+   return("header","default","procdesc") if (!defined($rec));
+   my @l=qw(default procdesc subproc acl misc source);
+   push(@l,"procroles") if ($self->IsMemberOf("admin"));
+
+   return(@l);
 }
 
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default subproc procdesc acl misc source));
+   return(qw(header default procdesc subproc acl misc 
+             procroles  source));
 }
 
 sub SelfAsParentObject
