@@ -753,6 +753,11 @@ sub Init
                       func=>'MainWithNew',
                       prio=>1000);
    
+   $self->RegisterObj("bsm.bp.lnkbs",
+                      "itil::lnkbprocessbservice",
+                      func=>'Main',
+                      prio=>1000);
+   
    $self->RegisterObj("bsm.bs",
                       "itil::businessservice",
                       func=>'MainWithNew',
