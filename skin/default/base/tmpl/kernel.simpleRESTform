@@ -63,7 +63,7 @@ form{
 
 </style>
 <form id=form>
-<h1>W5Base simpleRESTCall Debugger</h1>
+<h1>%TITLE%</h1>
 <h4>%SCRIPT_URI%</h4>
 %FIELDS%
 <br>
