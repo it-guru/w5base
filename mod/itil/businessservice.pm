@@ -643,8 +643,8 @@ sub new
                 allowcleanup  =>1,
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>['sortkey','name',"xcomments"],
-                vjoininhash   =>['sortkey','lnkpos','id','objtype',
-                                 'obj1id','obj2id','obj3id','comments']),
+                vjoininhash   =>['sortkey','variant','lnkpos','id','objtype',
+                                 'obj1id','comments']),
 
       new kernel::Field::SubList(
                 name          =>'servicecompappl',
