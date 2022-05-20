@@ -2337,12 +2337,25 @@ sub simpleRESTCallHandler
       else{
          my @l=caller(1);
          print $self->HttpHeader("text/html");
+         my $title="W5Base REST Debugger";
+         my $path=$ENV{SCRIPT_URL};
+         my $sitename=$self->Config->Param("SITENAME");
+         if ($sitename eq ""){
+            $sitename="W5Base";
+         }
+         else{
+            $sitename="W5B:$sitename";
+         }
+         if (my ($mod,$obj,$func)=$path=~m#/([^/]+)/([^/]+)/([^/]+)$#){
+            $title="${sitename} ${mod}::${obj}::${func} - REST Debugger";
+         }
+
          print $self->HtmlHeader(
                            body=>1,
                            style=>['default.css','mainwork.css',
                                    'kernel.App.Web.css'],
                            js=>['jquery.js','toolbox.js'],
-                           title=>"W5Base REST Debugger");
+                           title=>$title);
          print $self->getAppTitleBar();
          my $fForm="<fieldset>";
          $fForm.="<legend>Call Parameters:</legend>";
@@ -2386,6 +2399,7 @@ sub simpleRESTCallHandler
                { 
                   skinbase=>'base',
                   static=>{
+                     TITLE=>$title,
                      FIELDS=>$fForm,
                      SCRIPT_URI=>$SCRIPT_URI
                   }
