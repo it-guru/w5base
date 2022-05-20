@@ -74,9 +74,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $rec=shift;
    my @l=$self->SUPER::getDetailBlockPriority($rec);
-printf STDERR ("f1:@l\n");
    array_insert(\@l,"subproc","businessservices");
-printf STDERR ("f2:@l\n");
    return(@l);
 }
 
