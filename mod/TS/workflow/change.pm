@@ -526,7 +526,12 @@ sub getNotifyDestinationsFromSMGroups
    my @l=$grpobj->getHashList(qw(name groupmailbox));
    foreach my $grprec (@l){
       if ($grprec->{groupmailbox} ne ""){
-         $mailaddress{$grprec->{groupmailbox}}++;
+         my $email=$grprec->{groupmailbox};
+         my @email=split(/\s*[;,]\s*/,$email);
+         print STDERR Dumper(\@email);
+         foreach my $emailpart (@email){
+            $mailaddress{$emailpart}++;
+         }
       }
    }
    return(keys(%mailaddress));
@@ -683,7 +688,7 @@ sub generateMailSet
          my $approvedtxt;
          my $pendinggrps=$self->getApproverGrp($WfRec,'pending');
          my $approvedgrps=$self->getApproverGrp($WfRec,'done');
-         
+
          if (defined($authority)) {
             $tmpl="tmpl/ext.changenotify.$notifymode.$authority";
          }
