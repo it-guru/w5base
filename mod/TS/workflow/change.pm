@@ -528,7 +528,6 @@ sub getNotifyDestinationsFromSMGroups
       if ($grprec->{groupmailbox} ne ""){
          my $email=$grprec->{groupmailbox};
          my @email=split(/\s*[;,]\s*/,$email);
-         print STDERR Dumper(\@email);
          foreach my $emailpart (@email){
             $mailaddress{$emailpart}++;
          }
