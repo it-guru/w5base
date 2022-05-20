@@ -5,7 +5,8 @@ use strict;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 @EXPORT = qw(
-             &trim &rtrim &ltrim &limitlen &in_array &first_index &base36
+             &trim &rtrim &ltrim &limitlen &in_array &array_insert
+             &first_index &base36
              &extractLanguageBlock
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &UTF8toLatin1
              );
@@ -222,6 +223,25 @@ sub in_array
    }
    return(exists($items{$search_for})?1:0);
 }
+
+sub array_insert
+{
+   my ($arr,$ankerPos,$ins,$rel)=@_;
+
+   $rel="AfterOrEnd" if ($rel eq "");
+
+   if ($rel eq "AfterOrEnd"){
+      my $inserti=$#{$arr};
+      for(my $c=0;$c<=$#{$arr};$c++){
+         $inserti=$c+1 if ($arr->[$c] eq $ankerPos);
+      }
+      my @temparr=@$arr;
+      splice(@$arr,
+             $inserti,
+             $#{$arr}-$inserti,($ins,@temparr[$inserti..($#{$arr})]));
+   }
+}
+
 
 sub first_index
 {

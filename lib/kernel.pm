@@ -82,7 +82,8 @@ use charnames ':full';
 @ISA = qw(Exporter);
 @EXPORT = qw(&Query &LangTable &extractLanguageBlock 
              &globalContext &NowStamp &CalcDateDuration
-             &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array &first_index
+             &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array &array_insert
+             &first_index
              &base36
              &hash2xml &xml2hash &effVal &effChanged &effChangedVal
              &Debug &UTF8toLatin1 &Html2Latin1
