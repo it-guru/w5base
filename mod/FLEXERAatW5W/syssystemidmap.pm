@@ -171,7 +171,7 @@ sub getSqlFrom
    my $self=shift;
    my $mode=shift;
    my @flt=@_;
-   my $from="FLEXERAsup_syssystemidmap";
+   my $from="FLEXERAsup_syssystemidmap join dual on 1=0";
 
    return($from);
 }

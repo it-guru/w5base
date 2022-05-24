@@ -49,13 +49,13 @@ sub new
                 name          =>'fullname',
                 label         =>'Systemname',
                 uivisible     =>0,
-                dataobjattr   =>'systemname'),
+                dataobjattr   =>'FLEXERA_system.systemname'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 label         =>'Systemname',
                 ignorecase    =>1,
-                dataobjattr   =>'systemname'),
+                dataobjattr   =>'FLEXERA_system.systemname'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
@@ -162,11 +162,18 @@ sub new
                 dataobjattr   =>'UUID'),
 
       new kernel::Field::Text(
+                name          =>'instancecloudid',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                label         =>'InstanceCloudId',
+                dataobjattr   =>'instancecloudid'),
+
+      new kernel::Field::Text(
                 name          =>'w5systemid',
                 group         =>'w5basedata',
                 label         =>'W5BaseID',
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>'SYSTEMW5BASEID'),
+                dataobjattr   =>'FLEXERA_system2w5system.w5baseid'),
 
       new kernel::Field::Text(
                 name          =>'w5systemname',
@@ -176,6 +183,16 @@ sub new
                 vjointo       =>\'AL_TCom::system',
                 vjoinon       =>['w5systemid'=>'id'],
                 vjoindisp     =>'name'),
+
+      new kernel::Field::Text(
+                name          =>'applicationnames',
+                label         =>'W5Base/Applications',
+                group         =>'w5basedata',
+                readonly      =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['w5systemid'=>'systemid'],
+                vjoindisp     =>'appl'),
 
       new kernel::Field::CDate(
                 name          =>'crdate',
@@ -275,6 +292,26 @@ sub isWriteValid
    my $rec=shift;
    return(undef);
 }
+
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="";
+
+   $from.="$worktable  ".
+          "left outer join FLEXERA_system2w5system ".
+          "on $worktable.FLEXERASYSTEMID=".
+          "FLEXERA_system2w5system.FLEXERADEVICEID ";
+
+   return($from);
+}
+
+
 
 
 sub getDetailBlockPriority

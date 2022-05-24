@@ -6,6 +6,7 @@
 'IP-Addresses'=>{de=>'IP-Adressen'},
 'CORE-Count'=>{de=>'Core-Anzahl'},
 'CPU-Count'=>{de=>'CPU-Anzahl'},
+'W5Base/Applications'=>{de=>'W5Base/Anwendungen'},
 'Inventory-Date'=>{de=>'Inventory-Datum'},
 'Services-Inventory-Date'=>{de=>'Services-Inventory-Datum'},
 'HW-Inventory-Date'=>{de=>'HW-Inventory-Datum'},

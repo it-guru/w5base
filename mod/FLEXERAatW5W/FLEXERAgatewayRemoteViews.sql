@@ -11,6 +11,7 @@ select
    FlexSystem.UUID,
    FlexSystem.TENANTID,
    FlexSystem.SYSTEMNAME,
+   lower(FlexSystem.SYSTEMNAME) LW_SYSTEMNAME,
    FlexSystem.SYSTEMOS,
    FlexSystem.SYSTEMOSPATCHLEVEL,
    FlexSystem.SYSTEMCPUCOUNT,
@@ -32,30 +33,52 @@ select
    FlexSystem.BEACONID,
    FlexSystem.ISVM,
    FlexSystem.ISVMHOSTMISSING,
-   "itil::system".id SYSTEMW5BASEID
-from dbo.customDarwinExportDevice@flexerap FlexSystem
-   left outer join "W5I_FLEXERA__systemidmap_of"
-      on FlexSystem.FLEXERADEVICEID=
-         "W5I_FLEXERA__systemidmap_of".FLEXERASYSTEMID
-   left outer join "itil::system" 
-      on "W5I_FLEXERA__systemidmap_of".systemid=
-         "itil::system".systemid;
+   FlexSystem.INSTANCECLOUDID,
+   lower(FlexSystem.INSTANCECLOUDID) LW_INSTANCECLOUDID,
+   ' ' SYSTEMW5BASEID
+from dbo.customDarwinExportDevice@flexerap FlexSystem;
 
 CREATE INDEX "FLEXERA_system_id1"
    ON "mview_FLEXERA_system"(flexerasystemid) online;
 CREATE INDEX "FLEXERA_system_id2"
    ON "mview_FLEXERA_system"(systemname) online;
 CREATE INDEX "FLEXERA_system_id3"
+   ON "mview_FLEXERA_system"(lw_systemname) online;
+CREATE INDEX "FLEXERA_system_id4"
    ON "mview_FLEXERA_system"(systeminvhosttype) online;
+CREATE INDEX "FLEXERA_system_id5"
+   ON "mview_FLEXERA_system"(lw_instancecloudid) online;
+
+-- drop materialized view "mview_FLEXERA_system2w5system";
+create materialized view "mview_FLEXERA_system2w5system"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*2
+   as
+select distinct
+   FlexSystem.FLEXERADEVICEID,
+   FlexSystem.SYSTEMNAME,
+   system.id w5baseid
+from "mview_FLEXERA_system" FlexSystem
+   join "itil::system" system on 
+      FlexSystem.lw_systemname=system.name and
+         not system.srcsys in ('AWS')
+      or (system.srcid like
+          FlexSystem.lw_instancecloudid||'@%@%' and
+          system.srcsys='AWS');
+grant select on "mview_FLEXERA_system2w5system" to W5I;
+create or replace synonym W5I.FLEXERA_system2w5system for "mview_FLEXERA_system2w5system";
 
 
-create or replace view "W5I_FLEXERA_system" as
-select "mview_FLEXERA_system".*,
-       "W5I_FLEXERA__systemidmap_of".systemid
-from "mview_FLEXERA_system"
-   left outer join "W5I_FLEXERA__systemidmap_of"
-        on "mview_FLEXERA_system".flexerasystemid=
-           "W5I_FLEXERA__systemidmap_of".flexerasystemid;
+' W5I_FLEXERA__systemidmap_of fällt demnächst weg!
+'
+'
+'create or replace view "W5I_FLEXERA_system" as
+'select "mview_FLEXERA_system".*,
+'       "W5I_FLEXERA__systemidmap_of".systemid
+'from "mview_FLEXERA_system"
+'   left outer join "W5I_FLEXERA__systemidmap_of"
+'        on "mview_FLEXERA_system".flexerasystemid=
+'           "W5I_FLEXERA__systemidmap_of".flexerasystemid;
 
 grant select on "W5I_FLEXERA_system" to W5I;
 create or replace synonym W5I.FLEXERA_system for "W5I_FLEXERA_system";
