@@ -60,6 +60,7 @@ sub new
       new kernel::Field::Group(
                 name          =>'grp',
                 label         =>'Organisation',
+                vjoineditbase =>{'cistatusid'=>[3,4],'is_org'=>1},
                 vjoinon       =>'grpid'),
 
       new kernel::Field::Link(

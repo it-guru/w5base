@@ -134,7 +134,7 @@ sub new
                 },
                 jsonchanged   =>\&getOnChangedScript,
                 jsoninit      =>\&getOnChangedScript,
-                value         =>[undef,'SVC','PC','BC'],
+                value         =>['','SVC','PC','BC'],
                 dataobjattr   =>"$worktable.nature"),
 
       new kernel::Field::Interface(
@@ -624,14 +624,49 @@ sub new
                 label         =>'upper service',
                 group         =>'uservicecomp',
                 htmldetail    =>'NotEmpty',
+                depend        =>['allparentids','id'],
                 searchable    =>0,
-                vjointo       =>'itil::lnkbscomp',
+                vjointo       =>'itil::businessservice',
                 allowcleanup  =>1,
-                vjoinon       =>['id'=>'obj1id'],
-                vjoindisp     =>['uppername'],
-                vjoininhash   =>['sortkey','lnkpos','id','objtype',
-                                 'obj1id','obj2id','obj3id','comments',
-                                 'uppername','businessserviceid']),
+                vjoinon       =>['allparentids'=>'id'],
+                vjoindisp     =>['fullname'],
+                vjoininhash   =>['id','fullname']),
+
+      new kernel::Field::Interface(
+                name          =>'allparentids',
+                label         =>'all parent business service ids',
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['id'],
+                selectfix     =>1,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $app=$self->getParent();
+                   my @p;
+                   if (defined($current) && $current->{id} ne ""){
+                      my $id=$current->{id};
+                      my @curid=($id);
+                      do{
+                         my $op=$app->getPersistentModuleObject("parrentLoop",
+                                "itil::lnkbscomp");
+                         $op->SetFilter({objtype=>\'itil::businessservice',
+                                         obj1id=>\@curid});
+                         my @l=$op->getHashList(qw(businessserviceid));
+                         @curid=();
+                         foreach my $toprec (@l){
+                            if ($toprec->{businessserviceid} ne "" &&
+                                !in_array(\@p,$toprec->{businessserviceid})){
+                               push(@curid,$toprec->{businessserviceid});
+                               push(@p,$toprec->{businessserviceid});
+                            }
+                         }
+                      }while($#curid!=-1);
+                   }
+                   return(undef) if ($#p==-1);
+                   return(\@p);
+                }),
+
 
       new kernel::Field::SubList(
                 name          =>'servicecomp',
