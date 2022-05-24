@@ -1,4 +1,6 @@
 'itil::lnkbscomp'=>{de=>'Service Komponente',en=>'Service Component'},
+'Variant'=>{de=>'Variante'},
+'Pos'=>{de=>'Postion'},
 'Component'=>{de=>'Komponente'},
 'Component type'=>{de=>'Komponententyp'},
 'Redundance 1'=>{de=>'Redundanz 1'},
@@ -6,3 +8,4 @@
 'Comments shorted'=>{de=>'verkürzte Bemerkungen'},
 'no primary element specified'=>{de=>'keine primäre Komponente angegeben'},
 'upper Businessservice name'=>{de=>'übergeordneter Businessservice'},
+'new child business service already in parents'=>{de=>'Service Komponente bereits in den übergeordneten Service Komponenten'},

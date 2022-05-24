@@ -50,6 +50,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'businessserviceid',
+                selectfix     =>1,
                 label         =>'Businessservice ID',
                 dataobjattr   =>'lnkbscomp.businessservice'),
 
@@ -68,7 +69,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'variant',
-                label         =>'Pos',
+                label         =>'Variant',
                 htmlwidth     =>'50',
                 htmleditwidth =>'30px',
                 allownative   =>1,
@@ -107,7 +108,8 @@ sub new
                 label         =>'Pos',
                 htmlwidth     =>'50',
                 allownative   =>1,
-                htmleditwidth =>'30px',
+                default       =>'999',
+                htmleditwidth =>'40px',
                 getPostibleValues=>sub{
                    my $self=shift;
                    my $current=shift;
@@ -129,9 +131,10 @@ sub new
                          $max=$rec->{lnkpos} if ($rec->{lnkpos}>$max);
                       }
                       $max++;
-                      foreach(my $cc=1;$cc<=$max;$cc++){
+                      foreach(my $cc=1;$cc<$max;$cc++){
                          push(@lst,$cc,$cc);
                       }
+                      push(@lst,999,"E");
                    }
                    return(@lst);
                 },
@@ -149,17 +152,19 @@ sub new
                    my $app=$self->getParent();
                    my $c=$app->Context();
                    my ($variant,$lnkpos)=split(/\//,$d);
+                   my $businessserviceid=$current->{businessserviceid};
                    $d=~s/^0+//g;
                    $d=~s/\// /g;
                    $d=~s/ 0+/ /g;
-                   if ($c->{lastvariant} ne $current->{variant}){
+                   if ($c->{$businessserviceid}->{lastvariant} ne 
+                       $current->{variant}){
                       $d=sprintf("%-2d -->%2d",$variant,$lnkpos);
                    }
                    else{
                       $d=sprintf("%-2s +->%2d","",$lnkpos);
                    }
                    $d="<xmp>".$d."</xmp>";
-                   $c->{lastvariant}=$current->{variant};
+                   $c->{$businessserviceid}->{lastvariant}=$current->{variant};
                    return($d);
                 },
                 dataobjattr   =>"concat(LPAD(lnkbscomp.varikey,4,'0'),".
@@ -297,6 +302,15 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
+   if (!defined($oldrec)){
+      if ($newrec->{variant} eq ""){
+         $newrec->{variant}=1;
+      }
+      if ($newrec->{pos} eq ""){
+         $newrec->{pos}=999;
+      }
+   }
+
    if (!$self->checkWriteValid($oldrec,$newrec)){
       $self->LastMsg(ERROR,"no access");
       return(0);
@@ -308,20 +322,78 @@ sub Validate
    my $businessserviceid=effVal($oldrec,$newrec,"businessserviceid");
    my $objtype=effVal($oldrec,$newrec,"objtype");
    if ($objtype eq "itil::businessservice"){
-      for(my $r=1;$r<=3;$r++){
-         my $idfld="obj${r}id";
-         my $id=effVal($oldrec,$newrec,$idfld);
-         if ($id eq $businessserviceid){
-            $self->LastMsg(ERROR,"a business service an not contain herself");
+      my $id=effVal($oldrec,$newrec,"obj1id");
+      if ($id eq $businessserviceid){
+         $self->LastMsg(ERROR,"a business service an not contain herself");
+         return(0);
+      }
+      # recursions check
+      my $layer=1;
+      my @chkParentList;
+      # get Parents of current
+      my $op=$self->getPersistentModuleObject("itil::businessservice");
+      $op->SetFilter({id=>\$businessserviceid});
+      my ($currec)=$op->getOnlyFirst(qw(allparentids));
+      if (defined($currec) && defined($currec->{allparentids}) &&
+          ref($currec->{allparentids}) eq "ARRAY" &&
+          $#{$currec->{allparentids}}!=-1){
+         push(@chkParentList,@{$currec->{allparentids}});
+      }
+      if (!defined($oldrec)){
+         if (in_array(\@chkParentList,$id)){
+            $self->LastMsg(ERROR,
+                           "new child business service already in parents");
             return(0);
          }
+         push(@chkParentList,$id);
+      }
+      push(@chkParentList,$businessserviceid);
+      if (!$self->recursionValidate($layer,\@chkParentList)){
+         $self->LastMsg(ERROR,"recursion loop detected");
+         return(0);
       }
    }
-
-
-
    return(1);
 }
+
+sub recursionValidate
+{
+   my $self=shift;
+   my $layer=shift;
+   my $searchfor=shift;
+
+   my @searchfor=@{$searchfor};
+   if ($layer>10){
+      $self->LastMsg(ERROR,"service layer limit reached");
+      return(undef);
+   }
+
+   my @curtree=@searchfor;
+   my $lastid=pop(@curtree);
+   if (in_array(\@curtree,$lastid)){
+      return(undef);
+   }
+   my $op=$self->getPersistentModuleObject($self->SelfAsParentObject());
+   my %flt=(
+      objtype=>\'itil::businessservice',
+      businessserviceid=>\$lastid
+   );
+   $op->SetFilter(\%flt);
+   my @l=$op->getHashList(qw(id objtype obj1id));
+   foreach my $subrec (@l){
+      my @subsearchfor=@searchfor;
+      push(@subsearchfor,$subrec->{obj1id});
+      if (!$self->recursionValidate($layer+1,\@subsearchfor)){
+         return(undef);
+      }
+   }
+   return(1);
+}
+
+
+
+
+
 
 sub SecureValidate
 {
@@ -355,7 +427,7 @@ sub FinishWrite
    my $businessserviceid=effVal($oldrec,$newrec,"businessserviceid");
 
    $op->SetFilter({businessserviceid=>\$businessserviceid});
-   my @l=$op->getHashList(qw(sortkey variant lnkpos id));
+   my @l=$op->getHashList(qw(sortkey -mdate variant lnkpos id));
    my @oplist;
 
    my @u;
@@ -372,6 +444,9 @@ sub FinishWrite
       if ($u[$c]->{variant}==$variant+1){
          $variant++;
          $lnkpos=0;
+      }
+      if ($c==0 && $variant==0){
+         $variant=1;
       }
       $lnkpos++;
       if ($u[$c]->{variant} ne $variant){

@@ -8,8 +8,8 @@
       <tr>
          <td class=fname colspan=1 nowrap>
             <table cellspacing=0 cellpadding=0 border=0>
-            <tr><td class=finput>Variante/Pos:</td>
-                <td>%variant(sublistedit)%&nbsp;/&nbsp;%lnkpos(sublistedit)%</td></tr>
+            <tr><td class=finput nowrap>Variante/Pos:</td>
+                <td nowrap>%variant(sublistedit)%&nbsp;/&nbsp;%lnkpos(sublistedit)%</td></tr>
             </table>
          </td>
          <td class=finput colspan=3>%name(sublistedit)%</td>
