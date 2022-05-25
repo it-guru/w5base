@@ -1847,8 +1847,10 @@ sub HandleDelete
                                   } 
                                }
                                else{
-                                  $self->LastMsg(ERROR,
+                                  if (!$self->LastMsg()){
+                                     $self->LastMsg(ERROR,
                                            "SecureValidatedDeleteRecord error");
+                                  }
                                }
                             });
      if ($cnt==0 && $mode eq "Modify"){
