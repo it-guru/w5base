@@ -119,7 +119,6 @@ sub Validate
    if (defined($oldrec)){
       $olduserid=$oldrec->{userid};
    }
-
    if (!$self->IsMemberOf("admin")){
       my $curuserid=$self->getCurrentUserId();
       if ($userid ne $curuserid || $userid ne $olduserid){
@@ -147,7 +146,8 @@ sub isWriteValid
    my $rec=shift;
    return("ALL") if (!defined($rec));
    my $userid=$self->getCurrentUserId();
-   return(undef) if ($userid ne $rec->{userid});
+   return(undef) if ($userid ne $rec->{userid} && !$self->IsMemberOf("admin"));
+   return("default");
 }
 
 
