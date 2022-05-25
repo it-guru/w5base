@@ -48,7 +48,18 @@ sub LoadNewAuditTasteOSFiles
 
    my $joblog=getModuleObject($self->Config,"base::joblog");
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
+   # on suspend, no Errors and quit the event silient
    return({}) if ($datastream->isSuspended());
+   # if ping failed ...
+   if (!$datastream->Ping()){
+      # check if there are lastmsgs
+      # if there, send a message to interface partners
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      return({}) if ($infoObj->NotifyInterfaceContacts($datastream));
+      msg(ERROR,"no ping posible to $StreamDataobj");
+      return({});
+   }
+
 
    $self->{sys}=getModuleObject($self->Config,"itil::system");
    $self->{addsys}=getModuleObject($self->Config,"itil::addlnkapplgrpsystem");
