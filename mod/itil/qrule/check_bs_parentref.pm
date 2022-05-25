@@ -82,15 +82,19 @@ sub qcheckRecord
    my $appl=getModuleObject($self->getParent->Config,"itil::appl");
 
    foreach my $s (@{$rec->{upperservice}}){
-      $bs->ResetFilter();
-      $bs->SetFilter({id=>\$s->{businessserviceid}});
-      my ($orec,$msg)=$bs->getOnlyFirst(qw(id fullname cistatusid));
-      if (!defined($orec)){
-         push(@msg,"parent element can not be resolved");
-      }
-      else{
-         if (!in_array(\@okstate,$orec->{cistatusid})){
-            push(@msg,"invalid state in parent elemente: ".$orec->{fullname});
+      msg(INFO,"check businessservice id:".$s->{id});
+      if ($s->{id} ne ""){
+         $bs->ResetFilter();
+         $bs->SetFilter({id=>\$s->{id}});
+         my ($orec,$msg)=$bs->getOnlyFirst(qw(id fullname cistatusid));
+         if (!defined($orec)){
+            push(@msg,"parent element can not be resolved");
+         }
+         else{
+            if (!in_array(\@okstate,$orec->{cistatusid})){
+               push(@msg,"invalid state in parent elemente: ".
+                         $orec->{fullname});
+            }
          }
       }
    }
