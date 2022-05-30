@@ -461,36 +461,6 @@ sub qcheckRecord
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'string');
 
-               ################################################################
-               # handling for plandecons, notifyplandecons1, notifyplandecons2
-               #$rec->{eohs}="2022-01-31 22:00:00";
-               if ($parrec->{ishousing} && $rec->{eohs} ne "" &&
-                   $rec->{plandecons} eq ""){
-                  my $deohs=CalcDateDuration(NowStamp("en"),$rec->{eohs});
-                  msg(INFO,"delta days eohs: ".$deohs->{totaldays});
-                  if ($deohs->{totaldays}<90){
-                     my $msg="missing planned deconstruction date";
-                     push(@qmsg,$msg);
-                     push(@dataissue,$msg);
-                     $errorlevel=3 if ($errorlevel<3);
-                  }
-                  else{
-                     if ($deohs->{totaldays}<180 && 
-                         $rec->{notifyplandecons2} eq ""){
-                        $self->doDeConNotify($dataobj,$rec,$parrec,$deohs,
-                                             "notifyplandecons2");
-                     }
-                     elsif ($deohs->{totaldays}<365 && 
-                            $deohs->{totaldays}>250 &&
-                         $rec->{notifyplandecons1} eq ""){
-                        $self->doDeConNotify($dataobj,$rec,$parrec,$deohs,
-                                             "notifyplandecons1");
-                     }
-                  }
-               }
-               ################################################################
-
-
                return(undef,undef) if (!$par->Ping());
             }
          }
@@ -587,57 +557,5 @@ sub getW5ACLocationname
    return($w5locrec->{name});
 
 }
-
-sub doDeConNotify
-{
-   my $self=shift;
-   my $dataobj=shift;
-   my $rec=shift;
-   my $parrec=shift;
-   my $deohs=shift;
-   my $mode=shift;
-
-   my $op=$dataobj->Clone();
-
-   msg(INFO,"doDeConNotify $mode :".$rec->{name});
-
-   my %notifyparam=(emailbcc=>['11634953080001']);
-   my %notifycontrol=();
-
-   if ($mode eq "notifyplandecons2"){
-      $notifycontrol{mode}="WARN";
-   }
-
-   $op->NotifyWriteAuthorizedContacts($rec,undef,
-                                      \%notifyparam,\%notifycontrol,sub{
-      my ($subject,$ntext);
-      my $subject=$dataobj->T("hint for deconstruction planning")." : ".
-                                 $rec->{name};
-      if ($mode eq "notifyplandecons2"){
-         $subject=$dataobj->T("request for deconstruction date")." : ".
-                                 $rec->{name};
-      }
-      my $tmpl=$dataobj->getParsedTemplate("tmpl/deconsNotify_".$mode,{
-         skinbase=>'tsacinv',
-         static=>{
-            URL=>$rec->{urlofcurrentrec},
-            ASSETNAME=>$rec->{name}
-         }
-      });
-      return($subject,$tmpl);
-   });
-   $op->ValidatedUpdateRecord($rec,{
-      $mode=>NowStamp("en"),
-      mdate=>$rec->{mdate},
-   },{id=>\$rec->{id}});
-            
-   #printf STDERR ("fifi: deohs=%s\n",Dumper($deohs));
-   #printf STDERR ("fifi: ishousing: %s\n",$parrec->{ishousing});
-   #printf STDERR ("fifi: eohs: %s\n",$rec->{eohs});
-   #printf STDERR ("fifi: plandecons: %s\n",$rec->{plandecons});
-   #printf STDERR ("fifi: notifyplandecons1: %s\n",$rec->{notifyplandecons1});
-   #printf STDERR ("fifi: notifyplandecons2: %s\n",$rec->{notifyplandecons2});
-}
-
 
 1;
