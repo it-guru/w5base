@@ -304,7 +304,7 @@ sub ProcessLine
       if ($format=~m/^(date|dayonly)\./){
      # printf STDERR ("fifi: field=%s format=%s data=%s\n",$field->Name(),
      #                $format,$data);
-         $self->{'worksheet'}->write_date_time($lineno,$cellno,$data,
+         $self->{'worksheet'}->write_date_time($lineno+1,$cellno,$data,
                                                $self->Format($format));
       }
       else{
@@ -312,10 +312,10 @@ sub ProcessLine
 
          my $numformat=$self->Format($format)->{_num_format};
          if ($numformat eq '@'){
-            $self->{'worksheet'}->write_string($lineno,$cellno,$data,
+            $self->{'worksheet'}->write_string($lineno+1,$cellno,$data,
                                                $self->Format($format));
          } else {
-            $self->{'worksheet'}->write($lineno,$cellno,$data,
+            $self->{'worksheet'}->write($lineno+1,$cellno,$data,
                                         $self->Format($format));
          }
       }
@@ -398,6 +398,23 @@ sub closeWorkbook
    }
    return(undef);
 }
+
+
+sub getEmpty
+{
+   my $self=shift;
+   my (%param)=@_;
+   my $d="";
+   $self->Init();
+   print STDOUT ($self->DownloadHeader().
+                 $self->getHttpHeader());
+
+
+   $self->Finish();
+
+   return($d);
+}
+
 
 sub Finish
 {
