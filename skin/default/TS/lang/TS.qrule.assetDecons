@@ -1,0 +1,5 @@
+'TS::qrule::assetDecons'=>{
+de=>'Überwachtung des geplanten Hardware-Rückbaus',
+en=>'Monitor planed hardware deconstruction'
+},
+
