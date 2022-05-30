@@ -93,3 +93,5 @@
 'End of Hardware-Support in unexpected range'=>{de=>'Ende des Hardware-Supports in unerwartetem Bereich'},
 'planned deconstruction date in unexpected range'=>{de=>'geplanter Rückbau Zeitpunkt in unerwartetem Bereich'},
 'planned deconstruction date'=>{de=>'geplanter Rückbau Zeitpunkt'},
+'justification when exceeding "end of hardware support"'=>{de=>'Begründung bei Überschreitung von "Ende des Hardware-Supports"'},
+

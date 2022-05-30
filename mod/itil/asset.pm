@@ -505,8 +505,48 @@ sub new
                 name          =>'plandecons',
                 group         =>'financeco',
                 dayonly       =>1,
+                depend        =>['eohs'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+
+                   if (exists($param{current}) &&
+                       $param{current}->{'eohs'} ne ""){
+                      my $deohs=CalcDateDuration(NowStamp("en"),
+                                            $param{current}->{'eohs'});
+                      if ($deohs->{totaldays}<366){
+                         return(1);
+                      }
+                   }
+                   return(0);
+                },
                 label         =>'planned deconstruction date',
                 dataobjattr   =>'asset.plandecons'),
+
+     new kernel::Field::Textarea(
+                name          =>'eohscomments',
+                group         =>'financeco',
+                depend        =>['eohs'],
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+
+                   if (exists($param{current}) &&
+                       $param{current}->{'eohs'} ne ""){
+                      my $deohs=CalcDateDuration(NowStamp("en"),
+                                            $param{current}->{'eohs'});
+                      if ($deohs->{totaldays}<366){
+                         return(1);
+                      }
+                   }
+                   return(0);
+                },
+                label         =>'justification when exceeding '.
+                                '"end of hardware support"',
+                dataobjattr   =>'asset.denyupdcomments'),
+
 
       new kernel::Field::Date(
                 name          =>'notifyplandecons1',
