@@ -169,7 +169,7 @@ sub ProcessHead
             $data="";
          }
          if ($format=~m/^date\./){
-            $self->{'worksheet'}->write_date_time($lineno,0,$data,
+            $self->{'worksheet'}->write_date_time($lineno+1,0,$data,
                                                   $self->Format($format));
          }
          else{
