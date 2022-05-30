@@ -88,6 +88,39 @@ sub Init
    return();
 }
 
+
+sub ProcessHiddenLine
+{
+   my ($self,$fh,$viewgroups,$rec,$lineno,$msg)=@_;
+   my $app=$self->getParent->getParent();
+
+   my $idname=$app->IdField();
+   $idname=$idname->Name() if (defined($idname));
+
+   if ($app->{_Limit}>1){ # if limit is set (blockwise output), show invisilbe
+                          # records only with her id
+      my $localrec={};
+      if (exists($rec->{$idname})){
+         $localrec->{$idname}=$rec->{$idname};
+      }
+      my $d;
+      if (defined($self->{JSON})){
+         if ($self->{charset} eq "latin1"){
+            $self->{JSON}->property(latin1 => 1);
+            $self->{JSON}->property(utf8 => 0);
+         }
+         $d=$self->{JSON}->encode($localrec);
+      }
+      $d=$self->FormatRecordStruct($d,$localrec,$idname);
+      if ($lineno>0){
+         $d="\n,".$d;
+      }
+      return($d);
+   }
+   return(undef);
+}
+
+
 sub ProcessLine
 {
    my ($self,$fh,$viewgroups,$rec,$recordview,$fieldbase,$lineno,$msg)=@_;
@@ -144,7 +177,7 @@ sub ProcessLine
       $d=~s/"\\\\Date\((\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)\)\\\\"
            /new Date("$2\/$3\/$1 $4:$5:$6 UTC")/gx;
    }
-   if ($lineno>1){
+   if ($lineno>0){
       $d="\n,".$d;
    }
    return($d);
