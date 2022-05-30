@@ -181,6 +181,13 @@ sub ProcessLine
    push(@{$self->{recordlist}},\@cell);
    return(undef);
 }
+sub ProcessHiddenLine
+{
+   my ($self,$fh,$viewgroups,$rec,$lineno,$msg)=@_;
+   my $app=$self->getParent->getParent();
+   #push(@{$self->{recordlist}},[]);
+   return(undef);
+}
 
 sub ProcessBottom
 {
@@ -242,6 +249,7 @@ sub getEmpty
    my $self=shift;
    my (%param)=@_;
    my $d="";
+
    if ($param{HttpHeader}){
       $d.=$self->getHttpHeader();
       $d.=$self->getParent->getParent->HtmlHeader(

@@ -159,6 +159,7 @@ sub WriteToStdout
    my $self=shift;
    my %param=@_;
    $self->getParent->Context->{Linenumber}=0;
+   $self->getParent->Context->{Recordnumber}=0;
    my $app=$self->getParent();
    local *TMP;
 
@@ -215,7 +216,8 @@ sub WriteToStdout
                }
                my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
                                                 \@recordview,$fieldbase,
-                                $self->getParent->Context->{Linenumber},$msg);
+                                $self->getParent->Context->{Recordnumber},$msg);
+               $app->Context->{Recordnumber}++;
                if (defined($d)){
                   if (!exists($self->Format->{charset}) ||
                       lc($self->Format->{charset}) ne "utf-8"){
@@ -231,8 +233,24 @@ sub WriteToStdout
                }
             }
             else{
-               $self->Context->{CurrentLimit}++; # fix to handel isViewValid
-            }                                    # denied of a record
+               my $d=$self->Format->ProcessHiddenLine(\$fh,undef,$rec,
+                                $self->getParent->Context->{Recordnumber},$msg);
+               if (defined($d)){
+                  $app->Context->{Recordnumber}++;
+                  if (!exists($self->Format->{charset}) ||
+                      lc($self->Format->{charset}) ne "utf-8"){
+                     if (utf8::is_utf8($d)){
+                     #   $d=~s/[\x{2013}\x{2022}]/?/g;
+                        $d=UTF8toLatin1($d);
+                     }
+                  }
+                  syswrite($fh,$d);
+               }
+               else{
+                  $self->Context->{CurrentLimit}++; # fix to handel isViewValid
+                                                    # denied of a record
+               }
+            }
          }
          if ($self->{NewRecord} || (!$self->Format->isRecordHandler())){
             $rec=undef;
@@ -254,7 +272,7 @@ sub WriteToStdout
       close($fh);
       return(); 
    }
-   if ($app->Context->{Linenumber}==0){
+   if ($app->Context->{Recordnumber}==0){
       print $self->Format->getEmpty(HttpHeader=>$param{HttpHeader});
       close(TMP);
       close($fh);
@@ -297,6 +315,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
    }
 
    $self->getParent->Context->{Linenumber}=0;
+   $self->getParent->Context->{Recordnumber}=0;
    $self->Format->{fieldobjects}=[];
    $self->Format->{fieldkeys}={};
    my @baseview=$app->getFieldObjsByView([$app->getCurrentView()]);
@@ -340,7 +359,8 @@ sub WriteToScalar    # ToDo: viewgroups implementation
                }
                my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
                             \@recordview,$fieldbase,
-                            $app->Context->{Linenumber},$msg); 
+                            $app->Context->{Recordnumber},$msg); 
+               $self->getParent->Context->{Recordnumber}++;
                if (!exists($self->Format->{charset}) ||
                    lc($self->Format->{charset}) ne "utf-8"){
                   if (utf8::is_utf8($d)){
@@ -377,7 +397,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
       close($fh);
       return($msg); 
    }
-   if ($app->Context->{Linenumber}==0){
+   if ($app->Context->{Recordnumber}==0){
       close(TMP);
       close($fh);
       return("");
