@@ -34,8 +34,10 @@ select
    FlexSystem.ISVM,
    FlexSystem.ISVMHOSTMISSING,
    FlexSystem.INSTANCECLOUDID,
+   FlexSystem.REALCOMPUTERNAME,
+   lower(FlexSystem.REALCOMPUTERNAME) LW_REALCOMPUTERNAME,
    lower(FlexSystem.INSTANCECLOUDID) LW_INSTANCECLOUDID,
-   ' ' SYSTEMW5BASEID
+   FlexSystem.W5BASEID SYSTEMW5BASEID
 from dbo.customDarwinExportDevice@flexerap FlexSystem;
 
 CREATE INDEX "FLEXERA_system_id1"
@@ -48,6 +50,10 @@ CREATE INDEX "FLEXERA_system_id4"
    ON "mview_FLEXERA_system"(systeminvhosttype) online;
 CREATE INDEX "FLEXERA_system_id5"
    ON "mview_FLEXERA_system"(lw_instancecloudid) online;
+CREATE INDEX "FLEXERA_system_id6"
+   ON "mview_FLEXERA_system"(realcomputername) online;
+CREATE INDEX "FLEXERA_system_id7"
+   ON "mview_FLEXERA_system"(lw_realcomputername) online;
 
 -- drop materialized view "mview_FLEXERA_system2w5system";
 create materialized view "mview_FLEXERA_system2w5system"
@@ -60,11 +66,16 @@ select distinct
    system.id w5baseid
 from "mview_FLEXERA_system" FlexSystem
    join "itil::system" system on 
-      FlexSystem.lw_systemname=system.name and
+      FlexSystem.lw_realcomputername=system.name and
          not system.srcsys in ('AWS')
       or (system.srcid like
           FlexSystem.lw_instancecloudid||'@%@%' and
-          system.srcsys='AWS');
+          system.srcsys='AWS')
+where FlexSystem.DeviceStatus='ACTIVE';
+
+CREATE INDEX "FLEXERA_system2w5system_id1"
+   ON "mview_FLEXERA_system2w5system"(FLEXERADEVICEID) online;
+
 grant select on "mview_FLEXERA_system2w5system" to W5I;
 create or replace synonym W5I.FLEXERA_system2w5system for "mview_FLEXERA_system2w5system";
 
