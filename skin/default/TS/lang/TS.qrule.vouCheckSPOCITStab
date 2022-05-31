@@ -1,0 +1,5 @@
+'TS::qrule::vouCheckSPOCITStab'=>{
+de=>'Prüfung der Rollenvergabe "SPOC IT Stability"',
+en=>'Check role assignment "SPOC IT Stability"'
+},
+'missing role assignment SPOC IT Stability in contacts'=>{de=>'fehlende Rollenzuordnung SPOC IT Stability in den Kontakten'},
