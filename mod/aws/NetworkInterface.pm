@@ -259,9 +259,12 @@ sub DataCollector
                                                     "aws::VPC");
             $vo->SetFilter({idpath=>$vpc});
             my ($vpcrec,$msg)=$vo->getOnlyFirst(qw(id subnets));
-            $vpcpath{$vpc}=$vpcrec;
+            if (defined($vpcrec)){
+               $vpcpath{$vpc}=$vpcrec;
+            }
          }
       }
+
       foreach my $rec (@result){
          if ($rec->{vpcidpath} ne "" &&
              exists($vpcpath{$rec->{vpcidpath}}) &&
@@ -279,8 +282,6 @@ sub DataCollector
             }
          }
       }
-
-
 
    }
    catch {

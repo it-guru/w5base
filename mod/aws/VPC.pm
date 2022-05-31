@@ -175,7 +175,9 @@ sub DataCollector
    catch {
       my $eclass=blessed($_);
       if ($eclass eq "Paws::Exception"){
-         push(@errStack,"(".$_->code.") :".$_->message);
+         if ($_->code ne "InvalidVpcID.NotFound"){
+            push(@errStack,"(".$_->code.") :".$_->message);
+         }
       }
       else{
          push(@errStack,$_);
