@@ -104,6 +104,13 @@ sub DataCollector
 
    my $Authorization=$self->getVRealizeAuthorizationToken();
 
+   if (!defined($Authorization)){
+      if (!$self->LastMsg()){
+         $self->LastMsg(ERROR,"unknown getVRealizeAuthorizationToken problem");
+      }
+      return(undef);
+   }
+
    my ($dbclass,$requesttoken)=$self->decodeFilter2Query4vRealize(
       "projects","id",
       $filterset

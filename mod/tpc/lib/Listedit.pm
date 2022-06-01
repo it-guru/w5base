@@ -120,18 +120,25 @@ sub getVRealizeAuthorizationToken
 
             if ($code eq "400"){  # 400 logon Fehler
                if ($content=~m/Invalid username or password/i){
-                  $self->LastMsg(ERROR,"invalid username or password - ".
+                  $self->SilentLastMsg(ERROR,"invalid username or password - ".
                                        "authentication refused");
                }
-               return([],$code);
+               return(undef,$code);
             }
            # msg(ERROR,$reqtrace);
            # $self->LastMsg(ERROR,"unexpected data TPC project response");
             return(undef);
          }
       );
+      if (!defined($pred)){
+         if (!$self->LastMsg()){
+            $self->SilentLastMsg(ERROR,"unknown problem while preaccess_token");
+         }
+         return(undef);
+      }
       if (ref($pred) ne "HASH"){
-         die("Request for preaccess_token failed");
+         $self->SilentLastMsg(ERROR,"Request for preaccess_token failed");
+         return(undef);
       }
       my $refresh_token=$pred->{refresh_token};
       if ($refresh_token ne ""){
@@ -521,10 +528,8 @@ sub Ping
    }
    if (!$self->LastMsg()){
       if ($errors){
-         my $gc=globalContext();  # and errors are silent transfered to LastMsg
-         $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
          foreach my $emsg (split(/[\n\r]+/,$errors)){
-            push(@{$gc->{LastMsg}},$emsg);
+            $self->SilentLastMsg(ERROR,$emsg);
          }
       }
    }
