@@ -415,13 +415,11 @@ sub isWriteValid
    return(undef);
 }
 
-
-sub FinishWrite
+sub doRenumComps
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
 
    my $op=$self->Clone();
    my $businessserviceid=effVal($oldrec,$newrec,"businessserviceid");
@@ -468,14 +466,29 @@ sub FinishWrite
          msg(INFO,"renum lnkbscom $bk");
       }
    }
-
-
-
 #print STDERR Dumper(\@l);
 #print STDERR Dumper(\@u);
+}
 
 
+sub FinishDelete
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $bak=$self->SUPER::FinishDelete($oldrec);
 
+   $self->doRenumComps($oldrec,undef);
+   return($bak);
+}
+
+sub FinishWrite
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+
+   $self->doRenumComps($oldrec,$newrec);
    return($bak);
 }
 
