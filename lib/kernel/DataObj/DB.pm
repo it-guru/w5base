@@ -716,10 +716,8 @@ sub Ping
    }
    # ... so STDERR outputs from this method are redirected to $errors
    if ($errors){
-      my $gc=globalContext();  # and errors are silent transfered to LastMsg
-      $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
       foreach my $emsg (split(/[\n\r]+/,$errors)){
-         push(@{$gc->{LastMsg}},$emsg);
+         $self->SilentLastMsg(ERROR,$emsg);
       }
    }
 
