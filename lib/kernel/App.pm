@@ -1220,6 +1220,35 @@ sub LastMsg
 
 
 
+sub SilentLastMsg
+{
+   my $self=shift;
+   my $type=shift;
+   my $format=shift;
+   my @p=@_;
+   my $gc=globalContext();
+   my $caller=caller();
+
+   $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
+   if (defined($type)){
+      if ($type eq ""){
+         $gc->{LastMsg}=[];
+      }
+      else{
+         push(@{$gc->{LastMsg}},
+              sprintf($type.": ".$self->T($format,$caller)),@p);
+      }
+   }
+   else{
+      if (wantarray()){
+         return(@{$gc->{LastMsg}});
+      }
+   }
+   return($#{$gc->{LastMsg}}+1);
+}
+
+
+
 sub getSkinFile
 {
    my $self=shift;
