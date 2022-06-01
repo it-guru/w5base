@@ -144,7 +144,7 @@
 'itu.cfm'=>{de=>'Config/Report',en=>'Config/Report'},
 'itu.mon'=>{de=>'Monitoring',en=>'Monitoring'},
 'itu.sec'=>{de=>'Security/Auditing',en=>'Security/Auditing'},
-'bsm'=>{de=>'Business Services',en=>'Business Services'},
+'bsm'=>{de=>'Prozesse&Services',en=>'Prozesses&Services'},
 'bsm.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'bsm.bp.lnkbs'=>{de=>'Verkn. BusinessService',en=>'Link BusinessService'},
 'bsm.bs'=>{de=>'Business Service',en=>'Business service'},
