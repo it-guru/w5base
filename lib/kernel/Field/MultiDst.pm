@@ -100,7 +100,6 @@ sub RawValue
 
    $self->initialize() if (!$self->{isinitialized});
    if (defined($current)){
-printf STDERR ("fifi MultiDst RawValue=%s\n",Dumper($current));
       my $dsttyp;
       my $dsttypobj=$self->getParent->getField($self->{dsttypfield});
       if (defined($dsttypobj)){
