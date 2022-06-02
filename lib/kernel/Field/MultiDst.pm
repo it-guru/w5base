@@ -100,6 +100,7 @@ sub RawValue
 
    $self->initialize() if (!$self->{isinitialized});
    if (defined($current)){
+printf STDERR ("fifi MultiDst RawValue=%s\n",Dumper($current));
       my $dsttyp;
       my $dsttypobj=$self->getParent->getField($self->{dsttypfield});
       if (defined($dsttypobj)){
@@ -325,12 +326,12 @@ sub FormatedDetail
    my $mode=shift;
    my $d;
    my $fromquery=Query->Param("Formated_".$self->Name());
-   if ($fromquery ne ""){
-      $d=$fromquery;
-   }
-   else{
+  # if ($fromquery ne ""){
+  #    $d=$fromquery;
+  # }
+  # else{
       $d=$self->RawValue($current);
-   }
+  # }
    my $name=$self->Name();
    my $app=$self->getParent();
    $self->initialize() if (!$self->{isinitialized});
