@@ -330,7 +330,6 @@ sub ProcessLine
             if (ref($weblinkto) eq "CODE"){
                ($weblinkto,$weblinkon)=&{$weblinkto}($field,$data,$rec);
             }
-
             if (defined($weblinkto) && 
                 defined($weblinkon) && $weblinkto ne "none"){
 
@@ -342,9 +341,9 @@ sub ProcessLine
                      $weblinkto=$p->findNearestTargetDataObj(
                                 $weblinkto,"sublist:".$self->getParent->Self);
                   }
-                  if (!ref($self->{weblinkto})){ # 
-                     $field->{weblinkto}=$weblinkto;
-                  }
+            #      if (!ref($self->{weblinkto})){ # 
+            #         $field->{weblinkto}=$weblinkto;
+            #      }
                }
                if (ref($weblinkto) eq "SCALAR"){
                   $weblinkto=$$weblinkto; # dereferenzieren von weblinkto
