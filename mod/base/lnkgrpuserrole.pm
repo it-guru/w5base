@@ -142,6 +142,9 @@ sub new
                                  'RSKPManager2',               # ITIL role
                                  'RSKManager',                 # ITIL role
                                  'RSKCoord',                   # ITIL role
+                                 'BCManager',        # BusinessCapability Mgr
+                                 'PCManager',        # ProcessChain Mgr
+                                 'BPManager',        # BusinessProcess Mgr
                                  'RITDemandMgr',               # IT role
                                  'RAdmin',                     # W5Base role
                                  'RDataAdmin',                 # W5Base role
