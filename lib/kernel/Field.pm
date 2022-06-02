@@ -456,7 +456,8 @@ sub FieldCache
 {
    my $self=shift;
    my $pc=$self->getParent->Context;
-   my $fieldkey="FieldCache:".$self->Name();
+   my $p=$self->getParent();
+   my $fieldkey="FieldCache:".$p->Self()."::".$self->Name();
    $pc->{$fieldkey}={} if (!defined($pc->{$fieldkey}));
    return($pc->{$fieldkey});
 }
