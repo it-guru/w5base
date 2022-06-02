@@ -326,12 +326,7 @@ sub FormatedDetail
    my $mode=shift;
    my $d;
    my $fromquery=Query->Param("Formated_".$self->Name());
-  # if ($fromquery ne ""){
-  #    $d=$fromquery;
-  # }
-  # else{
-      $d=$self->RawValue($current);
-  # }
+   $d=$self->RawValue($current);
    my $name=$self->Name();
    my $app=$self->getParent();
    $self->initialize() if (!$self->{isinitialized});
