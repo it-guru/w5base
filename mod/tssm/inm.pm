@@ -574,7 +574,8 @@ sub getSqlFrom
 
    my $from=TABpref."probsummarym1 ".SELpref."probsummarym1 ".
          "left outer join ".TABpref."device2m1 ".SELpref."device2m1 ".
-         "on ".SELpref."probsummarym1.tsi_ci_name=".SELpref."device2m1.ci_name";
+         "on ".SELpref."probsummarym1.tsi_ci_name=".SELpref."device2m1.ci_name".
+         " and ".SELpref."device2m1.ci_name<>'N/A'";
    return($from);
 }
 

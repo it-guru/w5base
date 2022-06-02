@@ -44,7 +44,8 @@ sub new
       new kernel::Field::Interface(
                 name          =>'contactkey',
                 label         =>'Contact Key',
-                dataobjattr   =>SELpref.'chkuser.contact_name'),
+                dataobjattr   =>"REGEXP_REPLACE(".SELpref.
+                                "chkuser.contact_name,'[^A-Z,0-9_]','')"),
 
       new kernel::Field::TextDrop( name       =>'groupname',
                                    label      =>'Groupname',
