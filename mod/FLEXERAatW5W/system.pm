@@ -245,7 +245,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_systemdevicestatus"))){
-     Query->Param("search_systemdevicestatus"=>"!IGNORED");
+     Query->Param("search_systemdevicestatus"=>"ACTIVE");
    }
 }
 
