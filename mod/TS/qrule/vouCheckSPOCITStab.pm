@@ -13,7 +13,7 @@ NONE
 
 =head3 HINTS
 
-Check assigmentent of "SPOC IT Stability" in a virutal org unit.
+Check assignment of "SPOC IT Stability" in a virtual org unit.
 
 [de:]
 
