@@ -386,17 +386,13 @@ sub preProcessFilter
                }
                else{
                   foreach my $v (keys(%tr)){
-printf STDERR ("1qchk=%s v=$v\n",$qchk) if ($self->{name} eq "nature");
                      if ($v=~m/$qchk/i || $tr{$v} eq $chk){
-printf STDERR ("2qchk=%s v=$v\n",$qchk) if ($self->{name} eq "nature");
                         if (!grep(/^$tr{$v}$/,@newsearch)){
-printf STDERR ("3qchk=%s v=$v\n",$qchk) if ($self->{name} eq "nature");
                            push(@newsearch,$tr{$v});
                         }
                      }
                   }
                   foreach my $v (keys(%raw)){
-printf STDERR ("qchk=%s raw=$v\n",$qchk) if ($self->{name} eq "nature");
                      if ($v=~m/$qchk/i || $tr{$v} eq $chk){
                         if (!grep(/^$raw{$v}$/,@newsearch)){
                            push(@newsearch,$raw{$v});
@@ -407,7 +403,6 @@ printf STDERR ("qchk=%s raw=$v\n",$qchk) if ($self->{name} eq "nature");
             }
          }
       }
-printf STDERR ("newsearch=%s\n",Dumper(\@newsearch)) if ($self->{name} eq "nature");
       $hflt->{$field}=\@newsearch;
    }
    my ($subchanged,$suberr)=$self->SUPER::preProcessFilter($hflt);
