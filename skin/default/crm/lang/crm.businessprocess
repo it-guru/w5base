@@ -50,5 +50,4 @@
 'RLIManager'=>{ de=>'Lizenzprozessmanager', en=>'License-Manager'},
 'RLIManager2'=>{ de=>'Lizenzprozessmanager Vertreter', en=>'License-Manager deputy'},
 'invalid shortname specified'=>{de=>'ungültige Kurzbezeichnung'},
-
-
+'activation not allowed - please contact a business process manager'=>{de=>'Aktivierung nicht erlaubt - bitte konktaktieren Sie einen Geschäftsprozess-Manager'},

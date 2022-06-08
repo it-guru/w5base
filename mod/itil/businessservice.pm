@@ -2049,6 +2049,47 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+
+   if (defined($oldrec) && effChanged($oldrec,$newrec,"nature")){
+      $self->LastMsg(ERROR,"nature is not allowed to change");
+      return(0);
+   }
+   my $nature=effVal($oldrec,$newrec,"nature");
+
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      if (effChanged($oldrec,$newrec,"cistatusid")){
+         my $newcistatusid=effVal($oldrec,$newrec,"cistatusid");
+         if ($newcistatusid==3 ||
+             $newcistatusid==4 ){
+            my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
+            my $isok=0;
+            if ($nature eq "BC"){   # BusinessCap activation check
+               if ($mandatorid!=0 &&
+                  $self->IsMemberOf($mandatorid,["BCManager"], "down")){
+                  $isok=1;
+               }
+            }
+            elsif ($nature eq "PC"){ # ProcessChain activation check
+               if ($mandatorid!=0 &&
+                  $self->IsMemberOf($mandatorid,["PCManager"], "down")){
+                  $isok=1;
+               }
+               
+            }
+            else{
+               $isok=1;
+            }
+            if (!$isok){
+               $self->LastMsg(ERROR,"activation not allowed - ".
+                                    "please contact a suitable manager");
+               return(0);
+            }
+         }
+      }
+   }
+   
+
+
    if (!defined($oldrec) && defined($newrec->{name})
        && ($newrec->{name}=~m/^\s*$/)){
       $self->LastMsg(ERROR,"invalid service name specified");
@@ -2065,6 +2106,7 @@ sub Validate
       return(0);
    }
    my $applid=effVal($oldrec,$newrec,"applid");
+
 
    if ($applid eq ""){
       if (effVal($oldrec,$newrec,"nature") eq ""){
@@ -2155,6 +2197,23 @@ sub isWriteValid
                   $wr++;
                   last;
                }
+            }
+         }
+         if (!$wr){
+            my $nature=$rec->{"nature"};
+            my $mandatorid=$rec->{"mandatorid"};
+            if ($nature eq "BC"){   # BusinessCap activation check
+               if ($mandatorid!=0 &&
+                  $self->IsMemberOf($mandatorid,["BCManager"], "down")){
+                  $wr=1;
+               }
+            }
+            elsif ($nature eq "PC"){ # ProcessChain activation check
+               if ($mandatorid!=0 &&
+                  $self->IsMemberOf($mandatorid,["PCManager"], "down")){
+                  $wr=1;
+               }
+               
             }
          }
          if (!$wr){

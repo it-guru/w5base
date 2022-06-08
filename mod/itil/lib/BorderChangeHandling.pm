@@ -66,14 +66,6 @@ sub BorderChangeHandling
                {
                   obj1id=>\$id,
                   objtype=>\'itil::appl',
-               },
-               {
-                  obj2id=>\$id,
-                  objtype=>\'itil::appl',
-               },
-               {
-                  obj3id=>\$id,
-                  objtype=>\'itil::appl',
                }
             ]);
             my %bsid=();
@@ -90,14 +82,6 @@ sub BorderChangeHandling
             $lnk->SetFilter([
                {
                   obj1id=>\$id,
-                  objtype=>\'itil::businessservice',
-               },
-               {
-                  obj2id=>\$id,
-                  objtype=>\'itil::businessservice',
-               },
-               {
-                  obj3id=>\$id,
                   objtype=>\'itil::businessservice',
                }
             ]);

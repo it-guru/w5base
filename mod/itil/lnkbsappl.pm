@@ -70,8 +70,6 @@ sub getSqlFrom
           defined($filter[0]->{applid})){
          $precision0="and l0.appl='$filter[0]->{applid}' "; 
          $precision1="and l1.obj1id='$filter[0]->{applid}' "; 
-         $precision2="and l2.obj2id='$filter[0]->{applid}' "; 
-         $precision3="and l3.obj3id='$filter[0]->{applid}' "; 
       }
    }
  
@@ -85,32 +83,6 @@ sub getSqlFrom
          "select l1.businessservice,a1.id,a1.name ".
             "from lnkbscomp l1,appl a1 ".
             "where l1.objtype='itil::appl' and l1.obj1id=a1.id ".$precision1.
-      "union ".
-         "select l2.businessservice,a2.id,a2.name ".
-            "from lnkbscomp l2,appl a2 ".
-            "where l2.objtype='itil::appl' and l2.obj2id=a2.id ".$precision2.
-      "union ".
-         "select l3.businessservice,a3.id,a3.name ".
-            "from lnkbscomp l3,appl a3 ".
-            "where l3.objtype='itil::appl' and l3.obj3id=a3.id ".$precision3.
-      #union
-      #   select l11.businessservice,a11.name
-      #      from lnkbscomp l11,lnkapplsystem las11,appl a11
-      #      where l11.objtype='itil::system'
-      #         and l11.obj1id=las11.system
-      #         and las11.appl=a11.id and a11.cistatus<=4
-      #union 
-      #   select l12.businessservice,a12.name 
-      #      from lnkbscomp l12,lnkapplsystem las12,appl a12 
-      #      where l12.objtype='itil::system' 
-      #         and l12.obj2id=las12.system
-      #         and las12.appl=a12.id and a12.cistatus<=4
-      #union 
-      #   select l13.businessservice,a13.name 
-      #      from lnkbscomp l13,lnkapplsystem las13,appl a13 
-      #      where l13.objtype='itil::system' 
-      #         and l13.obj3id=las13.system
-      #         and las13.appl=a13.id and a13.cistatus<=4
       ") a");
 }
 
