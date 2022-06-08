@@ -47,6 +47,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'mandatorid',
+                selectfix     =>1,
                 dataobjattr   =>'businessprocess.mandator'),
 
      new kernel::Field::TextDrop(
@@ -59,6 +60,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'customerid',
+                selectfix     =>1,
                 dataobjattr   =>'businessprocess.customer'),
    
       new kernel::Field::Text(
@@ -383,9 +385,6 @@ sub new
    $self->{workflowlink}={ workflowkey=>[id=>'affectedbusinessprocessid']
                          };
    $self->{use_distinct}=1;
-   $self->{CI_Handling}={uniquename=>"shortname",
-                         activator=>["admin","w5base.crm.businessprocess"],
-                         uniquesize=>100};
    return($self);
 }
 
@@ -504,7 +503,6 @@ sub HandleInfoAboSubscribe
 
 
 
-
 sub Validate
 {
    my $self=shift;
@@ -516,9 +514,30 @@ sub Validate
       $self->LastMsg(ERROR,"invalid shortname specified");
       return(0);
    }
-   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
-      return(0);
+
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      if (effChanged($oldrec,$newrec,"cistatusid")){
+         my $newcistatusid=effVal($oldrec,$newrec,"cistatusid");
+         if ($newcistatusid==3 ||
+             $newcistatusid==4 ){
+            my $mandatorid=effVal($oldrec,$newrec,"mandatorid");
+            my $isok=0;
+            if ($mandatorid!=0 &&
+               $self->IsMemberOf($mandatorid,["BPManager"], "down")){
+               $isok=1;
+            }
+            if (!$isok){
+               $self->LastMsg(ERROR,"activation not allowed - ".
+                                  "please contact a business process manager");
+               return(0);
+            }
+         }
+      }
    }
+
+
+
+
 
    ########################################################################
    # standard security handling
@@ -566,12 +585,8 @@ sub Validate
          $newrec->{shortname}=$n2;
       }
    }
-
-
-
-
-
-   return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"shortname"));
+   return(0) if (!$self->HandleCIStatusModification(
+                             $oldrec,$newrec,"shortname"));
 
    return(1);
 }
@@ -655,14 +670,19 @@ sub isWriteValid
    my @admedit;
    @admedit=("procroles") if ($self->IsMemberOf("admin"));
 
-   return("default","procdesc","misc","acl",@admedit) if (!defined($rec) ||
-                         ($rec->{cistatusid}<3 && $rec->{creator}==$userid) ||
-                         $self->IsMemberOf($self->{CI_Handling}->{activator}));
+   #return("default","procdesc","misc","acl",@admedit) if (!defined($rec) ||
+   #                      ($rec->{cistatusid}<3 && $rec->{creator}==$userid) );
+
+   my $customerid=$rec->{customerid};
+   my $mandatorid=$rec->{mandatorid};
+
+   return("default","procdesc","misc","acl") if (!defined($rec));
 
    my @databossedit=("default","procdesc","misc","acl",@admedit);
 
    if ($rec->{databossid}==$userid ||
-       $self->IsMemberOf($self->{CI_Handling}->{activator})){
+       ($mandatorid!=0 && $self->IsMemberOf($mandatorid,["BPManager"],"down"))||
+       ($customerid!=0 && $self->IsMemberOf($customerid,["BPManager"],"down"))){
       return($self->expandByDataACL($rec->{mandatorid},@databossedit));
    }
 
@@ -688,12 +708,15 @@ sub isWriteValid
 }
 
 
+
+
+
 sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
    return("header","default","procdesc") if (!defined($rec));
-   my @l=qw(default procdesc subproc acl misc source);
+   my @l=qw(default procdesc subproc acl misc source history);
    push(@l,"procroles") if ($self->IsMemberOf("admin"));
 
    return(@l);

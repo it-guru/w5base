@@ -43,17 +43,6 @@ sub Initialize
 }
 
 
-sub SecureValidate
-{
-   my $self=shift;
-   my $oldrec=shift;
-   my $newrec=shift;
-
-   return(0) if (!$self->ProtectObject($oldrec,$newrec,$self->{adminsgroups}));
-   return(1);
-}
-
-
 
 sub FinishWrite
 {
@@ -82,7 +71,7 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
 
-   return("default") if ( $self->IsMemberOf($self->{adminsgroups}));
+   #return("default") if ( $self->IsMemberOf($self->{adminsgroups}));
 
    my $effowner=defined($rec) ? $rec->{owner} : undef;
    my $userid=$self->getCurrentUserId();
