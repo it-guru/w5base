@@ -1,0 +1,7 @@
+'leanix::BusinessCapability'=>{
+  en=>'LeanIX: BusinessCapability',
+  de=>'LeanIX: BusinessCapability'
+},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'fieldgroup.relations'=>{de=>'Relationen',en=>'Relations'},
+'State'=>{de=>'Status'},

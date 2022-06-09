@@ -1,0 +1,7 @@
+'leanix::Application'=>{
+  de=>'LeanIX: architekturelle Anwendung',
+  en=>'LeanIX: architecturel application'
+},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'fieldgroup.relations'=>{de=>'Relationen',en=>'Relations'},
+'State'=>{de=>'Status'},
