@@ -274,8 +274,14 @@ sub CheckFilter
                my $conjunction; # AND relation
 
                my @dataval=($rec->{$k});
-               @dataval=@{$rec->{$k}} if (ref($rec->{$k}) eq "ARRAY");
-               @dataval=values(%{$rec->{$k}}) if (ref($rec->{$k}) eq "HASH");
+               if (ref($rec->{$k}) eq "ARRAY"){
+                  @dataval=@{$rec->{$k}};
+                  @dataval=(undef) if ($#dataval==-1);
+               }
+               if (ref($rec->{$k}) eq "HASH"){
+                  @dataval=values(%{$rec->{$k}});
+                  @dataval=(undef) if ($#dataval==-1);
+               }
 
                for (my $i=0;$i<=$#words;$i++) {
                   my $chk=$words[$i];
