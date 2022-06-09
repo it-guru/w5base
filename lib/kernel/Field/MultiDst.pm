@@ -112,8 +112,14 @@ sub RawValue
             $targetid=$targetidobj->RawValue($current,$mode);
          }
          if (defined($targetid) && $targetid ne ""){
+            my $attr=$self->{dataobjattr};
+            $attr=$self->{name} if ($attr eq "");
+            if (exists($current->{$attr})){
+               return($current->{$attr});
+            }
             foreach my $dststruct (@{$self->{dstobj}}){
                next if ($dststruct->{name} ne $dsttyp);
+
                my $idobj=$dststruct->{obj}->IdField();
                $dststruct->{obj}->ResetFilter();
                $dststruct->{obj}->SetFilter({$idobj->Name()=>\$targetid});
