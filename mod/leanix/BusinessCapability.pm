@@ -73,7 +73,9 @@ sub new
                 group         =>'relations',
                 vjointo       =>\'leanix::Relation',
                 vjoinon       =>['id'=>'fromId'],
-                vjoindisp     =>['displayNameTo','typeToFS','type']),
+                vjoindisp     =>['displayNameTo','typeToFS','type'],
+                vjoininhash   =>['displayNameTo','typeToFS','type','id',
+                                 'toId','dataobjToFS']),
 
       new kernel::Field::MDate(
             name              =>'mdate',
