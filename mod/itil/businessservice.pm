@@ -134,7 +134,7 @@ sub new
                 },
                 jsonchanged   =>\&getOnChangedScript,
                 jsoninit      =>\&getOnChangedScript,
-                value         =>['','SVC','PC','BC'],
+                value         =>['','SVC','PRC','BC'],
                 dataobjattr   =>"$worktable.nature"),
 
       new kernel::Field::Interface(
@@ -1400,7 +1400,7 @@ if (s && dboss && appl ){
    else{
       appl.disabled=true;
    }
-   if (v=="SVC" || v=='PC' || v=='BC'){
+   if (v=="SVC" || v=='PRC' || v=='BC'){
       dboss.disabled=false;
    }
    else{
