@@ -627,7 +627,6 @@ sub new
                 depend        =>['allparentids','id'],
                 searchable    =>0,
                 vjointo       =>'itil::businessservice',
-                allowcleanup  =>1,
                 vjoinon       =>['allparentids'=>'id'],
                 vjoindisp     =>['fullname'],
                 vjoininhash   =>['id','fullname']),
@@ -2130,9 +2129,7 @@ sub Validate
          }
       }
       if (effVal($oldrec,$newrec,"mandatorid") eq ""){
-         print STDERR Dumper($newrec);
          my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write");
-         print STDERR (Dumper(\@mandators));
       }
    }
    else{

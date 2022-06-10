@@ -311,9 +311,11 @@ sub Validate
       }
    }
 
-   if (!$self->checkWriteValid($oldrec,$newrec)){
-      $self->LastMsg(ERROR,"no access");
-      return(0);
+   if ($self->isDataInputFromUserFrontend()){
+      if (!$self->checkWriteValid($oldrec,$newrec)){
+         $self->LastMsg(ERROR,"no access");
+         return(0);
+      }
    }
    if (effVal($oldrec,$newrec,"obj1id") eq ""){
       $self->LastMsg(ERROR,"no primary element specified");
@@ -463,7 +465,7 @@ sub doRenumComps
              variant=>$u[$c]->{variant},
              lnkpos=>$u[$c]->{lnkpos}
          },{id=>\$u[$c]->{id}});
-         msg(INFO,"renum lnkbscom $bk");
+         #msg(INFO,"renum lnkbscom $bk");
       }
    }
 #print STDERR Dumper(\@l);
