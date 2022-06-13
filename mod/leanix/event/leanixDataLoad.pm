@@ -29,10 +29,15 @@ sub leanixDataLoad
 {
    my $self=shift;
 
+   my $funcmgrid="11785813690001";  # Carsten
+   my $databossid="15214605570000"; # Natalia
+   my $mandatorid="200";
+
    my %db;
    my $lixbc=getModuleObject($self->Config,"leanix::BusinessCapability");
    my $lixap=getModuleObject($self->Config,"leanix::Application");
-   $lixbc->SetFilter({tags=>'BCC:* PRK:*',displayName=>'*ES-0001*'});
+   #$lixbc->SetFilter({tags=>'BCC:* PRK:*',displayName=>'*ES-0001*'});
+   $lixbc->SetFilter({tags=>'BCC:* PRK:*'});
    my @lixbcView=qw(name displayName id relations tags);
    my @l=$lixbc->getHashList(@lixbcView);
 
@@ -113,7 +118,9 @@ sub leanixDataLoad
    #
    foreach my $fsobj (qw(leanix::Application leanix::BusinessCapability)){
       foreach my $fsrec (values(%{$db{$fsobj}})){
-         my @tags=@{$fsrec->{tags}};
+         my $tags=$fsrec->{tags};
+         $tags=[$tags] if (ref($tags) ne "ARRAY");
+         my @tags=@{$tags};
          my @prc=grep(/^PRK:/,@tags);
          foreach my $prc (@prc){
             my $uuid=UUID::Tiny::create_uuid_as_string(UUID_V5,$prc);
@@ -136,77 +143,201 @@ sub leanixDataLoad
       }
    }
 
+
+   # create shortnames
+   foreach my $fsobj (qw(leanix::BusinessCapability)){
+      foreach my $fsrec (values(%{$db{$fsobj}})){
+         my $namestr=$fsrec->{name};
+         if (my ($sh,$n)=$namestr=~m/^([A-Z]+-[0-9]+)+\s*[-]{0,1}\s*(.*)$/){
+            $fsrec->{name}=$n;
+            $fsrec->{shortname}=$sh;
+         }
+      }
+   }
+
+
+
+
    
+   #
+   # Create BusinessServices in W5Base/Darwin
+   #
+   if (1){
+      my $w5bs=getModuleObject($self->Config,"itil::businessservice");
+      my $srcsys='leanix::BusinessCapability';
+      foreach my $lixrec (values(%{$db{$srcsys}})){
+         my $srcid=$lixrec->{id};
+         $w5bs->ResetFilter();
+         $w5bs->SetFilter({srcid=>\$srcid,srcsys=>\$srcsys});
+         my ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+         my $w5id;
+         if (!defined($w5rec)){
+            my $bk=$w5bs->ValidatedInsertRecord({
+               nature=>'BC',
+               shortname=>$lixrec->{shortname},
+               description=>$lixrec->{description},
+               name=>$lixrec->{name},
+               cistatusid=>'4',
+               databossid=>$databossid,
+               mandatorid=>$mandatorid,
+               funcmgrid=>$funcmgrid,
+               srcsys=>$srcsys,
+               srcid=>$srcid
+            });
+            if ($bk){
+               $w5bs->ResetFilter();
+               $w5bs->SetFilter({id=>\$bk});
+               ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+            }
+         }
+         $w5id=$w5rec->{id};
+         my %upd;
+         if ($w5rec->{cistatusid} ne "4"){
+            $upd{cistatusid}=4;
+         }
+         if ($w5rec->{mandatorid} eq ""){
+            $upd{mandatorid}=$mandatorid;
+         }
+         if ($w5rec->{databossid} eq ""){
+            $upd{databossid}=$databossid;
+         }
+         if ($w5rec->{funcmgrid} eq ""){
+            $upd{funcmgrid}=$funcmgrid;
+         }
+         if ($w5rec->{description} ne $lixrec->{description}){
+            $upd{description}=$lixrec->{description};
+         }
+         if (keys(%upd)){
+            $w5bs->ValidatedUpdateRecord($w5rec,\%upd,{id=>\$w5id});
+         }
+         $lixrec->{w5id}=$w5id;
+      }
+   }
+
    #
    # Create ProcessCains in W5Base/Darwin
    #
-   my $funcmgrid="11785813690001";
-   my $databossid="11785813690001";
-   my $mandatorid="200";
-   my $w5bs=getModuleObject($self->Config,"itil::businessservice");
-   my $w5bsc=getModuleObject($self->Config,"itil::lnkbscomp");
-   my $srcsys='leanix::ProcessChain';
-   foreach my $lixrec (values(%{$db{$srcsys}})){
-      my $srcid=$lixrec->{id};
-      $w5bs->ResetFilter();
-      $w5bs->SetFilter({srcid=>\$srcid,srcsys=>\$srcsys});
-      my ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
-      my $w5id;
-      if (!defined($w5rec)){
-         my $bk=$w5bs->ValidatedInsertRecord({
-            nature=>'PRC',
-            shortname=>$lixrec->{shortname},
-            name=>$lixrec->{name},
-            cistatusid=>'4',
-            databossid=>$databossid,
-            mandatorid=>$mandatorid,
-            funcmgrid=>$funcmgrid,
-            srcsys=>$srcsys,
-            srcid=>$srcid
-         });
-         if ($bk){
-            $w5bs->ResetFilter();
-            $w5bs->SetFilter({id=>\$bk});
-            ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+   if (1){
+      my $w5bs=getModuleObject($self->Config,"itil::businessservice");
+      my $srcsys='leanix::ProcessChain';
+      foreach my $lixrec (values(%{$db{$srcsys}})){
+         my $srcid=$lixrec->{id};
+         $w5bs->ResetFilter();
+         $w5bs->SetFilter({srcid=>\$srcid,srcsys=>\$srcsys});
+         my ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+         my $w5id;
+         if (!defined($w5rec)){
+            my $bk=$w5bs->ValidatedInsertRecord({
+               nature=>'PRC',
+               shortname=>$lixrec->{shortname},
+               description=>$lixrec->{description},
+               name=>$lixrec->{name},
+               cistatusid=>'4',
+               databossid=>$databossid,
+               mandatorid=>$mandatorid,
+               funcmgrid=>$funcmgrid,
+               srcsys=>$srcsys,
+               srcid=>$srcid
+            });
+            if ($bk){
+               $w5bs->ResetFilter();
+               $w5bs->SetFilter({id=>\$bk});
+               ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+            }
          }
+         $w5id=$w5rec->{id};
+         my %upd;
+         if ($w5rec->{cistatusid} ne "4"){
+            $upd{cistatusid}=4;
+         }
+         if ($w5rec->{description} ne $lixrec->{description}){
+            $upd{description}=$lixrec->{description};
+         }
+         if ($w5rec->{mandatorid} eq ""){
+            $upd{mandatorid}=$mandatorid;
+         }
+         if ($w5rec->{databossid} eq ""){
+            $upd{databossid}=$databossid;
+         }
+         if ($w5rec->{funcmgrid} eq ""){
+            $upd{funcmgrid}=$funcmgrid;
+         }
+         if (keys(%upd)){
+            $w5bs->ValidatedUpdateRecord($w5rec,\%upd,{id=>\$w5id});
+         }
+         $lixrec->{w5id}=$w5id;
       }
-      $w5id=$w5rec->{id};
-      my %upd;
-      if ($w5rec->{cistatusid} ne "4"){
-         $upd{cistatusid}=4;
-      }
-      if ($w5rec->{mandatorid} eq ""){
-         $upd{mandatorid}=$mandatorid;
-      }
-      if ($w5rec->{databossid} eq ""){
-         $upd{databossid}=$databossid;
-      }
-      if ($w5rec->{funcmgrid} eq ""){
-         $upd{funcmgrid}=$funcmgrid;
-      }
-      if (keys(%upd)){
-         $w5bs->ValidatedUpdateRecord($w5rec,\%upd,{id=>\$w5id});
-      }
-      my @currel=@{$w5rec->{servicecomp}};
-      foreach my $lixrel (@{$lixrec->{relations}}){
-         if ($lixrel->{dataobjToFS} eq "leanix::Application"){
-            if (ref($db{'leanix::Application'}->{$lixrel->{toId}}->{w5appl}) eq
-                "ARRAY"){
-               my @a=@{$db{'leanix::Application'}->{$lixrel->{toId}}->{w5appl}};
-               foreach my $a (@a){
-                  my $found=0;
-                  foreach my $currel (@currel){
-                     if ($currel->{objtype} eq "itil::appl" &&
-                         $currel->{obj1id} eq $a->{id}){
-                        $found++;
+   }
+
+   #
+   # Create ProcessCains Relations in W5Base/Darwin
+   #
+   if (1){
+      my $w5bs=getModuleObject($self->Config,"itil::businessservice");
+      my $w5bsc=getModuleObject($self->Config,"itil::lnkbscomp");
+      my $srcsys='leanix::ProcessChain';
+      foreach my $srcsys (qw(leanix::ProcessChain leanix::BusinessCapability)){
+         foreach my $lixrec (values(%{$db{$srcsys}})){
+            my $srcid=$lixrec->{id};
+            my $w5id=$lixrec->{w5id};
+            my $w5rec;
+       
+            if ($w5id ne ""){
+               $w5bs->ResetFilter();
+               $w5bs->SetFilter({id=>\$w5id});
+               ($w5rec)=$w5bs->getOnlyFirst(qw(name id relations));
+            }
+            my @currel=@{$w5rec->{servicecomp}};
+            foreach my $lixrel (@{$lixrec->{relations}}){
+               # ign relToParent relBusinessCapabilityToITComponent
+               if (!in_array($lixrel->{type},[
+                     qw(relBusinessCapabilityToProcess
+                        relBusinessCapabilityToApplication
+                        relToChild )])){
+                  next;
+               }
+               if ($lixrel->{dataobjToFS} eq "leanix::BusinessCapability"){
+                  my $lixBcRec=
+                       $db{'leanix::BusinessCapability'}->{$lixrel->{toId}};
+                  if ($lixBcRec->{w5id} ne ""){
+                     my $targetbsid=$lixBcRec->{w5id};
+                     my $found=0;
+                     foreach my $currel (@currel){
+                        if ($currel->{objtype} eq "itil::businessservice" &&
+                            $currel->{obj1id} eq $targetbsid){
+                           $found++;
+                        }
+                     }
+                     if (!$found){
+                        $w5bsc->ValidatedInsertRecord({
+                           businessserviceid=>$w5id,
+                           objtype=>'itil::businessservice', 
+                           obj1id=>$targetbsid
+                        });
                      }
                   }
-                  if (!$found){
-                     $w5bsc->ValidatedInsertRecord({
-                        businessserviceid=>$w5id,
-                        objtype=>'itil::appl', 
-                        obj1id=>$a->{id}
-                     });
+               }
+               if ($lixrel->{dataobjToFS} eq "leanix::Application"){
+                  my $lixApplRec=$db{'leanix::Application'}->{$lixrel->{toId}};
+                  if (ref($lixApplRec->{w5appl}) eq
+                      "ARRAY"){
+                     my @a=@{$lixApplRec->{w5appl}};
+                     foreach my $a (@a){
+                        my $found=0;
+                        foreach my $currel (@currel){
+                           if ($currel->{objtype} eq "itil::appl" &&
+                               $currel->{obj1id} eq $a->{id}){
+                              $found++;
+                           }
+                        }
+                        if (!$found){
+                           $w5bsc->ValidatedInsertRecord({
+                              businessserviceid=>$w5id,
+                              objtype=>'itil::appl', 
+                              obj1id=>$a->{id}
+                           });
+                        }
+                     }
                   }
                }
             }
