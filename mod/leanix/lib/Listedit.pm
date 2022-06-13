@@ -221,6 +221,7 @@ sub decodeFilter2Query4LeanIX
    }
    if (!$byId){
       $qparam{pageSize}="500";
+      $qparam{pageSize}="2000";
       $qparam{type}=$type;
    }
 

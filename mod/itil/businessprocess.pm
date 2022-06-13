@@ -39,7 +39,8 @@ sub new
                 vjointo       =>'itil::lnkbprocessbservice',
                 vjoinon       =>['id'=>'bprocessid'],
                 vjoindisp     =>['businessservice'],
-                vjoininhash   =>['businessservice']),
+                vjoininhash   =>['businessservice','businessserviceid',
+                                 'bservicecistatusid']),
    );
    $self->getField("pbusinessprocess")->{'vjointo'}='itil::businessprocess';
    $self->getField("pbusinessprocess")->{'weblinkto'}='itil::businessprocess';
