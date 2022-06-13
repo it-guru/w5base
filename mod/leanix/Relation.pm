@@ -81,6 +81,7 @@ sub new
             dst               =>[
                                 'leanix::BusinessCapability'=>'displayName',
                                 'leanix::Application'=>'displayName',
+                                'leanix::Process'=>'displayName',
                                 ],
             label             =>'displayNameTo',
             dsttypfield       =>'dataobjToFS',

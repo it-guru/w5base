@@ -36,6 +36,132 @@ sub leanixDataLoad
    my %db;
    my $lixbc=getModuleObject($self->Config,"leanix::BusinessCapability");
    my $lixap=getModuleObject($self->Config,"leanix::Application");
+   my $lixprc=getModuleObject($self->Config,"leanix::Process");
+
+   $lixprc->SetFilter({tags=>'"Framework: BCC"'});
+   my @l=$lixprc->getHashList(qw(name displayName id relations tags));
+
+   foreach my $bprec (@l){
+      my $id=$bprec->{id};
+      $db{'leanix::Process'}->{$id}=$bprec;
+   }
+
+   foreach my $id (sort(keys(%{$db{'leanix::Process'}}))){
+      my $bprec=$db{'leanix::Process'}->{$id};
+      #printf STDERR ("id:%s\n",$bprec->{id});
+      #printf STDERR ("   name=%s\n",$bprec->{name});
+      $bprec->{shortname}="";
+      $bprec->{customer}="DTAG";
+      if (my ($s,$n)=$bprec->{name}=~m/^(.*?)\s*:\s*(.*)$/){
+         $bprec->{shortname}=$s;
+         $bprec->{name}=$n;
+      }
+      if ($bprec->{shortname}=~m/^DTS/){
+         $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DTS";
+      }
+      elsif ($bprec->{shortname}=~m/^DTA/){
+         $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DT_A_GmbH";
+      }
+      elsif ($bprec->{shortname}=~m/^DTT/){
+         $bprec->{customer}="DTAG.GHQ.VD.TDG.T.DTT";
+      }
+      elsif ($bprec->{shortname}=~m/^GKV/){
+         $bprec->{customer}="DTAG.GHQ.VD.TDG.GK.DT_GKV";
+      }
+      elsif ($bprec->{shortname}=~m/^PVG/){
+         $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DT_PVG";
+      }
+      elsif ($bprec->{shortname}=~m/^TDG_F/){
+         $bprec->{customer}="DTAG.GHQ.VD.TDG";
+      }
+      #printf STDERR ("   name=%s\n",$bprec->{name});
+      #printf STDERR ("   shortname=%s\n",$bprec->{shortname});
+      #printf STDERR ("   customer=%s\n",$bprec->{customer});
+   }
+
+
+   #
+   # Create BusinessProcesses in W5Base/Darwin
+   #
+   if (1){
+      my $w5bp=getModuleObject($self->Config,"itil::businessprocess");
+      my $srcsys='leanix::Process';
+      foreach my $lixrec (values(%{$db{$srcsys}})){
+         my $srcid=$lixrec->{id};
+         next if ($lixrec->{shortname} eq "");
+         $w5bp->ResetFilter();
+         $w5bp->SetFilter({srcid=>\$srcid,srcsys=>\$srcsys});
+         my ($w5rec)=$w5bp->getOnlyFirst(qw(ALL));
+         my $w5id;
+         if (!defined($w5id)){
+            $w5bp->ResetFilter();
+            $w5bp->SetFilter({customer=>\$lixrec->{customer},
+                              shortname=>\$lixrec->{shortname}});
+            ($w5rec)=$w5bp->getOnlyFirst(qw(ALL));
+         }
+         if (!defined($w5rec)){
+            my $bk=$w5bp->ValidatedInsertRecord({
+               shortname=>$lixrec->{shortname},
+               customer=>$lixrec->{customer},
+               name=>$lixrec->{name},
+               cistatusid=>'4',
+               importance=>'3',
+               databossid=>$databossid,
+               processownerid=>$funcmgrid,
+               processowner2id=>$databossid,
+               mandatorid=>$mandatorid,
+               nature=>'PROCESS',
+               srcsys=>$srcsys,
+               srcid=>$srcid
+            });
+            if ($bk){
+               $w5bp->ResetFilter();
+               $w5bp->SetFilter({id=>\$bk});
+               ($w5rec)=$w5bp->getOnlyFirst(qw(ALL));
+            }
+            else{
+               printf STDERR ("fail:%s\n",Dumper($lixrec));
+            }
+         }
+         $w5id=$w5rec->{id};
+         my %upd;
+         if ($w5rec->{cistatusid} ne "4"){
+            $upd{cistatusid}=4;
+         }
+         if ($w5rec->{importance} eq ""){
+            $upd{importance}="3";
+         }
+         if ($w5rec->{mandatorid} eq ""){
+            $upd{mandatorid}=$mandatorid;
+         }
+         if ($w5rec->{srcsys} ne $srcsys){
+            $upd{srcsys}=$srcsys;
+         }
+         if ($w5rec->{srcid} ne $srcid){
+            $upd{srcid}=$srcid;
+         }
+         if ($w5rec->{databossid} eq ""){
+            $upd{databossid}=$databossid;
+         }
+         if ($w5rec->{processownerid} eq ""){
+            $upd{processownerid}=$funcmgrid;
+         }
+         if ($w5rec->{processowner2id} eq ""){
+            $upd{processowner2id}=$databossid;
+         }
+         if ($w5rec->{description} ne $lixrec->{description}){
+            $upd{description}=$lixrec->{description};
+         }
+         if (keys(%upd)){
+            $w5bp->ValidatedUpdateRecord($w5rec,\%upd,{id=>\$w5id});
+         }
+         $lixrec->{w5id}=$w5id;
+      }
+   }
+
+
+
+
    #$lixbc->SetFilter({tags=>'BCC:* PRK:*',displayName=>'*ES-0001*'});
    $lixbc->SetFilter({tags=>'BCC:* PRK:*'});
    my @lixbcView=qw(name displayName id relations tags);
@@ -85,7 +211,9 @@ sub leanixDataLoad
    }
    foreach my $obj (keys(%db)){
       if (!in_array($obj,[qw(leanix::Application 
-                             leanix::BusinessCapability)])){
+                             leanix::BusinessCapability
+                             leanix::Process
+          )])){
          delete($db{$obj});
       }
    }
@@ -272,10 +400,9 @@ sub leanixDataLoad
    #
    # Create ProcessCains Relations in W5Base/Darwin
    #
-   if (1){
+   if (0){
       my $w5bs=getModuleObject($self->Config,"itil::businessservice");
       my $w5bsc=getModuleObject($self->Config,"itil::lnkbscomp");
-      my $srcsys='leanix::ProcessChain';
       foreach my $srcsys (qw(leanix::ProcessChain leanix::BusinessCapability)){
          foreach my $lixrec (values(%{$db{$srcsys}})){
             my $srcid=$lixrec->{id};
@@ -290,9 +417,9 @@ sub leanixDataLoad
             my @currel=@{$w5rec->{servicecomp}};
             foreach my $lixrel (@{$lixrec->{relations}}){
                # ign relToParent relBusinessCapabilityToITComponent
+               #     relBusinessCapabilityToProcess
                if (!in_array($lixrel->{type},[
-                     qw(relBusinessCapabilityToProcess
-                        relBusinessCapabilityToApplication
+                     qw( relBusinessCapabilityToApplication
                         relToChild )])){
                   next;
                }
@@ -346,6 +473,61 @@ sub leanixDataLoad
    }
 
 
+   #
+   # Create BusinessProcess Relations in W5Base/Darwin
+   #
+   if (1){
+      my $w5bp=getModuleObject($self->Config,"itil::businessprocess");
+      my $w5bpc=getModuleObject($self->Config,"itil::lnkbprocessbservice");
+      foreach my $srcsys (qw(leanix::Process)){
+         foreach my $lixrec (values(%{$db{$srcsys}})){
+            my $srcid=$lixrec->{id};
+            my $w5id=$lixrec->{w5id};
+            my $w5rec;
+       
+            if ($w5id ne ""){
+               $w5bp->ResetFilter();
+               $w5bp->SetFilter({id=>\$w5id});
+               ($w5rec)=$w5bp->getOnlyFirst(qw(name id businessservices));
+            }
+            next if (!defined($w5rec));
+
+            my @currel=@{$w5rec->{businessservices}};
+            foreach my $lixrel (@{$lixrec->{relations}}){
+               # ign relToParent relBusinessCapabilityToITComponent
+               #     relBusinessCapabilityToProcess
+
+
+
+#               if (!in_array($lixrel->{type},[
+#                     qw( relBusinessCapabilityToApplication
+#                        relToChild )])){
+#                  next;
+#               }
+               if ($lixrel->{dataobjToFS} eq "leanix::BusinessCapability"){
+                  my $lixBcRec=
+                       $db{'leanix::BusinessCapability'}->{$lixrel->{toId}};
+                  if ($lixBcRec->{w5id} ne ""){
+                     my $targetbsid=$lixBcRec->{w5id};
+printf STDERR ("lixrel=%s\n",Dumper($lixrel));
+                     my $found=0;
+                     foreach my $currel (@currel){
+                        if ($currel->{businessserviceid} eq $targetbsid){
+                           $found++;
+                        }
+                     }
+                     if (!$found){
+                        $w5bpc->ValidatedInsertRecord({
+                           bprocessid=>$w5id,
+                           businessserviceid=>$targetbsid,
+                        });
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
 
 
 
@@ -361,6 +543,8 @@ sub leanixDataLoad
                    scalar(keys(%{$db{'leanix::BusinessCapability'}})));
    printf STDERR ("n leanix::ProcessChain=%d\n",
                    scalar(keys(%{$db{'leanix::ProcessChain'}})));
+   printf STDERR ("n leanix::Process=%d\n",
+                   scalar(keys(%{$db{'leanix::Process'}})));
 
 
 

@@ -682,7 +682,8 @@ sub isWriteValid
 
    if ($rec->{databossid}==$userid ||
        ($mandatorid!=0 && $self->IsMemberOf($mandatorid,["BPManager"],"down"))||
-       ($customerid!=0 && $self->IsMemberOf($customerid,["BPManager"],"down"))){
+       ($customerid!=0 && $self->IsMemberOf($customerid,["BPManager"],"down"))||
+       $self->IsMemberOf("admin")){
       return($self->expandByDataACL($rec->{mandatorid},@databossedit));
    }
 
