@@ -1,0 +1,7 @@
+'leanix::Process'=>{
+  de=>'LeanIX: Geschäftsprozess',
+  en=>'LeanIX: Businessprocess'
+},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'fieldgroup.relations'=>{de=>'Relationen',en=>'Relations'},
+'description'=>{de=>'Beschreibung'},

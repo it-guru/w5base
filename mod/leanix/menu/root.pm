@@ -41,6 +41,15 @@ sub Init
    $self->RegisterObj("itu.cfm.leanix.bc",
                       "leanix::BusinessCapability",
                       defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cfm.leanix.appl",
+                      "leanix::Application",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cfm.leanix.prc",
+                      "leanix::Process",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 
