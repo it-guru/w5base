@@ -66,6 +66,10 @@ sub new
             searchable        =>'0',
             label             =>'State'),
 
+      new kernel::Field::Textarea(     
+            name              =>'description',
+            label             =>'description'),
+
       new kernel::Field::SubList(
                 name          =>'relations',
                 label         =>'Relations',
@@ -186,6 +190,7 @@ sub DataCollector
                id=>$dRec->{id},
                displayName=>$dRec->{displayName},
                name=>$dRec->{name},
+               description=>$dRec->{description},
                type=>$dRec->{type},
                tags=>\@tags,
                lxState=>$dRec->{lxState},
