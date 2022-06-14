@@ -45,8 +45,16 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(
                 name          =>'id',
-                label         =>'InterfaceComponentID',
+                label         =>'LinkID',
+                group         =>'source',
                 dataobjattr   =>'lnkbscomp.id'),
+
+      new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'Fullname',
+                onRawValue    =>\&mkFullname,
+                depend        =>['uppername','name']),
+
 
       new kernel::Field::Link(
                 name          =>'businessserviceid',
@@ -56,7 +64,7 @@ sub new
 
       new kernel::Field::TextDrop(
                 name          =>'uppername',
-                label         =>'upper Businessservice name',
+                label         =>'Businessservice name',
                 readonly      =>sub{
                    my $self=shift;
                    my $rec=shift;
@@ -99,6 +107,14 @@ sub new
                          push(@lst,$cc,$cc);
                       }
                    }
+                   else{
+                      foreach(my $cc=1;$cc<=999;$cc++){
+                         push(@lst,$cc,$cc);
+                      }
+                      push(@lst,"","");
+                      push(@lst,"E",999);
+                      return(@lst);
+                   }
                    return(@lst);
                 },
                 dataobjattr   =>'lnkbscomp.varikey'),
@@ -135,6 +151,13 @@ sub new
                          push(@lst,$cc,$cc);
                       }
                       push(@lst,999,"E");
+                   }
+                   else{
+                      foreach(my $cc=1;$cc<=999;$cc++){
+                         push(@lst,$cc,$cc);
+                      }
+                      push(@lst,"","");
+                      return(@lst);
                    }
                    return(@lst);
                 },
@@ -208,9 +231,10 @@ sub new
                 label         =>'Comments',
                 dataobjattr   =>'lnkbscomp.comments'),
 
-      new kernel::Field::Textarea(
+      new kernel::Field::Text(
                 name          =>'xcomments',
                 label         =>'Comments shorted',
+                htmldetail    =>'0',
                 uploadable    =>0,
                 readonly      =>1,
                 depend        =>['comments'],
@@ -267,12 +291,14 @@ sub new
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
+                readonly      =>1,
                 label         =>'primary sync key',
                 dataobjattr   =>"lnkbscomp.modifydate"),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
+                readonly      =>1,
                 label         =>'secondary sync key',
                 dataobjattr   =>"lpad(lnkbscomp.id,35,'0')"),
 
@@ -294,6 +320,28 @@ sub new
    return($self);
 }
 
+sub mkFullname
+{
+   my $self=shift;
+   my $current=shift;
+   my $app=$self->getParent();
+
+   my $uppernamefld=$app->getField("uppername",$current);
+   my $namefld=$app->getField("name",$current);
+
+
+   my $fullname="";
+   my $uppername=$uppernamefld->RawValue($current);
+   my $name=$namefld->RawValue($current);
+   $fullname.=$uppername;
+   $fullname.=" -> " if ($fullname ne "" && $name ne "");
+   $fullname.=$name;
+
+   return($fullname);
+}
+
+
+
 
 sub Validate
 {
@@ -306,10 +354,11 @@ sub Validate
       if ($newrec->{variant} eq ""){
          $newrec->{variant}=1;
       }
-      if ($newrec->{pos} eq ""){
-         $newrec->{pos}=999;
+      if ($newrec->{lnkpos} eq ""){
+         $newrec->{lnkpos}=999;
       }
    }
+
 
    if ($self->isDataInputFromUserFrontend()){
       if (!$self->checkWriteValid($oldrec,$newrec)){
@@ -526,6 +575,16 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("itil::lnkbscomp");
 }
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 
 

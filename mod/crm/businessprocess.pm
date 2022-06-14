@@ -673,10 +673,10 @@ sub isWriteValid
    #return("default","procdesc","misc","acl",@admedit) if (!defined($rec) ||
    #                      ($rec->{cistatusid}<3 && $rec->{creator}==$userid) );
 
+   return("default","procdesc","misc","acl") if (!defined($rec));
+
    my $customerid=$rec->{customerid};
    my $mandatorid=$rec->{mandatorid};
-
-   return("default","procdesc","misc","acl") if (!defined($rec));
 
    my @databossedit=("default","procdesc","misc","acl",@admedit);
 
