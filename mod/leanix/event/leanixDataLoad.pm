@@ -31,6 +31,7 @@ sub leanixDataLoad
 
    my $funcmgrid="11785813690001";  # Carsten
    my $databossid="15214605570000"; # Natalia
+   $databossid="11785813690001"; # doch alles auf Carsten
    my $bccgroup="16539985210003"; # DTAG.GHQ.VTI.DTIT.Hub.BCO.BCC
    my $mandatorid="200";
 
@@ -346,6 +347,8 @@ sub leanixDataLoad
          my $nature="BC";
          $nature="PRC" if ($srcsys eq "leanix::ProcessChain");
          foreach my $lixrec (values(%{$db{$srcsys}})){
+            # skip BC:BCC Enabling Services -> not create in Darwin
+            next if ($lixrec->{id} eq "02e1cc01-c862-481b-a7b8-afa02108f027");
             my $srcid=$lixrec->{id};
             $w5bs->ResetFilter();
             $w5bs->SetFilter({srcid=>\$srcid,srcsys=>\$srcsys});
@@ -433,55 +436,63 @@ sub leanixDataLoad
                $w5bs->SetFilter({id=>\$w5id});
                ($w5rec)=$w5bs->getOnlyFirst(qw(name id relations));
             }
-            my @currel=@{$w5rec->{servicecomp}};
-            foreach my $lixrel (@{$lixrec->{relations}}){
-               # ign relToParent relBusinessCapabilityToITComponent
-               #     relBusinessCapabilityToProcess
-               if (!in_array($lixrel->{type},[
-                     qw( relBusinessCapabilityToApplication
-                        relToChild )])){
-                  next;
-               }
-               if ($lixrel->{dataobjToFS} eq "leanix::BusinessCapability"){
-                  my $lixBcRec=
-                       $db{'leanix::BusinessCapability'}->{$lixrel->{toId}};
-                  if ($lixBcRec->{w5id} ne ""){
-                     my $targetbsid=$lixBcRec->{w5id};
-                     my $found=0;
-                     foreach my $currel (@currel){
-                        if ($currel->{objtype} eq "itil::businessservice" &&
-                            $currel->{obj1id} eq $targetbsid){
-                           $found++;
-                        }
-                     }
-                     if (!$found){
-                        $w5bsc->ValidatedInsertRecord({
-                           businessserviceid=>$w5id,
-                           objtype=>'itil::businessservice', 
-                           obj1id=>$targetbsid
-                        });
-                     }
+            if (defined($w5rec)){
+               my @currel=@{$w5rec->{servicecomp}};
+               foreach my $lixrel (@{$lixrec->{relations}}){
+                  # ign relToParent relBusinessCapabilityToITComponent
+                  #     relBusinessCapabilityToProcess
+                  if (!in_array($lixrel->{type},[
+                        qw( relBusinessCapabilityToApplication
+                           relToChild )])){
+                     next;
                   }
-               }
-               if ($lixrel->{dataobjToFS} eq "leanix::Application"){
-                  my $lixApplRec=$db{'leanix::Application'}->{$lixrel->{toId}};
-                  if (ref($lixApplRec->{w5appl}) eq
-                      "ARRAY"){
-                     my @a=@{$lixApplRec->{w5appl}};
-                     foreach my $a (@a){
+                  #
+                  # Skip realtions from ProcessChain to BusinessCapability
+                  # - this informations are not correct in LeanIX 
+                  #
+                  if ($lixrel->{dataobjToFS} eq "leanix::BusinessCapability" &&
+                      $srcsys eq "leanix::BusinessCapability"){
+                     my $lixBcRec=
+                          $db{'leanix::BusinessCapability'}->{$lixrel->{toId}};
+                     if ($lixBcRec->{w5id} ne ""){
+                        my $targetbsid=$lixBcRec->{w5id};
                         my $found=0;
                         foreach my $currel (@currel){
-                           if ($currel->{objtype} eq "itil::appl" &&
-                               $currel->{obj1id} eq $a->{id}){
+                           if ($currel->{objtype} eq "itil::businessservice" &&
+                               $currel->{obj1id} eq $targetbsid){
                               $found++;
                            }
                         }
                         if (!$found){
                            $w5bsc->ValidatedInsertRecord({
                               businessserviceid=>$w5id,
-                              objtype=>'itil::appl', 
-                              obj1id=>$a->{id}
+                              objtype=>'itil::businessservice', 
+                              obj1id=>$targetbsid
                            });
+                        }
+                     }
+                  }
+                  if ($lixrel->{dataobjToFS} eq "leanix::Application"){
+                     my $lixApplRec=
+                        $db{'leanix::Application'}->{$lixrel->{toId}};
+                     if (ref($lixApplRec->{w5appl}) eq
+                         "ARRAY"){
+                        my @a=@{$lixApplRec->{w5appl}};
+                        foreach my $a (@a){
+                           my $found=0;
+                           foreach my $currel (@currel){
+                              if ($currel->{objtype} eq "itil::appl" &&
+                                  $currel->{obj1id} eq $a->{id}){
+                                 $found++;
+                              }
+                           }
+                           if (!$found){
+                              $w5bsc->ValidatedInsertRecord({
+                                 businessserviceid=>$w5id,
+                                 objtype=>'itil::appl', 
+                                 obj1id=>$a->{id}
+                              });
+                           }
                         }
                      }
                   }
