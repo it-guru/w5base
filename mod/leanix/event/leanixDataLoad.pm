@@ -31,6 +31,7 @@ sub leanixDataLoad
 
    my $funcmgrid="11785813690001";  # Carsten
    my $databossid="15214605570000"; # Natalia
+   my $bccgroup="16539985210003"; # DTAG.GHQ.VTI.DTIT.Hub.BCO.BCC
    my $mandatorid="200";
 
    my %db;
@@ -85,6 +86,7 @@ sub leanixDataLoad
    #
    if (1){
       my $w5bp=getModuleObject($self->Config,"itil::businessprocess");
+      my $w5bpacl=getModuleObject($self->Config,"crm::businessprocessacl");
       my $srcsys='leanix::Process';
       foreach my $lixrec (values(%{$db{$srcsys}})){
          my $srcid=$lixrec->{id};
@@ -156,6 +158,25 @@ sub leanixDataLoad
             $w5bp->ValidatedUpdateRecord($w5rec,\%upd,{id=>\$w5id});
          }
          $lixrec->{w5id}=$w5id;
+         # assign rights
+         my $acls=$w5rec->{acls};
+         $acls=[] if (ref($acls) ne "ARRAY");
+         my $foundgrp=0;
+         foreach my $acl (@$acls){
+            if ($acl->{acltarget} eq "base::grp" &&
+                $acl->{acltargetid} eq $bccgroup){
+               $foundgrp++;
+            }
+         }
+         if (!$foundgrp){
+            $w5bpacl->ValidatedInsertRecord({
+               aclparentobj=>'crm::businessprocess',
+               acltarget=>'base::grp',
+               acltargetid=>$bccgroup,
+               aclmode=>'write',
+               refid=>$w5id 
+            });
+         }
       }
    }
 
@@ -292,108 +313,79 @@ sub leanixDataLoad
    #
    if (1){
       my $w5bs=getModuleObject($self->Config,"itil::businessservice");
+      my $lnkc=getModuleObject($self->Config,"base::lnkcontact");
       my $srcsys='leanix::BusinessCapability';
-      foreach my $lixrec (values(%{$db{$srcsys}})){
-         my $srcid=$lixrec->{id};
-         $w5bs->ResetFilter();
-         $w5bs->SetFilter({srcid=>\$srcid,srcsys=>\$srcsys});
-         my ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
-         my $w5id;
-         if (!defined($w5rec)){
-            my $bk=$w5bs->ValidatedInsertRecord({
-               nature=>'BC',
-               shortname=>$lixrec->{shortname},
-               description=>$lixrec->{description},
-               name=>$lixrec->{name},
-               cistatusid=>'4',
-               databossid=>$databossid,
-               mandatorid=>$mandatorid,
-               funcmgrid=>$funcmgrid,
-               srcsys=>$srcsys,
-               srcid=>$srcid
-            });
-            if ($bk){
-               $w5bs->ResetFilter();
-               $w5bs->SetFilter({id=>\$bk});
-               ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+      foreach my $srcsys (qw(leanix::BusinessCapability leanix::ProcessChain)){
+         my $nature="BC";
+         $nature="PRC" if ($srcsys eq "leanix::ProcessChain");
+         foreach my $lixrec (values(%{$db{$srcsys}})){
+            my $srcid=$lixrec->{id};
+            $w5bs->ResetFilter();
+            $w5bs->SetFilter({srcid=>\$srcid,srcsys=>\$srcsys});
+            my ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+            my $w5id;
+            if (!defined($w5rec)){
+               my $bk=$w5bs->ValidatedInsertRecord({
+                  nature=>$nature,
+                  shortname=>$lixrec->{shortname},
+                  description=>$lixrec->{description},
+                  name=>$lixrec->{name},
+                  cistatusid=>'4',
+                  databossid=>$databossid,
+                  mandatorid=>$mandatorid,
+                  funcmgrid=>$funcmgrid,
+                  srcsys=>$srcsys,
+                  srcid=>$srcid
+               });
+               if ($bk){
+                  $w5bs->ResetFilter();
+                  $w5bs->SetFilter({id=>\$bk});
+                  ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+               }
             }
-         }
-         $w5id=$w5rec->{id};
-         my %upd;
-         if ($w5rec->{cistatusid} ne "4"){
-            $upd{cistatusid}=4;
-         }
-         if ($w5rec->{mandatorid} eq ""){
-            $upd{mandatorid}=$mandatorid;
-         }
-         if ($w5rec->{databossid} eq ""){
-            $upd{databossid}=$databossid;
-         }
-         if ($w5rec->{funcmgrid} eq ""){
-            $upd{funcmgrid}=$funcmgrid;
-         }
-         if ($w5rec->{description} ne $lixrec->{description}){
-            $upd{description}=$lixrec->{description};
-         }
-         if (keys(%upd)){
-            $w5bs->ValidatedUpdateRecord($w5rec,\%upd,{id=>\$w5id});
-         }
-         $lixrec->{w5id}=$w5id;
-      }
-   }
+            $w5id=$w5rec->{id};
+            my %upd;
+            if ($w5rec->{cistatusid} ne "4"){
+               $upd{cistatusid}=4;
+            }
+            if ($w5rec->{mandatorid} eq ""){
+               $upd{mandatorid}=$mandatorid;
+            }
+            if ($w5rec->{databossid} eq ""){
+               $upd{databossid}=$databossid;
+            }
+            if ($w5rec->{funcmgrid} eq ""){
+               $upd{funcmgrid}=$funcmgrid;
+            }
+            if ($w5rec->{description} ne $lixrec->{description}){
+               $upd{description}=$lixrec->{description};
+            }
+            if (keys(%upd)){
+               $w5bs->ValidatedUpdateRecord($w5rec,\%upd,{id=>\$w5id});
+            }
+            $lixrec->{w5id}=$w5id;
 
-   #
-   # Create ProcessCains in W5Base/Darwin
-   #
-   if (1){
-      my $w5bs=getModuleObject($self->Config,"itil::businessservice");
-      my $srcsys='leanix::ProcessChain';
-      foreach my $lixrec (values(%{$db{$srcsys}})){
-         my $srcid=$lixrec->{id};
-         $w5bs->ResetFilter();
-         $w5bs->SetFilter({srcid=>\$srcid,srcsys=>\$srcsys});
-         my ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
-         my $w5id;
-         if (!defined($w5rec)){
-            my $bk=$w5bs->ValidatedInsertRecord({
-               nature=>'PRC',
-               shortname=>$lixrec->{shortname},
-               description=>$lixrec->{description},
-               name=>$lixrec->{name},
-               cistatusid=>'4',
-               databossid=>$databossid,
-               mandatorid=>$mandatorid,
-               funcmgrid=>$funcmgrid,
-               srcsys=>$srcsys,
-               srcid=>$srcid
-            });
-            if ($bk){
-               $w5bs->ResetFilter();
-               $w5bs->SetFilter({id=>\$bk});
-               ($w5rec)=$w5bs->getOnlyFirst(qw(ALL));
+            # add contact
+            my $contacts=$w5rec->{contacts};
+            $contacts=[] if (ref($contacts) ne "ARRAY");
+
+            my $foundgrp=0;
+            foreach my $contact (@$contacts){
+               if ($contact->{target} eq "base::grp" &&
+                   $contact->{targetid} eq $bccgroup){
+                  $foundgrp++;
+               }
+            }
+            if (!$foundgrp){
+               $lnkc->ValidatedInsertRecord({
+                  parentobj=>'itil::businessservice',
+                  target=>'base::grp',
+                  targetid=>$bccgroup,
+                  roles=>['write'],
+                  refid=>$w5id 
+               });
             }
          }
-         $w5id=$w5rec->{id};
-         my %upd;
-         if ($w5rec->{cistatusid} ne "4"){
-            $upd{cistatusid}=4;
-         }
-         if ($w5rec->{description} ne $lixrec->{description}){
-            $upd{description}=$lixrec->{description};
-         }
-         if ($w5rec->{mandatorid} eq ""){
-            $upd{mandatorid}=$mandatorid;
-         }
-         if ($w5rec->{databossid} eq ""){
-            $upd{databossid}=$databossid;
-         }
-         if ($w5rec->{funcmgrid} eq ""){
-            $upd{funcmgrid}=$funcmgrid;
-         }
-         if (keys(%upd)){
-            $w5bs->ValidatedUpdateRecord($w5rec,\%upd,{id=>\$w5id});
-         }
-         $lixrec->{w5id}=$w5id;
       }
    }
 
@@ -509,7 +501,7 @@ sub leanixDataLoad
                        $db{'leanix::BusinessCapability'}->{$lixrel->{toId}};
                   if ($lixBcRec->{w5id} ne ""){
                      my $targetbsid=$lixBcRec->{w5id};
-printf STDERR ("lixrel=%s\n",Dumper($lixrel));
+#printf STDERR ("lixrel=%s\n",Dumper($lixrel));
                      my $found=0;
                      foreach my $currel (@currel){
                         if ($currel->{businessserviceid} eq $targetbsid){
