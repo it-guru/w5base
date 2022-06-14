@@ -39,45 +39,50 @@ sub leanixDataLoad
    my $lixap=getModuleObject($self->Config,"leanix::Application");
    my $lixprc=getModuleObject($self->Config,"leanix::Process");
 
-   $lixprc->SetFilter({tags=>'"Framework: BCC"'});
-   my @l=$lixprc->getHashList(qw(name displayName id relations tags));
+   if (1){
+      $lixprc->SetFilter({tags=>'"Framework: BCC"'});
+      my @l=$lixprc->getHashList(qw(name displayName id relations tags));
+      if ($#l==-1){
+         return({exitcode=>1,exitmsg=>'unexpected result from LeanIX'});
+      }
 
-   foreach my $bprec (@l){
-      my $id=$bprec->{id};
-      $db{'leanix::Process'}->{$id}=$bprec;
-   }
+      foreach my $bprec (@l){
+         my $id=$bprec->{id};
+         $db{'leanix::Process'}->{$id}=$bprec;
+      }
 
-   foreach my $id (sort(keys(%{$db{'leanix::Process'}}))){
-      my $bprec=$db{'leanix::Process'}->{$id};
-      #printf STDERR ("id:%s\n",$bprec->{id});
-      #printf STDERR ("   name=%s\n",$bprec->{name});
-      $bprec->{shortname}="";
-      $bprec->{customer}="DTAG";
-      if (my ($s,$n)=$bprec->{name}=~m/^(.*?)\s*:\s*(.*)$/){
-         $bprec->{shortname}=$s;
-         $bprec->{name}=$n;
+      foreach my $id (sort(keys(%{$db{'leanix::Process'}}))){
+         my $bprec=$db{'leanix::Process'}->{$id};
+         #printf STDERR ("id:%s\n",$bprec->{id});
+         #printf STDERR ("   name=%s\n",$bprec->{name});
+         $bprec->{shortname}="";
+         $bprec->{customer}="DTAG";
+         if (my ($s,$n)=$bprec->{name}=~m/^(.*?)\s*:\s*(.*)$/){
+            $bprec->{shortname}=$s;
+            $bprec->{name}=$n;
+         }
+         if ($bprec->{shortname}=~m/^DTS/){
+            $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DTS";
+         }
+         elsif ($bprec->{shortname}=~m/^DTA/){
+            $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DT_A_GmbH";
+         }
+         elsif ($bprec->{shortname}=~m/^DTT/){
+            $bprec->{customer}="DTAG.GHQ.VD.TDG.T.DTT";
+         }
+         elsif ($bprec->{shortname}=~m/^GKV/){
+            $bprec->{customer}="DTAG.GHQ.VD.TDG.GK.DT_GKV";
+         }
+         elsif ($bprec->{shortname}=~m/^PVG/){
+            $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DT_PVG";
+         }
+         elsif ($bprec->{shortname}=~m/^TDG_F/){
+            $bprec->{customer}="DTAG.GHQ.VD.TDG";
+         }
+         #printf STDERR ("   name=%s\n",$bprec->{name});
+         #printf STDERR ("   shortname=%s\n",$bprec->{shortname});
+         #printf STDERR ("   customer=%s\n",$bprec->{customer});
       }
-      if ($bprec->{shortname}=~m/^DTS/){
-         $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DTS";
-      }
-      elsif ($bprec->{shortname}=~m/^DTA/){
-         $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DT_A_GmbH";
-      }
-      elsif ($bprec->{shortname}=~m/^DTT/){
-         $bprec->{customer}="DTAG.GHQ.VD.TDG.T.DTT";
-      }
-      elsif ($bprec->{shortname}=~m/^GKV/){
-         $bprec->{customer}="DTAG.GHQ.VD.TDG.GK.DT_GKV";
-      }
-      elsif ($bprec->{shortname}=~m/^PVG/){
-         $bprec->{customer}="DTAG.GHQ.VD.TDG.TService.DT_PVG";
-      }
-      elsif ($bprec->{shortname}=~m/^TDG_F/){
-         $bprec->{customer}="DTAG.GHQ.VD.TDG";
-      }
-      #printf STDERR ("   name=%s\n",$bprec->{name});
-      #printf STDERR ("   shortname=%s\n",$bprec->{shortname});
-      #printf STDERR ("   customer=%s\n",$bprec->{customer});
    }
 
 
@@ -183,11 +188,17 @@ sub leanixDataLoad
 
 
 
+   msg(INFO,"start load of  BCs");
    #$lixbc->SetFilter({tags=>'BCC:* PRK:*',displayName=>'*ES-0001*'});
-   $lixbc->SetFilter({tags=>'BCC:* PRK:*'});
+   #$lixbc->SetFilter({tags=>'*BCC* *PRK*'});
+   #$lixbc->SetFilter({id=>'10e88161-f938-45f7-b6a4-d95dfe0ba42d'});
+   $lixbc->SetFilter({tags=>'"Framework: BCC" PRK:*'});
    my @lixbcView=qw(name displayName id relations tags);
    my @l=$lixbc->getHashList(@lixbcView);
 
+   if ($#l==-1){
+      return({exitcode=>1,exitmsg=>'unexpected result from BC LeanIX call'});
+   }
    foreach my $rec (@l){
       my $rel=$rec->{relations};
       foreach my $relrec (@$rel){
@@ -199,22 +210,37 @@ sub leanixDataLoad
    foreach my $rec (@l){
       $db{$lixbc->Self()}->{$rec->{id}}=$rec;
    }
+   msg(INFO,"end load of BCs n=".($#l+1));
+
+
 
    my $fillup=0;
+   my $filluploop=0;
    do{
       $fillup=0;
+      $filluploop++;
+      msg(INFO,"fillup $filluploop BusinessCapability start");
       foreach my $id (sort(keys(%{$db{'leanix::BusinessCapability'}}))){
          if (!defined($db{'leanix::BusinessCapability'}->{$id})){
             $lixbc->SetFilter({id=>\$id});
-            my ($brec)=$lixbc->getOnlyFirst(@lixbcView);
-            if (defined($brec)){
-               $db{'leanix::BusinessCapability'}->{$id}=$brec;
-               $fillup++;
+            my ($rec)=$lixbc->getOnlyFirst(@lixbcView);
+            if (defined($rec)){
+               $db{'leanix::BusinessCapability'}->{$id}=$rec;
+               my $rel=$rec->{relations};
+               foreach my $relrec (@$rel){
+                  if (!exists($db{$relrec->{dataobjToFS}}->{$relrec->{toId}})){
+                     $db{$relrec->{dataobjToFS}}->{$relrec->{toId}}=undef;
+                     msg(INFO,"fillup: ".$relrec->{dataobjToFS}."  id:".
+                              $relrec->{toId});                     
+                     $fillup++;
+                  }
+               }
+               
             }
          }
       }
-   }while($fillup==0);
-
+   }while($fillup!=0);
+   msg(INFO,"fillup BusinessCapability end");
 
 
    #
@@ -392,7 +418,7 @@ sub leanixDataLoad
    #
    # Create ProcessCains Relations in W5Base/Darwin
    #
-   if (0){
+   if (1){
       my $w5bs=getModuleObject($self->Config,"itil::businessservice");
       my $w5bsc=getModuleObject($self->Config,"itil::lnkbscomp");
       foreach my $srcsys (qw(leanix::ProcessChain leanix::BusinessCapability)){
