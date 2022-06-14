@@ -313,6 +313,7 @@ sub leanixDataLoad
             push(@{$db{'leanix::ProcessChain'}->{$uuid}->{relations}},{
                dataobjToFS=>$fsobj,
                toId=>$fsrec->{id},
+               type=>'relToChild'
             });
          }
       }
