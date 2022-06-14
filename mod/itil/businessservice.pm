@@ -69,7 +69,6 @@ sub new
       new kernel::Field::Text(
                 name          =>'name',
                 sqlorder      =>'desc',
-                searchable    =>0,
                 label         =>'Name',
                 explore       =>200,
                 dataobjattr   =>"$worktable.name"),
@@ -78,7 +77,6 @@ sub new
                 name          =>'shortname',
                 sqlorder      =>'desc',
                 htmldetail    =>'NotEmptyOrEdit',
-                searchable    =>0,
                 htmleditwidth =>'50px',
                 explore       =>300,
                 label         =>'Short name',
@@ -2068,7 +2066,7 @@ sub Validate
                   $isok=1;
                }
             }
-            elsif ($nature eq "PC"){ # ProcessChain activation check
+            elsif ($nature eq "PRC"){ # ProcessChain activation check
                if ($mandatorid!=0 &&
                   $self->IsMemberOf($mandatorid,["PCManager"], "down")){
                   $isok=1;

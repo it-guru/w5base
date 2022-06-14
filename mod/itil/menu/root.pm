@@ -750,9 +750,14 @@ sub Init
    
    $self->RegisterObj("bsm.bp",
                       "itil::businessprocess",
-                      func=>'MainWithNew',
+                      func=>'Main',
                       prio=>1000);
    
+   $self->RegisterObj("bsm.bp.new",
+                      "itil::businessprocess",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("bsm.bp.lnkbs",
                       "itil::lnkbprocessbservice",
                       func=>'Main',
@@ -760,12 +765,21 @@ sub Init
    
    $self->RegisterObj("bsm.bs",
                       "itil::businessservice",
-                      func=>'MainWithNew',
+                      func=>'Main',
                       prio=>1000);
    
+   $self->RegisterObj("bsm.bs.new",
+                      "itil::businessservice",
+                      func=>'New',
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("bsm.bs.lnkbscontact",
                       "itil::lnkbscontact");
    
+   $self->RegisterObj("bsm.bs.lnkbscomp",
+                      "itil::lnkbscomp",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("bsm.ba",
                       "itil::appl",
                       func=>'MainWithNew',
