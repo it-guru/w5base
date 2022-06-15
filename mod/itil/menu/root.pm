@@ -758,6 +758,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("bsm.bp.lnkbpcontact",
+                      "crm::businessprocessacl",
+                      func=>'Main',
+                      prio=>1000);
+   
    $self->RegisterObj("bsm.bp.lnkbs",
                       "itil::lnkbprocessbservice",
                       func=>'Main',
