@@ -325,6 +325,15 @@ sub getDetailBlockPriority
              bserviceinfo applinfo source ));
 }
 
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
+
 
 sub initSearchQuery
 {
