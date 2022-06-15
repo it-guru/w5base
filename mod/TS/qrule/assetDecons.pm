@@ -90,7 +90,7 @@ sub qcheckRecord
    if ($rec->{eohs} ne ""){
       my $deohs=CalcDateDuration(NowStamp("en"),$rec->{eohs});
       msg(INFO,"delta days eohs: ".$deohs->{totaldays});
-      if ($deohs->{totaldays}<0){
+      if ($rec->{eohs} ne ""){
          my $plandeconsok=0;
          if ($rec->{plandecons} ne ""){
             my $dplandecons=CalcDateDuration(NowStamp("en"),$rec->{plandecons});
@@ -101,16 +101,22 @@ sub qcheckRecord
                $errorlevel=3 if ($errorlevel<3);
             }
             else{
-               if (!isDetailed(undef,$rec,"eohscomments",20,5)){
-                  my $msg="justification for overwriten planned ".
-                          "deconstruction date not detailed enough";
-                  push(@qmsg,$msg);
-                  push(@dataissue,$msg);
-                  $errorlevel=3 if ($errorlevel<3);
+               my $chk=CalcDateDuration($rec->{plandecons},$rec->{eohs});
+               if ($chk->{totaldays}<0){
+                  if (!isDetailed(undef,$rec,"eohscomments",20,5)){
+                     my $msg="justification for overwriten planned ".
+                             "deconstruction date not detailed enough";
+                     push(@qmsg,$msg);
+                     push(@dataissue,$msg);
+                     $errorlevel=3 if ($errorlevel<3);
+                  }
+                  else{
+                     $plandeconsok++;
+                  }
                }
                else{
-                  $plandeconsok++;
-               }
+                  $plandeconsok++;  # no jusitification, if decostruction
+               }                    # before end of hardware support
             }
          }
          if (!$plandeconsok){
