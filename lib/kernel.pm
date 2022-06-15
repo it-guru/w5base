@@ -85,7 +85,8 @@ use charnames ':full';
              &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array &array_insert
              &first_index
              &base36
-             &hash2xml &xml2hash &effVal &effChanged &effChangedVal
+             &hash2xml &xml2hash &effVal &effChanged &effChangedVal 
+             &isDetailed
              &Debug &UTF8toLatin1 &Html2Latin1
              &Datafield2Hash &Hash2Datafield &CompressHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
@@ -834,6 +835,33 @@ sub effChanged
    }
    return(undef);
 }
+
+sub isDetailed
+{
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $var=shift;
+   my $minlen=shift;
+   my $minwords=shift;
+
+   my $val=effVal($oldrec,$newrec,$var);
+
+   if (defined($minlen)){
+      my $chkval=$val;
+      $chkval=~s/(.)\1{3}//g;  # remove repeating chars
+      return(0) if (length($chkval)<$minlen);
+   }
+   if (defined($minwords)){
+      my @l=grep(!/^\s*$/,  # remove emty words
+              map({$_=~s/([a-z])\1{2}//gi;$_;} # replace xxxxx durch nix
+                 split(/[^a-z]+/i,$val)
+              )
+           ); 
+      return(0) if ($#l+1<$minwords);
+   }
+   return(1);
+}
+
 
 #
 # detects the effective change of a given variable
