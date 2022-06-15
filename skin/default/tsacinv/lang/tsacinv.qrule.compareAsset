@@ -5,7 +5,3 @@
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
 'different values stored in AssetManager'=>{de=>'in AssetManager sind andere Inhalte gespeichert'},
 'given assetid not found as active in AssetManager'=>{de=>'angegebene AssetID ist im AssetManager nicht aktiv'},
-'missing planned deconstruction date'=>{de=>'fehlender geplanter Rückbau Zeitpunkt'},
-'hint for deconstruction planning'=>{de=>'Hinweis zur Rückbauplanung'},
-'econstruction planning'=>{de=>'Hinweis zur Rückbauplanung'},
-'request for deconstruction date'=>{de=>'Anforderung Rückbauzeitpunkt'},

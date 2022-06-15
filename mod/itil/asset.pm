@@ -528,6 +528,7 @@ sub new
                 name          =>'eohscomments',
                 group         =>'financeco',
                 depend        =>['eohs'],
+                htmlheight    =>'50px',
                 htmldetail    =>sub{
                    my $self=shift;
                    my $mode=shift;
@@ -1324,7 +1325,7 @@ sub Validate
          $newrec->{refreshpland}=undef;
       }
    }
-   if (!defined($oldrec) || effChanged($oldrec,$newrec,"plandecons")){
+   if (effChanged($oldrec,$newrec,"plandecons","dayonly")){
       my $eohs=effVal($oldrec,$newrec,"plandecons");
       if ($eohs ne ""){
          my $nowstamp=NowStamp("en");
@@ -1338,11 +1339,12 @@ sub Validate
          }
       }
    }
-   if (!defined($oldrec) || effChanged($oldrec,$newrec,"eohs")){
+   if (effChanged($oldrec,$newrec,"eohs","dayonly")){
       my $eohs=effVal($oldrec,$newrec,"eohs");
       if ($eohs ne ""){
          my $nowstamp=NowStamp("en");
          my $age=CalcDateDuration($nowstamp,$eohs);
+printf STDERR ("fifi 03 %s\n",Dumper($age));
          if (!defined($age) ||
              $age->{days}>365*11 ||
              $age->{days}<(365*10)*-1){
@@ -1352,7 +1354,8 @@ sub Validate
       }
    }
 
-   if (effChanged($oldrec,$newrec,"eohs")){  # reset refreshinfo if eohs changed
+   if (effChanged($oldrec,$newrec,"eohs","dayonly")){
+      # reset refreshinfo if eohs changed
       foreach my $var (qw(refreshinfo3 refreshinfo2 refreshinfo1
                           notifyplandecons1 notifyplandecons2)){
          my $cur=effVal($oldrec,$newrec,$var);
@@ -1361,7 +1364,7 @@ sub Validate
          }
       }
    }
-   if (effChanged($oldrec,$newrec,"plandecons")){  # reset notifypland
+   if (effChanged($oldrec,$newrec,"plandecons","dayonly")){  # reset notifypland
       foreach my $var (qw(notifyplandecons1 notifyplandecons2)){
          my $cur=effVal($oldrec,$newrec,$var);
          if ($cur ne ""){

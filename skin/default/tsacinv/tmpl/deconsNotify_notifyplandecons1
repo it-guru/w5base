@@ -1,6 +1,6 @@
 Dear databoss,
 
-the Asset %ASSETNAME% is a HOUSING Asset in a TSI-RZ. The end of 
-hardware support for this asset is within the next 12 months.
+at asset %ASSETNAME% the end of hardware support will be 
+reached within the next 12 months.
 Please plan the deconstruction of this asset and if you have a
 date, store it in W5Base/Darwin.
