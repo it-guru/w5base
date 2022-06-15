@@ -96,10 +96,10 @@ sub ltrim
   return(undef) if (!defined($_[0]));
   if (ref($_[0]) eq "SCALAR"){
      return(undef) if (!defined(${$_[0]}));
-     ${$_[0]}=~s/\s*$//;
+     ${$_[0]}=~s/[\s\xa0]*$//;
      return(${$_[0]});
   }
-  $_[0]=~s/^\s*//;
+  $_[0]=~s/^[\s\xa0]*//;
   return($_[0]);
 }
 
@@ -108,10 +108,10 @@ sub rtrim
   return(undef) if (!defined($_[0]));
   if (ref($_[0]) eq "SCALAR"){
      return(undef) if (!defined(${$_[0]}));
-     ${$_[0]}=~s/\s*$//;
+     ${$_[0]}=~s/[\s\xa0]*$//;
      return(${$_[0]});
   }
-  $_[0]=~s/\s*$//;
+  $_[0]=~s/[\s\xa0]*$//;
   return($_[0]);
 }
 
