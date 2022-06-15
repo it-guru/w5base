@@ -16,14 +16,14 @@ Monitor Hardware deconstruction.
 For assets it is mandatory that at least 3 months before 
 end of the hardware support, a planned deconstruction date 
 (in W5Base/Darwin) is/will be documented. 
-This is necessary because there are agreements with TSI,
+This is necessary because there are agreements at our concern,
 there has to be a deconstruction planning for such assets.
 
 [de:]
 
 Bei Assets ist es zwingend, dass spätestens 3 Monate vor
 Ende des Hardware-Supports, ein geplanter Rückbauzeitpunkt (in W5Base/Darwin)
-erfasst ist/wird. Dies ist notwendig da es Vereinbarungen mit TSI gibt, dass 
+erfasst ist/wird. Dies ist notwendig da es Vereinbarungen im Konzern gibt, dass 
 für derartige Assets eine Rückbauplanung geben muß.
 
 
@@ -87,27 +87,59 @@ sub qcheckRecord
    ################################################################
    # handling for plandecons, notifyplandecons1, notifyplandecons2
    #$rec->{eohs}="2022-01-31 22:00:00";
-   if ($rec->{eohs} ne "" &&
-       $rec->{plandecons} eq ""){
+   if ($rec->{eohs} ne ""){
       my $deohs=CalcDateDuration(NowStamp("en"),$rec->{eohs});
       msg(INFO,"delta days eohs: ".$deohs->{totaldays});
-      if ($deohs->{totaldays}<90){
-         my $msg="missing planned deconstruction date";
-         push(@qmsg,$msg);
-         push(@dataissue,$msg);
-         $errorlevel=3 if ($errorlevel<3);
-      }
-      else{
-         if ($deohs->{totaldays}<180 && 
-             $rec->{notifyplandecons2} eq ""){
-            $self->doDeConNotify($dataobj,$rec,$deohs,
-                                 "notifyplandecons2");
+      if ($deohs->{totaldays}<0){
+         my $plandeconsok=0;
+         if ($rec->{plandecons} ne ""){
+            my $dplandecons=CalcDateDuration(NowStamp("en"),$rec->{plandecons});
+            if ($dplandecons->{totaldays}<0){
+               my $msg="overwriten planned deconstruction date";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
+            else{
+               if (!isDetailed(undef,$rec,"eohscomments",20,5)){
+                  my $msg="justification for overwriten planned ".
+                          "deconstruction date not detailed enough";
+                  push(@qmsg,$msg);
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
+               else{
+                  $plandeconsok++;
+               }
+            }
          }
-         elsif ($deohs->{totaldays}<365 && 
-                $deohs->{totaldays}>250 &&
-             $rec->{notifyplandecons1} eq ""){
-            $self->doDeConNotify($dataobj,$rec,$deohs,
-                                 "notifyplandecons1");
+         if (!$plandeconsok){
+            my $msg="overwriten end of hardware support ".
+                    "without valid deconstruction planning";
+            push(@qmsg,$msg);
+            push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
+         }
+      }
+      if ($rec->{plandecons} eq ""){
+         if ($deohs->{totaldays}<90){
+            my $msg="missing planned deconstruction date";
+            push(@qmsg,$msg);
+            push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
+         }
+         else{
+            if ($deohs->{totaldays}<180 && 
+                $rec->{notifyplandecons2} eq ""){
+               $self->doDeConNotify($dataobj,$rec,$deohs,
+                                    "notifyplandecons2");
+            }
+            elsif ($deohs->{totaldays}<365 && 
+                   $deohs->{totaldays}>250 &&
+                $rec->{notifyplandecons1} eq ""){
+               $self->doDeConNotify($dataobj,$rec,$deohs,
+                                    "notifyplandecons1");
+            }
          }
       }
    }
