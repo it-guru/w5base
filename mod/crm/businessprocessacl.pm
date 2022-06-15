@@ -35,16 +35,17 @@ sub new
 
 
    $self->AddFields(
-      new kernel::Field::Link(
+      new kernel::Field::TextDrop(
                 name          =>'fullname',
                 readonly      =>1,
                 depend        =>['refid','aclmode'],
-                label         =>'Fullname',
+                label         =>'BusinessProcess',
                 vjointo       =>'crm::businessprocess',
                 vjoinon       =>['refid'=>'id'],
                 vjoindisp     =>'fullname'),
-      insertafter=>'id'
+      insertafter=>'refid'
    );
+   $self->setDefaultView(qw(fullname acltargetname aclmode));
 
    return($self);
 }

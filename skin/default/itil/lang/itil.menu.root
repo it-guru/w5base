@@ -148,6 +148,7 @@
 'bsm.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'bsm.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'bsm.bp.lnkbs'=>{de=>'Verkn. BusinessService',en=>'Link BusinessService'},
+'bsm.bp.lnkbpcontact'=>{de=>'Zugriffssteuerung',en=>'accesscontrol'},
 'bsm.bs'=>{de=>'Business Service',en=>'Business service'},
 'bsm.bs.new'=>{de=>'Neueingabe',en=>'New'},
 'bsm.bs.lnkbscontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
