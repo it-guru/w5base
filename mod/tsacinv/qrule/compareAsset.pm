@@ -220,9 +220,12 @@ sub qcheckRecord
                               \@qmsg,\@dataissue,\$errorlevel,
                               mode=>'string');
 
+                # fix slotno with whitespaces in AM
+                my $acslotno=trim($parrec->{slotno});
+
                 $self->IfComp($dataobj,
                               $rec,"slotno",
-                              $parrec,"slotno",
+                              {slotno=>$acslotno},"slotno",
                               $autocorrect,$forcedupd,$wfrequest,
                               \@qmsg,\@dataissue,\$errorlevel,
                               mode=>'string');
