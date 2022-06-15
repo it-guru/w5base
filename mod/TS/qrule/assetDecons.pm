@@ -198,7 +198,7 @@ sub doDeConNotify
                                  $rec->{name};
       }
       my $tmpl=$dataobj->getParsedTemplate("tmpl/deconsNotify_".$mode,{
-         skinbase=>'tsacinv',
+         skinbase=>'TS',
          static=>{
             URL=>$rec->{urlofcurrentrec},
             ASSETNAME=>$rec->{name}
