@@ -812,8 +812,23 @@ sub effChanged
    my $oldrec=shift;
    my $newrec=shift;
    my $var=shift;
+   my $mode=shift;   # dayonly
    if (defined($newrec) && exists($newrec->{$var})){
-      if (!defined($oldrec) || $newrec->{$var} ne $oldrec->{$var}){
+      my $newrecvar;
+      my $oldrecvar;
+      if (defined($oldrec)){
+         $oldrecvar=$oldrec->{$var};
+         if ($mode eq "dayonly"){
+            $oldrecvar=~s/\s[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}//;
+         }
+      }
+      if (defined($newrec)){
+         $newrecvar=$newrec->{$var};
+         if ($mode eq "dayonly"){
+            $newrecvar=~s/\s[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}//;
+         }
+      }
+      if ($newrecvar ne $oldrecvar){
          return(1);
       }
    }
