@@ -25,23 +25,11 @@ to W5Base/Darwin, set the field "allow automatic updates by interfaces"
 in the block "Control-/Automationinformations" to "yes". 
 The data will be synced automatically.
 
-For HOUSING assets it is mandatory that at least 3 months before 
-end of the hardware support, a planned deconstruction date 
-(in W5Base/Darwin) is/will be documented. 
-This is necessary because there are agreements with TSI,
-there has to be a deconstruction planning for such assets.
-
 [de:]
 
 Falls das Asset in AssetManager durch die MU gepflegt wird, sollte 
 das Feld "automatisierte Updates durch Schnittstellen zulassen" im Block 
 "Steuerungs-/Automationsdaten" auf "ja" gesetzt werden.
-
-Bei HOUSING Assets ist es zwingend, dass spätestens 3 Monate vor
-Ende des Hardware-Supports, ein geplanter Rückbauzeitpunkt (in W5Base/Darwin)
-erfasst ist/wird. Dies ist notwendig da es Vereinbarungen mit TSI gibt, dass 
-für derartige Assets eine Rückbauplanung geben muß.
-
 
 =cut
 
