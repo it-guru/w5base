@@ -1,5 +1,6 @@
 'itil::itcloudarea'=>{de=>'Cloud Area',en=>'Cloud Area'},
 'fieldgroup.appl'=>{de=>'Anwendungs-Informationen',en=>'Application informations'},
+'fieldgroup.cloudinfo'=>{de=>'Cloud-Informationen',en=>'Cloud informations'},
 'fieldgroup.inm'=>{de=>'Incident Management',en=>'Incident Management'},
 'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
@@ -64,3 +65,6 @@ From now, it is allowed to deploy items in this area.
 'invalid cloudarea cistatus'=>{de=>'ungültiger CI-Status der CloudArea'},
 'invalid application in cloudarea'=>{de=>'ungültige Anwendung in CloudArea'},
 'Notification on successful automatic CI-Import'=>{de=>'Benachrichtigung bei erfolgreichem CI-Import'},
+'Costcenter'=>{de=>'Kontierungsobjekt'},
+'Config-Item first activation'=>{de=>'Config-Item erstmalige Aktivierung'},
+'requestor account'=>{de=>'Anforderer Account'},
