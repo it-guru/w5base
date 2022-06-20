@@ -120,11 +120,13 @@ sub qcheckRecord
             }
          }
          if (!$plandeconsok){
-            my $msg="overwriten end of hardware support ".
-                    "without valid deconstruction planning";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-            $errorlevel=3 if ($errorlevel<3);
+            if ($deohs->{totaldays}<90){
+               my $msg="overwriten end of hardware support ".
+                       "without valid deconstruction planning";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
          }
       }
       if ($rec->{plandecons} eq ""){
