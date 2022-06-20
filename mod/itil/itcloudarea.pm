@@ -456,7 +456,7 @@ sub checkAutoactivation
          my $appl=$self->getPersistentModuleObject("itil::appl");
          $appl->SetFilter({cistatusid=>[3,4],id=>\$applid});
          my @fields=qw(databossid tsmid tsm2id opmid opm2id itsemid itsem2id
-                       delmgrid delmgr2id semid sem2id);
+                       delmgrid delmgr2id semid sem2id applmgrid);
          my ($arec,$msg)=$appl->getOnlyFirst(@fields);
          if (defined($arec)){
             my @uids;
