@@ -60,3 +60,5 @@ alter table itcloudarea add lastqcheck  datetime default NULL,add key(lastqcheck
 alter table itcloud add platformresp bigint(20),add securityresp bigint(20);
 alter table itcloud add notifysupport int(1) default '1',add allowuncleanseq int(1) default '0',add ca_allowdirectactivate int(1) default '0',add ca_activate_triggerurl varchar(128),add ca_deactivate_triggerurl varchar(128),add ca_order_triggerurl varchar(128);
 alter table itcloudarea add deplnotify int(1) default '1';
+alter table itcloudarea add cifirstactivation datetime default NULL;
+alter table itcloudarea add requestoraccount  varchar(128) default NULL;

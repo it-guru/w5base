@@ -92,6 +92,7 @@ sub new
                 label         =>'CI-State',
                 vjoineditbase =>{id=>">0 AND <7"},
                 vjointo       =>'base::cistatus',
+                default       =>'3',
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
@@ -142,12 +143,17 @@ sub new
                 dataobjattr   =>'qitcloudarea.comments'),
 
       new kernel::Field::Text(
+                name          =>'requestoraccount',
+                htmldetail    =>'0',
+                label         =>'requestor account',
+                dataobjattr   =>'qitcloudarea.requestoraccount'),
+
+      new kernel::Field::Text(
                 name          =>'conumber',
-                translation   =>'itil::appl',
                 htmleditwidth =>'150px',
                 htmlwidth     =>'100px',
+                readonly      =>1,
                 group         =>'appl',
-                readonly     =>1,
                 label         =>'Costcenter',
                 weblinkto     =>'itil::costcenter',
                 weblinkon     =>['conumber'=>'name'],
@@ -253,6 +259,14 @@ sub new
                 label         =>'Creation-Date',
                 dataobjattr   =>'qitcloudarea.createdate'),
                                                 
+      new kernel::Field::Date(
+                name          =>'cifirstactivation',
+                group         =>'source',
+                htmldetail    =>0,
+                selectfix     =>1,
+                label         =>'Config-Item first activation',
+                dataobjattr   =>'qitcloudarea.cifirstactivation'),
+
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
@@ -417,6 +431,67 @@ sub isDeleteValid
 }
 
 
+sub checkAutoactivation
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (defined($oldrec) && $oldrec->{cifirstactivation} ne ""){
+      if (!effChanged($oldrec,$newrec,"applid")){
+         msg(INFO,"Autoactivation of $oldrec->{fullname} by 1stact ".
+                  $oldrec->{cifirstactivation});
+         $newrec->{cistatusid}="4";
+         return(1);
+      }
+      else{
+         msg(INFO,"no Autoactivation of $oldrec->{fullname} by 1stact ");
+      }
+   }
+   if (!defined($oldrec) || exists($newrec->{requestoraccount})){
+      my $requestoraccount=$newrec->{requestoraccount};
+      if ($requestoraccount ne ""){
+         my $isAutoactivationOk=0;
+         my $applid=effVal($oldrec,$newrec,"applid");
+         my $appl=$self->getPersistentModuleObject("itil::appl");
+         $appl->SetFilter({cistatusid=>[3,4],id=>\$applid});
+         my @fields=qw(databossid tsmid tsm2id opmid opm2id itsemid itsem2id
+                       delmgrid delmgr2id semid sem2id);
+         my ($arec,$msg)=$appl->getOnlyFirst(@fields);
+         if (defined($arec)){
+            my @uids;
+            foreach my $fld (@fields){
+               push(@uids,$arec->{$fld}) if ($arec->{$fld} ne "");
+            }
+            my $user=$self->getPersistentModuleObject("base::user");
+            $user->SetFilter({cistatusid=>[4],userid=>\@uids});
+            my @urec=$user->getHashList(qw(dsid posix accounts));
+            foreach my $urec (@urec){
+               if ($requestoraccount eq $urec->{dsid} ||
+                   $requestoraccount eq $urec->{posix} ){
+                  $isAutoactivationOk=1;
+               }
+               else{
+                  foreach my $accrec (@{$urec->{accounts}}){
+                     if ($accrec->{account} eq $requestoraccount){
+                        $isAutoactivationOk=1;
+                     }
+                  }
+               }
+            }
+         }
+         if ($isAutoactivationOk){
+            $newrec->{cistatusid}="4";
+            msg(INFO,"autoactivation by $requestoraccount");
+            return(1);
+         }
+      }
+   }
+
+   return(0);
+}
+
+
 sub Validate
 {
    my $self=shift;
@@ -440,7 +515,7 @@ sub Validate
       $self->LastMsg(ERROR,"no valid application specified");
       return(0);
    }
-   if (!defined($oldrec) || effChanged($oldrec,$newrec,"applid")){
+   if (effChanged($oldrec,$newrec,"applid")){
       if ($applid ne ""){
          my $o=getModuleObject($self->Config,"itil::appl");
          $o->SetFilter({id=>\$applid});
@@ -457,6 +532,27 @@ sub Validate
             return(0);
          }
       }
+      # reset cifirstactivation if applid is changed
+      my $cifirstactivation=effVal($oldrec,$newrec,"cifirstactivation");
+      if ($cifirstactivation ne ""){
+         $newrec->{cifirstactivation}=undef;
+      }
+      if (defined($oldrec) && (             # reset to available, if appl
+           $oldrec->{cistatusid} eq "4" ||  # is changed
+           $oldrec->{cistatusid} eq "5" ||
+           $oldrec->{cistatusid} eq "6" )){
+         $newrec->{cistatusid}="3";
+      }
+   }
+   my $autoactivation=0;
+   if (!defined($oldrec) || effVal($oldrec,$newrec,"cistatusid") eq "3"
+                         || effVal($oldrec,$newrec,"cistatusid") eq "4"){
+      if ($newrec->{cistatusid} eq "3" ||
+          $newrec->{cistatusid} eq "4"){
+         if ($self->checkAutoactivation($oldrec,$newrec)){
+            $autoactivation=1;
+         }
+      }
    }
 
 
@@ -466,8 +562,8 @@ sub Validate
       return(0);
    }
 
-   if (!defined($oldrec) || effChanged($oldrec,$newrec,"cistatusid")){
-      if ($newrec->{cistatusid}==4){
+   if (effChanged($oldrec,$newrec,"cistatusid")){
+      if ($newrec->{cistatusid}==4 && !$autoactivation){
          if ($self->isDataInputFromUserFrontend() && 
              !$self->IsMemberOf("admin")){
             my $c=getModuleObject($self->Config,"itil::itcloud");
@@ -489,6 +585,15 @@ sub Validate
          }
       }
    }
+   if (effVal($oldrec,$newrec,"cistatusid") eq "4"){
+      my $cifirstactivation=effVal($oldrec,$newrec,"cifirstactivation");
+      if ($cifirstactivation eq ""){
+         $newrec->{cifirstactivation}=NowStamp("en");
+      }
+   }
+
+
+
    if (effChanged($oldrec,$newrec,"cistatusid")){
       if ($newrec->{cistatusid}==6){
          if ($self->isDataInputFromUserFrontend() && 
@@ -594,7 +699,9 @@ sub FinishWrite
          if (defined($newrec) &&
              exists($newrec->{cistatusid}) &&
              $newrec->{cistatusid}==4){
-            $doNotify=3;
+            if (!defined($oldrec) || $oldrec->{cifirstactivation} eq ""){
+               $doNotify=3;  # send activation mail only if they isn't send
+            }                # already
          }
       }
       if ($oldrec->{cistatusid}==6 &&   # it it is a reactivateion without 
