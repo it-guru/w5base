@@ -3050,6 +3050,124 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
 
 }
 
+sub fltRulesOrderingAuthorized
+{
+   my $self=shift;
+   my $applid=shift;
+   my $param=shift;
+   my $userid=shift;
+
+   my $directUserid=[qw(applmgrid itsemid itsem2id)];
+   my $directGroupid=[];  # noch nicht implementiert
+   my $roles=[qw(write orderingauth)];
+
+   return($directUserid,$directGroupid,$roles);
+}
+
+sub validateOrderingAuthorized
+{
+   my $self=shift;
+   my $applid=shift;
+   my $param=shift;
+
+   my %userid;
+   if ($param->{email} ne "" && ($param->{email}=~m/\@/)){
+      my $emailfilter=$param->{email};
+      $emailfilter=~s/[\s"'\*\?]//;
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->SetFilter({emails=>$emailfilter,cistatusid=>[4,5]});
+      my @l=$user->getHashList(qw(userid fullname));
+      if ($#l==0){
+         $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
+      }
+   }
+   if ($param->{posix} ne "" && !($param->{posix}=~m/\@/)){
+      my $emailfilter=$param->{posix};
+      $emailfilter=~s/[\s"'\*\?]//;
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->SetFilter({posix=>\$emailfilter,cistatusid=>[4,5]});
+      my @l=$user->getHashList(qw(userid fullname));
+      if ($#l==0){
+         $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
+      }
+   }
+   if ($param->{dsid} ne "" && !($param->{dsid}=~m/\@/)){
+      my @flt=();
+      my $dsidfilter=$param->{dsid};
+      $dsidfilter=~s/[\s"'\*\?]//;
+      if (length($dsidfilter)>3){
+         push(@flt,{dsid=>\$dsidfilter,cistatusid=>[4,5]});
+      }
+      if ($#flt!=-1){
+         my $user=getModuleObject($self->Config,"base::user");
+         $user->SetFilter(\@flt);
+         my @l=$user->getHashList(qw(userid fullname));
+         if ($#l==0){
+            $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
+         }
+      }
+   }
+
+   my ($directUserid,$directGroupid,$Croles)=$self->fltRulesOrderingAuthorized(
+      $applid,$param,\%userid
+   );
+   my $orderAllowed=0;
+   my @userid=keys(%userid);
+   my $op=$self->Clone();
+   $op->ResetFilter();
+   $op->SetFilter({id=>\$applid});
+
+
+   my ($rec,$msg)=$op->getOnlyFirst(qw(id name contacts ),@$directUserid);
+   if (defined($rec)){
+      if (keys(%userid)){
+         my @grpid;
+         foreach my $userid (@userid){
+            my %grps=$self->getGroupsOf($userid,["RMember"],"up");
+            push(@grpid,keys(%grps));
+         }
+         if (!$orderAllowed){
+            foreach my $fldname (@$directUserid){
+               if ($rec->{$fldname} ne "" && 
+                   in_array(\@userid,$rec->{$fldname})){
+                  $orderAllowed=1;
+               }
+            }
+         }
+         # due perf the check of grp and user is splited
+         if (!$orderAllowed){   # direct base::user check
+            UCHK: foreach my $crec (@{$rec->{contacts}}){
+               my $roles=$crec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if ($crec->{target} eq "base::user"){
+                  if (in_array($roles,$Croles) &&
+                      in_array(\@userid,$crec->{targetid})){
+                     $orderAllowed=1;
+                     last UCHK;
+                  }
+               }
+            }
+         }
+         if (!$orderAllowed){   # direct base::grp check
+            GCHK: foreach my $crec (@{$rec->{contacts}}){
+               my $roles=$crec->{roles};
+               $roles=[$roles] if (ref($roles) ne "ARRAY");
+               if ($crec->{target} eq "base::grp"){
+                  if (in_array($roles,$Croles) &&
+                      in_array(\@grpid,$crec->{targetid})){
+                     $orderAllowed=1;
+                     last GCHK;
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   return(\%userid,$orderAllowed); 
+}
+
+
 
 #############################################################################
 
@@ -3078,7 +3196,6 @@ sub getBackendName     # returns the name/function to place in select
 
    return($self->SUPER::getBackendName($mode,$db));
 }
-
 
 
 

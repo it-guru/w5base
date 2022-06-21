@@ -1097,6 +1097,40 @@ sub IdOrderValidate
    );
 }
 
+sub fltRulesOrderingAuthorized
+{
+   my $self=shift;
+   my $applid=shift;
+   my $param=shift;
+   my $userid=shift;
+
+   if ($param->{dsid} ne "" && !($param->{dsid}=~m/\@/)){
+      my $dsidfilter=$param->{dsid};
+      my $accountfilter=$param->{dsid};
+      $accountfilter=~s/[\s"'\*\?]//;
+      $accountfilter=~s/\\/\//;
+      my @flt=();
+      if (length($accountfilter)>3){
+         push(@flt,{accounts=>$accountfilter,cistatusid=>[4,5]});
+      }
+      if ($dsidfilter=~m/^a[0-9]{3,10}$/i){
+         $dsidfilter=~s/^a//i;
+         $dsidfilter="tCID:".$dsidfilter;
+         push(@flt,{dsid=>\$dsidfilter,cistatusid=>[4,5]});
+      }
+      if ($#flt!=-1){
+         my $user=getModuleObject($self->Config,"base::user");
+         $user->SetFilter(\@flt);
+         my @l=$user->getHashList(qw(userid fullname));
+         if ($#l==0){
+            $userid->{$l[0]->{userid}}=$l[0]->{fullname}; 
+         }
+      }
+   }
+   return($self->SUPER::fltRulesOrderingAuthorized($applid,$param,$userid));
+}
+
+
 sub doIdOrderValidate
 {
    my $self=shift;
@@ -1107,6 +1141,7 @@ sub doIdOrderValidate
    $self->SetFilter({id=>\$param->{id}});
    my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
    if (($param->{id}=~m/^[0-9]{1,20}$/) && defined($rec)){
+      my $id=$param->{id};
       $r->{data}={
          name=>$rec->{name}, 
          conumber=>$rec->{conumber}, 
@@ -1121,95 +1156,14 @@ sub doIdOrderValidate
          $r->{orderPosible}="false";
       }
       $r->{orderAllowed}="false";
-      my %userid=();
-      if ($param->{email} ne ""){
-         my $emailfilter=$param->{email};
-         $emailfilter=~s/[\s"'\*\?]//;
-         my $user=getModuleObject($self->Config,"base::user");
-         $user->SetFilter({emails=>$emailfilter,cistatusid=>[4,5]});
-         my @l=$user->getHashList(qw(userid fullname));
-         if ($#l==0){
-            $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
-         }
-      }
-      if ($param->{dsid} ne ""){
-         my $accountfilter=$param->{dsid};
-         $accountfilter=~s/[\s"'\*\?]//;
-         $accountfilter=~s/\\/\//;
-         my @flt=();
-         if (length($accountfilter)>3){
-            push(@flt,{accounts=>$accountfilter,cistatusid=>[4,5]});
-         }
-         my $dsidfilter=$param->{dsid};
-         $dsidfilter=~s/[\s"'\*\?]//;
-         if ($dsidfilter=~m/^\d{3,10}$/){
-            $dsidfilter="tCID:".$dsidfilter;
-            push(@flt,{dsid=>\$dsidfilter,cistatusid=>[4,5]});
-         }
-         if ($dsidfilter=~m/^a[0-9]{3,10}$/i){
-            $dsidfilter=~s/^a//i;
-            $dsidfilter="tCID:".$dsidfilter;
-            push(@flt,{dsid=>\$dsidfilter,cistatusid=>[4,5]});
-         }
-         if ($#flt!=-1){
-            my $user=getModuleObject($self->Config,"base::user");
-            $user->SetFilter(\@flt);
-            my @l=$user->getHashList(qw(userid fullname));
-            if ($#l==0){
-               $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
-            }
-         }
-      }
-      if (keys(%userid)){
-         $r->{userReference}=\%userid;
-      }
-      my @userid=keys(%userid);
-      if (keys(%userid)){
-         my @grpid;
-         foreach my $userid (@userid){
-            my %grps=$self->getGroupsOf($userid,["RMember"],"up");
-            push(@grpid,keys(%grps));
-         }
-         if ($r->{orderAllowed} ne "true"){
-            foreach my $fldname (qw(applmgrid itsemid itsem2id)){
-               if ($rec->{$fldname} ne "" && 
-                   in_array(\@userid,$rec->{$fldname})){
-                  $r->{orderAllowed}="true";
-               }
-            }
-         }
-         # due perf the check of grp and user is splited
-         if ($r->{orderAllowed} ne "true"){   # direct base::user check
-            UCHK: foreach my $crec (@{$rec->{contacts}}){
-               my $roles=$crec->{roles};
-               $roles=[$roles] if (ref($roles) ne "ARRAY");
-               if ($crec->{target} eq "base::user"){
-                  if (in_array($roles,"write") &&
-                      in_array(\@userid,$crec->{targetid})){
-                     $r->{orderAllowed}="true";
-                     last UCHK;
-                  }
-               }
-            }
-         }
-         if ($r->{orderAllowed} ne "true"){   # direct base::grp check
-            GCHK: foreach my $crec (@{$rec->{contacts}}){
-               my $roles=$crec->{roles};
-               $roles=[$roles] if (ref($roles) ne "ARRAY");
-               if ($crec->{target} eq "base::grp"){
-                  if (in_array($roles,"write") &&
-                      in_array(\@grpid,$crec->{targetid})){
-                     $r->{orderAllowed}="true";
-                     last GCHK;
-                  }
-               }
-            }
-         }
-      }
 
-
-      #applmgrid tsmid tsm2id
-
+      my ($uref,$orderAllowed)=$self->validateOrderingAuthorized($id,$param);
+      if ($orderAllowed){
+         $r->{orderAllowed}="true";
+      }
+      if (defined($uref) && ref($uref) eq "HASH"){
+         $r->{userReference}=$uref;
+      }
    }
    else{
       return({
@@ -1217,8 +1171,6 @@ sub doIdOrderValidate
          exitmsg=>'invalid id'
       });
    }
-
-
 
    
    return({
