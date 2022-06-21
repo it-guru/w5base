@@ -202,6 +202,7 @@ sub AZURE_CloudAreaSync
                my $aname=$a->{name};
                $aname=~s/\[.*\]$//;
                my $bname=$b->{name};
+               $bname=~s/\[.*\]$//;
                $bname=~s/[\s.]+/_/g;
                if ($aname eq $bname &&
                    $a->{cistatusid}<6 &&
@@ -227,12 +228,20 @@ sub AZURE_CloudAreaSync
                      srcid   =>$newrec->{subscriptionId}
                   }
                };
+               if (defined($oldrec)){
+                  my $oldname=$oldrec->{name};
+                  $oldname=~s/\[.*\]$//;
+                  if ($oldname eq $name){
+                     delete($oprec->{DATA}->{name});
+                  }
+               }
+
+
                if ($mode eq "insert"){
                   $oprec->{DATA}->{cistatusid}="3";
                }
                if ($mode eq "update"){
-                  if ($oldrec->{cistatusid}==6 &&
-                      $oldrec->{applid} ne $newrec->{applid}){
+                  if ($oldrec->{cistatusid}==6){
                      $oprec->{DATA}->{cistatusid}="3";
                   }
                   if ($oldrec->{cistatusid}!=3 &&
