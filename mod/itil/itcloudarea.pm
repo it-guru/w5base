@@ -453,33 +453,22 @@ sub checkAutoactivation
       if ($requestoraccount ne ""){
          my $isAutoactivationOk=0;
          my $applid=effVal($oldrec,$newrec,"applid");
-         my $appl=$self->getPersistentModuleObject("itil::appl");
-         $appl->SetFilter({cistatusid=>[3,4],id=>\$applid});
-         my @fields=qw(databossid tsmid tsm2id opmid opm2id itsemid itsem2id
-                       delmgrid delmgr2id semid sem2id applmgrid);
-         my ($arec,$msg)=$appl->getOnlyFirst(@fields);
-         if (defined($arec)){
-            my @uids;
-            foreach my $fld (@fields){
-               push(@uids,$arec->{$fld}) if ($arec->{$fld} ne "");
-            }
-            my $user=$self->getPersistentModuleObject("base::user");
-            $user->SetFilter({cistatusid=>[4],userid=>\@uids});
-            my @urec=$user->getHashList(qw(dsid posix accounts));
-            foreach my $urec (@urec){
-               if ($requestoraccount eq $urec->{dsid} ||
-                   $requestoraccount eq $urec->{posix} ){
-                  $isAutoactivationOk=1;
-               }
-               else{
-                  foreach my $accrec (@{$urec->{accounts}}){
-                     if ($accrec->{account} eq $requestoraccount){
-                        $isAutoactivationOk=1;
-                     }
-                  }
-               }
-            }
+         my $appldataobj="itil::appl";
+         $appldataobj=$self->findNearestTargetDataObj($appldataobj,
+                       "itcloudarea:checkAutoactivation:".$self->Self);
+         my $appl=$self->getPersistentModuleObject($appldataobj);
+
+         my %qp=(
+            email=>$requestoraccount,
+            posix=>$requestoraccount,
+            dsid=>$requestoraccount
+         );
+
+         my ($ur,$orderAllowed)=$appl->validateOrderingAuthorized($applid,\%qp);
+         if ($orderAllowed){
+            $isAutoactivationOk=1;
          }
+
          if ($isAutoactivationOk){
             $newrec->{cistatusid}="4";
             msg(INFO,"autoactivation by $requestoraccount");

@@ -24,3 +24,4 @@
 'Productmanager'=>{de=>'Produktmanager'},
 'Application manager deputy'=>{de=>'Applicationmanager Vertreter'},
 'role Technical Approver cannot be assigned to groups'=>{de=>'Rolle Technischer Genehmiger kann nicht an Gruppen zugewiesen werden'},
+'ordering authorized'=>{de=>'bestellberechtigt'},

@@ -88,6 +88,8 @@ sub getPosibleRoles
                                                  $self->Self),
          "orderin2"        =>$self->getParent->T("Order acceptation deputy",
                                                  $self->Self),
+         "orderingauth"    =>$self->getParent->T("ordering authorized",
+                                                 $self->Self),
          "read"            =>$self->getParent->T("read application",
                                                  $self->Self),
          "privread"        =>$self->getParent->T("privacy read",
