@@ -94,6 +94,7 @@ sub leanixDataLoad
       my $w5bp=getModuleObject($self->Config,"itil::businessprocess");
       my $w5bpacl=getModuleObject($self->Config,"crm::businessprocessacl");
       my $srcsys='leanix::Process';
+      $bccgroup="16558801150001";  # membergroup.BCO_BS.BP
       foreach my $lixrec (values(%{$db{$srcsys}})){
          my $srcid=$lixrec->{id};
          next if ($lixrec->{shortname} eq "");
@@ -345,7 +346,13 @@ sub leanixDataLoad
       my $srcsys='leanix::BusinessCapability';
       foreach my $srcsys (qw(leanix::BusinessCapability leanix::ProcessChain)){
          my $nature="BC";
-         $nature="PRC" if ($srcsys eq "leanix::ProcessChain");
+         $bccgroup="16558789800001";  # membergroup.BCO_BS.BC
+         if ($srcsys eq "leanix::ProcessChain"){
+            $nature="PRC";
+            $bccgroup="16558789460001";  # membergroup.BCO_BS.PRC
+
+            next; # Laut Carsten, sollen die PRCs NICHT geladen werden
+         }
          foreach my $lixrec (values(%{$db{$srcsys}})){
             # skip BC:BCC Enabling Services -> not create in Darwin
             next if ($lixrec->{id} eq "02e1cc01-c862-481b-a7b8-afa02108f027");
