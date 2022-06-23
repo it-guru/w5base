@@ -1275,6 +1275,77 @@ sub Process
              additional     =>\%additional
             };
       if (my $id=$wf->Store(undef,$newmailrec)){
+
+         if (1){
+            my $wfa=getModuleObject($self->Config,"base::wfattach");
+            my $changenumber=$WfRec->{srcid};
+            my $name=$WfRec->{name};
+            my $eventstart=$WfRec->{eventstart};
+            my $eventend=$WfRec->{eventend};
+            my $urlofcurrentrec=$WfRec->{urlofcurrentrec};
+            my $uid=$urlofcurrentrec;
+            $uid=~s/[:\/]/_/g;
+            $eventstart=$wfa->ExpandTimeExpression($eventstart,"ICS",
+                                                   "GMT","GMT"); 
+            $eventend=$wfa->ExpandTimeExpression($eventend,"ICS",
+                                                 "GMT","GMT"); 
+            my $description=$urlofcurrentrec."\n"."---\n";
+
+            my $applobj=$self->getField('affectedapplication',$WfRec);
+            if (defined($applobj)){
+               $description.=$applobj->FormatedResult($WfRec,'AscV01');
+               $description.="\n---\n";
+            }
+            my $descobj=$self->getField('changedescription',$WfRec);
+            if (defined($descobj)){
+               $description.=$descobj->FormatedResult($WfRec,'AscV01');
+            }
+            $description=~s/\n/\\n/gs;
+            my $data=
+               "BEGIN:VCALENDAR\n".
+               "PRODID:W5Base/Darwin\n".
+               "VERSION:2.0\n".
+               "METHOD:PUBLISH\n".
+              # "METHOD:REQUEST\n".  # das geht nur für Updates
+
+               "X-MS-OLK-FORCEINSPECTOROPEN:TRUE\n".
+
+               "BEGIN:VEVENT\n".
+               "UID:$uid\n".
+               "BEGIN:VALARM\n".
+               "TRIGGER:-PT24H\n".
+               "ACTION:DISPLAY\n".
+               "END:VALARM\n".
+
+               "DTSTART:$eventstart\n".
+               "DTEND:$eventend\n".
+               "CLASS:PUBLIC\n".
+               "PRIORITY:5\n".
+               "SEQUENCE:0\n".
+               "SUMMARY;LANGUAGE=en:$changenumber: $name\n".
+               "DESCRIPTION:$description\n".
+               "TRANSP:OPAQUE\n".
+               "X-MICROSOFT-CDO-BUSYSTATUS:FREE\n".
+               "X-MICROSOFT-CDO-IMPORTANCE:1\n".
+               "X-MICROSOFT-DISALLOW-COUNTER:FALSE\n".
+               "X-MS-OLK-ALLOWEXTERNCHECK:TRUE\n".
+               "X-MS-OLK-AUTOFILLLOCATION:TRUE\n".
+               "X-MS-OLK-AUTOSTARTCHECK:FALSE\n".
+               "X-MS-OLK-CONFTYPE:0\n".
+               "END:VEVENT\n".
+               "END:VCALENDAR\n";
+            $data=~s/\n/\r\n/gs;
+            utf8::encode($data);
+            
+            my $termrec;
+            $termrec->{data}=$data;
+            $termrec->{name}=$changenumber.".ics";
+            $termrec->{wfheadid}=$id;
+            $termrec->{contenttype}="text/calendar";
+            $wfa->ValidatedInsertRecord($termrec);
+         }
+
+
          if ($self->getParent->activateMailSend($WfRec,$wf,$id,
                                                 $newmailrec,$action)){
             my $NotifyMode=Query->Param('NotifyMode');
