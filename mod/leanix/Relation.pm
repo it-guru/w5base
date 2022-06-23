@@ -32,6 +32,12 @@ sub new
 
    $self->AddFields(
       new kernel::Field::Id(     
+            name              =>'fromId__id',
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            label             =>'RelID-Path'),
+
+      new kernel::Field::Text(     
             name              =>'id',
             group             =>'source',
             htmldetail        =>'NotEmpty',
@@ -82,17 +88,11 @@ sub new
                                 'leanix::BusinessCapability'=>'displayName',
                                 'leanix::Application'=>'displayName',
                                 'leanix::Process'=>'displayName',
+                                'leanix::ITComponent'=>'displayName',
                                 ],
             label             =>'displayNameTo',
             dsttypfield       =>'dataobjToFS',
-            dstidfield        =>'toId'),
-
-      new kernel::Field::MDate(
-            name              =>'mdate',
-            group             =>'source',
-            label             =>'Modification-Date',
-            searchable        =>0,  # das tut noch nicht
-            dataobjattr       =>'updatedAt'),
+            dstidfield        =>'toId')
    );
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id displayName));
@@ -175,14 +175,16 @@ sub DataCollector
       if (exists($dBlock->{data})){
          my $dBlockData=$dBlock->{data};
          $dBlockData=[$dBlockData] if (ref($dBlockData) ne "ARRAY");
-         #  printf STDERR ("rawRec=%s\n",Dumper($dBlockData));
+         # printf STDERR ("rawRec=%s\n",Dumper($dBlockData));
          foreach my $dRec (@{$dBlockData}){
             my $rec={
                id=>$dRec->{id},
+               fromId__id=>$dRec->{fromId}."::".$dRec->{id},
                fromId=>$dRec->{fromId},
                toId=>$dRec->{toId},
                type=>$dRec->{type},
                typeToFS=>$dRec->{typeToFS},
+               typeFromFS=>$dRec->{typeFromFS},
                dataobjToFS=>"leanix::".$dRec->{typeToFS},
                displayNameToFS=>$dRec->{displayNameToFS},
                displayNameTo=>$dRec->{displayNameToFS},

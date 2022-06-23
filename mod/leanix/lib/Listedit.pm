@@ -184,6 +184,28 @@ sub decodeFilter2Query4LeanIX
       foreach my $filtername (keys(%{$filter})){
          my $f=$filter->{$filtername}->[0];
          foreach my $fn (keys(%{$f})){
+            if (my ($fld1,$fld2)=$fn=~m/^(\S+)__(\S+)$/){
+               my $id;
+               if (ref($f->{$fn}) eq "ARRAY" &&
+                   $#{$f->{$fn}}==0){
+                  $id=$f->{$fn}->[0];
+               }
+               elsif (ref($f->{$fn}) eq "SCALAR"){
+                  $id=${$f->{$fn}};
+               }
+               else{
+                  $id=$f->{$fn};
+               }
+               my ($val1,$val2)=$id=~m/^(\S+)::(\S+)$/;
+               $f->{$fld1}=$val1;
+               $f->{$fld2}=$val2;
+               delete($f->{$fn});
+            }
+         }
+      }
+      foreach my $filtername (keys(%{$filter})){
+         my $f=$filter->{$filtername}->[0];
+         foreach my $fn (keys(%{$f})){
             my $fld=$self->getField($fn);
             if (defined($fld)){
                if ($fn eq $idfield){  # Id Field handling
