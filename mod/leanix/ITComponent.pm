@@ -86,7 +86,7 @@ sub new
                 group         =>'relations',
                 vjointo       =>\'leanix::Relation',
                 vjoinon       =>['id'=>'fromId'],
-                vjoindisp     =>['typeToFS','displayNameToFS','type']),
+                vjoindisp     =>['displayNameTo','typeToFS','type']),
 
       new kernel::Field::MDate(
             name              =>'mdate',
