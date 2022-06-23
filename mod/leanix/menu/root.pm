@@ -50,6 +50,10 @@ sub Init
                       "leanix::Process",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.cfm.leanix.itc",
+                      "leanix::ITComponent",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 
