@@ -1,4 +1,4 @@
-package leanix::BusinessCapability;
+package leanix::ITComponent;
 #  W5Base Framework
 #  Copyright (C) 2022  Hartmut Vogler (it@guru.de)
 #
@@ -58,6 +58,18 @@ sub new
             label             =>'type'),
 
       new kernel::Field::Text(     
+            name              =>'externalid',
+            label             =>'External ID'),
+
+      new kernel::Field::Text(     
+            name              =>'w5baseid',
+            label             =>'Application W5BaseID'),
+
+      new kernel::Field::Text(     
+            name              =>'alias',
+            label             =>'Alias'),
+
+      new kernel::Field::Text(     
             name              =>'tags',
             group             =>'tags',
             label             =>'tags'),
@@ -67,10 +79,6 @@ sub new
             searchable        =>'0',
             label             =>'State'),
 
-      new kernel::Field::Textarea(     
-            name              =>'description',
-            label             =>'description'),
-
       new kernel::Field::SubList(
                 name          =>'relations',
                 label         =>'Relations',
@@ -78,9 +86,7 @@ sub new
                 group         =>'relations',
                 vjointo       =>\'leanix::Relation',
                 vjoinon       =>['id'=>'fromId'],
-                vjoindisp     =>['displayNameTo','typeToFS','type'],
-                vjoininhash   =>['displayNameTo','typeToFS','type','id',
-                                 'toId','dataobjToFS']),
+                vjoindisp     =>['typeToFS','displayNameToFS','type']),
 
       new kernel::Field::MDate(
             name              =>'mdate',
@@ -111,7 +117,7 @@ sub DataCollector
    }
 
    my ($dbclass,$requesttoken)=$self->decodeFilter2Query4LeanIX(
-      "BusinessCapability",
+      "ITComponent",
       "id",
       $filterset
    );
@@ -179,25 +185,36 @@ sub DataCollector
             my @tags;
             my %tags;
             foreach my $r (@{$dRec->{tags}}){
-              my $key=$r->{name};
+               my $key=$r->{name};
                if ($r->{tagGroup}->{shortName} ne ""){
                   $key=$r->{tagGroup}->{shortName}.": ".$key;
                }
                $tags{$key}++;
             }
             @tags=sort(keys(%tags));
-            
+
+
             my $rec={
                id=>$dRec->{id},
                displayName=>$dRec->{displayName},
                name=>$dRec->{name},
-               description=>$dRec->{description},
                type=>$dRec->{type},
                tags=>\@tags,
                lxState=>$dRec->{lxState},
                fullname=>$dRec->{type}.": ".$dRec->{displayName},
                updatedAt=>$dRec->{updatedAt}
             };
+            foreach my $fld (@{$dRec->{fields}}){
+               if ($fld->{name} eq "alias"){
+                  $rec->{alias}=$fld->{data}->{value};
+               }
+               if ($fld->{name} eq "externalId"){
+                  $rec->{externalid}=$fld->{data}->{externalId};
+                  if (my ($w5id)=$rec->{externalid}=~m/^W5BaseID-(\d+)$/){
+                     $rec->{w5baseid}=$w5id;
+                  }
+               }
+            }
             push(@{$d},$rec);
          }
       }

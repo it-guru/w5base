@@ -1,0 +1,7 @@
+'leanix::ITComponent'=>{
+  de=>'LeanIX: ITComponent Anwendungsumgebung',
+  en=>'LeanIX: ITComponent Applicationenviroment'
+},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'fieldgroup.relations'=>{de=>'Relationen',en=>'Relations'},
+'State'=>{de=>'Status'},

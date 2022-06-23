@@ -2,3 +2,4 @@
 'itu.cfm.leanix.bc'=>{de=>'BusinessCapability',en=>'BusinessCapability'},
 'itu.cfm.leanix.appl'=>{de=>'Application',en=>'Application'},
 'itu.cfm.leanix.prc'=>{de=>'Process',en=>'Process'},
+'itu.cfm.leanix.itc'=>{de=>'ITComponent',en=>'ITComponent'},

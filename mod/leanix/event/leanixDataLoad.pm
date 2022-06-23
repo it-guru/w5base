@@ -39,7 +39,16 @@ sub leanixDataLoad
    my $lixbc=getModuleObject($self->Config,"leanix::BusinessCapability");
    my $lixap=getModuleObject($self->Config,"leanix::Application");
    my $lixprc=getModuleObject($self->Config,"leanix::Process");
+   my $lixitc=getModuleObject($self->Config,"leanix::ITComponent");
 
+   if (1){
+      $lixitc->SetFilter({});
+      my @l=$lixitc->getHashList(qw(name displayName id w5baseid tags));
+      foreach my $itcrec (@l){
+         my $id=$itcrec->{id};
+         $db{'leanix::ITComponent'}->{$id}=$itcrec;
+      }
+   }
    if (1){
       $lixprc->SetFilter({tags=>'"Framework: BCC"'});
       my @l=$lixprc->getHashList(qw(name displayName id relations tags));
@@ -262,6 +271,7 @@ sub leanixDataLoad
       if (!in_array($obj,[qw(leanix::Application 
                              leanix::BusinessCapability
                              leanix::Process
+                             leanix::ITComponent
           )])){
          delete($db{$obj});
       }
@@ -450,6 +460,7 @@ sub leanixDataLoad
                   #     relBusinessCapabilityToProcess
                   if (!in_array($lixrel->{type},[
                         qw( relBusinessCapabilityToApplication
+                            relBusinessCapabilityToITComponent
                            relToChild )])){
                      next;
                   }
@@ -498,6 +509,37 @@ sub leanixDataLoad
                                  businessserviceid=>$w5id,
                                  objtype=>'itil::appl', 
                                  obj1id=>$a->{id}
+                              });
+                           }
+                        }
+                     }
+                  }
+                  if ($lixrel->{dataobjToFS} eq "leanix::ITComponent"){
+                     my $lixApplRec=
+                        $db{'leanix::ITComponent'}->{$lixrel->{toId}};
+                     if ($lixApplRec->{w5baseid} ne ""){
+                        my $w5appid=$lixApplRec->{w5baseid};
+                        my @a;
+                        my $w5app=$w5bsc->getPersistentModuleObject(
+                                  "itil::appl");
+                        $w5app->SetFilter({id=>\$w5appid});
+                        my @l=$w5app->getHashList(qw(name id));
+                        foreach my $arec (@l){
+                           push(@a,$arec->{id});
+                        }
+                        foreach my $a (@a){
+                           my $found=0;
+                           foreach my $currel (@currel){
+                              if ($currel->{objtype} eq "itil::appl" &&
+                                  $currel->{obj1id} eq $a){
+                                 $found++;
+                              }
+                           }
+                           if (!$found){
+                              $w5bsc->ValidatedInsertRecord({
+                                 businessserviceid=>$w5id,
+                                 objtype=>'itil::appl', 
+                                 obj1id=>$a
                               });
                            }
                         }
@@ -580,6 +622,8 @@ sub leanixDataLoad
                    scalar(keys(%{$db{'leanix::BusinessCapability'}})));
    printf STDERR ("n leanix::ProcessChain=%d\n",
                    scalar(keys(%{$db{'leanix::ProcessChain'}})));
+   printf STDERR ("n leanix::ITComponent=%d\n",
+                   scalar(keys(%{$db{'leanix::ITComponent'}})));
    printf STDERR ("n leanix::Process=%d\n",
                    scalar(keys(%{$db{'leanix::Process'}})));
 
