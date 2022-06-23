@@ -1344,7 +1344,6 @@ sub Validate
       if ($eohs ne ""){
          my $nowstamp=NowStamp("en");
          my $age=CalcDateDuration($nowstamp,$eohs);
-printf STDERR ("fifi 03 %s\n",Dumper($age));
          if (!defined($age) ||
              $age->{days}>365*11 ||
              $age->{days}<(365*10)*-1){
