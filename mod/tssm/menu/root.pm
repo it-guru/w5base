@@ -157,6 +157,131 @@ sub Init
                       "tssm::prmDumper",
                       defaultacl=>['admin']);
 
+
+
+   $self->RegisterObj("itu.proc.sm",                                       # OK
+                      "tmpl/welcome",
+                      prio=>100,
+                      defaultacl=>['admin',"support"]);
+   
+   $self->RegisterObj("itu.proc.sm.change",                                # OK
+                      "tssm::chm",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.proc.sm.change.task",
+                      "tssm::chmtask",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.proc.sm.change.task.pso",
+                      "tssm::chm_pso",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.proc.sm.change.model",
+                      "tssm::chmmodel",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.proc.sm.change.relations",
+                      "tssm::lnk",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.proc.sm.change.device",
+                      "tssm::chm_device",
+                      defaultacl=>['admin',"support"]);
+
+   $self->RegisterObj("itu.proc.sm.change.ApprovalLog",
+                      "tssm::chm_approvallog",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.change.ApprovalReq",
+                      "tssm::chm_approvereq",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.change.ApprovedGrp",
+                      "tssm::chm_approvedgrp",
+                      defaultacl=>['admin']);
+   
+   $self->RegisterObj("itu.proc.sm.incident",
+                      "tssm::inm",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.proc.sm.incident.relations",
+                      "tssm::lnk",
+                      defaultacl=>['valid_user']);
+   
+   $self->RegisterObj("itu.proc.sm.incident.assignment",
+                      "tssm::inm_assignment",
+                      defaultacl=>['admin',"support"]);
+   
+   $self->RegisterObj("itu.proc.sm.problem",
+                      "tssm::prm",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.proc.sm.problem.relations",
+                      "tssm::lnk",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.proc.sm.krn",
+                      "tmpl/welcome",
+                      prio=>2000,
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.proc.sm.krn.user",
+                      "tssm::user",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.proc.sm.krn.user.account",
+                      "tssm::useraccount",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.proc.sm.krn.group",
+                      "tssm::group",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.proc.sm.krn.company",
+                      "tssm::company",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.proc.sm.krn.group.lnkuser",
+                      "tssm::lnkusergroup",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.dev",
+                      "tssm::dev",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.user.lnkgroup",
+                      "tssm::lnkusergroup",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.Dump",
+                      "tmpl/welcome",
+                      prio=>10,
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.Dump.dictonary",                    # OK
+                      "tssm::DBDataDiconary",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.Dump.chmDataDump",                  # OK
+                      "tssm::chmDumper",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.Dump.tskDataDump",                  # OK
+                      "tssm::tskDumper",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.Dump.inmDataDump",                  # OK
+                      "tssm::inmDumper",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.Dump.devDataDump",                  # OK
+                      "tssm::devDumper",
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.sm.krn.Dump.prmDataDump",                  # OK
+                      "tssm::prmDumper",
+                      defaultacl=>['admin']);
+
    return($self);
 }
 
