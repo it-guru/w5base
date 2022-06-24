@@ -975,7 +975,11 @@ function scrollToActive(){
    if (e){
       var rect = e.getBoundingClientRect();
       if (rect){
-         document.body.scrollTop=rect.top;
+         var newscrollpos=rect.top-80;
+         if (newscrollpos<0){
+            newscrollpos=0;
+         }
+         document.body.scrollTop=newscrollpos;
       }
    }
 }
