@@ -1,0 +1,6 @@
+'tssnow::dev'=>{de=>'ServiceNow ConfigItem',en=>'ServiceNow ConfigItem'},
+'brief description'=>{de=>'Kurzbeschreibung'},
+'short description'=>{de=>'Kurzbeschreibung'},
+'Location'=>{de=>'Standort'},
+
+
