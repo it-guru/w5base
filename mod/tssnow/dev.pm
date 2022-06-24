@@ -38,6 +38,8 @@ sub new
                 name          =>'linenumber',
                 label         =>'No.'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'Sys-Id',
