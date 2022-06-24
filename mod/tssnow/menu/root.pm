@@ -40,9 +40,17 @@ sub Init
                       prio=>100,
                       defaultacl=>['admin',"support"]);
    
+   $self->RegisterObj("itu.proc.snow.incident",
+                      "tssnow::inm",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itu.proc.snow.krn",
                       "tmpl/welcome",
                       prio=>2000,
+                      defaultacl=>['admin']);
+
+   $self->RegisterObj("itu.proc.snow.krn.dev",
+                      "tssnow::dev",
                       defaultacl=>['valid_user']);
 
    return($self);
