@@ -38,6 +38,8 @@ sub new
                 htmlwidth     =>'1%',
                 label         =>'No.'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'Sys-Id',
