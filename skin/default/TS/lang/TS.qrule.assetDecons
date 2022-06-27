@@ -9,3 +9,4 @@ en=>'Monitor planed hardware deconstruction'
 'overwriten end of hardware support without valid deconstruction planning'=>{de=>'Überschreitung des "Ende des Hardware-Supports" ohne gültige Rückbauplanung'},
 'overwriten planned deconstruction date'=>{de=>'Überschreibung des geplanten Rückbauzeitpunktes'},
 'justification for overwriten planned deconstruction date not detailed enough'=>{de=>'Begründung für Überschreitung des "Ende des Hardware-Supports" nicht ausführlich genug'},
+'excluded hardware model'=>{de=>'ausgeschlossenes Hardware-Model'},
