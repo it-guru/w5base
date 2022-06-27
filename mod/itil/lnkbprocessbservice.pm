@@ -117,7 +117,19 @@ sub new
                 group         =>'source',
                 label         =>'last Editor',
                 dataobjattr   =>'lnkbprocessbusinessservice.modifyuser'),
-                                   
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"lnkbprocessbusinessservice.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(lnkbprocessbusinessservice.id,35,'0')"),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',

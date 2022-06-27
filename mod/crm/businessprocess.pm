@@ -326,7 +326,19 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'Creation-Date',
                 dataobjattr   =>'businessprocess.createdate'),
-                                                  
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"businessprocess.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(businessprocess.id,35,'0')"),
+
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
