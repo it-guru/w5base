@@ -81,6 +81,23 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
+   my @ign_hwmodels=map({uc($_)}  (
+         "NETWORK INSTRUMENTS AGGREGATOR NTAP",
+         "NETWORK INSTRUMENTS OPTICAL NTAP",
+         "IXIA FLEX TAP TP-100-LR-85-70",
+         "IXIA FLEX TAP TP-1-SX-50-70",
+         "IXIA FLEX TAP TPX-10-SR-50-70",
+         "KEYSIGHT IXIA FLEX TAP TPX-40-SR-50-70-MTP",
+         "HDS VSP CF",
+         "HDS HUS150 CONTROLLER",
+         "IBM 1U FLAT PANEL MONITOR CONSOLE KIT"
+   ));
+
+
+
+   if (in_array(uc($rec->{hwmodel}),\@ign_hwmodels)){
+      return(undef,{qmsg=>'excluded hardware model'});
+   }
 
    return(0,undef) if ($rec->{cistatusid}!=4);
 
