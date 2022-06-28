@@ -1,0 +1,80 @@
+<script language="JavaScript">
+function processRest(){
+      var form=$("#form");
+      var cururl=document.location.href;
+      $("#result").attr("src","../../base/load/loading");
+      $("#resultset").show();
+      setTimeout(function(e){
+         var path=new Array();
+         $('#form').find('input').each(function() {
+           var pid=$(this).attr("data-path");
+           if (pid){
+              if (pid.match(/^[0-9]+$/)){
+                 path[pid]=this.value;
+              }
+           }
+         });
+         cururl+="/"+path.join("/");
+        
+         $("#result").attr("src",cururl);
+         $("#resultpath").val(cururl);
+     },500);
+}
+$(document).ready(function(){
+   setEnterSubmit(document.forms[0],processRest);
+   $("#doPost").click(processRest);
+});
+
+</script>
+<style>
+fieldset{
+   background:#eee;
+}
+legend{
+  margin-top: 19px;
+  font-weight: bold;
+  background: #ddd;
+  border: 1px solid #999;
+}
+label{
+   display: inline-block;
+   text-align: right;
+   float: left;
+   width:200px;
+}
+
+#form input{  
+    display: inline-block;
+    text-align: left;
+    float: left;
+    width:200px;
+    margin-left:10px;
+}
+
+form{
+   width:540px;
+   margin: 0 auto;
+}
+
+</style>
+<form id=form>
+<h1>%TITLE%</h1>
+<h4>%SCRIPT_URI%</h4>
+%FIELDS%
+<br>
+<input id=doPost type=button style="cursor:pointer;text-align:center;width:100%;margin:0px" value="ExpandPath to iframe">
+<br>
+<br>
+</form>
+
+<center>
+<fieldset id=resultset style="display:none;overflow:auto;width:80%;text-align:left">
+<legend>Result</legend>
+<center>
+<input type=text readonly style="width:600px" id=resultpath>
+<iframe border=1 scrolling="no" frameborder=1 id=result width=600 height=170 src="../../base/load/loading" style="border-style:solid"><iframe>
+</center>
+</fieldset>
+</center>
+
+
