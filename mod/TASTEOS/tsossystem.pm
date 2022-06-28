@@ -114,6 +114,9 @@ sub DataCollector
          if ($code eq "401"){  # 401 bedeutet nicht gefunden
             return([],"200");
          }
+         if ($code eq "403"){  # 403 Datensatz durch den TasteOS Cleanup
+            return([],"200");  # gelöscht
+         }
          msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,"unexpected data TSOS response");
          return(undef);
