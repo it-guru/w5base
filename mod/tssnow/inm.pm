@@ -63,6 +63,11 @@ sub new
                 ignorecase    =>1,
                 dataobjattr   =>'incident.SHORT_DESCRIPTION'),
 
+      new kernel::Field::Interface(
+                name          =>'rawname',
+                label         =>'Brief Description',
+                dataobjattr   =>'incident.SHORT_DESCRIPTION'),
+
       new kernel::Field::Text(
                 name          =>'status',
                 label         =>'Status',
@@ -97,6 +102,11 @@ sub new
                 label         =>'Create time',
                 dataobjattr   =>'incident.opened_at'),
 
+     new kernel::Field::Textarea(
+                name          =>'description',
+                label         =>'Description',
+                dataobjattr   =>"incident.description"),
+
       new kernel::Field::Date(
                 name          =>'closetime',
                 label         =>'Closing time',
@@ -108,6 +118,32 @@ sub new
                 group         =>'source',
                 dataobjattr   =>'incident.opened_at'),
                                 # alternativ waere da noch SYS_CREATED_ON
+
+      new kernel::Field::Text(
+                name          =>'correlationid',
+                group         =>'source',
+                htmldetail    =>0,
+                label         =>'CorrelationID',
+                dataobjattr   =>"incident.correlation_id"),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                label         =>'Source-System',
+                dataobjattr   =>"SUBSTR(incident.correlation_id,1,".
+                                "Instr(incident.correlation_id,':',-1,1) -1)"),
+
+      new kernel::Field::Text(
+                name          =>'srcid',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                label         =>'Source-ID',
+                depend        =>[qw(srcsys)],
+                dataobjattr   =>"SUBSTR(incident.correlation_id,".
+                                "Instr(incident.correlation_id,':',-1,1) +1)"),
+
+
    );
    $self->{use_distinct}=0;
 

@@ -423,6 +423,11 @@ sub getAppTitleBar
    my %param=@_;
    my $d="";
 
+   my $noLinks=0;
+   if (exists($param{noLinks})){
+      $noLinks=$param{noLinks};
+   }
+
    my $prefix=$param{prefix};
 
    my $user=$ENV{REMOTE_USER};
@@ -439,7 +444,7 @@ sub getAppTitleBar
       $user=$self->T("Logged in as")." ".$user;
    }
    if ($ENV{REMOTE_USER} eq "anonymous"){
-      $onclick=" ";
+      $onclick=" id=LoggedInAs ";
    }
    $param{title}=$self->T($self->Self,$self->Self) if (!defined($param{title}));
 
@@ -450,7 +455,12 @@ sub getAppTitleBar
                        "id=ModuleObjectInfo";
       }
    }
+   if ($noLinks){
+      $onclick=" id=LoggedInAs ";
+      $titleonclick="id=ModuleObjectInfo";
+   }
    my $directLink=$param{AppDirectLink};
+   my $directLinkClose="</a>";
    if (!defined($directLink)){
       $directLink=$self->getAppDirectLink();
    }
@@ -458,13 +468,24 @@ sub getAppTitleBar
    if ($param{autofocus} eq "1" || $param{autofocus} eq "title"){
       $autofocus=" autofocus"; 
    }
+   if ($directLink ne ""){
+      $directLink="<a class=TitleBarLink target=_top ".
+                  "href='$directLink'${autofocus}>";
+      
+   }
+   if ($noLinks){
+      $directLinkClose="";
+      $directLink="";
+   }
+   
+
+   
    my $titlebar=sprintf("<tr class=TitleBar><td class=TitleBarLeftTD>".
                  "<div $titleonclick ".
                  "style=\"margin:0;padding:0;".
                  "text-overflow:ellipsis;overflow:hidden\">".
-                 "<a class=TitleBarLink target=_top ".
-                 "href='$directLink'${autofocus}>".
-                 "%s</a>&nbsp;</div></td>".
+                 $directLink."%s".$directLinkClose.
+                 "&nbsp;</div></td>".
                  "<td class=TitleBarRightTD>".
                  "<div class=hideOnMobile>".
                  "<a href=\"\" target=_blank $onclick>%s</a>".
@@ -2283,7 +2304,16 @@ sub _simpleRESTCallHandler_SendResult
 sub simpleRESTCallHandler
 {
    my $self=shift;
-   my $qfields=shift;
+   my $qfields;
+   my $processor=shift;   # "PostForm" | "ExpandPath"
+   if (ref($processor) eq "HASH"){
+      $qfields=$processor;
+      $processor="PostForm";
+     
+   }
+   else{
+      $qfields=shift;
+   }
    my $authorize=shift;
    my $f=shift;
    my @param=@_;
@@ -2331,6 +2361,9 @@ sub simpleRESTCallHandler
                }
             }
             my @result=&{$f}($self,$q);
+            if ($#result==0 && $result[0]==-1){
+               return();
+            }
             return($self->_simpleRESTCallHandler_SendResult(0,@result));
          }
       }
@@ -2356,7 +2389,7 @@ sub simpleRESTCallHandler
                                    'kernel.App.Web.css'],
                            js=>['jquery.js','toolbox.js'],
                            title=>$title);
-         print $self->getAppTitleBar();
+         print $self->getAppTitleBar(noLinks=>1);
          my $fForm="<fieldset>";
          $fForm.="<legend>Call Parameters:</legend>";
          my $initfound=0;
@@ -2385,7 +2418,11 @@ sub simpleRESTCallHandler
                $fForm.="<div>";
                $fForm.="<label for=\"$v\">$v</label>";
                $fForm.="<input type=\"input\" name=\"$v\" id=\"$v\" ".
-                       "value=\"$init\" style=\"float:none\">";
+                       "value=\"$init\" style=\"float:none\"";
+               if (exists($qfields->{$v}->{path})){
+                  $fForm.=" data-path=\"".$qfields->{$v}->{path}."\"";
+               }
+               $fForm.=">\n";
                $fForm.="</div>\n";
             }
          }
@@ -2395,7 +2432,7 @@ sub simpleRESTCallHandler
             $SCRIPT_URI=~s/^http:/https:/;
          }
          print $self->getParsedTemplate(
-               "tmpl/kernel.simpleRESTform",
+               "tmpl/kernel.simpleRESTform.".$processor,
                { 
                   skinbase=>'base',
                   static=>{

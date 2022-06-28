@@ -6,5 +6,4 @@
 'Current Assignment'=>{de=>'aktuelle Assignmentgroup'},
 'Closing time'=>{de=>'Abschlusszeitpunkt'},
 'Create time'=>{de=>'Erstellungszeitpunkt'},
-
-
+'Description'=>{de=>'Beschreibung'},
