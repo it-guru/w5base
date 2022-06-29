@@ -230,6 +230,13 @@ sub ProcessXLS
                #printf STDERR ("CommonName: %s\n", $rec{CommonName});
             }
             my $srcid=$rec{SharePointLfdNr};
+            if ($srcid eq ""){
+               $srcid=$rec{lfdNr};
+            }
+            if ($srcid eq ""){
+               printf STDERR ("Error Record no srcid: %s\n",Dumper(\%rec));
+               die("Error Record no srcid");
+            }
             my $csr=$self->getPersistentModuleObject("csr","CRaS::csr");
             my %csrrec=(
                name=>$rec{CommonName},
