@@ -672,6 +672,47 @@ sub formatedMultiline
 }
 
 
+sub getCSTeamIDbyApplid
+{
+   my $self=shift;
+   my $applid=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $csteamid;
+   my $csteamaccess=0;
+
+   my $appl=getModuleObject($self->Config,"itil::appl");
+   $appl->SetFilter({id=>\$applid});
+   my ($arec)=$appl->getOnlyFirst(qw(ALL));
+   my @org;
+   if (defined($arec)){
+      my @grp;
+      my $team=$arec->{businessteam};
+      my @team=split(/\./,$team);
+      for(my $c=0;$c<=$#team;$c++){
+         push(@org,join(".",@team[0..$c])); 
+      }
+   }
+   my $csteam=getModuleObject($self->Config,"CRaS::csteam");
+   if ($self->isDataInputFromUserFrontend()){
+      $csteam->SetFilter({orgarea=>\@org});
+   }
+   else{
+      $csteam->SetFilter({});
+   }
+   my @l=$csteam->getHashList(qw(orgarea grpid id));
+   if ($#l>=0){
+      $csteamid=$l[0]->{id}; 
+      if ($l[0]->{grpid} ne ""){
+         if ($self->IsMemberOf([$l[0]->{grpid}])){
+            $csteamaccess++;
+         }
+      }
+   }
+   return($csteamid,$csteamaccess);
+}
+
+
 sub Validate
 {
    my $self=shift;
@@ -725,33 +766,11 @@ sub Validate
          $newrec->{state}=1;
       }
       my $applid=effVal($oldrec,$newrec,"applid"); 
-      my $appl=getModuleObject($self->Config,"itil::appl");
-      $appl->SetFilter({id=>\$applid});
-      my ($arec)=$appl->getOnlyFirst(qw(ALL));
-      my @org;
-      if (defined($arec)){
-         my @grp;
-         my $team=$arec->{businessteam};
-         my @team=split(/\./,$team);
-         for(my $c=0;$c<=$#team;$c++){
-            push(@org,join(".",@team[0..$c])); 
-         }
-      }
-      my $csteam=getModuleObject($self->Config,"CRaS::csteam");
-      if ($self->isDataInputFromUserFrontend()){
-         $csteam->SetFilter({orgarea=>\@org});
-      }
-      else{
-         $csteam->SetFilter({});
-      }
-      my @l=$csteam->getHashList(qw(orgarea grpid id));
-      if ($#l>=0){
-         $newrec->{csteamid}=$l[0]->{id}; 
-         if ($l[0]->{grpid} ne ""){
-            if ($self->IsMemberOf([$l[0]->{grpid}])){
-               $csteamaccess++;
-            }
-         }
+      my $csteamid;
+      ($csteamid,$csteamaccess)=$self->getCSTeamIDbyApplid($applid,
+                                                           $oldrec,$newrec);
+      if (defined($csteamid)){
+         $newrec->{csteamid}=$csteamid;
       }
    }
    if (!defined($oldrec) && !defined($newrec->{csteamid})){
@@ -847,46 +866,6 @@ sub Validate
       if ($#altnames!=-1){
          $newrec->{sslaltnames}=join("; ",sort(@altnames));
       }
-
-
-
-
-#      if (1){
-#         # "Alternative Name" analyse
-#         my $alternativeNames;
-#         my $exts;
-#
-#         eval('$exts=$pkcs->extensions_by_oid();');
-#         if ($@){
-#            msg(WARN,"x509::extensions_by_oid crashed with $@");
-#         }
-#         if (ref($exts) eq "HASH"){
-#            foreach my $oid (keys(%$exts)){
-#              my $ext=$exts->{$oid};
-#              if ($oid eq "2.5.29.17"){
-#                 my $val=$ext->value();
-#                 if ($ext->can("to_string")){
-#                    $val=$ext->to_string();
-#                 }
-#                 elsif ($ext->can("as_string")){
-#                    $val=$ext->as_string();
-#                 }
-#                 $alternativeNames=$val;
-#              }
-#            }
-#         }
-#         if (defined($alternativeNames)){
-#            if (!defined($oldrec)){
-#               $newrec->{altname}=$alternativeNames;
-#            }
-#            else{
-#               if ($oldrec->{altname} ne $alternativeNames){
-#                  $newrec->{altname}=$alternativeNames;
-#               }
-#            }
-#         }
-#         msg(INFO,"alternativeNames=$alternativeNames");
-#      }
    }
    if (exists($newrec->{'ssslcert'})) {
       my $x509=$self->readPEM(effVal($oldrec,$newrec,'ssslcert'));
@@ -903,6 +882,15 @@ sub Validate
          $newrec->{ssslissuerdn}=$x509->{ssslissuerdn};
       }
    }
+
+
+   #
+   # getCSTeamIDbyApplid muss vermutlich hier rein (da zukünftig
+   # die Ermittlung des ServiceTeams von den CSR Daten (Erkennen,
+   # ob es sich um ein Client-Cert handelt) abhängt - das
+   # wird dann aber erst noch gebaut (und im jetzigen Schritt noch
+   # nicht umgesetzt)
+   #
 
    return(1);
 }
@@ -929,6 +917,17 @@ sub FinishWrite
       $newrec{sslcertorg}=$oldrec->{sslcertorg};
       $newrec{replacedrefno}=$oldrec->{refno};
       $newrec{spassword}=$oldrec->{spassword};
+
+      $newrec{csteamid}=$oldrec->{csteamid};
+      if (1){
+         my ($csteamid,$csteamaccess)=
+            $self->getCSTeamIDbyApplid($newrec{applid},undef,$newrec);
+         if (defined($csteamid)){  # neues Team ist nun für 
+                                   # die AG zusändig
+            $newrec{csteamid}=$csteamid;
+         }
+      }
+
       $newrec{state}="1";
       $self->ValidatedInsertRecord(\%newrec);
    }
