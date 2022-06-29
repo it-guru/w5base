@@ -607,7 +607,7 @@ sub isWriteValid
    else{
       if ($self->IsMemberOf($rec->{csgrpid})){
          my @l=("default");
-         if ($rec->{state}==1){
+         if ($rec->{state}==1 || $rec->{state}==3){
             push(@l,"caref");
          }
          return(@l);
