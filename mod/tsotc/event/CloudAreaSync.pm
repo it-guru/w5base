@@ -81,6 +81,7 @@ sub CloudAreaSync
           appl=>$appansrec->{appl},
           lastmondate=>$appansrec->{lastmondate}
        );
+       next if ($fullname=~m/test/i);
        push(@a,\%carec);
    }
    if ($#a==-1){
@@ -153,6 +154,7 @@ sub CloudAreaSync
    $itcloudareaobj->SetFilter({
       cloud=>join(" ",sort(keys(%itcloud))),
    });
+printf STDERR ("fifi clouds=%s\n",join(",",sort(keys(%itcloud))));
    $itcloudareaobj->SetCurrentView(qw(ALL));
    my $itcloudarea=$itcloudareaobj->getHashIndexed("id","fullname",
                                                    "name","srcid");
@@ -265,7 +267,7 @@ sub CloudAreaSync
             else{
                if ($currec->{cistatusid}>5){ # reaktivieren einer bereits
                   $updrec->{cistatusid}=3;   # als veraltet markieren CloudArea
-               }                             # (mit Nachfrage beim AG DV)
+               }                             
             }
 
             if ($currec->{srcsys} ne $a->{srcsys}){
@@ -311,14 +313,15 @@ sub CloudAreaSync
    }
    if (keys(%$caref)){  # cleanup only if min. one ref found
       foreach my $carec (values(%{$itcloudarea->{id}})){
-          next if ($carec->{cistatusid}>=6);  # check only entries in active state
-          next if (!($carec->{srcsys}=~m/^tsotc::/)); # check only from this mod
+          next if ($carec->{cistatusid}>=6); #check only entries in active state
           if (!exists($caref->{$carec->{id}})){  # seems not exists anymore
              $itcloudareaobj->ValidatedUpdateRecord(
                 $carec,{cistatusid=>6},{
                    id=>$carec->{id}
                 }
              );
+          }
+          else{
           }
       }
    }
