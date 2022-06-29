@@ -154,7 +154,6 @@ sub CloudAreaSync
    $itcloudareaobj->SetFilter({
       cloud=>join(" ",sort(keys(%itcloud))),
    });
-printf STDERR ("fifi clouds=%s\n",join(",",sort(keys(%itcloud))));
    $itcloudareaobj->SetCurrentView(qw(ALL));
    my $itcloudarea=$itcloudareaobj->getHashIndexed("id","fullname",
                                                    "name","srcid");
