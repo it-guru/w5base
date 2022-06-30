@@ -241,6 +241,54 @@ sub new
                 label         =>'Flat hours per month (internal)',
                 dataobjattr   =>'servicesupport.iflathourscost'),
 
+      new kernel::Field::Number(
+                name          =>'usecountitilappl',
+                precision     =>0,
+                htmldetail    =>0,
+                group         =>'usecount',
+                label         =>'usage in itil::appl',
+                dataobjattr   =>"(select count(*) from appl ".
+                                "where ".
+                                "appl.servicesupport=servicesupport.id ".
+                                "and appl.cistatus<6 ".
+                                "and appl.cistatus>1)"),
+
+      new kernel::Field::Number(
+                name          =>'usecountitilsystem',
+                precision     =>0,
+                htmldetail    =>0,
+                group         =>'usecount',
+                label         =>'usage in itil::system',
+                dataobjattr   =>"(select count(*) from system ".
+                                "where ".
+                                "system.servicesupport=servicesupport.id ".
+                                "and system.cistatus<6 ".
+                                "and system.cistatus>1)"),
+
+      new kernel::Field::Number(
+                name          =>'usecountitilasset',
+                precision     =>0,
+                htmldetail    =>0,
+                group         =>'usecount',
+                label         =>'usage in itil::asset',
+                dataobjattr   =>"(select count(*) from asset ".
+                                "where ".
+                                "asset.prodmaintlevel=servicesupport.id ".
+                                "and asset.cistatus<6 ".
+                                "and asset.cistatus>1)"),
+
+      new kernel::Field::Number(
+                name          =>'usecountitilswinstance',
+                precision     =>0,
+                htmldetail    =>0,
+                group         =>'usecount',
+                label         =>'usage in itil::swinstance',
+                dataobjattr   =>"(select count(*) from swinstance ".
+                                "where ".
+                                "swinstance.servicesupport=servicesupport.id ".
+                                "and swinstance.cistatus<6 ".
+                                "and swinstance.cistatus>1)"),
+
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
@@ -517,7 +565,7 @@ sub isViewValid
    }
 
    return("header","default","responsibility","characteristic","contacts",
-          "source","history",@adds);
+          "source","history","usecount",@adds);
 }
 
 sub getRecordImageUrl
