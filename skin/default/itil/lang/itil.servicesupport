@@ -32,3 +32,8 @@ Leistung oder eines Services.',en=>'
 'deputy Databoss'=>{de=>'Datenverantwortlicher Vertreter'},
 'you are not authorized to set other persons as databoss'=>{de=>'Sie sind nicht berechtig, andere Personen als Datenverantwortlicher einzutragen'},
 'you are not authorized to change cistatus or name'=>{de=>'Sie sind nicht berechtigt, CI-Status oder Name zu ändern'},
+'fieldgroup.usecount'=>{de=>'Service und Support - Verwendung',en=>'Service and Support - usage'},
+'usage in itil::appl'=>{de=>'Verwendung in itil::appl'},
+'usage in itil::system'=>{de=>'Verwendung in itil::system'},
+'usage in itil::asset'=>{de=>'Verwendung in itil::asset'},
+'usage in itil::swinstance'=>{de=>'Verwendung in itil::swinstance'},
