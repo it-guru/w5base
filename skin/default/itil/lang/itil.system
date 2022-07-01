@@ -132,3 +132,7 @@
 'invalid characters in functional alias'=>{de=>'unzulässige Zeichen im funktionellen Alias'},
 'Incident-Ticket contact email'=>{de=>'Incident-Ticket Kontakt E-Mail'},
 'Change-Ticket contact email'=>{de=>'Change-Ticket Kontakt E-Mail'},
+'ICS / SOX compliance implemented'=>{
+ de=>'ICS / SOX konformer Betrieb implementiert'
+},
+

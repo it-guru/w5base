@@ -707,16 +707,6 @@ sub new
                 label         =>'NORmodelID',
                 dataobjattr   =>'system.itnormodel'),
 
-      new kernel::Field::JoinUniqMerge(
-                name          =>'issox',
-                label         =>'Default for ICS / SOX compliance (calculated)',
-                group         =>'sec',
-                searchable    =>1,
-                vjointo       =>'itil::lnkapplsystem',
-                vjoinbase     =>[{applcistatusid=>"<=4"}],
-                vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>'systemissox'),
-
       new kernel::Field::Select(
                 name          =>'nosoxinherit',
                 group         =>'sec',
@@ -727,6 +717,24 @@ sub new
                 value         =>['0','1'],
                 translation   =>'itil::appl',
                 dataobjattr   =>'system.no_sox_inherit'),
+
+      new kernel::Field::JoinUniqMerge(
+                name          =>'issox',
+                label         =>'Default for ICS / SOX compliance (calculated)',
+                group         =>'sec',
+                searchable    =>1,
+                vjointo       =>'itil::lnkapplsystem',
+                vjoinbase     =>[{applcistatusid=>"<=4"}],
+                vjoinon       =>['id'=>'systemid'],
+                vjoindisp     =>'systemissox'),
+
+
+      new kernel::Field::Boolean(
+                name          =>'issoximpl',
+                group         =>'sec',
+                label         =>'ICS / SOX compliance implemented',
+                allowempty    =>'1',
+                dataobjattr   =>'system.issoximpl'),
 
 
       new kernel::Field::Textarea(

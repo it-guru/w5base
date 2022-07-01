@@ -376,10 +376,10 @@ sub qcheckRecord
                      });
                      my ($vsysrec,$msg)=$vsys->getOnlyFirst(qw(id name 
                                                                assetid));
-                     if (!$vsys->Ping()){
-                        return(undef,{qmsg=>"ADOP-T not available - ".
-                                     "assetid is not detectable"});
-                     }
+                     #if (!$vsys->Ping()){
+                     #   return(undef,{qmsg=>"ADOP-T not available - ".
+                     #                "assetid is not detectable"});
+                     #}
                      if ($vsysrec->{assetid} ne ""){
                         my $msg=$self->T('substituted assetid for %s '.
                                        'from %s to %s based on ADOP-T');
@@ -561,6 +561,12 @@ sub qcheckRecord
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');
+               $self->IfComp($dataobj,
+                             $rec,"issoximpl",
+                             $parrec,"sas70relevant",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'boolean');
 
 
                #
@@ -882,6 +888,8 @@ sub qcheckRecord
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'string');
+
+
             }
          }
          if ($rec->{asset} ne ""){
