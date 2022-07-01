@@ -1841,3 +1841,4 @@ alter table asset add plandecons datetime default NULL;
 alter table accessurl add ssl_certissuerdn varchar(256) default null;
 alter table asset add notifyplandecons1 datetime default NULL,add notifyplandecons2 datetime default NULL;
 alter table asset add eohscomments longtext;
+alter table system add issoximpl int(2) default NULL;
