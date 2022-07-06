@@ -5,3 +5,4 @@
 'Name too long (max. 12 characters)'=>{de=>'Name zu lang (max. 12 Zeichen)'},
 'invalid Sub-Unit name (invalid characters)'=>{de=>'ungültiger Untereinheiten-Name (ungültige Zeichen)'},
 'Description'=>{de=>'Beschreibung'},
+"Sub-Unit name 'people' is not allowed"=>{de=>"Unter-Organisationseinheiten mit dem Namen 'people' sind nicht erlaubt"}
