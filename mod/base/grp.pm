@@ -88,6 +88,18 @@ sub new
                 label         =>'Description',
                 dataobjattr   =>'grp.description'),
 
+      new kernel::Field::Text(
+                name          =>'sdescription',
+                htmldetail    =>0,
+                searchable    =>0,
+                label         =>'shorted Description',
+                prepRawValue  =>sub{
+                   my $self=shift;
+                   my $d=shift;
+                   return(TextShorter($d,70,['INDICATED']));
+                },
+                dataobjattr   =>'grp.description'),
+
       new kernel::Field::SubList(
                 name          =>'users',
                 subeditmsk    =>'subedit.group',
@@ -356,7 +368,7 @@ sub new
                 vjointo       =>'base::grp',
                 vjoinbase     =>{'cistatusid'=>"<6"},
                 vjoinon       =>['grpid'=>'parentid'],
-                vjoindisp     =>['name','cistatus'],
+                vjoindisp     =>['name','cistatus','sdescription'],
                 vjoininhash   =>['grpid','name','fullname','srcsys']),
 
       new kernel::Field::QualityText(),

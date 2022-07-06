@@ -1,6 +1,7 @@
 'Parentgroup'                  =>{ de=>'Eltern-Gruppe'},
 'Fullname'                     =>{ de=>'Vollständiger Name'},
 'Description'                  =>{ de=>'Beschreibung/Adresse'},
+'shorted Description'          =>{ de=>'gekürzte Beschreibung'},
 'Name'                         =>{ de=>'Name'},
 'group has members!'           =>{ de=>'Die Gruppe hat noch Mitglieder!'},
 'group has references in menu acl!'=>{ de=>'Die Gruppe hat Refrenzen in Menüzugriffssteuerung!'},
