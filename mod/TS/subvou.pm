@@ -216,6 +216,14 @@ sub Validate
          return(0);
       }
    }
+   if (effChanged($oldrec,$newrec,"name")){
+      my $newname=effVal($oldrec,$newrec,"name");
+      if ($newname=~m/^people$/i){
+         $self->LastMsg(ERROR,"Sub-Unit name 'people' is not allowed");
+         return(0);
+      }
+   }
+
    return(1);
 }
 

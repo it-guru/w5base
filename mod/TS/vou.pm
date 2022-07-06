@@ -751,44 +751,51 @@ sub syncToGroups
          my @dellist;
          my @updlist;
          my @inslist;
-
-         foreach my $sub (@{$oldrec->{subvous}}){
-            my $fnd;
-            foreach my $cgrp (@l){
-               if ($cgrp->{name} eq $sub->{name} ||
-                   ($cgrp->{srcsys} eq "TS::subvou" &&
-                    $cgrp->{srcid} eq $sub->{id})){
-                  $fnd=$cgrp;
+         if ($#{$oldrec->{subvous}}!=-1){
+            push(@{$oldrec->{subvous}},{
+                                id=>$grpid,
+                                name=>'People',
+                                description=>'all Hub members, without '.
+                                             'specific '.
+                                             'Hub-subgroup membership'});
+            foreach my $sub (@{$oldrec->{subvous}}){
+               my $fnd;
+               foreach my $cgrp (@l){
+                  if ($cgrp->{name} eq $sub->{name} ||
+                      ($cgrp->{srcsys} eq "TS::subvou" &&
+                       $cgrp->{srcid} eq $sub->{id})){
+                     $fnd=$cgrp;
+                  }
                }
-            }
-            if (defined($fnd)){
-               my $upd={};
-               if ($fnd->{cistatusid} ne $cistatus){
-                  $upd->{cistatusid}=$cistatus; 
+               if (defined($fnd)){
+                  my $upd={};
+                  if ($fnd->{cistatusid} ne $cistatus){
+                     $upd->{cistatusid}=$cistatus; 
+                  }
+                  my $cname=$fnd->{name};
+                  $cname=~s/\[\d+\]$//;
+                  if ($cname ne $sub->{name}){
+                     $upd->{name}=$sub->{name};
+                  }
+                  if ($fnd->{description} ne $sub->{description}){
+                     $upd->{description}=$sub->{description};
+                  }
+                  if ($fnd->{srcid} ne $sub->{id}){
+                     $upd->{srcid}=$sub->{id};
+                  }
+                  if ($fnd->{srcsys} ne "TS::subvou"){
+                     $upd->{srcsys}="TS::subvou";
+                  }
+                  if ($fnd->{is_projectgrp} ne "1"){
+                     $upd->{is_projectgrp}="1";
+                  }
+                  if (keys(%$upd)){
+                     push(@updlist,[$fnd,$upd]);
+                  }
                }
-               my $cname=$fnd->{name};
-               $cname=~s/\[\d+\]$//;
-               if ($cname ne $sub->{name}){
-                  $upd->{name}=$sub->{name};
+               else{
+                  push(@inslist,$sub);
                }
-               if ($fnd->{description} ne $sub->{description}){
-                  $upd->{description}=$sub->{description};
-               }
-               if ($fnd->{srcid} ne $sub->{id}){
-                  $upd->{srcid}=$sub->{id};
-               }
-               if ($fnd->{srcsys} ne "TS::subvou"){
-                  $upd->{srcsys}="TS::subvou";
-               }
-               if ($fnd->{is_projectgrp} ne "1"){
-                  $upd->{is_projectgrp}="1";
-               }
-               if (keys(%$upd)){
-                  push(@updlist,[$fnd,$upd]);
-               }
-            }
-            else{
-               push(@inslist,$sub);
             }
          }
          foreach my $cgrp (@l){
