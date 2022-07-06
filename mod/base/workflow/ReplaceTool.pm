@@ -141,6 +141,18 @@ sub viewReplaceFields
    my @sets=split(/\s+/,$d);
    my $app=$self->getParent;
    my @d;
+
+   if ($#sets==0 && $sets[0] eq "ALL"){
+      @sets=();
+      foreach my $mod (keys(%{$app->{ReplaceTool}})){
+         my $crec=$app->{ReplaceTool}->{$mod}->getControlRecord();
+         my %crec=@{$crec};
+         foreach my $tag (keys(%crec)){
+            push(@sets,'SR:'.$mod."::".$tag);
+         }
+      }
+   }
+   
    foreach my $s (@sets){
       if (my ($mod,$tag)=$s=~m/^SR:(.*)::([^:]+)$/){
          if (defined($app->{ReplaceTool}->{$mod})){
@@ -269,6 +281,17 @@ sub doReplaceOperation
       my $url=$baseurl;
       $url.="/auth/base/workflow/ById/".$WfRec->{id};
       $W5V2::OperationContext=$url;
+   }
+
+  if ($#sets==0 && $sets[0] eq "ALL"){
+      @sets=();
+      foreach my $mod (keys(%{$app->{ReplaceTool}})){
+         my $crec=$app->{ReplaceTool}->{$mod}->getControlRecord();
+         my %crec=@{$crec};
+         foreach my $tag (keys(%crec)){
+            push(@sets,'SR:'.$mod."::".$tag);
+         }
+      }
    }
 
    my $count=0;
