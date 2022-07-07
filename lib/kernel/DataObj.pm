@@ -4520,7 +4520,7 @@ sub Limit
       }
       $self->{_Limit}=$_[0];
       $self->{_LimitStart}=$_[1];
-      $self->{_LimitStart}=1 if (!defined($self->{_LimitStart}));
+      $self->{_LimitStart}=0 if (!defined($self->{_LimitStart}));
       if ($_[2]){
          $self->{_UseSoftLimit}=1;
       }
