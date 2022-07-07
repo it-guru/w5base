@@ -137,8 +137,27 @@ sub qcheckRecord
                           grpcistatusid=>\'4',
                           alertstate=>'[EMPTY]'});
       my $grp;
-      my @l=$lnkgrp->getHashList(qw(cdate group roles alertstate grpid));
-      my @e=grep({in_array($_->{roles},['REmployee'])} @l);
+      my @l=$lnkgrp->getHashList(qw(cdate group roles alertstate grpid
+                                    is_projectgrp));
+      my @e=grep({in_array($_->{roles},[orgRoles()])} @l);
+
+      if ($#e>0){  # if more then one orgRole Relations, prever use 
+                   # of is_projectgrp group relations.
+         my %is_projectgrp=();
+         map({
+            if ($_->{is_projectgrp}){
+               $is_projectgrp{$_->{grpid}}++;
+            }
+         } @e);
+         if (keys(%is_projectgrp)){
+            my @newe;
+            foreach my $erec (@e){
+               push(@newe,$erec) if ($erec->{is_projectgrp});
+            }
+            @e=@newe;
+         }
+      }
+
       if ($#e!=-1){  # Wenn REmployee Einträge, dann haben die Vorrang
          $grp=$e[0];
       }
@@ -158,6 +177,7 @@ sub qcheckRecord
          } @l);
          $grp=$l2[0];
       }
+
       if (defined($grp)){
          my $grpid=$grp->{grpid};
          my $refid=$rec->{$vjoinon->[0]};
