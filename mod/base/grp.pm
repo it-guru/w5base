@@ -110,7 +110,8 @@ sub new
                 vjoinon       =>['grpid'=>'grpid'],
                 vjoindisp     =>['user','userweblink','roles'],
                 vjoininhash   =>['userid','email','user',
-                                 'posix','usertyp','roles','srcsys']),
+                                 'posix','usertyp','roles','srcsys',
+                                 'lnkgrpuserid']),
 
       new kernel::Field::Text(
                 name          =>'orgusers',
