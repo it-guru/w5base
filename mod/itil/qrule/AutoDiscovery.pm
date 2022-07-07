@@ -441,7 +441,8 @@ sub DiscoverData
          next if ($r->{engineid} ne $adrec->{engineid});
          $cnt++;
          if ($cnt>1){  # double Record found
-            msg(WARN,"double adrec detected '$adrec->{autodischint}'");
+            msg(WARN,"double adrec detected");
+            msg(WARN,"adrec=".Dumper($adrec));
             msg(WARN,"(This message is only for debugging and ".
                      "needs to be removed in ".
                      "the future by development)");
