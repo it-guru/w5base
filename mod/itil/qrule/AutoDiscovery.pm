@@ -442,10 +442,12 @@ sub DiscoverData
          $cnt++;
          if ($cnt>1){  # double Record found
             msg(WARN,"double adrec detected");
+            msg(WARN,"l=".Dumper(\@l));
             msg(WARN,"adrec=".Dumper($adrec));
             msg(WARN,"(This message is only for debugging and ".
                      "needs to be removed in ".
                      "the future by development)");
+            msg(WARN,"======");
             next;
          }
          if ($oldrecs->{$r->{id}}->{misscount}>0){
