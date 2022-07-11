@@ -116,6 +116,7 @@ sub _classifyElements
    my @COM=qw(like and or =);
    foreach my $w (@w){
       my $qw=quotemeta($w);
+      next if ($w eq "");  # skip blanks
       if (grep(/^${qw}$/i,@COM)){
          push(@e,{'type'=>'COM','name'=>$w});
       }
@@ -307,7 +308,6 @@ sub compileExpression
       $self->errString("syntax error - can not parse words");
       return(undef); 
    }
-
    #
    # Pass2: classify element list
    #
@@ -352,7 +352,7 @@ sub compileExpression
       }
       $cmd.=")};";
       $self->Code($cmd);
-      #printf STDERR ("DEBUG src: $cmd\n"); 
+      printf STDERR ("DEBUG src: $cmd\n"); 
      
       my $match=eval($cmd);
       $self->errString($@) if ($self->errString() eq "" && $@ ne "");
