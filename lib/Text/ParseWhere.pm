@@ -352,7 +352,7 @@ sub compileExpression
       }
       $cmd.=")};";
       $self->Code($cmd);
-      printf STDERR ("DEBUG src: $cmd\n"); 
+      #printf STDERR ("DEBUG src: $cmd\n"); 
      
       my $match=eval($cmd);
       $self->errString($@) if ($self->errString() eq "" && $@ ne "");
