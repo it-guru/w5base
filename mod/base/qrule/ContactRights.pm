@@ -20,7 +20,8 @@ NONE
 Bitte hinterlegen Sie mindestens einen Kontakt mit der Rolle "schreiben", 
 der nicht gleichzeitig Datenverantwortlicher für diesen Datensatz ist. 
 Ist ein Config-Item älter als 4 Wochen, so wird die organisatorische
-Einheit des Datenverantwortlichen automatisch als Kontakt mit der
+Einheit (Projektgruppen werden dabei bevorzugt verwendet) des 
+Datenverantwortlichen automatisch als Kontakt mit der
 Rolle "schreiben" hinzugefügt, falls keine weiteren Kontakte mit
 der Rolle "schreiben" vorhanden sind.
 
@@ -34,7 +35,8 @@ und bei Gleichstand dann die, die die älteste Zuordnung hat.
 Please enter at least one person, other than the current databoss, 
 into the field Contacts with the role application write.
 If a config item is older than 4 weeks, the organizational unit 
-of the databoss is automatically added as a contact with the 
+(project groups will be used preferred) of the databoss is 
+automatically added as a contact with the 
 role "write" if there are no further contacts with the role "write".
 
 
