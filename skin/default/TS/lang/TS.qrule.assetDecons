@@ -1,5 +1,5 @@
 'TS::qrule::assetDecons'=>{
-de=>'Überwachtung des geplanten Hardware-Rückbaus',
+de=>'Überwachung des geplanten Hardware-Rückbaus',
 en=>'Monitor planed hardware deconstruction'
 },
 'missing planned deconstruction date'=>{de=>'fehlender geplanter Rückbau Zeitpunkt'},
