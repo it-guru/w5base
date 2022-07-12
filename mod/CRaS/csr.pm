@@ -760,7 +760,6 @@ sub Validate
    #}
 
    my $csteamaccess=0;
-
    if (!defined($oldrec)){
       if (!exists($newrec->{state}) && !exists($newrec->{rawstate})){
          $newrec->{state}=1;
@@ -778,6 +777,9 @@ sub Validate
         "unable to find Certificate-Service Team for selected application");
       return(0);
    }
+
+
+
    if (!exists($newrec->{state}) && $newrec->{editrefno} ne "" &&
        in_array(effVal($oldrec,$newrec,"state"),[qw(1 2)])){
       $newrec->{state}="3";
@@ -788,10 +790,22 @@ sub Validate
          $self->LastMsg(ERROR,"No application specified");
          return(0);
       }
-      if (!$self->itil::lib::Listedit::isWriteOnApplValid(
-                                          $newrec->{applid},"technical")) {
-         my $csteamid=effVal($oldrec,$newrec,"csteamid");
-         if (!$csteamaccess){
+      my $applid=effVal($oldrec,$newrec,"applid"); 
+      my ($csteamid,$csteamaccess);
+      if (effChanged($oldrec,$newrec,"state")){
+         ($csteamid,$csteamaccess)=$self->getCSTeamIDbyApplid(
+                                   $applid, $oldrec,$newrec);
+      }
+      if (effChanged($oldrec,$newrec,"state") && 
+          $newrec->{state} eq "5"){
+         if (!defined($csteamid)){
+            $self->LastMsg(ERROR,
+                 "new record would be out of a serviceteam scope");
+            return(0);
+         }
+      }
+      if (!$self->itil::lib::Listedit::isWriteOnApplValid($applid,"technical")){
+         if (!$csteamaccess && !$self->IsMemberOf($oldrec->{csgrpid})){
             $self->LastMsg(ERROR,"no write access on specified application");
             return(0);
          }

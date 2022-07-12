@@ -48,3 +48,4 @@
 'CRaS check for renew'=>{de=>'CRaS Prüfung der Erneuerung/Verlängerung'},
 'CRaS expiration extrem near'=>{de=>'CRaS Verfall extrem nahe'},
 'sigend state only allowed with singed cert file'=>{de=>'signiert Status nur zulässig mit signiertem Zertifikat'},
+'new record would be out of a serviceteam scope'=>{de=>'neuer Datensatz wäre nicht im Fokus eines ServiceTeams'},
