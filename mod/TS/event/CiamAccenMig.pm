@@ -38,9 +38,11 @@ sub CiamAccenMig
 {
    my $self=shift;
 
+   my $ua=getModuleObject($self->Config,"base::useraccount");
    my $user=getModuleObject($self->Config,"base::user");
    my $wf=getModuleObject($self->Config,"base::workflow");
 
+   my %affectedUser=();
    my @trans=split(/\n/,$trans);
    my @mig=map({
      my @map;
@@ -57,16 +59,70 @@ sub CiamAccenMig
 
    my $c=0;
    foreach my $map (@mig){
-      $user->ResetFilter();
-      my $olddsid="tCID:".$map->[0];
-      $user->SetFilter({dsid=>\$olddsid,cistatusid=>"<6"});
-      my ($oldurec,$msg)=$user->getOnlyFirst(qw(ALL));
-      if (defined($oldurec) && $map->[1] ne ""){
+      #last if (keys(%affectedUser)>20);
+      if ($map->[1] ne ""){
+         $c++;
+         $user->ResetFilter();
+         my $olddsid="tCID:".$map->[0];
+         $user->SetFilter({dsid=>\$olddsid,cistatusid=>"<6"});
+         my ($oldurec,$msg)=$user->getOnlyFirst(qw(ALL));
+
          $user->ResetFilter();
          my $newdsid="tCID:".$map->[1];
          $user->SetFilter({dsid=>\$newdsid,cistatusid=>"<6"});
          my ($newurec,$msg)=$user->getOnlyFirst(qw(ALL));
-         if (defined($newurec)){
+
+         if (defined($newurec) && defined($newurec)){
+            $user->ResetFilter();
+            $user->ValidatedUpdateRecord($newurec,{
+               cistatusid=>'6',
+               email=>$newurec->{email}.".new",
+               dsid=>undef,
+               posix=>undef
+            },{
+               userid=>\$newurec->{userid}
+            });
+            $affectedUser{$newurec->{userid}}++;
+         }
+         if (defined($oldurec)){
+            my $oldurecuserid=$oldurec->{userid};
+            $user->ResetFilter();
+            $user->ValidatedUpdateRecord($oldurec,{
+               dsid=>$newdsid,
+               email=>$oldurec->{email}.".temp.external",
+               posix=>undef
+            },{
+               userid=>\$oldurecuserid
+            });
+            $user->ResetFilter();
+            $user->SetFilter({userid=>\$oldurecuserid});
+            my ($oldurec,$msg)=$user->getOnlyFirst(qw(ALL));
+            if (defined($oldurec)){
+               printf STDERR ("QCheck1:%s\n",$oldurec->{qcstate});
+            }
+            # do a second qCheck
+            $user->ResetFilter();
+            $user->SetFilter({userid=>\$oldurecuserid});
+            my ($oldurec,$msg)=$user->getOnlyFirst(qw(ALL));
+            if (defined($oldurec)){
+               printf STDERR ("QCheck2:%s\n",$oldurec->{qcstate});
+            }
+
+
+
+            $affectedUser{$oldurecuserid}++;
+         }
+         if (defined($newurec) && defined($oldurec)){
+            #print STDERR Dumper($newurec->{accounts});
+            foreach my $acrec (@{$newurec->{accounts}}){
+              $ua->ValidatedUpdateRecord($acrec,{userid=>$oldurec->{userid}},
+                                         {account=>\$acrec->{account}}); 
+            }
+         }
+
+
+
+         if (defined($newurec) && defined($oldurec)){
             $c++;
             printf STDERR ("Trans: %s\n".
                            "       -> %s\n\n",
@@ -81,27 +137,21 @@ sub CiamAccenMig
                   fwdtargetid         => '1',
                   replaceat           =>'ALL',
                   replaceoptype       => 'base::user',
-                  replacesearchid       => $oldurec->{userid},
-                  replacereplacewithid  => $newurec->{userid},
+                  replacesearchid       => $newurec->{userid},
+                  replacereplacewithid  => $oldurec->{userid},
                   srcsys=>$self->Self
                })){
                printf STDERR ("Replace started at $id\n");
-               if (1){
-                  $user->ResetFilter();
-                  $user->ValidatedUpdateRecord($oldurec,{cistatusid=>'6'},{
-                     userid=>\$oldurec->{userid}
-                  });
-               }
             }
          }
-
-        
       }
    }
    printf STDERR ("found %d mappings\n",$c);
 
 
 #   printf STDERR ("fifi trans=%s\n",Dumper(\@mig));
+
+   print STDERR ("UserID: ".join(" ",sort(keys(%affectedUser)))."\n\n");
 
 
    return({exitcode=>0});
