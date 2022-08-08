@@ -81,7 +81,7 @@ sub CloudAreaSync
           appl=>$appansrec->{appl},
           lastmondate=>$appansrec->{lastmondate}
        );
-       next if ($fullname=~m/test/i);
+       #next if ($fullname=~m/test/i);
        push(@a,\%carec);
    }
    if ($#a==-1){
