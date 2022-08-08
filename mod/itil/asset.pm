@@ -546,7 +546,7 @@ sub new
                 },
                 label         =>'justification when exceeding '.
                                 '"end of hardware support"',
-                dataobjattr   =>'asset.denyupdcomments'),
+                dataobjattr   =>'asset.eohscomments'),
 
 
       new kernel::Field::Date(
