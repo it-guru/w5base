@@ -42,6 +42,8 @@ sub new
                 align         =>'left',
                 label         =>'QRule ID'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'fullname',
                 label         =>'full QRule Name',
