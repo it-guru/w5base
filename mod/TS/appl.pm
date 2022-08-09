@@ -1147,7 +1147,11 @@ sub doIdOrderValidate
          conumber=>$rec->{conumber}, 
          cistatusid=>$rec->{cistatusid}, 
          mandator=>$rec->{mandator}, 
-         customer=>$rec->{customer} 
+         customer=>$rec->{customer},
+         opmode=>$rec->{opmode},
+         applmgrid=>$rec->{applmgrid},
+         tsm2id=>$rec->{tsm2id},
+         tsmid=>$rec->{tsmid} 
       };
       if ($rec->{cistatusid} eq "3" || $rec->{cistatusid} eq "4"){
          $r->{orderPosible}="true";
