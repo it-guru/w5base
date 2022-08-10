@@ -2388,6 +2388,7 @@ sub simpleRESTCallHandler
                            style=>['default.css','mainwork.css',
                                    'kernel.App.Web.css'],
                            js=>['jquery.js','toolbox.js'],
+                           form=>'form',
                            title=>$title);
          print $self->getAppTitleBar(noLinks=>1);
          my $fForm="<fieldset>";
@@ -2443,6 +2444,7 @@ sub simpleRESTCallHandler
                }
              );
 
+         printf("</form>");
          printf("</body>");
          printf("</html>");
       }
