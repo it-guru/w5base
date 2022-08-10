@@ -112,6 +112,39 @@ sub new
                    return($d);
                 }),
 
+      new kernel::Field::Interface(
+                name          =>'responsibleid',
+                label         =>'Responsible Id',
+                searchable    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   return(
+                      $self->getParent->{qrule}->{$id}->getReponsibleUserID());
+                }),
+
+      new kernel::Field::Contact(
+                name          =>'responsible',
+                label         =>'Responsible',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                vjoinon       =>'responsibleid'
+                ),
+
+      new kernel::Field::Text(
+                name          =>'businessprocess',
+                label         =>'Process',
+                htmldetail    =>'NotEmpty',
+                searchable    =>0,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $id=$current->{id};
+                   return(
+                  $self->getParent->{qrule}->{$id}->getBusinessProcessName());
+                }),
+
    );
    $self->LoadSubObjs("qrule","qrule");
    $self->{'data'}=[];
