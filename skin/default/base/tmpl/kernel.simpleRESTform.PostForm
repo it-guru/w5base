@@ -62,7 +62,6 @@ form{
 }
 
 </style>
-<form id=form>
 <h1>%TITLE%</h1>
 <h4>%SCRIPT_URI%</h4>
 %FIELDS%
@@ -70,7 +69,6 @@ form{
 <input id=doPost type=button style="cursor:pointer;text-align:center;width:100%;margin:0px" value="POST with application/javascript REQUEST">
 <br>
 <br>
-</form>
 
 <center>
 <fieldset id=resultset style="display:none;overflow:auto;width:80%;text-align:left">

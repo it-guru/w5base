@@ -2,6 +2,8 @@
 function processRest(){
       var form=$("#form");
       var cururl=document.location.href;
+      cururl=cururl.replace(/\?.*$/,'');
+console.log("cururl=",cururl);
       $("#result").attr("src","../../base/load/loading");
       $("#resultset").show();
       setTimeout(function(e){
@@ -57,7 +59,6 @@ form{
 }
 
 </style>
-<form id=form>
 <h1>%TITLE%</h1>
 <h4>%SCRIPT_URI%</h4>
 %FIELDS%
@@ -65,7 +66,6 @@ form{
 <input id=doPost type=button style="cursor:pointer;text-align:center;width:100%;margin:0px" value="ExpandPath to iframe">
 <br>
 <br>
-</form>
 
 <center>
 <fieldset id=resultset style="display:none;overflow:auto;width:80%;text-align:left">
