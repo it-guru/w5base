@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
+use UUID::Tiny(':std');
 @ISA=qw(kernel::Event);
 
 
@@ -70,11 +71,14 @@ sub CloudAreaSync
                            lastmondate))){
        $itcloud{lc($appansrec->{cluster})}++;
        my $fullname=$appansrec->{cluster}.".".$appansrec->{name};
+
+       my $fake_srcid=create_uuid(UUID_V3,$fullname);
+
        my %carec=(
           itcloud=>$appansrec->{cluster},
           fullname=>$fullname,
           name=>$appansrec->{name},
-          srcid=>undef,
+          srcid=>uuid_to_string($fake_srcid),
           srcsys=>$appans->Self(),
           supportid=>$appans->{supportid},
           applid=>$appansrec->{applid},
