@@ -249,6 +249,16 @@ sub  calcViewMatrix
                else{
                   $vMatrix->{htmldetailof}->[$c]=1;
                }
+               my $fldro=$fieldlist->[$c]->readonly();
+               if ($fldro){  # readonly fields are making no sense in edit mode
+                  if ($currentfieldgroup ne ""){
+                     my $fldgroups=$fieldlist->[$c]->{group};
+                     $fldgroups=[$fldgroups] if (ref($fldgroups) ne "ARRAY");
+                     if (in_array($fldgroups,$currentfieldgroup)){
+                        $vMatrix->{htmldetailof}->[$c]=0;
+                     }
+                  }
+               }
             }
             else{
                $vMatrix->{htmldetailof}->[$c]=0;
