@@ -402,11 +402,11 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.swinstance",
-                      "TS::swinstance",
+                      "AL_TCom::swinstance",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("AL_TCom.swinstance.new",
-                      "itil::swinstance",
+                      "AL_TCom::swinstance",
                       func=>'New',
                       defaultacl=>['valid_user']);
 
