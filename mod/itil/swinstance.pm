@@ -462,34 +462,30 @@ sub new
                 name          =>'relations',
                 label         =>'Instance-Relations',
                 group         =>'relations',
+                htmldetail    =>'NotEmptyOrEdit',
                 subeditmsk    =>'subedit.swinstance',
                 vjointo       =>'itil::lnkswinstanceswinstance',
                 vjoineditbase =>{'cistatusid'=>"<=5"},
                 vjoinon       =>['id'=>'fromswi'],
-#                vjoinonfinish =>sub{
-#                   my $self=shift;
-#                   my $flt=shift;
-#                   my $param=shift;
-#                   my $mode=shift;
-#                   my @flt=($flt);
-#                   push(@flt,{toswi=>$flt->{fromswi}});
-#
-#                   return(\@flt);
-#                },
                 vjoindisp     =>['toswinstance','conmode']),
 
-      new kernel::Field::Text(
-                name          =>'referedat',
-                label         =>'refered by',
+      new kernel::Field::SubList(
+                name          =>'references',
+                label         =>'refered by software instances',
                 group         =>'relations',
                 readonly      =>1,
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   return(0) if ($param{currentfieldgroup} eq $self->{group});
-                   return(1);
-                },
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'itil::lnkswinstanceswinstance',
+                vjoineditbase =>{'cistatusid'=>"<=5"},
+                vjoinon       =>['id'=>'toswi'],
+                vjoindisp     =>['fromswinstance']),
+
+      new kernel::Field::Text(                 # this field only exists for
+                name          =>'referedat',   # downward compatibility. The
+                label         =>'refered by',  # successor is "references"
+                group         =>'relations',   # and should be used in the
+                readonly      =>1,             # future
+                htmldetail    =>0,
                 vjointo       =>'itil::lnkswinstanceswinstance',
                 vjoineditbase =>{'cistatusid'=>"<=5"},
                 vjoinon       =>['id'=>'toswi'],
