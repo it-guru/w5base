@@ -942,12 +942,21 @@ sub validateCloudAreaImportState
                                  'itil::itcloudarea')." - ".
                         $self->T("invalid application cistatus",
                                  'itil::itcloudarea');
+            my $cloudnamereference=$cloudarearec->{fullname};
+            if ($cloudnamereference ne "" &&
+                $cloudarearec->{srcsys} ne "" &&
+                $cloudarearec->{srcid} ne ""){
+               $cloudnamereference.=" (".
+                                    $cloudarearec->{srcsys}.
+                                    ":".
+                                    $cloudarearec->{srcid}.")";
+            }
             my $tmpl=$self->getParsedTemplate(
                        "tmpl/genericSystemImport_BadAppl",{
                static=>{
                   SYSTEM=>$importname,
                   URL=>$w5applrec->{urlofcurrentrec},
-                  CLOUDAREA=>$cloudarearec->{fullname},
+                  CLOUDAREA=>$cloudnamereference,
                   APPL=>$w5applrec->{name}
                }
             });
@@ -1015,12 +1024,22 @@ sub validateCloudAreaImportState
                                  'itil::itcloudarea')." - ".
                         $self->T("invalid cloudarea cistatus",
                                  'itil::itcloudarea');
+
+            my $cloudnamereference=$cloudarearec->{fullname};
+            if ($cloudnamereference ne "" &&
+                $cloudarearec->{srcsys} ne "" &&
+                $cloudarearec->{srcid} ne ""){
+               $cloudnamereference.=" (".
+                                    $cloudarearec->{srcsys}.
+                                    ":".
+                                    $cloudarearec->{srcid}.")";
+            }
             my $tmpl=$self->getParsedTemplate(
                        "tmpl/genericSystemImport_BadCloudArea",{
                static=>{
                   SYSTEM=>$importname,
                   URL=>$cloudarearec->{urlofcurrentrec},
-                  CLOUDAREA=>$cloudarearec->{fullname},
+                  CLOUDAREA=>$cloudnamereference,
                   APPL=>$w5applrec->{name}
                }
             });
