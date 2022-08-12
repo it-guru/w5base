@@ -68,3 +68,4 @@ From now, it is allowed to deploy items in this area.
 'Costcenter'=>{de=>'Kontierungsobjekt'},
 'Config-Item first activation'=>{de=>'Config-Item erstmalige Aktivierung'},
 'requestor account'=>{de=>'Anforderer Account'},
+'Export IP-Objects to firewall management system'=>{de=>'IP-Object Export ins Firewall-Management System'},
