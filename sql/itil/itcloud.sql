@@ -62,3 +62,4 @@ alter table itcloud add notifysupport int(1) default '1',add allowuncleanseq int
 alter table itcloudarea add deplnotify int(1) default '1';
 alter table itcloudarea add cifirstactivation datetime default NULL;
 alter table itcloudarea add requestoraccount  varchar(128) default NULL;
+alter table itcloudarea add ipobjectexport int(1) default '1';

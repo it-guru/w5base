@@ -205,8 +205,18 @@ sub new
                 name          =>'deplnotify',
                 group         =>'control',
                 htmleditwidth =>'30%',
-                label         =>'Notification on successful automatic CI-Import',
+                label         =>
+                              'Notification on successful automatic CI-Import',
                 dataobjattr   =>'qitcloudarea.deplnotify'),
+
+      new kernel::Field::Boolean(
+                name          =>'ipobjectexport',
+                group         =>'control',
+                htmleditwidth =>'30%',
+                label         =>
+                              'Export IP-Objects to firewall management system',
+                dataobjattr   =>'qitcloudarea.ipobjectexport'),
+
 
       new kernel::Field::Creator(
                 name          =>'creator',
