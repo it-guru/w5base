@@ -892,12 +892,18 @@ sub validateCloudAreaImportState
                                             \%notifyParam,{mode=>'ERROR'},sub{
                   my ($_self,$notifyParam,$notifycontrol)=@_;
                   my $cloudcontactadded=0;
-                  foreach my $fld (qw(securityrespid supportid platformrespid)){
-                     if ($cloudrec->{$fld} ne "" && 
-                         !in_array($notifyParam->{emailcc},$cloudrec->{$fld}) &&
-                         !in_array($notifyParam->{emailto},$cloudrec->{$fld})){
-                        push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
-                        $cloudcontactadded++;
+                  if (!($cloudrec->{allowuncleanseq})){
+                     foreach my $fld (qw(securityrespid 
+                                         supportid 
+                                         platformrespid)){
+                        if ($cloudrec->{$fld} ne "" && 
+                            !in_array($notifyParam->{emailcc},
+                                      $cloudrec->{$fld}) &&
+                            !in_array($notifyParam->{emailto},
+                                      $cloudrec->{$fld})){
+                           push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
+                           $cloudcontactadded++;
+                        }
                      }
                   }
                   my ($subject,$ntext);
@@ -940,11 +946,13 @@ sub validateCloudAreaImportState
          $appl->NotifyWriteAuthorizedContacts($w5applrec,{},
                                               \%notifyParam,{mode=>'ERROR'},sub{
             my ($_self,$notifyParam,$notifycontrol)=@_;
-            foreach my $fld (qw(securityrespid supportid)){
-               if ($cloudrec->{$fld} ne "" && 
-                   !in_array($notifyParam->{emailcc},$cloudrec->{$fld}) &&
-                   !in_array($notifyParam->{emailto},$cloudrec->{$fld})){
-                  push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
+            if (!($cloudrec->{allowuncleanseq})){
+               foreach my $fld (qw(securityrespid supportid)){
+                  if ($cloudrec->{$fld} ne "" && 
+                      !in_array($notifyParam->{emailcc},$cloudrec->{$fld}) &&
+                      !in_array($notifyParam->{emailto},$cloudrec->{$fld})){
+                     push(@{$notifyParam->{emailcc}},$cloudrec->{$fld});
+                  }
                }
             }
             my ($subject,$ntext);
