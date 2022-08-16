@@ -746,6 +746,7 @@ sub syncToGroups
                                     grpid is_projectgrp
                                     is_org is_line is_depart is_resort
                                     is_team  is_orggroup
+                                    users
                                     parent parentid));
 
          my @dellist;
@@ -807,8 +808,12 @@ sub syncToGroups
                      $fnd=$cgrp;
                   }
                }
-               if (!defined($fnd)){
-                  push(@dellist,$cgrp);
+               if ($cgrp->{name} ne "People" ||
+                   ($cgrp->{name} eq "People" &&
+                    $#{$cgrp->{users}}==-1)){  # for .People group, a del
+                  if (!defined($fnd)){          # is not allowed
+                     push(@dellist,$cgrp);
+                  }
                }
             }
          }
