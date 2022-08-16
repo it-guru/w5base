@@ -84,11 +84,18 @@ sub qcheckRecord
 
    return(undef,undef) if ($rec->{srcsys} ne "AWS");
 
+   my $awsacc=getModuleObject($self->getParent->Config(),"aws::account");
 
    my ($awsid,$awsacccountid,$awsregion)=
       $rec->{srcid}=~m/^(\S+)\@([0-9]+)\@(\S+)$/;
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),"aws::system");
+
+   if ($awsacc->isSuspended() ||
+       $par->isSuspended()){
+      return(undef,{qmsg=>'suspended'});
+   }
+
    return(undef,undef) if (!$par->Ping());
 
 
