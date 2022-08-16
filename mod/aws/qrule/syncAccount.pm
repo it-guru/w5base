@@ -98,6 +98,9 @@ sub qcheckRecord
   
    { 
       my $chk=getModuleObject($self->getParent->Config(),"aws::account");
+      if ($chk->isSuspended()){
+         return(undef,{qmsg=>'suspended'});
+      }
       $chk->SetFilter({accountid=>$awsaccountid});
       my @acc=$chk->getHashList(qw(accountid));
       if ($#acc==-1){
