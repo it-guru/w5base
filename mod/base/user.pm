@@ -923,6 +923,17 @@ sub new
                 name          =>'lastknownboss',
                 label         =>'last known boss',
                 htmldetail    =>0,
+                vjoinonfinish =>sub{
+                   my $self=shift;
+                   my $flt=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   if ($flt->{userid} eq ""){
+                      $flt->{userid}="-99";
+                   }
+                   return($flt);
+                },
                 group         =>'userro',
                 searchable    =>0, # nicht suchbar, da kein db join möglich!
                 vjointo       =>'base::user',
@@ -932,12 +943,24 @@ sub new
       new kernel::Field::Link(
                 name          =>'lastknownpbossid',
                 label         =>'last known project boss IDs',
+                selectfix     =>1,
                 dataobjattr   =>'contact.lastknownpboss'),
 
       new kernel::Field::SubList(
                 name          =>'lastknownpboss',
                 label         =>'last known project boss',
                 htmldetail    =>0,
+                vjoinonfinish =>sub{
+                   my $self=shift;
+                   my $flt=shift;
+                   my $current=shift;
+                   my $mode=shift;
+
+                   if ($flt->{userid} eq ""){
+                      $flt->{userid}="-99";
+                   }
+                   return($flt);
+                },
                 group         =>'userro',
                 searchable    =>0, # nicht suchbar, da kein db join möglich!
                 vjointo       =>'base::user',
