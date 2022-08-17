@@ -223,15 +223,15 @@ body{
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
+    margin: 5% auto; /* 15% from the top and centered */
     padding: 20px;
     padding-top: 5px;
     border: 1px solid #888;
     overflow:hidden;
     width: 80%; 
-    height: 50%;
+    height: 70%;
     min-width:600px;
-    min-height:400px;
+    xmin-height:400px;
     position:relative; // to allow absolute enties
 }
 
@@ -525,6 +525,41 @@ div#SearchResult{
 <script language="JavaScript" src="../../../public/base/load/require.js"></script>
 
 <script langauge="JavaScript">
+
+
+function wrapText(text, limit, breakpoints) {
+
+  var parts = text.split(' ');
+  var lines = [];
+  text = parts[0];
+  parts.shift();
+
+  while (parts.length > 0) {
+    var newText = `${text} ${parts[0]}`;
+
+    if (newText.length > limit) {
+      lines.push(`${text}\n`);
+      breakpoints--;
+
+      if (breakpoints === 0) {
+        lines.push(parts.join(' '));
+        break;
+      } else {
+         text = parts[0];
+     }
+    } else {
+      text = newText;
+    }
+     parts.shift();
+  }
+
+  if (lines.length === 0) {
+    return text;
+  } else {
+    return lines.join('');
+  }
+}
+
 
 requirejs.onError = function (err) {
     console.log("genrell Erro:",err.requireType);
