@@ -1412,7 +1412,11 @@ EOF
 sub jsExploreFormatLabelMethod
 {
    my $self=shift;
-   return("newlabel=newlabel.replace(':',':\\n');");
+   my $d=<<EOF;
+//newlabel=newlabel.replaceAll(':',':\\n');
+newlabel=wrapText(newlabel,20,3);
+EOF
+   return($d);
 }
 
 
@@ -2500,64 +2504,49 @@ sub jsExploreObjectMethods
                 w5obj.SetFilter({
                    id:dataobjid
                 });
-                w5obj.findRecord(\"id,upperservice,servicecomp,parentid\",
+                w5obj.findRecord(\"id,upperservice,servicecomp\",
                      function(data){
                    console.log(\"found\",data);
                    for(recno=0;recno<data.length;recno++){
-                      for(i=0;i<data[recno].upperservice.length;i++){
-                         var r=data[recno].upperservice[i];
-                         app.addNode(dataobj,r.businessserviceid,
-                                     r.businessserviceid);
-                         app.addEdge(app.toObjKey(dataobj,dataobjid),
-                                     app.toObjKey(dataobj,r.businessserviceid),{
-                                        noAcross:true,
-                                        color:{
-                                           color:'blue'
-                                        },
-                                        arrows:{
-                                           from:{
-                                              enabled:true,
-                                              type:'arrow'
+                      if (data[recno].upperservice){
+                         for(i=0;i<data[recno].upperservice.length;i++){
+                            var r=data[recno].upperservice[i];
+                            app.addNode(dataobj,r.id,
+                                        r.id);
+                            app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                        app.toObjKey(dataobj,r.id),{
+                                           noAcross:true,
+                                           color:{
+                                              color:'blue'
+                                           },
+                                           arrows:{
+                                              from:{
+                                                 enabled:true,
+                                                 type:'arrow'
+                                              }
                                            }
-                                        }
-                                     });
+                                        });
+                         }
                       }
-                      for(i=0;i<data[recno].servicecomp.length;i++){
-                         var r=data[recno].servicecomp[i];
-                         app.addNode(r.objtype,r.obj1id,r.obj1id);
-                         app.addEdge(app.toObjKey(dataobj,dataobjid),
-                                     app.toObjKey(r.objtype,r.obj1id),{
-                                        noAcross:true,
-                                        color:{
-                                           color:'blue'
-                                        },
-                                        arrows:{
-                                           to:{
-                                              enabled:true,
-                                              type:'arrow'
+                      if (data[recno].servicecomp){
+                         for(i=0;i<data[recno].servicecomp.length;i++){
+                            var r=data[recno].servicecomp[i];
+                            app.addNode(r.objtype,r.obj1id,r.obj1id);
+                            app.addEdge(app.toObjKey(dataobj,dataobjid),
+                                        app.toObjKey(r.objtype,r.obj1id),{
+                                           noAcross:true,
+                                           color:{
+                                              color:'blue'
+                                           },
+                                           arrows:{
+                                              to:{
+                                                 enabled:true,
+                                                 type:'arrow'
+                                              }
                                            }
-                                        }
-                                     });
+                                        });
+                         }
                       }
-                      if (data[recno].parentid!=\"\"){
-                         app.addNode(\"itil::appl\",data[recno].parentid,
-                                     data[recno].parentid);
-                         app.addEdge(app.toObjKey(dataobj,dataobjid),
-                                     app.toObjKey(\"itil::appl\",
-                                     data[recno].parentid),{
-                                        color:{
-                                           color:'silver'
-                                        },
-                                        title:'App',
-                                        arrows:{
-                                           to:{
-                                              enabled:true,
-                                              type:'bar'
-                                           }
-                                        }
-                                     });
-                      }
-                      
                    }
                    methodDone(\"end of am500addTangCIs\");
                 });

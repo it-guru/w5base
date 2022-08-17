@@ -56,6 +56,9 @@ define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
    ClassAppletLib[applet].class.prototype.run=function(){
       var appletobj=this;
       var app=this.app;
+
+      app.InitObjectStore();
+
       if (arguments.length){
          var dataobj=arguments[0][0];
          var dataobjid=arguments[0][1];
@@ -102,7 +105,7 @@ define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
             $(dialog).css("height","100%");
             $(dialog).append("<table id=SearchTab width=97% height=90% "+
                               "border=0>"+  
-                              "<tr height=1%><td >"+
+                              "<tr height=1%><td colspan=2>"+
            "<h1>"+ClassAppletLib['%SELFNAME%'].desc.label+"</h1>"+
                               "</td></tr>"+
                               "<tr height=1%><td width=10%>"+
@@ -128,6 +131,18 @@ define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
                   $(dialog).find("#SearchInp").focus();
                }
             });
+            function resizeModalHandler(e){
+               var h=$(this).parent().height();
+               var w=$(this).parent().width();
+               var hSearchFrm=$(this).find('#SearchFrm').first().height();
+               $(this).find('#SearchTab').width(w*0.95);
+               $(this).find('#SearchContainer').height((0.9*h)-hSearchFrm-10);
+               $(this).find('#SearchResult').height((0.9*h)-hSearchFrm-10);
+               //console.log("got reszie in dialog "+
+               //            "h="+h+" w="+w+" SearchFrm="+hSearchFrm);
+               e.stopPropagation();
+            }
+            $(dialog).on('resize',resizeModalHandler);
             $(".spinner").hide();
             return(dialog);
          },function(){

@@ -496,9 +496,12 @@ sub jsExplore
                 w5obj.SetFilter(flt);
                 w5obj.findRecord(that.fieldnamelabel+
                                  ",urlofcurrentrec",function(data){
-                   var newlabel=data[0][that.fieldnamelabel];
-                   newlabel=that.formatLabel(newlabel);
+                   var newlabel="???";
                    if (data[0]){
+                      if (data[0][that.fieldnamelabel]){
+                         newlabel=data[0][that.fieldnamelabel];
+                      }
+                      newlabel=that.formatLabel(newlabel);
                       if (data[0]["urlofcurrentrec"]){
                          that.update({
                             urlofcurrentrec:data[0]["urlofcurrentrec"]
