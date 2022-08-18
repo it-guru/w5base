@@ -71,11 +71,9 @@ sub getDescription
    return($html);
 }
 
-sub getSection
+sub getHints
 {
    my $self=shift;
-   my $section=shift;
-
    my $instdir=$self->getParent->Config->Param("INSTDIR");
    my $selfname=$self->Self();
    my $h;
@@ -85,7 +83,7 @@ sub getSection
       my $inhints=0;
       while(my $l=<F>){
          $l=~s/\s*$//;
-         if ($l=~m/${section}/){
+         if ($l=~m/HINTS/){
             $inhints=1;
             next;
          }
@@ -105,31 +103,9 @@ sub getSection
          }
       }
       close(F);
+
    }
    return($h);
-}
-
-sub getReponsibleUserID
-{
-   my $self=shift;
-   my $d=$self->getSection("RESPONSIBLEUSERID");
-   $d=~s/[^0-9]//gs;
-
-   return($d);
-}
-
-sub getBusinessProcessName
-{
-   my $self=shift;
-   my $d=$self->getSection("BUSINESSPROCESS");
-   $d=~s/\n/ /gs;
-   return($d);
-}
-
-sub getHints
-{
-   my $self=shift;
-   return($self->getSection("HINTS"));
 }
 
 sub qcheckRecord
