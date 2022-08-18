@@ -46,12 +46,6 @@ The DataIssue can be resolved by finding and deleting
 the invalid contact references. 
 If necessary, new users or groups with the corresponding roles can be added.
 
-=head3 RESPONSIBLEUSERID
-12808977330001
-
-=head3 BUSINESSPROCESS
-Internal W5Base
-
 =cut
 #######################################################################
 #  W5Base Framework
