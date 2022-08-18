@@ -39,6 +39,7 @@ sub new
 
       new kernel::Field::Id(
                 name          =>'id',
+                group         =>'source',
                 label         =>'Qrule activation LinkID',
                 dataobjattr   =>'lnkqrulemandator.lnkqrulemandatorid'),
  
@@ -55,6 +56,16 @@ sub new
                 name          =>'dataobj',
                 label         =>'confine to data object',
                 dataobjattr   =>'lnkqrulemandator.dataobj'),
+                                                 
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'activation full qualified label',
+                htmldetail    =>0,
+                dataobjattr   =>"concat(lnkqrulemandator.qrule,'-',".
+                           "lnkqrulemandator.dataobj,'-',".
+                           "if (lnkqrulemandator.mandator is null ".
+                           "or lnkqrulemandator.mandator='0','ANY',".
+                           "if (mandator.name is null,'INVALID',mandator.name)))"),
                                                  
       new kernel::Field::Text(
                 name          =>'dataobjlabel',
@@ -133,6 +144,17 @@ sub new
                 htmlwidth     =>'150',
                 label         =>'Comments',
                 dataobjattr   =>'lnkqrulemandator.comments'),
+
+      new kernel::Field::SubList(
+                name          =>'individualAttr',
+                label         =>'individual attributes',
+                group         =>'individualAttr',
+                allowcleanup  =>1,
+                forwardSearch =>1,
+                htmldetail    =>'NotEmpty',
+                vjointo       =>'base::grpindivlnkqrulemandator',
+                vjoinon       =>['id'=>'srcdataobjid'],
+                vjoindisp     =>['fieldname','indivfieldvalue']),
                                                  
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -182,6 +204,11 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'lnkqrulemandator.realeditor'),
    );
+
+   $self->{individualAttr}={
+      dataobj=>'base::grpindivlnkqrulemandator'
+   };
+
    $self->setDefaultView(qw(mandator qrule cistatus cdate dataobj));
    $self->setWorktable("lnkqrulemandator");
    return($self);
@@ -193,6 +220,22 @@ sub isCopyValid
 
    return(1);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $selfasparent=$self->SelfAsParentObject();
+   my $from="$worktable left outer join mandator ".
+            "on $worktable.mandator=mandator.grpid ";
+
+   return($from);
+}
+
+
 
 
 
@@ -381,6 +424,17 @@ sub LoadQualityActivationLinks
    }
    return(%dataobjtocheck);
 }
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   my $grp=shift;
+   my %param=@_;
+   return(qw(header default individualAttr source ));
+}
+
+
 
 
 
