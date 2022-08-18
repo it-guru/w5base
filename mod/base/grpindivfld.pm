@@ -40,7 +40,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'dataobj',
                 label         =>'link attribut to Data-Object',
-                size          =>'20',
+                size          =>'25',
                 readonly      =>sub{
                    my $self=shift;
                    my $rec=shift;
@@ -58,6 +58,9 @@ sub new
                            $app->T("itil::system","itil::system"));
                    push(@l,"base::workflow",
                            $app->T("base::workflow","base::workflow"));
+                   push(@l,"base::lnkqrulemandator",
+                           $app->T("base::lnkqrulemandator",
+                          "base::lnkqrulemandator"));
                    return(@l);
                 }, 
                 dataobjattr   =>'grpindivfld.dataobject'),

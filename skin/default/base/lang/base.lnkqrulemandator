@@ -1,5 +1,5 @@
-'base::lnkqrulemandator'=>{de=>'Mandant-Qualitätsregel Verknüpfung',
-                           en=>'Mandator-Quality-Rule link'},
+'base::lnkqrulemandator'=>{de=>'Mandant-Qualitätsregel Verknüpfung/Aktivierung',
+                           en=>'Mandator-Quality-Rule link/activation'},
 'confine to data object'=>{de=>'beschränkt auf Datenobjekt'},
 'Quality Rule'=>{de=>'Quality Regel'},
 'data object label'=>{de=>'Datenobjektbezeichnung'},
@@ -17,3 +17,6 @@
 "Mandator '%s' uses dataobject '%s', not '%s'"=>
    {de=>"Mandant '%s' benutzt das Datenobjekt '%s', nicht '%s'"},
 'Rule-State'=>{de=>'Regel-Status'},
+'activation full qualified label'=>{de=>'vollqualifiziere Aktivierungsbezeichnung'},
+'individual attributes'=>{de=>'individuelle Attribute'},
+'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},
