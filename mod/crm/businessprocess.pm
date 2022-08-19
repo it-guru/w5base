@@ -785,6 +785,19 @@ sub prepUploadRecord
 }
 
 
+sub jsExploreFormatLabelMethod
+{
+   my $self=shift;
+   my $d=<<EOF;
+newlabel=wrapText(newlabel,20);
+newlabel=newlabel.replaceAll('\@','\\n\@');
+newlabel=newlabel.replaceAll(':',':\\n');
+EOF
+   return($d);
+}
+
+
+
 
 
 

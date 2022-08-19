@@ -65,9 +65,23 @@ define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
          this.app.ShowNetworkMap({
             physics: {
                barnesHut:{
-                  gravitationalConstant:-50000
+                  avoidOverlap: 0.99,
+                  gravitationalConstant:-000
                },
-               enabled: true   // || "once"
+               //enabled: true   // || "once"
+               enabled: false   // || "once"
+            },
+            layout: {
+               hierarchical: {
+                 nodeSpacing: 200,
+                 direction: 'UD',
+                 //sortMethod: 'hubsize',
+                 sortMethod: 'directed',
+                 shakeTowards: 'roots',
+                 levelSeparation:150,
+                 treeSpacing: 800,
+                 edgeMinimization:true
+               }
             }
          });
          this.app.console.log("INFO","loading scenario ...");
@@ -93,9 +107,19 @@ define(["base/Explore/jsLib/base/kernel.Explore.network"],function (){
                },
                { label:MasterItem.label, mtag:dataobj+"/"+MasterItem.dataobjid}
             );
+
+            console.log("add master item ",MasterItem);
+            MasterItem.nodeMethods['m500addTangCIs'].exec.call(
+               MasterItem
+            );
+
             app.processOpStack(function(opResults){
                console.log("scenario loaded",opResults);
-               app.networkFitRequest=true;
+               app.network.fit({
+                  animation: true
+               });
+               $(".spinner").hide();
+               //app.networkFitRequest=true;
             });
         });
       }
