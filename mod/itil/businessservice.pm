@@ -25,6 +25,7 @@ use kernel::Field;
 use DateTime;
 use DateTime::Span;
 use itil::lib::BorderChangeHandling;
+use itil::lib::Listedit;
 
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB);
 
@@ -1427,7 +1428,8 @@ sub jsExploreFormatLabelMethod
    my $self=shift;
    my $d=<<EOF;
 //newlabel=newlabel.replaceAll(':',':\\n');
-newlabel=wrapText(newlabel,20,3);
+newlabel=wrapText(newlabel,20);
+newlabel=newlabel.replaceAll(':',':\\n');
 EOF
    return($d);
 }
@@ -2517,47 +2519,54 @@ sub jsExploreObjectMethods
                 w5obj.SetFilter({
                    id:dataobjid
                 });
-                w5obj.findRecord(\"id,upperservice,servicecomp\",
+                w5obj.findRecord(\"id,servicetrees\",
                      function(data){
-                   console.log(\"found\",data);
+                   //console.log(\"recive \",data);
                    for(recno=0;recno<data.length;recno++){
-                      if (data[recno].upperservice){
-                         for(i=0;i<data[recno].upperservice.length;i++){
-                            var r=data[recno].upperservice[i];
-                            app.addNode(dataobj,r.id,
-                                        r.id);
-                            app.addEdge(app.toObjKey(dataobj,dataobjid),
-                                        app.toObjKey(dataobj,r.id),{
-                                           noAcross:true,
-                                           color:{
-                                              color:'blue'
-                                           },
-                                           arrows:{
-                                              from:{
-                                                 enabled:true,
-                                                 type:'arrow'
-                                              }
-                                           }
-                                        });
+                      if (data[recno].servicetrees){
+                         for(var dkey in data[recno].servicetrees.obj){
+                            var obj=data[recno].servicetrees.obj[dkey];
+                            var a=new Object();
+                            a.level=3;
+                            if (obj.dataobj==\"crm::businessprocess\"){
+                               a.level=-2;
+                            }
+                            if (obj.dataobj==\"itil::businessservice\"){
+                               a.level=-1;
+                            }
+                            a.shapeProperties=new Object();
+                            a.widthConstraint=new Object();
+                            a.widthConstraint.minimum=200;
+                            a.shapeProperties.useBorderWithImage=true;
+                            a.shapeProperties.borderDashes=true;
+                            a.widthConstraint.maximum=250;
+                            //a.size=40;
+                            app.addNode(obj.dataobj,obj.dataobjid,obj.label,a);
                          }
-                      }
-                      if (data[recno].servicecomp){
-                         for(i=0;i<data[recno].servicecomp.length;i++){
-                            var r=data[recno].servicecomp[i];
-                            app.addNode(r.objtype,r.obj1id,r.obj1id);
-                            app.addEdge(app.toObjKey(dataobj,dataobjid),
-                                        app.toObjKey(r.objtype,r.obj1id),{
-                                           noAcross:true,
-                                           color:{
-                                              color:'blue'
-                                           },
-                                           arrows:{
-                                              to:{
-                                                 enabled:true,
-                                                 type:'arrow'
-                                              }
-                                           }
-                                        });
+                         for(var dkey in data[recno].servicetrees.obj){
+                            var cobj=data[recno].servicetrees.obj[dkey];
+                            if (cobj.directParent){
+                               for(i=0;i<cobj.directParent.length;i++){
+                                  var pkey=cobj.directParent[i];
+                                  var pobj=data[recno].servicetrees.obj[pkey];
+                                  var pObjKey=app.toObjKey(pobj.dataobj,
+                                                           pobj.dataobjid);
+                                  var cObjKey=app.toObjKey(cobj.dataobj,
+                                                           cobj.dataobjid);
+                                  app.addEdge(pObjKey,cObjKey,{
+                                                 noAcross:true,
+                                                 color:{
+                                                    color:'black'
+                                                 },
+                                                 arrows:{
+                                                    to:{
+                                                       enabled:true,
+                                                       type:'arrow'
+                                                    }
+                                                 }
+                                  });
+                               }
+                            }
                          }
                       }
                    }

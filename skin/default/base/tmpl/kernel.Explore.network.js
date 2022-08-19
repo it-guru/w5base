@@ -332,8 +332,8 @@ define(["visjs"],function(vis){
              var cur=W5Explore.edge.get(edgeid);
              if (edgeTempl && edgeTempl.noAcross){
                 if (!cur){
-                   var edgeid=toid+"::"+fromid;
-                   cur=W5Explore.edge.get(edgeid);
+                   var ledgeid=toid+"::"+fromid;
+                   cur=W5Explore.edge.get(ledgeid);
                 }
                 delete edgeTempl['noAcross'];
              }
