@@ -1828,6 +1828,45 @@ sub new
                 depend        =>['id','name'],
                 onRawValue    =>\&itil::lib::Listedit::calculateServiceTrees),
 
+      new kernel::Field::Interface(
+                name          =>'involvedbusinessprocessesids',
+                label         =>'involved in businessprocessesIDs',
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'businessservices',
+                depend        =>['name','id','servicetrees'],
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $app=$self->getParent();
+                   my $stfld=$app->getField("servicetrees",$current);
+                   my $st=$stfld->RawValue($current);
+
+                   my @bpids=();
+                   if (ref($st) eq "HASH" && exists($st->{obj})){
+                      foreach my $obj (values(%{$st->{obj}})){
+                         if ($obj->{dataobj}=~m/::businessprocess$/){
+                            if (!in_array(\@bpids,$obj->{dataobjid})){
+                               push(@bpids,$obj->{dataobjid});
+                            }
+                         }
+                      } 
+                   }
+                   return(\@bpids);
+                }),
+
+      new kernel::Field::SubList(
+                name          =>'involvedbusinessprocesses',
+                label         =>'involved in businessprocesses',
+                group         =>'businessservices',
+                depend        =>['name','id','servicetrees',
+                                 'involvedbusinessprocessesids'],
+                htmldetail    =>'0',
+                vjointo       =>'crm::businessprocess',
+                vjoinbase     =>[{'cistatusid'=>\'4'}],
+                vjoinon       =>['involvedbusinessprocessesids'=>'id'],
+                vjoindisp     =>['fullname','customerprio','importance']),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
