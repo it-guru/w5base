@@ -218,3 +218,5 @@
 'specified application is no in acceptable CI-State'=>{de=>'angegebene Anwendung is nicht in einem zulässigen CI-Status'},
 'invalid applid specified'=>{de=>'ungültige applid angegeben'},
 'Software instances'=>{de=>'Software-Instanzen'},
+'involved in businessprocesses'=>{de=>'involviert in Geschäftsprozessen'},
+'involved in businessprocessesIDs'=>{de=>'involviert in GeschäftsprozessIDs'},
