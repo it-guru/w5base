@@ -261,6 +261,14 @@ sub new
                 vjoinon       =>['id'=>'businessserviceid'],
                 vjoindisp     =>'mgmtitemgroup'),
 
+      new kernel::Field::Interface(
+                name          =>'servicetrees',
+                label         =>'service trees',
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['id','fullname'],
+                onRawValue    =>\&itil::lib::Listedit::calculateServiceTrees),
+
 
 #      new kernel::Field::TimeSpans(
 #                name          =>'supportReq',
@@ -1408,6 +1416,11 @@ if (s && dboss && appl ){
 EOF
    return($d);
 }
+
+
+
+
+
 
 sub jsExploreFormatLabelMethod
 {

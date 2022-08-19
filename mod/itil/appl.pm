@@ -25,6 +25,7 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::CIStatusTools;
 use kernel::MandatorDataACL;
+use itil::lib::Listedit;
 use itil::lib::BorderChangeHandling;
 use finance::costcenter;
 use kernel::Scene;
@@ -1817,6 +1818,16 @@ sub new
                 },
                 dataobjattr   =>'appl.additional'),
 
+
+      new kernel::Field::Interface(
+                name          =>'servicetrees',
+                label         =>'service trees',
+                readonly      =>1,
+                searchable    =>0,
+                group         =>'businessservices',
+                depend        =>['id','name'],
+                onRawValue    =>\&itil::lib::Listedit::calculateServiceTrees),
+
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
                 label         =>'Contacts',
@@ -2014,6 +2025,7 @@ sub new
 
    return($self);
 }
+
 
 
 sub ItemSummary
