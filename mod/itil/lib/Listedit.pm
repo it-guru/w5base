@@ -1610,6 +1610,208 @@ sub NotifyInterfaceContacts
 }
 
 
+sub calculateServiceTreeSubPath
+{
+   my $o=shift;
+   my $allpaths=shift;
+   my $curpath=shift;
+   my $currec=shift;
+
+   if ($#{$currec->{directParent}}==-1){
+      if ($#{$curpath}!=-1){
+         push(@$allpaths,[@{$curpath}]);
+         @{$curpath}=();
+      }
+   }
+   else{
+      foreach my $pKey (@{$currec->{directParent}}){
+        if ($o->{$pKey}->{cistatusid}==4){
+           next if (in_array($curpath,$pKey)); # loop prevention
+           my @newcurpath=@{$curpath};
+           push(@newcurpath,$pKey);
+           calculateServiceTreeSubPath($o,$allpaths,\@newcurpath,$o->{$pKey}); 
+        }
+      }
+   }
+   return();
+}
+
+
+sub calculateServiceTrees
+{
+   my $self=shift;
+   my $current=shift;
+   my $app=$self->getParent();
+
+   my %o;
+   my $baseRec={
+      dataobj=>$app->SelfAsParentObject(),
+      dataobjid=>$current->{id}
+   };
+   if (exists($current->{fullname}) && $current->{fullname} ne ""){
+      $baseRec->{label}=$current->{fullname};
+   }
+   else{
+      $baseRec->{label}=$current->{name};
+   }
+   my $mainKey=$baseRec->{dataobj}."::".$baseRec->{dataobjid};
+   $o{$mainKey}=$baseRec;
+   my @pathRoots=();
+   my $fillupCount;
+   do{   # loop for upper elements
+      $fillupCount=0;
+      foreach my $chkrec (values(%o)){
+         if (!exists($chkrec->{directParent})){
+            $fillupCount++;
+            my @p;
+            if ($chkrec->{dataobj} eq "itil::appl" ||
+                $chkrec->{dataobj} eq "itil::businessservice"){
+               my $obj=$app->getPersistentModuleObject("streelnkbscomp",
+                                                       "itil::lnkbscomp");
+               $obj->SetFilter({objtype=>\$chkrec->{dataobj},
+                                obj1id=>\$chkrec->{dataobjid}});
+               my @l=$obj->getHashList(qw(businessserviceid));
+               foreach my $rec (@l){
+                  my $prec={
+                     dataobj=>'itil::businessservice',
+                     dataobjid=>$rec->{businessserviceid},
+                  };
+                  my $k=$prec->{dataobj}."::".$prec->{dataobjid};
+                  $o{$k}=$prec if (!exists($o{$k}));
+                  push(@p,$k);
+               }
+            }
+            if ($chkrec->{dataobj} eq "itil::businessservice"){
+               my $obj=$app->getPersistentModuleObject("lnkbsprocess",
+                                                   "itil::lnkbprocessbservice");
+               $obj->SetFilter({businessserviceid=>\$chkrec->{dataobjid}});
+               my @l=$obj->getHashList(qw(bprocessid));
+               foreach my $rec (@l){
+                  my $prec={
+                     dataobj=>'crm::businessprocess',
+                     dataobjid=>$rec->{bprocessid},
+                  };
+                  my $k=$prec->{dataobj}."::".$prec->{dataobjid};
+                  $o{$k}=$prec if (!exists($o{$k}));
+                  push(@p,$k);
+               }
+            }
+            if ($chkrec->{dataobj} eq "crm::businessprocess"){
+               my $obj=$app->getPersistentModuleObject("bsprocess",
+                                                   "crm::businessprocess");
+               $obj->SetFilter({id=>\$chkrec->{dataobjid}});
+               my @l=$obj->getHashList(qw(pbusinessprocessid));
+               foreach my $rec (@l){
+                  if ($rec->{pbusinessprocessid} ne ""){
+                     my $prec={
+                        dataobj=>'crm::businessprocess',
+                        dataobjid=>$rec->{pbusinessprocessid},
+                     };
+                     my $k=$prec->{dataobj}."::".$prec->{dataobjid};
+                     $o{$k}=$prec if (!exists($o{$k}));
+                     push(@p,$k);
+                  }
+               }
+            }
+            $chkrec->{directParent}=\@p;
+         }
+      }
+   }while($fillupCount!=0);  # fillup direction upwards
+
+   # fillup downwards from mainKey
+
+   my %downfillupKeys;
+   $downfillupKeys{$mainKey}=0;
+
+   if (1){  # downfill
+      do{   # loop for upper elements
+         $fillupCount=0;
+         foreach my $chkKey (keys(%downfillupKeys)){
+            if ($downfillupKeys{$chkKey}==0){
+               $downfillupKeys{$chkKey}++;
+               $fillupCount++;
+               my $chkrec=$o{$chkKey};
+               if ($chkrec->{dataobj} eq "itil::businessservice"){
+                  my $obj=$app->getPersistentModuleObject("streelnkbscomp",
+                                                          "itil::lnkbscomp");
+                  $obj->SetFilter({businessserviceid=>\$chkrec->{dataobjid}});
+                  my @l=$obj->getHashList(qw(objtype obj1id));
+                  if ($#l==-1){  # nix drunter
+                     if (!in_array(\@pathRoots,$chkKey)){
+                        push(@pathRoots,$chkKey);
+                     }
+                  }
+                  foreach my $rec (@l){
+                     my $prec={
+                        dataobj=>$rec->{objtype},
+                        dataobjid=>$rec->{obj1id},
+                        directParent=>[]
+                     };
+                     my $k=$prec->{dataobj}."::".$prec->{dataobjid};
+                     if (!exists($downfillupKeys{$k})){
+                        $downfillupKeys{$k}=0;
+                        $o{$k}=$prec if (!exists($o{$k}));
+                     }
+                     if (!in_array($o{$k}->{directParent},$chkKey)){
+                        push(@{$o{$k}->{directParent}},$chkKey);
+                     }
+                  }
+               }
+               if (!in_array(\@pathRoots,$chkKey)){
+                  # appl entries are always roots
+                  if ( $chkrec->{dataobj}=~m/::appl$/ ){
+                     push(@pathRoots,$chkKey);
+                  }
+               }
+            }
+         }
+      }while($fillupCount!=0);  # fillup direction upwards
+   }
+
+
+
+   my %ids;
+   foreach my $chkrec (values(%o)){
+      $ids{$chkrec->{dataobj}}->{$chkrec->{dataobjid}}++
+   }
+   foreach my $dataobj (keys(%ids)){
+      if ($dataobj eq "itil::businessservice" || 
+          $dataobj eq "crm::businessprocess" ||
+          $dataobj eq "itil::appl" ||
+          $dataobj eq "itil::system"){
+         my @ids=keys(%{$ids{$dataobj}});
+         my $obj=$app->getPersistentModuleObject("obj".$dataobj,$dataobj);
+         $obj->SetFilter({id=>\@ids});
+         my @l=$obj->getHashList(qw(id cistatusid fullname name 
+                                    urlofcurrentrec));
+         foreach my $lrec (@l){
+            my $k=$dataobj."::".$lrec->{id};
+            $o{$k}->{cistatusid}=$lrec->{cistatusid};
+            $o{$k}->{urlofcurrentrec}=$lrec->{urlofcurrentrec};
+            if (exists($lrec->{fullname}) && $lrec->{fullname} ne ""){
+               $o{$k}->{label}=$lrec->{fullname};
+            }
+            else{
+               $o{$k}->{label}=$lrec->{name};
+            }
+            $o{$k}->{id}=$lrec->{id};
+         }
+      }
+   }
+
+   my @allpaths;
+   foreach my $rootKey (@pathRoots){
+      my @curpath=($rootKey);
+      calculateServiceTreeSubPath(\%o,\@allpaths,\@curpath,$o{$rootKey}); 
+   }
+   foreach my $chkrec (values(%o)){
+      delete($chkrec->{directParent}) if ($#{$chkrec->{directParent}}==-1);
+   }
+ 
+   return({obj=>\%o,path=>\@allpaths});
+}
+
+
 
 
 
