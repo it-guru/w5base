@@ -183,6 +183,14 @@ sub new
                 label         =>'last Editor',
                 dataobjattr   =>'faq.owner'),
 
+      new kernel::Field::Email(
+                name          =>'owneremail',
+                group         =>'sig',
+                htmldetail    =>0,
+                readonly      =>1,
+                label         =>'last editor email',
+                dataobjattr   =>'ownercontact.email'),
+
       new kernel::Field::Link(
                 name          =>'ownerid',
                 group         =>'sig',
@@ -356,6 +364,9 @@ sub getSqlFrom
             "on faq.faqid=rfaqacl.refid and ".
             "rfaqacl.aclmode='read' and ".
             "rfaqacl.aclparentobj='faq::article' ".
+            "left outer join contact ownercontact ".
+            "on faq.owner=ownercontact.userid ".
+            "and ownercontact.cistatus=4 ".
             "left outer join faqacl as wfaqacl ".
             "on faq.faqid=wfaqacl.refid and ".
             "wfaqacl.aclmode='write' and ".
@@ -777,7 +788,7 @@ sub FullView
    $self->SecureSetFilter(\%flt);
    my ($rec,$msg)=$self->getOnlyFirst(qw(name data attachments viewcount faqid
                                          furtherkeys kwords viewfreq viewlast
-                                         owner
+                                         owner owneremail
                                          mdate editor realeditor));
 
    if (defined($rec)){
@@ -848,6 +859,28 @@ sub FullView
    my $fldobj=$self->getField("mdate",$rec);
    my $d=$fldobj->FormatedResult($rec,"HtmlV01");
    print(" at ".$d) if ($d ne "");
+
+
+   my $fldobj=$self->getField("owneremail",$rec);
+   my $owneremail=$fldobj->RawValue($rec);
+   if ($owneremail ne ""){
+      my $qs=kernel::cgi::Hash2QueryString(to=>$owneremail,
+                               id=>$rec->{faqid},
+                               subject=>"Feedback: ".$rec->{name},
+                               parent=>$self->Self());
+      my $onclick="openwin('../../base/workflow/externalMailHandler?$qs',".
+                  "'_blank',".
+                  "'height=640,width=800,toolbar=no,status=no,".
+                  "resizable=yes,scrollbars=no')";
+     
+      my $feedbacktext=$self->T("feedback to last editor");
+      my $clickfeedback=$self->T("click to send feedback to last editor");
+      print("<span class=noprint style=\"margin:0;padding:0\">".
+            "<br><span class=sublink title=\"$clickfeedback\" ".
+            "onclick=\"$onclick\">${feedbacktext} ".
+            $owneremail."</span></span>");
+   }
+
    print("<br>powered by W5Base technology<br><br>");
 
    print("</div>");
