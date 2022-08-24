@@ -543,6 +543,17 @@ sub getHtmlDetailPageContent
             "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
             "src=\"HtmlAutoDiscManager?$urlparam\"></iframe>";
    }
+   elsif ($p eq "ContextMapView"){
+      Query->Param("$idname"=>$idval);
+      $idval="NONE" if ($idval eq "");
+
+      my $q=new kernel::cgi({});
+      $q->Param("$idname"=>$idval);
+      my $urlparam=$q->QueryString();
+      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
+            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
+            "src=\"ContextMapView?$urlparam\"></iframe>";
+   }
    $page.=$self->HtmlPersistentVariables($idname);
    return($page);
 }
@@ -564,6 +575,9 @@ sub getHtmlDetailPages
          if ($self->can("HtmlInterviewLink")){
             push(@pa,'HtmlInterviewLink'=>$self->T("Interview"));
          }
+      }
+      if ($self->can("ContextMap") && $self->can("generateContextMap")){
+         push(@pa,"ContextMapView"=>$self->T("Context map"));
       }
       return(@pa);
    }

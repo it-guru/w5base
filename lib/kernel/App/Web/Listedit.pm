@@ -398,8 +398,42 @@ sub getValidWebFunctions
    if ($self->can("HtmlInterviewLink")){
       push(@l,qw(HtmlInterviewLink));
    }
+   if ($self->can("generateContextMap")){
+      push(@l,"jsonContextMap","ContextMapView","ContextMap");
+   }
    return(@l);
 }
+
+
+sub jsonContextMap
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $idfield=$self->IdField();
+   my $idname=$idfield->Name();
+   my $val="undefined";
+   if (defined(Query->Param("FunctionPath"))){
+      $val=Query->Param("FunctionPath");
+   }
+   $val=~s/^\///;
+   $val="UNDEF" if ($val eq "");
+
+   $self->ResetFilter();
+   $self->SecureSetFilter({id=>\$val});
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+   print $self->HttpHeader("application/json");
+
+   my $d=$self->generateContextMap($rec);
+
+   my $JSON;
+   eval('use JSON;$JSON=new JSON;');
+   $JSON->utf8(1);
+
+   print $JSON->encode($d);
+}
+
 
 sub jsExploreLabelFieldname
 {
@@ -553,6 +587,289 @@ sub jsExploreFormatLabelMethod
    my $self=shift;
    return("");
 }
+
+
+sub ContextMapView   
+{
+   my $self=shift;
+
+   my %flt=$self->getSearchHash();
+   $self->ResetFilter();
+   $self->SecureSetFilter(\%flt);
+   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+
+
+   print $self->HttpHeader();
+   print $self->HtmlHeader(
+                           title=>"TeamView",
+                           js=>['toolbox.js','primitives.js','jquery.js'],
+                           style=>['default.css','work.css',
+                                   'kernel.App.Web.css',
+                                   'Output.HtmlDetail.css',
+                                   'primitives.css',
+                                   'Output.ListeditTabObject.css']);
+
+
+   my $detailx=$self->DetailX();
+   my $detaily=$self->DetailY();
+
+   my $UserCache=$self->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+   }
+   my $winsize="normal";
+   if (defined($UserCache->{winsize}) && $UserCache->{winsize} ne ""){
+      $winsize=$UserCache->{winsize};
+   }
+   my $winname="_blank";
+   if (defined($UserCache->{winhandling}) &&
+       $UserCache->{winhandling} eq "winonlyone"){
+      $winname="W5BaseDataWindow";
+   }
+   my $openwinStart="custopenwin(";
+   my $openwinEnd="'$winsize',$detailx,$detaily,'$winname')";
+
+
+
+   if (defined($rec)){
+      my $url="./jsonContextMap/".$rec->{id};
+print <<EOF;
+<script type='text/javascript'>
+var ctrl;
+
+
+function onTemplateRender(event, data) {
+   //console.log("onRender:",event,data);
+   switch (data.renderingMode) {
+      case primitives.RenderingMode.Create:
+         /* Initialize template content here */
+         break;
+      case primitives.RenderingMode.Update:
+         /* Update template content here */
+         break;
+   }
+
+   var itemConfig = data.context;
+
+   var photo = data.element.childNodes[1].firstChild;
+   photo.src = itemConfig.image;
+   photo.alt = itemConfig.title;
+
+   var titleBackground = data.element.firstChild;
+   titleBackground.style.backgroundColor = itemConfig.itemTitleColor || 
+                                           primitives.Colors.RoyalBlue;
+
+   var title = data.element.firstChild.firstChild;
+   title.firstChild.textContent = itemConfig.title;
+   if (itemConfig.titleurl){
+      data.element.firstChild.firstChild.style.cursor='pointer';
+      data.element.firstChild.firstChild.firstChild.href=itemConfig.titleurl;
+      data.element.firstChild.firstChild.firstChild.onclick=
+        function(e){
+           ${openwinStart}itemConfig.titleurl,${openwinEnd};
+           return(false);
+        };
+   }
+
+   var description = data.element.childNodes[2];
+   description.textContent = itemConfig.description;
+}
+
+function generateTemplate(tmpl){
+   var t=["div",
+               {
+                  "style": {
+                     "width": tmpl.itemSize.width+ + "px",
+                     "height": tmpl.itemSize.height + "px"
+                  },
+                  "class": ["bp-item", "bp-corner-all", "bt-item-frame"]
+               },
+               ["div",
+                  {
+                     "name": "titleBackground",
+                     "class": ["bp-item", "bp-corner-all", "bt-title-frame"],
+                     "style": {
+                        top: "2px",
+                        left: "2px",
+                        width: ""+(tmpl.itemSize.width-5)+"px",
+                        height: "18px"
+                     }
+                  },
+                  ["div",
+                     {
+                        "name": "title",
+                        "class": ["bp-item", "bp-title"],
+                        "style": {
+                           padding: "1px",
+                           left: "6px",
+                           width: "208px",
+                           width: ""+(tmpl.itemSize.width-8)+"px",
+                           height: "18px"
+                        }
+                     },
+                    ["a",{
+                         "href":"",
+                         "class": ["bp-item", "bp-title"],
+                       },
+                    ]
+                  ]
+               ],
+               ["div",
+                  {
+                     "class": ["bp-item", "bp-photo-frame"],
+                     "style": {
+                        top: "26px",
+                        left: "2px",
+                        width: "50px",
+                        height: "60px"
+                     }
+                  },
+                  ["img",
+                     {
+                        "name": "photo",
+                        "class": ["bp-item", "bp-title"],
+                        "style": {
+                           width: "50px",
+                           height: "60px"
+                        }
+                     }
+                  ]
+               ],
+               ["div",
+                  {
+                     "name": "description",
+                     "class": "bp-item",
+                     "style": {
+                        top: "25px",
+                        left: "56px",
+                        width: ""+(tmpl.itemSize.width-55)+"px",
+                        height: "56px",
+                        fontSize: "10px"
+                     }
+                  }
+               ]
+            ];
+   return(t);
+}
+
+
+\$.ajax({
+  url: '$url',
+}).done(function(data) {
+   var opt = new primitives.OrgConfig();
+   if (data.items){
+      var items=new Array();
+      for(var c=0;c<data.items.length;c++){
+         var item=data.items[c];
+         items.push(new primitives.FamItemConfig(item));
+      }
+      //console.log("items:",items);
+      opt.items = items;
+      //opt.alignBranches=true;
+      if (data.cursorItem){
+         opt.cursorItem = data.cursorItem;
+      }
+      opt.defaultTemplateName= "itemTmpl";
+
+      var tmpl0=new primitives.TemplateConfig();
+      tmpl0.name='itemTmpl';
+      tmpl0.itemSize=new primitives.Size(100, 95);
+      tmpl0.itemTemplate = generateTemplate(tmpl0);
+
+      var tmpl1=new primitives.TemplateConfig();
+      tmpl1.name='wideTemplate';
+      tmpl1.itemSize=new primitives.Size(150, 95);
+      tmpl1.itemTemplate = generateTemplate(tmpl1);
+
+      var tmpl2=new primitives.TemplateConfig();
+      tmpl2.name='ultraWideTemplate';
+      tmpl2.itemSize=new primitives.Size(250, 95);
+      tmpl2.itemTemplate = generateTemplate(tmpl2);
+
+      opt.templates = [tmpl0,tmpl1,tmpl2];
+      opt.onItemRender = onTemplateRender;
+
+      opt.alignBranches=true;
+
+      opt.enableMatrixLayout=false;
+      if (data.enableMatrixLayout){
+         opt.enableMatrixLayout=true;
+         opt.minimumMatrixSize=2;
+         opt.maximumColumnsInMatrix=4;
+      }
+
+      //opt.onButtonsRender = function (data) {
+      //   var itemConfig = data.context;
+      //   var element = data.element;
+      //   console.log("data:",data);
+      //   console.log("itemConfig:",itemConfig);
+      //   element.innerHTML = "";
+      //   element.appendChild(primitives.JsonML.toHTML(["div",
+      //      {
+      //      class: "btn-group-vertical btn-group-sm"
+      //      },
+      //      ["button", 
+      //         {
+      //            "type": "button",
+      //            "data-buttonname": "delete",
+      //            "class": "btn btn-light"
+      //         },
+      //         ["i", { "class": "fa fa-minus-circle" }],
+      //         "X"
+      //      ]
+      //   ]));
+      //};
+      opt.pageFitMode = primitives.PageFitMode.None;
+      opt.hasSelectorCheckbox = primitives.Enabled.False;
+      //opt.normalItemsInterval = 50;
+      opt.lineLevelShift = 50;
+      opt.arrowsDirection=primitives.GroupByType.Children;
+      ctrl=primitives.FamDiagram(document.getElementById("basicdiagram"),opt);
+      //console.log("primitives.FamDiagram=",ctrl);
+   }
+}).fail(function() {
+  alert("Ajax failed to fetch data")
+})
+
+\$(window).resize(function(){
+  if (ctrl){
+     ctrl.update(primitives.UpdateMode.Refresh);
+  }
+});
+
+
+
+</script>
+<div id="basicdiagram" style="width: 100%; height:100%; border:1;padding:0;margin:0"></div>
+
+
+EOF
+   }
+   print $self->HtmlBottom(body=>1,form=>1);
+
+}
+
+
+
+sub ContextMap
+{
+   my ($self)=@_;
+   my $idfield=$self->IdField();
+   my $idname=$idfield->Name();
+   my $val="undefined";
+   if (defined(Query->Param("FunctionPath"))){
+      $val=Query->Param("FunctionPath");
+   }
+   $val=~s/^\///;
+   $val="UNDEF" if ($val eq "");
+   my %param;
+   my $target="../Detail";
+   $param{ModeSelectCurrentMode}="ContextMapView";
+   $param{$idname}=$val;
+   $self->HtmlGoto($target,post=>\%param);
+   return();
+}
+
 
 
 sub ById

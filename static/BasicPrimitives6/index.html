@@ -1,0 +1,170 @@
+<html>
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+   <title>First organization diagram</title>
+
+
+   <script type="text/javascript" src="./primitives.js"></script>
+   <link href="./css/primitives.css" media="screen" rel="stylesheet" type="text/css" />
+
+   <script type='text/javascript'>
+      var control;
+      var timer = null;
+
+      document.addEventListener('DOMContentLoaded', function () {
+         var options = new primitives.OrgConfig();
+
+         var items = [
+            new primitives.FamItemConfig({
+               id: 0,
+               title: "James Smith",
+               description: "VP, Public Sector",
+               contentSize: new primitives.Size(200,40),
+               image: "a.png"
+            }),
+            new primitives.FamItemConfig({
+               id: 1,
+               parents:[0],
+               title: "Ted Lucas",
+               description: "VP, Human Resources",
+               image: "b.png"
+            }),
+            new primitives.FamItemConfig({
+               id: 2,
+               parents:[0],
+               title: "Fritz Stuger",
+               groupTitle: "Adviser",
+               description: "Business Solutions, US",
+               image: "c.png"
+            }),
+            new primitives.FamItemConfig({
+               id: 'a2342',
+               title: "Fritz Stuger dies ist ein Langer",
+               description: "Business Solutions, US, ghjkhgkjgkjgAAAAkgkg",
+               image:  "c.png"
+            }),
+            new primitives.FamItemConfig({
+               id: '1000',
+               title: "Parent1000",
+               description: "Business Solutions, US, ghjkhgkjgkjgAAAAkgkg",
+               image:  "c.png"
+            }),
+            new primitives.FamItemConfig({
+               id: '2000',
+               childrenPlacementType: primitives.ChildrenPlacementType.Matrix,
+               title: "Parent2000",
+               description: "Business Solutions, US, ghjkhgkjgkjgAAAAkgkg",
+               image:  "c.png"
+            }),
+            new primitives.FamItemConfig({
+               id: 'b34xxx2',
+               parents:['1000','2000'],
+               itemType: 7,
+               title: "multiParentX",
+               groupTitle: "Adviser",
+               description: "Business Solutions, US, ghjkhgkjgkjgAAAAkgkg",
+               image:  "c.png"
+            }),
+            new primitives.FamItemConfig({
+               id: 'b34yyy2',
+               parents:['b34xxx2'],
+               title: "childchildLanger",
+               labelSize: new primitives.Size(100,40),
+               description: "Business Solutions, US, ghjkhgkjgkjgAAAAkgkg",
+               image:  "c.png"
+            }),
+            new primitives.FamItemConfig({
+               id: 'xb34yyy2',
+               parents:['b34xxx2'],
+               title: "paralel",
+               description: "Business Solutions, US, ghjkhgkjgkjgAAAAkgkg",
+               image:  "c.png"
+            }),
+            new primitives.FamItemConfig({
+               id: 'xxb34yyy2',
+               parents:['b34xxx2'],
+               title: "paralel",
+               levelOffset:10,
+               description: "Business Solutions, US, ghjkhgkjgkjgAAAAkgkg",
+               image:  "c.png"
+            }),
+            new primitives.FamItemConfig({
+               id: 'ccc',
+               parents:['xxb34yyy2'],
+               title: "paralel",
+               description: "Business Solutions, US, ghjkhgkjgkjgAAAAkgkg",
+               image:  "c.png"
+            }),
+            new primitives.FamItemConfig({ id: 112, parent: 1, title: "Child 7" }),
+         ];
+
+         options.items = items;
+         options.annotations=[
+             {
+               annotationType: primitives.AnnotationType.Level,
+               levels: [0],
+               title: "Prozesses",
+               titleColor: primitives.Colors.RoyalBlue,
+               offset: new primitives.Thickness(0, 0, 0, -1),
+               lineWidth: new primitives.Thickness(0, 0, 0, 0),
+               opacity: 0,
+               borderColor: primitives.Colors.Gray,
+               fillColor: primitives.Colors.Gray,
+               lineType: primitives.LineType.Dotted
+             },
+             {
+               annotationType: primitives.AnnotationType.Level,
+               levels: [1],
+               title: "SubProzesses",
+               titleColor: primitives.Colors.RoyalBlue,
+               offset: new primitives.Thickness(0, 0, 0, -1),
+               lineWidth: new primitives.Thickness(0, 0, 0, 0),
+               opacity: 0,
+               borderColor: primitives.Colors.Gray,
+               fillColor: primitives.Colors.Gray,
+               lineType: primitives.LineType.Dotted
+             },
+             {
+                  annotationType: primitives.AnnotationType.Background,
+                  fillColor: "#e5f9f8",
+                  includeChildren: false,
+                  offset: new primitives.Thickness(5,5,5,5),
+                  items: ['2000','1000','b34xxx2'],
+                  name: "usercontrolledbackground"
+             }
+         ];
+         options.alignBranches=true;
+         options.cursorItem = 1;
+
+         options.onButtonsRender = function (data) {
+            var itemConfig = data.context;
+            var element = data.element;
+            console.log("data:",data);
+            console.log("itemConfig:",itemConfig);
+            element.innerHTML = "";
+            element.appendChild(primitives.JsonML.toHTML(["div",
+               {
+               class: "btn-group-vertical btn-group-sm"
+               },
+               ["button", 
+                  {
+                     "type": "button",
+                     "data-buttonname": "delete",
+                     "class": "btn btn-light"
+                  },
+                  ["i", { "class": "fa fa-minus-circle" }],
+                  "X"
+               ]
+            ]));
+         };
+         options.pageFitMode = primitives.PageFitMode.None;
+         options.hasSelectorCheckbox = primitives.Enabled.False;
+         options.arrowsDirection=primitives.GroupByType.Children;
+
+         control = primitives.FamDiagram(document.getElementById("basicdiagram"), options);
+      });
+
+   </script>
+</head>
+<body><div id="basicdiagram" style="width: 80%; height:100%; border:0;padding:0;margin:0"></div></body>
+</html>
