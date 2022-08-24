@@ -25,6 +25,7 @@ EOF
 'MSG004'=>{de=>'Verfügbare Felder:',en=>'Available Fields:'},
 'MSG005'=>{de=>'Felder der aktuellen Ansicht:',en=>'Fields of current View:'},
 'History'=>{de=>'Verlauf'},
+'Context map'=>{de=>'Kontext-Map'},
 'you are not autorized to delete the requested record'=>{de=>'Sie sind nicht berechtigt, den angeforderten Datensatz zu löschen'},
 'you are not autorized to insert the requested record'=>{de=>'Sie sind nicht berechtig den angeforderten Datensatz zu erzeugen'},
 'New'=>{de=>'Neueingabe'},

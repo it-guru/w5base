@@ -184,6 +184,13 @@ sub Run
             }
             $param{cache}=3600;
          }
+         if ($ext eq "map"){
+            $content="text/javascript";
+            if (!ref($filename)){
+               $filename=$instdir."/lib/javascript/".$func; 
+            }
+            $param{cache}=3600;
+         }
       }
       if (ref($filename) ne "ARRAY"){
          if ($content ne "text/javascript"){

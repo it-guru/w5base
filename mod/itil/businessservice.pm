@@ -2348,154 +2348,117 @@ sub initSearchQuery
 }
 
 
-#sub getHtmlDetailPages
-#{
-#   my $self=shift;
-#   my ($p,$rec)=@_;
-#
-#   return($self->SUPER::getHtmlDetailPages($p,$rec)) if (!defined($rec));
-#
-#   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
-#   if ($rec->{nature} ne ""){
-#      push(@l,"TView"=>$self->T("Tree View"));
-#   }
-#   return(@l);
-#}
 
-#sub getHtmlDetailPageContent
-#{
-#   my $self=shift;
-#   my ($p,$rec)=@_;
-#   return($self->SUPER::getHtmlDetailPageContent($p,$rec)) if ($p ne "TView");
-#
-#   my $page;
-#   my $idname=$self->IdField->Name();
-#   my $idval=$rec->{$idname};
-#
-#   if ($p eq "TView"){
-#      Query->Param("$idname"=>$idval);
-#      $idval="NONE" if ($idval eq "");
-#
-#      my $q=new kernel::cgi({});
-#      $q->Param("$idname"=>$idval);
-#      my $urlparam=$q->QueryString();
-#      $page="<link rel=\"stylesheet\" ".
-#            "href=\"../../../static/lytebox/lytebox.css\" ".
-#            "type=\"text/css\" media=\"screen\" />";
-#
-#      $page.="<iframe style=\"width:100%;height:100%;border-width:0;".
-#            "padding:0;margin:0\" class=HtmlDetailPage name=HtmlDetailPage ".
-#            "src=\"TreeView?$urlparam\"></iframe>";
-#   }
-#   $page.=$self->HtmlPersistentVariables($idname);
-#   return($page);
-#}
+sub getValidWebFunctions
+{
+   my $self=shift;
 
+   return($self->SUPER::getValidWebFunctions(@_),"ContextMap","ContextMapView");
+}
 
-#sub getValidWebFunctions
-#{
-#   my $self=shift;
-#
-#   return($self->SUPER::getValidWebFunctions(@_),"TreeView");
-#}
+sub generateContextMap
+{
+   my $self=shift;
+   my $rec=shift;
 
-#sub TreeView   
-#{
-#   my $self=shift;
-#
-#   my %flt=$self->getSearchHash();
-#   $self->ResetFilter();
-#   $self->SecureSetFilter(\%flt);
-#   my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
-#
-#
-#   print $self->HttpHeader();
-#   print $self->HtmlHeader(
-#                           title=>"TeamView",
-#                           js=>['toolbox.js'],
-#                           style=>['default.css','work.css',
-#                                   'kernel.App.Web.css',
-#                                   'Output.HtmlDetail.css']);
-#   if (defined($rec)){
-#      printf("<div id=\"HtmlDetail\"><div style=\"padding:5px\">".
-#             "<br><h2>%s :</h2><br>%s<br>",
-#             $self->T("Businessservice tree analyse"),
-#             $self->getField("fullname")->
-#                FormatedDetail($rec,"HtmlV01"));
-#
-#      print("<table width=100%>");
-#
-#      printf("<tr><td>");
-#      printf("<hr>");
-#      printf("<h1>".$self->T("Support times")."</h1>");
-#      printf("<h3>".$self->T("requested support times")."</h1> (%s)",
-#             $self->getField("servicesupport")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("%s",
-#             $self->getField("supportReq")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("</td></tr>");
-#      
-#
-#      printf("<tr><td>");
-#      printf("<h3>".$self->T("implemented support times")."</h1> (%s)",
-#             $self->getField("implservicesupport")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("<br>%s",
-#             $self->getField("implsupporttimes")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("</td></tr>");
-#      
-#
-#      printf("<tr><td>");
-#      printf("<h3>".$self->T("aggregated support times tree")."</h1>");
-#      printf("%s",
-#             $self->getField("supportTreeCheck")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("</td></tr>");
-#      printf("</table>");
-#
-#
-#      print("<table width=100%>");
-#
-#      printf("<tr><td>");
-#      printf("<hr>");
-#      printf("<h1>".$self->T("Service times")."</h1>");
-#      printf("<h3>".$self->T("requested service times")."</h1> (%s)",
-#             $self->getField("servicesupport")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("%s",
-#             $self->getField("serivceReq")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("</td></tr>");
-#      
-#      printf("<tr><td>");
-#      printf("<h3>".$self->T("implemented service times")."</h1> (%s)",
-#             $self->getField("implservicesupport")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("<br>%s",
-#             $self->getField("implserivcetimes")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("</td></tr>");
-#      
-#
-#      printf("<tr><td>");
-#      printf("<h3>".$self->T("aggregated service times tree")."</h1>");
-#      printf("%s",
-#             $self->getField("serivceTreeCheck")->
-#                FormatedDetail($rec,"HtmlDetail"));
-#      printf("</td></tr>");
-#      printf("</table>");
-#
-#
-#      printf("</div></div>");
-#
-#   }
-#   print $self->HtmlBottom(body=>1,form=>1);
-#
-#}
+   my $d={
+      items=>[]
+   };
+
+   my $imageUrl=$self->getRecordImageUrl(undef);
+   my $cursorItem;
+
+   my %matrixIdLength;
+   my $maxParents=0;
+
+   foreach my $id (keys(%{$rec->{servicetrees}->{obj}})){
+      my $obj=$rec->{servicetrees}->{obj}->{$id};
+
+      my $itemrec={id=>$id,title=>$obj->{label},image=>$imageUrl};
+
+      if ($obj->{dataobj} ne ""){
+         my $o=getModuleObject($self->Config,$obj->{dataobj});
+         if ($o){
+            $itemrec->{image}=$o->getRecordImageUrl(undef);
+         }
+         if ($obj->{dataobj} eq $self->Self() ||
+             $obj->{dataobj} eq $self->SelfAsParentObject()){
+            if ($obj->{dataobjid} eq $rec->{id}){
+               $cursorItem=$id; 
+            }
+         }
+      }
+
+      my $titleurl=$obj->{urlofcurrentrec};
+      if (($obj->{dataobj}=~m/::businessservice$/)){  # nur da get ContextMap
+        #  ($obj->{dataobj}=~m/::businessprocess$/)){
+         $titleurl=~s#/ById/#/ContextMap/#;
+      }
+      $itemrec->{titleurl}=$titleurl;
+      
 
 
+      my $matrixId="1"; 
+      $matrixId="2" if ($obj->{dataobj}=~m/::businessservice$/);
+      $matrixId="3" if ($obj->{dataobj}=~m/::appl$/);
+      $itemrec->{matrixId}=$matrixId;
+
+      my $title=$itemrec->{title};
+      if (($title=~m/:.*:/) || ($title=~m/^[^:]{5,20}:/) ){
+         my @l=split(/:/,$title);
+         my $description=pop(@l);
+         $title=join(":",@l);
+         $itemrec->{title}=$title;
+         $itemrec->{description}=$description;
+         $itemrec->{description}=~s/\@/\@ /g;
+      }
+      my $l1=LengthOfLongestWord($itemrec->{title});
+      my $l2=LengthOfLongestWord($itemrec->{description});
+      my $l3=length($itemrec->{title});
+      my $l4=length($itemrec->{description});
+
+      if ($l1>25 || $l2>20 || $l3>40 || $l4>50){
+         $matrixIdLength{$matrixId}=25 if ($matrixIdLength{$matrixId}<25);
+      }
+      elsif ($l1>16 || $l2>12 || $l3>30 || $l4>40){
+         $matrixIdLength{$matrixId}=16 if ($matrixIdLength{$matrixId}<16);
+      }
+      #$itemrec->{groupTitle}=$obj->{dataobj};
+      $itemrec->{levelOffset}=2 if ($obj->{dataobj}=~m/::businessservice$/);
+
+      if (exists($obj->{directParent})){
+         $itemrec->{parents}=$obj->{directParent};
+         if ($#{$obj->{directParent}}+1>$maxParents){
+            $maxParents=$#{$obj->{directParent}}+1;
+         }
+      }
+      $itemrec->{labelPlacement}=3;
+      push(@{$d->{items}},$itemrec);
+   }
+   foreach my $itemrec (@{$d->{items}}){
+      my $matrixId=$itemrec->{matrixId};
+      if (exists($matrixIdLength{$matrixId})){
+         if ($matrixIdLength{$matrixId}==16){
+            $itemrec->{templateName}="wideTemplate";
+         }
+         if ($matrixIdLength{$matrixId}==25){
+            $itemrec->{templateName}="ultraWideTemplate";
+         }
+      }
+   }
+
+   if ($cursorItem){
+      $d->{cursorItem}=$cursorItem;
+   }
+   if ($maxParents>3){
+      $d->{enableMatrixLayout}=1;
+   }
+   else{
+      $d->{enableMatrixLayout}=0;
+   }
+   #print STDERR Dumper($d);
+   return($d);
+}
 
 
 sub jsExploreObjectMethods

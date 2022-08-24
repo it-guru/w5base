@@ -98,7 +98,7 @@ use charnames ':full';
              &orgRoles &extractLangEntry
              &msg &sysmsg &ERROR &WARN &DEBUG &INFO &OK &utf8 &latin1 &utf16
              &utf8_to_latin1
-             &TextShorter
+             &TextShorter &LengthOfLongestWord
              &joinCsvLine
              &splitCsvLine
              &getClientAddrIdString
@@ -1195,6 +1195,21 @@ sub TextShorter
    }
    return($text);
 }
+
+sub LengthOfLongestWord
+{
+   my $str=shift;
+   my @l=split(/\s/,$str);
+   my $max=0;
+
+   foreach my $s (@l){
+     $max=length($s) if ($max<length($s));
+   }
+   return($max);
+}
+
+
+
 
 sub _isWriteValid {return undef};
 
