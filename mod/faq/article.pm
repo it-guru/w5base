@@ -934,6 +934,9 @@ function setTitle()
 addEvent(window, "load", setTitle);
 </script>
 EOF
+
+   print $self->HtmlPersistentVariables($self->IdField()->Name());
+
    print $self->HtmlBottom(body=>1,form=>1);
 }
 
