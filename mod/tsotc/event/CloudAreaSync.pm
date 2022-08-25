@@ -72,7 +72,7 @@ sub CloudAreaSync
        $itcloud{lc($appansrec->{cluster})}++;
        my $fullname=$appansrec->{cluster}.".".$appansrec->{name};
 
-       my $fake_srcid=create_uuid(UUID_V3,$fullname);
+       my $fake_srcid=create_uuid(UUID_V3,$fullname.":".$appansrec->{applid});
 
        my %carec=(
           itcloud=>$appansrec->{cluster},
@@ -297,7 +297,7 @@ sub CloudAreaSync
             }
             else{
                if ($currec->{cistatusid} eq "6"){
-                  $updrec->{cistatusid}="4";
+                  $updrec->{cistatusid}="3";
                   $updrec->{applid}=$a->{applid};
                }
             }
