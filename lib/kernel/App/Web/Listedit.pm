@@ -752,16 +752,62 @@ function generateTemplate(tmpl){
    return(t);
 }
 
+function onScale(scale) {
+   if (ctrl){
+      if (scale != null) {
+         ctrl.setOption("scale", scale);
+      }
+      ctrl.update(primitives.UpdateMode.Refresh);
+   }
+}
+
+window.addEventListener('wheel', function(event) {
+  if (event.ctrlKey == true) {
+     event.preventDefault();
+     if (ctrl){
+        if (event.deltaY>0){
+           ctrl.zoomLevel++;
+        }
+        if (event.deltaY<0){
+           ctrl.zoomLevel--;
+        }
+        if (ctrl.zoomLevel<-2){
+           ctrl.zoomLevel=-2;
+        }
+        if (ctrl.zoomLevel>2){
+           ctrl.zoomLevel=2;
+        }
+        if (ctrl.zoomLevel==-2) {onScale(0.3);}
+        if (ctrl.zoomLevel==-1) {onScale(0.6);}
+        if (ctrl.zoomLevel== 0) {onScale(1.0);}
+        if (ctrl.zoomLevel== 1) {onScale(1.3);}
+        if (ctrl.zoomLevel== 2) {onScale(1.6);}
+     }
+  }
+}, { passive: false });
+
 
 \$.ajax({
   url: '$url',
 }).done(function(data) {
    var opt = new primitives.OrgConfig();
    if (data.items){
+      var basicMode="Fam";
+      if (data.basicMode){
+         if (data.basicMode=="Org"){
+            basicMode="Org";
+         }
+      }
+      
       var items=new Array();
       for(var c=0;c<data.items.length;c++){
          var item=data.items[c];
-         items.push(new primitives.FamItemConfig(item));
+         if (basicMode=="Org"){
+            items.push(new primitives.OrgItemConfig(item));
+         }
+         if (basicMode=="Fam"){
+            items.push(new primitives.FamItemConfig(item));
+         }
       }
       //console.log("items:",items);
       opt.items = items;
@@ -794,8 +840,8 @@ function generateTemplate(tmpl){
       opt.enableMatrixLayout=false;
       if (data.enableMatrixLayout){
          opt.enableMatrixLayout=true;
-         opt.minimumMatrixSize=2;
-         opt.maximumColumnsInMatrix=4;
+         opt.minimumMatrixSize=3;
+         opt.maximumColumnsInMatrix=5;
       }
 
       //opt.onButtonsRender = function (data) {
@@ -824,7 +870,17 @@ function generateTemplate(tmpl){
       //opt.normalItemsInterval = 50;
       opt.lineLevelShift = 50;
       opt.arrowsDirection=primitives.GroupByType.Children;
-      ctrl=primitives.FamDiagram(document.getElementById("basicdiagram"),opt);
+      if (basicMode=="Fam"){
+         ctrl=primitives.FamDiagram(
+                 document.getElementById("basicdiagram"),opt
+         );
+      }
+      if (basicMode=="Org"){
+         ctrl=primitives.OrgDiagram(
+                 document.getElementById("basicdiagram"),opt
+         );
+      }
+      ctrl.zoomLevel=0;
       //console.log("primitives.FamDiagram=",ctrl);
    }
 }).fail(function() {

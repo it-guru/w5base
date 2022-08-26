@@ -2404,7 +2404,9 @@ sub generateContextMap
       $itemrec->{matrixId}=$matrixId;
 
       my $title=$itemrec->{title};
-      if (($title=~m/:.*:/) || ($title=~m/^[^:]{5,20}:/) ){
+      if (($title=~m/:.*:/) || 
+           ($title=~m/^[^:]{5,20}:/) ||
+           ($title=~m/^[^:]{2,10}:[^:]{20}/) ){
          my @l=split(/:/,$title);
          my $description=pop(@l);
          $title=join(":",@l);
