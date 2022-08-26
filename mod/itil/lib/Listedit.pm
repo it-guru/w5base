@@ -1656,6 +1656,18 @@ sub calculateServiceTrees
    }
    my $mainKey=$baseRec->{dataobj}."::".$baseRec->{dataobjid};
    $o{$mainKey}=$baseRec;
+   if ($baseRec->{dataobj}=~m/::businessservice$/){
+      if ($current->{nature} eq "" && $current->{applid} ne ""){
+         my $baseSub={
+            dataobj=>$app->findNearestTargetDataObj(
+                     'itil::appl','field:id'),
+            dataobjid=>$current->{applid},
+            directParent=>[$mainKey]
+         };
+         my $mainSubKey=$baseSub->{dataobj}."::".$baseSub->{dataobjid};
+         $o{$mainSubKey}=$baseSub;
+      }
+   }
    my @pathRoots=();
    my $fillupCount;
    do{   # loop for upper elements
@@ -1664,8 +1676,8 @@ sub calculateServiceTrees
          if (!exists($chkrec->{directParent})){
             $fillupCount++;
             my @p;
-            if ($chkrec->{dataobj} eq "itil::appl" ||
-                $chkrec->{dataobj} eq "itil::businessservice"){
+            if (($chkrec->{dataobj}=~m/::appl$/) ||
+                ($chkrec->{dataobj}=~m/::businessservice$/) ){
                my $obj=$app->getPersistentModuleObject("streelnkbscomp",
                                                        "itil::lnkbscomp");
                $obj->SetFilter({objtype=>\$chkrec->{dataobj},
@@ -1681,14 +1693,16 @@ sub calculateServiceTrees
                   push(@p,$k);
                }
             }
-            if ($chkrec->{dataobj} eq "itil::businessservice"){
+            if ( ($chkrec->{dataobj}=~m/::businessservice$/) ){
                my $obj=$app->getPersistentModuleObject("lnkbsprocess",
                                                    "itil::lnkbprocessbservice");
-               $obj->SetFilter({businessserviceid=>\$chkrec->{dataobjid}});
+               $obj->SetFilter({businessserviceid=>\$chkrec->{dataobjid},
+                                bprocesscistatusid=>\'4'});
                my @l=$obj->getHashList(qw(bprocessid));
                foreach my $rec (@l){
                   my $prec={
-                     dataobj=>'crm::businessprocess',
+                     dataobj=>$app->findNearestTargetDataObj(
+                              'crm::businessprocess','field:id'),
                      dataobjid=>$rec->{bprocessid},
                   };
                   my $k=$prec->{dataobj}."::".$prec->{dataobjid};
@@ -1696,7 +1710,7 @@ sub calculateServiceTrees
                   push(@p,$k);
                }
             }
-            if ($chkrec->{dataobj} eq "crm::businessprocess"){
+            if ( ($chkrec->{dataobj}=~m/::businessprocess$/) ){
                my $obj=$app->getPersistentModuleObject("bsprocess",
                                                    "crm::businessprocess");
                $obj->SetFilter({id=>\$chkrec->{dataobjid}});
@@ -1704,7 +1718,8 @@ sub calculateServiceTrees
                foreach my $rec (@l){
                   if ($rec->{pbusinessprocessid} ne ""){
                      my $prec={
-                        dataobj=>'crm::businessprocess',
+                        dataobj=>$app->findNearestTargetDataObj(
+                                 'crm::businessprocess','field:id'),
                         dataobjid=>$rec->{pbusinessprocessid},
                      };
                      my $k=$prec->{dataobj}."::".$prec->{dataobjid};
@@ -1731,7 +1746,7 @@ sub calculateServiceTrees
                $downfillupKeys{$chkKey}++;
                $fillupCount++;
                my $chkrec=$o{$chkKey};
-               if ($chkrec->{dataobj} eq "itil::businessservice"){
+               if ( ($chkrec->{dataobj}=~m/::businessservice$/) ){
                   my $obj=$app->getPersistentModuleObject("streelnkbscomp",
                                                           "itil::lnkbscomp");
                   $obj->SetFilter({businessserviceid=>\$chkrec->{dataobjid}});
@@ -1775,10 +1790,10 @@ sub calculateServiceTrees
       $ids{$chkrec->{dataobj}}->{$chkrec->{dataobjid}}++
    }
    foreach my $dataobj (keys(%ids)){
-      if ($dataobj eq "itil::businessservice" || 
-          $dataobj eq "crm::businessprocess" ||
-          $dataobj eq "itil::appl" ||
-          $dataobj eq "itil::system"){
+      if ( ($dataobj=~m/::businessservice$/) || 
+           ($dataobj=~m/::businessprocess$/) ||
+           ($dataobj=~m/::appl$/) ||
+           ($dataobj=~m/::system$/) ){
          my @ids=keys(%{$ids{$dataobj}});
          my $obj=$app->getPersistentModuleObject("obj".$dataobj,$dataobj);
          $obj->SetFilter({id=>\@ids});

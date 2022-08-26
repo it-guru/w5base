@@ -267,7 +267,7 @@ sub new
                 label         =>'service trees',
                 readonly      =>1,
                 searchable    =>0,
-                depend        =>['id','fullname'],
+                depend        =>['id','fullname','nature','applid'],
                 onRawValue    =>\&itil::lib::Listedit::calculateServiceTrees),
 
 
@@ -2419,10 +2419,10 @@ sub generateContextMap
       my $l3=length($itemrec->{title});
       my $l4=length($itemrec->{description});
 
-      if ($l1>25 || $l2>20 || $l3>40 || $l4>50){
+      if ($l1>25 || $l2>19 || $l3>40 || $l4>50){
          $matrixIdLength{$matrixId}=25 if ($matrixIdLength{$matrixId}<25);
       }
-      elsif ($l1>16 || $l2>12 || $l3>30 || $l4>40){
+      elsif ($l1>16 || $l2>10 || $l3>30 || $l4>40){
          $matrixIdLength{$matrixId}=16 if ($matrixIdLength{$matrixId}<16);
       }
       #$itemrec->{groupTitle}=$obj->{dataobj};
