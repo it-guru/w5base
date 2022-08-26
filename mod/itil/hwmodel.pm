@@ -96,7 +96,8 @@ sub new
                 group         =>'statusinfo',
                 label         =>'Asset use count',
                 dataobjattr   =>"(select count(*) from asset ".
-                                "where asset.hwmodel=hwmodel.id and asset.cistatus<6)"),
+                                "where asset.hwmodel=hwmodel.id ".
+                                "and asset.cistatus<6)"),
                                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -172,7 +173,7 @@ sub new
    $self->setWorktable("hwmodel");
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.itil.hwmodel"],
-                         uniquesize=>255};
+                         uniquesize=>75};
    return($self);
 }
 
