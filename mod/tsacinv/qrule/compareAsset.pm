@@ -264,7 +264,7 @@ sub qcheckRecord
                                 my $parrec=shift;
                                 my $newval=shift;
                                 if (length($newval)<3 ||
-                                    length($newval)>40 ||
+                                    length($newval)>60 ||
                                     ($newval=~m/^(.)\1{3}/)){
                                    return(undef);
                                 }

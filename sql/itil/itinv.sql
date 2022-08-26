@@ -340,7 +340,7 @@ create table hwmodel (
   id          bigint(20)  NOT NULL,
   fullname    varchar(80) NOT NULL,
   cistatus    int(2)      NOT NULL,
-    name        varchar(40) NOT NULL,
+    name        varchar(80) NOT NULL,
     mandator    bigint(20)  default NULL,
     producer    bigint(20)  default NULL,
     platform    bigint(20)  default NULL,
