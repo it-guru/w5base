@@ -743,6 +743,11 @@ sub Init
                       prio=>50,
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.ds",
+                      "tmpl/welcome.itu",
+                      prio=>60,
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("bsm",
                       "tmpl/welcome",
                       defaultacl=>['valid_user'],
