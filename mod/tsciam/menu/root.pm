@@ -36,20 +36,37 @@ sub Init
    my $self=shift;
 
    $self->RegisterObj("itu.ciam",
+                      ">itu.ds.ciam");
+
+   $self->RegisterObj("itu.ds.ciam",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
-   
+
+
    $self->RegisterObj("itu.ciam.user",
+                      ">itu.ds.ciam.user");
+   
+   $self->RegisterObj("itu.ds.ciam.user",
                       "tsciam::user",
                       defaultacl=>['admin']);
-   
+
+
    $self->RegisterObj("itu.ciam.orgarea",
+                      ">itu.ds.ciam.orgarea");
+   
+   $self->RegisterObj("itu.ds.ciam.orgarea",
                       "tsciam::orgarea",
                       defaultacl=>['admin']);
 
+
    $self->RegisterObj("itu.ciam.location",
+                      ">itu.ds.ciam.location");
+
+   $self->RegisterObj("itu.ds.ciam.location",
                       "tsciam::location",
                       defaultacl=>['admin']);
+
+
 
    $self->RegisterObj("sysadm.grp.ciampfix",
                       "tsciam::orgarea",
