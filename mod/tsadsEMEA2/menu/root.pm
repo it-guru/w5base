@@ -1,6 +1,6 @@
-package tsadsEMEA1::menu::root;
+package tsadsEMEA2::menu::root;
 #  W5Base Framework
-#  Copyright (C) 2016  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2022  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@ package tsadsEMEA1::menu::root;
 #
 use strict;
 use vars qw(@ISA);
-use Data::Dumper;
 use kernel;
 use kernel::MenuRegistry;
 @ISA=qw(kernel::MenuRegistry);
@@ -35,27 +34,18 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("itu.tsadsEMEA1",
-                      ">itu.ds.ad");
-
-   $self->RegisterObj("itu.tsadsEMEA1.user",
-                      ">itu.itu.ds.ad.tsadsEMEA1");
-
-   $self->RegisterObj("itu.ds.ad",
-                      "tmpl/welcome",
-                      defaultacl=>['valid_user']);
-   
-   $self->RegisterObj("itu.ds.ad.tsadsEMEA1",
+   $self->RegisterObj("itu.ds.ad.tsadsEMEA2",
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("itu.ds.ad.tsadsEMEA1.user",
-                      "tsadsEMEA1::aduser",
+   $self->RegisterObj("itu.ds.ad.tsadsEMEA2.user",
+                      "tsadsEMEA2::aduser",
                       defaultacl=>['admin']);
 
-   $self->RegisterObj("itu.ds.ad.tsadsEMEA1.group",
-                      "tsadsEMEA1::adgroup",
+   $self->RegisterObj("itu.ds.ad.tsadsEMEA2.group",
+                      "tsadsEMEA2::adgroup",
                       defaultacl=>['admin']);
+
    return(1);
 }
 

@@ -1,4 +1,4 @@
-package tsadsEMEA1::user;
+package tsadsEMEA1::aduser;
 #  W5Base Framework
 #  Copyright (C) 2006  Hartmut Vogler (it@guru.de)
 #
@@ -18,11 +18,10 @@ package tsadsEMEA1::user;
 #
 use strict;
 use vars qw(@ISA);
+use tsadsEMEA1::lib::Listedit;
 use kernel;
-use kernel::App::Web;
-use kernel::DataObj::LDAP;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::LDAP);
+@ISA=qw(tsadsEMEA1::lib::Listedit);
 
 # Attribute im ADS LDAP:
 # accountExpires             lastLogoff                    postalCode                            
@@ -73,8 +72,14 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
+   $self->{ObjectClass}="Person";
+
+   my $module=$self->Module();
+   my $domain=lc($module);
+   $domain=~s/^tsads//;
    
-   $self->setBase("OU=Users,OU=DE,DC=emea1,DC=cds,DC=t-internal,DC=com");
+   #$self->setBase("OU=Users,OU=DE,DC=$domain,DC=cds,DC=t-internal,DC=com");
+   $self->setBase("DC=$domain,DC=cds,DC=t-internal,DC=com");
    $self->AddFields(
       new kernel::Field::Linenumber(name     =>'linenumber',
                                     label      =>'No.'),
@@ -87,7 +92,6 @@ sub new
 
       new kernel::Field::Text(     name       =>'fullname',
                                    label      =>'Fullname',
-                                   searchable =>0,
                                    htmldetail =>0,
                                    dataobjattr=>'displayName'),
 
@@ -102,6 +106,11 @@ sub new
       new kernel::Field::Email(    name       =>'email',
                                    label      =>'E-Mail',
                                    dataobjattr=>'mail'),
+
+      new kernel::Field::Text(     name       =>'account',
+                                   label      =>'Account',
+                                   group      =>'source',
+                                   dataobjattr=>'sAMAccountName'),
 
       new kernel::Field::Text(     name       =>'addresses',
                                    group      =>'addresses',
@@ -128,10 +137,33 @@ sub new
                                    label      =>'room number',
                                    dataobjattr=>'roomNumber'),
 
-      new kernel::Field::Text(     name       =>'groups',
+      new kernel::Field::Text(     name       =>'memberOf',
+                                   htmldetail =>0,
                                    group      =>'groups',
-                                   label      =>'Groups',
+                                   label      =>'memberOf',
                                    dataobjattr=>'memberOf'),
+
+      new kernel::Field::SubList(  name       =>'groups',
+                                   group      =>'groups',
+                                   searchable =>0,
+                                   label      =>'groups',
+                                   vjointo    =>'tsadsEMEA1::lnkaduseradgroup',
+                                   vjoinon    =>['id'=>'userObjectID'],
+                                   vjoindisp  =>['group'],
+                                   vjoinonfinish=>sub{   #Hack to allow spaces
+                                      my $self=shift;    #ids
+                                      my $flt=shift;
+                                      my $current=shift;
+                                      my $mode=shift;
+
+                                      if ($flt->{userObjectID} ne ""){
+                                         $flt->{userObjectID}=
+                                             '"'.$flt->{userObjectID}.'"';
+                                      }
+                                      return($flt);
+                                   },
+
+                                   vjoininhash=>['groupObjectId','group']),
 
       new kernel::Field::Textarea( name       =>'usercert',
                                    group      =>'usercert',
@@ -146,12 +178,11 @@ sub new
                                    group      =>'source',
                                    dataobjattr=>'employeeID'),
 
-      new kernel::Field::Text(     name       =>'sAMAccountName',
-                                   label      =>'sAMAccountName',
-                                   searchable =>0,
+      new kernel::Field::Text(     name       =>'ObjectClass',
+                                   label      =>'ObjectClass',
                                    group      =>'source',
-                                   dataobjattr=>'sAMAccountName'),
-
+                                   searchable =>0,
+                                   dataobjattr=>'ObjectClass'),
 
    );
    $self->setDefaultView(qw(surname givenname email company 
@@ -159,19 +190,6 @@ sub new
    return($self);
 }
 
-
-sub isQualityCheckValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(0);
-}
-
-sub isUploadValid
-{
-   my $self=shift;
-   return(0);
-}
 
 sub getDetailBlockPriority
 {
@@ -183,20 +201,6 @@ sub getDetailBlockPriority
 
 
 
-
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"tsadsEMEA1"));
-   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
-
-   return(1) if (defined($self->{tsadsEMEA1}));
-   return(0);
-}
-
-
-
 sub getRecordImageUrl
 {
    my $self=shift;
@@ -204,20 +208,6 @@ sub getRecordImageUrl
    return("../../../public/base/load/user.jpg?".$cgi->query_string());
 }
          
-
-sub isViewValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return("ALL");
-}
-
-sub isWriteValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(undef);
-}
 
 
 1;
