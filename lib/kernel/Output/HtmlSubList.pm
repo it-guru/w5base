@@ -379,7 +379,7 @@ sub ProcessLine
                   my $detaily=$self->getParent->getParent->DetailY();
                   $targetval=$targetval->[0] if (ref($targetval) eq "ARRAY");
                   my %q=('AllowClose'=>1,
-                         "search_$targetid"=>$targetval);
+                         "search_$targetid"=>'"'.$targetval.'"');
                   my $winname="_blank";
                   if (defined($UserCache->{winhandling}) &&
                       $UserCache->{winhandling} eq "winonlyone"){

@@ -273,7 +273,7 @@ sub addWebLinkToFacility
          }
          $dest.="?".kernel::cgi::Hash2QueryString(
             'AllowClose'=>1,
-            "search_$targetid"=>$targetval
+            "search_$targetid"=>'"'.$targetval.'"'
          );
          my $UserCache=$self->getParent->Cache->{User}->{Cache};
          if (defined($UserCache->{$ENV{REMOTE_USER}})){
