@@ -17,7 +17,7 @@
 'Addresses'=>{ de=>'Adressen'},
 'Accounting Area'=>{ de=>'Buchungskreis'},
 'Moible-Phonenumber'=>{ de=>'Handy-Nummer'},
-'tsadsEMEA1::user'=>{ de=>'T-Systems ADS EMEA1 - User',en=>'T-Systems ADS EMEA1 - User'},
+'tsadsEMEA1::aduser'=>{ de=>'Telekom ADS EMEA1 - Person',en=>'Telekom ADS EMEA1 - Person'},
 'fieldgroup.default'=>{ de=>'Personalien',en=>'Person-Informations'},
 'fieldgroup.groups'=>{ de=>'Gruppen',en=>'Groups'},
 'fieldgroup.addresses'=>{ de=>'Adressen',en=>'Addresses'},
