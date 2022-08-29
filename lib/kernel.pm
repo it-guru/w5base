@@ -149,16 +149,22 @@ sub utf8_to_latin1
       if (exists($specialmap{$n})) {
          if (ref($specialmap{$n}) eq 'ARRAY') {
             foreach my $newname (@{$specialmap{$n}}) {
-               $mapped.=chr(charnames::vianame($newname));
+               if ($newname){
+                  $mapped.=chr(charnames::vianame($newname));
+               }
             }
          }
          else {
-            $mapped.=chr(charnames::vianame($specialmap{$n}));
+            if ($specialmap{$n}){
+               $mapped.=chr(charnames::vianame($specialmap{$n}));
+            }
          }
       }
       else {
          $n=~s/^(LATIN (CAPITAL|SMALL) LETTER [A-Z]) WITH.*$/$1/;
-         $mapped.=chr(charnames::vianame($n));
+         if ($n){
+            $mapped.=chr(charnames::vianame($n));
+         }
       }
    }
 
