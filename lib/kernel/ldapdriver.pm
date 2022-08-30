@@ -299,7 +299,6 @@ sub finish
    delete($c->{$self->{ldapname}}->{sthdata});
    delete($c->{$self->{ldapname}}->{sthcount});
 }
-
    
 sub fetchrow
 {
@@ -311,14 +310,32 @@ sub fetchrow
       my %rec=();
       foreach my $attr ($entry->attributes) {
          my @val=$entry->get_value($attr);
-         for(my $c=0;$c<=$#val;$c++){
-            $val[$c]=utf8_to_latin1($val[$c]);
-         }
-         if ($#val>0){
-            $rec{$attr}=\@val;
+         if ($attr eq "objectGUID"){              # hard MS objectGUID handling
+           my $GUIDstr=uc(unpack("H32",$val[0])); # primary for ActiveDirectory
+           my @G=unpack("(A2)*", $GUIDstr);       # handling
+           my @GUIDmsmap=(
+              "${G[3]}${G[2]}${G[1]}${G[0]}",
+              "${G[5]}${G[4]}",
+              "${G[7]}${G[6]}",
+              "${G[8]}${G[9]}",
+              "${G[10]}${G[11]}${G[12]}${G[13]}${G[14]}${G[15]}"
+           );
+           $rec{$attr}=join("-",@GUIDmsmap);
+
+           # Original LDAP Coding for filters
+           #@GUIDmsmap=@G;
+           #$rec{$attr}=join("",map({'\\\\'.$_} @G));
          }
          else{
-            $rec{$attr}=$val[0];
+            for(my $c=0;$c<=$#val;$c++){
+               $val[$c]=utf8_to_latin1($val[$c]);
+            }
+            if ($#val>0){
+               $rec{$attr}=\@val;
+            }
+            else{
+               $rec{$attr}=$val[0];
+            }
          }
       }
       return(\%rec);

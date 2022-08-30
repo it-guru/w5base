@@ -271,13 +271,30 @@ sub initSqlWhere
             $q=$q;
             my $notempty=0;
             $notempty=1 if ($$where ne "");
-            $$where="(& ".$$where if ($notempty);
+            $$where="(& ".$$where if ($notempty);  # damit Arrays geodert werden
             $$where.="($sqlfield=$q)";
             $$where.="  )" if ($notempty);
          }
       }
       #msg(INFO,"AddOrList=$$where");
    }
+
+sub objectGUID2LDAP
+{
+   my $objectGUID=shift;
+
+   if (my @o=$objectGUID
+              =~m/^([0-9a-f]+)-([0-9a-f]+)-
+                   ([0-9a-f]+)-([0-9a-f]+)-([0-9a-f]+)$/ix){
+      my @o0=reverse(unpack("(A2)*",$o[0])); 
+      my @o1=reverse(unpack("(A2)*",$o[1])); 
+      my @o2=reverse(unpack("(A2)*",$o[2])); 
+      my @o3=unpack("(A2)*",$o[3]); 
+      my @o4=unpack("(A2)*",$o[4]); 
+      return(join("",map({'\\'.$_} @o0,@o1,@o2,@o3,@o4)));
+   }
+   return(undef);
+}
 
 
 sub getFinalLdapFilter
@@ -290,7 +307,7 @@ sub getFinalLdapFilter
 
    my @l1where=();
    foreach my $filter (@filter){
-     # msg(INFO,"getSqlWhere: interpret %s",Dumper($filter));
+      #msg(INFO,"getSqlWhere: interpret %s",Dumper($filter));
       my @subflt=$filter;
       @subflt=@$filter if (ref($filter) eq "ARRAY");
       my @l0where=();
@@ -308,6 +325,36 @@ sub getFinalLdapFilter
                my $dataobjattr=$fo->{dataobjattr};
                #msg(INFO,"getFinalLdapFilter: process field '$field' ".
                #         "dataobjattr=$dataobjattr");
+               if ($dataobjattr eq "objectGUID"){
+                  if (ref($filter->{$field}) eq "ARRAY"){
+                    for(my $c=0;$c<=$#{$filter->{$field}};$c++){
+                       if (my $lfmt=objectGUID2LDAP($filter->{$field}->[$c])){
+                          $filter->{$field}->[$c]=$lfmt;
+                       }
+                    }
+                  }
+                  elsif(ref($filter->{$field}) eq "SCALAR"){
+                     if (my $lfmt=objectGUID2LDAP(${$filter->{$field}})){
+                        $filter->{$field}=\$lfmt;
+                     }
+                  }
+                  else{
+                    my @l=grep(!/^\s*$/,split(/\s+/,$filter->{$field}));
+                    my $mapped=0;
+                    for(my $c=0;$c<=$#l;$c++){
+                       if (my $lfmt=objectGUID2LDAP($l[$c])){
+                          $l[$c]=$lfmt;
+                          $mapped++;
+                       }
+                              
+                    }
+                    if ($#l!=-1 && $mapped){
+                       @l=map({$_=~s/\\/\\\\/g;$_;} @l);
+                       $filter->{$field}=join(" ",@l);
+                    }
+                  }
+               }
+
                if (ref($filter->{$field}) eq "ARRAY"){
                   AddOrList(\$subwhere,$fo,$dataobjattr,{wildcards=>0},
                             @{$filter->{$field}});
