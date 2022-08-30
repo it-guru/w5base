@@ -1,0 +1,10 @@
+'tsadsEMEA1::qrule::ruWhiteListCheck'=>{
+  de=>'Prüfung gegen die Russland-Whitelist',
+  en=>'Validation against the russia-whitelist'
+},
+'deactivation of russion collegue - not on whitelist'=>{
+ de=>'Deaktivierung des russischen Kollegen - nicht auf der WhiteList', 
+},
+'reactivation of russion collegue - found on whitelist'=>{
+ de=>'Re-Aktivierung des russischen Kollegen - auf WhiteList gefunden', 
+}
