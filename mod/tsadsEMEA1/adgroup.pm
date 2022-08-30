@@ -40,67 +40,93 @@ sub new
    $self->setBase("DC=$domain,DC=cds,DC=t-internal,DC=com");
    $self->{objectClass}="Group";
    $self->AddFields(
-      new kernel::Field::Linenumber(name     =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
 
-#      new kernel::Field::Id(       name       =>'id',
-#                                   label      =>'ObjectID',
-#                                   group      =>'source',
-#                                   align      =>'left',
-#                                   dataobjattr=>'distinguishedName'),
+      new kernel::Field::Text(     
+                name          =>'fullname',
+                label         =>'Name',
+                dataobjattr   =>'displayName'),
 
-      new kernel::Field::Text(     name       =>'fullname',
-                                   label      =>'Fullname',
-                                   htmldetail =>0,
-                                   dataobjattr=>'displayName'),
+      new kernel::Field::Textarea(
+                name          =>'info',
+                label         =>'Comments',
+                dataobjattr   =>'info'),
 
-      new kernel::Field::Email(    name       =>'email',
-                                   label      =>'E-Mail',
-                                   dataobjattr=>'mail'),
+      new kernel::Field::Email(
+                name          =>'email',
+                label         =>'E-Mail',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'mail'),
 
-      new kernel::Field::Text(     name       =>'member',
-                                   htmldetail =>0,
-                                   group      =>'members',
-                                   label      =>'member',
-                                   dataobjattr=>'member'),
+      new kernel::Field::Text(
+                name          =>'member',
+                htmldetail    =>0,
+                group         =>'members',
+                label         =>'member',
+                dataobjattr   =>'member'),
 
-      new kernel::Field::SubList(  name       =>'members',
-                                   group      =>'members',
-                                   label      =>'members',
-                                   searchable =>0,
-                                   vjointo    =>'tsadsEMEA1::lnkaduseradgroup',
-                                   vjoinon    =>['distinguishedName'=>'groupObjectID'],
-                                   vjoindisp  =>['user'],
-                                   vjoinonfinish=>sub{   #Hack to allow spaces 
-                                      my $self=shift;    #ids
-                                      my $flt=shift;
-                                      my $current=shift;
-                                      my $mode=shift;
-                                    
-                                      if ($flt->{groupObjectID} ne ""){
-                                         $flt->{groupObjectID}=
-                                             '"'.$flt->{groupObjectID}.'"';
-                                      }
-                                      return($flt);
-                                   },
-                                   vjoininhash=>['userObjectId','usergroup']),
+      new kernel::Field::SubList(
+                name          =>'members',
+                group         =>'members',
+                label         =>'members',
+                searchable    =>0,
+                vjointo       =>'tsadsEMEA1::lnkaduseradgroup',
+                vjoinon       =>['distinguishedName'
+                                 =>'groupObjectID'],
+                vjoindisp     =>['user'],
+                vjoinonfinish =>sub{   #Hack to allow spaces 
+                   my $self=shift;    #ids
+                   my $flt=shift;
+                   my $current=shift;
+                   my $mode=shift;
+                 
+                   if ($flt->{groupObjectID} ne ""){
+                      $flt->{groupObjectID}=
+                          '"'.$flt->{groupObjectID}.'"';
+                   }
+                   return($flt);
+                },
+                vjoininhash   =>['userObjectId','usergroup']),
 
-      new kernel::Field::Text(     name       =>'distinguishedName',
-                                   label      =>'distinguishedName',
-                                   group      =>'source',
-                                   align      =>'left',
-                                   dataobjattr=>'distinguishedName'),
+      new kernel::Field::Text(
+                name          =>'distinguishedName',
+                label         =>'distinguishedName',
+                group         =>'source',
+                align         =>'left',
+                dataobjattr   =>'distinguishedName'),
 
-      new kernel::Field::Text(     name       =>'objectClass',
-                                   label      =>'ObjectClass',
-                                   group      =>'source',
-                                   dataobjattr=>'objectClass'),
+      new kernel::Field::Text(
+                name          =>'objectClass',
+                label         =>'ObjectClass',
+                group         =>'source',
+                dataobjattr   =>'objectClass'),
 
-      new kernel::Field::Id(       name       =>'objectGUID',
-                                   label      =>'ObjectGUID',
-                                   group      =>'source',
-                                   align      =>'left',
-                                   dataobjattr=>'objectGUID'),
+      new kernel::Field::Id(
+                name          =>'objectGUID',
+                label         =>'ObjectGUID',
+                group         =>'source',
+                align         =>'left',
+                dataobjattr   =>'objectGUID'),
+
+      new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                searchable    =>0,
+                label         =>'Creation-Date',
+                dataobjattr   =>'whenCreated'),
+
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                searchable    =>0,
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'whenChanged'),
+
+
    );
    $self->setDefaultView(qw(fullname));
    return($self);
