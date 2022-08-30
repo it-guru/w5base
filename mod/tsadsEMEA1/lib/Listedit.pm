@@ -52,7 +52,7 @@ sub SetFilter
 {
    my $self=shift;
    my @flt=@_;
-   if (exists($self->{ObjectClass})){
+   if (exists($self->{objectClass})){
       foreach my $fltsub (@flt){
          my @fltsub=$fltsub;
          if (ref($fltsub[0]) eq "ARRAY"){
@@ -61,7 +61,7 @@ sub SetFilter
          foreach my $fltsubhash (@fltsub){
             if (ref($fltsubhash) eq "HASH"){
                if (!exists($fltsubhash->{id})){
-                  $fltsubhash->{ObjectClass}=$self->{ObjectClass};
+                  $fltsubhash->{objectClass}=$self->{objectClass};
                }
             }
          }
