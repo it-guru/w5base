@@ -22,4 +22,7 @@
 'fieldgroup.groups'=>{ de=>'Gruppen',en=>'Groups'},
 'fieldgroup.addresses'=>{ de=>'Adressen',en=>'Addresses'},
 'fieldgroup.usercert'=>{ de=>'Zertificat',en=>'Certificate'},
+'memberOf'=>{ de=>'Mitglied von'},
+'ObjectID'=>{ de=>'ObjektID'},
+
 

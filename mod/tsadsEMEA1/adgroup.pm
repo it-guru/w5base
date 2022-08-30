@@ -38,16 +38,16 @@ sub new
    $domain=~s/^tsads//;
    
    $self->setBase("DC=$domain,DC=cds,DC=t-internal,DC=com");
-   $self->{ObjectClass}="Group";
+   $self->{objectClass}="Group";
    $self->AddFields(
       new kernel::Field::Linenumber(name     =>'linenumber',
                                     label      =>'No.'),
 
-      new kernel::Field::Id(       name       =>'id',
-                                   label      =>'ObjectID',
-                                   group      =>'source',
-                                   align      =>'left',
-                                   dataobjattr=>'distinguishedName'),
+#      new kernel::Field::Id(       name       =>'id',
+#                                   label      =>'ObjectID',
+#                                   group      =>'source',
+#                                   align      =>'left',
+#                                   dataobjattr=>'distinguishedName'),
 
       new kernel::Field::Text(     name       =>'fullname',
                                    label      =>'Fullname',
@@ -69,7 +69,7 @@ sub new
                                    label      =>'members',
                                    searchable =>0,
                                    vjointo    =>'tsadsEMEA1::lnkaduseradgroup',
-                                   vjoinon    =>['id'=>'groupObjectID'],
+                                   vjoinon    =>['distinguishedName'=>'groupObjectID'],
                                    vjoindisp  =>['user'],
                                    vjoinonfinish=>sub{   #Hack to allow spaces 
                                       my $self=shift;    #ids
@@ -85,14 +85,22 @@ sub new
                                    },
                                    vjoininhash=>['userObjectId','usergroup']),
 
+      new kernel::Field::Text(     name       =>'distinguishedName',
+                                   label      =>'distinguishedName',
+                                   group      =>'source',
+                                   align      =>'left',
+                                   dataobjattr=>'distinguishedName'),
 
-      new kernel::Field::Text(     name       =>'ObjectClass',
+      new kernel::Field::Text(     name       =>'objectClass',
                                    label      =>'ObjectClass',
                                    group      =>'source',
-                                   searchable =>0,
-                                   dataobjattr=>'ObjectClass'),
+                                   dataobjattr=>'objectClass'),
 
-
+      new kernel::Field::Id(       name       =>'objectGUID',
+                                   label      =>'ObjectGUID',
+                                   group      =>'source',
+                                   align      =>'left',
+                                   dataobjattr=>'objectGUID'),
    );
    $self->setDefaultView(qw(fullname));
    return($self);

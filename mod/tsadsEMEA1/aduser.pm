@@ -72,7 +72,7 @@ sub new
    my %param=@_;
    $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
-   $self->{ObjectClass}="Person";
+   $self->{objectClass}="Person";
 
    my $module=$self->Module();
    my $domain=lc($module);
@@ -84,11 +84,11 @@ sub new
       new kernel::Field::Linenumber(name     =>'linenumber',
                                     label      =>'No.'),
 
-      new kernel::Field::Id(       name       =>'id',
-                                   label      =>'ObjectID',
-                                   group      =>'source',
-                                   align      =>'left',
-                                   dataobjattr=>'distinguishedName'),
+#      new kernel::Field::Id(       name       =>'id',
+#                                   label      =>'ObjectID',
+#                                   group      =>'source',
+#                                   align      =>'left',
+#                                   dataobjattr=>'distinguishedName'),
 
       new kernel::Field::Text(     name       =>'fullname',
                                    label      =>'Fullname',
@@ -148,7 +148,7 @@ sub new
                                    searchable =>0,
                                    label      =>'groups',
                                    vjointo    =>'tsadsEMEA1::lnkaduseradgroup',
-                                   vjoinon    =>['id'=>'userObjectID'],
+                                   vjoinon    =>['distinguishedName'=>'userObjectID'],
                                    vjoindisp  =>['group'],
                                    vjoinonfinish=>sub{   #Hack to allow spaces
                                       my $self=shift;    #ids
@@ -178,11 +178,23 @@ sub new
                                    group      =>'source',
                                    dataobjattr=>'employeeID'),
 
-      new kernel::Field::Text(     name       =>'ObjectClass',
+      new kernel::Field::Text(     name       =>'distinguishedName',
+                                   label      =>'distinguishedName',
+                                   group      =>'source',
+                                   align      =>'left',
+                                   dataobjattr=>'distinguishedName'),
+
+      new kernel::Field::Text(     name       =>'objectClass',
                                    label      =>'ObjectClass',
                                    group      =>'source',
-                                   searchable =>0,
-                                   dataobjattr=>'ObjectClass'),
+                                   dataobjattr=>'objectClass'),
+
+      new kernel::Field::Id(       name       =>'objectGUID',
+                                   label      =>'ObjectGUID',
+                                   group      =>'source',
+                                   align      =>'left',
+                                   dataobjattr=>'objectGUID'),
+
 
    );
    $self->setDefaultView(qw(surname givenname email company 

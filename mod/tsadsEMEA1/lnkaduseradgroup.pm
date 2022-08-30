@@ -47,12 +47,14 @@ sub new
                                      if ($current->{groupObjectID}
                                          =~m/,dc=emea1,/i){
                                         return(\'tsadsEMEA1::adgroup',
-                                               ['groupObjectID'=>'id']);
+                                               ['groupObjectID'
+                                                =>'distinguishedName']);
                                      }
                                      if ($current->{groupObjectID}
                                          =~m/,dc=emea2,/i){
                                         return(\'tsadsEMEA2::adgroup',
-                                               ['groupObjectID'=>'id']);
+                                               ['groupObjectID'
+                                                =>'distinguishedName']);
                                      }
                                      return("none",undef);
                                   },
@@ -67,12 +69,14 @@ sub new
                                      if ($current->{userObjectID}
                                          =~m/,dc=emea1,/i){
                                         return(\'tsadsEMEA1::aduser',
-                                               ['userObjectID'=>'id']);
+                                               ['userObjectID'
+                                                =>'distinguishedName']);
                                      }
                                      if ($current->{userObjectID}
                                          =~m/,dc=emea2,/i){
                                         return(\'tsadsEMEA2::aduser',
-                                               ['userObjectID'=>'id']);
+                                               ['userObjectID'
+                                                =>'distinguishedName']);
                                      }
                                      return("none",undef);
                                   },
@@ -99,8 +103,8 @@ sub queryRelations
 
       if (exists($flt->{userObjectID})){  
          my $user=$self->getPersistentModuleObject($module."::aduser");
-         $user->SetFilter({id=>$flt->{userObjectID}});
-         foreach my $arec ($user->getHashList(qw(id memberOf))){
+         $user->SetFilter({distinguishedName=>$flt->{userObjectID}});
+         foreach my $arec ($user->getHashList(qw(distinguishedName memberOf))){
             my $qid=$flt->{userObjectID};
             $qid=~s/^["'](.*)["']$/$1/;
             foreach my $cnid (@{$arec->{memberOf}}){
@@ -118,8 +122,8 @@ sub queryRelations
 
       if (exists($flt->{groupObjectID})){  
          my $group=$self->getPersistentModuleObject($module."::adgroup");
-         $group->SetFilter({id=>$flt->{groupObjectID}});
-         foreach my $arec ($group->getHashList(qw(id member))){
+         $group->SetFilter({distinguishedName=>$flt->{groupObjectID}});
+         foreach my $arec ($group->getHashList(qw(distinguishedName member))){
             my $qid=$flt->{groupObjectID};
             $qid=~s/^["'](.*)["']$/$1/;
             foreach my $cnid (@{$arec->{member}}){
