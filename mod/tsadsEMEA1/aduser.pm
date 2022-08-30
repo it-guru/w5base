@@ -81,121 +81,148 @@ sub new
    #$self->setBase("OU=Users,OU=DE,DC=$domain,DC=cds,DC=t-internal,DC=com");
    $self->setBase("DC=$domain,DC=cds,DC=t-internal,DC=com");
    $self->AddFields(
-      new kernel::Field::Linenumber(name     =>'linenumber',
-                                    label      =>'No.'),
+      new kernel::Field::Linenumber(
+                name          =>'linenumber',
+                label         =>'No.'),
 
-#      new kernel::Field::Id(       name       =>'id',
-#                                   label      =>'ObjectID',
-#                                   group      =>'source',
-#                                   align      =>'left',
-#                                   dataobjattr=>'distinguishedName'),
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'Fullname',
+                htmldetail    =>0,
+                dataobjattr   =>'displayName'),
 
-      new kernel::Field::Text(     name       =>'fullname',
-                                   label      =>'Fullname',
-                                   htmldetail =>0,
-                                   dataobjattr=>'displayName'),
+      new kernel::Field::Text(
+                name          =>'surname',
+                label         =>'Surname',
+                dataobjattr   =>'sn'),
 
-      new kernel::Field::Text(     name       =>'surname',
-                                   label      =>'Surname',
-                                   dataobjattr=>'sn'),
+      new kernel::Field::Text(
+                name          =>'givenname',
+                label         =>'Givenname',
+                dataobjattr   =>'givenName'),
 
-      new kernel::Field::Text(     name       =>'givenname',
-                                   label      =>'Givenname',
-                                   dataobjattr=>'givenName'),
+      new kernel::Field::Email(
+                name          =>'email',
+                label         =>'E-Mail',
+                dataobjattr   =>'mail'),
 
-      new kernel::Field::Email(    name       =>'email',
-                                   label      =>'E-Mail',
-                                   dataobjattr=>'mail'),
+      new kernel::Field::Text(
+                name          =>'account',
+                label         =>'Account',
+                group         =>'source',
+                dataobjattr   =>'sAMAccountName'),
 
-      new kernel::Field::Text(     name       =>'account',
-                                   label      =>'Account',
-                                   group      =>'source',
-                                   dataobjattr=>'sAMAccountName'),
+      new kernel::Field::Text(
+                name       =>'addresses',
+                group      =>'addresses',
+                label      =>'Adresses',
+                dataobjattr=>'proxyAddresses'),
 
-      new kernel::Field::Text(     name       =>'addresses',
-                                   group      =>'addresses',
-                                   label      =>'Adresses',
-                                   dataobjattr=>'proxyAddresses'),
+      new kernel::Field::Text(
+                name          =>'company',
+                label         =>'Company',
+                dataobjattr   =>'company'),
 
-      new kernel::Field::Text(     name       =>'company',
-                                   label      =>'Company',
-                                   dataobjattr=>'company'),
+      new kernel::Field::Text(
+                name          =>'division',
+                label         =>'Division',
+                dataobjattr   =>'division'),
 
-      new kernel::Field::Text(     name       =>'division',
-                                   label      =>'Division',
-                                   dataobjattr=>'division'),
+      new kernel::Field::Text(
+                name          =>'department',
+                label         =>'Department',
+                dataobjattr   =>'department'),
 
-      new kernel::Field::Text(     name       =>'department',
-                                   label      =>'Department',
-                                   dataobjattr=>'department'),
+      new kernel::Field::Text(
+                name          =>'location',
+                label         =>'Location',
+                dataobjattr   =>'l'),
 
-      new kernel::Field::Text(     name       =>'location',
-                                   label      =>'Location',
-                                   dataobjattr=>'l'),
+      new kernel::Field::Text(
+                name          =>'room',
+                label         =>'room number',
+                dataobjattr   =>'roomNumber'),
 
-      new kernel::Field::Text(     name       =>'room',
-                                   label      =>'room number',
-                                   dataobjattr=>'roomNumber'),
+      new kernel::Field::Text(
+                name          =>'memberOf',
+                htmldetail    =>0,
+                group         =>'groups',
+                label         =>'memberOf',
+                dataobjattr   =>'memberOf'),
 
-      new kernel::Field::Text(     name       =>'memberOf',
-                                   htmldetail =>0,
-                                   group      =>'groups',
-                                   label      =>'memberOf',
-                                   dataobjattr=>'memberOf'),
+      new kernel::Field::SubList(
+                name          =>'groups',
+                group         =>'groups',
+                searchable    =>0,
+                label         =>'groups',
+                vjointo       =>'tsadsEMEA1::lnkaduseradgroup',
+                vjoinon       =>['distinguishedName'=>'userObjectID'],
+                vjoindisp     =>['group'],
+                vjoinonfinish =>sub{   #Hack to allow spaces
+                   my $self=shift;    #ids
+                   my $flt=shift;
+                   my $current=shift;
+                   my $mode=shift;
 
-      new kernel::Field::SubList(  name       =>'groups',
-                                   group      =>'groups',
-                                   searchable =>0,
-                                   label      =>'groups',
-                                   vjointo    =>'tsadsEMEA1::lnkaduseradgroup',
-                                   vjoinon    =>['distinguishedName'=>'userObjectID'],
-                                   vjoindisp  =>['group'],
-                                   vjoinonfinish=>sub{   #Hack to allow spaces
-                                      my $self=shift;    #ids
-                                      my $flt=shift;
-                                      my $current=shift;
-                                      my $mode=shift;
+                   if ($flt->{userObjectID} ne ""){
+                      $flt->{userObjectID}=
+                          '"'.$flt->{userObjectID}.'"';
+                   }
+                   return($flt);
+                },
 
-                                      if ($flt->{userObjectID} ne ""){
-                                         $flt->{userObjectID}=
-                                             '"'.$flt->{userObjectID}.'"';
-                                      }
-                                      return($flt);
-                                   },
+                vjoininhash   =>['groupObjectId','group']),
 
-                                   vjoininhash=>['groupObjectId','group']),
+      new kernel::Field::Textarea( 
+                name          =>'usercert',
+                group         =>'usercert',
+                searchable    =>0,
+                htmldetail    =>0,
+                label         =>'userCertificate',
+                dataobjattr   =>'userCertificate'),
 
-      new kernel::Field::Textarea( name       =>'usercert',
-                                   group      =>'usercert',
-                                   searchable =>0,
-                                   htmldetail =>0,
-                                   label      =>'userCertificate',
-                                   dataobjattr=>'userCertificate'),
+      new kernel::Field::Text(
+                name          =>'employeeID',
+                label         =>'employeeID',
+                searchable    =>0,
+                group         =>'source',
+                dataobjattr   =>'employeeID'),
 
-      new kernel::Field::Text(     name       =>'employeeID',
-                                   label      =>'employeeID',
-                                   searchable =>0,
-                                   group      =>'source',
-                                   dataobjattr=>'employeeID'),
+      new kernel::Field::Text(
+                name          =>'distinguishedName',
+                label         =>'distinguishedName',
+                group         =>'source',
+                align         =>'left',
+                dataobjattr   =>'distinguishedName'),
 
-      new kernel::Field::Text(     name       =>'distinguishedName',
-                                   label      =>'distinguishedName',
-                                   group      =>'source',
-                                   align      =>'left',
-                                   dataobjattr=>'distinguishedName'),
+      new kernel::Field::Text(
+                name          =>'objectClass',
+                label         =>'ObjectClass',
+                group         =>'source',
+                dataobjattr   =>'objectClass'),
 
-      new kernel::Field::Text(     name       =>'objectClass',
-                                   label      =>'ObjectClass',
-                                   group      =>'source',
-                                   dataobjattr=>'objectClass'),
+      new kernel::Field::Id(
+                name          =>'objectGUID',
+                label         =>'ObjectGUID',
+                group         =>'source',
+                align         =>'left',
+                dataobjattr   =>'objectGUID'),
 
-      new kernel::Field::Id(       name       =>'objectGUID',
-                                   label      =>'ObjectGUID',
-                                   group      =>'source',
-                                   align      =>'left',
-                                   dataobjattr=>'objectGUID'),
+     new kernel::Field::CDate(
+                name          =>'cdate',
+                group         =>'source',
+                sqlorder      =>'desc',
+                searchable    =>0,
+                label         =>'Creation-Date',
+                dataobjattr   =>'whenCreated'),
 
-
+      new kernel::Field::MDate(
+                name          =>'mdate',
+                group         =>'source',
+                searchable    =>0,
+                sqlorder      =>'desc',
+                label         =>'Modification-Date',
+                dataobjattr   =>'whenChanged'),
    );
    $self->setDefaultView(qw(surname givenname email company 
                             division department location room));
