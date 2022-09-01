@@ -2349,13 +2349,6 @@ sub initSearchQuery
 
 
 
-sub getValidWebFunctions
-{
-   my $self=shift;
-
-   return($self->SUPER::getValidWebFunctions(@_),"ContextMap","ContextMapView");
-}
-
 sub generateContextMap
 {
    my $self=shift;
@@ -2390,9 +2383,9 @@ sub generateContextMap
       }
 
       my $titleurl=$obj->{urlofcurrentrec};
-      if (($obj->{dataobj}=~m/::businessservice$/)){  # nur da get ContextMap
-        #  ($obj->{dataobj}=~m/::businessprocess$/)){
-         $titleurl=~s#/ById/#/ContextMap/#;
+      if (($obj->{dataobj}=~m/::businessservice$/) ||
+          ($obj->{dataobj}=~m/::appl$/)){ 
+         $titleurl=~s#/ById/#/Map/#;
       }
       $itemrec->{titleurl}=$titleurl;
       
