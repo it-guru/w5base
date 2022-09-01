@@ -300,6 +300,10 @@ sub overviewDataIssue
    if (defined($primrec->{stats}->{$keyname2})){
       $dataissues+=$primrec->{stats}->{$keyname2}->[0];
    }
+   my $keyname3='base.DataIssue.notified';
+   if (defined($primrec->{stats}->{$keyname3})){
+      $dataissues+=$primrec->{stats}->{$keyname3}->[0];
+   }
 
   
    my $color="goldenrod";
@@ -850,6 +854,15 @@ sub processRecord
          my $d=CalcDateDuration($mdate,NowStamp("en"));
          $age=$d->{totalminutes};
       }
+
+      my $cdate=$rec->{cdate};
+      my $cage=0;
+      if ($cdate ne ""){
+         my $d=CalcDateDuration($cdate,NowStamp("en"));
+         $cage=$d->{totaldays};
+      }
+
+
       if ($rec->{class} eq "base::workflow::DataIssue"){
          if ($rec->{stateid}!=5 && defined($rec->{responsiblegrp})){
 
@@ -942,21 +955,27 @@ sub processRecord
 
          {
             my $resp=\@responsiblegrp;
-            if ($rec->{stateid}!=5 && 
-                $rec->{class} eq "base::workflow::DataIssue"){ 
-               if ($age>259200){ # 1/2 Jahr
-                  $self->getParent->storeStatVar("Group",$resp,{},
-                                                 "base.DataIssue.dead",1);
+            if ($rec->{class} eq "base::workflow::DataIssue"){ 
+               if ($rec->{stateid}!=5){
+                  if ($age>259200){ # 1/2 Jahr
+                     $self->getParent->storeStatVar("Group",$resp,{},
+                                                    "base.DataIssue.dead",1);
+                  }
+                  elsif ($age>80640){ # 8 Wochen
+                     $self->getParent->storeStatVar("Group",$resp,{},
+                                                    "base.DataIssue.sleep56",1);
+                  }
+                  elsif ($age>40320){ # 4 Wochen
+                     $self->getParent->storeStatVar("Group",$resp,{},
+                                                    "base.DataIssue.sleep28",1);
+                  }
                }
-               elsif ($age>80640){ # 8 Wochen
+               if ($cage>6){
                   $self->getParent->storeStatVar("Group",$resp,{},
-                                                 "base.DataIssue.sleep56",1);
-               }
-               elsif ($age>40320){ # 4 Wochen
-                  $self->getParent->storeStatVar("Group",$resp,{},
-                                                 "base.DataIssue.sleep28",1);
+                                                 "base.DataIssue.notified",1);
                }
             }
+
             $self->getParent->storeStatVar("Group",$resp,{},
                                            "base.Workflow.open",1);
             if ($age>259200){ # 1/2 Jahr
