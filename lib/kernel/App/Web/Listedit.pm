@@ -399,7 +399,7 @@ sub getValidWebFunctions
       push(@l,qw(HtmlInterviewLink));
    }
    if ($self->can("generateContextMap")){
-      push(@l,"jsonContextMap","ContextMapView","ContextMap");
+      push(@l,"jsonContextMap","ContextMapView","Map");
    }
    return(@l);
 }
@@ -840,8 +840,18 @@ window.addEventListener('wheel', function(event) {
       opt.enableMatrixLayout=false;
       if (data.enableMatrixLayout){
          opt.enableMatrixLayout=true;
-         opt.minimumMatrixSize=3;
-         opt.maximumColumnsInMatrix=5;
+         if (data.minimumMatrixSize){
+            opt.minimumMatrixSize=data.minimumMatrixSize;
+         }
+         else{
+            opt.minimumMatrixSize=3;
+         }
+         if (data.maximumColumnsInMatrix){
+            opt.maximumColumnsInMatrix=data.maximumColumnsInMatrix;
+         }
+         else{
+            opt.maximumColumnsInMatrix=5;
+         }
       }
 
       //opt.onButtonsRender = function (data) {
@@ -907,7 +917,7 @@ EOF
 
 
 
-sub ContextMap
+sub Map
 {
    my ($self)=@_;
    my $idfield=$self->IdField();

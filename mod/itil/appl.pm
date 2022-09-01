@@ -3219,6 +3219,163 @@ sub validateOrderingAuthorized
 }
 
 
+sub generateContextMap
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $d={
+      items=>[]
+   };
+
+   my $imageUrl=$self->getRecordImageUrl(undef);
+   my $cursorItem;
+
+
+#   foreach my $id (keys(%{$rec->{servicetrees}->{obj}})){
+#      my $obj=$rec->{servicetrees}->{obj}->{$id};
+#
+#      my $itemrec={id=>$id,title=>$obj->{label},image=>$imageUrl};
+#
+#      if ($obj->{dataobj} ne ""){
+#         my $o=getModuleObject($self->Config,$obj->{dataobj});
+#         if ($o){
+#            $itemrec->{image}=$o->getRecordImageUrl(undef);
+#         }
+#         if ($obj->{dataobj} eq $self->Self() ||
+#             $obj->{dataobj} eq $self->SelfAsParentObject()){
+#            if ($obj->{dataobjid} eq $rec->{id}){
+#               $cursorItem=$id; 
+#            }
+#         }
+#      }
+#
+#      my $titleurl=$obj->{urlofcurrentrec};
+#      if (($obj->{dataobj}=~m/::businessservice$/)){  # nur da get ContextMap
+#        #  ($obj->{dataobj}=~m/::businessprocess$/)){
+#         $titleurl=~s#/ById/#/ContextMap/#;
+#      }
+#      $itemrec->{titleurl}=$titleurl;
+#
+#      my $title=$itemrec->{title};
+#      if (($title=~m/:.*:/) || 
+#           ($title=~m/^[^:]{5,20}:/) ||
+#           ($title=~m/^[^:]{2,10}:[^:]{20}/) ){
+#         my @l=split(/:/,$title);
+#         my $description=pop(@l);
+#         $title=join(":",@l);
+#         $itemrec->{title}=$title;
+#         $itemrec->{description}=$description;
+#         $itemrec->{description}=~s/\@/\@ /g;
+#      }
+#      if (exists($obj->{directParent})){
+#         $itemrec->{parents}=$obj->{directParent};
+#      }
+#      $itemrec->{labelPlacement}=3;
+#      push(@{$d->{items}},$itemrec);
+#   }
+   my $applgrpid;
+
+   my $cursorItem="itil::appl::".$rec->{id};
+   if ($cursorItem && $rec->{applgrp} ne ""){
+      $applgrpid="itil::applgrp::".$rec->{applgrpid};
+      my $itemrec={
+         id=>$applgrpid,
+         title=>$rec->{applgrp},
+         image=>$imageUrl,
+         dataobj=>'itil::applgrp',
+         dataobjid=>$rec->{applgrpid}
+      };
+      my $o=getModuleObject($self->Config,"itil::applgrp");
+      if ($o){
+         $itemrec->{image}=$o->getRecordImageUrl(undef);
+      }
+      push(@{$d->{items}},$itemrec);
+   }
+   if ($cursorItem){
+      my $itemrec={
+         id=>$cursorItem,
+         title=>$rec->{name},
+         image=>$imageUrl
+      };
+      my $titleurl=$rec->{urlofcurrentrec};
+      $titleurl=~s#/ById/#/Map/#;
+      $itemrec->{titleurl}=$titleurl;
+
+      if ($applgrpid){
+         $itemrec->{parents}=[$applgrpid];
+      }
+      push(@{$d->{items}},$itemrec);
+   }
+
+
+
+
+   if ($cursorItem){
+      my %assetid;
+      foreach my $sysrec (@{$rec->{systems}}){
+         my $id="itil::system::".$sysrec->{systemid};
+         my $itemrec={
+            id=>$id,
+            title=>$sysrec->{system},
+            dataobj=>'itil::appl',
+            dataobjid=>$rec->{id},
+            description=>$sysrec->{shortdesc}
+         };
+         my $o=getModuleObject($self->Config,"itil::system");
+         if ($o){
+            $itemrec->{image}=$o->getRecordImageUrl(undef);
+         }
+         # assetassetname
+         # assetid
+         $itemrec->{parents}=[$cursorItem];
+         push(@{$d->{items}},$itemrec);
+ 
+         if ($sysrec->{assetassetname} ne ""){
+            my $assetk="itil::asset::".$sysrec->{assetid}; 
+            if (!exists($assetid{$assetk})){
+               my $itemrec={
+                  id=>$assetk,
+                  title=>$sysrec->{assetassetname},
+                  parents=>[$id]
+               };
+               my $o=getModuleObject($self->Config,"itil::asset");
+               if ($o){
+                  $itemrec->{image}=$o->getRecordImageUrl(undef);
+               }
+               $assetid{$assetk}=$itemrec;
+            }
+            else{
+               push(@{$assetid{$assetk}->{parents}},$id);
+            }
+         }
+      }
+      if (keys(%assetid)){
+         push(@{$d->{items}},values(%assetid));
+      }
+   }
+
+
+   foreach my $itemrec (@{$d->{items}}){
+      $itemrec->{templateName}="wideTemplate";
+   }
+
+   if ($cursorItem){
+      $d->{cursorItem}=$cursorItem;
+   }
+   $d->{enableMatrixLayout}=1;
+   $d->{minimumMatrixSize}=2;
+   $d->{maximumColumnsInMatrix}=3;
+
+   #print STDERR Dumper($d);
+   return($d);
+}
+
+
+
+
+
+
 
 #############################################################################
 
@@ -3247,7 +3404,6 @@ sub getBackendName     # returns the name/function to place in select
 
    return($self->SUPER::getBackendName($mode,$db));
 }
-
 
 
 

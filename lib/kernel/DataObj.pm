@@ -576,7 +576,7 @@ sub getHtmlDetailPages
             push(@pa,'HtmlInterviewLink'=>$self->T("Interview"));
          }
       }
-      if ($self->can("ContextMap") && $self->can("generateContextMap")){
+      if ($self->can("Map") && $self->can("generateContextMap")){
          push(@pa,"ContextMapView"=>$self->T("Context map"));
       }
       return(@pa);
