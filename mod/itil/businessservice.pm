@@ -2452,10 +2452,10 @@ sub generateContextMap
       $d->{enableMatrixLayout}=0;
    }
    if ($#{$d->{items}}>19){
-      $d->{initialZoomLevel}="-6";
+      $d->{initialZoomLevel}="6";
    }
    elsif ($#{$d->{items}}>8){
-      $d->{initialZoomLevel}="-5";
+      $d->{initialZoomLevel}="5";
    }
 
    #print STDERR Dumper($d);
