@@ -3366,8 +3366,9 @@ sub generateContextMap
    $d->{enableMatrixLayout}=1;
    $d->{minimumMatrixSize}=2;
    $d->{maximumColumnsInMatrix}=3;
-   if ($#{$d->{items}}>8){
-      $d->{initialZoomLevel}="-5";
+   if ($#{$d->{items}}>10){
+      $d->{maximumColumnsInMatrix}=4;
+      $d->{initialZoomLevel}="5";
    }
 
    #print STDERR Dumper($d);

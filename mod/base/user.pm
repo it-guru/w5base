@@ -2521,6 +2521,176 @@ sub jsExploreObjectMethods
 }
 
 
+sub generateContextMap
+{
+   my $self=shift;
+   my $rec=shift;
 
+   my $d={
+      items=>[]
+   };
+   my %item;
+
+
+   my $imageUrl=$self->getRecordImageUrl(undef);
+   my $cursorItem;
+
+   my $cursorItem="base::user::".$rec->{userid};
+   if ($cursorItem){
+      my $title=$rec->{fullname};
+      my $description=$rec->{email};
+      my $itemrec={
+         id=>$cursorItem,
+         dataobj=>'base::user',
+         dataobjid=>$rec->{userid},
+         templateName=>'contactTemplate'
+      };
+      $item{$cursorItem}=$itemrec;
+      push(@{$d->{items}},$itemrec);
+   }
+   my %baseorg;
+   foreach my $grprec (@{$rec->{groups}}){
+      if ($grprec->{is_orggrp}){  # only organisational groups view
+         my $roles=$grprec->{roles};
+         $roles=[$roles] if (ref($roles) ne "ARRAY");
+         if (in_array($roles,[orgRoles()])){
+            $baseorg{$grprec->{grpid}}++;
+         } 
+      }
+   }
+   my $grp=$self->getPersistentModuleObject("base::grp");
+   if (keys(%baseorg)){
+      $grp->SetFilter({grpid=>[keys(%baseorg)],cistatusid=>'4'});
+      my @l=$grp->getHashList(qw(fullname name grpid users description
+                                 urlofcurrentrec));
+      foreach my $grec (@l){
+         my $gid="base::grp::".$grec->{grpid};
+         if (!exists($item{$gid})){
+            my $itemrec={
+               id=>$gid,
+               title=>$grec->{name},
+               dataobj=>'base::grp',
+               dataobjid=>$grec->{grpid},
+               description=>$grec->{description},
+               templateName=>'ultraWideTemplate'
+            };
+            $item{$gid}=$itemrec;
+            push(@{$d->{items}},$itemrec);
+            
+         }
+         foreach my $urec (@{$grec->{users}}){
+            my $roles=$urec->{roles};
+            $roles=[$roles] if (ref($roles) ne "ARRAY");
+            if (in_array($roles,[orgRoles()])){
+               my $uid="base::user::".$urec->{userid};
+               if (!exists($item{$uid})){
+                  my $itemrec={
+                     id=>$uid,
+                     dataobj=>'base::user',
+                     dataobjid=>$urec->{userid},
+                     templateName=>'contactTemplate',
+                     parents=>[]
+                  };
+                  $item{$uid}=$itemrec;
+                  push(@{$d->{items}},$itemrec);
+               }
+               if (!in_array($item{$uid}->{parents},$gid)){
+                  push(@{$item{$uid}->{parents}},$gid);
+               }
+            }
+         }
+      }
+      # fillup recursiv all parent groups
+
+
+
+
+      #
+   }
+   {
+      my $opobj=$self;
+      my %id;
+      foreach my $k (keys(%item)){
+         if ($item{$k}->{dataobj} eq "base::user"){
+            $id{$item{$k}->{dataobjid}}++;
+         }
+      }
+      if (keys(%id)){
+         $opobj->ResetFilter();
+         $opobj->SetFilter({userid=>[keys(%id)]});
+         foreach my $chkrec ($opobj->getHashList(qw(ALL))){
+            my $k=$opobj->Self()."::".$chkrec->{userid};
+            my $imageUrl=$opobj->getRecordImageUrl($chkrec);
+            $item{$k}->{titleurl}=$chkrec->{urlofcurrentrec};
+            $item{$k}->{titleurl}=~s#/ById/#/Map/#;
+            $item{$k}->{image}=$imageUrl;
+            $item{$k}->{title}=$chkrec->{fullname};
+            $item{$k}->{title}=~s/ \(.*$//;
+         }
+      }
+   }
+   {
+      my $opobj=$grp;
+      my %id;
+      foreach my $k (keys(%item)){
+         if ($item{$k}->{dataobj} eq "base::grp"){
+            $id{$item{$k}->{dataobjid}}++;
+         }
+      }
+      if (keys(%id)){
+         do{
+            $opobj->ResetFilter();
+            $opobj->SetFilter({grpid=>[keys(%id)]});
+            foreach my $chkrec ($opobj->getHashList(qw(ALL))){
+               my $k=$opobj->Self()."::".$chkrec->{grpid};
+               if (!exists($item{$k})){
+                  my $itemrec={
+                     id=>$k,
+                     title=>$chkrec->{name},
+                     dataobj=>'base::grp',
+                     dataobjid=>$chkrec->{grpid},
+                     description=>$chkrec->{description},
+                     templateName=>'ultraWideTemplate'
+                  };
+                  $item{$k}=$itemrec;
+                  push(@{$d->{items}},$itemrec);
+               }
+               my $imageUrl=$opobj->getRecordImageUrl($chkrec);
+               $item{$k}->{titleurl}=$chkrec->{urlofcurrentrec};
+               $item{$k}->{titleurl}=~s#/ById/#/Map/#;
+               $item{$k}->{image}=$imageUrl;
+               delete($id{$chkrec->{grpid}});
+               if ($chkrec->{parentid} ne ""){
+                  my $pkey="base::grp::".$chkrec->{parentid};
+                  if (!exists($item{$k}->{parents})){
+                     $item{$k}->{parents}=[];
+                  }
+                  if (!in_array($item{$k}->{parents},$pkey)){
+                     push(@{$item{$k}->{parents}},$pkey);
+                  }
+                  if (!exists($item{$pkey})){
+                     $id{$chkrec->{parentid}}++;
+                  }
+               }
+            }
+         }while(keys(%id)!=0);
+      }
+   }
+
+   if ($cursorItem){
+      $d->{cursorItem}=$cursorItem;
+   }
+
+   $d->{enableMatrixLayout}=1;
+   $d->{minimumMatrixSize}=4;
+   $d->{maximumColumnsInMatrix}=3;
+   if ($#{$d->{items}}>8){
+      $d->{initialZoomLevel}="5";
+   }
+
+
+   #print STDERR Dumper($d);
+   return($d);
+}
 
 1;

@@ -420,7 +420,7 @@ sub jsonContextMap
    $val="UNDEF" if ($val eq "");
 
    $self->ResetFilter();
-   $self->SecureSetFilter({id=>\$val});
+   $self->SecureSetFilter({$idname=>\$val});
    my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
 
    print $self->HttpHeader("application/json");
@@ -632,7 +632,9 @@ sub ContextMapView
 
 
    if (defined($rec)){
-      my $url="./jsonContextMap/".$rec->{id};
+      my $idfield=$self->IdField();
+      my $idname=$idfield->Name();
+      my $url="./jsonContextMap/".$rec->{$idname};
 print <<EOF;
 <script type='text/javascript'>
 var ctrl;
@@ -672,7 +674,9 @@ function onTemplateRender(event, data) {
    }
 
    var description = data.element.childNodes[2];
-   description.textContent = itemConfig.description;
+   if (description){
+      description.textContent = itemConfig.description;
+   }
 }
 
 function generateTemplate(tmpl){
@@ -752,8 +756,98 @@ function generateTemplate(tmpl){
    return(t);
 }
 
+function generateContactTemplate(tmpl){
+   var t=["div",
+               {
+                  "style": {
+                     "width": tmpl.itemSize.width+ + "px",
+                     "height": tmpl.itemSize.height + "px"
+                  },
+                  "class": ["bp-item", "bp-corner-all", "bt-item-frame"]
+               },
+               ["div",
+                  {
+                     "name": "titleBackground",
+                     "class": ["bp-item", "bp-corner-all", "bt-title-frame"],
+                     "style": {
+                        top: "2px",
+                        left: "2px",
+                        width: ""+(tmpl.itemSize.width-5)+"px",
+                        height: "18px"
+                     }
+                  },
+                  ["div",
+                     {
+                        "name": "title",
+                        "class": ["bp-item", "bp-title"],
+                        "style": {
+                           padding: "1px",
+                           left: "6px",
+                           width: "208px",
+                           width: ""+(tmpl.itemSize.width-8)+"px",
+                           height: "18px"
+                        }
+                     },
+                    ["a",{
+                         "href":"",
+                         "class": ["bp-item", "bp-title"],
+                       },
+                    ]
+                  ]
+               ],
+               ["div",
+                  {
+                     "class": ["bp-item", "bp-photo-frame"],
+                     "style": {
+                        top: "26px",
+                        left: "2px",
+                        width: "80px",
+                        height: "80px"
+                     }
+                  },
+                  ["img",
+                     {
+                        "name": "photo",
+                        "class": ["bp-item", "bp-title"],
+                        "style": {
+                           width: "80px",
+                           height: "80px"
+                        }
+                     }
+                  ]
+               ],
+               ["div",
+                  {
+                     "name": "description",
+                     "class": "bp-item",
+                     "style": {
+                        top: "25px",
+                        left: "86px",
+                        width: ""+(tmpl.itemSize.width-85)+"px",
+                        fontSize: "10px",
+                        height: '12px'
+                     }
+                  }
+               ],
+               ["div",
+                  {
+                     "name": "email",
+                     "class": "bp-item",
+                     "style": {
+                        top: "38px",
+                        left: "86px",
+                        width: ""+(tmpl.itemSize.width-85)+"px",
+                        fontSize: "10px",
+                        height: '12px'
+                     }
+                  }
+               ]
+            ];
+   return(t);
+}
+
 function updateByZoomLevel(){
-   var scale=1+(0.1*ctrl.zoomLevel);
+   var scale=1-(0.1*ctrl.zoomLevel);
    onScale(scale);
 }
 
@@ -835,7 +929,12 @@ window.addEventListener('wheel', function(event) {
       tmpl2.itemSize=new primitives.Size(250, 95);
       tmpl2.itemTemplate = generateTemplate(tmpl2);
 
-      opt.templates = [tmpl0,tmpl1,tmpl2];
+      var tmpl3=new primitives.TemplateConfig();
+      tmpl3.name='contactTemplate';
+      tmpl3.itemSize=new primitives.Size(210, 115);
+      tmpl3.itemTemplate = generateContactTemplate(tmpl3);
+
+      opt.templates = [tmpl0,tmpl1,tmpl2,tmpl3];
       opt.onItemRender = onTemplateRender;
 
       opt.alignBranches=true;
