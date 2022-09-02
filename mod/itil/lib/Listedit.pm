@@ -1795,7 +1795,11 @@ sub calculateServiceTrees
            ($dataobj=~m/::appl$/) ||
            ($dataobj=~m/::system$/) ){
          my @ids=keys(%{$ids{$dataobj}});
-         my $obj=$app->getPersistentModuleObject("obj".$dataobj,$dataobj);
+
+         my $nearestDataObj=$app->findNearestTargetDataObj(
+                                 $dataobj,'field:id');
+         my $obj=$app->getPersistentModuleObject("obj".$nearestDataObj,
+                                                 $nearestDataObj);
          $obj->SetFilter({id=>\@ids});
          my @l=$obj->getHashList(qw(id cistatusid fullname name 
                                     urlofcurrentrec));

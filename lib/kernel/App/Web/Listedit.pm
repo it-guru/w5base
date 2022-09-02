@@ -752,6 +752,11 @@ function generateTemplate(tmpl){
    return(t);
 }
 
+function updateByZoomLevel(){
+   var scale=1+(0.1*ctrl.zoomLevel);
+   onScale(scale);
+}
+
 function onScale(scale) {
    if (ctrl){
       if (scale != null) {
@@ -760,6 +765,7 @@ function onScale(scale) {
       ctrl.update(primitives.UpdateMode.Refresh);
    }
 }
+
 
 window.addEventListener('wheel', function(event) {
   if (event.ctrlKey == true) {
@@ -771,17 +777,13 @@ window.addEventListener('wheel', function(event) {
         if (event.deltaY<0){
            ctrl.zoomLevel--;
         }
-        if (ctrl.zoomLevel<-2){
-           ctrl.zoomLevel=-2;
+        if (ctrl.zoomLevel<-9){
+           ctrl.zoomLevel=-9;
         }
-        if (ctrl.zoomLevel>2){
-           ctrl.zoomLevel=2;
+        if (ctrl.zoomLevel>9){
+           ctrl.zoomLevel=9;
         }
-        if (ctrl.zoomLevel==-2) {onScale(0.3);}
-        if (ctrl.zoomLevel==-1) {onScale(0.6);}
-        if (ctrl.zoomLevel== 0) {onScale(1.0);}
-        if (ctrl.zoomLevel== 1) {onScale(1.3);}
-        if (ctrl.zoomLevel== 2) {onScale(1.6);}
+        updateByZoomLevel();
      }
   }
 }, { passive: false });
@@ -790,6 +792,7 @@ window.addEventListener('wheel', function(event) {
 \$.ajax({
   url: '$url',
 }).done(function(data) {
+   console.log("start rendering data=",data);
    var opt = new primitives.OrgConfig();
    if (data.items){
       var basicMode="Fam";
@@ -891,6 +894,10 @@ window.addEventListener('wheel', function(event) {
          );
       }
       ctrl.zoomLevel=0;
+      if (data.initialZoomLevel){
+         ctrl.zoomLevel=data.initialZoomLevel;
+         updateByZoomLevel();
+      }
       //console.log("primitives.FamDiagram=",ctrl);
    }
 }).fail(function() {
