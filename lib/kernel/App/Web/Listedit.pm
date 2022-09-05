@@ -638,6 +638,8 @@ sub ContextMapView
 print <<EOF;
 <script type='text/javascript'>
 var ctrl;
+var basicMode="Fam";
+var dataurl='$url';
 
 
 function onTemplateRender(event, data) {
@@ -883,35 +885,120 @@ window.addEventListener('wheel', function(event) {
 }, { passive: false });
 
 
+function ButtonsRenderer (data) {
+   var itemConfig = data.context;
+   var element = data.element;
+   element.innerHTML = "";
+   if (data.context.expandBaseLocation){
+      element.appendChild(primitives.JsonML.toHTML(["div",
+         {
+         class: "btn-group-vertical btn-group-sm"
+         },
+         ["button", 
+            {
+               "type": "button",
+               "data-buttonname": "expand",
+               "style":"cursor:pointer",
+               "title":"expand"
+            },
+            "+"
+         ]
+      ]));
+   }
+}
+
+function processDynData(opt,data){
+   var items=new Array();
+   if (ctrl){
+      items=ctrl.getOption("items");
+   }
+   var addList=new Array();
+   var delList=new Array();
+   if (data.items.add){
+      addList=data.items.add;
+   }
+   if (data.items.del){
+      delList=data.items.del;
+   }
+   if (!data.items.add && !data.items.del){
+      addList=data.items;
+   }
+   for(var c=0;c<addList.length;c++){
+      var item=addList[c];
+      var isUpdated=0;
+      var newRec;
+      if (basicMode=="Org"){
+         newRec=new primitives.OrgItemConfig(item);
+      }
+      if (basicMode=="Fam"){
+         newRec=new primitives.FamItemConfig(item);
+      }
+      for(var cc=0;cc<items.length;cc++){
+         if (items[cc].id==item.id){
+            isUpdated=1;
+            items[cc].parents=item.parents; 
+         }
+      }
+      if (!isUpdated){
+         items.push(newRec);
+      }
+   }
+   for(var c=0;c<delList.length;c++){
+      for(var cc=0;cc<items.length;cc++){
+         if (items[cc].id==delList[cc]){
+            items.splice(cc,1);
+         }
+      }
+   }
+   
+   //console.log("items:",items);
+   opt.items = items;
+
+   if (data.cursorItem){
+      opt.cursorItem = data.cursorItem;
+   }
+}
+
+
+function ButtonHandler(e,data){
+   if (e.srcElement.attributes['data-buttonname'].value=='expand'){
+      console.log("Expand clicked");
+      if (data.context.expandBaseLocation){
+         var expandUrl=dataurl+"&OP="+
+             e.srcElement.attributes['data-buttonname'].value+
+             "&BASE="+data.context.id;
+         \$.ajax({
+           url: expandUrl,
+         }).done(function(expandData) {
+            console.log("expand from =",data.context,"expandData=",expandData);
+            data.context.expandBaseLocation=0; // expand only allowed once
+            var opt=new Object();
+            processDynData(opt,expandData);
+            if (ctrl){
+               ctrl.setOptions(opt);
+               ctrl.update(primitives.UpdateMode.Refresh);
+            }
+         });
+      }
+   }
+}
+
+
 \$.ajax({
-  url: '$url',
+  url: dataurl,
 }).done(function(data) {
-   console.log("start rendering data=",data);
+   console.log("data=",data);
    var opt = new primitives.OrgConfig();
    if (data.items){
-      var basicMode="Fam";
       if (data.basicMode){
          if (data.basicMode=="Org"){
             basicMode="Org";
          }
       }
-      
-      var items=new Array();
-      for(var c=0;c<data.items.length;c++){
-         var item=data.items[c];
-         if (basicMode=="Org"){
-            items.push(new primitives.OrgItemConfig(item));
-         }
-         if (basicMode=="Fam"){
-            items.push(new primitives.FamItemConfig(item));
-         }
-      }
-      //console.log("items:",items);
-      opt.items = items;
+      processDynData(opt,data);
+
+
       //opt.alignBranches=true;
-      if (data.cursorItem){
-         opt.cursorItem = data.cursorItem;
-      }
       opt.defaultTemplateName= "itemTmpl";
 
       var tmpl0=new primitives.TemplateConfig();
@@ -981,6 +1068,12 @@ window.addEventListener('wheel', function(event) {
       opt.hasSelectorCheckbox = primitives.Enabled.False;
       //opt.normalItemsInterval = 50;
       opt.lineLevelShift = 50;
+
+      opt.hasButtons = primitives.Enabled.Auto;
+      //opt.buttonsPanelSize = 36;
+      opt.onButtonsRender=ButtonsRenderer;
+      opt.onButtonClick=ButtonHandler;
+
       opt.arrowsDirection=primitives.GroupByType.Children;
       if (basicMode=="Fam"){
          ctrl=primitives.FamDiagram(
