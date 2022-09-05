@@ -3225,58 +3225,64 @@ sub generateContextMap
    my $rec=shift;
 
    my $d={
-      items=>[]
+      items=>{add=>[]}
    };
 
    my $imageUrl=$self->getRecordImageUrl(undef);
    my $cursorItem;
 
-
-#   foreach my $id (keys(%{$rec->{servicetrees}->{obj}})){
-#      my $obj=$rec->{servicetrees}->{obj}->{$id};
-#
-#      my $itemrec={id=>$id,title=>$obj->{label},image=>$imageUrl};
-#
-#      if ($obj->{dataobj} ne ""){
-#         my $o=getModuleObject($self->Config,$obj->{dataobj});
-#         if ($o){
-#            $itemrec->{image}=$o->getRecordImageUrl(undef);
-#         }
-#         if ($obj->{dataobj} eq $self->Self() ||
-#             $obj->{dataobj} eq $self->SelfAsParentObject()){
-#            if ($obj->{dataobjid} eq $rec->{id}){
-#               $cursorItem=$id; 
-#            }
-#         }
-#      }
-#
-#      my $titleurl=$obj->{urlofcurrentrec};
-#      if (($obj->{dataobj}=~m/::businessservice$/)){  # nur da get ContextMap
-#        #  ($obj->{dataobj}=~m/::businessprocess$/)){
-#         $titleurl=~s#/ById/#/ContextMap/#;
-#      }
-#      $itemrec->{titleurl}=$titleurl;
-#
-#      my $title=$itemrec->{title};
-#      if (($title=~m/:.*:/) || 
-#           ($title=~m/^[^:]{5,20}:/) ||
-#           ($title=~m/^[^:]{2,10}:[^:]{20}/) ){
-#         my @l=split(/:/,$title);
-#         my $description=pop(@l);
-#         $title=join(":",@l);
-#         $itemrec->{title}=$title;
-#         $itemrec->{description}=$description;
-#         $itemrec->{description}=~s/\@/\@ /g;
-#      }
-#      if (exists($obj->{directParent})){
-#         $itemrec->{parents}=$obj->{directParent};
-#      }
-#      $itemrec->{labelPlacement}=3;
-#      push(@{$d->{items}},$itemrec);
-#   }
-   my $applgrpid;
-
    my $cursorItem="itil::appl::".$rec->{id};
+
+   if (Query->Param("OP") eq "expand"){
+      foreach my $id (keys(%{$rec->{servicetrees}->{obj}})){
+         my $obj=$rec->{servicetrees}->{obj}->{$id};
+     
+         my $itemrec={id=>$id,title=>$obj->{label},image=>$imageUrl};
+     
+         if ($obj->{dataobj} ne ""){
+            my $o=getModuleObject($self->Config,$obj->{dataobj});
+            if ($o){
+               $itemrec->{image}=$o->getRecordImageUrl(undef);
+            }
+            if ($obj->{dataobj} eq $self->Self() ||
+                $obj->{dataobj} eq $self->SelfAsParentObject()){
+               if ($obj->{dataobjid} eq $rec->{id}){
+                  $cursorItem=$id; 
+               }
+            }
+         }
+     
+         my $titleurl=$obj->{urlofcurrentrec};
+         if (($obj->{dataobj}=~m/::businessservice$/)){  # nur da get ContextMap
+           #  ($obj->{dataobj}=~m/::businessprocess$/)){
+            $titleurl=~s#/ById/#/ContextMap/#;
+         }
+         $itemrec->{titleurl}=$titleurl;
+     
+         my $title=$itemrec->{title};
+         if (($title=~m/:.*:/) || 
+              ($title=~m/^[^:]{5,20}:/) ||
+              ($title=~m/^[^:]{2,10}:[^:]{20}/) ){
+            my @l=split(/:/,$title);
+            my $description=pop(@l);
+            $title=join(":",@l);
+            $itemrec->{title}=$title;
+            $itemrec->{description}=$description;
+            $itemrec->{description}=~s/\@/\@ /g;
+         }
+         if (exists($obj->{directParent})){
+            $itemrec->{parents}=$obj->{directParent};
+         }
+         $itemrec->{labelPlacement}=3;
+         push(@{$d->{items}->{add}},$itemrec);
+      }
+      $d->{items}->{del}=["itil::applgrp::".$rec->{applgrpid}];
+       
+      
+      return($d);
+   }
+
+   my $applgrpid;
    if ($cursorItem && $rec->{applgrp} ne ""){
       $applgrpid="itil::applgrp::".$rec->{applgrpid};
       my $itemrec={
@@ -3290,13 +3296,14 @@ sub generateContextMap
       if ($o){
          $itemrec->{image}=$o->getRecordImageUrl(undef);
       }
-      push(@{$d->{items}},$itemrec);
+      push(@{$d->{items}->{add}},$itemrec);
    }
    if ($cursorItem){
       my $itemrec={
          id=>$cursorItem,
          title=>$rec->{name},
-         image=>$imageUrl
+         image=>$imageUrl,
+         expandBaseLocation=>1
       };
       my $titleurl=$rec->{urlofcurrentrec};
       $titleurl=~s#/ById/#/Map/#;
@@ -3305,7 +3312,7 @@ sub generateContextMap
       if ($applgrpid){
          $itemrec->{parents}=[$applgrpid];
       }
-      push(@{$d->{items}},$itemrec);
+      push(@{$d->{items}->{add}},$itemrec);
    }
 
 
@@ -3329,7 +3336,7 @@ sub generateContextMap
          # assetassetname
          # assetid
          $itemrec->{parents}=[$cursorItem];
-         push(@{$d->{items}},$itemrec);
+         push(@{$d->{items}->{add}},$itemrec);
  
          if ($sysrec->{assetassetname} ne ""){
             my $assetk="itil::asset::".$sysrec->{assetid}; 
@@ -3351,12 +3358,12 @@ sub generateContextMap
          }
       }
       if (keys(%assetid)){
-         push(@{$d->{items}},values(%assetid));
+         push(@{$d->{items}->{add}},values(%assetid));
       }
    }
 
 
-   foreach my $itemrec (@{$d->{items}}){
+   foreach my $itemrec (@{$d->{items}->{add}}){
       $itemrec->{templateName}="wideTemplate";
    }
 
@@ -3366,7 +3373,7 @@ sub generateContextMap
    $d->{enableMatrixLayout}=1;
    $d->{minimumMatrixSize}=2;
    $d->{maximumColumnsInMatrix}=3;
-   if ($#{$d->{items}}>10){
+   if ($#{$d->{items}->{add}}>10){
       $d->{maximumColumnsInMatrix}=4;
       $d->{initialZoomLevel}="5";
    }
