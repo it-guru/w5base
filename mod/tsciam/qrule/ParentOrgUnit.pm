@@ -97,8 +97,28 @@ sub qcheckRecord
             }
             if (!($ciam->LastMsg())){
                if ($nosgroups && $nousers){  # empty CIAM Group: HR Rotz
-                  push(@qmsg,"orphaned orgunit group in CIAM");
-                  return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+                  # check current group, if users have a srcload within last
+                  # 90 days. If it is, this group is "fresh" orphaned and
+                  # the dataissue can be deferred
+                  my $foundfreshuser=0;
+                  foreach my $lnkrec (@{$rec->{users}}){
+                     if ($lnkrec->{srcsys} eq "CIAM"){
+                        my $d=CalcDateDuration($lnkrec->{srcload},
+                                               NowStamp("en"));
+                        if (defined($d) && $d->{totaldays}<90){
+                           $foundfreshuser++;
+                        }
+                     }
+                  }
+                  if ($foundfreshuser){
+                     push(@qmsg,
+                          "orphaned orgunit group in CIAM but within 90d");
+                     return(0,{qmsg=>\@qmsg});
+                  }
+                  else{
+                     push(@qmsg,"orphaned orgunit group in CIAM");
+                     return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
+                  }
                }
             }
             else{
