@@ -152,6 +152,12 @@ table.datatable tr.subline:hover{
    background:#b0c5ec;
 }
 
+p.heightLimitedText{
+  margin-right:15px;
+  max-height:48px;
+  overflow:auto;
+}
+
 
 div.clipicon {
   position: absolute;
