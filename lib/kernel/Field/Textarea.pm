@@ -219,6 +219,12 @@ sub FormatedResult
       else{
          $d=quoteHtml($d);
       }
+      if ($FormatAs eq "HtmlV01"){
+         my @lines=split(/\n/,$d);
+         if (length($d)>80 || $#lines>3){
+            $d="<p class=heightLimitedText>".$d."</p>";
+         }
+      }
       if ($FormatAs eq "HtmlV01" || $FormatAs eq "HtmlExplore" || 
           $FormatAs eq "HtmlSubList"){
          # target ist kein pre-Formated HTML Element
