@@ -509,7 +509,8 @@ sub displayDataIssue
    return() if ($primrec->{dstrange}=~m/KW/);
    my $showall=Query->Param("FullDataIssueList");
    #my $data=$app->extractYear($primrec,$hist,"base.DataIssue.IdList.open");
-   my $data=$app->extractYear($primrec,$hist,"base.DataIssue.open",
+   my $data=$app->extractYear($primrec,$hist,
+                              ["base.DataIssue.notified","base.DataIssue.open"],
                               setUndefZero=>1);
    my $user=$app->extractYear($primrec,$hist,"User",
                               setUndefZero=>1);
@@ -694,7 +695,8 @@ sub processData
 
    if (my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/){
       my @wfstat=qw(id eventstart class step eventend stateid mandatorid
-                             fwdtarget fwdtargetid responsiblegrp mdate);
+                             fwdtarget fwdtargetid responsiblegrp mdate 
+                             createdate);
      
      
       my $wf=getModuleObject($self->getParent->Config,"base::workflow");
@@ -855,7 +857,7 @@ sub processRecord
          $age=$d->{totalminutes};
       }
 
-      my $cdate=$rec->{cdate};
+      my $cdate=$rec->{createdate};
       my $cage=0;
       if ($cdate ne ""){
          my $d=CalcDateDuration($cdate,NowStamp("en"));

@@ -1469,8 +1469,11 @@ sub extractYear
    my $self=shift;
    my $primrec=shift;
    my $hist=shift;
-   my $name=shift;
-   my %param=@_;
+   my $name=shift;    # if in name are more then one name (arrayref), there
+   my %param=@_;      # will be checked in sequence of specified and first
+                      # is used
+
+   $name=[$name] if (ref($name) ne "ARRAY");
 
    my ($Y,$M)=$primrec->{dstrange}=~m/^(\d{4})(\d{2})$/;
 
@@ -1484,11 +1487,17 @@ sub extractYear
    for(my $m=1;$m<=12;$m++){
       my $k=sprintf("%04d%02d",$Y,$m);
       if ($m<=$M){
-         if (defined($p{$k}) && ref($p{$k}->{stats}->{$name}) eq "ARRAY" &&
-             $p{$k}->{stats}->{$name}->[0] ne ""){
-            push(@d,$p{$k}->{stats}->{$name}->[0]);
+         my $foundKpi=0;
+         foreach my $nameChk (@$name){
+            if (defined($p{$k}) && 
+                ref($p{$k}->{stats}->{$nameChk}) eq "ARRAY" &&
+                $p{$k}->{stats}->{$nameChk}->[0] ne ""){
+               push(@d,$p{$k}->{stats}->{$nameChk}->[0]);
+               $foundKpi++;
+               last;
+            }
          }
-         else{
+         if (!$foundKpi){
             if ($param{setUndefZero}){
                push(@d,0);
                
