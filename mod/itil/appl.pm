@@ -3255,7 +3255,7 @@ sub generateContextMap
          my $titleurl=$obj->{urlofcurrentrec};
          if (($obj->{dataobj}=~m/::businessservice$/)){  # nur da get ContextMap
            #  ($obj->{dataobj}=~m/::businessprocess$/)){
-            $titleurl=~s#/ById/#/ContextMap/#;
+            $titleurl=~s#/ById/#/Map/#;
          }
          $itemrec->{titleurl}=$titleurl;
      
