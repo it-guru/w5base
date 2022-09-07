@@ -632,14 +632,19 @@ sub getHashIndexed
          foreach my $key (@key){
             my $v=$rec->{$key};
             next if (!defined($v));
-            if (exists($res->{$key}->{$v})){
-               if (ref($res->{$key}->{$v}) ne "ARRAY"){
-                  $res->{$key}->{$v}=[$res->{$key}->{$v}];
+            my @vl=($v);
+            @vl=@$v if (ref($v) eq "ARRAY"); 
+            foreach my $v (@vl){
+               next if (!defined($v) || $v eq "");
+               if (exists($res->{$key}->{$v})){
+                  if (ref($res->{$key}->{$v}) ne "ARRAY"){
+                     $res->{$key}->{$v}=[$res->{$key}->{$v}];
+                  }
+                  push(@{$res->{$key}->{$v}},$rec);
                }
-               push(@{$res->{$key}->{$v}},$rec);
-            }
-            else{
-               $res->{$key}->{$v}=$rec;
+               else{
+                  $res->{$key}->{$v}=$rec;
+               }
             }
          }
          ($rec,$msg)=$self->getNext();
