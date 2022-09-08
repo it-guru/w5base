@@ -635,7 +635,7 @@ sub getHashIndexed
             my @vl=($v);
             @vl=@$v if (ref($v) eq "ARRAY"); 
             foreach my $v (@vl){
-               next if (!defined($v) || $v eq "");
+               next if (!defined($v));
                if (exists($res->{$key}->{$v})){
                   if (ref($res->{$key}->{$v}) ne "ARRAY"){
                      $res->{$key}->{$v}=[$res->{$key}->{$v}];
