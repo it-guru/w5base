@@ -482,11 +482,19 @@ EOF
                    $targeturl=~s/\/auth\//\/public\//;
                }
             }
+
             $ByIdLinkStart="<a tabindex=-1 ".
                            "id=toplineimage target=_blank title=\"".
             $self->getParent->getParent->T("use this link to reference this ".
             "record (f.e. in mail)")."\" href=\"$targeturl\">";
             $ByIdLinkEnd="</a>";
+            if ($targeturl ne ""){
+               $targeturl=~s#^.*//[^/]+/#/#;
+               $d.="\n\n<script language=\"JavaScript\">\n";
+               $d.="window.setTimeout(function(){".
+                   "parent.history.pushState({},'Id','$targeturl');},100);\n";
+               $d.="</script>\n\n";
+            }
          }
          if ($self->getParent->getParent->can("getRecordHeaderField")){
             my $fobj=$self->getParent->getParent->getRecordHeaderField($rec);
