@@ -1,4 +1,4 @@
-'base::qrule'=>{de=>'Qualitiätsregel',en=>'Qualityrule'},
+'base::qrule'=>{de=>'Qualitätsregel',en=>'Qualityrule'},
 'fail'=>{de=>'fehlgeschlagen'},
 'note'=>{de=>'Hinweis'},
 'disabled'=>{de=>'deaktiviert'},
