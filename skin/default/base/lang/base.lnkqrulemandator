@@ -1,7 +1,7 @@
 'base::lnkqrulemandator'=>{de=>'Mandant-Qualitätsregel Verknüpfung/Aktivierung',
                            en=>'Mandator-Quality-Rule link/activation'},
 'confine to data object'=>{de=>'beschränkt auf Datenobjekt'},
-'Quality Rule'=>{de=>'Quality Regel'},
+'Quality Rule'=>{de=>'Qualitiätsregel'},
 'data object label'=>{de=>'Datenobjektbezeichnung'},
 'Quality Rule Code'=>{de=>'Quality Regel Programmcode'},
 'Quality Rule Description'=>{de=>'Quality Regel Beschreibung'},
