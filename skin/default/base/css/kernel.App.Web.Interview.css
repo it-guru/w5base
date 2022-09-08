@@ -50,6 +50,7 @@ td.InterviewSubMenu{
 }
 div.InterviewQuest{
    margin-left:20px;
+   overflow:hidden;
    border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:gray;
 }
 table.InterviewQuest{
