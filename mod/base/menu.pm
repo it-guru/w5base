@@ -1196,7 +1196,6 @@ EOF
          $currenturl=~s/^http[s]{0,1}://i;  # prevent mixed content problem
       }
       else{
-printf STDERR ("mt path =$fp\n");
          if (defined($mt->{fullname}->{$fp})){
             my $m=$mt->{fullname}->{$fp};
             my $target;
