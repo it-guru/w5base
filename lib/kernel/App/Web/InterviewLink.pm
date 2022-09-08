@@ -90,7 +90,6 @@ sub InterviewSubForm
                 $lastquestclust ne $qrec->{questclust}){
                $d.="<div class=\"InterviewQuestClust\">".
                    $qrec->{questclust}."</div>";
-
                $d.="\n<div class=InterviewQuestHead>".
                    "<table border=0 class=InterviewQuestHead width=95%>".
                    "<tr><td class=InterviewQuestHead></td>".
@@ -119,19 +118,21 @@ sub InterviewSubForm
                 "<td width=180 nowrap valign=top>".
                 "<div class=InterviewQuestAnswer ".
                 "id=answer$qrec->{id}>$qrec->{HTMLanswer}</div></td>".
-                "<td width=1% align=center valign=top>".
-                "<div id=verify$qrec->{id}>$qrec->{HTMLverify}</div>".
-                "<div class=qhelp onclick=switchExt($qrec->{id})>".
-                "<img border=0 ".
+                "<td width=1% align=center valign=top nowrap>".
+                "<span class=qhelp onclick=switchExt($qrec->{id})>".
+                "<img border=0 id='COMMENTINDICATOR_$qrec->{id}' ".
                 "title=\"$commenttxt\" ".
-                "src=\"../../../public/base/load/comment.gif\">".
-                "</div>".
+                "src=\"../../../public/base/load/nocomment.gif\">".
+                "</span>".
                 "</td>".
                 "<td width=1% align=center valign=top>".
                 "<div class=qhelp onclick=qhelp($qrec->{id})>".
                 "<img border=0 ".
                 "src=\"../../../public/base/load/questionmark.gif\">".
                 "</div>".
+                "</td>".
+                "<td width=18 nowrap valign=top>".
+                "<span id=verify$qrec->{id}>$qrec->{HTMLverify}</span>".
                 "</td>".
                 "</tr>".
                 "<tr><td colspan=5>".
@@ -190,8 +191,6 @@ sub InterviewMainForm
                  "<option value=\"1\">Ja</option>".
                  "<option value=\"0\">Nein</option>".
                  "</select>";
-   my $scomments="<textarea name=comments onchange=submitChange(this) ".
-                 "rows=2 style=\"width:100%\"></textarea>";
    $label=~s/['<>]//g;
 
    $d.=<<EOF;
@@ -353,6 +352,27 @@ function loadForm(id,xmlobject)
       eval(js);
    }
 }
+
+function updateCommentIndicator(qid)
+{
+   var indic=\$('#COMMENTINDICATOR_'+qid);
+   var comments=\$('#COMMENTS_'+qid);
+   if (indic && comments){
+      var imgsrc=indic.attr('src');
+      var newsrc=imgsrc;
+      if (comments.val()!=""){
+         newsrc=newsrc.replace(/\\/[^/]+\$/,'/comment.gif');
+     
+      }
+      else{
+         newsrc=newsrc.replace(/\\/[^/]+\$/,'/nocomment.gif');
+      }
+      if (newsrc!=imgsrc){
+         indic.attr('src',newsrc);
+      }
+   }
+}
+
 function submitChange(o)
 {
    var vname=o.name;
@@ -362,6 +382,7 @@ function submitChange(o)
    var parentid=document.getElementById("parentid").value;
    var parentobj=document.getElementById("parentobj").value;
 
+   updateCommentIndicator(qid);
    doStoreValue(qid,parentobj,parentid,vname,vval);
 }
 

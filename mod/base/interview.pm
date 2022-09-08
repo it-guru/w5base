@@ -857,10 +857,11 @@ sub getHtmlEditElements
    $HTMLcomments="";
    my $txt="";
    $txt=quoteHtml($answer->{comments}) if (defined($answer));
-   $HTMLcomments.="<textarea name=comments $opmode ".
+   $HTMLcomments.="<textarea id=COMMENTS_$iid name=comments $opmode ".
                   "rows=5 style=\"width:100%;resize:vertical\">".
                   $txt."</textarea>";
    $HTMLanswer=" - ? - ";
+   $HTMLjs.="updateCommentIndicator($iid);";
    #my $HTMLVerifyButton=
    #             "<div class=qverify>".
    #             "<img border=0 ".
@@ -873,11 +874,11 @@ sub getHtmlEditElements
          if ($irec->{needverify}){
             my $msg=$self->T("click to set answer as verified");
             $HTMLVerifyButton=
-                "<div class=qverify id=\"HTMLverify$irec->{id}\" ".
+                "<span class=qverify id=\"HTMLverify$irec->{id}\" ".
                 "onclick=qverify($irec->{id}) >".
                 "<img border=0 style=\"cursor:hand\" title='$msg' alt='$msg' ".
                 "src=\"../../../public/base/load/confirm_entry.gif\">".
-                "</div>";
+                "</span>";
          }
          else{
             $HTMLVerifyButton="<div></div>";
