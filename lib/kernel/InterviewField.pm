@@ -52,7 +52,8 @@ sub getTotalActiveQuestions
                                         boundpviewgroup addquestdata
                                         interviewcatid contactid contact2id
                                         boundpcontact necessverifyinterv
-                                        questtyp restriction))){
+                                        questtyp restriction
+                                        allownotrelevant))){
       my $restok=1;
       if ($irec->{restriction} ne ""){
          $restok=0;

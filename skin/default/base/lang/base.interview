@@ -59,3 +59,4 @@
 'necessary answer verify interval'=>{de=>'notwendigs Antwortinterval'},
 'click to set answer as verified'=>{de=>'klicken um Antwort als aktuell zu markieren'},
 'invalid restriction expression'=>{de=>'Ungültiger Einschränkuns-Ausdruck'},
+'allow not relevant'=>{de=>'"nicht relevant" erlauben'},
