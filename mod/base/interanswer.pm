@@ -81,7 +81,9 @@ sub new
                 name          =>'relevant',
                 markempty     =>1,
                 label         =>'Relevant',
-                dataobjattr   =>'interanswer.relevant'),
+                dataobjattr   =>'if (interview.isrelevant,'.
+                                    'interanswer.relevant,1)',
+                wrdataobjattr =>'interanswer.relevant'),
 
       new kernel::Field::Text(
                 name          =>'name_cistatus',

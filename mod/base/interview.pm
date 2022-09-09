@@ -320,6 +320,11 @@ sub new
                 label         =>'additional quest data',
                 dataobjattr   =>'interview.addquerydata'),
 
+      new kernel::Field::Boolean(
+                name          =>'allownotrelevant',
+                label         =>'allow not relevant',
+                dataobjattr   =>'interview.isrelevant'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
@@ -829,25 +834,40 @@ sub getHtmlEditElements
    if ($write){
       $opmode="onchange=submitChange(this)";
    }
-   
-   $HTMLrelevant="<table><tr height=20 border=0 cellspacing=0 cellpadding=0>".
-                 "<td valign=middle>".
-                 "<select name=relevant $opmode >";
-   if (!defined($answer) && !$write){
-      $HTMLrelevant.="<option value=\"\">?</option>";
+
+   {
+      my $relevant_opmode=$opmode;
+      if (!$irec->{allownotrelevant}){
+         $relevant_opmode="disabled";
+      }
+     
+      $HTMLrelevant="<table><tr height=20 border=0 ".
+                    "cellspacing=0 cellpadding=0>".
+                    "<td valign=middle>".
+                    "<select name=relevant $relevant_opmode >";
+      if ($irec->{allownotrelevant}){
+         if (!defined($answer) && !$write){
+            $HTMLrelevant.="<option value=\"\">?</option>";
+         }
+      }
+     
+      $HTMLrelevant.="<option value=\"1\">".$self->T("yes")."</option>";
+     
+      if ($irec->{allownotrelevant}){
+         if (defined($answer) && !($answer->{relevant})){
+            $HTMLrelevant.="<option selected value=\"0\">".
+                       $self->T("no")."</option>";
+         }
+         else{
+            $HTMLrelevant.="<option value=\"0\">".
+                        $self->T("no")."</option>";
+         }
+      }
+      $HTMLrelevant.="</select></td></tr></table>";
    }
 
-   $HTMLrelevant.="<option value=\"1\">".$self->T("yes")."</option>";
 
-   if (defined($answer) && !($answer->{relevant})){
-      $HTMLrelevant.="<option selected value=\"0\">".
-                 $self->T("no")."</option>";
-   }
-   else{
-      $HTMLrelevant.="<option value=\"0\">".
-                  $self->T("no")."</option>";
-   }
-   $HTMLrelevant.="</select></td></tr></table>";
+
    $HTMLcomments="<table cellspacing=0 cellpadding=0>".
                  "<tr><td></td><td nowrap class=InterviewSubMenu>".
                  "Frage an Fragen-Ansprechpartner</td>".
