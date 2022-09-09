@@ -488,13 +488,19 @@ EOF
             $self->getParent->getParent->T("use this link to reference this ".
             "record (f.e. in mail)")."\" href=\"$targeturl\">";
             $ByIdLinkEnd="</a>";
-            if ($targeturl ne ""){
-               $targeturl=~s#^.*//[^/]+/#/#;
-               $d.="\n\n<script language=\"JavaScript\">\n";
-               $d.="window.setTimeout(function(){".
-                   "parent.history.pushState({},'Id','$targeturl');},100);\n";
-               $d.="</script>\n\n";
-            }
+            #if ($targeturl ne ""){
+            #   $targeturl=~s#^.*//[^/]+/#/#;
+            #   $d.="\n\n<script language=\"JavaScript\">\n";
+            #   $d.="window.setTimeout(function(){".
+            #       "var curl=parent.document.location.href;\n".
+            #       "curl=curl.replace(/\\/(auth|public)\\/.*\$/,'/\$1/');\n".
+            #       "var tarl='$targeturl';\n".
+            #       "tarl=tarl.replace(/^.*\\/(auth|public)\\//,'');\n".
+            #       "tarl=curl+tarl;\n".
+            #       "parent.history.pushState({},'Id',tarl);\n".
+            #       "},100);\n";
+            #   $d.="</script>\n\n";
+            #}
          }
          if ($self->getParent->getParent->can("getRecordHeaderField")){
             my $fobj=$self->getParent->getParent->getRecordHeaderField($rec);
