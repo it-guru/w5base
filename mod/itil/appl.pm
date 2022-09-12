@@ -1673,7 +1673,9 @@ sub new
                                  '0.3',
                                  '1',
                                  '2',
-                                 '4'],
+                                 '4',
+                               #  '0'
+                                ],
                 default       =>'0.5',
                 searchable    =>0,
                 dataobjattr   =>'appl.soslanumdrtests'),
