@@ -100,18 +100,20 @@ sub qcheckRecord
       return(3,{qmsg=>[$msg],dataissue=>[$msg]});
    }
 
-   if ($rec->{drclass}>3 && $rec->{drclass}<8) {
-      if ($rec->{soslanumdrtests}<0.5) {
-         my $msg="Minimum Disaster-Recovery test interval: ".
-                 $self->T('DRTESTPERYEAR.0.5','itil::appl');
-         return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+   if ($rec->{drclass} ne ""){
+      if ($rec->{drclass}>3 && $rec->{drclass}<8) {
+         if ($rec->{soslanumdrtests}<0.5) {
+            my $msg="Minimum Disaster-Recovery test interval: ".
+                    $self->T('DRTESTPERYEAR.0.5','itil::appl');
+            return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+         }
       }
-   }
-   else{
-      if ($rec->{soslanumdrtests}<1) {
-         my $msg="Minimum Disaster-Recovery test interval: ".
-                 $self->T('DRTESTPERYEAR.1','itil::appl');
-         return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+      else{
+         if ($rec->{soslanumdrtests}<1) {
+            my $msg="Minimum Disaster-Recovery test interval: ".
+                    $self->T('DRTESTPERYEAR.1','itil::appl');
+            return(3,{qmsg=>[$msg],dataissue=>[$msg]});
+         }
       }
    }
 
