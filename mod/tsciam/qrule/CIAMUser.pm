@@ -593,6 +593,15 @@ sub qcheckRecord
                      \@qmsg,\@dataissue,\$errorlevel,
                      mode=>'string');
       }
+      if ($rec->{country} eq "RU" &&
+          $rec->{cistatusid} eq "5" &&
+          uc($ciamrec->{country}) ne "RU" &&
+          $rec->{allowifupdate} eq "1" &&
+          $rec->{usertyp} eq "user"){
+         $forcedupd->{cistatusid}=4;
+         push(@qmsg,"reactivating russian colleague due land changed");
+         msg(WARN,"land change reactivation of russion ".$rec->{email});
+      }
 
       if (keys(%$forcedupd)){
          if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
