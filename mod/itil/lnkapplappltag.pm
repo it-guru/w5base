@@ -213,7 +213,7 @@ sub checkWriteValid
    my $oldrec=shift;
    my $newrec=shift;
 
-   my $lnkapplappl=effVal($oldrec,$newrec,"lnkapplappl");
+   my $lnkapplappl=effVal($oldrec,$newrec,"tags");
 
    return(undef) if ($lnkapplappl eq "");
 

@@ -17,7 +17,7 @@
 'fieldgroup.interfacescomp'=>{
     de=>'spezielle Schnittstellen Komponenten/Einzelheiten und Kontakte',
     en=>'individual Interface components and contacts'},
-'fieldgroup.interfacetag'=>{
+'fieldgroup.tags'=>{
     de=>'Schnittstellen Tags',
     en=>'interface tags'},
 'Interface components'=>{de=>'Schnittstellen Komponenten'},

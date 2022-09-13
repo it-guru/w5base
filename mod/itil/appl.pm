@@ -606,6 +606,26 @@ sub new
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>['name','ciusage']),
 
+      new kernel::Field::SubList(
+                name          =>'tags',
+                label         =>'ItemTags',
+                group         =>'tags',
+                htmldetail    =>'NotEmpty',
+                vjoinbase     =>{'internal'=>'0'},
+                vjointo       =>'itil::tag_appl',
+                vjoinon       =>['id'=>'refid'],
+                vjoindisp     =>['name','value']),
+
+      new kernel::Field::SubList(
+                name          =>'alltags',
+                label         =>'all ItemTags',
+                group         =>'tags',
+                htmldetail    =>0,
+                vjointo       =>'itil::tag_appl',
+                vjoinon       =>['id'=>'refid'],
+                vjoindisp     =>['name','value'],
+                vjoininhash   =>['name','id','mdate','cdate']),
+
       new kernel::Field::Text(
                 name          =>'businessteambossid',
                 group         =>'technical',
@@ -2639,7 +2659,7 @@ sub isViewValid
               mutimes   individualAttr
               misc opmgmt phonenumbers services businessservices 
               soclustgroup socomments source swinstances systems applurl 
-              addcis
+              addcis tags
               technical workflowbasedata header inmchm inm chm interview efforts
               functional);
 
@@ -2817,7 +2837,7 @@ sub getDetailBlockPriority
              customer custcontracts supcontracts
              contacts phonenumbers 
              interfaces systems itcloudareas 
-             swinstances services businessservices applurl addcis
+             swinstances services businessservices applurl addcis tags
              monisla 
              mutimes misc attachments individualAttr control 
              sodrgroup soclustgroup socomments accountnumbers licenses 
