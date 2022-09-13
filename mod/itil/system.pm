@@ -1330,6 +1330,26 @@ sub new
                 vjoindisp     =>['name','ciusage']),
 
       new kernel::Field::SubList(
+                name          =>'tags',
+                label         =>'ItemTags',
+                group         =>'tags',
+                htmldetail    =>'NotEmpty',
+                vjoinbase     =>{'internal'=>'0'},
+                vjointo       =>'itil::tag_system',
+                vjoinon       =>['id'=>'refid'],
+                vjoindisp     =>['name','value']),
+
+      new kernel::Field::SubList(
+                name          =>'alltags',
+                label         =>'all ItemTags',
+                group         =>'tags',
+                htmldetail    =>0,
+                vjointo       =>'itil::tag_system',
+                vjoinon       =>['id'=>'refid'],
+                vjoindisp     =>['name','value'],
+                vjoininhash   =>['name','id','mdate','cdate']),
+
+      new kernel::Field::SubList(
                 name          =>'applicationteams',
                 label         =>'Application business teams',
                 group         =>'applications',
@@ -2269,7 +2289,7 @@ sub isViewValid
    return("header","default","systemclass") if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @all=qw(header default swinstances 
-              inmchm addcis softsetvalidation
+              inmchm addcis tags softsetvalidation
               software admin logsys contacts monisla misc opmode 
               physys ipaddresses sysiface phonenumbers sec applications
               location source customer history upd relperson
@@ -2488,7 +2508,7 @@ sub getDetailBlockPriority
              vhost physys systemclass cluster
              opmode sec applications customer software 
              swinstances sysiface ipaddresses
-             contacts addcis monisla misc upd 
+             contacts addcis tags monisla misc upd 
              attachments individualAttr control source));
 }
 

@@ -6,6 +6,7 @@
 'fieldgroup.physys'=>{de=>'physikalische Systemdaten',en=>'physical Systemdata'},
 'fieldgroup.inmchm'=>{de=>'Incident/Change-Kontakte',en=>'Incident/Change contacts'},
 'fieldgroup.opmode'=>{de=>'Betriebsart',en=>'Operation mode'},
+'fieldgroup.tags'=>{de=>'Item Tags',en=>'Item Tags'},
 'fieldgroup.location'=>{de=>'Standort',en=>'Location'},
 'fieldgroup.systemclass'=>{de=>'Systemklassifizierung',en=>'Systemclass'},
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
