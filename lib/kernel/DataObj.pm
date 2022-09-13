@@ -1976,8 +1976,6 @@ sub ValidatedInsertOrUpdateRecord
                if ($o ne $n){
                   $changed=1;
                   if ($k ne "srcload"){
-#printf STDERR ("k=$k\nold='$rec->{$k}'\n\nnew='$newrec->{$k}'\n\n\n");
-#printf STDERR ("k=$k\nold:'\n%s\nnew:\n%s\n\n\n",HexDump($rec->{$k}),HexDump($newrec->{$k}));
                      $restoremdate=0;
                   }
                }
@@ -2000,10 +1998,12 @@ sub ValidatedInsertOrUpdateRecord
             msg(ERROR,"internal error on ValidatedInsertOrUpdateRecord %s ".
                       "in $self",
                 Dumper(\@filter));
+            return(0); # better do not process forther records
          }
       }
       push(@idlist,$rec->{$idfname});
       $found++;
+      return(1);  # return true - further records should be processed
    });
    if (!$found){
       my $id=$self->ValidatedInsertRecord($newrec);
