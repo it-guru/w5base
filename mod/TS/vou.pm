@@ -55,8 +55,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'shortname',
                 label         =>'Shortname',
-                maxlength     =>'12',
-                size          =>'12',
+                maxlength     =>'6',
+                size          =>'6',
                 htmlwidth     =>'80',
                 htmleditwidth =>'80',
                 dataobjattr   =>'vou.shortname'),
@@ -462,7 +462,7 @@ sub new
    $self->setWorktable("vou");
    $self->{CI_Handling}={
       uniquename=>"shortname",
-      uniquesize=>8,
+      uniquesize=>6,
       activator=>["admin","w5base.TS.vou"]
    };
    return($self);
@@ -512,7 +512,7 @@ sub Validate
       if ($newshortname=~m/^\s*$/ || 
           !($newshortname=~m/^[a-z0-9_-]+$/i) ||
           ($newshortname=~m/^[0-9-]/i) ||
-          length($newshortname)>12){
+          length($newshortname)>6){
          $self->LastMsg(ERROR,"invalid shortname specified");
          return(0);
       }
