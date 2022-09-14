@@ -611,7 +611,7 @@ sub new
                 label         =>'ItemTags',
                 group         =>'tags',
                 htmldetail    =>'NotEmpty',
-                vjoinbase     =>{'internal'=>'0'},
+                vjoinbase     =>{'internal'=>'0','ishidden'=>'0'},
                 vjointo       =>'itil::tag_appl',
                 vjoinon       =>['id'=>'refid'],
                 vjoindisp     =>['name','value']),
