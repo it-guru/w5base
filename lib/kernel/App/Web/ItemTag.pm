@@ -70,6 +70,11 @@ sub new
                 label         =>'Value',
                 dataobjattr   =>$tagtable.'.value'),
 
+      new kernel::Field::Boolean(           # vorgesehen, damit man per API  
+                name          =>'ishidden', # Tags setzen kann, die aber nur
+                label         =>'is hidden',# in alltags auftauchen - nicht aber
+                dataobjattr   =>$tagtable.'.ishidden'),  # in HtmlDetail
+
       new kernel::Field::Text(
                 name          =>'refid',
                 frontreadonly =>1,
@@ -111,13 +116,18 @@ sub new
    foreach my $obj (values(%{$self->{tagctrl}})){
       $obj->Configure($self,$self->{parent},$self->{control});
    }
+
+   my $internalsql="'0'";
+   if ($#{$self->{control}->{internalKeys}}!=-1){
+      $internalsql="($tagtable.name in (".
+                   join(",",map({"'".$_."'"}
+                        @{$self->{control}->{internalKeys}}))."))";
+   }
    $self->AddFields(
       new kernel::Field::Link(
                 name          =>'internal',
                 label         =>'isInternal',
-                dataobjattr   =>"($tagtable.name in (".
-                                join(",",map({"'".$_."'"} 
-                                   @{$self->{control}->{internalKeys}}))."))")
+                dataobjattr   =>$internalsql)
    );
 
    return($self);

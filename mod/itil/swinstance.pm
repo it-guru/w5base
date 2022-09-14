@@ -932,6 +932,25 @@ sub new
       #          vjoinon       =>['id'=>'swinstanceid'],
       #          vjoindisp     =>['namegrp','name','val']),
 
+      new kernel::Field::SubList(
+                name          =>'tags',
+                label         =>'ItemTags',
+                group         =>'tags',
+                htmldetail    =>'NotEmpty',
+                vjoinbase     =>{'internal'=>'0','ishidden'=>'0'},
+                vjointo       =>'itil::tag_swinstance',
+                vjoinon       =>['id'=>'refid'],
+                vjoindisp     =>['name','value']),
+
+      new kernel::Field::SubList(
+                name          =>'alltags',
+                label         =>'all ItemTags',
+                group         =>'tags',
+                htmldetail    =>0,
+                vjointo       =>'itil::tag_swinstance',
+                vjoinon       =>['id'=>'refid'],
+                vjoindisp     =>['name','value'],
+                vjoininhash   =>['name','id','mdate','cdate']),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -1796,7 +1815,8 @@ sub isViewValid
    return("header","default") if (!defined($rec));
    my @all=qw(header default adm sec ssl misc monisla env history control
               relations swinstancerules swinstancerunnodes runon
-              softwareinst contacts attachments source swinstanceparam qc);
+              softwareinst contacts attachments tags
+              source swinstanceparam qc);
    if (defined($rec)){
       if ($rec->{'runon'} eq "0"){
          push(@all,"systems");
@@ -1873,7 +1893,7 @@ sub getDetailBlockPriority
    my $self=shift;
    return(qw(header default adm runon softwareinst env monisla sec misc cluster 
              systems swinstancerunnodes contacts swinstanceparam ssl 
-             control swinstancerules attachments relations source));
+             control swinstancerules attachments relations tags source));
 }
 
 sub preQualityCheckRecord

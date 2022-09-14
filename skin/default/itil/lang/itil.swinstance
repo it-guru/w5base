@@ -9,6 +9,7 @@
 'Instance Administrator'=>{de=>'Instanz Administrator'},
 'Deputy Instance Administrator'=>{de=>'Instanz Administrator Vertreter'},
 'fieldgroup.adm'=>{de=>'Administration/DBA',en=>'Administration/DBA'},
+'fieldgroup.tags'=>{de=>'Item Tags',en=>'Item Tags'},
 'fieldgroup.monisla'=>{de=>'Service Monitoring und SLA Überwachung',en=>'Service Monitoring and SLA'},
 'fieldgroup.relations'=>{de=>'Instanz Relationen',en=>'Instance relations'},
 'fieldgroup.ssl'=>{de=>'SSL Zertifikats-Prüfsystem',en=>'SSL Verification'},
@@ -92,3 +93,4 @@
 'RUNON.1'=>{de=>'Cluster-Service',en=>'cluster-service'},
 'RUNON.2'=>{de=>'Cloudarea',en=>'Cloudarea'},
 'cloudarea application and instance application does not match'=>{de=>'Anwendung der CloudArea stimmt nicht mit der Anwendung in der Software-Instanz überein'},
+'all ItemTags'=>{de=>'alle ItemTags'},
