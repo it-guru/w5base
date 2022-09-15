@@ -90,7 +90,11 @@ sub qcheckRecord
          "KEYSIGHT IXIA FLEX TAP TPX-40-SR-50-70-MTP",
          "HDS VSP CF",
          "HDS HUS150 CONTROLLER",
-         "IBM 1U FLAT PANEL MONITOR CONSOLE KIT"
+         "IBM 1U FLAT PANEL MONITOR CONSOLE KIT",
+         "CISCO UCS B260 M4",
+         "CISCO UCS B200 M3",
+         "CISCO UCS B200 M4",
+         "CISCO UCS B200 M5"
    ));
 
 
