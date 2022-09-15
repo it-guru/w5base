@@ -422,6 +422,14 @@ sub Import
       srcid=>$sysrec->{idpath},
       ipaddresses=>$sysrec->{ipaddresses}
    };
+
+   if ($sysimporttempl->{autoscalinggroup} ne "" &&
+       $sysimporttempl->{name} ne "" &&
+       ($sysimporttempl->{name}=~m/[^a-z0-9-]/) &&
+       !($sysimporttempl->{autoscalinggroup}=~m/[^a-z0-9-]/)){
+      $sysimporttempl->{name}=$sysimporttempl->{autoscalinggroup};
+   }
+       
    if (exists($sysrec->{tags})){
       if (exists($sysrec->{tags}->{'eks:nodegroup-name'}) &&
           $sysrec->{tags}->{'eks:nodegroup-name'} ne ""){
@@ -429,6 +437,7 @@ sub Import
               $sysrec->{tags}->{'eks:nodegroup-name'};
       }
    }
+
 
 
 
