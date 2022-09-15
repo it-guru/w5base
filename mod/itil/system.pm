@@ -2749,7 +2749,6 @@ sub QRuleSyncCloudSystem
             $parshortdesc=~s/[^a-z0-9_-]//gi; # remove non ASC Char
          }
          my $sysname=lc($orgsysname);
-         $sysname=~s/[^a-z0-9_-]/_/gi;  # remove illegal chars in systemname
          if ($sysname=~m/^\S{5,32}\s/){  # Wenn der Name am Anfang steht und
             $sysname=~s/\s.*//;          # mit Leerzeichen sepperiert noch ein
          }                               # text, dann weg damit
