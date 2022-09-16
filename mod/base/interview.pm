@@ -844,7 +844,8 @@ sub getHtmlEditElements
       $HTMLrelevant="<table><tr height=20 border=0 ".
                     "cellspacing=0 cellpadding=0>".
                     "<td valign=middle>".
-                    "<select name=relevant $relevant_opmode >";
+                    "<select style=\"width:50px\" ".
+                    "name=relevant $relevant_opmode >";
       if ($irec->{allownotrelevant}){
          if (!defined($answer) && !$write){
             $HTMLrelevant.="<option value=\"\">?</option>";
