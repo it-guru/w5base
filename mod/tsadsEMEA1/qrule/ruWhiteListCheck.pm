@@ -96,8 +96,18 @@ sub qcheckRecord
    my @qmsg;
    my @dataissue;
 
+
    if ($rec->{cistatusid}<6){
-      if ($rec->{country} eq "RU" && $rec->{usertyp} eq "user"){
+      my $lastexternalseen=9999;
+      if ($rec->{lastexternalseen} ne ""){
+         my $d=CalcDateDuration($rec->{lastexternalseen},NowStamp("en"));
+         if (defined($d)){
+            $lastexternalseen=$d->{totaldays};
+         }
+      }
+      if ($rec->{country} eq "RU" && $rec->{usertyp} eq "user" &&
+          ($rec->{cistatusid}==4 || 
+           ($rec->{cistatusid}==5 && $lastexternalseen<7))){
          my $adurec;
          my $adgrec;
          my $e2user=getModuleObject($self->getParent->Config,
