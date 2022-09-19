@@ -976,6 +976,10 @@ sub processRecord
                   $self->getParent->storeStatVar("Group",$resp,{},
                                                  "base.DataIssue.notified",1);
                }
+               else{
+                  $self->getParent->storeStatVar("Group",$resp,{},
+                                                 "base.DataIssue.notified",0);
+               }
             }
 
             $self->getParent->storeStatVar("Group",$resp,{},
