@@ -104,7 +104,6 @@ sub _parseWords($$)
          push(@w,@stack);
       }
    }
-print STDERR Dumper(\@w);
    return(@w);
 }
 
