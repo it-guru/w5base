@@ -90,8 +90,8 @@ sub _parseWords($$)
          }
          push(@w,@stack);
       }
-      if ($w=~m/^[a-z0-9]+=/i){
-         push(@w,($w=~m/^([a-z0-9]+)(=)(.*)$/i));
+      if ($w=~m/^[a-z0-9]+[=<>]/i){
+         push(@w,($w=~m/^([a-z0-9]+)([=<>])(.*)$/i));
       }
       else{
          push(@w,$w);
@@ -104,6 +104,7 @@ sub _parseWords($$)
          push(@w,@stack);
       }
    }
+print STDERR Dumper(\@w);
    return(@w);
 }
 
@@ -113,7 +114,7 @@ sub _classifyElements
    my @w=@_;
    my @e;
 
-   my @COM=qw(like and or =);
+   my @COM=qw(like and or = < >);
    foreach my $w (@w){
       my $qw=quotemeta($w);
       next if ($w eq "");  # skip blanks
@@ -339,6 +340,12 @@ sub compileExpression
          }
          if ($e->{type} eq "COM" && $e->{name} eq "="){
             $cmd.=" eq ";
+         }
+         if ($e->{type} eq "COM" && $e->{name} eq ">"){
+            $cmd.=" > ";
+         }
+         if ($e->{type} eq "COM" && $e->{name} eq "<"){
+            $cmd.=" < ";
          }
          if ($e->{type} eq "COM" && lc($e->{name}) eq "and"){
             $cmd.=" and ";
