@@ -126,6 +126,7 @@ sub qcheckRecord
    my $wf=getModuleObject($self->getParent->Config,"base::workflow");
    my $ia=getModuleObject($self->getParent->Config,"base::interanswer");
    my $i=getModuleObject($self->getParent->Config,"base::interview");
+   my $tag=getModuleObject($self->getParent->Config,"itil::tag_appl");
    my $iarec=$self->readCurrentAnswers($ia,$rec);
 
    $i->SetFilter({qtag=>'SOB*'});
@@ -134,6 +135,12 @@ sub qcheckRecord
 
    my $changenumberok=1;
    my $interviewchanged=0;
+   my $ChangeEndDate;
+
+   if ($rec->{soslanumdrtestinterval} == 0 ||
+       $rec->{soslanumdrtestinterval} == 12){
+      return(undef,{qmsg=>'DR-Test checking deactivated or automated'});
+   }
 
    if (exists($iarec->{qtag}->{SOB_003}) &&
        $iarec->{qtag}->{SOB_003}->{relevant} eq "1" &&
@@ -141,30 +148,52 @@ sub qcheckRecord
       my $changenumber=$iarec->{qtag}->{SOB_003}->{answer};
       if ($changenumber=~/^C\d+$/){
          $wf->SetFilter({srcid=>\$changenumber,srcsys=>'*change'});
-         my ($wfrec,$msg)=$wf->getOnlyFirst(qw(eventend));
+         my ($wfrec,$msg)=$wf->getOnlyFirst(qw(eventend wffields.changeend 
+                                               invoicedate));
          if (defined($wfrec)){
             my $qtag="SOB_004";
             my $day=$wfrec->{eventend};
-            $day=~s/ .*$//; # cut of time
-            my ($y,$m,$d)=$day=~m/(\d+)-(\d+)-(\d+)/;
-            $day="$y-$m-$d";
-            if (!defined($iarec->{qtag}->{$qtag})){
-               # insert new
-               $ia->ValidatedInsertRecord({
-                   parentid=>$rec->{id},
-                   parentobj=>'itil::appl',
-                   interviewid=>$self->{intv}->{qtag}->{$qtag}->{id},
-                   relevant=>1,
-                   answer=>$day
-               });
-               $interviewchanged++;
+            if ($wfrec->{changeend} ne ""){
+               $ChangeEndDate=$wfrec->{changeend};
+               $ChangeEndDate=$wfrec->{invoicedate};
             }
-            else{
-               # update old
-               $ia->ValidatedUpdateRecord($iarec->{qtag}->{$qtag},
-                  { relevant=>1, answer=>$day},
-                  {id=>$iarec->{qtag}->{$qtag}->{id}});
-               $interviewchanged++;
+            if ($day ne ""){
+               my $d=CalcDateDuration($day,NowStamp("en"));
+               #print STDERR "Delta workflowend ($day):".Dumper($d);
+               if (defined($d)){
+                  if ($d->{totaldays}>0){  # take workflow end, if it's in past
+                     $day=~s/ .*$//; # cut of time
+                     my ($y,$m,$d)=$day=~m/(\d+)-(\d+)-(\d+)/;
+                     $day="$y-$m-$d";
+                     if (!defined($iarec->{qtag}->{$qtag})){
+                        # insert new
+                        $tag->setTag($rec->{id},"DRTestNotify","");
+                        $ia->ValidatedInsertRecord({
+                            parentid=>$rec->{id},
+                            parentobj=>'itil::appl',
+                            interviewid=>$self->{intv}->{qtag}->{$qtag}->{id},
+                            relevant=>1,
+                            answer=>$day
+                        });
+                        $interviewchanged++;
+                     }
+                     else{
+                        # update old
+                        if ($iarec->{qtag}->{$qtag}->{relevant} ne "1" ||
+                            $iarec->{qtag}->{$qtag}->{answer} ne $day){
+                           $tag->setTag($rec->{id},"DRTestNotify","");
+                           $ia->ValidatedUpdateRecord($iarec->{qtag}->{$qtag},
+                              { relevant=>1, answer=>$day},
+                              {id=>$iarec->{qtag}->{$qtag}->{id}});
+                           $interviewchanged++;
+                        }
+                     }
+                  }
+                  else{
+                     my $msg="temporary skip take of workflow end from change";
+                     push(@qmsg,$msg);
+                  }
+               }
             }
          }
          else{
@@ -198,52 +227,162 @@ sub qcheckRecord
    $lastday=~s#/#.#g;
    $planday=~s#/#.#g;
    my $maxagedays=365;
+   my $maxagedays=int(365/$rec->{soslanumdrtestinterval});
    if ($lastday ne "" && 
        ($lastday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) &&
-       $rec->{soslanumdrtests}>0){
-      $maxagedays=365/$rec->{soslanumdrtests};
+       $rec->{soslanumdrtestinterval}>0){
       my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
       if ($lday ne ""){
          my $duration=CalcDateDuration(NowStamp("en"),$lday);
-         if (defined($duration) && $duration->{days}<($maxagedays*-1)){
-            my $msg="age of Disaster-Recovery Test violates SLA definition";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-            $errorlevel=3 if ($errorlevel<3);
+         if (defined($duration)){
+            if ($duration->{days}<($maxagedays*-1)){
+               my $msg="age of Disaster-Recovery Test violates SLA definition";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
          }
       }
    }
    if ($lastday ne "" &&
-       ($lastday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) &&
-       $planday ne "" &&
-       ($planday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ){
-      my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
-      my $pday=$wf->ExpandTimeExpression($planday,"en","GMT","GMT");
-      if ($lday ne "" && $pday ne ""){
-         my $duration=CalcDateDuration($lday,$pday);
-         if (defined($duration) && $duration->{days}<-56){
-            my $msg="Disaster-Recovery Test plan date is bevor last test";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-            $errorlevel=3 if ($errorlevel<3);
+       ($lastday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)){
+      #printf STDERR ("lastday=%s\n",$lastday);
+      #printf STDERR ("soslanumdrtests=%s\n",$rec->{soslanumdrtests});
+      #printf STDERR ("maxagedays=%s\n",$maxagedays);
+      if ($planday ne "" &&
+          ($planday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ){
+         my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
+         my $pday=$wf->ExpandTimeExpression($planday,"en","GMT","GMT");
+         if ($lday ne "" && $pday ne ""){
+            my $duration=CalcDateDuration($lday,$pday);
+            if (defined($duration) && $duration->{days}<-56){
+               my $msg="Disaster-Recovery Test plan date is bevor last test";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
+         }
+         if ($#qmsg==-1 && $pday ne ""){
+            my $duration=CalcDateDuration(NowStamp("en"),$pday);
+            if (defined($duration) && $duration->{days}<(($maxagedays/2)*-1)){
+               my $msg="Disaster-Recovery Test plan date is in the past";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
+         }
+         if ($#qmsg==-1 && $pday ne ""){
+            my $duration=CalcDateDuration(NowStamp("en"),$pday);
+            if (defined($duration) && $duration->{days}>$maxagedays){
+               my $msg=
+                  "Disaster-Recovery Test plan date is to far in the future";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
          }
       }
-      if ($#qmsg==-1 && $pday ne ""){
-         my $duration=CalcDateDuration(NowStamp("en"),$pday);
-         if (defined($duration) && $duration->{days}<(($maxagedays/2)*-1)){
-            my $msg="Disaster-Recovery Test plan date is in the past";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-            $errorlevel=3 if ($errorlevel<3);
+      if ($lastday ne "" && $maxagedays>0){
+         my $debuglog="";
+         #printf STDERR ("ChangeEndDate=%s\n",$ChangeEndDate);
+         my $ChangeEndDateOnly=$ChangeEndDate;
+         $ChangeEndDateOnly=~s/ .*$//;
+         if ($lastday eq ""){
+            $lastday=NowStamp("en");
+            $lastday=~s/\s.*$//;
          }
-      }
-      if ($#qmsg==-1 && $pday ne ""){
-         my $duration=CalcDateDuration(NowStamp("en"),$pday);
-         if (defined($duration) && $duration->{days}>$maxagedays){
-            my $msg="Disaster-Recovery Test plan date is to far in the future";
-            push(@qmsg,$msg);
-            push(@dataissue,$msg);
-            $errorlevel=3 if ($errorlevel<3);
+         $debuglog.="last date of DR-Tests: $lastday\n"; 
+         $debuglog.="maximum days bettween DR-Tests: $maxagedays\n"; 
+         my $deadline=$wf->ExpandTimeExpression(
+                      $lastday."+${maxagedays}d",
+                      "en","GMT","GMT");
+
+         $deadline=~s/\s.*$//;
+         if ($planday ne ""){
+            $deadline=$planday;
+            $debuglog.="deadline replaced by interview answer: $deadline\n"; 
+         }
+         else{
+            $debuglog.="deadline for DR-Test: $deadline\n"; 
+         }
+         $deadline=~s/\s.*$//;
+
+         my $plandeadline=$wf->ExpandTimeExpression(
+                           $deadline."-42d",
+                           "en","GMT","GMT");
+         $debuglog.="plan of DR-Test deadline: $plandeadline\n"; 
+         $debuglog.="last day from Change: $ChangeEndDate\n"; 
+         
+         my $d=CalcDateDuration(NowStamp("en"),$plandeadline);
+         my $needToPlan=0;
+         if (defined($d)){
+            if ($d->{totaldays}<0){
+               $needToPlan=1;
+            }
+         }
+         else{
+            msg(ERROR,"DR Test calc needToPlan failed: $plandeadline");
+         }
+         msg(INFO,"$rec->{name}: next DR-Test planing deadline: ".
+                  $plandeadline);
+         msg(INFO,"$rec->{name}: days to next DR-Test planing deadline: ".
+                  "$d->{totaldays}");
+         msg(INFO,"$rec->{name}: next DR-Test planning needed: $needToPlan");
+         if ($needToPlan){
+            my $d;
+            if ($ChangeEndDate ne ""){
+               #printf STDERR ("ChangeEndDate=%s\n",$ChangeEndDate);
+               $d=CalcDateDuration($deadline." 00:00:00",$ChangeEndDate);
+               #printf STDERR ("plandeadline->ChangeEndDate:%s\n",Dumper($d));
+            }
+            if (!defined($d) || ($d->{totaldays}>-42 && $d->{totaldays}<7)){
+               # Zieldatum des Changes um den deadline Termin
+               my $msg="missing valid next DR-Test change planning";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+               {
+                  msg(INFO,"set DR-TestChange missing");
+                  my $marker=$tag->getTag($rec->{id},
+                              {name=>"DRTestNotify",mdate=>'>now-90d'});
+                  if ($marker eq ""){
+                     msg(INFO,"set DRTestNotify tag");
+                     msg(INFO,"DR Test planning needed for ".$rec->{name}.
+                              " - deadline for test is $deadline");
+                     my $notifyparam={emailbcc=>11634953080001};
+                     my $notifycontrol={};
+                     $dataobj->NotifyWriteAuthorizedContacts($rec,{},
+                                     $notifyparam,$notifycontrol,sub{
+                        my $self=shift;
+                        my $notifyparam=shift;
+                        my $notifycontrol=shift;
+                        my $subject;
+                        my $text;
+                        $subject=$self->T("request to plan next DR Test for").
+                                 " ".$rec->{name};
+                        my $tmpl=$self->getParsedTemplate(
+                           "tmpl/AL_TCom.qrule.checkInterviewDR.testplan",{
+                              static=>{
+                                 APPNAME=>$rec->{name}
+                              }
+                        });
+                        $text=$tmpl;
+
+                        $text.="\n\n";
+                   
+                        $text.=$self->T("Calculation base for this mail").":\n".
+                               "---\n".
+                               $debuglog;
+                   
+                   
+                        return($subject,$text);
+                     });
+                     # mail verschicken
+                     $tag->setTag($rec->{id},"DRTestNotify",NowStamp("en"));
+                  }
+                  # hier sollte die Notification versandt werden
+               }
+            }
          }
       }
    }
