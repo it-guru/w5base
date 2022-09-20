@@ -194,6 +194,10 @@
 'DRTESTPERYEAR.1'=>{de=>'1 Test/Jahr',en=>'1 test/year'},
 'DRTESTPERYEAR.2'=>{de=>'2 Tests/Jahr',en=>'2 tests/year'},
 'DRTESTPERYEAR.4'=>{de=>'4 Tests/Jahr',en=>'4 tests/year'},
+'DRTESTPERYEAR.12'=>{
+ de=>'1 Test/Monat (automatisch)',
+ en=>'1 test/month (automaticly)'
+},
 'used AssetIDs'=>{de=>'verwendete AssetIDs'},
 'used Serverfarms'=>{de=>'verwendete Serverfarmen'},
 'SLA number Cluster-Switch test interval'=>{de=>'SLA Anzahl zugesicherter Cluster-Service Switch Tests'},

@@ -17,3 +17,18 @@
 'age of Disaster-Recovery Test violates SLA definition'=>{
  de=>'Alter des letzten Disaster-Recovery Tests verletzt SLA-Vorgaben'
 },
+'temporary skip take of workflow end from change'=>{
+ de=>'zeitweises übergehen der Workflow-Ende-Übernahme aus Change'
+},
+'missing valid next DR-Test change planning'=>{
+ de=>'fehlende gültige "nächster DR-Test Change" Planung'
+},
+'Calculation base for this mail'=>{
+ de=>'Berechnungsbasis für diese Info-Mail'
+},
+'request to plan next DR Test for'=>{
+ de=>'Aufforderung zur Planung des nächsten DR-Tests für'
+},
+'DR-Test checking deactivated or automated'=>{
+ de=>'DR-Test Prüfung deaktiviert oder automatisiert'
+}
