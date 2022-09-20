@@ -195,6 +195,35 @@ sub setTag
    return(@idlist);
 }
 
+sub getTag
+{
+   my $self=shift;
+   my $id=shift;
+   my $name=shift;
+   my %flt;
+
+   if (ref($name) eq "HASH"){
+      %flt=%{$name};
+   }
+   else{
+      %flt=(name=>$name);
+   }
+   $flt{refid}=\$id;
+
+
+   $self->SetFilter(\%flt);
+   my @l=$self->getHashList(qw(mdate name value));
+   if ($#l==-1){
+      return();
+   }
+
+   my @v=map({$_->{value}} @l);
+   if (wantarray()){
+      return(@v);
+   } 
+   return($v[0]);
+}
+
 
 sub SetTagFilter
 {
