@@ -316,7 +316,7 @@ sub HandleCIStatus
          }
       }
       else{
-         if (!defined($oldrec) && $newrec->{cistatusid}==0){
+         if ($newrec->{cistatusid}==0){
             if (!$self->isActivator($oldrec,$newrec,%param)){
                $self->LastMsg(ERROR,"you are not authorized to set ".
                                     "this state - ".
@@ -324,7 +324,7 @@ sub HandleCIStatus
                return(0);
             }
          }
-         if ($oldrec->{cistatusid}==1 && $newrec->{cistatusid}>2){
+         elsif ($oldrec->{cistatusid}==1 && $newrec->{cistatusid}>2){
             if (!$self->isActivator($oldrec,$newrec,%param)){
                $self->LastMsg(ERROR,"you are not authorized to set ".
                                     "this state, please set state ".
@@ -333,7 +333,7 @@ sub HandleCIStatus
             }
          }
          elsif (effChanged($oldrec,$newrec,"cistatusid") && 
-                $newrec->{cistatusid}>2){
+                ($newrec->{cistatusid}>2 && $newrec->{cistatusid}<6)){
             if ($oldrec->{cistatusid}<4){
                if (!$self->isActivator($oldrec,$newrec,%param)){
                   $self->LastMsg(ERROR,"you are not authorized to set ".
