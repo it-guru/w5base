@@ -1372,6 +1372,17 @@ sub ExpandTRangeExpression
       $val="$Y-$M-01 00:00:00/$Y-$M-$max 23:59:59";
       $f=sprintf("%04d/%02d",$Y,$M);
    }
+   elsif ($val=~m/^currentyear$/gi){
+      my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($srctimezone); 
+      $val="$Y-01-01 00:00:00/$Y-12-31 23:59:59";
+      $f=sprintf("%04d",$Y);
+   }
+   elsif ($val=~m/^lastyear$/gi){
+      my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($srctimezone); 
+      $Y--;
+      $val="$Y-01-01 00:00:00/$Y-12-31 23:59:59";
+      $f=sprintf("%04d",$Y);
+   }
 
    if (my ($Y1,$M1,$D1,$h1,$m1,$s1,$Y2,$M2,$D2,$h2,$m2,$s2)=
           $val=~m/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s
@@ -1492,6 +1503,17 @@ sub PreParseTimeExpression
       my $max=Days_in_Month($Y,$M);
       $val="\">=$Y-$M-01 00:00:00\" AND \"<=$Y-$M-$max 23:59:59\"";
       $f=sprintf("%04d/%02d",$Y,$M);
+   }
+   elsif ($val=~m/^currentyear$/gi){
+      my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($tz); 
+      $val="\">=$Y-01-01 00:00:00\" AND \"<=$Y-01-12 23:59:59\"";
+      $f=sprintf("%04d",$Y);
+   }
+   elsif ($val=~m/^lastyear$/gi){
+      my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($tz); 
+      $Y--;
+      $val="\">=$Y-01-01 00:00:00\" AND \"<=$Y-01-12 23:59:59\"";
+      $f=sprintf("%04d",$Y);
    }
    elsif ($val=~m/^currentmonth and lastmonth$/gi ||
           $val=~m/^lastmonth and currentmonth$/gi){

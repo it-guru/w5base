@@ -753,8 +753,9 @@ sub getRelatedWorkflows
    my $tt=$param->{'timerange'};
 
    if ($tt=~m/[\(\)]/ ||
-       $tt eq "lastweek" ||
-       $tt eq "last2weeks"
+       $tt eq "currentyear"  || $tt eq "lastyear" ||
+       $tt eq "currentmonth" || $tt eq "lastmonth" ||
+       $tt eq "lastweek"     || $tt eq "last2weeks"
       ){     # if a month or year is specified, the open
       $q->{eventend}=$tt;     # entrys will not be displayed
    }
@@ -793,7 +794,6 @@ sub getRelatedWorkflows
       }
    }
 
-
    my %qmax=%$q;
    $h->ResetFilter();
    $h->SetFilter(\%qmax);
@@ -803,6 +803,9 @@ sub getRelatedWorkflows
    map({$idl{$_->{id}}=$_;
       my $d=$_->{urlofcurrentrec};  # ensure field is resolved
    } $h->getHashList(@internalWfView));
+   if ($h->LastMsg()){
+      return();
+   }
    if ($W5V2::OperationContext eq "WebFrontend"){
       if (keys(%idl)>$limit){
          $self->LastMsg(ERROR,$self->T("selection to ".

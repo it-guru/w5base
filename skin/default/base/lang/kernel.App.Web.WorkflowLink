@@ -1,2 +1,3 @@
 'Event End'=>{de=>"Ereignisende"},
 'selection to unspecified for fulltext search'=>{de=>'Auswahl zu groß für Volltextsuche'},
+'selection to unspecified for search'=>{de=>'Auswahl nicht ausreichend eingegrenzt'},

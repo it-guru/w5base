@@ -234,6 +234,10 @@ sub getTimeRangeDrop
                 $app->T("future and last 15 days"), 
                 '>now-28d'=>
                 $app->T("future and last 28 days"));
+         if (in_array(\@modes,'monthyear')){
+            push(@l,"currentyear",$app->T("current year"));
+            push(@l,"lastyear",$app->T("last year"));
+         }
          while(defined(my $exp=shift(@l))){
             my $nam=shift(@l);
             $d.="<option value=\"".$exp."\"";
