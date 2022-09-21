@@ -720,7 +720,7 @@ sub Import
          $self->LastMsg(ERROR,"ApplicationID has no Assignment Group");
          return(undef);
       }
-      # check 2: Assingment Group active
+      # check 2: Assignment Group active
       my $acgroup=getModuleObject($self->Config,"tsacinv::group");
       $acgroup->SetFilter({lgroupid=>\$applrec->{lassignmentid}});
       my ($acgrouprec,$msg)=$acgroup->getOnlyFirst(qw(supervisorldapid));
