@@ -767,6 +767,7 @@ sub RoleSyncIn
    my %delrec;
    foreach my $rulerole (keys(%{$rules})){
       foreach my $uid (@{$rules->{$rulerole}}){
+         next if (!($uid=~m/^[0-9]{2,20}$/));
          my $uidfound=0;
          foreach my $crec (@{$cur}){
             my $r=$crec->{roles};
@@ -829,7 +830,7 @@ sub RoleSyncIn
       }
    }
    foreach my $insrec (values(%insrec)){
-      #printf STDERR ("DEBUG: insrec:%s\n",Dumper($insrec));
+      printf STDERR ("DEBUG: insrec:%s\n",Dumper($insrec));
       my $doIt=1;
       if ($param->{onInsert}){
          $doIt=&{$param->{onInsert}}($self,$insrec);
@@ -839,7 +840,7 @@ sub RoleSyncIn
       }
    }
    foreach my $updrec (values(%updrec)){
-      #printf STDERR ("DEBUG: updrec:%s\n",Dumper($updrec->[1]));
+      printf STDERR ("DEBUG: updrec:%s\n",Dumper($updrec->[1]));
       my $doIt=1;
       if ($param->{onUpdate}){
          $doIt=&{$param->{onUpdate}}($self,$updrec->[0],$updrec->[1]);
