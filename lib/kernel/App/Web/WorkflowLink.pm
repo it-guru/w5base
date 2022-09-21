@@ -190,11 +190,21 @@ sub WorkflowLinkResult
    
    my $ids=$self->getRelatedWorkflows($currentid,
              {timerange=>$tt,class=>$class,fulltext=>$fulltext});
-   if (defined($ids)){
-      $h->ResetFilter();
-      $h->SecureSetFilter({id=>[keys(%{$ids})],isdeleted=>0});
-      $h->setDefaultView(qw(linenumber eventstart eventend state name));
-      return($h->Result(ExternalFilter=>1));
+   if ($self->LastMsg()){
+      my $outtmpl='<br><br><center>%LASTMSG%</center>'; 
+      $self->ParseTemplateVars(\$outtmpl,{});
+      print($self->HttpHeader("text/html"));
+      print($self->HtmlHeader(style=>['default.css'],body=>1));
+      print($outtmpl);
+      print("</body></html>");
+   }
+   else{
+      if (defined($ids)){
+         $h->ResetFilter();
+         $h->SecureSetFilter({id=>[keys(%{$ids})],isdeleted=>0});
+         $h->setDefaultView(qw(linenumber eventstart eventend state name));
+         return($h->Result(ExternalFilter=>1));
+      }
    }
 }
 

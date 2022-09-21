@@ -1,4 +1,6 @@
 'current month'=>{de=>'aktueller Monat'},
+'current year'=>{de=>'aktuelles Jahr'},
+'last year'=>{de=>'letztes Jahr'},
 'current and next 48h'=>{de=>'aktuell und die nächsten 48 Stunden'},
 'next 3 days'=>{de=>'in den nächsten 3 Tagen'},
 'next 7 days'=>{de=>'in den nächsten 7 Tagen'},
