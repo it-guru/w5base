@@ -71,6 +71,11 @@ sub new
                 vjoinon       =>['swinstanceid'=>'id'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::Interface(
+                name          =>'swinstanceid',
+                label         =>'Software-InstanceID',
+                dataobjattr   =>'swinstancerule.swinstance'),
+
       new kernel::Field::Select(
                 name          =>'ruletype',
                 selectfix     =>1,
@@ -224,11 +229,6 @@ sub new
                 vjoinon       =>['refid'=>'id'],
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoindisp     =>'name'),
-
-      new kernel::Field::Link(
-                name          =>'swinstanceid',
-                group         =>'link',
-                dataobjattr   =>'swinstancerule.swinstance'),
 
       new kernel::Field::Link(
                 name          =>'parentname',
