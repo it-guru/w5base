@@ -300,10 +300,6 @@ sub overviewDataIssue
    if (defined($primrec->{stats}->{$keyname2})){
       $dataissues+=$primrec->{stats}->{$keyname2}->[0];
    }
-   my $keyname3='base.DataIssue.notified';
-   if (defined($primrec->{stats}->{$keyname3})){
-      $dataissues+=$primrec->{stats}->{$keyname3}->[0];
-   }
 
   
    my $color="goldenrod";
