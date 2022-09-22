@@ -31,9 +31,46 @@ sub getTotalActiveQuestions
    my %contextCache;
    my $lang=$self->getParent->Lang();
    my $userid=$self->getParent->getCurrentUserId();
+
+
+
    my $p=getModuleObject($self->getParent->Config,$parentobj);
+   $p->ResetFilter();
    $p->SetFilter({$idname=>\$id});
    my ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
+
+   if (exists($rec->{mandatorid}) && $rec->{mandatorid} ne ""){
+      my $lq=getModuleObject($self->getParent->Config,"base::lnkqrulemandator");
+      my $parentflt=$parentobj;
+      $parentflt=~s/^.*::/*::/;
+      $lq->SetFilter({mandatorid=>\$rec->{mandatorid},dataobj=>$parentflt,
+                      cistatusid=>\'4'});
+      my @l=$lq->getHashList(qw(dataobj mandatorid));
+      my %tparent;
+      foreach my $lqrec (@l){
+         if ($lqrec->{dataobj} ne "" &&  $lqrec->{mandatorid} ne "" &&
+             $lqrec->{mandatorid} ne "0"){
+            $tparent{$lqrec->{dataobj}}++;
+         }
+      }
+      my @keytparent=keys(%tparent);
+      if ($#keytparent==0){
+         msg(INFO,"interview parent transformation from $parentobj to ".
+                  $keytparent[0]."::".$id);
+         $p=getModuleObject($self->getParent->Config,$keytparent[0]);
+         $p->ResetFilter();
+         $p->SetFilter({$idname=>\$id});
+         ($rec,$msg)=$p->getOnlyFirst(qw(ALL));
+      }
+      elsif ($#keytparent==-1){
+         msg(INFO,"no qrules for interview parent transformation ".
+                  "${parentobj}::".$id);
+      } 
+      else{
+         msg(ERROR,"not unique interview parent transformation ".
+                  "${parentobj}::".$id);
+      }
+   }
 
    #my $ic=getModuleObject($self->getParent->Config,"base::interviewcat");
    #$ic->SetCurrentView(qw(id fulllabel));
