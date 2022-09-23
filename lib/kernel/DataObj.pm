@@ -808,8 +808,7 @@ sub getRelatedWorkflows
    }
    if ($W5V2::OperationContext eq "WebFrontend"){
       if (keys(%idl)>$limit){
-         $self->LastMsg(ERROR,$self->T("selection to ".
-                                       "unspecified for search",
+         $self->LastMsg(ERROR,$self->T("selection not sufficiently specified",
                                        "kernel::App::Web::WorkflowLink"));
          return(undef);
       }
@@ -852,8 +851,7 @@ sub getRelatedWorkflows
    }
    if ($W5V2::OperationContext eq "WebFrontend"){
       if (keys(%idl)>$limit){
-         $self->LastMsg(ERROR,$self->T("selection to ".
-                                       "unspecified for search",
+         $self->LastMsg(ERROR,$self->T("selection not sufficiently specified",
                                        "kernel::App::Web::WorkflowLink"));
          return(undef);
       }
