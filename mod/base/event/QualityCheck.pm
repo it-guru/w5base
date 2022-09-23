@@ -84,13 +84,18 @@ sub QualityCheck
       my $n=keys(%dataobjtocheck);
       my $doSleep=($self->{qualitycheckduration}+600-10)/$n;
       $doSleep=10 if ($doSleep<10);
-      $doSleep=300 if ($doSleep>300);
+      $doSleep=180 if ($doSleep>180);
       foreach my $dataobj (sort(keys(%dataobjtocheck))){
          msg(INFO,"calling QualityCheck for '$dataobj'");
          my $o=getModuleObject($self->Config,$dataobj);
          if (defined($o)){
             my $cnt=$o->CountRecords();
-            if ($dataobj eq "base::workflow" || $cnt<50000){
+            my $taskcnt=int($cnt/50000);
+
+            $taskcnt=1 if ($dataobj eq "base::workflow" || $taskcnt<1);
+            $taskcnt=4 if ($taskcnt>4);
+
+            if ($taskcnt==1){
                my $bk=$self->W5ServerCall("rpcCallEvent",
                                           "QualityCheck",$dataobj);
                if (!defined($bk->{AsyncID})){
@@ -100,11 +105,14 @@ sub QualityCheck
                sleep($doSleep);
             }
             else{
-               my @tasks=(1,2);
+               my @tasks;
+               for(my $c=1;$c<=$taskcnt;$c++){
+                  push(@tasks,$c);
+               }
                foreach my $t (@tasks){
                   my $bk=$self->W5ServerCall("rpcCallEvent",
                                              "QualityCheck",$dataobj,
-                                             "T".$t."/2");
+                                             "T".$t."/".$taskcnt);
                   if (!defined($bk->{AsyncID})){
                      msg(ERROR,"can't call QualityCheck for ".
                                "dataobj '$dataobj' Event");

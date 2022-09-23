@@ -150,15 +150,23 @@ sub SetFilterForQualityCheck    # prepaire dataobject for automatic
          $flt[0]->{mdate}="<now-10m";  # prevent recheck of element, if it is
                                        # recently modified.
          if (my $lastqcheck=$self->getField("lastqcheck")){
-            $flt[1]->{cistatusid}=[6];        # check of cistatus=6 is only
-            $flt[1]->{mdate}=">now-56d";      # posible, if qcheck is
-            $flt[1]->{lastqcheck}="<now-7d";  # lastqcheckBased - these
-         }                                    # records are only checked once
-      }                                       # a week
+            # check  of cistatus=6 is only posible, if LastQualityCheck is
+            # older then 7 days (in 5 weeks range).
+            $flt[1]->{cistatusid}=[6];     
+            $flt[1]->{mdate}=">now-35d";  
+            $flt[1]->{lastqcheck}="<now-7d"; 
+            # check  of cistatus=6 is only posible, if LastQualityCheck is
+            # older then 4 weeks (in 100 day range).
+            $flt[2]->{cistatusid}=[6];     
+            $flt[2]->{mdate}=">now-100d";  
+            $flt[2]->{lastqcheck}="<now-28d"; 
+         }                                  
+      }                                    
       my %fltadd=%{$flt[0]};
       $fltadd{lastqcheck}=undef;    # handle uncheckt records prefered
       push(@flt,\%fltadd);
    }
+   #msg(WARN,sprintf("SetFilterForQualityCheck=%s\n",Dumper(\@flt)));
    $self->SetFilter(\@flt);
    $self->SetCurrentView(@view);
    return(1);
