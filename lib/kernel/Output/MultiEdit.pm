@@ -54,7 +54,6 @@ sub Init
    $opobj->doInitialize();  # ensure, all grpIndiv Fields are loaded
    $self->Context->{opobj}=$opobj;
 
-
    $self->SUPER::Init();
    return(undef);
 }
@@ -184,6 +183,7 @@ sub MultiOperationActionOn
       my %rec=($OPFIELD=>$OPVALUE);
       my $newrec=$opobj->getWriteRequestHash("upload",$oprec,\%rec);
       if (defined($newrec)){
+         $self->getParent->getParent->setTimePerEditStamp();
          if (!($opobj->SecureValidatedUpdateRecord($oprec,$newrec,
                                                    {$idfield->Name()=>\$id}))){
             $fail=1;
