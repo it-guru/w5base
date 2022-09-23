@@ -251,10 +251,21 @@ sub _validateCIStatusHistoryActivity
                        "CI-State downgrade not allowed on long ".
                        "lasting active CI - create admin request to ".
                        "approve this operation");
-               return(0),
+               return(0);
             }
          }
-         print STDERR Dumper($d);
+      }
+      if ($oldrec->{mdate} ne "" && $oldrec->{cistatusid}>5 &&
+          defined($newrec) && $newrec->{cistatusid}<6 ){
+         my $d=CalcDateDuration($oldrec->{mdate},NowStamp("en"));
+         if (defined($d) && $d->{totaldays}>90){
+            $self->LastMsg(ERROR,
+                    "CI-State reactivation not allowed after ".
+                    "90 days in disposed of wasted state - ".
+                    "create admin request to ".
+                    "approve this operation");
+            return(0);
+         }
       }
       if ($sameop>2 && $oldrec->{cistatusid}<4){
          $self->LastMsg(ERROR,"flipping cistatus makes detect - ".
