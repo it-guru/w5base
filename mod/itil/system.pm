@@ -2530,6 +2530,22 @@ sub preQualityCheckRecord
    return($self->itil::lib::Listedit::preQualityCheckRecord(@_));
 }
 
+sub postQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($rec->{cistatusid}==6 && $rec->{mdate} ne ""){
+      my $dd=CalcDateDuration($rec->{mdate},NowStamp("en"));
+      # check mdate
+
+   }
+
+   msg(DEBUG,"postQualityCheckRecord in itil::system");
+
+   return($self->itil::lib::Listedit::postQualityCheckRecord(@_));
+}
+
 sub getHtmlPublicDetailFields
 {
    my $self=shift;
