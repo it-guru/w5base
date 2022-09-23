@@ -230,16 +230,15 @@ sub new
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Interface(
+                name          =>'refid',
+                selectfix     =>1,
+                dataobjattr   =>'swinstancerule.refid'),
+
       new kernel::Field::Link(
                 name          =>'parentname',
                 group         =>'link',
                 dataobjattr   =>'swinstancerule.parentname'),
-
-      new kernel::Field::Link(
-                name          =>'refid',
-                selectfix     =>1,
-                group         =>'link',
-                dataobjattr   =>'swinstancerule.refid'),
 
       new kernel::Field::Link(
                 name          =>'parentobj',
