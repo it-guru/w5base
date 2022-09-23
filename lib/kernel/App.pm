@@ -77,6 +77,31 @@ sub Config
    return($self->{'Config'});
 }
 
+
+#
+# Call to ensure, not to many edit operation occured at
+# one second
+#
+sub setTimePerEditStamp
+{
+   my $self=shift;
+
+   $self->{TimePerEditCount}=0      if (!exists($self->{TimePerEditCount}));
+   if ($self->{TimePerEditStamp} ne time()){
+      $self->{TimePerEditCount}=0;
+      $self->{TimePerEditStamp}=time();
+   }
+   else{
+      $self->{TimePerEditCount}++;
+   }
+   if ($self->{TimePerEditCount}>7){
+      sleep(1);
+      $self->{TimePerEditCount}=0;
+   }
+}
+
+
+
 sub getPersistentModuleObject
 {
    my $self=shift;
