@@ -370,7 +370,13 @@ sub Import
                                cdate id contactemail availability_zone
                                projectid ipaddresses));
    if ($#l==-1){
-      $self->LastMsg(ERROR,"Systemname '%s' not found in OTC",$importname);
+      if ($self->isDataInputFromUserFrontend()){
+         $self->LastMsg(ERROR,"Systemname '%s' not found in OTC",$importname);
+      }
+      else{
+         $self->Log(WARN,"basedata",
+                 sprintf("Systemname '%s' not found in OTC",$importname));
+      }
       return(undef);
    }
    if ($#l>0){
