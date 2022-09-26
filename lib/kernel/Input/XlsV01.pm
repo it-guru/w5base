@@ -181,6 +181,7 @@ sub Process
                 $recno,$row,
                 scalar(keys(%rec)),
                 $ENV{REMOTE_USER});
+      $self->getParent->getParent->setTimePerEditStamp();
       &{$self->{Callback}}(\%rec,undef);
    }
 
