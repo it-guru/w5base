@@ -1,0 +1,4 @@
+'click to open relation'=>{de=>'klicken, um Relation zu öffnen'},
+'click to open target workflow'=>{de=>'klicken um verknüften Workflow zu öffnen'},
+'info'=>{de=>'Informeller Verweis',en=>'Informational relation'},
+'REV.info'=>{de=>'Informeller Bezug',en=>'Informational reference'},

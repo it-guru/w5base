@@ -28,6 +28,8 @@
 'REV.dependson'=>{de=>'nach diesem Workflow kann der Workflow "%s" bearbeitet werden',en=>'after the current workflow the workflow "%s" can be processed'},
 'derivation'=>{de=>'Abgeleiteter Workflow "%s"',en=>'derivated workflow "%s"'},
 'REV.derivation'=>{de=>'Abgeleitet von Workflow "%s"',en=>'derivated from workflow "%s"'},
+'info'=>{de=>'Informeller Verweis',en=>'Informational relation'},
+'REV.info'=>{de=>'Informeller Bezug',en=>'Informational reference'},
 'devreqdetailstatprocboss.1'=>{de=>'ja',en=>'yes'},
 'devreqdetailstatprocboss.0'=>{de=>'nein',en=>'no'},
 'devreqdetailstatprocboss.needless'=>{de=>'nicht erforderlich'},

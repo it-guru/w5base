@@ -3597,10 +3597,13 @@ sub ListRel
             if ($mode ne "mail"){
                $d.="<table width=\"100%\" border=0 ".
                    "cellspacing=0 cellpadding=0>";
-               $d.="<tr><td width=\"1%\" nowrap style=\"border-top:solid;".
+               $d.="<tr><td width=\"1%\" valign=top ".
+                   "nowrap style=\"border-top:solid;".
                    "border-width:1px;border-top-color:silver\">";
                if ($mode ne "edit"){
-                  $d.="<a class=sublink href=javascript:openwin(\"".
+                  my $clicktitle=$self->getParent->T("click to open relation");
+                  $d.="<a class=sublink title='$clicktitle' ".
+                      "href=javascript:openwin(\"".
                       "../../base/workflowrelation/Detail?AllowClose=1&".
                       "id=$rec->{id}\",\"_blank\",\"height=480,width=640,".
                       "toolbar=no,status=no,resizable=yes,scrollbars=no\")>";
@@ -3635,8 +3638,9 @@ sub ListRel
                $stateobj=$fo->getField("srcstate");
                $partnerstate=$stateobj->FormatedDetail($rec);
             }
-            my $trlabel=$self->getParent->T($transpref.$label,
-                                            $rec->{translation}); 
+            my $transl=$rec->{translation};
+            $transl="base::workflow::WorkflowRelation" if ($transl eq "");
+            my $trlabel=$self->getParent->T($transpref.$label,$transl); 
             if ($trlabel=~m/\%s/){
                $trlabel=sprintf($trlabel,$iid);
             }
@@ -3697,20 +3701,27 @@ sub ListRel
                   $actstart="<font color=gray>";
                   $actend="</font>";
                }
-               $d.="<td $onclick style=\"border-top:solid;border-width:1px;".
-                   "border-top-color:silver\">".
+               $d.="<td $onclick valign=top ".
+                   "style=\"border-top:solid;border-width:1px;".
+                   "border-top-color:silver;cursor:pointer\">".
                    "<div style='float:left'>$actstart".$trlabel.
                    "$actend $pref</div>".
                    "<div style='float:right;white-space:nowrap;".
-                   "width:30%;margin-right:5px;text-align:right'>".
+                   "width:20%;margin-right:5px;text-align:right'>".
                    "$actstart$partnerstate$actend</div>".
                    "</td></tr>";
+               my $clicktitle=$self->getParent->T("click to open ".
+                                                  "target workflow");
                if ($partner ne ""){
-                  $d.="<tr><td></td><td $onclick>$partner</td></tr>";
+                  $d.="<tr><td></td><td $onclick style='cursor:pointer' ".
+                      "title='$clicktitle'>".
+                      $partner."</td></tr>";
                }
                if ($transpref ne "REV."){
                   if ($rec->{comments} ne ""){ #comment are not displayed in rev
-                     $d.="<tr><td></td><td $onclick>$rec->{comments}</td></tr>";
+                     $d.="<tr><td></td><td $onclick style='cursor:pointer' ".
+                         "title='$clicktitle'>".
+                         $rec->{comments}."</td></tr>";
                   }
                }
                $d.="</table>";
@@ -3818,6 +3829,12 @@ EOF
       my $opid=Query->Param("opid");
       my $ok=0;
       $opid=~s/[\s\*\?]//g;
+      if (!($opid=~m/^[0-9]+$/)){
+         my ($extractopid)=$opid=~m/([0-9]{5,20})/;
+         if (defined($extractopid)){
+            $opid=$extractopid;
+         }
+      }
       if (defined($opid) && $opid ne ""){
          my $wf=$self->getParent;
          $wf->ResetFilter();
