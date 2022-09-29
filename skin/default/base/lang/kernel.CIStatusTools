@@ -208,4 +208,7 @@ de=>'Schwingung/Flippen des CI-Status erkannt - '.
 'CI-State reactivation not allowed after 90 days in disposed of wasted state - create admin request to approve this operation'=>{
   de=>'CI-Status-Reaktivierung nicht zulässig nach 90 Tagen in veraltet/gelöscht Status - Admin-Anfrage erstellen, um diesen Vorgang zu genehmigen'
 },
+"you are not authorized to set this state - please try to use 'on order'"=>{
+  de=>"Sie sind nicht berechtigt, diesen CI-Status zu vergeben - versuchen Sie 'bestellt/angefordert'"
+}
 
