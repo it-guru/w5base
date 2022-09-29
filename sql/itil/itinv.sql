@@ -360,9 +360,8 @@ create table hwmodel (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
 create table lnkapplsystem (
-  id           bigint(20) NOT NULL,
-  appl         bigint(20) NOT NULL,
-  system       bigint(20) NOT NULL,
+  id           bigint(20) NOT NULL,       cistatus    int(2)     default '4',
+  appl         bigint(20) NOT NULL,       system      bigint(20) NOT NULL,
   comments     longtext    default NULL,
   additional   longtext    default NULL,
   fraction     double(8,2) default '100.00',
@@ -375,7 +374,8 @@ create table lnkapplsystem (
   srcsys       varchar(100) default 'w5base',
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
-  PRIMARY KEY  (id), FOREIGN KEY fk_system (system) REFERENCES system (id) ON DELETE CASCADE,
+  PRIMARY KEY  (id), key cistatus (cistatus), 
+  FOREIGN KEY fk_system (system) REFERENCES system (id) ON DELETE CASCADE,
   KEY appl (appl),UNIQUE applsys(appl,system),
   KEY system (system),
   UNIQUE KEY `srcsys` (srcsys,srcid)
