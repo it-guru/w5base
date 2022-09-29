@@ -25,3 +25,6 @@
 'sub units'=>{de=>'virtuelle Untereinheiten',en=>'virtual Sub-Units'},
 'responsible applications'=>{de=>'verantwortete Anwendungen'},
 'Canvas relations'=>{de=>'Canvas Zuordnungen'},
+'deactivation is only allowed for w5base.TS.vou members'=>{
+  de=>'Deaktivierungen sind nur durch Mitglieder von w5base.TS.vou möglich'
+}

@@ -551,6 +551,13 @@ sub Validate
          return(0);
       }
    }
+   if ($ocistatusid eq "4" && $ncistatusid ne "4"){
+      if (!$self->IsMemberOf($self->{CI_Handling}->{activator})){
+         $self->LastMsg(ERROR,
+                 "deactivation is only allowed for w5base.TS.vou members");
+         return(0);
+      }
+   }
 
    if (exists($newrec->{canvasid})){
       my $canvasid=$newrec->{canvasid};
