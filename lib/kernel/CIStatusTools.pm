@@ -327,7 +327,7 @@ sub HandleCIStatus
          }
       }
       else{
-         if ($newrec->{cistatusid}==0){
+         if (exists($newrec->{cistatusid}) && $newrec->{cistatusid}==0){
             if (!$self->isActivator($oldrec,$newrec,%param)){
                $self->LastMsg(ERROR,"you are not authorized to set ".
                                     "this state - ".
