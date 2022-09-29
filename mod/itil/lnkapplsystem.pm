@@ -1112,10 +1112,10 @@ sub getSqlFrom
     $from.="left outer join grp as businessteam ".
            "on appl.businessteam=businessteam.grpid";
 
-printf STDERR ("datasourcerest1:\n%s\n\n",$datasourcerest1);
-printf STDERR ("datasourcerest2:\n%s\n\n",$datasourcerest2);
-printf STDERR ("datasourcerest3:\n%s\n\n",$datasourcerest3);
-printf STDERR ("FROM:\n%s\n\n",$from);
+    #printf STDERR ("datasourcerest1:\n%s\n\n",$datasourcerest1);
+    #printf STDERR ("datasourcerest2:\n%s\n\n",$datasourcerest2);
+    #printf STDERR ("datasourcerest3:\n%s\n\n",$datasourcerest3);
+    #printf STDERR ("FROM:\n%s\n\n",$from);
 
    return($from);
 }
