@@ -96,7 +96,8 @@ sub getSqlFrom
    my $from=<<EOF;
 ( select lnkapplsystem.appl applid,ipaddress.id as ipid
       from lnkapplsystem,ipaddress
-      where lnkapplsystem.system=ipaddress.system
+      where lnkapplsystem.system=ipaddress.system 
+            and lnkapplsystem.cistatus='4'
    union
    select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
       from lnkitclustsvcappl,ipaddress 
@@ -124,6 +125,8 @@ sub getSqlFrom
 ) as ai,appl,ipaddress 
 
 EOF
+   $from=~s/\n/ /gs;  # reduce data in
+   $from=~s/ +/ /gs;  # sql logs
 
    return($from);
 }

@@ -277,6 +277,20 @@ sub new
                 group         =>'source',
                 label         =>'last Editor',
                 dataobjattr   =>'qlnkapplsystem.modifyuser'),
+
+      new kernel::Field::Select(
+                name          =>'cistatus',
+                label         =>'CI-State',
+                group         =>'source',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Interface(
+                name          =>'cistatusid',
+                label         =>'CI-StateID',
+                wrdataobjattr =>'lnkapplsystem.cistatus',
+                dataobjattr   =>'qlnkapplsystem.cistatus'),
                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -977,7 +991,9 @@ sub getSqlFrom
          }
       }
    }
-
+   if ($datasourcerest1 eq "1"){
+      $datasourcerest1="lnkapplsystem.cistatus='4'";
+   }
 
    $datasourcerest1=" where $datasourcerest1" if ($datasourcerest1 ne ""); 
    $datasourcerest2=" where $datasourcerest2" if ($datasourcerest2 ne ""); 
@@ -998,6 +1014,7 @@ sub getSqlFrom
         "lnkapplsystem.modifyuser, ".
         "lnkapplsystem.editor, ".
         "lnkapplsystem.realeditor, ".
+        "lnkapplsystem.cistatus, ".
         "lnkapplsystem.srcsys, ".
         "lnkapplsystem.srcid, ".
         "lnkapplsystem.srcload, ".
@@ -1018,6 +1035,7 @@ sub getSqlFrom
         "lnkitclustsvcappl.modifyuser, ".
         "lnkitclustsvcappl.editor, ".
         "lnkitclustsvcappl.realeditor, ".
+        "'4' cistatus, ".
         "lnkitclustsvcappl.srcsys, ".
         "lnkitclustsvcappl.srcid, ".
         "lnkitclustsvcappl.srcload, ".
@@ -1046,6 +1064,7 @@ sub getSqlFrom
         "swinstance.modifyuser, ".
         "swinstance.editor, ".
         "swinstance.realeditor, ".
+        "'4' cistatus, ".
         "swinstance.srcsys, ".
         "swinstance.srcid, ".
         "swinstance.srcload, ".
@@ -1057,7 +1076,7 @@ sub getSqlFrom
 
    my $fields="id,appl,system,comments,additional,fraction,createdate,".
               "createuser,modifyuser,modifydate,".
-              "editor,realeditor,srcsys,srcid,srcload";
+              "editor,realeditor,cistatus,srcsys,srcid,srcload";
 
    my $from="(select $fields,min(numrawreltyp) numreltyp ".
             "from ($datasource) qqlnkapplsystem ".
@@ -1093,7 +1112,10 @@ sub getSqlFrom
     $from.="left outer join grp as businessteam ".
            "on appl.businessteam=businessteam.grpid";
 
-
+printf STDERR ("datasourcerest1:\n%s\n\n",$datasourcerest1);
+printf STDERR ("datasourcerest2:\n%s\n\n",$datasourcerest2);
+printf STDERR ("datasourcerest3:\n%s\n\n",$datasourcerest3);
+printf STDERR ("FROM:\n%s\n\n",$from);
 
    return($from);
 }
