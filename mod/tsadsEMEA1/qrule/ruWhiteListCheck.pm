@@ -130,8 +130,8 @@ sub qcheckRecord
             $adgrec=$rec if (defined($rec));
          }
          if (!defined($adurec)){
-            msg(ERROR,"russian collegue '".$rec->{email}.
-                      "' not found in active directory");
+            #msg(ERROR,"russian collegue '".$rec->{email}.
+            #          "' not found in active directory");
             return(undef,{qmsg=>'AD person record not found'});
          }
          if (!defined($adgrec)){
