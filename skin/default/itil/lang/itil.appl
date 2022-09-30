@@ -189,9 +189,9 @@
 'invalid basemonitoring status combination'=>{de=>'ungültige Basismonitoring/Status Kombination'},
 'DRTESTPERYEAR.'=>{de=>'[nicht definiert]',en=>'[not defined]'},
 'DRTESTPERYEAR.0'=>{de=>'keine DR Tests vorgesehen',en=>'no DR Tests agreed'},
-'DRTESTPERYEAR.0.3'=>{de=>'1 Test alle 3 Jahre',en=>'1 test every 3 years'},
-'DRTESTPERYEAR.0.5'=>{de=>'1 Test alle 2 Jahre',en=>'1 test every 2 years'},
-'DRTESTPERYEAR.1'=>{de=>'1 Test/Jahr',en=>'1 test/year'},
+'DRTESTPERYEAR.0.3'=>{de=>'1 Test alle 36 Monate',en=>'1 test every 36 months'},
+'DRTESTPERYEAR.0.5'=>{de=>'1 Test alle 24 Monate',en=>'1 test every 24 months'},
+'DRTESTPERYEAR.1'=>{de=>'1 Test/12 Monate',en=>'1 test/12 months'},
 'DRTESTPERYEAR.2'=>{de=>'2 Tests/Jahr',en=>'2 tests/year'},
 'DRTESTPERYEAR.4'=>{de=>'4 Tests/Jahr',en=>'4 tests/year'},
 'DRTESTPERYEAR.12'=>{
