@@ -2541,7 +2541,8 @@ sub Validate
             if ($oldcistatusid>=3 && $oldcistatusid<=5){
                if ($newrec->{cistatusid}>5){
                   if ($#{$oldrec->{itcloudareas}}!=-1){
-                     $self->LastMsg(ERROR,"this CI-Status change is only allowed without existing cloudarea");
+                     $self->LastMsg(ERROR,"this CI-Status change is only ".
+                                    "allowed without existing cloudarea");
                      return(0);
                   }
                }
