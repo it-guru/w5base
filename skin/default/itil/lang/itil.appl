@@ -226,3 +226,4 @@
 'involved in businessprocesses'=>{de=>'involviert in Geschäftsprozessen'},
 'involved in businessprocessesIDs'=>{de=>'involviert in GeschäftsprozessIDs'},
 'all ItemTags'=>{de=>'alle ItemTags'},
+'this CI-Status change is only allowed without existing cloudarea'=>{de=>'Diese CI-Status Änderung ist nur ohne existieren CloudAreas erlaubt'},

@@ -2534,6 +2534,22 @@ sub Validate
       }
    }
 
+   if (effChanged($oldrec,$newrec,"cistatusid")){
+      if (defined($oldrec)){
+         my $oldcistatusid=$oldrec->{cistatusid};
+         if (defined($newrec) && exists($newrec->{cistatusid})){
+            if ($oldcistatusid>=3 && $oldcistatusid<=5){
+               if ($newrec->{cistatusid}>5){
+                  if ($#{$oldrec->{itcloudareas}}!=-1){
+                     $self->LastMsg(ERROR,"this CI-Status change is only allowed without existing cloudarea");
+                     return(0);
+                  }
+               }
+            }
+         }
+      }
+   }
+
    if (defined($newrec->{slacontravail})){
       if ($newrec->{slacontravail}>100 || $newrec->{slacontravail}<0){
          my $fo=$self->getField("slacontravail");
@@ -2794,6 +2810,7 @@ sub ValidateDelete
        $#{$rec->{systems}}!=-1 ||
        $#{$rec->{services}}!=-1 ||
        $#{$rec->{applurl}}!=-1 ||
+       $#{$rec->{itcloudareas}}!=-1 ||
        $#{$rec->{swinstances}}!=-1 ||
        $#{$rec->{supcontracts}}!=-1 ||
        $#{$rec->{custcontracts}}!=-1){
