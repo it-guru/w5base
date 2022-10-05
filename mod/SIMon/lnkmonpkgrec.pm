@@ -217,6 +217,33 @@ sub new
                 label         =>'exception approver explanation',
                 dataobjattr   =>'lnksimonpkgrec.exceptrejecttxt'),
 
+      new kernel::Field::Select(
+                name          =>'exceptcluster',
+                label         =>'exception cluster',
+                group         =>'exceptionappr',
+                multisize     =>'4',
+                transprefix   =>'EXCL.',
+                value         =>['STORAGE',
+                                 'CRYPTO',
+                                 'NETWORK',
+                                 'ADS',
+                                 'VDS',
+                                 'TSG',
+                                 'GS',
+                                 'OUTOFOP',
+                                 'RETIERED',
+                                 'MISC'],  # see also opmode at system
+                uploadable    =>0,
+                htmleditwidth =>'200px',
+                container     =>'rawexceptcluster'),
+
+
+      new kernel::Field::Container(
+                name          =>'rawexceptcluster',
+                label         =>'raw except cluster',
+                htmldetail    =>0,
+                dataobjattr   =>'lnksimonpkgrec.exceptcluster'),
+
       new kernel::Field::Date(
                 name          =>'exceptapprdate',
                 group         =>'exceptionappr',
