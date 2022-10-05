@@ -431,6 +431,9 @@ sub isWriteValid
             return(@databossedit);
          }
       }
+      if ($self->IsMemberOf($rec->{managergrpid})){
+         return("misc")
+      }
    }
    return(undef);
 }
