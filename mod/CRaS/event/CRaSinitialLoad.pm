@@ -206,6 +206,13 @@ sub ProcessXLS
                $appl->ResetFilter();
                $appl->SetFilter({ictono=>\$rec{ICTO},cistatusid=>"3 4 5"});
                my @l=$appl->getHashList(qw(opmode id));
+               my $fld=$appl->getField("opmode");
+               my @opmodeprio=grep(!/^\s*$/,@{$fld->{value}});
+               my %opmodep;
+               for(my $c=0;$c<=$#opmodeprio;$c++){
+                  $opmodep{$opmodeprio[$c]}=$c+1;
+               }
+               @l=sort({$opmodep{$a->{opmode}} <=> $opmodep{$b->{opmode}}} @l);
                if ($#l>=0){
                   $rec{applid}=$l[0]->{id};
                }
