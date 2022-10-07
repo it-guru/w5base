@@ -126,6 +126,9 @@ sub _classifyElements
       elsif ($w=~m/^".*"$/){
          push(@e,{'type'=>'VALUE','val'=>$w});
       }
+      elsif ($w=~m/^[0-9]+(\.[0-9]+)?$/){
+         push(@e,{'type'=>'CONST','val'=>$w});
+      }
       elsif ($w=~m/^'.*'$/){
          push(@e,{'type'=>'CONST','val'=>$w});
       }
