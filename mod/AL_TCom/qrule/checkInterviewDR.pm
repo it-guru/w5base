@@ -133,7 +133,8 @@ sub qcheckRecord
    $i->SetCurrentView(qw(id qtag));
    $self->{intv}=$i->getHashIndexed("qtag");
 
-   my $changenumberok=1;
+   my $ChangeNeeded=0;
+   my $ChangeNumber;
    my $interviewchanged=0;
    my $ChangeEndDate;
 
@@ -141,12 +142,17 @@ sub qcheckRecord
        $rec->{soslanumdrtestinterval} == 12){
       return(undef,{qmsg=>'DR-Test checking deactivated or automated'});
    }
+   if (exists($iarec->{qtag}->{SOB_003}) &&
+       $iarec->{qtag}->{SOB_003}->{relevant} eq "1"){
+      $ChangeNeeded++;
+   }
 
    if (exists($iarec->{qtag}->{SOB_003}) &&
        $iarec->{qtag}->{SOB_003}->{relevant} eq "1" &&
        $iarec->{qtag}->{SOB_003}->{answer} ne ""){
       my $changenumber=$iarec->{qtag}->{SOB_003}->{answer};
       if ($changenumber=~/^C\d+$/){
+         $ChangeNumber=$changenumber;
          $wf->SetFilter({srcid=>\$changenumber,srcsys=>'*change'});
          my ($wfrec,$msg)=$wf->getOnlyFirst(qw(eventend wffields.changeend 
                                                invoicedate));
@@ -155,7 +161,6 @@ sub qcheckRecord
             my $day=$wfrec->{eventend};
             if ($wfrec->{changeend} ne ""){
                $ChangeEndDate=$wfrec->{changeend};
-               $ChangeEndDate=$wfrec->{invoicedate};
             }
             if ($day ne ""){
                my $d=CalcDateDuration($day,NowStamp("en"));
@@ -244,11 +249,20 @@ sub qcheckRecord
          }
       }
    }
+   if ($planday eq "" && $rec->{cdate} ne ""){
+      my $duration=CalcDateDuration($rec->{cdate},NowStamp("en"));
+      if (defined($duration) && $duration->{totaldays}>($maxagedays*0.5)){
+         my $msg="missing valid next DR-Test change planning";
+         push(@qmsg,$msg);
+         push(@dataissue,$msg);
+         $errorlevel=3 if ($errorlevel<3);
+      }
+   }
+   msg(INFO,"$rec->{name}: lastday: ".$lastday);
+   msg(INFO,"$rec->{name}: planday: ".$planday);
+   msg(INFO,"$rec->{name}: maxagedays: ".$maxagedays);
    if ($lastday ne "" &&
        ($lastday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)){
-      #printf STDERR ("lastday=%s\n",$lastday);
-      #printf STDERR ("soslanumdrtests=%s\n",$rec->{soslanumdrtests});
-      #printf STDERR ("maxagedays=%s\n",$maxagedays);
       if ($planday ne "" &&
           ($planday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ){
          my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
@@ -271,6 +285,15 @@ sub qcheckRecord
                $errorlevel=3 if ($errorlevel<3);
             }
          }
+         if ($#qmsg==-1 && $lday ne ""){
+            my $duration=CalcDateDuration(NowStamp("en"),$lday);
+            if (defined($duration) && $duration->{days}>90){
+               my $msg="Disaster-Recovery last test is to far in the future";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
+         }
          if ($#qmsg==-1 && $pday ne ""){
             my $duration=CalcDateDuration(NowStamp("en"),$pday);
             if (defined($duration) && $duration->{days}>$maxagedays){
@@ -281,6 +304,17 @@ sub qcheckRecord
                $errorlevel=3 if ($errorlevel<3);
             }
          }
+         if ($#qmsg==-1 && $pday ne "" && $lday ne ""){
+            my $duration=CalcDateDuration($lday,$pday);
+            if (defined($duration) && $duration->{days}>$maxagedays){
+               my $msg=
+                  "Disaster-Recovery Test plan date is to far in the future";
+               push(@qmsg,$msg);
+               push(@dataissue,$msg);
+               $errorlevel=3 if ($errorlevel<3);
+            }
+         }
+
       }
       if ($lastday ne "" && $maxagedays>0){
          my $debuglog="";
@@ -323,6 +357,17 @@ sub qcheckRecord
          else{
             msg(ERROR,"DR Test calc needToPlan failed: $plandeadline");
          }
+         if ($needToPlan && $ChangeNumber eq ""){ # check if next plandate 
+                                                  # within next 42 days
+            msg(INFO,"needToPlanCheck: lastday: $lastday");
+            msg(INFO,"needToPlanCheck: planday: $planday");
+            if ($lastday eq $planday){
+               my $msg="found change planning without ChangeNumber";
+               push(@qmsg,$msg);
+               $needToPlan=0;
+            }
+         }
+
          msg(INFO,"$rec->{name}: next DR-Test planing deadline: ".
                   $plandeadline);
          msg(INFO,"$rec->{name}: days to next DR-Test planing deadline: ".
