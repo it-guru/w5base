@@ -31,4 +31,11 @@
 },
 'DR-Test checking deactivated or automated'=>{
  de=>'DR-Test Prüfung deaktiviert oder automatisiert'
+},
+'found change planning without ChangeNumber'=>{
+ de=>'Change-Planung ohne ChangeNummer gefunden'
+},
+'Disaster-Recovery last test is to far in the future'=>{
+ de=>'DR-Test Prüfung - letzter Test ist zu weit in der Zukunft'
 }
+
