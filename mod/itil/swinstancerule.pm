@@ -351,6 +351,18 @@ sub new
                 selectfix     =>1,
                 dataobjattr   =>'system.adm2'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"swinstancerule.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(swinstancerule.id,35,'0')"),
+
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
