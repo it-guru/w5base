@@ -1,0 +1,5 @@
+Doku at:
+https://eu.leanix.net/services/integration-api/v1/docs/
+und dann API Token auf 
+https://telekom.leanix.net/services/integration-api/v1/api-docs/
+
