@@ -80,3 +80,4 @@ create table lnksimonpkgrec (
   FOREIGN KEY fk_simonpkg (simonpkg) REFERENCES simonpkg (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
+alter table lnksimonpkgrec add rejectcnt int(2) default '0';
