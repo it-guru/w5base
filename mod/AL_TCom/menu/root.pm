@@ -348,6 +348,11 @@ sub Init
                       prio=>20000,
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.system.monpkgrec",
+                      "SIMon::lnkmonpkgrec",
+                      prio=>1000,
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("AL_TCom.asset",
                       "AL_TCom::asset",
                       defaultacl=>['valid_user']);
