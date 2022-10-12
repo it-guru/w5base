@@ -45,6 +45,8 @@ sub new
                 label         =>'Name',
                 dataobjattr   =>'hwmodel.name'),
 
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Select(
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
