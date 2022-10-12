@@ -38,7 +38,9 @@ sub new
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
                 dataobjattr   =>'osrelease.id'),
-                                                  
+
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'190px',
