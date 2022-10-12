@@ -195,6 +195,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'exceptrequestorid',
+                selectfix     =>1,
                 group         =>'exceptionreq',
                 label         =>'exception requestor ID',
                 dataobjattr   =>'lnksimonpkgrec.exceptrequestor'),
@@ -599,11 +600,56 @@ sub Validate
          $newrec->{exceptapprdate}=undef;
       }
       if (effChanged($oldrec,$newrec,"exceptstate")){
-         if (effVal($oldrec,$newrec,"exceptstate") eq "REJECT"){
+         my $newstate=effVal($oldrec,$newrec,"exceptstate");
+         if ($newstate eq "REJECT"){
             $newrec->{rejectcnt}=\'rejectcnt+1';
          }
-         if (effVal($oldrec,$newrec,"exceptstate") eq "ACCEPT"){
+         if ($newstate eq "ACCEPT"){
             $newrec->{rejectcnt}='0';
+         }
+         if (exists($newrec->{rejectcnt})){
+            msg(INFO,"send Mail to requestor state=$newstate");
+            my $userid=$self->getCurrentUserId();
+            my @emailto;
+            my %notifyparam;
+            my %notifycontrol;
+
+            if ($newstate eq "REJECT"){
+               $notifycontrol{mode}="WARN";
+            }
+            push(@emailto,effVal($oldrec,$newrec,"exceptrequestorid"));
+
+            $notifyparam{emailfrom}=$userid;
+            $notifyparam{emailto}=\@emailto;
+            $notifyparam{emailbcc}=['11634953080001',$userid];
+            $self->NotifyLangContacts($oldrec,$newrec,
+               \%notifyparam,\%notifycontrol,
+               sub{
+                  my $self=shift;
+                  my $notifyparam=shift;
+                  my $notifycontrol=shift;
+                  my $subject=$self->T("exception request");
+                  my $text;
+                  $subject.=" ".$newstate;
+                  $subject.=" ".$self->T("for")." ";
+                  $subject.=effVal($oldrec,$newrec,"system");
+                  $text.=
+                    $self->T("Your exception request for non-installation of");
+                  $text.="\n";
+                  $text.=effVal($oldrec,$newrec,"monpkg");
+                  $text.=" ";
+                  $text.=$self->T("on");
+                  $text.=" ";
+                  $text.=effVal($oldrec,$newrec,"system");
+                  $text.="\n";
+                  $text.="... ".$self->T("is $newstate")."\n";
+                  $text.="\n---\n";
+                  $text.=$self->T("Justification").":\n";
+                  $text.=effVal($oldrec,$newrec,"exceptrejecttxt");
+                  $text.="\n---\n";
+                  return($subject,$text); 
+               }
+            ); 
          }
       }
       if (effChanged($oldrec,$newrec,"exceptrejecttxt") ||
