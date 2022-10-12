@@ -211,6 +211,13 @@ sub new
                 dataobjattr   =>"if (lnksimonpkgrec.exceptstate is null,".
                                 "'REQUESTED',lnksimonpkgrec.exceptstate)"),
 
+      new kernel::Field::Number(
+                name          =>'rejectcnt',
+                group         =>'exceptionappr',
+                htmldetail    =>0,
+                label         =>'counter for exception rejects',
+                dataobjattr   =>'lnksimonpkgrec.rejectcnt'),
+
       new kernel::Field::Textarea(
                 name          =>'exceptrejecttxt',
                 group         =>'exceptionappr',
@@ -591,6 +598,14 @@ sub Validate
          $newrec->{exceptapproverid}=undef;
          $newrec->{exceptapprdate}=undef;
       }
+      if (effChanged($oldrec,$newrec,"exceptstate")){
+         if (effVal($oldrec,$newrec,"exceptstate") eq "REJECT"){
+            $newrec->{rejectcnt}=\'rejectcnt+1';
+         }
+         if (effVal($oldrec,$newrec,"exceptstate") eq "ACCEPT"){
+            $newrec->{rejectcnt}='0';
+         }
+      }
       if (effChanged($oldrec,$newrec,"exceptrejecttxt") ||
           effChanged($oldrec,$newrec,"exceptstate")){
          $newrec->{exceptapproverid}=$userid;
@@ -602,6 +617,11 @@ sub Validate
                 "approve/reject\n";
       }
       if (effChanged($oldrec,$newrec,"exceptreqtxt")){
+         if (effVal($oldrec,$newrec,"rejectcnt")>3){
+            $self->LastMsg(ERROR,"no further exception requests allowed - ".
+                                 "to many rejects");
+            return(undef);
+         }
          if (effVal($oldrec,$newrec,"exceptreqtxt") eq ""){
             if (effVal($oldrec,$newrec,"exceptrequestorid") ne ""){
                $newrec->{comments}=
