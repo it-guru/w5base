@@ -1830,6 +1830,37 @@ sub calculateServiceTrees
    return({obj=>\%o,path=>\@allpaths});
 }
 
+#
+# Update lnkapplsystem on cistatus-Change in itil::appl or itil::system
+#
+sub updateLnkapplsystem
+{
+   my $self=shift;
+   my $newcistatus=shift;
+   my $rel=shift;
+
+   my @updids;
+
+   foreach my $relrec (@{$rel}){
+      if ($relrec->{id} ne "" &&
+          $relrec->{reltyp} eq "direct" && 
+          $relrec->{cistatusid} ne $newcistatus){
+         push(@updids,$relrec->{id});
+      }
+   }
+   if ($#updids!=-1){
+      my $o=getModuleObject($self->Config,"itil::lnkapplsystem");
+      my $opobj=$o->Clone();
+      $o->SetFilter({id=>\@updids});
+      my @l=$o->getHashList(qw(ALL));
+      foreach my $rec (@l){
+         my $updid=$rec->{id};
+         $opobj->ValidatedUpdateRecord($rec,
+                  {cistatusid=>$newcistatus},{id=>$updid});
+      }
+   }
+}
+
 
 
 

@@ -68,6 +68,16 @@ sub new
                 vjoindisp     =>'name',
                 dataobjattr   =>'appl.name'),
                                                    
+      new kernel::Field::Select(
+                name          =>'applcistatus',
+                readonly      =>1,
+                htmlwidth     =>'80px',
+                group         =>'applinfo',
+                label         =>'Application CI-State',
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['applcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+                                                  
       new kernel::Field::TextDrop(
                 name          =>'system',
                 htmlwidth     =>'100px',
@@ -280,8 +290,16 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'cistatus',
-                label         =>'CI-State',
+                label         =>'Relation CI-State',
                 group         =>'source',
+                selectsearch  =>sub{
+                   my $self=shift;
+                   my @l;
+                   push(@l,$self->getParent->T("CI-Status(4)","base::cistatus"),
+                           $self->getParent->T("CI-Status(6)","base::cistatus")
+                   );
+                   return(@l);
+                },
                 vjointo       =>'base::cistatus',
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
@@ -361,16 +379,6 @@ sub new
                 label         =>'Application Mandator',
                 readonly      =>1),
 
-      new kernel::Field::Select(
-                name          =>'applcistatus',
-                readonly      =>1,
-                htmlwidth     =>'80px',
-                group         =>'applinfo',
-                label         =>'Application CI-State',
-                vjointo       =>'base::cistatus',
-                vjoinon       =>['applcistatusid'=>'id'],
-                vjoindisp     =>'name'),
-                                                  
       new kernel::Field::Text(
                 name          =>'applapplid',
                 label         =>'ApplicationID',
@@ -899,8 +907,6 @@ sub getSqlFrom
    my $self=shift;
    my $mode=shift;
    my @filter=@_;
-
-
    #
    # creating pre selection for subselect
    #
@@ -922,6 +928,15 @@ sub getSqlFrom
             }
             if (exists($f->{assetid}) && ref($f->{assetid}) eq "SCALAR"){
                $f->{assetid}=[${$f->{assetid}}];
+            }
+            if (exists($f->{cistatusid}) && ref($f->{cistatusid}) eq "ARRAY"){
+               # this is only to allow searches in lnkapplsystem throw the
+               # Web-Frontend by users in disposed of wasted relations
+               if ($#{$f->{cistatusid}}==0 && $f->{cistatusid}->[0] eq "6"){
+                  $datasourcerest1.=" and lnkapplsystem.cistatus in (".
+                                join(",",map({"'".$_."'"} 
+                                         @{$f->{cistatusid}})).")";
+               }
             }
             if (exists($f->{assetid}) && ref($f->{assetid}) eq "ARRAY"){
                my $sys=getModuleObject($self->Config,"itil::system");
@@ -960,11 +975,20 @@ sub getSqlFrom
                $datasourcerest2.=" and 1=0";
                $datasourcerest3.=" and 1=0";
             }
-            if (exists($f->{id}) && ref($f->{id}) eq "ARRAY" &&
-                $#{$f->{id}}==0 && $f->{id}->[0]=~m/^\d+$/){
-               $datasourcerest1.=" and lnkapplsystem.id='$f->{id}->[0]'";
+            if (exists($f->{id}) && ref($f->{id}) eq "ARRAY"){
                $datasourcerest2.=" and 1=0";
                $datasourcerest3.=" and 1=0";
+               if ($#{$f->{id}}==0 && $f->{id}->[0]=~m/^\d+$/){
+                  $datasourcerest1.=" and lnkapplsystem.id='$f->{id}->[0]'";
+               }
+               if ($#{$f->{id}}>0){
+                  $datasourcerest1.=" and lnkapplsystem.id in (".
+                  join(",",map({
+                         my $id=$_;
+                         "'".$id."'";
+                      } @{$f->{id}}))
+                  .")";
+               }
             }
             if (exists($f->{id}) && ref($f->{id}) eq "SCALAR" &&
                 ${$f->{id}}=~m/^\d+$/){
@@ -992,7 +1016,15 @@ sub getSqlFrom
       }
    }
    if ($datasourcerest1 eq "1"){
+      msg(INFO,"lnkapplsystem filter with cistatus=4");
       $datasourcerest1="lnkapplsystem.cistatus='4'";
+      $datasourcerest2.=" and " if ($datasourcerest2 ne "");
+      $datasourcerest2="system.cistatus<=5 and itclust.cistatus<=5";
+      $datasourcerest3.=" and " if ($datasourcerest3 ne "");
+      $datasourcerest3="swinstance.cistatus<=5 and system.cistatus<=5";
+   }
+   else{
+      #msg(INFO,"lnkapplsystem filter open");
    }
 
    $datasourcerest1=" where $datasourcerest1" if ($datasourcerest1 ne ""); 
@@ -1160,11 +1192,21 @@ sub Validate
       $self->LastMsg(ERROR,"invalid systemid specified");
       return(undef);
    }
+   return(1);
+}
+
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+
    my $applid=effVal($oldrec,$newrec,"applid");
 
    if ($self->isDataInputFromUserFrontend()){
       if (!$self->isWriteOnApplValid($applid,"systems")){
-         $self->LastMsg(ERROR,"no access");
+         $self->LastMsg(ERROR,
+               "no rights to modify this system - application relation");
          return(undef);
       }
    }

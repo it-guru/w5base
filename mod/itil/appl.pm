@@ -193,7 +193,7 @@ sub new
                 vjoininhash   =>['system','systemsystemid','systemcistatus',
                                  'systemid','id','reltyp','shortdesc',
                                  'assetassetname','assetid',
-                                 'srcsys','srcid']),
+                                 'srcsys','srcid','id','cistatusid']),
       new kernel::Field::Group(
                 name          =>'itsemteam',
                 htmldetail    =>sub{
@@ -2634,6 +2634,24 @@ sub FinishWrite
    my $oldrec=shift;
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+
+   my $newlnkapplsystemcist;
+   if (effChanged($oldrec,$newrec,"cistatusid") &&
+       defined($oldrec) && $oldrec->{cistatusid}<6 &&
+       defined($newrec) && $newrec->{cistatusid}>=6){
+      $newlnkapplsystemcist=6;
+   }
+   if (effChanged($oldrec,$newrec,"cistatusid") &&
+       defined($oldrec) && $oldrec->{cistatusid}>=6 &&
+       defined($newrec) && $newrec->{cistatusid}<6){
+      $newlnkapplsystemcist=4;
+   }
+   if (defined($newlnkapplsystemcist)){
+      $self->itil::lib::Listedit::updateLnkapplsystem(
+             $newlnkapplsystemcist,$oldrec->{systems});
+   }
+
+
    $self->NotifyOnCIStatusChange($oldrec,$newrec);
    $self->NotifyAddOrRemoveObject($oldrec,$newrec,"name",
                                   "STEVapplchanged",100000003);

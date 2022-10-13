@@ -138,7 +138,8 @@ sub new
                 vjoinon       =>['id'=>'systemid'],
                 vjoindisp     =>['appl','applcistatus','reltyp','fraction'],
                 vjoininhash   =>['appl','applcistatusid','mandatorid',
-                                 'applid','businessteam']),
+                                 'applid','businessteam','id','cistatusid',
+                                 'srcsys','srcid','reltyp']),
 
       new kernel::Field::Text(
                 name          =>'applicationnames',
@@ -2240,6 +2241,23 @@ sub FinishWrite
    my $oldrec=shift;
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
+
+   my $newlnkapplsystemcist;
+   if (effChanged($oldrec,$newrec,"cistatusid") &&
+       defined($oldrec) && $oldrec->{cistatusid}<6 &&
+       defined($newrec) && $newrec->{cistatusid}>=6){
+      $newlnkapplsystemcist=6;
+   }
+   if (effChanged($oldrec,$newrec,"cistatusid") &&
+       defined($oldrec) && $oldrec->{cistatusid}>=6 &&
+       defined($newrec) && $newrec->{cistatusid}<6){
+      $newlnkapplsystemcist=4;
+   }
+   if (defined($newlnkapplsystemcist)){
+      $self->itil::lib::Listedit::updateLnkapplsystem(
+           $newlnkapplsystemcist,$oldrec->{applications});
+   }
+ 
    $self->NotifyOnCIStatusChange($oldrec,$newrec);
    return($bak);
 }
