@@ -975,19 +975,33 @@ sub Process
             my $openuserid=$WfRec->{openuser};
             my $openusername=$WfRec->{openusername};
             my $step=$self->getParent->getStepByShortname("opdone");
-            $self->StoreRecord($WfRec,{stateid=>16,
-                                       step=>$step,
-                                       eventend=>NowStamp("en"),
-                                       closedate=>NowStamp("en"),
-                                       fwddebtargetid=>undef,
-                                       fwddebtarget=>undef,
-                                       fwdtarget=>'base::user',
-                                       fwdtargetid=>$openuserid,
-                                      });
-            $self->PostProcess($action.".".$op,$WfRec,$actions,
-                               fwdtarget=>'base::user',
-                               fwdtargetid=>$openuserid,
-                               fwdtargetname=>$openusername);
+            if ($openuserid ne ""){
+               $self->StoreRecord($WfRec,{stateid=>16,
+                                          step=>$step,
+                                          eventend=>NowStamp("en"),
+                                          closedate=>NowStamp("en"),
+                                          fwddebtargetid=>undef,
+                                          fwddebtarget=>undef,
+                                          fwdtarget=>'base::user',
+                                          fwdtargetid=>$openuserid,
+                                         });
+               $self->PostProcess($action.".".$op,$WfRec,$actions,
+                                  fwdtarget=>'base::user',
+                                  fwdtargetid=>$openuserid,
+                                  fwdtargetname=>$openusername);
+            }
+            else{
+               my $step=$self->getParent->getStepByShortname("finish");
+               $self->StoreRecord($WfRec,{stateid=>21,
+                                          step=>$step,
+                                          eventend=>NowStamp("en"),
+                                          closedate=>NowStamp("en"),
+                                          fwddebtargetid=>undef,
+                                          fwddebtarget=>undef,
+                                          fwdtargetid=>undef,
+                                          fwdtarget=>undef,
+                                         });
+            }
             return(1);
          }
 
