@@ -46,3 +46,8 @@ then these applications-system links are not listed.
 'Application Mandator'=>{de=>'Anwendungs Mandant'},
 'ApplicationID'=>{de=>'Anwendungs-ID'},
 'deputy Technical Solution Manager E-Mail'=>{de=>'TSM Vertreter E-Mail'},
+'no rights to modify this system - application relation'=>{
+de=>'keine Berechtigung diese System-Anwendungsrelation zu verändern'
+},
+'Relation CI-State'=>{de=>'Relations CI-Status'},
+
