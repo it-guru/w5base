@@ -82,9 +82,9 @@ sub QualityCheck
    #msg(INFO,Dumper(\%dataobjtocheck));
    if ($dataobj eq ""){
       my $n=keys(%dataobjtocheck);
-      my $doSleep=($self->{qualitycheckduration}+600-10)/$n;
-      $doSleep=10 if ($doSleep<10);
-      $doSleep=180 if ($doSleep>180);
+      my $doSleep=($self->{qualitycheckduration}+600-30)/$n;
+      $doSleep=30 if ($doSleep<30);
+      $doSleep=300 if ($doSleep>300);
       foreach my $dataobj (sort(keys(%dataobjtocheck))){
          msg(INFO,"calling QualityCheck for '$dataobj'");
          my $o=getModuleObject($self->Config,$dataobj);
