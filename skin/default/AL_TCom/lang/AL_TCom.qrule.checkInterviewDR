@@ -37,5 +37,8 @@
 },
 'Disaster-Recovery last test is to far in the future'=>{
  de=>'DR-Test Prüfung - letzter Test ist zu weit in der Zukunft'
+},
+'missing last DR-Test date'=>{
+ de=>'fehlender letzter DR-Test Zeitpunkt',
 }
 
