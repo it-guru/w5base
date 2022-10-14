@@ -175,13 +175,13 @@ sub qcheckRecord
       applcistatusid=>[4]
    });
 
-   my @l=$lobj->getHashList(qw(systemid applgrpid id 
+
+   my @l=$lobj->getHashList(qw(systemid applgrpid applid id reltyp
                                systemsystemid systemsrcsys systemsrcid));
    my %ul;
    foreach my $lrec (@l){
       $ul{$lrec->{applgrpid}."-".$lrec->{systemid}}=$lrec;
    }
-#printf STDERR ("fifi ul=%s\n",Dumper(\%ul));
    @l=values(%ul);
 
 
