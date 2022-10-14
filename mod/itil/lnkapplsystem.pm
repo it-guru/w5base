@@ -1018,13 +1018,9 @@ sub getSqlFrom
    if ($datasourcerest1 eq "1"){
       msg(INFO,"lnkapplsystem filter with cistatus=4");
       $datasourcerest1="lnkapplsystem.cistatus='4'";
-      $datasourcerest2.=" and " if ($datasourcerest2 ne "");
-      $datasourcerest2="system.cistatus<=5 and itclust.cistatus<=5";
-      $datasourcerest3.=" and " if ($datasourcerest3 ne "");
-      $datasourcerest3="swinstance.cistatus<=5 and system.cistatus<=5";
    }
    else{
-      #msg(INFO,"lnkapplsystem filter open");
+      msg(INFO,"lnkapplsystem filter open");
    }
 
    $datasourcerest1=" where $datasourcerest1" if ($datasourcerest1 ne ""); 
