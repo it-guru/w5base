@@ -211,10 +211,10 @@ sub qcheckRecord
          }
       }
    }
-   if (!exists(   # break, if answer on changenumber is not active
-        $rec->{interviewst}->{qStat}->{activeQuestions}->{qtag}->{SOB_003})){
-      return(undef);
-   }
+   #if (!exists(   # break, if answer on changenumber is not active
+   #     $rec->{interviewst}->{qStat}->{activeQuestions}->{qtag}->{SOB_003})){
+   #   return(undef);
+   #}
    if ($interviewchanged){
       $iarec=$self->readCurrentAnswers($ia,$rec);
    }
