@@ -197,6 +197,8 @@ sub Validate
        effChanged($oldrec,$newrec,"applgrpid") ||
        effChanged($oldrec,$newrec,"systemid")){
       if (!$self->checkApplgrpSystemRel($applgrp,$system)){
+         msg(ERROR,"relationcheck bettwen applgrp=$applgrp ".
+                   "and system=$system failed");
          $self->LastMsg(ERROR,"no existing relation between application group ".
                               "and system");
          return(0);
