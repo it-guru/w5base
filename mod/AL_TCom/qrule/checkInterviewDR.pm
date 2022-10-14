@@ -249,6 +249,15 @@ sub qcheckRecord
          }
       }
    }
+   if ($lastday eq "" && $rec->{cdate} ne ""){
+      my $duration=CalcDateDuration($rec->{cdate},NowStamp("en"));
+      if (defined($duration) && $duration->{totaldays}>($maxagedays)){
+         my $msg="missing last DR-Test date";
+         push(@qmsg,$msg);
+         push(@dataissue,$msg);
+         $errorlevel=3 if ($errorlevel<3);
+      }
+   }
    if ($planday eq "" && $rec->{cdate} ne ""){
       my $duration=CalcDateDuration($rec->{cdate},NowStamp("en"));
       if (defined($duration) && $duration->{totaldays}>($maxagedays*0.5)){
