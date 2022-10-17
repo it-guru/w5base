@@ -735,8 +735,10 @@ sub FinishWrite
             $supportcontact=$crec->{databoss};
          }
          if ($doNotify==1){
+            my $urlofcurrentrec=$carec->{urlofcurrentrec};
             $appl->NotifyWriteAuthorizedContacts($arec,{},{
                      dataobj=>$self->Self,
+                   #  emailbcc=>11634953080001,
                      dataobjid=>$carec->{id}
                   },{},sub{
                my ($subject,$ntext);
@@ -747,6 +749,7 @@ sub FinishWrite
                $ntext.=",\n\n";                             
                my $msgtempl=$self->T("CMSG001");
                $msgtempl=~s/%SUPPORTCONTACT%/$supportcontact/g;
+               $msgtempl=~s/%URLOFCURRENTREC%/$urlofcurrentrec/g;
                $ntext.=sprintf($msgtempl,$carec->{name},$arec->{name});
                $ntext.="\n";
                return($subject,$ntext);
