@@ -23,19 +23,41 @@
 'CMSG001'=>{
 de=>'eine neue CloudArea <b>%s</b> wurde für die 
 Anwendung <b>%s</b> konfiguriert. 
-Diese CloudArea muß durch Sie aktiviert werden um automatisierte Import-Prozeduren zu ermöglichen.
 
-Falls Sie nicht der Meinung sind, dass die CloudArea korrekt Ihrer Anwendung zugeordnet sein sollte, eine Fehlkonfiguation oder andere Probleme mit der CloudArea vorliegt, kontaktieren Sie bitte ...
-<b>%SUPPORTCONTACT%</b> 
-... um die Situation zu bereinigen.
+Diese CloudArea muß durch Sie aktiviert werden um automatisierte Import-Prozeduren zu ermöglichen. Bitte die korrekte Zuordnung der CloudArea zu Ihrer Anwendung bestätigen oder wennden Sie sich an Ihren Cloud Provider.
+
+  JA:   die Cloud area ist korrekt zugeordnet.
+        Bitte klicken Sie auf den folgenden 
+        Link und setzen Sie den CI-Status 
+        auf installiert/aktiv.
+        %URLOFCURRENTREC% 
+  
+  NEIN: die Cloud area ist falsch zugeordnet.  
+        Durch Klicken auf den folgenden Link 
+        kontaktieren Sie den Cloud 
+        Plattform Verantwortlichen und bitten 
+        um Klärung.
+        mailto: <b>%SUPPORTCONTACT%</b>
+
+Die Aktivierung der CloudArea ist unabhängig vom CI-Status oder der Betriebsart der Anwendung und ist IMMER notwendig, wenn die CloudArea verwendet werden soll.
 ',
-en=>'a new cloudarea <b>%s</b> has been
-configured for your application <b>%s</b> .
-This area needs to be activated by you, to make it useable in automatic import
-procedures.
-If you do not believe that the CloudArea is correctly assigned to your application, there is a misconfiguration or other problems with the CloudArea, please contact ...
-<b>%SUPPORTCONTACT%</b> 
-... to rectify the situation.
+en=>'a new cloudarea <b>%s</b> has been configured for 
+your application <b>%s</b> .
+
+This area needs to be activated by you, to make it useable in automatic import procedures. Please confirm the correctness of the cloud area assignment or contact your Cloud Provider.
+
+  YES:  cloud area is assigned correctly.
+        Please click on the link and set 
+        the CI-Status to "installed/active".
+        %URLOFCURRENTREC% 
+  
+  NO:   cloud area assignment is incorrect.  
+        Please click the link to contact the 
+        cloud platform responsible for 
+        clarification.
+        mailto: <b>%SUPPORTCONTACT%</b>
+
+Activation of the CloudArea is independent of the CI status or the operating mode of the application and is ALWAYS necessary if the CloudArea is to be used.
 '
 },
 'CMSG002'=>{
