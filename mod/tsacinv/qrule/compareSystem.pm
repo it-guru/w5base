@@ -319,7 +319,13 @@ sub qcheckRecord
                      $m->SetFilter({id=>$rec->{srcid}});
                      my ($tpcrec)=$m->getOnlyFirst(qw(name));
                      if (defined($tpcrec)){
-                        $parrec->{systemname}=$tpcrec->{name};
+                        if ($dataobj->ValidateSystemname($tpcrec->{name})){
+                           $parrec->{systemname}=$tpcrec->{name};
+                        }
+                        else{
+                           msg(INFO,"skip use of systemname '".
+                                    $tpcrec->{name}."' from TPC");
+                        }
                      }
                   }
                }
