@@ -19,6 +19,7 @@ package itil::lnkapplurl;
 use strict;
 use vars qw(@ISA);
 use kernel;
+use itil::appl;
 use itil::lib::Listedit;
 @ISA=qw(kernel::App::Web::Listedit itil::lib::Listedit kernel::DataObj::DB);
 
@@ -506,6 +507,28 @@ sub new
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>'accessurl.expiration'),
 
+      new kernel::Field::Link(
+                name          =>'secapplmgr2id',
+                noselect      =>'1',
+                dataobjattr   =>'lnkapplmgr2.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'sectarget',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.target'),
+
+      new kernel::Field::Link(
+                name          =>'sectargetid',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.targetid'),
+
+      new kernel::Field::Link(
+                name          =>'secroles',
+                noselect      =>'1',
+                dataobjattr   =>'lnkcontact.croles'),
+
+
+
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
       new kernel::Field::QualityState(),
@@ -524,6 +547,14 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from="accessurl ".
+            "left outer join lnkcontact ".
+            "on lnkcontact.parentobj='itil::appl' ".
+            "   and accessurl.appl=lnkcontact.refid ".
+            "left outer join lnkcontact as lnkapplmgr2 ".
+            "on (lnkapplmgr2.parentobj='itil::appl' ".
+            "and accessurl.appl=lnkapplmgr2.refid ".
+            "and lnkapplmgr2.croles like '%roles=_applmgr2_=roles%' ".
+            "and lnkapplmgr2.target='base::user') ".
             "left outer join lnkapplappl ".
             "on accessurl.lnkapplappl=lnkapplappl.id ".
             "left outer join appl ".
@@ -581,12 +612,9 @@ sub SecureSetFilter
    if (!$self->isDirectFilter(@flt) &&
        !$self->IsMemberOf([qw(admin w5base.itil.appl.read w5base.itil.read)],
                           "RMember")){
-      my $userid=$self->getCurrentUserId();
-      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
-      push(@flt,[
-                 {databossid=>\$userid},
-                 {mandatorid=>\@mandators},
-                ]);
+      my @addflt;
+      $self->itil::appl::addApplicationSecureFilter([''],\@addflt);
+      push(@flt,\@addflt);
    }
    return($self->SetFilter(@flt));
 }
