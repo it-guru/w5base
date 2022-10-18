@@ -1531,7 +1531,7 @@ sub PreParseTimeExpression
    }
    elsif ($val=~m/^currentyear$/gi){
       my ($Y,$M,$D,$h,$m,$s)=Today_and_Now($tz); 
-      $val="\">=$Y-01-01 00:00:00\" AND \"<=$Y-01-12 23:59:59\"";
+      $val="\">=$Y-01-01 00:00:00\" AND \"<=$Y-12-31 23:59:59\"";
       $f=sprintf("%04d",$Y);
    }
    elsif ($val=~m/^lastyear$/gi){
