@@ -123,6 +123,8 @@ sub qcheckRecord
                  $rec->{cistatusid}!=4 &&
                  $rec->{cistatusid}!=5);
 
+   return(undef) if ($rec->{opmode} ne "prod");
+
    my $wf=getModuleObject($self->getParent->Config,"base::workflow");
    my $ia=getModuleObject($self->getParent->Config,"base::interanswer");
    my $i=getModuleObject($self->getParent->Config,"base::interview");
