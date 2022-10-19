@@ -407,7 +407,10 @@ sub new
                 htmldetail    =>0,
                 group         =>'applinfo',
                 uploadable    =>0,
-                fields        =>[qw(databoss databossid applmgr applmgrid)]),
+                fields        =>[qw(databoss databossid applmgr applmgrid
+                                    tsmid tsm2id 
+                                    opmid opm2id 
+                                    businessteamid )]),
 
       new kernel::Field::Link(
                 name          =>'databossid',
