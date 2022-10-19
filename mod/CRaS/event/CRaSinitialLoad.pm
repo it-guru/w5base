@@ -342,7 +342,7 @@ sub ProcessXLS
    }
    {
       my $csr=$self->getPersistentModuleObject("csr","CRaS::csr");
-      $csr->BulkDeleteRecord({'srcload'=>"<$start"});
+      $csr->BulkDeleteRecord({'srcload'=>"<'$start'"});
    }
 
 
