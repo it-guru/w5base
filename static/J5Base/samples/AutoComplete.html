@@ -1,0 +1,194 @@
+<html>
+<head>
+<title>Simple App Search</title>
+<link rel="stylesheet" href="../../../auth/base/load/jquery.AjaxAutocomplete.css"></link>
+
+<script language="JavaScript" src="../../../auth/base/load/J5Base.js">
+</script>
+
+<script language="JavaScript" src="../../../auth/base/load/jquery.AjaxAutocomplete.js">
+</script>
+
+<!--
+https://www.jqueryscript.net/form/jQuery-Ajax-Autocomplete-Plugin-For-Input-Fields-Autocomplete.html
+-->
+
+<script language="JavaScript">
+
+var W5Base=createConfig({ 
+   useUTF8:false, 
+   mode:'auth',
+   transfer:'JSON' 
+});
+
+
+$(document).ready(function (){
+   $('#addr').html(document.w5baseurl);
+   $('#appname').focus();
+
+   // example for TS/appl/NameSelector REST Call
+   $("#appname").autocomplete({
+      serviceUrl:'../../../auth/TS/appl/NameSelector',  
+      type:'POST',
+      showNoSuggestionNotice:true,
+      paramName:'name',
+      minChars: 2,
+      dataType:'json',
+      autoSelectFirst:true,
+      ajaxSettings:{
+         headers:{
+            Accept: 'application/json'
+         }
+      },
+      onSelect:function (suggestion) {
+         $("#appid").val(suggestion.data.id);
+      },
+      transformResult:function(response, originalQuery) {
+         response.suggestions=new Array();
+         var data=response.result.data;
+         for(var c=0;c<data.length;c++){
+            response.suggestions.push({value:data[c].name,data:data[c]});
+         }
+         return(response);
+      },
+   });
+
+
+   $("#contact").autocomplete({
+      serviceUrl:'../../../auth/base/user/Result',  
+      type:'POST',
+      paramName:'search_fullname',
+      minChars: 2,
+      dataType:'json',
+      showNoSuggestionNotice:true,
+      onSelect:function (suggestion) {
+         $("#userid").val(suggestion.data.id);
+      },
+      onSearchStart:function (query){
+         query.search_fullname='"*'+query.search_fullname+'*"';
+         query.search_cistatusid='4';
+         query.search_usertyp='!service';
+         query.FormatAs="nativeJSON";
+         query.CurrentView="(fullname,userid)";
+         query.Limit="50";
+         return(query);
+      },
+      autoSelectFirst:true,
+      ajaxSettings:{
+         headers:{
+            Accept: 'application/json'
+         }
+      },
+      transformResult:function(response, originalQuery) {
+         var r={
+            suggestions:new Array()
+         };
+         for(var c=0;c<response.length;c++){
+            r.suggestions.push({value:response[c].fullname,data:{
+               id:response[c].userid
+            }});
+         }
+         return(r);
+      },
+   });
+
+   $("#grp").autocomplete({
+      serviceUrl:'../../../auth/base/grp/Result',  
+      type:'POST',
+      showNoSuggestionNotice:true,
+      paramName:'search_fullname',
+      minChars: 2,
+      dataType:'json',
+      onSelect:function (suggestion) {
+         $("#grpid").val(suggestion.data.id);
+      },
+      onSearchStart:function (query){
+         query.search_fullname='"*'+query.search_fullname+'*"';
+         query.search_cistatusid='4';
+         query.search_parent='DTAG.*.DTIT.Hub.*';
+         query.FormatAs="nativeJSON";
+         query.CurrentView="(fullname,grpid)";
+         query.Limit="50";
+         return(query);
+      },
+      autoSelectFirst:true,
+      ajaxSettings:{
+         headers:{
+            Accept: 'application/json'
+         }
+      },
+      transformResult:function(response, originalQuery) {
+         var r={
+            suggestions:new Array()
+         };
+         for(var c=0;c<response.length;c++){
+            r.suggestions.push({value:response[c].fullname,data:{
+               id:response[c].grpid
+            }});
+         }
+         return(r);
+      },
+   });
+
+
+});
+
+
+
+</script>
+
+</head>
+<body>
+<!-- CONTROL -->
+<table border=0 width=50%>
+   <tr>
+      <td width=1% nowrap colspan=2 style="padding-top:20px">
+          RESTCall: TS/appl/NameSelector (special for ANY 
+          application - no mandator restr.)</td>
+      <td style="padding-top:20px;padding-left:30px;padding-right:20px">W5BaseID</td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Anwendung:</td>
+      <td>
+         <input style="width:100%" type=text id=appname value="">
+      </td>
+      <td>
+         <input style="width:100%" type=text tabindex="-1" readonly id=appid value="">
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap colspan=2 style="padding-top:20px">
+          RESTCall: base/user/Result (simple by W5Base Standard REST)</td>
+      <td style="padding-top:20px;padding-left:30px;padding-right:20px">W5BaseID</td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Kontakt:</td>
+      <td>
+         <input style="width:100%" type=text id=contact value="">
+      </td>
+      <td>
+         <input style="width:100%" type=text tabindex="-1" readonly id=userid value="">
+      </td>
+   </tr>
+   <tr>
+      <td width=1% nowrap colspan=2 style="padding-top:20px">
+          RESTCall: base/grp/Result (additional filters (parent *HUB*)</td>
+      <td style="padding-top:20px;padding-left:30px;padding-right:20px">W5BaseID</td>
+   </tr>
+   <tr>
+      <td width=1% nowrap>Hub-Gruppen:</td>
+      <td>
+         <input style="width:100%" type=text id=grp value="">
+      </td>
+      <td>
+         <input style="width:100%" type=text tabindex="-1" readonly id=grpid value="">
+      </td>
+   </tr>
+
+</table>
+
+
+
+</body>
+</html>
+
