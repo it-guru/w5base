@@ -1520,7 +1520,7 @@ sub NotifyInterfaceContacts
       fromapplcistatus=>[3,4], 
       toapplcistatus=>[3,4], 
       cistatusid=>[3,4], 
-      interfacestag=>"0=\"W5DATAOBJ\" AND 1=\"$W5DATAOBJ\""
+      tags=>"0=\"W5DATAOBJ\" AND 1=\"$W5DATAOBJ\""
    });
    foreach my $ifrec ($o->getHashList(qw(fullname fromappl toappl
                                          rawmonitor interfacescomp))){
