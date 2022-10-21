@@ -391,8 +391,8 @@ sub qcheckRecord
                $d=CalcDateDuration($deadline." 00:00:00",$ChangeEndDate);
                #printf STDERR ("plandeadline->ChangeEndDate:%s\n",Dumper($d));
             }
-            if (!defined($d) || ($d->{totaldays}>-42 && $d->{totaldays}<7)){
-               # Zieldatum des Changes um den deadline Termin
+            if (!defined($d) || ($d->{totaldays}<-42 && $d->{totaldays}>7)){
+               # Zieldatum des Changes nicht um den deadline Termin
                my $msg="missing valid next DR-Test change planning";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
