@@ -62,7 +62,10 @@ sub new
                    my $self=shift;
                    my $current=shift;
                    my $id=$current->{id};
-                   return($self->getParent->{qrule}->{$id}->getName());
+                   if (exists($self->getParent->{qrule}->{$id})){
+                      return($self->getParent->{qrule}->{$id}->getName());
+                   }
+                   return("NotExistingQRule:".$id);
                 }),
 
       new kernel::Field::Text(
