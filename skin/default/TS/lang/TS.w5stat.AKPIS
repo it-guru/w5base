@@ -1,0 +1,30 @@
+'TS::w5stat::AKPIS::AKPIS'=>{de=>'AppKPIs',en=>'AppKPIs'},
+'AKPIS.app.all.acinmassingmentgroup.filled'=>{
+ de=>'Anzahl Anwendungen, bei denen Incident-Assigmentgroup ausgefüllt ist',
+ en=>'application count with filled Incident-Assigmentgroup'
+},
+'AKPIS.app.all.applmgr.filled'=>{
+ de=>'Anzahl Anwendungen, bei denen ApplicationManager ausgefüllt ist',
+ en=>'application count with filled ApplicationManager'
+},
+'AKPIS.app.all.businessteam.filled'=>{
+ de=>'Anzahl Anwendungen mit ausgefülltem Betriebsteam',
+ en=>'application count with filled businessteam'
+},
+'AKPIS.app.all.contacts.filled'=>{
+ de=>'Anzahl Anwendungen mit gefüllten Kontakten',
+ en=>'application count with filled contacts'
+},
+'AKPIS.app.ibi.contacts.filled'=>{
+ de=>'Anzahl IBI Anwendungen mit gefüllten Kontakten',
+ en=>'IBI application count with filled contacts'
+},
+'AKPIS.app.all.count'=>{
+ de=>'Anzahl aller Anwendungen im Focus (CI-Status=installiert/aktiv)',
+ en=>'overall count of all application in focus (CI-Status=installed/active)'
+},
+'AKPIS.app.all.dataissue.exists'=>{
+ de=>'Anzahl Anwendungen mit aktivem DataIssue',
+ en=>'count of application with active DataIssue'
+},
+
