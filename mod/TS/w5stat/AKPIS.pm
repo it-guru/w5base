@@ -179,7 +179,6 @@ sub processRecord
    my $module=shift;
    my $monthstamp=shift;
    my $rec=shift;
-   my %colors=@{$self->{Colors}};
    my $app=$self->getParent();
    my %param=@_;
    my ($year,$month)=$monthstamp=~m/^(\d{4})(\d{2})$/;
