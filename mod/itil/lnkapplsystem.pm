@@ -947,6 +947,7 @@ sub getSqlFrom
                   push(@sysid,$sysrec->{id});
                }
                push(@sysid,"-99") if ($#sysid==-1);
+           #    $datasourcerest1.=" and lnkapplsystem.cistatus='4'";   # assetid handling on only active relations???
                $datasourcerest1.=" and lnkapplsystem.system in (".
                              join(",",map({"'".$_."'"} @sysid)).")";
                $datasourcerest2.=" and system.id in (".
@@ -1020,7 +1021,7 @@ sub getSqlFrom
       $datasourcerest1="lnkapplsystem.cistatus='4'";
    }
    else{
-      msg(INFO,"lnkapplsystem filter open");
+      #msg(INFO,"lnkapplsystem filter open $datasourcerest1");
    }
 
    $datasourcerest1=" where $datasourcerest1" if ($datasourcerest1 ne ""); 
