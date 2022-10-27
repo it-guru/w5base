@@ -30,6 +30,22 @@ sub new
    my %param=@_;
    my $self=bless({%param},$type);
 
+   $self->{applicationfields}=[
+      qw(
+         name cistatusid mandatorid opmode
+         businessteam applid 
+         tsm 
+         contacts
+         applmgr
+         isnosysappl systems cloudareas
+         isnoifaceappl interfaces
+         description
+         acinmassingmentgroup
+         mgmtitemgroup 
+         dataissuestate
+      )
+   ];
+
    return($self);
 }
 
@@ -134,24 +150,14 @@ sub processData
 
    return() if ($statstream ne "AKPIS");
 
+
+
    my $appl=getModuleObject($self->getParent->Config,"TS::appl");
-   $appl->SetCurrentView(qw(
-      name cistatusid mandatorid opmode
-      businessteam applid 
-      tsm 
-      contacts
-      applmgr
-      isnosysappl systems cloudareas
-      isnoifaceappl interfaces
-      description
-      acinmassingmentgroup
-      mgmtitemgroup 
-      dataissuestate
-   ));
-   if ($appl->Config->Param("W5BaseOperationMode") eq "devx"){
+   $appl->SetCurrentView(@{$self->{applicationfields}});
+   if ($appl->Config->Param("W5BaseOperationMode") eq "dev"){
       $appl->SetFilter({cistatusid=>'<=4',
                         name=>'W5* Dina* TSG_VIRTUELLE_T-SERVER*'.
-                              'NGSS*Perfo* ServiceOn* a*(TA) BI* AD(P)'});
+                              'NGSS*Perfo* ServiceOn*  BI* AD(P)'});
    }
    else{
       $appl->SetFilter({cistatusid=>'4'});
@@ -169,6 +175,83 @@ sub processData
    }
    msg(INFO,"FINE of tsAKPIS::appl  $count records");
 
+   my $asset=getModuleObject($self->getParent->Config,"TS::asset");
+   $asset->SetCurrentView(qw(
+      name cistatusid mandatorid 
+      dataissuestate eohs plandecons
+   ));
+   if ($asset->Config->Param("W5BaseOperationMode") eq "dev"){
+      $asset->SetFilter({cistatusid=>'<=4',
+     #   name=>" A21524409 A21565671 A21559627 A21224829 A21414755" 
+      });
+
+   }
+   else{
+      $asset->SetFilter({cistatusid=>'4'});
+   }
+   $asset->SetCurrentOrder("NONE");
+   msg(INFO,"starting collect of AKPIS Hardware");
+   my ($rec,$msg)=$asset->getFirst();
+   if (defined($rec)){
+      do{
+         $self->getParent->processRecord($statstream,'tsAKPIS::asset',
+                                         $dstrange,$rec,%param);
+         ($rec,$msg)=$asset->getNext();
+         $count++;
+      } until(!defined($rec));
+   }
+   msg(INFO,"FINE of tsAKPIS::asset  $count records");
+
+}
+
+
+sub getRepOrgFromApplrec
+{
+   my $self=shift;
+   my $reclist=shift;
+   my $app=$self->getParent();
+
+   my @repOrg;
+   my %appblk=();
+   my @appblk=("all");
+
+   foreach my $rec (@{$reclist}){
+      $appblk{"all"}++;
+      my $mgmtitemgroup=$rec->{mgmtitemgroup};
+      $mgmtitemgroup=[$mgmtitemgroup] if (ref($mgmtitemgroup) ne "ARRAY");
+
+      my $grp=$app->getPersistentModuleObject("base::grp");
+      if ($rec->{businessteam} ne ""){
+         push(@repOrg,$rec->{businessteam});
+      }
+      if ($rec->{mandatorid} ne ""){
+         $grp->SetFilter({grpid=>\$rec->{mandatorid},cistatusid=>'4'});
+         my ($grec)=$grp->getOnlyFirst(qw(fullname));
+         if (defined($grec)){
+            push(@repOrg,$grec->{fullname});
+         }
+      }
+      foreach my $t (@repOrg){
+         $self->getParent->Trace(" -> $t");
+      }
+      if ($rec->{opmode} eq "prod"){
+         $appblk{"prod"}++;
+      } 
+      else{
+         $appblk{"nonprod"}++;
+      }
+
+      if (in_array($mgmtitemgroup,"IBI-Relevant")){
+         $appblk{"ibi"}++;
+      }
+      if (grep(/^top(\d+)-/i,@$mgmtitemgroup)){
+         $appblk{"top"}++;
+      }
+   }
+   @appblk=sort(keys(%appblk));
+
+   return({repOrg=>\@repOrg,appblk=>\@appblk});
+
 }
 
 
@@ -185,49 +268,71 @@ sub processRecord
 
    return() if ($statstream ne "AKPIS");
 
+   if ($module eq "tsAKPIS::asset"){
+      msg(INFO,"AKPIS Processs $rec->{name}");
+      my $assetkpi={};
+
+      if ($rec->{dataissuestate}->{dataissuestate} ne "OK"){
+         $assetkpi->{'dataissue.exists'}=1;
+      }
+      else{
+         $assetkpi->{'dataissue.exists'}=0;
+      }
+
+      if ($rec->{eohs} ne ""){
+         $assetkpi->{'eohs.count'}=1;
+      }
+      else{
+         $assetkpi->{'eohs.count'}=0;
+      }
+
+      if ($rec->{plandecons} ne ""){
+         $assetkpi->{'plandecons.count'}=1;
+      }
+      else{
+         $assetkpi->{'plandecons.count'}=0;
+      }
+
+
+      my $lnkappl=$app->getPersistentModuleObject("itil::lnkapplsystem");
+      $lnkappl->SetFilter({
+         applcistatusid=>'4',
+         systemcistatusid=>'4',
+         assetid=>[$rec->{id}]
+      });
+      #my @l=$lnkappl->getHashList(qw(applid appl businessteamid));
+      $lnkappl->SetCurrentView(qw(applid));
+      my $ia=$lnkappl->getHashIndexed("applid");
+      my $appl=$app->getPersistentModuleObject("itil::appl");
+      $appl->SetFilter({id=>[keys(%{$ia->{applid}})]});
+      my @arec=$appl->getHashList(@{$self->{applicationfields}});
+
+      my $ctrl=$self->getRepOrgFromApplrec(\@arec);
+      my @repOrg=@{$ctrl->{repOrg}};
+      my @appblk=@{$ctrl->{appblk}};
+
+      foreach my $appblk (@appblk){
+         my $key="AKPIS.asset.$appblk.count";
+         $self->getParent->storeStatVar("Group",\@repOrg,{},
+                                        $key,1);
+         foreach my $akey (keys(%$assetkpi)){
+            my $key="AKPIS.app.$appblk.$akey";
+            $self->getParent->storeStatVar("Group",\@repOrg,{},
+                                           $key,$assetkpi->{$akey});
+         }
+      }
+   }
    if ($module eq "tsAKPIS::appl"){
-      my %canvas;
       msg(INFO,"AKPIS Processs $rec->{name}");
       $self->getParent->Trace("");
       $self->getParent->Trace("Processing: ".$rec->{name});
-      my $mgmtitemgroup=$rec->{mgmtitemgroup};
-      $mgmtitemgroup=[$mgmtitemgroup] if (ref($mgmtitemgroup) ne "ARRAY");
-
 
       my $appkpi={};
       my $name=$rec->{name};
 
-      my $grp=$app->getPersistentModuleObject("base::grp");
-      my @repOrg;
-      if ($rec->{businessteam} ne ""){
-         push(@repOrg,$rec->{businessteam});
-      }
-      if ($rec->{mandatorid} ne ""){
-         $grp->SetFilter({grpid=>\$rec->{mandatorid},cistatusid=>'4'});
-         my ($grec)=$grp->getOnlyFirst(qw(fullname));
-         if (defined($grec)){
-            push(@repOrg,$grec->{fullname});
-         }
-      }
-      $self->getParent->Trace("Count Application $name on ...");
-      foreach my $t (@repOrg){
-         $self->getParent->Trace(" -> $t");
-      }
-
-      my @appblk=("all");
-      if ($rec->{opmode} eq "prod"){
-         push(@appblk,"prod");
-      } 
-      else{
-         push(@appblk,"nonprod");
-      }
-
-      if (in_array($mgmtitemgroup,"IBI-Relevant")){
-         push(@appblk,"ibi");
-      }
-      if (grep(/^top(\d+)-/i,@$mgmtitemgroup)){
-         push(@appblk,"top");
-      }
+      my $ctrl=$self->getRepOrgFromApplrec([$rec]);
+      my @repOrg=@{$ctrl->{repOrg}};
+      my @appblk=@{$ctrl->{appblk}};
 
       if ($rec->{dataissuestate}->{dataissuestate} ne "OK"){
          $appkpi->{'dataissue.exists'}=1;
