@@ -324,6 +324,7 @@ sub processFilterHash
          next;
       }
       my $fotype=$fo->Type();
+      $fo->preparseSearch(\$filter->{$fieldname});
       my $preparedFilter=$fo->prepareToSearch($filter->{$fieldname});
       if (defined($preparedFilter)){
          if ($fotype eq "Fulltext"){

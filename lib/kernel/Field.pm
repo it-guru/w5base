@@ -128,6 +128,7 @@ sub new
    $self->{_permitted}->{background}=1; # Color of Background (if posible)
    $self->{_permitted}->{label}=1;      # Die Beschriftung des Felds
    $self->{_permitted}->{readonly}=1;   # Nur zum lesen
+   $self->{_permitted}->{preparseSearch}=1;  # preparse search hash value
    $self->{_permitted}->{frontreadonly}=1;   # Nur zum lesen
    $self->{_permitted}->{grouplabel}=1; # 1 wenn in HTML Detail Grouplabel soll
    $self->{_permitted}->{dlabelpref}=1; # Beschriftungs prefix in HtmlDetail
