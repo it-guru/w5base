@@ -82,6 +82,25 @@ sub new
                 name          =>'dstrange',
                 label         =>'Month',
                 selectfix     =>1,
+                preparseSearch=>sub{
+                   my $self=shift;
+                   my $fltref=shift;
+
+                   if (ref($fltref) eq "SCALAR"){
+                      my $search=trim($$fltref);
+                      if ($search=~m/^currentmonth$/i){
+                         my ($year,$mon,$day)=Today_and_Now("GMT");
+                         my $currentmonth=sprintf("%04d%02d",$year,$mon);
+                         $$fltref=$currentmonth;
+                      }
+                      if ($search=~m/^currentweek$/i){
+                         my ($year,$mon,$day)=Today_and_Now("GMT");
+                         my ($week,$wyear)=Week_of_Year($year,$mon,$day);
+                         my $currentweek=sprintf("%04dKW%02d",$wyear,$week);
+                         $$fltref=$currentweek;
+                      }
+                   }
+                },
                 dataobjattr   =>'w5stat.monthkwday'),
 
       new kernel::Field::Link(
