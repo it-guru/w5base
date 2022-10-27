@@ -1601,6 +1601,47 @@ sub new
 
 
 
+sub initSqlWhere
+{
+   my $self=shift;
+   my $mode=shift;
+   my $filter=shift;
+   my @filter=@$filter;
+   my $where="";
+
+   if ($mode eq "select"){
+      foreach my $f (@filter){
+         if (ref($f) eq "HASH"){
+            if (exists($f->{assetid})){
+               my $assetid=$f->{assetid};
+               if (ref($assetid) eq "SCALAR"){
+                  my $aid=$$assetid;
+                  $assetid=[$aid];
+               }
+               if ($assetid=~m/^\d+$/){
+                  my $aid=$assetid;
+                  $assetid=[$aid];
+               }
+               if ($#{$assetid}==-1){
+                 $assetid=['-99'];
+               }
+               my $astr=join(",",map({"'".$_."'"} @$assetid));
+               $where="(system.systemtype<>'virtualizedSystem' ".
+                       "and system.asset in ($astr)) ".
+                      "or (system.systemtype='virtualizedSystem' ".
+                       "and vsystem.asset in ($astr))";
+            }
+         }
+      }
+   }
+
+   return($where);
+}
+
+
+
+
+
 
 sub getTeamBossID
 {
