@@ -154,7 +154,7 @@ sub processData
 
    my $appl=getModuleObject($self->getParent->Config,"TS::appl");
    $appl->SetCurrentView(@{$self->{applicationfields}});
-   if ($appl->Config->Param("W5BaseOperationMode") eq "dev"){
+   if ($appl->Config->Param("W5BaseOperationMode") eq "devx"){
       $appl->SetFilter({cistatusid=>'<=4',
                         name=>'W5* Dina* TSG_VIRTUELLE_T-SERVER*'.
                               'NGSS*Perfo* ServiceOn*  BI* AD(P)'});
@@ -180,7 +180,7 @@ sub processData
       name cistatusid mandatorid 
       dataissuestate eohs plandecons
    ));
-   if ($asset->Config->Param("W5BaseOperationMode") eq "dev"){
+   if ($asset->Config->Param("W5BaseOperationMode") eq "devx"){
       $asset->SetFilter({cistatusid=>'<=4',
         name=>" A21524409 A21565671 A21559627 A21224829 A21414755" 
       });
@@ -316,6 +316,17 @@ sub processRecord
       my $appl=$app->getPersistentModuleObject("itil::appl");
       $appl->SetFilter({id=>[keys(%{$ia->{applid}})]});
       my @arec=$appl->getHashList(@{$self->{applicationfields}});
+
+      foreach my $arec (@arec){
+         foreach my $akey (keys(%$assetkpi)){
+            my $key="AKPIS.asset.$akey";
+            $self->getParent->storeStatVar("Application",
+                                           [$arec->{name}],
+                                           {nosplit=>1,
+                                            nameid=>$arec->{id}},
+                                           $key,$assetkpi->{$akey});
+         }
+      }
 
       my $ctrl=$self->getRepOrgFromApplrec(\@arec);
       my @repOrg=@{$ctrl->{repOrg}};
