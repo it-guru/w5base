@@ -746,6 +746,17 @@ sub ShowEntry
       }
    }
    else{
+      my $FunctionPath=Query->Param("FunctionPath");
+      if ($FunctionPath ne ""){
+         if (my ($requestid,$requesttag)=$FunctionPath=~m/\/(\d+)\/(.*)$/){
+            $self->HtmlGoto("../../ShowEntry",
+                            post=>{
+                               id=>$requestid,
+                               tag=>$requesttag
+                            });
+            return();
+         }
+      }
       $requestid=Query->Param("id");
       $requesttag=Query->Param("tag");
    }
@@ -860,7 +871,9 @@ EOF
                "Quality Report $label - $primrec->{fullname}".
                "</div>".
                "<div class=chartsublabel>".
+               "<a href=\"ShowEntry/$requestid/$requesttag\" target=_blank>".
                "$subtitle".
+               "</a>".
                "</div>");
          print $htmlReport;
          if ($requesttag eq "base::w5stat::overview::overview" ||
