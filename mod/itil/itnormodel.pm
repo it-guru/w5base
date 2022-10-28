@@ -115,8 +115,18 @@ sub new
    
 
    );
-   $self->setDefaultView(qw(name nettobruttoratio slaavail cistatus cdate mdate));
+   $self->setDefaultView(qw(name nettobruttoratio slaavail 
+                            cistatus cdate mdate));
    $self->setWorktable("itnormodel");
+   $self->{history}={
+      delete=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ]
+   };
+
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.itil.itnormodel"],
                          uniquesize=>40};
@@ -136,6 +146,15 @@ sub isCopyValid
    my $self=shift;
 
    return(1);
+}
+
+
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
 }
 
 
