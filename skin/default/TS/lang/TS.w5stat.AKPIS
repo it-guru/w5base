@@ -220,3 +220,124 @@
  en=>'overall count of top application'
 },
 
+
+'AKPIS.asset.in_all_app.count'=>{
+ de=>'Gesammtanzahl Asset in allen Anwendungen',
+ en=>'overall count of assets in applications'
+},
+'AKPIS.asset.in_all_app.dataissue.exists'=>{
+ de=>'Gesammtanzahl Asset mit aktivem DataIssue in allen Anwendungen',
+ en=>'overall count of assets with active DataIssue in all applications'
+},
+'AKPIS.asset.in_all_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in allen Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in all applications'
+},
+'AKPIS.asset.in_all_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in allen Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in all applications'
+},
+'AKPIS.asset.in_all_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in allen Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in all applications'
+},
+'AKPIS.asset.in_all_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in allen Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in all applications'
+},
+'AKPIS.asset.in_ibi_app.count'=>{
+ de=>'Gesammtanzahl Asset in IBI Anwendungen',
+ en=>'overall count of assets in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.dataissue.exists'=>{
+ de=>'Gesammtanzahl Asset mit aktivem DataIssue in IBI Anwendungen',
+ en=>'overall count of assets with active DataIssue in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in IBI Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in IBI Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in IBI Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in IBI Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in IBI applications'
+},
+'AKPIS.asset.in_nonprod_app.count'=>{
+ de=>'Gesammtanzahl Asset in NonProduktions-Anwendungen',
+ en=>'overall count of assets in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.dataissue.exists'=>{
+ de=>'Gesammtanzahl Asset mit aktivem DataIssue in NonProduktions-Anwendungen',
+ en=>'overall count of assets with active DataIssue in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in NonProduktions-Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in NonProduktions-Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in NonProduktions-Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in NonProduktions-Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in non-production applications'
+},
+'AKPIS.asset.in_prod_app.count'=>{
+ de=>'Gesammtanzahl Asset in Produktions-Anwendungen',
+ en=>'overall count of assets in production applications'
+},
+'AKPIS.asset.in_prod_app.dataissue.exists'=>{
+ de=>'Gesammtanzahl Asset mit aktivem DataIssue in Produktions-Anwendungen',
+ en=>'overall count of assets with active DataIssue in production applications'
+},
+'AKPIS.asset.in_prod_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in Produktions-Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in production applications'
+},
+'AKPIS.asset.in_prod_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in Produktions-Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in production applications'
+},
+'AKPIS.asset.in_prod_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in Produktions-Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in production applications'
+},
+'AKPIS.asset.in_prod_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in Produktions-Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in production applications'
+},
+'AKPIS.asset.in_top_app.count'=>{
+ de=>'Gesammtanzahl Asset in Top-Anwendungen',
+ en=>'overall count of assets in top applications'
+},
+'AKPIS.asset.in_top_app.dataissue.exists'=>{
+ de=>'Gesammtanzahl Asset mit aktivem DataIssue in Top-Anwendungen',
+ en=>'overall count of assets with active DataIssue in top applications'
+},
+'AKPIS.asset.in_top_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in Top-Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in top applications'
+},
+'AKPIS.asset.in_top_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in Top-Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in top applications'
+},
+'AKPIS.asset.in_top_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in Top-Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in top applications'
+},
+'AKPIS.asset.in_top_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in Top-Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in top applications'
+},

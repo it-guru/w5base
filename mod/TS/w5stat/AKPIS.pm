@@ -182,7 +182,7 @@ sub processData
    ));
    if ($asset->Config->Param("W5BaseOperationMode") eq "dev"){
       $asset->SetFilter({cistatusid=>'<=4',
-     #   name=>" A21524409 A21565671 A21559627 A21224829 A21414755" 
+        name=>" A21524409 A21565671 A21559627 A21224829 A21414755" 
       });
 
    }
@@ -279,15 +279,25 @@ sub processRecord
          $assetkpi->{'dataissue.exists'}=0;
       }
 
+      $assetkpi->{'eohs.exceeded'}=0;
       if ($rec->{eohs} ne ""){
          $assetkpi->{'eohs.count'}=1;
+         my $d=CalcDateDuration($rec->{eohs},NowStamp("en"));
+         if (defined($d) && $d->{totaldays}>0){
+            $assetkpi->{'eohs.exceeded'}=1;
+         }
       }
       else{
          $assetkpi->{'eohs.count'}=0;
       }
 
+      $assetkpi->{'plandecons.exceeded'}=0;
       if ($rec->{plandecons} ne ""){
          $assetkpi->{'plandecons.count'}=1;
+         my $d=CalcDateDuration($rec->{plandecons},NowStamp("en"));
+         if (defined($d) && $d->{totaldays}>0){
+            $assetkpi->{'plandecons.exceeded'}=1;
+         }
       }
       else{
          $assetkpi->{'plandecons.count'}=0;
@@ -312,11 +322,11 @@ sub processRecord
       my @appblk=@{$ctrl->{appblk}};
 
       foreach my $appblk (@appblk){
-         my $key="AKPIS.asset.$appblk.count";
+         my $key="AKPIS.asset.in_${appblk}_app.count";
          $self->getParent->storeStatVar("Group",\@repOrg,{},
                                         $key,1);
          foreach my $akey (keys(%$assetkpi)){
-            my $key="AKPIS.app.$appblk.$akey";
+            my $key="AKPIS.asset.in_${appblk}_app.$akey";
             $self->getParent->storeStatVar("Group",\@repOrg,{},
                                            $key,$assetkpi->{$akey});
          }
