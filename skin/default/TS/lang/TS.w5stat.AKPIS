@@ -341,3 +341,51 @@
  de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in Top-Anwendungen',
  en=>'overall count of assets with exceeded planned decostruction date in top applications'
 },
+'AKPIS.app.acinmassingmentgroup.filled'=>{
+ de=>'Anwendung wird mit Incident-Assigmentgroup ausgefüllt berücksichtig',
+ en=>'application will be counted as incidentassigmentgroup is filled'
+},
+'AKPIS.app.applmgr.filled'=>{
+ de=>'Anwendung wird mit ApplicationManager ausgefüllt berücksichtig',
+ en=>'application will be counted as ApplicationManager is filled'
+},
+'AKPIS.app.tsm.filled'=>{
+ de=>'Anwendung wird mit TSM ausgefüllt berücksichtig',
+ en=>'application will be counted as TSM is filled'
+},
+'AKPIS.app.contacts.filled'=>{
+ de=>'Anwendung wird mit Kontakte ausgefüllt berücksichtig',
+ en=>'application will be counted as contacts is filled'
+},
+'AKPIS.app.systems.filled'=>{
+ de=>'Anwendung wird mit Systeme ausgefüllt berücksichtig',
+ en=>'application will be counted as systems is filled'
+},
+'AKPIS.app.interfaces.filled'=>{
+ de=>'Anwendung wird mit Schnittstellen ausgefüllt berücksichtig',
+ en=>'application will be counted as interfaces is filled'
+},
+'AKPIS.app.businessteam.filled'=>{
+ de=>'Anwendung wird mit Betriebsteam ausgefüllt berücksichtig',
+ en=>'application will be counted as businessteam is filled'
+},
+'AKPIS.app.opmode.filled'=>{
+ de=>'Anwendung wird mit vorwiegender Betriebsart ausgefüllt berücksichtig',
+ en=>'application will be counted as operation mode is filled'
+},
+'AKPIS.app.description.filled'=>{
+ de=>'Anwendung wird mit Beschreibung ausgefüllt berücksichtig',
+ en=>'application will be counted as description is filled'
+},
+'AKPIS.asset.dataissue.exists'=>{
+ de=>'Anwendung wird als DataIssue existierend gezählt',
+ en=>'application will be counted as DataIssue existing'
+},
+'AKPIS.asset.eohs.count'=>{
+ de=>'Anwendung wird als Ende Hardware-Support bei min. einem Asset definiert gezählt',
+ en=>'application will be counted end of hardware support defined at least by one asset'
+},
+'AKPIS.asset.plandecons.count'=>{
+ de=>'Anwendung wird als geplanter Rückbauzeitpunkt bei min. einem Asset definiert gezählt',
+ en=>'application will be counted planned deconstruction defined at least by one asset'
+},
