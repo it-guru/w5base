@@ -1522,8 +1522,16 @@ sub NotifyInterfaceContacts
       cistatusid=>[3,4], 
       tags=>"0=\"W5DATAOBJ\" AND 1=\"$W5DATAOBJ\""
    });
-   foreach my $ifrec ($o->getHashList(qw(fullname fromappl toappl
-                                         rawmonitor interfacescomp))){
+   my @iflist=$o->getHashList(qw(fullname fromappl toappl
+                                 rawmonitor interfacescomp));
+   if ($#iflist>5){
+      msg(ERROR,"abnormal hight interface count ($#iflist) on \n".
+                "NotifyInterfaceContacts for $W5DATAOBJ\n".
+                "skip notification for interface partners!");
+      return(0);
+   }
+   
+   foreach my $ifrec (@iflist){
       my %notify_to;
       my %notify_cc;
       my $useall=1;
