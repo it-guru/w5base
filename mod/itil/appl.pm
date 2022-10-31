@@ -620,6 +620,7 @@ sub new
                 name          =>'alltags',
                 label         =>'all ItemTags',
                 group         =>'tags',
+                searchable    =>0,
                 htmldetail    =>0,
                 vjointo       =>'itil::tag_appl',
                 vjoinon       =>['id'=>'refid'],

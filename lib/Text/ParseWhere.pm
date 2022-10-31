@@ -126,7 +126,13 @@ sub _classifyElements
       elsif ($w=~m/^".*"$/){
          push(@e,{'type'=>'VALUE','val'=>$w});
       }
-      elsif ($w=~m/^[0-9]+(\.[0-9]+)?$/){
+      elsif (($#e!=-1 && $e[$#e]->{type} eq "COMP") 
+             && $w=~m/^[0-9]+(\.[0-9]+)?$/){
+         # numbers without quotes can be only CONSTs,
+         # if they are after a COMP (compare) element.
+         # If they are bevore a COMP, they will be 
+         # interpretated as varname (by index)
+         my $typ="CONST";
          push(@e,{'type'=>'CONST','val'=>$w});
       }
       elsif ($w=~m/^'.*'$/){
