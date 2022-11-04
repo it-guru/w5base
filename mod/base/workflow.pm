@@ -2451,6 +2451,12 @@ sub New                   # Workflow starten
    my $class=Query->Param("WorkflowClass");
    my @WorkflowStep=Query->Param("WorkflowStep");
 
+
+   if ($class=~m/::Explore::/){
+      $self->HtmlGoto("../../base/Explore/Start/$class");
+      return();
+   }
+
    my $step;
    if (@WorkflowStep){
       $step=$WorkflowStep[$#WorkflowStep];
@@ -2520,6 +2526,10 @@ sub New                   # Workflow starten
                     "your bookmarks, to access faster to this workflow."),$a);
       $tips.="tips['$wfclass']=\"$tip\";\n";
    }
+
+
+
+
    my $selbox="<select onchange=\"changetips();\" ".
               "size=5 id=class name=WorkflowClass class=newworkflow>";
    my $oldval=Query->Param("WorkflowClass");
@@ -2528,6 +2538,34 @@ sub New                   # Workflow starten
       $selbox.=" selected" if ($disp{$name} eq $oldval);
       $selbox.=">$name</option>";
    }
+
+   $self->LoadSubObjsOnDemand("Explore","Explore");
+
+   {
+      my $lang=$self->Lang();
+
+      foreach my $sobj (values(%{$self->{Explore}})){
+         my $d;
+         if ($sobj->isAppletVisible($self)){
+            if ($sobj->can("getObjectInfo")){
+               $d=$sobj->getObjectInfo($self,$lang);
+            }
+            if (defined($d) && $d->{formular}){
+               my $selfname=$sobj->Self();
+               $selbox.="<option value=\"$selfname\"";
+               #$selbox.=" selected" if ($disp{$name} eq $oldval);
+               $selbox.=">Formular: ".$d->{label}."</option>";
+               $tips.="tips['$selfname']=\"$d->{description}\";\n";
+            #   my $jsdata=$jsengine->encode($d);
+            #   utf8::encode($jsdata);
+            #   printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+            }
+         }
+      }
+   }
+
+
+
    $selbox.="</select>";
    my $appheader=$self->getAppTitleBar();
    my $msg=$self->T("Please select the workflow to start:");
@@ -2665,6 +2703,15 @@ sub preparseEmail
 sub externalMailHandler 
 {
    my $self=shift;
+
+   my $jsonRequest=0;
+   my $jsonResult={};
+
+   my @accept=split(/\s*,\s*/,lc($ENV{HTTP_ACCEPT}));
+   if (in_array(\@accept,["application/json","text/javascript"])){
+      $jsonRequest=1;
+   }
+
 
    my $parent=Query->Param("parent");
    my $addref=Query->Param("addref");
@@ -2820,6 +2867,7 @@ sub externalMailHandler
       }
       if (!$self->LastMsg()){
          if (my $mailid=$self->Store(undef,\%notiy)){
+            $jsonResult->{mailid}=$mailid;
             my $msg;
             if (defined($att) && defined($attinfo)){
                my $newrec;
@@ -2851,14 +2899,41 @@ sub externalMailHandler
             }
          }
       }
-      print $self->HttpHeader("text/html");
-      print $self->HtmlHeader(style=>['default.css','work.css'],
-                              body=>1,form=>1,target=>'action',
-                              title=>'W5Base Mail Client');
-      my $lastmsg=$self->findtemplvar({},"LASTMSG");
-      print $lastmsg;
-      if ($opok){
-         print <<EOF;
+      if ($jsonRequest){
+         print $self->HttpHeader("application/json");
+         if ($self->LastMsg()){
+            my @lastmsg=$self->LastMsg();
+            $jsonResult->{lastmsg}=\@lastmsg;
+         }
+         if ($jsonResult->{mailid} ne ""){
+            my $mailid=$jsonResult->{mailid};
+            $self->ResetFilter();
+            $self->SetFilter({id=>\$mailid});
+            my ($wfrec,$msg)=$self->getOnlyFirst(qw(urlofcurrentrec));
+            if (defined($wfrec)){
+               $jsonResult->{urlofcurrentrec}=$wfrec->{urlofcurrentrec}; 
+            }
+         }
+         my $JSON;
+         eval("use JSON;\$JSON=new JSON;");
+         if ($@ eq ""){
+            $JSON->utf8(1);
+            $JSON->allow_blessed(1);
+            $JSON->convert_blessed(1);
+            my $res=$JSON->pretty->encode($jsonResult);
+            print $res;
+         }
+         return();
+      }
+      else{
+         print $self->HttpHeader("text/html");
+         print $self->HtmlHeader(style=>['default.css','work.css'],
+                                 body=>1,form=>1,target=>'action',
+                                 title=>'W5Base Mail Client');
+         my $lastmsg=$self->findtemplvar({},"LASTMSG");
+         print $lastmsg;
+         if ($opok){
+            print <<EOF;
 <script language="JavaScript">
 function doRefresh()
 { if (parent.opener){ parent.opener.document.forms[0].submit(); } }
@@ -2868,11 +2943,10 @@ window.setTimeout("doRefresh();",1000); window.setTimeout("doClose();",1100);
 </script>
 
 EOF
+         }
+         print $self->HtmlBottom(body=>1,form=>1);
+         return();
       }
-      print $self->HtmlBottom(body=>1,form=>1);
-
-
-
    }
    else{
       if ($parent eq "base::workflow" && $id ne "" && $s eq ""){

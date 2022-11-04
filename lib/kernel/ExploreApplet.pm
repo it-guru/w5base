@@ -28,6 +28,7 @@ sub new
 {
    my $type=shift;
    my $self=bless({@_},$type);
+   $self->{formular}=0 if (!exists($self->{formular}));
    return($self);
 }
 
@@ -38,6 +39,14 @@ sub isAppletVisible
    my $app=shift;
 
    return(1);
+}
+
+sub getObjectHiddenState
+{
+   my $self=shift;
+   my $app=shift;
+
+   return(0);
 }
 
 sub getJSObjectClass
@@ -92,6 +101,8 @@ sub getObjectInfo
       label=>$app->T($self->Self,$self->Self),
       description=>$app->T("description",$self->Self),
       sublabel=>$app->T("sublabel",$self->Self),
+      hidden=>$self->getObjectHiddenState($app,$lang),
+      formular=>$self->{formular},
       prio=>$self->getObjectPrio($app,$lang)
    });
 }
