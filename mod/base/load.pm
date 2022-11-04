@@ -85,7 +85,8 @@ sub Run
       $translation.="::template.messages";
       my $d=$self->getParsedTemplate($func,{translation=>$translation,
                                             static=>$static});
-      if ($ENV{HTTP_ACCEPT}=~m/charset=utf-{0,1}8/i){
+      if (($ENV{HTTP_ACCEPT}=~m/charset=utf-{0,1}8/i) ||
+          ($ENV{HTTP_ACCEPT_CHARSET}=~m/^UTF-8/i)){
          utf8::encode($d);
       }
       print $d;
