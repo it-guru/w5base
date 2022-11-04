@@ -579,6 +579,8 @@ requirejs.config({
         'jquery.dataTables': '../auth/base/load/jquery.dataTables',
         ellipsis: '../public/base/load/jquery.ellipsis',
         datadumper: '../public/base/load/datadumper',
+        W5ExploreForms: '../public/base/load/W5ExploreForms',
+        AjaxAutocomplete: '../public/base/load/jquery.AjaxAutocomplete',
         TimeSpans: '../public/base/load/TimeSpans',
         visjs: '../public/base/load/vis.min'
    },
@@ -783,7 +785,7 @@ var W5ExploreClass=function(){
       }
       if (!level2){
          $(this.main).outerHeight(
-             $(window).innerHeight());
+             $(window).innerHeight()-1);  // -1 prevent scrollbars
          if (this.console.div){
             $(this.workspace).outerHeight(
               $(this.main).innerHeight()-
@@ -793,7 +795,7 @@ var W5ExploreClass=function(){
          else{
             $(this.workspace).outerHeight(
               $(this.main).innerHeight()-
-              $(this.mpathline).outerHeight()-5);
+              $(this.mpathline).outerHeight()-3);
          }
          if (this.netmap){
             $(this.netmap).outerHeight(
@@ -838,6 +840,8 @@ var W5ExploreClass=function(){
          var app=this;
          if (showMain){
             $(mfirst).click(function(){
+               var mpathentries=$("#mpath_ul_listentries li").length;
+               if (mpathentries!=1) return(0);  // show all only on top level
                if (app.hideControl.fullView()){
                   app.hideControl.fullView(0);
                }
@@ -852,6 +856,7 @@ var W5ExploreClass=function(){
          this.mpathline.appendChild(mfirst);
 
          this.mpath = document.createElement('ul');
+         $(this.mpath).attr("id","mpath_ul_listentries");
          $(this.mpath).addClass("TitleBar-arrows");
          this.mpathline.appendChild(this.mpath);
       //}
@@ -899,8 +904,8 @@ var W5ExploreClass=function(){
       $(this.mpath).append(m);
       var paramstack=new Array();
       var appletname;
-      console.trace("setMPath");
-      console.log("this.setMPath setMPath()",arguments);
+      //console.trace("setMPath");
+      //console.log("this.setMPath setMPath()",arguments);
       if (arguments){
          for(mi=0;mi<arguments.length;mi++){
 
@@ -1371,7 +1376,8 @@ var W5ExploreClass=function(){
       var appletCnt=appletKey.length;
       for(var c=0;c<appletCnt;c++){
          var k=appletKey[c];
-         if (app.hideControl.isAppletVisible(k)){
+         if (app.hideControl.isAppletVisible(k) && 
+             (!ClassAppletLib[k].desc.hidden)){
             var e=document.createElement('div');
             $(e).addClass("item");
             var tile=document.createElement('div');
