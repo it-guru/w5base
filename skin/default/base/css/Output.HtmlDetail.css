@@ -361,6 +361,49 @@ table.subtable td.hl {
    font-weight: bold;
 }
 
+.alert{
+   background-color:#FFCDCD
+}
+
+.alerttip {
+  position: relative;
+  display: inline-block;
+  boxrder-bottom: 1px dotted black;
+}
+
+.alerttip .alerttiptext {
+  width: 180px;
+  background-color: gray;
+  color: #fff;
+  border-radius: 6px;
+  padding: 5px;
+  text-align:left;
+  
+  top: 135%;
+  left: 15%;  
+  margin-left: -60px;
+  
+  /* Position the alerttip */
+  position: absolute;
+  z-index: 1;
+}
+
+.alerttip::after {
+    content: "";
+    position: absolute;
+    top: 80%;
+    left: 5%;    
+    margin-left: -5px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent gray transparent;
+}
+
+.noticeText{
+   font-style: italic;
+}
+
+
 
 img.toplineimage{
    margin:5px;
