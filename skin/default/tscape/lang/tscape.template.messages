@@ -1,0 +1,13 @@
+'Requestor'=>{de=>'Anforderer'},
+'Applicationname'=>{de=>'Anwendungsname'},
+'order'=>{de=>'Bestellung/Anforderung'},
+'Shortname'=>{de=>'Kurzname'},
+'Description'=>{de=>'Beschreibung'},
+'current state'=>{de=>'Aktueller Status'},
+'NoEmpty'=>{
+'de'=>'Dieses Feld darf nicht leer sein',
+'en'=>'Empty a not allowed value for this field',
+},
+'your reference'=>{
+  de=>'Ihre Auftragsrefernz'
+}

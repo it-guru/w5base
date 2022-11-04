@@ -1,0 +1,6 @@
+'tscape::Explore::ictoform'=>{
+  de=>'ICTO-ID Antragsformular',
+  en=>'ICTO-ID Orderform'
+},
+'description'=>{de=>'BETA: Antragsformular für ICT Objekte' ,en=>'BETA: order form for ICT Objects'},
+'sublabel'=>{de=>'Formulare',en=>'Forms'},

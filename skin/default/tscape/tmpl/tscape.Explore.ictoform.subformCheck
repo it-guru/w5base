@@ -1,0 +1,28 @@
+<div style="margin:10px">
+<div class="detailframe">
+<div class="detailheadline">
+
+<table width="100%" cellspacing="0" cellpadding="0">
+ <tbody><tr>
+ <td class="detailheadline" align="left">
+ <h3 class="grouplabel">Final: Check data</h3>
+ </td>
+ </tr>
+ </tbody>
+</table>
+
+</div>
+<table class="detailframe" border=1>
+<tbody>
+
+<tr class="fline">
+<td colspan=3 align=center><div id=lastmsg>
+<img src="../../../public/base/load/ajaxloader.gif">
+</div></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+</div>
