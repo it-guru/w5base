@@ -641,7 +641,7 @@ var ClassAppletLib=new Object();
 
    ClassApplet=function(app){
       this.app=app;
-      console.log("top constructor ClassApplet");
+      //console.log("top constructor ClassApplet");
    };
    ClassApplet.prototype.run=function(){
       alert("no run() defined in this Applet");
@@ -766,10 +766,10 @@ var W5ExploreClass=function(){
          link.rel = "stylesheet";
          link.href = loadurl;
          document.getElementsByTagName("head")[0].appendChild(link);
-         console.log("loadCss loaded ",loadurl);
+         //console.log("loadCss loaded ",loadurl);
       }
       else{
-         console.log("loadCss already loaded ",loadurl);
+         //console.log("loadCss already loaded ",loadurl);
       }
    }
    this.ResizeLayout=function(level2){
@@ -1007,7 +1007,7 @@ var W5ExploreClass=function(){
           new Promise(function(res,rej){
              require(["base/Explore/jsApplets"], 
                 function() {
-                   console.log("Applets is loaded");
+                   //console.log("Applets is loaded");
                    res(1);
                 },function(error){
                    alert("script parse error "+error);
@@ -1021,7 +1021,7 @@ var W5ExploreClass=function(){
 
    this.loadAppletClass=function(applet){
       if (ClassAppletLib[applet].class){
-         console.log("load applet "+applet+" from cache");
+         // console.log("load applet "+applet+" from cache");
          return(Promise.resolve(ClassAppletLib[applet].class));
       }
       $(".spinner").show();
@@ -1029,7 +1029,7 @@ var W5ExploreClass=function(){
          new Promise(function(res,rej){
             require(["jsApplets/"+applet], 
                function(o) {
-                  console.log("Applets code is loaded",o);
+                  //console.log("Applets code is loaded",o);
                   res(ClassAppletLib[applet].class);
                },function(e){
                   console.log("fail",e);
