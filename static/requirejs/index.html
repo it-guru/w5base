@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>xxx</title>
+<script language="JavaScript" src="../../public/base/load/jquery.js">
+</script>
+<script language="JavaScript" src="./require.js">
+</script>
+<link rel="shortcut icon" href="#" />
+</head>
+<body>
+<script language="JavaScript">
+requirejs.onError = function (err) {
+    console.log("genrell Erro:",err.requireType);
+    if (err.requireType === 'timeout') {
+        console.log('modules: ' + err.requireModules);
+    }
+    throw err;
+};
+
+requirejs.config({
+   baseUrl:"./scripts/",
+   paths: {
+      mod1: './mod1',
+      mod2: './mod2',
+      mod3: './mod3',
+   },
+});
+$(document).ready(function(){
+  require(["./mod1","mod2","mod3","mod3"],
+     function(m1,m2,m3,m4) {
+        console.log("is initial loaded");
+        console.log("m1",m1);
+        console.log("m2",m2);
+        console.log("m3",m3);
+        var m21=new m2();
+        var m22=new m2();
+        m3.f1();
+        m3.f1();
+        m4.f1();
+
+        m21.f1();
+        m21.f1();
+        m22.f1();
+
+  //      res();
+     },function(e){
+        console.log("e=",e);
+ //       rej("ERROR: can not resolv dataobj");
+  });
+});
+</script>
+All output on console.log
+
+
+</body>
+</html>
+
