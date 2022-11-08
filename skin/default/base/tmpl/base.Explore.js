@@ -579,8 +579,6 @@ requirejs.config({
         'jquery.dataTables': '../auth/base/load/jquery.dataTables',
         ellipsis: '../public/base/load/jquery.ellipsis',
         datadumper: '../public/base/load/datadumper',
-        W5ExploreForms: '../public/base/load/W5ExploreForms',
-        AjaxAutocomplete: '../public/base/load/jquery.AjaxAutocomplete',
         TimeSpans: '../public/base/load/TimeSpans',
         visjs: '../public/base/load/vis.min'
    },
@@ -1514,7 +1512,7 @@ var W5ExploreClass=function(){
          else{
             var applet=runpath.shift();
             console.log("URL:",document.location.href);
-            console.log("runpath:",runpath);
+            //console.log("runpath:",runpath);
             if (!document.location.href.match(/\/Start\//)){
                app.showW5ExploreLogo(applet);
                $(".spinner").show();

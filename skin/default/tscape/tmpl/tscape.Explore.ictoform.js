@@ -1,7 +1,8 @@
 var applet='%SELFNAME%';
 
-define(["datadumper","W5ExploreForms","AjaxAutocomplete"],
- function (Dumper,W5ExploreForms,AjaxAutocomplete){
+define(["jquery","datadumper",
+        "../../public/base/load/W5ExploreForms"],
+ function ($,Dumper,W5ExploreForms){
    var W5Form=new W5ExploreForms();   // instance AppletClass object
 
    ClassAppletLib[applet].class=function(app){
@@ -216,11 +217,11 @@ define(["datadumper","W5ExploreForms","AjaxAutocomplete"],
    /////////////////////////////////////////////////////////////////
 
 
-   ClassAppletLib[applet].class.prototype.run=function(){
+   ClassAppletLib[applet].class.prototype.run=function(paramstack){
       var appletobj=this;
       var app=this.app;
 
-      W5Form.run(appletobj);   // default runhandler for AppletClass
+      W5Form.run(appletobj,paramstack);   // default runhandler for AppletClass
       appletobj.AppletClass.addForm(appletobj,"subform1");
    };
    return(ClassAppletLib[applet].class);
