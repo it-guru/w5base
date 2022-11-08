@@ -53,13 +53,11 @@ define(["datadumper","W5ExploreForms","AjaxAutocomplete"],
          var formname=$("#formspace>div").last().attr("id");
          if (formname=='subform1'){
             if (this.ValidateFormStep(formname)){
-              // this.addForm("subform2");
                this.AppletClass.addForm(this,"subform2");
             }
          }
          else if (formname=='subform2'){
             if (this.ValidateFormStep(formname)){
-               //this.addForm("subformCheck");
                this.AppletClass.addForm(this,"subformCheck");
             }
          }
@@ -67,7 +65,7 @@ define(["datadumper","W5ExploreForms","AjaxAutocomplete"],
       if (e.target.id=="FormOperationBack"){
          var formname=$("#formspace>div").last().attr("id");
          if (formname!="subform1"){
-            this.removeForm(formname);
+            this.AppletClass.removeForm(this,formname);
          }
       }
       if (e.target.id=="FormOperationSave"){
@@ -95,7 +93,7 @@ define(["datadumper","W5ExploreForms","AjaxAutocomplete"],
                dataType: "json",
                success: function(data){
                   console.log("data=",data);
-                  that.addForm("subformEnd",function(){
+                  that.AppletClass.addForm(that,"subformEnd",function(){
                      $("#endmsg").html("1st data");
                      var res="";
                      res+=data.lastmsg[0];
