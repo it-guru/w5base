@@ -90,8 +90,8 @@ sub _parseWords($$)
          }
          push(@w,@stack);
       }
-      if ($w=~m/^[a-z0-9]+[=<>]/i){
-         push(@w,($w=~m/^([a-z0-9]+)([=<>])(.*)$/i));
+      if ($w=~m/^[a-z0-9]+(=|<|>|!=)/i){
+         push(@w,($w=~m/^([a-z0-9]+)(=|<|>|!=)(.*)$/i));
       }
       else{
          push(@w,$w);
@@ -113,7 +113,7 @@ sub _classifyElements
    my @w=@_;
    my @e;
 
-   my @COM=qw(like and or = < >);
+   my @COM=qw(like and or = < > !=);
    foreach my $w (@w){
       my $qw=quotemeta($w);
       next if ($w eq "");  # skip blanks
@@ -126,11 +126,11 @@ sub _classifyElements
       elsif ($w=~m/^".*"$/){
          push(@e,{'type'=>'VALUE','val'=>$w});
       }
-      elsif (($#e!=-1 && $e[$#e]->{type} eq "COMP") 
+      elsif (($#e!=-1 && $e[$#e]->{type} eq "COM") 
              && $w=~m/^[0-9]+(\.[0-9]+)?$/){
          # numbers without quotes can be only CONSTs,
-         # if they are after a COMP (compare) element.
-         # If they are bevore a COMP, they will be 
+         # if they are after a COM (compare) element.
+         # If they are bevore a COM, they will be 
          # interpretated as varname (by index)
          my $typ="CONST";
          push(@e,{'type'=>'CONST','val'=>$w});
@@ -348,6 +348,9 @@ sub compileExpression
          }
          if ($e->{type} eq "COM" && $e->{name} eq "="){
             $cmd.=" eq ";
+         }
+         if ($e->{type} eq "COM" && $e->{name} eq "!="){
+            $cmd.=" != ";
          }
          if ($e->{type} eq "COM" && $e->{name} eq ">"){
             $cmd.=" > ";
