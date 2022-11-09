@@ -484,13 +484,16 @@ sub Validate
       if (ref($newrec->{emailbcc}) ne "ARRAY"){
          $newrec->{emailbcc}=[$newrec->{emailbcc}];
       }
+      if (ref($newrec->{emailcc}) ne "ARRAY"){
+         $newrec->{emailcc}=[$newrec->{emailcc}];
+      }
       my %u=();
       map({trim(\$_);$u{$_}=1; } @{$newrec->{emailto}});
       @{$newrec->{emailto}}=grep(!/^\s*$/,sort(keys(%u)));
       if ($#{$newrec->{emailto}}==-1 &&
-          $#{$newrec->{emailbcc}}==-1){
-         $self->LastMsg(ERROR,"field '%s' is empty",
-                        $self->getField("emailto")->Label());
+          (!exists($newrec->{emailbcc}) || $#{$newrec->{emailbcc}}==-1) &&
+          (!exists($newrec->{emailcc}) || $#{$newrec->{emailcc}}==-1)){
+         $self->LastMsg(ERROR,"missing any target address in mailheader");
          return(0);
       }
    }
