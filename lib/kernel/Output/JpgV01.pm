@@ -161,7 +161,10 @@ sub ProcessLine
                                    current    => $rec,
                                    mode       => "DTP".lc($self->modeName()),
                                   },$name,"formated");
-
+      }
+      if (ref($data) eq "HASH"){
+         $data="[data not formatable on selected format]";
+         #$data=Dumper($data);
       }
       $self->{dtp}->WriteLine([$label,$data],
                               %font,
