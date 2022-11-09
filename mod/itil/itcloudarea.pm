@@ -689,7 +689,7 @@ sub FinishWrite
             $doNotify=2;
          }
       }
-      if ($oldrec->{cistatusid}==3 &&
+      if (defined($oldrec) && defined($newrec) &&
           exists($newrec->{applid}) &&
           $oldrec->{applid} ne $newrec->{applid}){
          $doNotify=1;
@@ -738,7 +738,7 @@ sub FinishWrite
             my $urlofcurrentrec=$carec->{urlofcurrentrec};
             $appl->NotifyWriteAuthorizedContacts($arec,{},{
                      dataobj=>$self->Self,
-                   #  emailbcc=>11634953080001,
+                     emailbcc=>11634953080001,
                      dataobjid=>$carec->{id}
                   },{},sub{
                my ($subject,$ntext);
