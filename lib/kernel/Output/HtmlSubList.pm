@@ -226,7 +226,7 @@ EOF
 }
 sub ProcessLine
 {
-   my ($self,$fh,$viewgroups,$rec,$msg)=@_;
+   my ($self,$fh,$viewgroups,$rec,$recview,$fieldbase,$recno,$msg,$param)=@_;
    my $app=$self->getParent->getParent();
    my $view=$app->getCurrentViewName();
    my @view=$app->getCurrentView();
@@ -448,13 +448,16 @@ sub ProcessLine
       $d.=" style=\"$style\"";
       $d.=" title=\"$weblinkname\"";
       $d.="$nowrap>".$data;
+      if (ref($param) eq "HASH" && 
+          (($param->{ParentMode}=~m/^Html/) && 
+           $param->{ParentMode} ne "HtmlNative")){
          if (trim($data) ne ""){
             $d.="<div class=clipicon>".
                 "<img title=\"copy\" src=\"../../base/load/edit_copy.gif\">".
                 "</div>\n";
          }
+      }
       $d.="</td>\n";
-
    }
    $d.="</tr>\n";
    return($d);

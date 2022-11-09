@@ -216,7 +216,8 @@ sub WriteToStdout
                }
                my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
                                                 \@recordview,$fieldbase,
-                                $self->getParent->Context->{Recordnumber},$msg);
+                                $self->getParent->Context->{Recordnumber},
+                                                $msg,\%param);
                $app->Context->{Recordnumber}++;
                if (defined($d)){
                   if (!exists($self->Format->{charset}) ||
@@ -234,7 +235,8 @@ sub WriteToStdout
             }
             else{
                my $d=$self->Format->ProcessHiddenLine(\$fh,undef,$rec,
-                                $self->getParent->Context->{Recordnumber},$msg);
+                                $self->getParent->Context->{Recordnumber},
+                                                      $msg,\%param);
                if (defined($d)){
                   $app->Context->{Recordnumber}++;
                   if (!exists($self->Format->{charset}) ||
@@ -313,7 +315,6 @@ sub WriteToScalar    # ToDo: viewgroups implementation
       $rec=undef;
       $self->getParent->SetCurrentView(qw(ALL));
    }
-
    $self->getParent->Context->{Linenumber}=0;
    $self->getParent->Context->{Recordnumber}=0;
    $self->Format->{fieldobjects}=[];
@@ -359,7 +360,7 @@ sub WriteToScalar    # ToDo: viewgroups implementation
                }
                my $d=$self->Format->ProcessLine(\$fh,\@viewgroups,$rec,
                             \@recordview,$fieldbase,
-                            $app->Context->{Recordnumber},$msg); 
+                            $app->Context->{Recordnumber},$msg,\%param); 
                $self->getParent->Context->{Recordnumber}++;
                if (!exists($self->Format->{charset}) ||
                    lc($self->Format->{charset}) ne "utf-8"){
