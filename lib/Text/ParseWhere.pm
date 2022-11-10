@@ -350,7 +350,7 @@ sub compileExpression
             $cmd.=" eq ";
          }
          if ($e->{type} eq "COM" && $e->{name} eq "!="){
-            $cmd.=" != ";
+            $cmd.=" ne ";
          }
          if ($e->{type} eq "COM" && $e->{name} eq ">"){
             $cmd.=" > ";
