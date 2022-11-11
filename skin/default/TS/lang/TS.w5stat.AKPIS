@@ -135,6 +135,10 @@
  de=>'Anzahl Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
  en=>'count of application with filled systems or cloudareas'
 },
+'AKPIS.app.all.techchmapprgroup.filled'=>{
+ de=>'Anzahl Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of application with min. one techical change approvergroup'
+},
 'AKPIS.app.all.tsm.filled'=>{
  de=>'Anzahl Anwendungen mit ausgefülltem TSM (technical solution manager)',
  en=>'count of application with filled tsm'
@@ -186,6 +190,50 @@
 'AKPIS.app.nonprod.systems.filled'=>{
  de=>'Anzahl Non-Produktions-Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
  en=>'count of non-production application with filled systems or cloudareas'
+},
+'AKPIS.app.ibi.techchmapprgroup.filled'=>{
+ de=>'Anzahl IBI-Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of IBI-application with min. one techical change approvergroup'
+},
+'AKPIS.app.top.techchmapprgroup.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of Top-application with min. one techical change approvergroup'
+},
+'AKPIS.app.prod.techchmapprgroup.filled'=>{
+ de=>'Anzahl Prod-Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of Prod-application with min. one techical change approvergroup'
+},
+'AKPIS.app.nonprod.techchmapprgroup.filled'=>{
+ de=>'Anzahl NonProd-Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of NonProd-application with min. one techical change approvergroup'
+},
+'AKPIS.app.techchmapprgroup.filled'=>{
+ de=>'technischen Change-Approvergroup erfasst',
+ en=>'techical change approvergroup documented'
+},
+'AKPIS.app.applid.filled'=>{
+ de=>'Anwendungen hat AnwendungsID (ApplID)',
+ en=>'application has ApplicationID'
+},
+'AKPIS.app.all.applid.filled'=>{
+ de=>'Anzahl Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of application with filled ApplicationID'
+},
+'AKPIS.app.top.applid.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of top application with filled ApplicationID'
+},
+'AKPIS.app.prod.applid.filled'=>{
+ de=>'Anzahl Prod-Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of prod application with filled ApplicationID'
+},
+'AKPIS.app.nonprod.applid.filled'=>{
+ de=>'Anzahl NonProd-Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of nonprod application with filled ApplicationID'
+},
+'AKPIS.app.ibi.applid.filled'=>{
+ de=>'Anzahl IBI relevanter Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of ibi application with filled ApplicationID'
 },
 'AKPIS.app.ibi.tsm.filled'=>{
  de=>'Anzahl IBI relevanter Anwendungen mit ausgefülltem TSM (technical solution manager)',
