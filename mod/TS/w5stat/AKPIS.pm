@@ -33,7 +33,7 @@ sub new
    $self->{applicationfields}=[
       qw(
          name cistatusid mandatorid opmode
-         businessteam applid 
+         businessteam applid chmapprgroups
          tsm 
          contacts
          applmgr
@@ -394,13 +394,22 @@ sub processRecord
 
 
       foreach my $v (qw(tsm applmgr description businessteam opmode
-                        acinmassingmentgroup)){
+                        acinmassingmentgroup applid)){
          if ($rec->{$v} ne ""){
             $appkpi->{$v.'.filled'}=1;
          }
          else{
             $appkpi->{$v.'.filled'}=0;
          }
+      }
+      $appkpi->{'techchmapprgroup.filled'}=0;
+
+      foreach my $apprgrp (@{$rec->{'chmapprgroups'}}){
+         if ($apprgrp->{group} ne "" && 
+             $apprgrp->{responsibility} eq "technical"){
+            $appkpi->{'techchmapprgroup.filled'}=1;
+         }
+
       }
 
       foreach my $akey (keys(%$appkpi)){
