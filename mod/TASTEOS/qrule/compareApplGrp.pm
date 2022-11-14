@@ -374,11 +374,10 @@ sub qcheckRecord
             $TSOSmachineid=undef;
          }
          if ($TSOSmachineid eq ""){
-
-
-
-
-
+            $tsosmacrec->{salt}=$tsosmacrec->{machineNumber};
+            $tsosmacrec->{salt}.=":" if ($tsosmacrec->{salt} ne "" &&
+                                         $tsosmacrec->{systemid} ne "");
+            $tsosmacrec->{salt}.=$tsosmacrec->{systemid};
             my $newid=insNewTSOSmac($dataobj, $tsosmac,$opladdobj,
                                     $rec,$tsosmacrec,$lrec,$ladd->{systemid});
          }
