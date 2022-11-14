@@ -22,6 +22,7 @@ use kernel;
 use kernel::Field;
 use TASTEOS::lib::Listedit;
 use JSON;
+use UUID::Tiny(':std');
 @ISA=qw(TASTEOS::lib::Listedit);
 
 sub new
@@ -94,6 +95,10 @@ sub new
             name              =>'description',
             searchable        =>1,
             label             =>'Description'),
+
+      new kernel::Field::Link(
+            name              =>'salt',
+            label             =>'MachineID create salt'),
 
    );
    $self->{'data'}=\&DataCollector;
@@ -235,14 +240,17 @@ sub InsertRecord
    foreach my $k (keys(%$newrec)){
       my $dk=$k;
       $dk="systemId" if ($k eq "systemid");
-      $new{$dk}=$newrec->{$k};
-      $new{$dk}=$new{$dk}->[0] if (ref($new{$dk}) eq "ARRAY");
+      if ($k eq "salt"){
+         my $TasetOSNS='ea28d30f-b10e-45c2-8619-4f5ce4cde7c1';
+         my $saltuuid=create_uuid(UUID_V5,$TasetOSNS,$newrec->{$k});
+         my $reqMachineId=uuid_to_string($saltuuid);
+         $new{'machine-id'}=$reqMachineId;
+      }
+      else{
+         $new{$dk}=$newrec->{$k};
+         $new{$dk}=$new{$dk}->[0] if (ref($new{$dk}) eq "ARRAY");
+      }
    }
-
-
-
-
-
    my $d=$self->CollectREST(
       dbname=>'TASTEOS',
       requesttoken=>"INS.".$newrec->{name}.time(),
