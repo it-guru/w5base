@@ -473,8 +473,9 @@ sub Import
    my $w5carec;
 
    if ($accountid ne ""){
-      $cloudarea->SetFilter({cloudid=>$cloudrec->{id},
-                             srcid=>$accountid
+      $cloudarea->SetFilter({
+         cloudid=>$cloudrec->{id},
+         srcid=>$accountid
       });
       my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
       if (defined($w5cloudarearec)){

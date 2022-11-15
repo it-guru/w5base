@@ -77,7 +77,8 @@ sub qcheckRecord
 
 
    return(undef,undef) if ($rec->{cloud} ne "AWS");
-   return(undef,undef) if ($rec->{cistatusid}<4);
+   #return(undef,undef) if ($rec->{cistatusid}<4);
+   return(undef,undef) if ($rec->{cistatusid}!=4 && $rec->{cistatusid}!=3);
 
    my $awsaccountid=$rec->{srcid};
    my $awsregion='eu-central-1';   # aktuell wird nur EINE Region gesynct
@@ -132,7 +133,7 @@ sub qcheckRecord
             };
          }
       }
-      #printf STDERR ("netif=%s\n",Dumper(\@netif));
+      printf STDERR ("netif=%s\n",Dumper(\@netif));
 
 
 
@@ -165,6 +166,7 @@ sub qcheckRecord
          }]
       );
       my @cursys=$sys->getHashList(qw(id srcid cistatusid));
+      printf STDERR ("fifi cursys=%s\n",Dumper(\@cursys));
 
       my @delsys;
       my @inssys;
@@ -288,8 +290,13 @@ sub qcheckRecord
                itcloudareaid=>$rec->{id},
                networkid    =>$netarea->{ISLAND}
             };
-            my $newid=$ipobj->ValidatedInsertRecord($rec);
-            push(@qmsg,"added: ".$iprec->{name});
+            if ($rec->{cistatusid}==4){  # native IPs only on active CloudAreas
+               my $newid=$ipobj->ValidatedInsertRecord($rec);
+               push(@qmsg,"added: ".$iprec->{name});
+            }
+            else{
+               push(@qmsg,"reject import: ".$iprec->{name});
+            }
             if ($awssyscount<50){
                $checksession->{EssentialsChangedCnt}++;
             }
