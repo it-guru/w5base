@@ -218,7 +218,7 @@ sub isViewValid
 
    my @groups=("header","default","source");
 
-   if ($self->IsMemberOf("admin")){
+   if ($self->IsMemberOf(["admin","w5base.w5stat.read"])){
       push(@groups,"stats");
    }
    if ($rec->{statstream} eq "default"){
