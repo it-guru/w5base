@@ -610,9 +610,20 @@ sub genericSystemImport
    if (ref($sysrec->{name}) eq "ARRAY"){
       $importname="SYSTEM: ".join(", ",@{$sysrec->{name}});
    }
-
-   if (!$cloudarea->validateCloudAreaImportState($importname,
+   my $useDummyImport=0;
+   my $cloudAreaOk=0;
+   if ($cloudarea->validateCloudAreaImportState($importname,
                                          $cloudrec,$cloudarearec,$w5applrec)){
+      $cloudAreaOk++;
+   }
+   else{
+      if ($cloudrec->{allowinactsysimport}){
+         $useDummyImport++;
+      }
+   }
+
+   # printf STDERR ("fifi cloudAreaOk=$cloudAreaOk useDummyImport=$useDummyImport\n");
+   if ((!$useDummyImport) && (!$cloudAreaOk)){
       if ($self->LastMsg()==-1){
          $self->LastMsg(ERROR,"invalid CloudArea State");
       }
@@ -714,9 +725,11 @@ sub genericSystemImport
                next; # das Teil ist schon zu alt, um es wieder zu aktivieren
             }
          }
-         foreach my $appl (@{$osys->{applications}}){
-            if ($appl->{applid} eq $w5applrec->{id}){
-               $applok++;
+         if ($cloudarearec->{cistatusid}==4){
+            foreach my $appl (@{$osys->{applications}}){
+               if ($appl->{applid} eq $w5applrec->{id}){
+                  $applok++;
+               }
             }
          }
          my $sysallowed=0;
@@ -827,6 +840,7 @@ sub genericSystemImport
       }
    }
    my $curdataboss;
+print STDERR ("fifi w5sysrec=%s\n",Dumper($w5sysrec));
    if (defined($w5sysrec)){
       $curdataboss=$w5sysrec->{databossid};
       my %newrec=();
@@ -1076,7 +1090,11 @@ sub genericSystemImport
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){
-      if (defined($w5applrec)){
+      if ($cloudarearec->{cistatusid}==3){
+printf STDERR ("no application relations\n");
+      }
+      elsif ($cloudarearec->{cistatusid}==4 &&
+          defined($w5applrec)){
          { # create application relation
             my $lnkapplsys=getModuleObject($self->Config,"itil::lnkapplsystem");
             my $DataInputState=$lnkapplsys->isDataInputFromUserFrontend();

@@ -178,6 +178,14 @@ sub new
                 dataobjattr   =>'itcloud.deconssupport'),
 
       new kernel::Field::Boolean(
+                name          =>'allowinactsysimport',
+                group         =>'control',
+                label         =>'CI-Import for cloud-databoss '.
+                                'on inactive cloudarea',
+                dataobjattr   =>'itcloud.allowinactsysimport'),
+
+
+      new kernel::Field::Boolean(
                 name          =>'allowuncleanseq',
                 group         =>'rootcontrol',
                 label         =>'allow unclean sequences and ci state checking',
