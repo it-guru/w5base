@@ -498,27 +498,52 @@ sub Validate
    my $newrec=shift;
    my $origrec=shift;
 
-
-   my $itcloudid=effVal($oldrec,$newrec,"cloudid");
-   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
-      if (!defined($oldrec)){
-         if (!$self->isWriteOnITCloudValid($itcloudid,"areas")){
-            $self->LastMsg(ERROR,"no write access to specified cloud");
-            return(undef);
-         }
-      }
-   }
    my $applid=effVal($oldrec,$newrec,"applid");
    $applid=~s/[^0-9]//g;
    if ($applid eq ""){
       $self->LastMsg(ERROR,"no valid application specified");
       return(0);
    }
+   my $app=getModuleObject($self->Config,"itil::appl");
+
+   my $itcloudid=effVal($oldrec,$newrec,"cloudid");
+   $itcloudid=~s/[^0-9]//g;
+   my $c=getModuleObject($self->Config,"itil::itcloud");
+   $c->SetFilter({id=>$itcloudid});
+   my ($crec,$msg)=$c->getOnlyFirst(qw(cistatusid ordersupport deconssupport));
+   if (!defined($crec)){
+      $self->LastMsg(ERROR,"invalid cloud record");
+      return(0);
+   }
+
+   if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
+      if (!defined($oldrec)){
+         if (effVal($oldrec,$newrec,"cistatusid") eq "2"){ # on order
+            if (!$crec->{ordersupport}){
+               $self->LastMsg(ERROR,"no W5Base order support for this cloud");
+               return(undef);
+            }
+            my $userid=$self->getCurrentUserId();
+            if (!$app->validateOrderingAuthorized($applid,{userid=>$userid})){
+               $self->LastMsg(ERROR,"no order access to specified application");
+               return(undef);
+            }
+         }
+      }
+      if (effChanged($oldrec,$newrec,"cistatusid")){
+         if (effVal($oldrec,$newrec,"cistatusid") eq "5"){ # deconstruction
+            if (!$crec->{deconssupport}){
+               $self->LastMsg(ERROR,
+                     "no W5Base deconstruction support for this cloud");
+               return(undef);
+            }
+         }
+      }
+   }
    if (effChanged($oldrec,$newrec,"applid")){
       if ($applid ne ""){
-         my $o=getModuleObject($self->Config,"itil::appl");
-         $o->SetFilter({id=>\$applid});
-         my ($orec,$msg)=$o->getOnlyFirst(qw(cistatusid));
+         $app->SetFilter({id=>\$applid});
+         my ($orec,$msg)=$app->getOnlyFirst(qw(cistatusid));
          if (!defined($orec)){
             $self->LastMsg(ERROR,"invalid applid specified");
             return(0);
@@ -565,9 +590,6 @@ sub Validate
       if ($newrec->{cistatusid}==4 && !$autoactivation){
          if ($self->isDataInputFromUserFrontend() && 
              !$self->IsMemberOf("admin")){
-            my $c=getModuleObject($self->Config,"itil::itcloud");
-            $c->SetFilter({id=>$itcloudid});
-            my ($crec,$msg)=$c->getOnlyFirst(qw(cistatusid));
             my $itcloudcistatusid;
             if (defined($crec)){
                $itcloudcistatusid=$crec->{cistatusid};
@@ -582,6 +604,11 @@ sub Validate
                return(0);
             }
          }
+      }
+      if ($newrec->{cistatusid}==2 && 
+          defined($oldrec) && $oldrec->{cistatusid}>2){
+         $self->LastMsg(ERROR,"switch back to on order is not allowed");
+         return(0);
       }
    }
    if (effVal($oldrec,$newrec,"cistatusid") eq "4"){
@@ -604,7 +631,7 @@ sub Validate
             }
          }
       }
-      if ($newrec->{cistatusid}<3){
+      if ($newrec->{cistatusid}<2){
          if ($self->isDataInputFromUserFrontend() && 
              !$self->IsMemberOf("admin")){
             if (!$self->isWriteOnITCloudValid($itcloudid,"default")){
@@ -671,6 +698,10 @@ sub FinishWrite
       if (exists($newrec->{cistatusid}) &&
           $newrec->{cistatusid}==3){
          $doNotify=1;
+      }
+      if (exists($newrec->{cistatusid}) &&
+          $newrec->{cistatusid}==2){  # on order
+         $doNotify=4;
       }
    }
    else{
@@ -755,7 +786,7 @@ sub FinishWrite
                return($subject,$ntext);
             });
          }
-         if ($doNotify==2 || $doNotify==3){
+         if ($doNotify==2 || $doNotify==3 || $doNotify==4){
             my %notifyParam=(
                 dataobj=>$self->Self,
                 dataobjid=>$carec->{id},
@@ -779,6 +810,9 @@ sub FinishWrite
                   $subject=$self->T("user activation of Cloud-Area",
                                     'itil::itcloudarea');
                }
+               if ($doNotify==4){
+                  $subject=$self->T("Cloud-Area order",'itil::itcloudarea');
+               }
                $subject.=" ";
                $subject.=$carec->{fullname};
                my $ntext=$self->T("Dear databoss",'kernel::QRule');
@@ -792,6 +826,10 @@ sub FinishWrite
                   $ntext.=sprintf(
                           $self->T("CMSG003"),
                                    $carec->{name},$arec->{name});
+               }
+               if ($doNotify==4){
+                  my $msgtempl=$self->T("CMSG004");
+                  $ntext.=sprintf($msgtempl,$carec->{name},$arec->{name});
                }
                $ntext.="\n";
                return($subject,$ntext);

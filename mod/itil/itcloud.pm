@@ -166,6 +166,18 @@ sub new
                 dataobjattr   =>'itcloud.notifysupport'),
 
       new kernel::Field::Boolean(
+                name          =>'ordersupport',
+                group         =>'control',
+                label         =>'support W5Base order process',
+                dataobjattr   =>'itcloud.ordersupport'),
+
+      new kernel::Field::Boolean(
+                name          =>'deconssupport',
+                group         =>'control',
+                label         =>'support W5Base deconstruction process',
+                dataobjattr   =>'itcloud.deconssupport'),
+
+      new kernel::Field::Boolean(
                 name          =>'allowuncleanseq',
                 group         =>'rootcontrol',
                 label         =>'allow unclean sequences and ci state checking',

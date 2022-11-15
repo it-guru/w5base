@@ -82,6 +82,16 @@ set to installed/active.
 From now, it is allowed to deploy items in this area.
 '
 },
+'CMSG004'=>{
+de=>'die  CloudArea <b>%s</b> wurde bestellt.
+
+Bitte kümmern Sie sich um die Bereitstellung der betreffenden CloudArea auf
+der Cloud.
+',
+en=>'
+the cloudarea <b>%s</b> has been ordered.
+'
+},
 'automatic import rejected'=>{de=>'Automatischer CI-Import abgewiesen'},
 'invalid application cistatus'=>{de=>'ungültiger CI-Status der Anwendung'},
 'invalid cloudarea cistatus'=>{de=>'ungültiger CI-Status der CloudArea'},
@@ -91,3 +101,10 @@ From now, it is allowed to deploy items in this area.
 'Config-Item first activation'=>{de=>'Config-Item erstmalige Aktivierung'},
 'requestor account'=>{de=>'Anforderer Account'},
 'Export IP-Objects to firewall management system'=>{de=>'IP-Object Export ins Firewall-Management System'},
+'no order access to specified application'=>{de=>'kein Bestellzugriff auf die angegebene Anwendung'},
+'Cloud-Area order'=>{de=>'Cloud-Area Bestellung'},
+'no W5Base order support for this cloud'=>{de=>'kein W5Base-Bestell-Support für die gewählte Cloud'},
+'no W5Base deconstruction support for this cloud'=>{de=>'kein W5Base-Rückbau-Support für die gewählte Cloud'},
+'switch back to on order is not allowed'=>{de=>'Rückstellung auf "bestellt/angefordert" ist nicht erlaubt'},
+
+
