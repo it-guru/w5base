@@ -3202,6 +3202,16 @@ sub validateOrderingAuthorized
          $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
       }
    }
+   if ($param->{userid} ne "" && !($param->{userid}=~m/\@/)){
+      my $userid=$param->{userid};
+      $userid=~s/[\s"'\*\?]//;
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->SetFilter({userid=>\$userid,cistatusid=>[4,5]});
+      my @l=$user->getHashList(qw(userid fullname));
+      if ($#l==0){
+         $userid{$l[0]->{userid}}=$l[0]->{fullname}; 
+      }
+   }
    if ($param->{dsid} ne "" && !($param->{dsid}=~m/\@/)){
       my @flt=();
       my $dsidfilter=$param->{dsid};

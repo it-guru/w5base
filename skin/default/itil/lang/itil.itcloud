@@ -23,3 +23,6 @@
 'in selected CI-Status a security responsible needs to be defined'=>{de=>'Im gewählten CI-Status muss ein Security Verantwortlicher definiert werden'},
 'notify support on cloudarea state change'=>{de=>'Benachrichtigung an Support bei CloudArea Statusänderung'},
 'allow unclean sequences and ci state checking'=>{de=>'unsaubere Abläufe erlauben und nur minimale CI-Status Prüfung'},
+'support W5Base order process'=>{de=>'Unterstützung des W5Base-Bestellprozesses für CloudAreas'},
+'support W5Base deconstruction process'=>{de=>'Unterstützung des W5Base-Rückbauprozess für CloudAreas'},
+
