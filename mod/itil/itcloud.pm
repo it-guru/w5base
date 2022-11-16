@@ -197,8 +197,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'allowinactsysimport',
                 group         =>'control',
-                label         =>'CI-Import for cloud-databoss '.
-                                'on inactive cloudarea',
+                label         =>'CI-Import for on inactive cloudarea',
                 dataobjattr   =>'itcloud.allowinactsysimport'),
 
 

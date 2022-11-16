@@ -218,6 +218,23 @@ sub new
                 dataobjattr   =>'qitcloudarea.ipobjectexport'),
 
 
+      new kernel::Field::TextDrop(
+                name          =>'respappl',
+                label         =>'responsible Application',
+                readonly      =>'1',
+                htmldetail    =>'0',
+                vjointo       =>'itil::appl',
+                vjoinon       =>['respapplid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Interface(
+                name          =>'respapplid',
+                selectfix     =>1,
+                dataobjattr   =>'if (qitcloudarea.cistatus=3,'.
+                                'if (itcloud.allowinactsysimport=1,'.
+                                'itcloud.appl,null),'.
+                                'qitcloudarea.appl)'),
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',

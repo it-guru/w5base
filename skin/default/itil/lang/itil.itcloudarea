@@ -106,5 +106,5 @@ the cloudarea <b>%s</b> has been ordered.
 'no W5Base order support for this cloud'=>{de=>'kein W5Base-Bestell-Support für die gewählte Cloud'},
 'no W5Base deconstruction support for this cloud'=>{de=>'kein W5Base-Rückbau-Support für die gewählte Cloud'},
 'switch back to on order is not allowed'=>{de=>'Rückstellung auf "bestellt/angefordert" ist nicht erlaubt'},
-
+'responsible Application'=>{de=>'verantwortliche Anwendung'},
 
