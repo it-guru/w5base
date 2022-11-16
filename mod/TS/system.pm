@@ -610,20 +610,19 @@ sub genericSystemImport
    if (ref($sysrec->{name}) eq "ARRAY"){
       $importname="SYSTEM: ".join(", ",@{$sysrec->{name}});
    }
-   my $useDummyImport=0;
    my $cloudAreaOk=0;
    if ($cloudarea->validateCloudAreaImportState($importname,
                                          $cloudrec,$cloudarearec,$w5applrec)){
       $cloudAreaOk++;
    }
    else{
-      if ($cloudrec->{allowinactsysimport}){
-         $useDummyImport++;
-      }
+      # check if default app exists and is allowed to import -> if yes, 
+      # load new w5applrec
+
    }
 
    # printf STDERR ("fifi cloudAreaOk=$cloudAreaOk useDummyImport=$useDummyImport\n");
-   if ((!$useDummyImport) && (!$cloudAreaOk)){
+   if ((!$cloudAreaOk)){
       if ($self->LastMsg()==-1){
          $self->LastMsg(ERROR,"invalid CloudArea State");
       }
