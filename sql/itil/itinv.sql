@@ -106,7 +106,7 @@ create table system (
   srcid      varchar(512) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  UNIQUE KEY systemid (systemid),
+  UNIQUE KEY systemid (systemid),key itcloudarea(itcloudarea),
   KEY adm (adm),KEY adm2 (adm2), KEY admteam (admteam),
   UNIQUE KEY name (name),KEY(mandator),key assetid(asset),
   UNIQUE KEY `srcsys` (srcsys,srcid)

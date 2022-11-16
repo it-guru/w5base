@@ -132,6 +132,22 @@ sub new
                 name          =>'supportid',
                 dataobjattr   =>'itcloud.support'),
 
+      new kernel::Field::TextDrop(
+                name       =>'appl',
+                htmlwidth  =>'150px',
+                label      =>'Cloud Infrastructure Application',
+                vjointo    =>'itil::appl',
+                allowempty =>1,
+                vjoineditbase =>{cistatusid=>"4"},
+                vjoinon    =>['applid'=>'id'],
+                vjoindisp  =>'name'),
+
+      new kernel::Field::Interface(
+                name          =>'applid',
+                uploadable    =>0,
+                label         =>'ApplicationID',
+                dataobjattr   =>'itcloud.appl'),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
@@ -151,6 +167,7 @@ sub new
                 group         =>'areas',
                 forwardSearch =>1,
                 allowcleanup  =>1,
+                htmllimit     =>'50',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 subeditmsk    =>'subedit.cloudareas',
                 vjointo       =>'itil::itcloudarea',
