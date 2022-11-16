@@ -26,4 +26,4 @@
 'support W5Base order process'=>{de=>'Unterstützung des W5Base-Bestellprozesses für CloudAreas'},
 'support W5Base deconstruction process'=>{de=>'Unterstützung des W5Base-Rückbauprozess für CloudAreas'},
 'CI-Import for cloud-databoss on inactive cloudarea'=>{de=>'CI-Import für Cloud-Datenverantwortlichen bei inaktiver CloudArea'},
-
+'Cloud Infrastructure Application'=>{de=>'Cloud-Infrastruktur-Anwendung'},
