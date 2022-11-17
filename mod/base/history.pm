@@ -207,12 +207,14 @@ sub new
 
       new kernel::Field::Textarea(
                 name          =>'oldstate',
+                allowAnyLatin1=>1,
                 label         =>'Old State',
                 dataobjattr   =>'history.oldstate'),
 
       new kernel::Field::Textarea(
                 name          =>'newstate',
                 label         =>'New State',
+                allowAnyLatin1=>1,
                 dataobjattr   =>'history.newstate'),
 
       new kernel::Field::Textarea(
@@ -322,5 +324,14 @@ sub FinishDelete
    my $oldrec=shift;
    return(1);
 }
+
+sub isQualityCheckValid
+{
+   my $self=shift;
+   my $rec=shift;
+   return(0);
+}
+
+
 
 1;

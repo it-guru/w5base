@@ -1611,7 +1611,17 @@ sub StoreUpdateDelta
                      $old=[$old] if (ref($old) ne "ARRAY");
                      $new=[$new] if (ref($new) ne "ARRAY");
                      $old=join(", ",sort(@{$old}));
-                     $new=rmNonLatin1(join(", ",sort(@{$new})));
+                     if ($fobj->can("allowAnyLatin1")){
+                        if ($fobj->allowAnyLatin1()){
+                           $new=rmAnyNonLatin1(join(", ",sort(@{$new})));
+                        }
+                        else{
+                           $new=rmNonLatin1(join(", ",sort(@{$new})));
+                        }
+                     }
+                     else{
+                        $new=rmNonLatin1(join(", ",sort(@{$new})));
+                     }
                      $new=~s/\r\n/\n/gs;
                      $old=~s/\r\n/\n/gs;
                      if (trim($new) ne trim($old)){
@@ -1975,11 +1985,11 @@ sub ValidatedInsertOrUpdateRecord
                my $o=$rec->{$k};
                my $n=$newrec->{$k};
                if (defined($o)){
-                  $o=rmNonLatin1(trim($o));
+                  $o=rmAnyNonLatin1(trim($o));
                   $o=~s/\r\n/\n/gs;
                }
                if (defined($n)){
-                  $n=rmNonLatin1(trim($n));
+                  $n=rmAnyNonLatin1(trim($n));
                   $n=~s/\r\n/\n/gs;
                }
                if ($o ne $n){

@@ -128,6 +128,7 @@ sub new
    $self->{_permitted}->{background}=1; # Color of Background (if posible)
    $self->{_permitted}->{label}=1;      # Die Beschriftung des Felds
    $self->{_permitted}->{readonly}=1;   # Nur zum lesen
+   $self->{_permitted}->{allowAnyLatin1}=1; # allow ALL Latin1 Chars (f.e. á)
    $self->{_permitted}->{preparseSearch}=1;  # preparse search hash value
    $self->{_permitted}->{frontreadonly}=1;   # Nur zum lesen
    $self->{_permitted}->{grouplabel}=1; # 1 wenn in HTML Detail Grouplabel soll
@@ -147,6 +148,9 @@ sub new
    }
    if (!defined($self->{history})){
       $self->{history}=1;
+   }
+   if (!defined($self->{allowAnyLatin1})){
+      $self->{allowAnyLatin1}=0;
    }
    if (!defined($self->{valign})){
       $self->{valign}="center";
@@ -608,6 +612,10 @@ sub Validate
    if (!ref($newrec->{$self->Name()}) &&
        $self->Type() ne "File"){
       if (!exists($self->{binary}) || $self->{binary} eq "0"){
+         if ($self->allowAnyLatin1()){
+            my $txt=rmAnyNonLatin1(trim($newrec->{$self->Name()}));
+            return({$self->Name()=>$txt});
+         }
          my $txt=rmNonLatin1(trim($newrec->{$self->Name()}));
          return({$self->Name()=>$txt});
       }

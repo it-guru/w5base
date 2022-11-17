@@ -82,7 +82,8 @@ use charnames ':full';
 @ISA = qw(Exporter);
 @EXPORT = qw(&Query &LangTable &extractLanguageBlock 
              &globalContext &NowStamp &CalcDateDuration
-             &trim &rtrim &ltrim &limitlen &rmNonLatin1 &in_array &array_insert
+             &trim &rtrim &ltrim &limitlen &rmNonLatin1 &rmAnyNonLatin1
+             &in_array &array_insert
              &first_index
              &base36
              &hash2xml &xml2hash &effVal &effChanged &effChangedVal 
@@ -515,7 +516,7 @@ sub orgRoles
 sub XmlQuote
 {
    my $org=shift;
-   $org=rmNonLatin1(unHtml($org));
+   $org=rmAnyNonLatin1(unHtml($org));
    $org=~s/&/&amp;/g;
    $org=~s/</&lt;/g;
    $org=~s/>/&gt;/g;
@@ -761,6 +762,7 @@ sub HashExtr
    return(@l);
 }
 
+# remove any non-Latin1 char, witch not belongs to the "kern" german charset
 sub rmNonLatin1
 {
    my $txt=shift;
@@ -768,6 +770,17 @@ sub rmNonLatin1
    $txt=~s/([\x10])/\n/g; 
    $txt=~s/([^\x00-\xff])/sprintf('&#%d;', ord($1))/ge; 
    $txt=~s/[^\ta-z0-9,:;\!"#\\\?\+\-\/<>\._\&\[\]\(\)\n\{\}= ÖÄÜöäüß\|\@\^\*'\$\§\%~]//ig;
+   return($txt);
+}
+
+# allow additional to the rmNonLatin1 all acent chars
+sub rmAnyNonLatin1
+{
+   my $txt=shift;
+   $txt=~s/([\x00-\x08])//g; 
+   $txt=~s/([\x10])/\n/g; 
+   $txt=~s/([^\x00-\xff])/sprintf('&#%d;', ord($1))/ge; 
+   $txt=~s/[^\ta-z0-9,:;\!"#\\\?\+\-\/<>\._\&\[\]\(\)\n\{\}= ÖÄÜöäüß ÀÁÂÃÅÈÉÊËÌÍÎÏÑÒÓÔÕÙÚÛİàáâãåèéêëìíîïñòóôõùúûıÿ\|\@\^\*'\$\§\%~]//ig;
    return($txt);
 }
 
