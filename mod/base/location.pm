@@ -94,12 +94,14 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'label',
+                allowAnyLatin1=>1,
                 label         =>'Location label',
                 dataobjattr   =>'location.label'),
 
       new kernel::Field::Text(
                 name          =>'address1',
                 htmlwidth     =>'200px',
+                allowAnyLatin1=>1,
                 label         =>'Street address',
                 dataobjattr   =>'location.address1'),
 
@@ -124,6 +126,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'location',
+                allowAnyLatin1=>1,
                 label         =>'Location',
                 dataobjattr   =>'location.location'),
 
@@ -409,6 +412,15 @@ sub new
 
    }
 
+   $self->{history}={
+      delete=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ]
+   };
+
    $self->{CI_Handling}={uniquename=>"name",
                          activator=>["admin","w5base.base.location"],
                          uniquesize=>255};
@@ -600,6 +612,22 @@ sub Validate
    $name=~s/\xD6/Oe/g;
    $name=~s/\xC4/Ae/g;
    $name=~s/\xDF/ss/g;
+
+   $name=~s/[ÀÁÂÃÅ]/A/g;
+   $name=~s/[ÈÉÊË]/E/g;
+   $name=~s/[ÌÍÎÏ]/I/g;
+   $name=~s/[Ñ]/N/g;
+   $name=~s/[ÒÓÔÕ]/O/g;
+   $name=~s/[ÙÚÛ]/U/g;
+   $name=~s/[İ]/Y/g;
+   $name=~s/[àáâãå]/a/g;
+   $name=~s/[èéêë]/e/g;
+   $name=~s/[ìíîï]/i/g;
+   $name=~s/[ñ]/n/g;
+   $name=~s/[òóôõ]/o/g;
+   $name=~s/[ùúû]/u/g;
+   $name=~s/[ÿı]/y/g;
+
    $name=~s/[\s\/,\/]+/_/g;
    $name=~s/_+/_/g;
    $newrec->{'name'}=$name;
@@ -684,7 +712,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default") if (!defined($rec));
+   return("header","default","history") if (!defined($rec));
    return("ALL");
 }
 
