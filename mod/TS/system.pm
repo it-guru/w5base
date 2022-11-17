@@ -561,6 +561,91 @@ sub genericSystemImportNotify
 }
 
 
+sub genericAddApplRelation
+{
+   my $self=shift;
+   my $replaceExisting=shift;
+   my $identifyby=shift;
+   my $curdataboss=shift;
+   my $w5applrec=shift;
+
+   { # create application relation
+      my $lnkapplsys=getModuleObject($self->Config,"itil::lnkapplsystem");
+      my $DataInputState=$lnkapplsys->isDataInputFromUserFrontend();
+      $lnkapplsys->isDataInputFromUserFrontend(0); # process as sys mode
+      $lnkapplsys->SetFilter({
+         systemid=>\$identifyby,
+         applid=>\$w5applrec->{id}
+      });
+      my ($lnkrec)=$lnkapplsys->getOnlyFirst(qw(ALL));
+      if (!defined($lnkrec)){
+         $lnkapplsys->ValidatedInsertRecord({
+            systemid=>$identifyby,
+            applid=>$w5applrec->{id}
+         });
+      }
+      $lnkapplsys->isDataInputFromUserFrontend($DataInputState);
+   }
+   { # add addition write contacts
+     my %addwr=();
+     foreach my $fld (qw(tsmid tsm2id opmid opm2id applmgrid 
+                         databossid contacts)){
+        if ($fld eq "contacts"){
+           foreach my $crec (@{$w5applrec->{contacts}}){
+              my $roles=$crec->{roles};
+              $roles=[$roles] if (ref($roles) ne "ARRAY");
+              if (in_array($roles,"write") &&
+                  $crec->{targetid} ne ""){
+                 $addwr{$crec->{target}}->{$crec->{targetid}}++;
+              }
+           } 
+        }
+        else{
+           if ($w5applrec->{$fld} ne "" && 
+               $w5applrec->{$fld} ne $curdataboss){
+              $addwr{'base::user'}->{$w5applrec->{$fld}}++;
+           }
+        }
+     }
+     my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
+     $lnkcontact->SetFilter({
+        refid=>\$identifyby,
+        parentobj=>[$self->SelfAsParentObject()],
+     });
+     my @cur=$lnkcontact->getHashList(qw(ALL));
+     $lnkcontact->ResetFilter();
+     foreach my $ctype (keys(%addwr)){
+        foreach my $contactid (keys(%{$addwr{$ctype}})){
+           my @old=grep({
+              $_->{target} eq $ctype && $_->{targetid} eq $contactid
+           } @cur);
+           if ($#old==-1){
+              $lnkcontact->ValidatedInsertRecord({
+                 target=>$ctype,
+                 targetid=>$contactid,
+                 roles=>['write'],
+                 refid=>$identifyby,
+                 comments=>"inherited by application",
+                 parentobj=>$self->SelfAsParentObject()
+              });   
+           }
+           else{
+              my @curroles=$old[0]->{roles};
+              if (ref($curroles[0]) eq "ARRAY"){
+                 @curroles=@{$curroles[0]};
+              }
+              if (!in_array(\@curroles,"write")){
+                 $lnkcontact->ValidatedUpdateRecord($old[0],{
+                    roles=>[@curroles,'write'],
+                 },{id=>\$old[0]->{id}});   
+              }
+           }
+        }
+     }
+   }
+}
+
+
 sub genericSystemImport
 {
    my $self=shift;
@@ -618,17 +703,25 @@ sub genericSystemImport
    else{
       # check if default app exists and is allowed to import -> if yes, 
       # load new w5applrec
-
+      if ($cloudarearec->{cistatusid}==3 && $cloudarearec->{respapplid} ne ""){
+         $appl->ResetFilter();
+         $appl->SetFilter({id=>\$cloudarearec->{respapplid}});
+         my ($apprec,$msg)=$appl->getOnlyFirst(qw(ALL));
+         if (defined($apprec)){
+            $w5applrec=$apprec;
+            if ($w5applrec->{cistatusid}==4){
+               $cloudAreaOk++;
+            }
+         }
+      }
    }
 
-   # printf STDERR ("fifi cloudAreaOk=$cloudAreaOk useDummyImport=$useDummyImport\n");
    if ((!$cloudAreaOk)){
       if ($self->LastMsg()==-1){
          $self->LastMsg(ERROR,"invalid CloudArea State");
       }
       return(undef);
    }
-
 
    my $w5sysrecmodified=0;
    my $w5autoscalegroupextend=0;
@@ -1089,85 +1182,9 @@ sub genericSystemImport
       $identifyby=$sys->ValidatedInsertRecord($newrec);
    }
    if (defined($identifyby) && $identifyby!=0){
-      if ($cloudarearec->{cistatusid}==3){
-         printf STDERR ("no application relations\n");
-      }
-      elsif ($cloudarearec->{cistatusid}==4 &&
-          defined($w5applrec)){
-         { # create application relation
-            my $lnkapplsys=getModuleObject($self->Config,"itil::lnkapplsystem");
-            my $DataInputState=$lnkapplsys->isDataInputFromUserFrontend();
-            $lnkapplsys->isDataInputFromUserFrontend(0); # process as sys mode
-            $lnkapplsys->SetFilter({
-               systemid=>\$identifyby,
-               applid=>\$w5applrec->{id}
-            });
-            my ($lnkrec)=$lnkapplsys->getOnlyFirst(qw(ALL));
-            if (!defined($lnkrec)){
-               $lnkapplsys->ValidatedInsertRecord({
-                  systemid=>$identifyby,
-                  applid=>$w5applrec->{id}
-               });
-            }
-            $lnkapplsys->isDataInputFromUserFrontend($DataInputState);
-         }
-         { # add addition write contacts
-           my %addwr=();
-           foreach my $fld (qw(tsmid tsm2id opmid opm2id applmgrid 
-                               databossid contacts)){
-              if ($fld eq "contacts"){
-                 foreach my $crec (@{$w5applrec->{contacts}}){
-                    my $roles=$crec->{roles};
-                    $roles=[$roles] if (ref($roles) ne "ARRAY");
-                    if (in_array($roles,"write") &&
-                        $crec->{targetid} ne ""){
-                       $addwr{$crec->{target}}->{$crec->{targetid}}++;
-                    }
-                 } 
-              }
-              else{
-                 if ($w5applrec->{$fld} ne "" && 
-                     $w5applrec->{$fld} ne $curdataboss){
-                    $addwr{'base::user'}->{$w5applrec->{$fld}}++;
-                 }
-              }
-           }
-           my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
-           $lnkcontact->SetFilter({
-              refid=>\$identifyby,
-              parentobj=>[$sys->SelfAsParentObject()],
-           });
-           my @cur=$lnkcontact->getHashList(qw(ALL));
-           $lnkcontact->ResetFilter();
-           foreach my $ctype (keys(%addwr)){
-              foreach my $contactid (keys(%{$addwr{$ctype}})){
-                 my @old=grep({
-                    $_->{target} eq $ctype && $_->{targetid} eq $contactid
-                 } @cur);
-                 if ($#old==-1){
-                    $lnkcontact->ValidatedInsertRecord({
-                       target=>$ctype,
-                       targetid=>$contactid,
-                       roles=>['write'],
-                       refid=>$identifyby,
-                       comments=>"inherited by application",
-                       parentobj=>$sys->SelfAsParentObject()
-                    });   
-                 }
-                 else{
-                    my @curroles=$old[0]->{roles};
-                    if (ref($curroles[0]) eq "ARRAY"){
-                       @curroles=@{$curroles[0]};
-                    }
-                    if (!in_array(\@curroles,"write")){
-                       $lnkcontact->ValidatedUpdateRecord($old[0],{
-                          roles=>[@curroles,'write'],
-                       },{id=>\$old[0]->{id}});   
-                    }
-                 }
-              }
-           }
-         }
+      if (($cloudarearec->{cistatusid}==4 || $cloudarearec->{cistatusid}==3) &&
+          defined($w5applrec)){  # contains respappl (if cistatusid=3)
+         $self->genericAddApplRelation(0,$identifyby,$curdataboss,$w5applrec); 
       }
       if ($self->LastMsg()==0){  # do qulity checks only if all is ok
          $sys->ResetFilter();
