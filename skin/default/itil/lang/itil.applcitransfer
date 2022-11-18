@@ -1,0 +1,6 @@
+'itil::applcitransfer'=>{
+  de=>'Anwendungs-Config-Item Transfer',
+  en=>'Application ConfigItem Transfer'
+},
+'emitting Application'=>{de=>'abgebende Anwendung'},
+'collecting Application'=>{de=>'aufnehmende Anwendung'},

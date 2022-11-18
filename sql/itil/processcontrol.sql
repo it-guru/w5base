@@ -60,3 +60,33 @@ create table lnkosreleasesoftwareset (
   PRIMARY KEY  (id), KEY software (osrelease),key(softwareset),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+set FOREIGN_KEY_CHECKS=0;
+create table applcitransfer (
+  id           bigint(20) NOT NULL,
+  eappl        bigint(20) NOT NULL,
+  cappl        bigint(20) NOT NULL,
+   eappl_ack_date   datetime     default NULL,
+   eappl_ack_user   bigint(20)   default NULL,
+   eappl_ack_cmnt   longtext     default NULL,
+   cappl_ack_date   datetime     default NULL,
+   cappl_ack_user   bigint(20)   default NULL,
+   cappl_ack_cmnt   longtext     default NULL,
+  configitems  longtext    default NULL,
+  transferdt   datetime    default NULL,
+  transferlog  longtext    default NULL,
+  comments     longtext    default NULL,
+  additional   longtext    default NULL,
+  createdate   datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate   datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser   bigint(20) default NULL,
+  modifyuser   bigint(20) default NULL,
+  editor       varchar(100) NOT NULL default '',
+  realeditor   varchar(100) NOT NULL default '',
+  srcsys       varchar(100) default 'w5base',
+  srcid        varchar(20) default NULL,
+  srcload      datetime    default NULL,
+  PRIMARY KEY  (id),
+  FOREIGN KEY fk_eappl (eappl) REFERENCES appl (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_cappl (cappl) REFERENCES appl (id) ON DELETE CASCADE,
+  UNIQUE KEY `srcsys` (srcsys,srcid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
