@@ -6,14 +6,15 @@ package TS::qrule::ApplDRClass;
 
 =head3 PURPOSE
 
-Checks whether an "installed/active" or "available/in project"
-application with primary operation mode "Production" or
-"Disaster Recovery" has a "Disaster Recovery Class" defined,
-otherwise an errror message is output.
-From a Disaster Recovery Class of "4" and more it will checked
-whether the "Application switch-over behaviour" is defined and
-the "SLA number Disaster-Recovery test interval" is at least
-"1 test every 2 years", otherwise an error message is output.
+Checks whether an "installed/active" or "available/in project" application with primary operation mode "Production" or "Disaster Recovery" has:
+
+-  "Disaster Recovery Class" defined,
+
+-  corresponding "SLA number Disaster-Recovery test interval" defined, 
+
+-  whether the "Application switch-over behaviour" is defined, 
+
+otherwise an error message is output.
 
 =head3 IMPORTS
 
@@ -23,27 +24,49 @@ NONE
 
 [en:]
 
-A "Disaster Recovery Class" must be defined.
+A "Disaster Recovery Class" (DR) must be defined for each productive application.
 
-On "Disaster Recovery Class" >= 4 the fields under "Disaster-Recovery" 
-have to be maintained and minimum 1 Disaster-Recovery test 
-every 2 years has to be assured.
+For non-productive applications is the parameter "Disaster Recovery Class" not mandatory. The value can be set to not defined to avoid DataIssue connected to this QRule.
 
-If you have any questions please contact the Darwin Support: 
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+The corresponding SLA number Disaster-Recovery test interval: must be defined, too. 
 
+For the DR process the following timeslots are relevant  depending on a set Disaster Recovery Class:
+
+- Disaster Recovery Classes 0-3: 1 test every 12 months
+
+- Disaster Recovery Classes 4-7: 1 test every 24 months
+
+- Disaster Recovery Classes 11-18: 1 test every 12 months
+
+Tests can be performed even more frequently, for example twice in 12 months. 
+The selection within the field SLA number Disaster-Recovery test interval: is then considered as mandatory and test must be performed within the set time interval.
+
+Further information you can find on Disaster Recovery FAQ site at intranet:
+
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b?currentLanguage=EN
 
 [de:]
 
-Eine "Disaster Recovery Class" muss definiert sein.
+Eine "Disaster Recovery Class" muss für jede Produktive Applikation definiert sein.
 
-Bei "Disaster Recovery Class" >= 4 müssen die entsprechenden Datenfelder 
-unter "Disaster-Recovery" gepflegt werden und es muss mindstens 
-1 Disaster-Recovery Test alle 2Jahre zugesichert werden.
+Für non-Produktive Systeme ist das Parameter "Disaster Recovery Class" nicht verpflichtend. Um DataIssue verbunden mit dieser Q-Regel zu vermeiden, ist der Wert auf nicht definiert zu setzen.
 
-Bei Fragen wenden Sie sich bitte an den DARWIN Support:
-https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
+Entsprechend muss auch das Parameter SLA Anzahl zugesicherter Disaster-Recovery Tests: gesetzt sein.
 
+Der DR Prozess sieht 2 Zeitfenster für DR Test vor  abhängig von der gesetzten Disaster Recovery Class:
+
+- Disaster Recovery Classes 0-3: 1 Test alle 12 Monate
+
+- Disaster Recovery Classes 4-7: 1 Test alle 24 Monate
+
+- Disaster Recovery Classes 11-18: 1 Test alle 12 Monate
+
+Es besteht die Möglichkeit, auch häufiger zu testen, z.B. 2-mal in 12 Monaten. 
+Die Wahl im Fenster SLA Anzahl zugesicherter Disaster-Recovery Tests: wird dann als verbindlich angesehen und muss termingetreu umgesetzt werden.
+
+Weiterführende Informationen finden Sie auch auf unserer FAQ Seite im Intranet:
+
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b?currentLanguage=EN
 
 =cut
 #######################################################################
