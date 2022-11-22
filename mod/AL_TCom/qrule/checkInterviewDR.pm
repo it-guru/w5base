@@ -16,52 +16,32 @@ NONE
 
 [en:]
 
-Checks and extends Interviews-Answers on DR-Test topic.
+Checks Interviews-Answers on DR-Test topic. 
+When the inserted change number looks like SM9 change number, the date of last DR test will be automatically filled out from the entered change.
+
+A DataIssue is created if age of the last DR test (calculated based on the SLA guidelines) is too old.
+
+A DataIssue is created if the date of the planned DR test is set further in the future as the interval defined in the SLA guidelines.
+
+A DataIssue is created if the date of the planned DR test is set 8 weeks before the last DR test.
+
+A DataIssue is created if the date of the planned DR test is older then the half test-interval.
+
+In case of a new application which doesnt have any entry under "last DR test" and there is no planned date next Disaster-Recovery test set and the age of application reaches the half of the test interval (based on SLA), a DataIssue is created.
 
 [de:]
 
-Prüft und erweitert die Interview-Antworten im Themenblock DR-Test.
-Wenn die eingegebene Changenummer wie eine SM9 Changenummer aussieht,
-dann wird das Datum des letzten DR Tests automatisch aus dem Change
-entnommen und in die Antwort eingefügt.
+Prüft die Interview-Antworten im Themenblock DR-Test. Wenn die eingegebene Changenummer wie eine SM9 Changenummer aussieht, dann wird das Datum des letzten DR Tests automatisch aus dem Change entnommen und in die Antwort eingefügt. Wenn kein gültiger CR Nummer aus dem SM9 vorhanden ist, ist das Feld leer zu lassen. Kommentare können ggf. in dediziertes Kommentarfeld eingetragen werden.
 
-Über die SLA Vorgaben wird errechnet, wie alt der letzte DR Test 
-maximal sein darf. Ist dieser zu alt, wird ein DataIssue erzeugt.
+Über die SLA Vorgaben wird errechnet, wie alt der letzte DR Test maximal sein darf. Ist dieser zu alt, wird ein DataIssue erzeugt.
 
-Ist das DR Test Plandatum weiter in der Zukunft, als das durch die
-SLA Vorgaben definierte Interval, so wird ein DataIssue erzeugt.
+Ist das DR Test Plandatum weiter in der Zukunft, als das durch die SLA Vorgaben definierte Intervall, so wird ein DataIssue erzeugt.
 
-Liegt das DR Test Plandatum länger als 8 Wochen vor dem letzten
-DR Test, so wird ein DataIssue erzeugt.
+Liegt das DR Test Plandatum länger als 8 Wochen vor dem letzten DR Test, so wird ein DataIssue erzeugt.
 
-Liegt das DR Test Plandatum länger als das halbe Test-Intervall in
-der Vergangenheit, so wird ein DataIssue erzeugt.
+Liegt das DR Test Plandatum länger als das halbe Test-Intervall in der Vergangenheit, so wird ein DataIssue erzeugt.
 
-Wurde eine Anwendung neu aufgebaut (und hat somit noch keinen
-"letzten DR Test", so sind die betreffenden Fragen alle auf
-"relevant"="nein" zu setzen.
-
-[en:]
-
-Checks and extends Interviews-Answers on DR-Test topic. When 
-the inserted change number looks like SM9 change number, the date of
-last DR test will be automatically filled out from the entered change.
-
-A DataIssue is created if max. age of the last DR test (calculated 
-based on the SLA guidlines) is too old. 
-
-A DataIssue is created if the date of the planned DR test is 
-set further in the future as the interval defined in the SLA guidlines.
-
-A DataIssue is created if the date of the planned DR test is 
-set 8 weeks before the last DR test.
-
-A DataIssue is created if the date of the planned DR test is 
-older then the half test-interval.
-
-In case of a new application (which doesnt have the "last DR 
-test") set all question under "relevant" to "no".
-
+Wurde eine Anwendung neu aufgebaut und hat noch keinen "letzten DR Test" und ist kein Plantermin vorhanden wenn das Alter der Anwendung das halbe Test-Intervall (vom SLA Vorgaben) erreicht, so wird ein DataIssue erzeugt.
 
 
 =cut
