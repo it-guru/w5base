@@ -665,9 +665,17 @@ sub new
       new kernel::Field::Text(                         # a hidden field, to
                 name          =>'autodischint',        # track relation created
                 htmldetail    =>'NotEmpty',            # by AutoDiscManager
-                label         =>'AutoDiscovery Relation',
-                readonly      =>1,
-                container     =>'additional'),
+                label         =>'AutoDiscovery Relation',  # needs to be in 
+                container     =>'additional'),             # allow write
+
+      new kernel::Field::Text(                         
+                name          =>'sourceautodischint',     
+                group         =>'source',
+                searchable    =>0,
+                htmldetail    =>'NotEmpty',            
+                label         =>'AutoDiscovery Relation',  
+                readonly      =>1,                        
+                alias         =>'autodischint'),           
                                                    
       new kernel::Field::Container(
                 name          =>'additional',
