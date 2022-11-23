@@ -769,6 +769,20 @@ sub rmNonLatin1
    $txt=~s/([\x00-\x08])//g; 
    $txt=~s/([\x10])/\n/g; 
    $txt=~s/([^\x00-\xff])/sprintf('&#%d;', ord($1))/ge; 
+   $txt=~s/[ΐΑΒΓΕ]/A/g; 
+   $txt=~s/[ΘΙΚΛ]/E/g; 
+   $txt=~s/[ΜΝΞΟ]/I/g; 
+   $txt=~s/[Ρ]/N/g; 
+   $txt=~s/[ΣΤΥ]/O/g; 
+   $txt=~s/[ΩΪΫ]/U/g; 
+   $txt=~s/[έ]/Y/g; 
+   $txt=~s/[αβγε]/a/g; 
+   $txt=~s/[θικλ]/e/g; 
+   $txt=~s/[μνξο]/i/g; 
+   $txt=~s/[ρ]/n/g; 
+   $txt=~s/[στυ]/o/g; 
+   $txt=~s/[ωϊϋ]/u/g; 
+   $txt=~s/[ύÿ]/y/g; 
    $txt=~s/[^\ta-z0-9,:;\!"#\\\?\+\-\/<>\._\&\[\]\(\)\n\{\}= ΦΔάφδόί\|\@\^\*'\$\§\%~]//ig;
    return($txt);
 }
