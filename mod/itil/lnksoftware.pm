@@ -644,26 +644,29 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-System',
                 dataobjattr   =>'lnksoftwaresystem.srcsys'),
                                                    
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-Id',
                 dataobjattr   =>'lnksoftwaresystem.srcid'),
                                                    
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Last-Load',
                 dataobjattr   =>'lnksoftwaresystem.srcload'),
 
       new kernel::Field::Text(                         # a hidden field, to
                 name          =>'autodischint',        # track relation created
-                htmldetail    =>'0',                   # by AutoDiscManager
+                htmldetail    =>'NotEmpty',            # by AutoDiscManager
                 label         =>'AutoDiscovery Relation',
-                readonly      =>0,
+                readonly      =>1,
                 container     =>'additional'),
                                                    
       new kernel::Field::Container(

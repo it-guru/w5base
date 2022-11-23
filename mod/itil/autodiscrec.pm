@@ -600,7 +600,6 @@ sub doTakeAutoDiscData
                   $upd{version}=$scanextra2;
                }
             }
-            #printf STDERR ("fifi SecureValidatedUpdateRecord in doTakeRemote\n");
             my $scanextra1=effVal($oldrec,$newrec,"scanextra1");
             if (trim($swirec->{instpath}) ne $scanextra1){
                $upd{instpath}=trim($scanextra1);
@@ -661,7 +660,7 @@ sub FinishWrite
                                     software scanname
                                     softwareid engineid));
          if ($#admap==0){
-            my $systemid=$rec->{lnkto_system};
+            my $systemid=$rec->{disc_on_systemid};
             my $softwareid=$admap[0]->{softwareid};
             
             my $lnksw=$self->getPersistentModuleObject("lnksw",
