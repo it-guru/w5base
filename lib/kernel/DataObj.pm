@@ -5350,7 +5350,13 @@ sub DoRESTcall
          $d=$xmltree;
       }
       else{
-         $d=decode_json($respcontent);
+         eval('$d=decode_json($respcontent);');
+         if ($@ ne ""){
+            if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+               msg(ERROR,"can not parse JSON content:\n".$respcontent);
+            }
+            return(undef);
+         }
       }
       #print STDERR ("Debug2: result=%s\n",Dumper($d));
       if (ref($d) eq "HASH" || ref($d) eq "ARRAY" || ref($d) eq "XML::Smart"){
