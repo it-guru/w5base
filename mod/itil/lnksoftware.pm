@@ -664,19 +664,12 @@ sub new
 
       new kernel::Field::Text(                         # a hidden field, to
                 name          =>'autodischint',        # track relation created
-                htmldetail    =>'NotEmpty',            # by AutoDiscManager
                 label         =>'AutoDiscovery Relation',  # needs to be in 
-                container     =>'additional'),             # allow write
-
-      new kernel::Field::Text(                         
-                name          =>'sourceautodischint',     
+                htmldetail    =>"NotEmpty",
                 group         =>'source',
                 searchable    =>0,
-                htmldetail    =>'NotEmpty',            
-                label         =>'AutoDiscovery Relation',  
-                readonly      =>1,                        
-                alias         =>'autodischint'),           
-                                                   
+                container     =>'additional'),             # allow write
+
       new kernel::Field::Container(
                 name          =>'additional',
                 label         =>'Additionalinformations',
@@ -1072,7 +1065,8 @@ sub Validate
                   return(undef);
                }
                else{
-                  if (!$self->isInstanceRelationWriteable($oldrec->{id}) &&
+                  if (($W5V2::OperationContext ne "QualityCheck") &&
+                      !$self->isInstanceRelationWriteable($oldrec->{id}) &&
                       !$self->isLicManager(effVal($oldrec,$newrec,
                                                   "mandatorid"))){
                      msg(INFO,"no licensmanager and no instance writer");
@@ -1163,6 +1157,8 @@ sub isWriteValid
    my $self=shift;
    my $rec=shift;
    my $rw=0;
+
+   return("ALL") if ($W5V2::OperationContext eq "QualityCheck");
 
    $rw=1 if (!defined($rec));
    $rw=1 if (defined($rec) && $self->isParentWriteable($rec->{systemid},
