@@ -1626,14 +1626,15 @@ sub initSqlWhere
                  $assetid=['-99'];
                }
                my $astr=join(",",map({"'".$_."'"} @$assetid));
-               $where="(system.systemtype<>'virtualizedSystem' ".
+               $where="((system.systemtype<>'virtualizedSystem' ".
                        "and system.asset in ($astr)) ".
                       "or (system.systemtype='virtualizedSystem' ".
-                       "and vsystem.asset in ($astr))";
+                       "and vsystem.asset in ($astr)))";
             }
          }
       }
    }
+
 
    return($where);
 }

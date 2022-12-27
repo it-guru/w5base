@@ -32,6 +32,8 @@ use HTTP::Cookies;          #
 use XML::Parser;            #
 use HTML::Parser;           #
 
+use Time::HiRes;
+
 use File::Temp qw(tempfile);
 @ISA=qw(kernel::Event);
 
@@ -211,19 +213,26 @@ sub mkAcFtpRecSystem
 
    # Wir "sehen" manche Assets nicht mehr - ist ein Problem
    #return(undef) if ($arec->{assetid} eq "");
+   my $nsys=1;
+#   if ($rec->{srcsys} eq "AWS" ||
+#       $rec->{srcsys} eq "Azure" ||
+#       ($rec->{srcsys}=~m/^TPC/) ){  # For clouds the SystemPartOfAsset calc
+#      $nsys=100;                     # makes no sense, because AssetManager
+#   }                                 # can only handle 0.01 (100 sys per Asset)
+#   elsif ($rec->{assetid} ne ""){
+if (1){
+      my $s=getModuleObject($self->Config,"itil::system");
+      $s->SetFilter({assetid=>$rec->{assetid},
+                     cistatusid=>"<6"});
+      my @l=$s->getHashList(qw(id));
 
-   my $s=getModuleObject($self->Config,"itil::system");
-   $s->SetFilter({asset=>\$rec->{asset},
-                  cistatusid=>"<6"});
-   my @l=$s->getHashList(qw(id));
-
-   my $nsys=$#l+1;
-   if ($nsys<=0){
-      $nsys=1;
+      $nsys=$#l+1;
+      if ($nsys<=0){
+         $nsys=1;
+      }
    }
    my $pSystemPartOfAsset=1/$nsys;
    my $TXTpSystemPartOfAsset=sprintf("%0.2lf",$pSystemPartOfAsset);
-
 
    my $memory=$rec->{memory};
    $memory="1" if ($memory eq "");
@@ -336,6 +345,8 @@ sub SendXmlToAM_system
    my $acnewback=0;
    if (defined($rec)){
       do{
+         my $t0=Time::HiRes::time();
+         msg(INFO,"Start of Record");
          if ($rec->{asset} ne "" && $rec->{acinmassingmentgroup} ne ""){
             $acasset->ResetFilter();
             $acasset->SetFilter({assetid=>\$rec->{asset}});
@@ -354,6 +365,10 @@ sub SendXmlToAM_system
                }
             }
          }
+         my $t1=Time::HiRes::time();
+         my $top=$t1-$t0;
+         msg(INFO,"End of Record in time top=$top");
+
          
          ($rec,$msg)=$system->getNext();
       } until(!defined($rec));
