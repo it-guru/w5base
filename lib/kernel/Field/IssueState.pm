@@ -291,7 +291,7 @@ sub RawValue
       my $obj=$self->getParent()->SelfAsParentObject();
       my $issuerec=$self->getWorkflowRec($obj,$refid);
       if (defined($issuerec)){
-         if ($mode ne ""){
+         if ($mode ne "" && $mode ne "JSON"){
             $msg="DataIssue ".
                  $self->getParent->T("since","kernel::Field::IssueState")." ".
                  $issuerec->{eventstart}." GMT";
@@ -303,10 +303,21 @@ sub RawValue
             # vergangenheit. Ansonsten FAIL
             # sufix "but OK" wenn der Bearbeitungszeitpunkt kürzer als 8 Wochen 
             # in der Vergangenheit und mdate min. 1h nach eventstart
+            my $d=CalcDateDuration($issuerec->{eventstart},
+                  NowStamp("en"),"GMT");
+            if (defined($d) && exists($d->{totaldays}) && $d->{totaldays}<8*7){
+               $msg="WARN";
+            }
+
+            my $d=CalcDateDuration($issuerec->{mdate},NowStamp("en"),"GMT");
+            if (defined($d) && exists($d->{totaldays}) && $d->{totaldays}<8*7){
+               $msg.=" but OK";
+            }
             $msg={
                dataissuestate=>$msg,
                id=>$issuerec->{id},
                eventstart=>$issuerec->{eventstart},
+               mdate=>$issuerec->{mdate},
                dataissue=>$issuerec->{name},
                dataobj=>$self->getParent->SelfAsParentObject(),
                dataobjid=>$refid,
@@ -315,7 +326,7 @@ sub RawValue
          }
       }
       else{
-         if ($mode ne ""){
+         if ($mode ne "" && $mode ne "JSON"){
             $msg="OK";
          }
          else{
