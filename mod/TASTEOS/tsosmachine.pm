@@ -271,6 +271,20 @@ sub InsertRecord
                  %new,
                  'Content-Type','application/json']);
       },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "409"){  # 409 conflict
+            return({machineid=>$new{'machine-id'}},"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data TSOS response");
+         return(undef);
+      },
       preprocess=>sub{   # create a valid JSON response
          my $self=shift;
          my $d=shift;
