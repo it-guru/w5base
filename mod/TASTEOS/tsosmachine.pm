@@ -244,6 +244,9 @@ sub InsertRecord
          my $TasetOSNS='ea28d30f-b10e-45c2-8619-4f5ce4cde7c1';
          my $saltuuid=create_uuid(UUID_V5,$TasetOSNS,$newrec->{$k});
          my $reqMachineId=uuid_to_string($saltuuid);
+         msg(INFO,"TasteOS request machine-id $reqMachineId on Insert\n".
+                  "based on salt '".$newrec->{$k}."' with \n".
+                  "TasetOSNS: $TasetOSNS");
          $new{'machine-id'}=$reqMachineId;
       }
       else{
