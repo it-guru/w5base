@@ -687,18 +687,30 @@ sub getCSTeamIDbyApplid
    my @org;
    if (defined($arec)){
       my @grp;
+
       my $team=$arec->{businessteam};
-      my @team=split(/\./,$team);
-      for(my $c=0;$c<=$#team;$c++){
-         push(@org,join(".",@team[0..$c])); 
+      if ($team ne ""){
+         my @team=split(/\./,$team);
+         for(my $c=0;$c<=$#team;$c++){
+            push(@org,join(".",@team[0..$c])); 
+         }
       }
+
+      my $responseorg=$arec->{responseorg};
+      if ($responseorg ne ""){
+         my @responseorg=split(/\./,$responseorg);
+         for(my $c=0;$c<=$#responseorg;$c++){
+            push(@org,join(".",@responseorg[0..$c])); 
+         }
+      }
+      @org="-1" if ($#org==-1);
    }
    my $csteam=getModuleObject($self->Config,"CRaS::csteam");
    if ($self->isDataInputFromUserFrontend()){
       $csteam->SetFilter({orgarea=>\@org});
    }
    else{
-      $csteam->SetFilter({});
+      $csteam->SetFilter({});   # allow all on Server-Jobs
    }
    my @l=$csteam->getHashList(qw(orgarea grpid id));
    if ($#l>=0){
