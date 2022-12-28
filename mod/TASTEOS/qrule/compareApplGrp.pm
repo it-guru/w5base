@@ -356,12 +356,15 @@ sub qcheckRecord
          };
          my $machineNumber;
 
-         if ($lrec->{systemsrcid} ne ""){
-            $machineNumber=$lrec->{systemsrcid};
-            if ($lrec->{systemsrcsys} ne ""){
-               $machineNumber=$lrec->{systemsrcsys}.":".
-                              $machineNumber;
-            }
+         {
+            my $systemsrcid=$lrec->{systemsrcid};
+            $systemsrcid=$lrec->{systemid} if ($systemsrcid eq "");
+      
+            my $systemsrcsys=$lrec->{systemsrcsys};
+            $systemsrcsys="w5base" if ($systemsrcsys eq "");
+
+            $machineNumber=$systemsrcid;
+            $machineNumber=$systemsrcsys.":".$machineNumber;
          }
          if ($machineNumber){
             $tsosmacrec->{machineNumber}=$machineNumber;
