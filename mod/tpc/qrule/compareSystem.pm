@@ -19,11 +19,19 @@ are imported from TPC. IP-Addresses can only be synced when the field
 
 =head3 HINTS
 
-[en:]
+When reconciling with the TPC, among other things, the transfer 
+of data authority to the to AssetManager in the case of MCOS systems. 
+In such a case the MCOS data record is not found in AssetManager, then 
+there is a misconfiguration present.
+This must be corrected with the MCOS support.
 
 
 [de:]
 
+Beim Abgleich mit der TPC, wird u.a. auch die Übergabe der Datenautoritiät
+auf AssetManager bei MCOS Systemen geregelt. Sollte in einem solchen Fall
+der MCOS Datensatz in AssetManager nicht gefunden werden, so liegt eine
+Fehlkonfiguriation vor. Diese muss mit dem MCOS Support ausgeregelt werden.
 
 
 =cut
@@ -82,7 +90,10 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
-   return(undef,undef) if ($rec->{srcsys} ne "TPC");
+   return(undef,undef) if ($rec->{srcsys} ne "TPC" &&
+                           !($rec->{srcsys}=~m/^TPC\d+$/));
+
+   my $TPCenv=$rec->{srcsys};
 
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),"tpc::machine");
@@ -156,7 +167,13 @@ sub qcheckRecord
                      ]);
                      my @chkl=$dataobj->getHashList(qw(id));
                      if ($#chkl!=-1){
-                        msg(ERROR,"MCOS transfer error for $rec->{id}");
+                        my $msg="missconfigurued MCOS system detected";
+                        push(@qmsg,$msg);
+                        push(@dataissue,$msg);
+                        my $msg="no MCOS record in AssetManager found";
+                        push(@qmsg,$msg);
+                        push(@dataissue,$msg);
+                        $errorlevel=3 if ($errorlevel<3);
                      }
                      else{
                         $forcedupd->{srcsys}='AssetManager';
