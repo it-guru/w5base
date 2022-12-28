@@ -126,9 +126,10 @@ from "W5I_system_universum"
      left outer join "W5I_FLEXERA__systemidmap_of"
         on "W5I_system_universum".systemid=
            "W5I_FLEXERA__systemidmap_of".systemid
-     left outer join "mview_FLEXERA_system"
-        on "W5I_FLEXERA__systemidmap_of".flexerasystemid=
-           "mview_FLEXERA_system".flexerasystemid
+   left outer join "mview_FLEXERA_system"
+        on "W5I_system_universum".w5baseid is not null and
+           "W5I_system_universum".w5baseid=
+           "mview_FLEXERA_system".systemw5baseid
      left outer join "itil::system"
         on "W5I_system_universum".systemid=
            "itil::system".systemid
