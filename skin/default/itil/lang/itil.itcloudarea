@@ -17,29 +17,29 @@
 'Cloud Area description'=>{de=>'Cloud Area Beschreibung'},
 'cloud is not active'=>{de=>'Cloud ist nicht aktiv'},
 "invalid cloud area name '%s'"=>{de=>"ungültiger Cloud Area name '%s'"},
-'user deactivation of Cloud-Area'=>{de=>'User Dekativierung der CloudArea'},
-'user activation of Cloud-Area'=>{de=>'User Aktivierung der CloudArea'},
-'New Cloud-Area'=>{de=>'Neue CloudArea'},
+'user deactivation of Cloud-Area'=>{de=>'User Dekativierung der Cloud Area'},
+'user activation of Cloud-Area'=>{de=>'User Aktivierung der Cloud Area'},
+'New Cloud-Area'=>{de=>'Neue Cloud Area'},
 'CMSG001'=>{
-de=>'eine neue CloudArea <b>%s</b> wurde für die 
+de=>'eine neue Cloud Area <b>%s</b> wurde für die 
 Anwendung <b>%s</b> konfiguriert. 
 
-Diese CloudArea muß durch Sie aktiviert werden um automatisierte Import-Prozeduren zu ermöglichen. Bitte die korrekte Zuordnung der CloudArea zu Ihrer Anwendung bestätigen oder wenden Sie sich an Ihren Cloud Provider.
+Diese Cloud Area muß durch Sie aktiviert werden um automatisierte Import-Prozeduren zu ermöglichen. Bitte die korrekte Zuordnung der Cloud Area zu Ihrer Anwendung bestätigen oder wenden Sie sich an Ihren Cloud Provider.
 
-  JA:   die Cloud area ist korrekt zugeordnet.
+  JA:   die Cloud Area ist korrekt zugeordnet.
         Bitte klicken Sie auf den folgenden 
         Link und setzen Sie den CI-Status 
         auf installiert/aktiv.
         %URLOFCURRENTREC% 
   
-  NEIN: die Cloud area ist falsch zugeordnet.  
+  NEIN: die Cloud Area ist falsch zugeordnet.  
         Durch Klicken auf den folgenden Link 
         kontaktieren Sie den Cloud 
         Plattform Verantwortlichen und bitten 
         um Klärung.
         mailto: <b>%SUPPORTCONTACT%</b>
 
-Die Aktivierung der CloudArea ist unabhängig vom CI-Status oder der Betriebsart der Anwendung und ist IMMER notwendig, wenn die CloudArea verwendet werden soll.
+Die Aktivierung der Cloud Area ist unabhängig vom CI-Status oder der Betriebsart der Anwendung und ist IMMER notwendig, wenn die Cloud Area verwendet werden soll.
 ',
 en=>'a new cloudarea <b>%s</b> has been configured for 
 your application <b>%s</b> .
@@ -61,9 +61,9 @@ Activation of the CloudArea is independent of the CI status or the operating mod
 '
 },
 'CMSG002'=>{
-de=>'die  CloudArea <b>%s</b> wurde auf "zeitweise inaktiv" gesetzt.
+de=>'die  Cloud Area <b>%s</b> wurde auf "zeitweise inaktiv" gesetzt.
 
-Bitte klären Sie mit der Anwendung <b>%s</b> ob dies als Rückbau-Anforderung für die betreffende CloudArea interpretiert werden soll.
+Bitte klären Sie mit der Anwendung <b>%s</b> ob dies als Rückbau-Anforderung für die betreffende Cloud Area interpretiert werden soll.
 ',
 en=>'
 the cloudarea <b>%s</b> has been
@@ -72,9 +72,9 @@ Please clarify with the application %s, if this should be interpreted as run-dow
 '
 },
 'CMSG003'=>{
-de=>'die  CloudArea <b>%s</b> wurde auf "installiert/aktiv" gesetzt.
+de=>'die  Cloud Area <b>%s</b> wurde auf "installiert/aktiv" gesetzt.
 
-Es ist nun zulässig, Systeme in dieser CloudArea zu deployen.
+Es ist nun zulässig, Systeme in dieser Cloud Area zu deployen.
 ',
 en=>'
 the cloudarea <b>%s</b> has been
@@ -83,9 +83,9 @@ From now, it is allowed to deploy items in this area.
 '
 },
 'CMSG004'=>{
-de=>'die  CloudArea <b>%s</b> wurde bestellt.
+de=>'die  Cloud Area <b>%s</b> wurde bestellt.
 
-Bitte kümmern Sie sich um die Bereitstellung der betreffenden CloudArea auf
+Bitte kümmern Sie sich um die Bereitstellung der betreffenden Cloud Area auf
 der Cloud.
 ',
 en=>'
@@ -94,15 +94,15 @@ the cloudarea <b>%s</b> has been ordered.
 },
 'automatic import rejected'=>{de=>'Automatischer CI-Import abgewiesen'},
 'invalid application cistatus'=>{de=>'ungültiger CI-Status der Anwendung'},
-'invalid cloudarea cistatus'=>{de=>'ungültiger CI-Status der CloudArea'},
-'invalid application in cloudarea'=>{de=>'ungültige Anwendung in CloudArea'},
+'invalid cloudarea cistatus'=>{de=>'ungültiger CI-Status der Cloud Area'},
+'invalid application in cloudarea'=>{de=>'ungültige Anwendung in Cloud Area'},
 'Notification on successful automatic CI-Import'=>{de=>'Benachrichtigung bei erfolgreichem CI-Import'},
 'Costcenter'=>{de=>'Kontierungsobjekt'},
 'Config-Item first activation'=>{de=>'Config-Item erstmalige Aktivierung'},
 'requestor account'=>{de=>'Anforderer Account'},
 'Export IP-Objects to firewall management system'=>{de=>'IP-Object Export ins Firewall-Management System'},
 'no order access to specified application'=>{de=>'kein Bestellzugriff auf die angegebene Anwendung'},
-'Cloud-Area order'=>{de=>'Cloud-Area Bestellung'},
+'Cloud-Area order'=>{de=>'Cloud Area Bestellung'},
 'no W5Base order support for this cloud'=>{de=>'kein W5Base-Bestell-Support für die gewählte Cloud'},
 'no W5Base deconstruction support for this cloud'=>{de=>'kein W5Base-Rückbau-Support für die gewählte Cloud'},
 'switch back to on order is not allowed'=>{de=>'Rückstellung auf "bestellt/angefordert" ist nicht erlaubt'},
