@@ -126,10 +126,15 @@ sub _classifyElements
       elsif ($w=~m/^".*"$/){
          push(@e,{'type'=>'VALUE','val'=>$w});
       }
-      elsif (($#e!=-1 && $e[$#e]->{type} eq "COM") 
+      elsif ( ($#e!=-1 && $e[$#e]->{type} eq "COM" 
+               && lc($e[$#e]->{name}) ne "and") &&
+              ($#e!=-1 && $e[$#e]->{type} eq "COM" 
+               && lc($e[$#e]->{name}) ne "or") &&
+              ($#e!=-1 && $e[$#e]->{type} eq "COM") 
              && $w=~m/^[0-9]+(\.[0-9]+)?$/){
          # numbers without quotes can be only CONSTs,
-         # if they are after a COM (compare) element.
+         # if they are after a COM (compare) element and
+         # the COM (compare) is not an OR or AND operation
          # If they are bevore a COM, they will be 
          # interpretated as varname (by index)
          my $typ="CONST";
@@ -235,8 +240,6 @@ sub fltHashFromExpression
    # Pass1: parse words
    #
    my @w=$self->_parseWords($WhereExp);
-
-
 
    #
    # Pass2: classify element list
