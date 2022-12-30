@@ -56,6 +56,13 @@ sub new
    return($self);
 }
 
+sub getCredentialName
+{
+   my $self=shift;
+
+   return("TPCX");
+}
+
 
 sub DataCollector
 {
@@ -72,7 +79,7 @@ sub DataCollector
    return(undef) if (!defined($dbclass));
 
    my $d=$self->CollectREST(
-      dbname=>'TPC',
+      dbname=>$self->getCredentialName(),
       requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;

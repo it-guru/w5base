@@ -1,6 +1,6 @@
-package tpc::menu::root;
+package TPC2::deploymentresource;
 #  W5Base Framework
-#  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2023  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,43 +19,26 @@ package tpc::menu::root;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::MenuRegistry;
-@ISA=qw(kernel::MenuRegistry);
+use kernel::Field;
+use tpc::deploymentresource;
+@ISA=qw(tpc::deploymentresource);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+
    return($self);
 }
 
-sub Init
+
+sub getCredentialName
 {
    my $self=shift;
 
-   $self->RegisterObj("itu.tpc",
-                      ">itu.cloud.tpc");
-   
-   $self->RegisterObj("itu.tpc.project",
-                      ">itu.cloud.tpc.tpc1.project");
-
-   $self->RegisterObj("itu.tpc.machine",
-                      ">itu.cloud.tpc.tpc1.machine");
-
-   $self->RegisterObj("itu.tpc.kernel",
-                      ">itu.cloud.tpc.tpc1.kernel");
-
-   $self->RegisterObj("itu.tpc.kernel.depl",
-                      ">itu.cloud.tpc.tpc1.kernel.depl");
-
-   $self->RegisterObj("itu.cloud.tpc",
-                      "tmpl/welcome",
-                      defaultacl=>['admin']);
-   
-   return($self);
+   return("TPC2");
 }
-
 
 
 1;
