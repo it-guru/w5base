@@ -137,7 +137,7 @@ sub new
                 htmlwidth  =>'150px',
                 label      =>'Cloud Infrastructure Application',
                 vjointo    =>'itil::appl',
-                allowempty =>1,
+                AllowEmpty =>1,
                 vjoineditbase =>{cistatusid=>"4"},
                 vjoinon    =>['applid'=>'id'],
                 vjoindisp  =>'name'),
@@ -466,6 +466,37 @@ sub SecureValidate
          return(0);
       }
    }
+
+   if (effChanged($oldrec,$newrec,"applid") &&
+       !$self->IsMemberOf("admin")){
+      my $chkapplid=effVal($oldrec,$newrec,"applid");
+      if ($chkapplid ne ""){
+         my $app=getModuleObject($self->Config(),"itil::appl");
+         $app->SetFilter({id=>\$chkapplid});
+         my ($arec)=$app->getOnlyFirst(qw(databossid cistatusid opmode));
+         if (!defined($arec)){
+            $self->LastMsg(ERROR,"unable to verify application record");
+            return(0);
+         }
+         if ($arec->{cistatusid} ne "4"){
+            $self->LastMsg(ERROR,
+               "infrastructure application is not active");
+            return(0);
+         }
+         if ($arec->{opmode} ne "prod"){
+            $self->LastMsg(ERROR,
+               "infrastructure application is not prod");
+            return(0);
+         }
+         my $curdatabossid=effVal($oldrec,$newrec,"databossid");
+         if ($arec->{databossid} ne $curdatabossid){
+            $self->LastMsg(ERROR,
+               "infrastructure application has not the same databoss as cloud");
+            return(0);
+         }
+      }
+   }
+
    return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
 }
 
@@ -494,6 +525,22 @@ sub Validate
       $self->LastMsg(ERROR,sprintf($self->T("invalid cloud name '%s'"),$name));
       return(0);
    }
+   my $chkapplid=effVal($oldrec,$newrec,"applid");
+   my $allowinactsysimport=effVal($oldrec,$newrec,"allowinactsysimport");
+   if (effChanged($oldrec,$newrec,"applid")){
+      if ($chkapplid eq "" && $allowinactsysimport){
+         $self->LastMsg(ERROR,"des geht ned");
+         return(0);
+      }
+   }
+   if (effChanged($oldrec,$newrec,"allowinactsysimport")){
+      if ($chkapplid eq "" && $allowinactsysimport){
+         $self->LastMsg(ERROR,
+            "infrastructure application needed for this mode");
+         return(0);
+      }
+   }
+
 
    my $fname=$name;
    $fname.=($fname ne "" && $cloudtyp ne "" ? "." : "").$cloudtyp;
