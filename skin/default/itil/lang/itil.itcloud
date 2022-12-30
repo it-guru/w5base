@@ -27,3 +27,8 @@
 'support W5Base deconstruction process'=>{de=>'Unterstützung des W5Base-Rückbauprozess für CloudAreas'},
 'CI-Import for on inactive cloudarea'=>{de=>'CI-Import bei inaktiver CloudArea'},
 'Cloud Infrastructure Application'=>{de=>'Cloud-Infrastruktur-Anwendung'},
+'infrastructure application has not the same databoss as cloud'=>{de=>'Infrastruktur-Anwendung hat nicht den gleichen Datenverantwortlichen wie die Cloud'},
+'infrastructure application is not prod'=>{de=>'Infrastruktur-Anwendung ist nicht produktiv'},
+'infrastructure application is not active'=>{de=>'Infrastruktur-Anwendung ist nicht aktiv'},
+'infrastructure application needed for this mode'=>{de=>'Für diesen Modus ist eine Infrastruktur-Anwendung notwendig'},
+
