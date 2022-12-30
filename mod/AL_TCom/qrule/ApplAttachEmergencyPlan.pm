@@ -13,35 +13,60 @@ Check if a active application has a EmergencyPlan Attachment.
 NONE
 
 =head3 HINTS
-This rule checks whether a emergency plan document is present.
 
-In case of a data issue, please check the name of the recorded document.
+This rule checks whether an emergency plan document is uploaded.
 
-Document name format: 
-SCM_Emergency_Plan_ICTO-xxxx_DARWIN-Applicationname_jjjjmmdd.pdf 
+Prescribed document format is: 
 
-If there is no Emergency Plan  document uploaded yet, 
-please upload one in the above mentioned format. 
+SCM_Emergency_Plan_ICTO-xxxx_Application_name_yyyymmdd.pdf
 
-For further informations please contact Mr. Arlt ...
 
-https://darwin.telekom.de/darwin/auth/base/user/ById/12651851320005
+A DataIssue is created if:
+
+-   No document is uploaded
+
+-   The uploaded document does not have the prescribed format (pdf)
+
+-   The name of the uploaded document does not correspond to the prescribed naming convention (see above)
+
+
+If there is no Emergency Plan document uploaded yet, please upload one in the above mentioned format.
+
+Further information you can find on Disaster Recovery FAQ site at intranet:
+
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b
+
+In case of any questions please contact our FMB:
+DR_Disaster_Recovery_Test@telekom.de
+
 
 [de:]
 
 Diese QualityRule prüft, ob ein Notfallplan Dokument hinterlegt ist.
 
-Falls Sie ein DataIssue haben, bitten wir Sie das Format zu überprüfen.
+Formatvorgabe: 
 
-Format:
-SCM_Notfallplan_ICTO-xxxx_DARWIN-Applikationsname_jjjjmmdd.pdf 
+SCM_Notfallplan_ICTO-xxxx_Applikationsname_jjjjmmdd.pdf
 
-Falls Sie bisher keinen Notfallplan hinterlegt hatten, bitten wir Sie dies 
-im oben aufgezeigten Format nachzuholen.
 
-Für nähere Informationen kontaktieren Sie bitte Hr. Arlt ...
+Ein DataIssue wird erzeugt, wenn:
 
-https://darwin.telekom.de/darwin/auth/base/user/ById/12651851320005
+- Kein Dokument hinterlegt ist
+
+- Das hinterlegte Dokument nicht das vorgegebene Format hat (pdf)
+
+- Der Name des hinterlegten Dokuments nicht der o.g. Formatvorgabe entspricht
+
+
+Falls Sie bisher keinen Notfallplan hinterlegt hatten, dies ist im oben aufgezeigten Format nachzuholen.
+
+Weiterführende Informationen finden Sie auch auf unserer FAQ Seite im Intranet:
+
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b
+
+Bei Fragen wenden Sie sich bitte an unsere FMB:
+DR_Disaster_Recovery_Test@telekom.de
+
 
 =cut
 #######################################################################
