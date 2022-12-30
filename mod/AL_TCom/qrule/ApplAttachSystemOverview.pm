@@ -6,59 +6,71 @@ package AL_TCom::qrule::ApplAttachSystemOverview;
 
 =head3 PURPOSE
 
-Check if a prio1 application has a SystemOverview Attachment.
+Check if IT application has a SystemOverview Attachment.
 
 =head3 IMPORTS
 
 NONE
 
 =head3 HINTS
-This rule checks whether a system environment document with relevant 
-communication relations is present on a production or desaster recovery application.
 
+Darwin checks whether a system environment document (short graphical overview - 1-2 pages) eventually with relevant communication relations is uploaded for every application in production and its disaster recovery environment. 
 In case of a data issue, please check the name of the recorded document.
 
-Document name format should be: 
-ICTO-xxxx_Applikationsnamexxxx_SystemOverview_jjjjmmdd.pdf 
+Prescribed document format is: 
+ICTO-xxxx_Application_name_SystemOverview_yyyymmdd.pdf
 
-If there is no System Overview document uploaded yet, 
-please upload one in the above mentioned format. 
+A DataIssue is created if:
 
-Background: 
-To speed up and to reduce the incident handling process in our complex 
-application landscape, a system environment document with all 
-communication relations is necessary.
+-   No document is uploaded
 
-It is not allowed to mark the system overview as private. Marking the system overview as private generates a dataissue.
- 
-Requested by TelekomIT Service Management on 08/16 
-(https://darwin.telekom.de/darwin/auth/base/user/ById/13559244960000)
+-   The uploaded document does not have the prescribed format (pdf)
 
+-   The name of the uploaded document does not correspond to the prescribed naming convention (see above)
+
+If there is no System Overview document uploaded yet, please upload one in the above mentioned format.
+
+Background: a system environment document with all communication relations is necessary to speed up and to reduce the incident handling process in our complex application landscape.
+
+It is not allowed to mark the system overview as private. Marking the system overview as private generates a DataIssue.
+
+Further information you can find on Disaster Recovery FAQ site at intranet:
+
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b
+
+In case of any questions please contact our FMB:
+DR_Disaster_Recovery_Test@telekom.de
 
 [de:]
 
-Bei jeder Produktions- und Katastrophenfall-Anwendung in W5Base/Darwin wird geprüft, 
-ob ein Dokument zur Systemumgebung mit den relevanten 
-Kommunikationsbeziehungen hinterlegt wurde.
+Bei jeder Produktionsanwendung (inklusive deren DR Umgebung) wird in Darwin geprüft, ob ein Dokument zur Systemumgebung (kurze grafische Übersicht - 1-2 Seiten) ggf. mit den relevanten Kommunikationsbeziehungen hinterlegt wurde.
 
-Falls Sie ein DataIssue haben bitten, wir Sie das Format zu überprüfen.
+Formatvorgabe: 
+ICTO-xxxx_Applikationsname_SystemOverview_jjjjmmdd.pdf
 
-Formatvorgabe:  ICTO-xxxx_Applikationsnamexxxx_SystemOverview_jjjjmmdd.pdf 
+Ein DataIssue wird erzeugt, wenn:
 
-Falls Sie bisher keine SystemOverview hinterlegt hatten, bitten wir Sie dies 
-im oben aufgezeigten Format nachzuholen.
+- Kein Dokument hinterlegt ist
 
-Hintergrund:
-Bei der Incident-Bearbeitung in unserer komplexen Anwendungslandschaft ist 
-eine dokumentierte Systemumgebung mit relevanten Kommunikationsbeziehungen 
-ein wichtiges Arbeitsmittel um die Ursachensuche zu beschleunigen und damit 
-mögliche Ausfallzeiten zu reduzieren. 
+- Das hinterlegte Dokument nicht das vorgegebene Format hat (pdf)
 
-Es ist nicht erlaubt, die SystemOverview Anlage als vertraulich zu markieren  dies generiert sonst ein DataIssue.
+- Der Name des hinterlegten Dokuments nicht der o.g. Formatvorgabe entspricht
 
-Anforderungsrequest 08/16:
-Anforderung durch 'TelekomIT Service Management'
-(https://darwin.telekom.de/darwin/auth/base/user/ById/13559244960000)
+
+Falls Sie bisher keine SystemOverview hinterlegt hatten, ist dies im oben aufgezeigten Format nachzuholen.
+
+Hintergrund: Bei der Incident-Bearbeitung in unserer komplexen Anwendungslandschaft ist eine dokumentierte Systemumgebung mit relevanten Kommunikationsbeziehungen ein wichtiges Arbeitsmittel um die Ursachensuche zu beschleunigen und damit mögliche Ausfallzeiten zu reduzieren.
+
+Es ist nicht erlaubt, die SystemOverview Anlage als vertraulich zu markieren - dies generiert sonst ein DataIssue.
+
+Weiterführende Informationen finden Sie auch auf unserer FAQ Seite im Intranet:
+
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b
+
+Bei Fragen wenden Sie sich bitte an unsere FMB:
+DR_Disaster_Recovery_Test@telekom.de
+
+
 
 
 =cut
