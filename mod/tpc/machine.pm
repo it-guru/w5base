@@ -185,6 +185,16 @@ sub new
 }
 
 
+sub getCredentialName
+{
+   my $self=shift;
+
+   return("TPCX");
+}
+
+
+
+
 sub DataCollector
 {
    my $self=shift;
@@ -197,7 +207,7 @@ sub DataCollector
       $filterset
    );
    my $d=$self->CollectREST(
-      dbname=>'TPC',
+      dbname=>$self->getCredentialName(),
       requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;

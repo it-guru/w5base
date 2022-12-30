@@ -1,6 +1,6 @@
-package tpc::menu::root;
+package TPC2::menu::root;
 #  W5Base Framework
-#  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2023  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -34,25 +34,27 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterObj("itu.tpc",
-                      ">itu.cloud.tpc");
-   
-   $self->RegisterObj("itu.tpc.project",
-                      ">itu.cloud.tpc.tpc1.project");
-
-   $self->RegisterObj("itu.tpc.machine",
-                      ">itu.cloud.tpc.tpc1.machine");
-
-   $self->RegisterObj("itu.tpc.kernel",
-                      ">itu.cloud.tpc.tpc1.kernel");
-
-   $self->RegisterObj("itu.tpc.kernel.depl",
-                      ">itu.cloud.tpc.tpc1.kernel.depl");
-
-   $self->RegisterObj("itu.cloud.tpc",
+   $self->RegisterObj("itu.cloud.tpc.TPC2",
                       "tmpl/welcome",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cloud.tpc.TPC2.project",
+                      "TPC2::project",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cloud.tpc.TPC2.machine",
+                      "TPC2::machine",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cloud.tpc.TPC2.kernel",
+                      "tmpl/welcome",
+                      prio=>9999,
                       defaultacl=>['admin']);
-   
+
+   $self->RegisterObj("itu.cloud.tpc.TPC2.kernel.depl",
+                      "TPC2::deployment",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

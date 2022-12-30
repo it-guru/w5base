@@ -1,0 +1,6 @@
+'TPC2::project'=>{
+   de=>'TPC2: Projekt',
+   en=>'TPC2: Project'
+},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'fieldgroup.machines'=>{de=>'Maschinen',en=>'Machines'},

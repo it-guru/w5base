@@ -76,6 +76,14 @@ sub new
 }
 
 
+sub getCredentialName
+{
+   my $self=shift;
+
+   return("TPCX");
+}
+
+
 sub DataCollector
 {
    my $self=shift;
@@ -89,7 +97,7 @@ sub DataCollector
    );
    my $ip=getModuleObject($self->Config(),"itil::ipaddress");
    my $d=$self->CollectREST(
-      dbname=>'TPC',
+      dbname=>$self->getCredentialName(),
       requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;

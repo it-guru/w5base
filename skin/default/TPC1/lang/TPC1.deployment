@@ -1,0 +1,6 @@
+'TPC1::deployment'=>{
+  de=>'TPC1: Deployment',
+  en=>'TPC1: Deployment'
+},
+'fieldgroup.resources'=>{de=>'Resourcen',en=>'Resources'},
+
