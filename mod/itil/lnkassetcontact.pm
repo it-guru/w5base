@@ -38,8 +38,37 @@ sub new
                 vjoindisp     =>'name'),
       insertafter=>'id'
    );
+
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'assetcistatusid',
+                htmlwidth     =>'100px',
+                label         =>'Asset CI-Status',
+                vjointo       =>'itil::asset',
+                vjoinon       =>['refid'=>'id'],
+                vjoindisp     =>'cistatusid',
+                dataobjattr   =>'asset.cistatus'),
+      insertafter=>'id'
+   );
+
    $self->{secparentobj}='itil::asset';
    $self->setDefaultView(qw(asset targetname cdate editor));
    return($self);
 }
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="";
+
+   $from.="$worktable left outer join asset ".
+          "on ${worktable}.refid=asset.id ";
+
+   return($from);
+}
+
+
 1;
