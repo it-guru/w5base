@@ -17,7 +17,10 @@ NONE
 [en:]
 
 Checks Interviews-Answers on DR-Test topic. 
-When the inserted change number looks like SM9 change number, the date of last DR test will be automatically filled out from the entered change.
+
+A valid CR number from SM9 is to be filled into the answer field  last (/next) Disaster-Recovery test (Change-Number) . In this case the date of last DR test will be automatically taken from the entered change and it will be copied to the answer field last Disaster-Recovery Test (WorkflowEnd). The existing content will be herewith replaced.
+
+If no valid CR number from SM9 exist, this field must be left empty. Possible comments can be inserted into the dedicated comment field available by clicking on corresponding icon (bubble).
 
 A DataIssue is created if age of the last DR test (calculated based on the SLA guidelines) is too old.
 
@@ -29,9 +32,24 @@ A DataIssue is created if the date of the planned DR test is older then the half
 
 In case of a new application which doesnt have any entry under "last DR test" and there is no planned date next Disaster-Recovery test set and the age of application reaches the half of the test interval (based on SLA), a DataIssue is created.
 
+
+Further information you can find on Disaster Recovery FAQ site at intranet:
+
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b
+
+
+The interview procedure here is not interactive, in case of any questions please contact our FMB:
+
+mailto:DR_Disaster_Recovery_Test@telekom.de
+
+
 [de:]
 
-Prüft die Interview-Antworten im Themenblock DR-Test. Wenn die eingegebene Changenummer wie eine SM9 Changenummer aussieht, dann wird das Datum des letzten DR Tests automatisch aus dem Change entnommen und in die Antwort eingefügt. Wenn kein gültiger CR Nummer aus dem SM9 vorhanden ist, ist das Feld leer zu lassen. Kommentare können ggf. in dediziertes Kommentarfeld eingetragen werden.
+Prüft die Interview-Antworten im Themenblock DR-Test. 
+
+Im Antwortfeld letzter (bzw. nächster) Disaster-Recovery Test (Change-Nummer) ist eine gültige CR Nummer aus SM9 einzutragen. In diesem Fall wird das Datum des letzten DR Tests automatisch aus dem Change entnommen und in das Antwortfeld letzter Disaster-Recovery Test (WorkflowEnd) eingefügt. Bereits eingetragene Inhalte werden dadurch überschrieben. 
+
+Wenn keine gültige CR Nummer aus SM9 vorhanden ist, ist das Feld leer zu lassen. Kommentare können ggf. in dediziertes Kommentarfeld eingetragen werden.
 
 Über die SLA Vorgaben wird errechnet, wie alt der letzte DR Test maximal sein darf. Ist dieser zu alt, wird ein DataIssue erzeugt.
 
@@ -42,6 +60,16 @@ Liegt das DR Test Plandatum länger als 8 Wochen vor dem letzten DR Test, so wird
 Liegt das DR Test Plandatum länger als das halbe Test-Intervall in der Vergangenheit, so wird ein DataIssue erzeugt.
 
 Wurde eine Anwendung neu aufgebaut und hat noch keinen "letzten DR Test" und ist kein Plantermin vorhanden wenn das Alter der Anwendung das halbe Test-Intervall (vom SLA Vorgaben) erreicht, so wird ein DataIssue erzeugt.
+
+
+Weiterführende Informationen finden Sie auch auf unserer FAQ Seite im Intranet:
+
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b
+
+
+Das Interviewverfahren ist nicht interaktiv, bei Fragen wenden Sie sich bitte an unsere FMB:
+
+mailto:DR_Disaster_Recovery_Test@telekom.de
 
 
 =cut
