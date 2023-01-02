@@ -1038,6 +1038,11 @@ sub doNotify
          }
       }
 
+      if ($mode eq "CERTSIGNED"){
+         if (defined($rec) && $rec->{creatorid} ne ""){
+            $ccuid{$rec->{creatorid}}++;
+         }
+      }
       if ($mode eq "CERTSIGNED" || $mode eq "CERTEXPIRE1" || 
                                    $mode eq "CERTEXPIRE2"){ 
          if (defined($arec)){
