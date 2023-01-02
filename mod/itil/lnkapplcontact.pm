@@ -35,7 +35,8 @@ sub new
                 label         =>'Application',
                 vjointo       =>'itil::appl',
                 vjoinon       =>['refid'=>'id'],
-                vjoindisp     =>'name'),
+                vjoindisp     =>'name',
+                dataobjattr   =>'appl.name'),
       insertafter=>'id'
    );
    $self->AddFields(
@@ -45,11 +46,30 @@ sub new
                 label         =>'Application CI-Status',
                 vjointo       =>'itil::appl',
                 vjoinon       =>['refid'=>'id'],
-                vjoindisp     =>'cistatusid'),
+                vjoindisp     =>'cistatusid',
+                dataobjattr   =>'appl.cistatus'),
       insertafter=>'id'
    );
    $self->{secparentobj}='itil::appl';
    $self->setDefaultView(qw(application targetname cdate editor));
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="";
+
+   $from.="$worktable left outer join appl ".
+          "on ${worktable}.refid=appl.id ";
+
+   return($from);
+}
+
+
+
 1;

@@ -38,8 +38,38 @@ sub new
                 vjoindisp     =>'fullname'),
       insertafter=>'id'
    );
+
+   $self->AddFields(
+      new kernel::Field::Link(
+                name          =>'swinstancecistatusid',
+                htmlwidth     =>'100px',
+                label         =>'Software-Instance CI-Status',
+                vjointo       =>'itil::swinstance',
+                vjoinon       =>['refid'=>'id'],
+                vjoindisp     =>'cistatusid',
+                dataobjattr   =>'swinstance.cistatus'),
+      insertafter=>'id'
+   );
+
    $self->{secparentobj}='itil::swinstance';
    $self->setDefaultView(qw(swinstance targetname cdate editor));
    return($self);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from="";
+
+   $from.="$worktable left outer join swinstance ".
+          "on ${worktable}.refid=swinstance.id ";
+
+   return($from);
+}
+
+
 1;

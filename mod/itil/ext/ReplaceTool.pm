@@ -181,9 +181,32 @@ sub getControlRecord
              dataobj      =>'itil::lnkapplcontact',
              target       =>'targetname',
              idfield      =>'targetid',
-             referenceonly=>1,
              targetlabel  =>'application',
-             baseflt      =>{secparentobj=>\'itil::appl',applcistatusid=>"<6"}
+             baseflt      =>{applcistatusid=>"<6"}
+           },
+           usersystemcontact=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::lnksystemcontact',
+             target       =>'targetname',
+             idfield      =>'targetid',
+             targetlabel  =>'system',
+             baseflt      =>{systemcistatusid=>"<6"}
+           },
+           userassetcontact=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::lnkassetcontact',
+             target       =>'targetname',
+             idfield      =>'targetid',
+             targetlabel  =>'asset',
+             baseflt      =>{assetcistatusid=>"<6"}
+           },
+           userswinstancecontact=>{
+             replaceoptype=>'base::user',
+             dataobj      =>'itil::lnkswinstancecontact',
+             target       =>'targetname',
+             idfield      =>'targetid',
+             targetlabel  =>'swinstance',
+             baseflt      =>{swinstancecistatusid=>"<6"}
            }
          ];
    return($d);
