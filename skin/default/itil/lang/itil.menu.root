@@ -145,7 +145,7 @@
 'itu.mon'=>{de=>'Monitoring',en=>'Monitoring'},
 'itu.sec'=>{de=>'Security/Auditing',en=>'Security/Auditing'},
 'itu.ds'=>{de=>'Verzeichnisdienste',en=>'DirectoryServices'},
-'bsm'=>{de=>'Prozesse&Services',en=>'Prozesses&Services'},
+'bsm'=>{de=>'Prozesse&Services',en=>'Processes&Services'},
 'bsm.bp'=>{de=>'Geschäftsprozess',en=>'Business process'},
 'bsm.bp.new'=>{de=>'Neueingabe',en=>'New'},
 'bsm.bp.lnkbs'=>{de=>'Verkn. BusinessService',en=>'Link BusinessService'},
