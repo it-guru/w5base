@@ -75,15 +75,7 @@ sub getControlRecord
              idfield      =>'databossid',
              targetlabel  =>'name',
              baseflt      =>{cistatusid=>'1 2 3 4 5'}
-           },
-           usercontact=>{
-             replaceoptype=>'base::user',
-             dataobj      =>'base::lnkcontact',
-             target       =>'targetname',
-             idfield      =>'targetid',
-             targetlabel  =>'fullname',
-             baseflt      =>{target=>\'base::grp'}
-           },
+           }
          ];
    return($d);
 }
