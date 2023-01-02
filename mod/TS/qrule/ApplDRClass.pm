@@ -41,9 +41,16 @@ For the DR process the following timeslots are relevant  depending on a set Disa
 Tests can be performed even more frequently, for example twice in 12 months. 
 The selection within the field SLA number Disaster-Recovery test interval: is then considered as mandatory and test must be performed within the set time interval.
 
+
 Further information you can find on Disaster Recovery FAQ site at intranet:
 
-https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b?currentLanguage=EN
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b
+
+
+In case of any questions you can contact our FMB:
+
+mailto:DR_Disaster_Recovery_Test@telekom.de
+
 
 [de:]
 
@@ -64,9 +71,16 @@ Der DR Prozess sieht 2 Zeitfenster für DR Test vor  abhängig von der gesetzten D
 Es besteht die Möglichkeit, auch häufiger zu testen, z.B. 2-mal in 12 Monaten. 
 Die Wahl im Fenster SLA Anzahl zugesicherter Disaster-Recovery Tests: wird dann als verbindlich angesehen und muss termingetreu umgesetzt werden.
 
+
 Weiterführende Informationen finden Sie auch auf unserer FAQ Seite im Intranet:
 
-https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b?currentLanguage=EN
+https://yam-united.telekom.com/pages/problem-management-telekom-it/apps/wiki/dr-faq/list/view/435cc4fa-558c-4354-9d43-2cd19482000b
+
+
+Bei Fragen wenden Sie sich bitte an unsere FMB:
+
+mailto:DR_Disaster_Recovery_Test@telekom.de
+
 
 =cut
 #######################################################################
