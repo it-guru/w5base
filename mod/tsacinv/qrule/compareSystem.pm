@@ -310,11 +310,16 @@ sub qcheckRecord
                #
                # MCOS Name special handling
                #
+
+
                if ($parrec->{srcsys} eq "MCOS_FCI" &&
-                   ($rec->{srcid}=~m/^\S+-\S+-\S+-\S+-\S+$/)){
+                   ($rec->{itcloudshortname}=~m/^TPC[0-9]/)){
+                  my $TPCenv=$rec->{itcloudshortname};
+                  # TPC MachineID in $rec->{srcid}=~m/^\S+-\S+-\S+-\S+-\S+$/
                   # MCOS Systemhandling - Systemname will be take from TPC 
+
                   my $m=getModuleObject($self->getParent->Config,
-                                        "tpc::machine");
+                                        $TPCenv."::machine");
                   if (defined($m)){
                      $m->SetFilter({id=>$rec->{srcid}});
                      my ($tpcrec)=$m->getOnlyFirst(qw(name));
@@ -324,7 +329,7 @@ sub qcheckRecord
                         }
                         else{
                            msg(INFO,"skip use of systemname '".
-                                    $tpcrec->{name}."' from TPC");
+                                    $tpcrec->{name}."' from TPC ($TPCenv)");
                         }
                      }
                   }
