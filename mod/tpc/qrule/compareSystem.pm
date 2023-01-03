@@ -93,10 +93,17 @@ sub qcheckRecord
    return(undef,undef) if ($rec->{srcsys} ne "TPC" &&
                            !($rec->{srcsys}=~m/^TPC\d+$/));
 
+   if (lc($rec->{srcsys}) eq "tpc"){ # migration TPC->TPC1
+      $dataobj->ValidatedUpdateRecord($rec,{srcsys=>'TPC1'},{id=>$rec->{id}});
+      $rec->{srcsys}="TPC1";
+   }
+
+
+
    my $TPCenv=$rec->{srcsys};
 
    my ($parrec,$msg);
-   my $par=getModuleObject($self->getParent->Config(),"tpc::machine");
+   my $par=getModuleObject($self->getParent->Config(),$TPCenv."::machine");
    return(undef,undef) if (!$par->Ping());
 
 

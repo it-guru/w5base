@@ -76,9 +76,14 @@ sub qcheckRecord
    my $errorlevel=0;
 
 
-   return(undef,undef) if ($rec->{cloud} ne "TPC" &&
-                           $rec->{cloud} ne "TEL-IT_PrivateCloud");
+   return(undef,undef) if ($rec->{itcloudshortname} ne "TPC1" &&
+                           $rec->{itcloudshortname} ne "TPC2");
+                          # migration from TPC to TPC1 will be done by
+                          # event/TPC1_CloudAreaSync
+
    return(undef,undef) if ($rec->{cistatusid}<4);
+
+   my $tpccode=$rec->{itcloudshortname};
 
    my $app=getModuleObject($self->getParent->Config(),"itil::appl");
    $app->SetFilter({id=>\$rec->{applid}});
@@ -95,7 +100,7 @@ sub qcheckRecord
    }
    my $tpcprojectid=$rec->{srcid};  
    { 
-      my $chk=getModuleObject($self->getParent->Config(),"tpc::project");
+      my $chk=getModuleObject($self->getParent->Config(),$tpccode."::project");
       $chk->SetFilter({id=>$tpcprojectid});
       my @acc=$chk->getHashList(qw(id));
       if ($#acc==-1){
@@ -104,7 +109,7 @@ sub qcheckRecord
    }
 
    if ($#qmsg==-1){
-      my $par=getModuleObject($self->getParent->Config(),"tpc::machine");
+      my $par=getModuleObject($self->getParent->Config(),$tpccode."::machine");
 
       $par->SetFilter({projectId=>$tpcprojectid});
 
