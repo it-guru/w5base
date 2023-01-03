@@ -31,4 +31,4 @@
 'infrastructure application is not prod'=>{de=>'Infrastruktur-Anwendung ist nicht produktiv'},
 'infrastructure application is not active'=>{de=>'Infrastruktur-Anwendung ist nicht aktiv'},
 'infrastructure application needed for this mode'=>{de=>'Für diesen Modus ist eine Infrastruktur-Anwendung notwendig'},
-
+'technical short name'=>{de=>'technischer Kurzname'},
