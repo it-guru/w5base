@@ -21,8 +21,7 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field;
 use tpc::projecttag;
-use JSON;
-@ISA=qw(tpc::lib::Listedit);
+@ISA=qw(tpc::projecttag);
 
 sub new
 {

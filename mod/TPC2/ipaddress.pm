@@ -33,5 +33,15 @@ sub new
 }
 
 
+sub getCredentialName
+{
+   my $self=shift;
+
+   return("TPC2");
+}
+
+
+
+
 
 1;
