@@ -201,6 +201,14 @@ sub new
                 dataobjattr   =>'itcloud.allowinactsysimport'),
 
 
+      new kernel::Field::Text(
+                name          =>'shortname',
+                label         =>'technical short name',
+                maxlength     =>10,
+                htmleditwidth =>'80px',
+                group         =>'rootcontrol',
+                dataobjattr   =>'itcloud.shortname'),
+
       new kernel::Field::Boolean(
                 name          =>'allowuncleanseq',
                 group         =>'rootcontrol',
@@ -581,6 +589,15 @@ sub Validate
                                  "needs to be defined");
             return(0);
          }
+      }
+   }
+   if (effChanged($oldrec,$newrec,"shortname")){
+      my $name=trim(effVal($oldrec,$newrec,"shortname"));
+      my $modname=$name;
+      $modname=~s/[^A-Za-z0-9]//g;
+      if ($modname ne $name){
+         $modname=undef if ($modname eq "");
+         $newrec->{shortname}=$modname;
       }
    }
 
