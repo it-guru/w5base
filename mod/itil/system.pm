@@ -964,12 +964,23 @@ sub new
                 label         =>'Cloud Area',
                 vjointo       =>'itil::itcloudarea',
                 vjoinon       =>['itcloudareaid'=>'id'],
-                vjoindisp     =>'fullname'),
+                vjoindisp     =>'fullname',
+                dataobjattr   =>"concat(itcloud.fullname,'.',".
+                                "itcloudarea.name)"),
 
       new kernel::Field::Interface(
                 name          =>'itcloudareaid',
+                group         =>'physys',
                 vjointo       =>'itil::itcloudarea',
                 dataobjattr   =>'system.itcloudarea'),
+
+      new kernel::Field::Interface(
+                name          =>'itcloudshortname',
+                label         =>'cloud technical shortname',
+                readonly      =>1,
+                group         =>'physys',
+                group         =>'cloudinfo',
+                dataobjattr   =>'itcloud.shortname'),
 
       new kernel::Field::TextDrop(
                 name          =>'hwmodel',
@@ -2152,6 +2163,8 @@ sub getSqlFrom
    $from.="left outer join lnkcontact ".
           "on lnkcontact.parentobj='itil::system' ".
           "and $worktable.id=lnkcontact.refid ".
+          "left outer join itcloudarea on system.itcloudarea=itcloudarea.id ".
+          "left outer join itcloud on itcloudarea.itcloud=itcloud.id ".
           "left outer join asset on system.asset=asset.id ".
           "left outer join system as vsystem on system.vhostsystem=vsystem.id ".
           "left outer join asset as vasset on vsystem.asset=vasset.id ".
