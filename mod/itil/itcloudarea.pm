@@ -331,6 +331,13 @@ sub new
                 dataobjattr   =>'itcloud.cistatus'),
 
       new kernel::Field::Link(
+                name          =>'itcloudshortname',
+                label         =>'cloud technical shortname',
+                readonly      =>1,
+                group         =>'cloudinfo',
+                dataobjattr   =>'itcloud.shortname'),
+
+      new kernel::Field::Link(
                 name          =>'mandatorid',
                 label         =>'Mandator ID of Cloud',
                 readonly      =>1,
