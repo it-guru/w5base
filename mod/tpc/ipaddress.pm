@@ -89,7 +89,9 @@ sub DataCollector
    my $self=shift;
    my $filterset=shift;
 
-   my $Authorization=$self->getVRealizeAuthorizationToken();
+   my $credentialName=$self->getCredentialName();
+
+   my $Authorization=$self->getVRealizeAuthorizationToken($credentialName);
 
    my ($dbclass,$requesttoken)=$self->decodeFilter2Query4vRealize(
       "machines","id",
@@ -97,7 +99,7 @@ sub DataCollector
    );
    my $ip=getModuleObject($self->Config(),"itil::ipaddress");
    my $d=$self->CollectREST(
-      dbname=>$self->getCredentialName(),
+      dbname=>$credentialName,
       requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;
@@ -128,8 +130,11 @@ sub DataCollector
          }
          my @resultdata;
          map({
-             $_->{NetworkInterfaces}=$self->genReadTPChref($Authorization,
-                         $_->{_links}->{'network-interfaces'});
+             $_->{NetworkInterfaces}=$self->genReadTPChref(
+                  $credentialName,
+                  $Authorization,
+                  $_->{_links}->{'network-interfaces'}
+             );
              my $nifs=$_->{NetworkInterfaces};
              $nifs=[$nifs] if (ref($nifs) ne "ARRAY");
              foreach my $nif (@$nifs){

@@ -57,15 +57,16 @@ sub ExternInternTimestampReformat
 sub getVRealizeAuthorizationToken
 {
    my $self=shift;
+   my $credentialName=shift;
 
    $W5V2::Cache->{GLOBAL}={} if (!exists($W5V2::Cache->{GLOBAL}));
    my $gc=$W5V2::Cache->{GLOBAL};
-   my $gckey="TPC_AuthCache";
+   my $gckey=$credentialName."_AuthCache";
 
    if (!exists($gc->{$gckey}) || $gc->{$gckey}->{Expiration}<time()){
       my $pred=$self->CollectREST(
          method=>'POST',
-         dbname=>'TPC',
+         dbname=>$credentialName,
          requesttoken=>'AuthLevel1',
          url=>sub{
             my $self=shift;
@@ -144,7 +145,7 @@ sub getVRealizeAuthorizationToken
       if ($refresh_token ne ""){
          my $d=$self->CollectREST(
             method=>'POST',
-            dbname=>'TPC',
+            dbname=>$credentialName,
             requesttoken=>'AuthLevel2',
             url=>sub{
                my $self=shift;
@@ -478,16 +479,18 @@ sub Ping
 {
    my $self=shift;
 
+   my $credentialN=$self->getCredentialName();
+
    my $errors;
    my $d;
    # Ping is for checking backend connect, without any error displaying ...
    {
     #  open local(*STDERR), '>', \$errors;
       eval('
-         my $Authorization=$self->getVRealizeAuthorizationToken();
+         my $Authorization=$self->getVRealizeAuthorizationToken($credentialN);
          if ($Authorization ne ""){
             $d=$self->CollectREST(
-               dbname=>"TPC",
+               dbname=>$credentialN,
                url=>sub{
                   my $self=shift;
                   my $baseurl=shift;
@@ -543,6 +546,7 @@ sub Ping
 sub genReadTPChref
 {
    my $self=shift;
+   my $credentialName=shift;
    my $auth=shift;
    my $hrefs=shift;
    if (ref($hrefs) eq "HASH"){
@@ -567,7 +571,7 @@ sub genReadTPChref
    my $dd=[];
    foreach my $href (@$hrefs){
       my $d=$self->CollectREST(
-         dbname=>'TPC',
+         dbname=>$credentialName,
          url=>sub{
             my $self=shift;
             my $baseurl=shift;

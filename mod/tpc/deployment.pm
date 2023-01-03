@@ -105,7 +105,9 @@ sub DataCollector
    my $self=shift;
    my $filterset=shift;
 
-   my $Authorization=$self->getVRealizeAuthorizationToken();
+   my $credentialName=$self->getCredentialName();
+
+   my $Authorization=$self->getVRealizeAuthorizationToken($credentialName);
 
 
    my ($dbclass,$requesttoken)=$self->decodeFilter2Query4vRealize(
@@ -117,7 +119,7 @@ sub DataCollector
    my $requesttoken="SEARCH.".time();
    #printf STDERR ("dbclass=%s\n",$dbclass);
    my $d=$self->CollectREST(
-      dbname=>$self->getCredentialName(),
+      dbname=>$credentialName,
       requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;

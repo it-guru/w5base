@@ -109,7 +109,9 @@ sub DataCollector
    my $self=shift;
    my $filterset=shift;
 
-   my $Authorization=$self->getVRealizeAuthorizationToken();
+   my $credentialName=$self->getCredentialName();
+
+   my $Authorization=$self->getVRealizeAuthorizationToken($credentialName);
 
    if (!defined($Authorization)){
       if (!$self->LastMsg()){
@@ -123,7 +125,7 @@ sub DataCollector
       $filterset
    );
    my $d=$self->CollectREST(
-      dbname=>$self->getCredentialName(),
+      dbname=>$credentialName,
       requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;
