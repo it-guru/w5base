@@ -2792,7 +2792,6 @@ sub QRuleSyncCloudSystem
    my $errorlevel=shift;
    my $wfrequest=shift;
 
-   #printf STDERR ("QRuleSyncCloudSystem:%s\n",Dumper($parrec));
 
    if ($rec->{srcsys} eq $srcsystag){
       my $sysnamelist=$parrec->{name};
