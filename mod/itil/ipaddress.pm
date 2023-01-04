@@ -724,13 +724,20 @@ sub Ipv6Expand
 
    my @unformat;
 
+
    if (1){ # Handling for muliple 0 blocks in :: sequence
       my @blks=split(/:/,$ip);
       my $n=$#blks+1;
       if ($n<8){
          my $miss=8-$n;
-         my $addblks=":0:" x $miss;
-         $ip=~s/::/$addblks/;
+         my $addblks=":0" x ($miss+1);
+         $ip=~s/::/$addblks:/;
+      }
+      # verify expand:
+      my @blks=split(/:/,$ip);
+      if ($#blks!=7){
+         msg(ERROR,"ipv6 Expand error: $ip");
+         Stacktrace();
       }
    }
 
