@@ -196,6 +196,8 @@ sub IPValidate {
    } else {
       $ip=~s/^\[(.*)\]$/$1/;
       my @groups=split(/:/,$ip,-1);
+
+printf STDERR ("fifix:%s\n",Dumper(\@groups));
       
       if (@groups!=8) {
          $$msg="unknown ip-address format";
