@@ -138,7 +138,7 @@ sub qcheckRecord
    if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
        $rec->{cistatusid}==5 ||
        (exists($forcedupd->{cistatusid}) && $forcedupd->{cistatusid}==4)){
-      if ($rec->{srcid} ne "" && $rec->{srcsys} eq "TPC"){
+      if ($rec->{srcid} ne "" && $rec->{srcsys} eq $TPCenv){
          if (!defined($parrec)){
             return(undef,undef) if (!$par->Ping());
             $forcedupd->{cistatusid}=6;
@@ -272,7 +272,7 @@ sub qcheckRecord
                msg(INFO,"try to add cloudarea to system ".$rec->{name});
                my $cloudarea=getModuleObject($self->getParent->Config,
                                              "itil::itcloudarea");
-               $cloudarea->SetFilter({srcsys=>\'TPC',
+               $cloudarea->SetFilter({srcsys=>\$TPCenv,
                                       srcid=>\$parrec->{projectId}
                });
                my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
@@ -288,7 +288,7 @@ sub qcheckRecord
                             "on invalid cloudarea");
                }
             }
-            $dataobj->QRuleSyncCloudSystem("TPC",
+            $dataobj->QRuleSyncCloudSystem($TPCenv,
                $self,
                $rec,$par,\%syncData,
                $autocorrect,$forcedupd,
