@@ -368,6 +368,8 @@ sub Import
    my $importname;
    my $sysrec;
 
+   my $credentialName=$self->getCredentialName();
+
    if ($param->{importname} ne ""){
       my $sysuuid;
       $importname=$param->{importname};
@@ -417,7 +419,7 @@ sub Import
    my $w5carec;
    {
       $itcloud->ResetFilter();
-      $itcloud->SetFilter({name=>'TPC TEL-IT_PrivateCloud',cistatusid=>'4'});
+      $itcloud->SetFilter({shortname=>\$credentialName ,cistatusid=>'4'});
       my ($crec,$msg)=$itcloud->getOnlyFirst(qw(id name fullname cistatusid));
       if (defined($crec)){
          $cloudrec=$crec;
@@ -501,7 +503,7 @@ sub Import
       cloudrec=>$cloudrec,
       cloudarearec=>$w5carec,
       imprec=>$sysimporttempl,
-      srcsys=>'TPC',
+      srcsys=>$credentialName,
       checkForSystemExistsFilter=>sub{  # Nachfrage ob Reuse System-Candidat not
          my $osys=shift;                # exists in srcobj
          my $srcid=$osys->{srcid};
