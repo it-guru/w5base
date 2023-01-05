@@ -703,16 +703,15 @@ sub TPC_CloudAreaSync
             $exitmsg=$lastmsg;
          }
       }
+      else{
+         my $d=$joblog->ExpandTimeExpression("now-1h","en","GMT","GMT");
+         $exitmsg="last:$d";
+      }
    }
-   #   $flt{cdate}=">now-14d";   # for DEBUG: Check last 14 days
+
+
 
    if (1){
-      my $d=$joblog->ExpandTimeExpression("now-1h","en","GMT","GMT");
-      $exitmsg="last:$d";
-   }
-
-
-   if (0){
       $pro->ResetFilter();
       $pro->SetFilter({});
       my @ss=$pro->getHashList(qw(id name applid));
@@ -863,26 +862,28 @@ sub TPC_CloudAreaSync
       DEPCHK: foreach my $deprec ($dep->getHashList(qw(opname cdate 
                                                projectid resources))){
          $ncnt++;
-         msg(INFO,"$ncnt) op:".$deprec->{opname});
-         msg(INFO,"cdate:".$deprec->{cdate});
-         msg(INFO,"project:".$deprec->{projectid}."\n--\n");
-
-
          if ($laststamp ne ""){  # filter of cdate on backend not working
             my $d=CalcDateDuration($laststamp,$deprec->{cdate});
-            if (defined($d) && $d->{totalminutes}<0){
+            if (defined($d) && $d->{totalminutes}<=0){
                next DEPCHK;
             }
          }
 
-
+         my $ismachine=0;
          my $resources=$deprec->{resources};
          if (ref($resources) eq "ARRAY"){
             foreach my $resrec (@$resources){
                if ($resrec->{type}=~m/machine/i){
                   $machineid{$resrec->{id}}++;
+                  $ismachine++;
                }
             }
+         }
+         if ($ismachine){
+            $exitmsg="last:".$deprec->{cdate};
+            msg(INFO,"$ncnt) op:".$deprec->{opname});
+            msg(INFO,"cdate:".$deprec->{cdate});
+            msg(INFO,"project:".$deprec->{projectid}."\n--\n");
          }
       }
       foreach my $machineid (sort(keys(%machineid))){
