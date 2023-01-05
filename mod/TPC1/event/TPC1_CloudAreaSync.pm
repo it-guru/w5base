@@ -24,6 +24,15 @@ use kernel::QRule;
 use tpc::lib::Listedit;
 @ISA=qw(kernel::Event);
 
+sub Init
+{
+   my $self=shift;
+
+
+   $self->RegisterEvent("TPC1_CloudAreaSync","TPC1_CloudAreaSync",timeout=>500);
+   return(1);
+}
+
 
 
 sub TPC1_CloudAreaSync

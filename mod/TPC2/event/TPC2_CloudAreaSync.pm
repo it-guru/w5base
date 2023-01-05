@@ -26,6 +26,16 @@ use tpc::lib::Listedit;
 
 
 
+sub Init
+{
+   my $self=shift;
+
+
+   $self->RegisterEvent("TPC2_CloudAreaSync","TPC2_CloudAreaSync",timeout=>500);
+   return(1);
+}
+
+
 sub TPC2_CloudAreaSync
 {
    my $self=shift;
