@@ -712,7 +712,7 @@ sub TPC_CloudAreaSync
    }
 
 
-   if (1){
+   if (0){
       $pro->ResetFilter();
       $pro->SetFilter({});
       my @ss=$pro->getHashList(qw(id name applid));
@@ -854,19 +854,28 @@ sub TPC_CloudAreaSync
       @msg=();     # project sync messages only on daychange
    }
 
-
    if (1){
       $dep->ResetFilter();
       $dep->SetFilter(\%flt);
       $dep->Limit(1000,0,0);
       $dep->SetCurrentOrder(qw(cdate id));
       my %machineid;
-      foreach my $deprec ($dep->getHashList(qw(opname cdate 
+      DEPCHK: foreach my $deprec ($dep->getHashList(qw(opname cdate 
                                                projectid resources))){
          $ncnt++;
          msg(INFO,"$ncnt) op:".$deprec->{opname});
          msg(INFO,"cdate:".$deprec->{cdate});
          msg(INFO,"project:".$deprec->{projectid}."\n--\n");
+
+
+         if ($laststamp ne ""){  # filter of cdate on backend not working
+            my $d=CalcDateDuration($laststamp,$deprec->{cdate});
+            if (defined($d) && $d->{totalminutes}<0){
+               next DEPCHK;
+            }
+         }
+
+
          my $resources=$deprec->{resources};
          if (ref($resources) eq "ARRAY"){
             foreach my $resrec (@$resources){
