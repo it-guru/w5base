@@ -20,7 +20,8 @@ Checks Interviews-Answers on DR-Test topic.
 
 A valid CR number from SM9 is to be filled into the answer field  last (/next) Disaster-Recovery test (Change-Number) . In this case the date of last DR test will be automatically taken from the entered change and it will be copied to the answer field last Disaster-Recovery Test (WorkflowEnd). The existing content will be herewith replaced.
 
-If no valid CR number from SM9 exist, this field must be left empty. Possible comments can be inserted into the dedicated comment field available by clicking on corresponding icon (bubble).
+If no valid CR number from SM9 exists, this field must be left empty.
+Possible comments can be inserted into the dedicated comment field available by clicking on corresponding icon (bubble).
 
 A DataIssue is created if age of the last DR test (calculated based on the SLA guidelines) is too old.
 
