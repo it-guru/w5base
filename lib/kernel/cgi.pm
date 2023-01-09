@@ -26,6 +26,7 @@ sub new
 {
    my $type=shift;
    my $self={};
+
    if ($ENV{REQUEST_METHOD} ne "GET" &&
        $ENV{REQUEST_METHOD} ne "POST"){
       $self->{'cgi'}=new CGI({});
@@ -50,6 +51,7 @@ sub new
    if ($#_==-1){
       my $ContentType=$ENV{CONTENT_TYPE};
       $ContentType=~s/;.*$//; # stripe charset
+      $ContentType=~s/,.*$//; # stripe charset
       if ($ContentType eq "application/json" && 
           $ENV{REQUEST_METHOD} eq "POST"){   # seems to be a JSON POST Request
          my $jsonpost=$self->Param("POSTDATA");

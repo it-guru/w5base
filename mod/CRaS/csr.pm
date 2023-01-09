@@ -391,7 +391,7 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'csr.ssslenddate'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'ssslcertfilename',
                 label         =>'Download-Filename signed certificate',
                 depend        =>['name'],
