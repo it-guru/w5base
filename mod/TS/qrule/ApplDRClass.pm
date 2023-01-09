@@ -26,7 +26,8 @@ NONE
 
 A "Disaster Recovery Class" (DR) must be defined for each productive application.
 
-For non-productive applications is the parameter "Disaster Recovery Class" not mandatory. The value can be set to not defined to avoid DataIssue connected to this QRule.
+For non-productive applications the parameter "Disaster Recovery Class" is not mandatory.
+The value can be set to not defined to avoid DataIssue connected to this QRule.
 
 The corresponding SLA number Disaster-Recovery test interval: must be defined, too. 
 
