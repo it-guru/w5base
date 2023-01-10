@@ -133,7 +133,7 @@ sub qcheckRecord
             };
          }
       }
-      printf STDERR ("netif=%s\n",Dumper(\@netif));
+      #printf STDERR ("netif=%s\n",Dumper(\@netif));
 
 
 
@@ -166,7 +166,7 @@ sub qcheckRecord
          }]
       );
       my @cursys=$sys->getHashList(qw(id srcid cistatusid));
-      printf STDERR ("fifi cursys=%s\n",Dumper(\@cursys));
+      #printf STDERR ("fifi cursys=%s\n",Dumper(\@cursys));
 
       my @delsys;
       my @inssys;
