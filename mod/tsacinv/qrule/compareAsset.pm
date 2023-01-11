@@ -246,9 +246,51 @@ sub qcheckRecord
                              \@qmsg,\@dataissue,\$errorlevel,
                              tolerance=>5,mode=>'integer');
 
+               my $cpucorecountmanaged=0;
+               if (($parrec->{nature} eq "SERVER"        ||
+                    $parrec->{nature} eq "HOST"          ||
+                    $parrec->{nature} eq "SERVER_BLADE"  ||
+                    $parrec->{nature} eq "VIRTUAL ASSET (server)" ||
+                    $parrec->{nature} eq "WORKSTATION") &&
+                   !($parrec->{ishousing})){
+                  msg(INFO,"asset cpucount missing, but should be filled");
+                  $cpucorecountmanaged=1;
+               }
+
+               if ($parrec->{cpucount} eq "" || $parrec->{cpucount} eq "0"){
+                  if (!$cpucorecountmanaged){
+                     if ($rec->{cpucount} eq "" || $rec->{cpucount} eq "0"){
+                        $parrec->{cpucount}="1";
+                        $checksession->{EssentialsChangedCnt}++;
+                     }
+                     else{
+                        delete($parrec->{cpucount});
+                     }
+                  }
+               }
+
                $self->IfComp($dataobj,
                              $rec,"cpucount",
                              $parrec,"cpucount",
+                             $autocorrect,$forcedupd,$wfrequest,
+                             \@qmsg,\@dataissue,\$errorlevel,
+                             mode=>'integer');
+
+               if ($parrec->{corecount} eq "" || $parrec->{corecount} eq "0"){
+                  if (!$cpucorecountmanaged){
+                     if ($rec->{corecount} eq "" || $rec->{corecount} eq "0"){
+                        $parrec->{corecount}="1";
+                        $checksession->{EssentialsChangedCnt}++;
+                     }
+                     else{
+                        delete($parrec->{corecount});
+                     }
+                  }
+               }
+
+               $self->IfComp($dataobj,
+                             $rec,"corecount",
+                             $parrec,"corecount",
                              $autocorrect,$forcedupd,$wfrequest,
                              \@qmsg,\@dataissue,\$errorlevel,
                              mode=>'integer');
@@ -357,13 +399,6 @@ sub qcheckRecord
                                 mode=>'day');
                }
 
-
-               $self->IfComp($dataobj,
-                             $rec,"corecount",
-                             $parrec,"corecount",
-                             $autocorrect,$forcedupd,$wfrequest,
-                             \@qmsg,\@dataissue,\$errorlevel,
-                             mode=>'integer');
 
                $self->IfComp($dataobj,
                              $rec,"cpuspeed",
