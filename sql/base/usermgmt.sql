@@ -3,7 +3,7 @@ CREATE TABLE grp (
   grpid bigint(20) NOT NULL default '0',
   parentid bigint(20) default NULL,
   fullname varchar(255) NOT NULL default '',
-  name varchar(20) NOT NULL default '',
+  name varchar(30) NOT NULL default '',
   cistatus int(11) NOT NULL default '0',
   email varchar(128) NOT NULL default '',
   supervisor bigint(20) NOT NULL default '0',
