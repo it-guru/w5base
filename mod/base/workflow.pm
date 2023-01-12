@@ -2547,18 +2547,21 @@ sub New                   # Workflow starten
       foreach my $sobj (values(%{$self->{Explore}})){
          my $d;
          if ($sobj->isAppletVisible($self)){
-            if ($sobj->can("getObjectInfo")){
-               $d=$sobj->getObjectInfo($self,$lang);
-            }
-            if (defined($d) && $d->{formular}){
-               my $selfname=$sobj->Self();
-               $selbox.="<option value=\"$selfname\"";
-               #$selbox.=" selected" if ($disp{$name} eq $oldval);
-               $selbox.=">Formular: ".$d->{label}."</option>";
-               $tips.="tips['$selfname']=\"$d->{description}\";\n";
-            #   my $jsdata=$jsengine->encode($d);
-            #   utf8::encode($jsdata);
-            #   printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+            my $hidden=$sobj->getObjectHiddenState($self);
+            if (!$hidden){
+               if ($sobj->can("getObjectInfo")){
+                  $d=$sobj->getObjectInfo($self,$lang);
+               }
+               if (defined($d) && $d->{formular}){
+                  my $selfname=$sobj->Self();
+                  $selbox.="<option value=\"$selfname\"";
+                  #$selbox.=" selected" if ($disp{$name} eq $oldval);
+                  $selbox.=">Formular: ".$d->{label}."</option>";
+                  $tips.="tips['$selfname']=\"$d->{description}\";\n";
+               #  my $jsdata=$jsengine->encode($d);
+               #  utf8::encode($jsdata);
+               #  printf("ClassAppletLib['%s']={desc:%s};\n",$selfname,$jsdata);
+               }
             }
          }
       }
