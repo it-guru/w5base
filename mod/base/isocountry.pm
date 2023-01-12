@@ -66,6 +66,11 @@ sub new
                 label         =>'ZIP Code Expression',
                 dataobjattr   =>'isocountry.zipcodeexp'),
 
+      new kernel::Field::Text(
+                name          =>'dialprefix',
+                label         =>'internation calling prefix',
+                dataobjattr   =>'isocountry.callingprefix'),
+
       new kernel::Field::Boolean(
                 name          =>'is_eu',
                 label         =>'member of european union',
@@ -140,7 +145,8 @@ sub new
                 dataobjattr   =>'isocountry.realeditor'),
 
    );
-   $self->setDefaultView(qw(linenumber token fullname cistatus cdate mdate));
+   $self->setDefaultView(qw(linenumber token fullname dialprefix 
+                            cistatus cdate mdate));
    $self->setWorktable("isocountry");
    return($self);
 }
@@ -215,6 +221,21 @@ sub Validate
       $newrec->{'fullname'}=~s/__/_/g;
       $newrec->{'fullname'}=~s/__/_/g;
    }
+
+   my $dp=effVal($oldrec,$newrec,"dialprefix");
+   if ($dp ne ""){
+      my $dpmod=$dp;
+      $dpmod=~s/[^0-9]//g;
+      if ($dpmod ne ""){
+         $dpmod="+".$dpmod;
+      }
+      if ($dp ne $dpmod){
+         $newrec->{dialprefix}=$dpmod;
+      }
+   }
+
+
+
 
    return(1);
 }
