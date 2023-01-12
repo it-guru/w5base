@@ -2,9 +2,13 @@
    <table class=editframe>
       <tr>
          <td class=fname width=10%>%phonenumber(label)%:</td>
-         <td class=finput width=40%>%phonenumber(sublistedit)%</td>
+         <td class=finput colspan=3>%phonenumber(sublistedit)%</td>
+      </tr>
+      <tr>
          <td class=fname width=10%>%name(label)%:</td>
          <td class=finput width=40% valign=top>%name(sublistedit)%</td>
+         <td class=fname width=10%>%showpublic(label)%:</td>
+         <td class=finput width=40%>%showpublic(sublistedit)%</td>
       </tr>
       <tr>
          <td colspan=4>%comments(sublistedit)%</td>

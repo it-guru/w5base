@@ -68,6 +68,15 @@ sub new
                 getPostibleValues=>\&getPostibleUsageValues,
                 dataobjattr   =>'phonenumber.name'),
                                                  
+      new kernel::Field::Select(
+                name          =>'showpublic',
+                label         =>'visibility',
+                value         =>['1','0'],
+                default       =>'1',
+                transprefix   =>'VIS.',
+                htmleditwidth =>'160px',
+                dataobjattr   =>'phonenumber.showpublic'),
+                                                 
       new kernel::Field::Link(
                 name          =>'rawname',
                 label         =>'rawName',
@@ -76,6 +85,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'shortedcomments',
                 htmlwidth     =>'320',
+                htmldetail    =>'0',
+                readonly      =>'1',
                 label         =>'shorted Comments',
                 depend        =>['comments'],
                 onRawValue    =>sub{

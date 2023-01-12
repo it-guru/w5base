@@ -42,6 +42,31 @@ sub Validate
    return({$self->Name()=>undef}) if ($newvalreq eq "");
    my $newvallist=$newvalreq;
    $newvallist=[$newvallist] if (ref($newvallist) ne "ARRAY");
+
+   my $defPrefix="+1";
+   my $country="US";
+   my $UserCache=$self->getParent->Cache->{User}->{Cache};
+   if (defined($UserCache->{$ENV{REMOTE_USER}})){
+      $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
+      if (defined($UserCache->{country}) && $UserCache->{country} ne ""){
+         $country=$UserCache->{country};
+      }
+   }
+   if ($country ne ""){
+      my $o=getModuleObject($self->getParent->Config,"base::isocountry");
+      if (defined($o)){
+         $o->SetFilter({token=>\$country});
+         my ($crec,$msg)=$o->getOnlyFirst(qw(token dialprefix));
+         if (defined($crec) && $crec->{dialprefix} ne ""){
+            $defPrefix=$crec->{dialprefix};
+         }
+      }
+ 
+
+   }
+   msg(INFO,"validating using country-Base $country with devprefix=$defPrefix");
+
+
    my $newvallist=[map({
          my $m=trim($_);
          if ($m ne ""){
@@ -66,6 +91,19 @@ sub Validate
                $num=~s/^\+49 17([0-9]{1})/+49 17$1 /;
                $num=~s/^\+49 16([0-9]{1})/+49 16$1 /;
                $m="$num";
+            }
+            my $mchk=$m;
+            $mchk=~s/^\+//;
+            $mchk=~s/[\s-]//g;
+            msg(INFO,"check number='$mchk'");
+            if (($mchk=~m/^(.)(\1)*$/) || 
+                ($mchk=~m/(.)(\1){6}/) ||
+                ($mchk=~m/23456/) ||
+                ($mchk=~m/56789/) ||
+                length($mchk)<8){
+               $self->getParent->LastMsg(ERROR,
+                            "senseless phonenumber '%s'",$m);
+               return(undef);
             }
          }
          $m=lc($m);
