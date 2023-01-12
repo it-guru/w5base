@@ -1957,6 +1957,16 @@ sub findtemplvar
    elsif ($var eq "T"){
       return($self->T(@param));
    }
+   elsif ($var eq "FAKEBASICLOGOFF"){
+      if ($ENV{REMOTE_USER} eq "" || $ENV{REMOTE_USER} eq "anonymous"){
+         return(" ");
+      }
+      my $title=$self->T("to logoff, please terminate your browser",
+                         "kernel::App::Web");
+      return("&bull; <a title=\"$title\" ".
+             "href=\"javascript:FakeBasicAuthLogoff()\" ".
+             "onclick=\"FakeBasicAuthLogoff()\">Logoff</a> &bull;");
+   }
    elsif ($var eq "SUPPORTINFO"){
       my $u=getModuleObject($self->Config,"base::user");
       my $d="";

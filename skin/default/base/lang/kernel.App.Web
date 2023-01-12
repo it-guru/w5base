@@ -43,3 +43,4 @@
 'looks not like an email address'=>{de=>'sieht nicht wie eine E-Mail Adresse aus'},
 'nice try, email belongs to a service'=>{de=>'netter Versuch, die E-Mail gehört zu einem Service-Kontakt'},
 'nice try, email belongs to an deleted or locked contact'=>{de=>'netter Versuch, die E-Mail gehört zu einem gelöschten oder gesperrten Kontakt'},
+'to logoff, please terminate your browser'=>{de=>'zum Abmelden, beenden Sie bitte ihren Web-Browser'},
