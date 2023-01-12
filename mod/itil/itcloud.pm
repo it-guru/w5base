@@ -800,9 +800,6 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
                    "<td valign=top>$data</td></tr>\n";
    }
 
-   #if (my $pn=$self->getField("phonenumbers")){
-   #   $htmlresult.=$pn->FormatForHtmlPublicDetail($rec,["phoneRB"]);
-   #}
    $htmlresult.="</table>\n";
    #if ($rec->{description} ne ""){
    #   my $desclabel=$self->getField("description")->Label();

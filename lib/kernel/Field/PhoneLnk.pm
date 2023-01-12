@@ -34,6 +34,9 @@ sub new
    if (!defined($self{vjoindisp})){
       $self{vjoindisp}=['phonenumber','name','shortedcomments'];
    }
+   if (!defined($self{vjoininhash})){
+      $self{vjoininhash}=['phonenumber','name','shortedcomments','showpublic'];
+   }
 
    my $self=bless($type->SUPER::new(%self),$type);
    return($self);
@@ -59,20 +62,27 @@ sub FormatForHtmlPublicDetail
 
    if (exists($rec->{$k}) && ref($rec->{$k}) eq "ARRAY"){
       foreach my $prec (@{$rec->{$k}}){
-         if (grep(/^$prec->{name}$/,@$ntypes)){
+         if ((!defined($ntypes) || grep(/^$prec->{name}$/,@$ntypes))
+             && $prec->{showpublic}){
             my $phonelabel=$prec->{shortedcomments};
-            if ($phonelabel=~m/^\s*$/){
-               $phonelabel=$app->T($prec->{name},
-                              $app->Self,"base::phonelnk");
-            }
+            $phonelabel=$app->T($prec->{name},
+                           $app->Self,"base::phonelnk");
             if (ref($app->{PhoneLnkUsage}) eq "CODE"){
                my %tr=&{$app->{PhoneLnkUsage}}($app);
                if (exists($tr{$phonelabel})){
                   $phonelabel=$tr{$phonelabel};
                }
             }
+            my $number=$prec->{phonenumber};
+            if ($prec->{shortedcomments} ne ""){
+               $number.="<div style=\"color:gray\">";
+               $number.="<i>";
+               $number.=$prec->{comments};
+               $number.="</i>";
+               $number.="</div>";
+            }
             $d.="<tr><td valign=top>$phonelabel</td>";
-            $d.="<td valign=top>$prec->{phonenumber}</td></tr>";
+            $d.="<td valign=top>$number</td></tr>";
          }
       }
    }

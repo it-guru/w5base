@@ -3141,7 +3141,7 @@ sub HtmlPublicDetail   # for display record in QuickFinder or with no access
 
    if ($ENV{REMOTE_USER} ne "anonymous"){
       if (my $pn=$self->getField("phonenumbers")){
-         $htmlresult.=$pn->FormatForHtmlPublicDetail($rec,["phoneRB"]);
+         $htmlresult.=$pn->FormatForHtmlPublicDetail($rec);
       }
    }
    $htmlresult.="</table>\n";
