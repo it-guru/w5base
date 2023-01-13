@@ -121,11 +121,33 @@ sub qcheckRecord
    #
    if ($rec->{systemid} ne ""){   # pruefen ob SYSTEMID von AssetManager
       $par->SetFilter({systemid=>\$rec->{systemid},
-                       status=>'"!out of operation"',
                        deleted=>\'0'});
       ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
    }
+
+
+   if (defined($parrec)){
+      if (lc($parrec->{status}) eq "out of operation"){
+         msg(INFO,"parrec for $rec->{systemid} found - but out of operation");
+         # jetzt checken wir mal das mdate des parrec - wenn das älter als
+         # 4 Wochen ist, dann machen wir local ein force cistatusid=6 
+         # draus - also ein automatisches "veraltet/gelöscht" setzen nach 
+         # 4 Wochen.
+         if ($rec->{cistatusid}<6){
+            my $d=CalcDateDuration($parrec->{mdate},NowStamp("en"));
+            #msg(INFO,"age=".Dumper($d));
+            if ($d->{totaldays}>4*7){
+               msg(WARN,"debug info - found long out of operation system ".
+                        "$rec->{systemid} in AssetManager and set cistatus=6");
+               $forcedupd->{cistatusid}="6";
+            }
+         }
+         $parrec=undef;
+      }
+   }
+
+
    if (!defined($parrec)){
       if ($rec->{systemid} eq "" && 
           $rec->{scapprgroupid} eq "" && # nur falls noch keine IAC gesetzt!
@@ -156,9 +178,12 @@ sub qcheckRecord
    #
    if (!defined($parrec)){      # pruefen ob wir bereits nach AM geschrieben
       # try to find parrec by srcsys and srcid
-      $par->ResetFilter();
-      $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
-      ($parrec)=$par->getOnlyFirst(qw(ALL));
+      if ($rec->{srcsys} ne "AssetManager" && # snap of parrec is not allowed
+          $rec->{itcloudareaid} eq ""){       # if we got an MCOS constellation
+         $par->ResetFilter();
+         $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+         ($parrec)=$par->getOnlyFirst(qw(ALL));
+      }
    }
 
    #
@@ -301,8 +326,9 @@ sub qcheckRecord
       }
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "AssetManager"){
          if (!defined($parrec)){
-            push(@qmsg,'given systemid not found as active in AssetManager');
-            push(@dataissue,'given systemid not found as active in AssetManager');
+            my $msg='given systemid not found as active in AssetManager';
+            push(@qmsg,$msg);
+            push(@dataissue,$msg);
             $errorlevel=3 if ($errorlevel<3);
          }
          else{
