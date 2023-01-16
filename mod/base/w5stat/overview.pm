@@ -111,6 +111,10 @@ sub displayOverview
    my $subloopcnt=0;
    foreach my $rec (@ovdata){
       $subloopcnt++;
+      my $ctrlrec={};
+      if (ref($rec->[0]) eq "HASH"){
+         $ctrlrec=shift(@$rec);
+      }
       my $text=$rec->[0];
 
       my $extfullname;
@@ -160,6 +164,18 @@ sub displayOverview
          if (defined($rec->[2])){
             $color=$rec->[2];
          }
+         my $preVal="";
+         my $pstVal="";
+
+         if ($ENV{HTTP_USER_AGENT} ne "" &&   # only in Web-Context
+             $rec->[1] ne "" && $ctrlrec->{detail} ne ""){
+            $preVal=
+               "<span style=\"cursor:pointer\" ".
+               "onclick=\"if (parent.setTag){".
+               "parent.setTag(".$ctrlrec->{id}.",'".$ctrlrec->{detail}."');".
+               "}\" >";
+            $pstVal="</span>";
+         }
          $d.="\n<tr height=1%>";
          $d.="<td><div class=\"$class\">".$text."</div>";
          if ($desc ne ""){
@@ -167,8 +183,9 @@ sub displayOverview
          }
          $d.="</td>";
          $d.="<td align=right width=50><font color=\"$color\"><b>".
-             $rec->[1]."</b></font></td>";
-         $d.="<td align=right width=50>".$rec->[3]."</td>";
+             $preVal.$rec->[1].$pstVal."</b></font></td>";
+
+         $d.="<td align=right width=50>".$preVal.$rec->[3].$pstVal."</td>";
          $d.="</tr>";
       }
       else{

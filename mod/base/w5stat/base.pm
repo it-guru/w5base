@@ -287,7 +287,11 @@ sub overviewDataIssue
       $color="red";
    }
    if ($primrec->{sgroup} eq "Group"){
-      push(@l,[$app->T('unprocessed DataIssue Workflows'),
+      push(@l,[{
+                 detail=>$self->Self."::dataissue",
+                 id=>$primrec->{id}
+               },
+               $app->T('unprocessed DataIssue Workflows'),
                $dataissues,$color,$delta]);
    }
 
@@ -311,7 +315,11 @@ sub overviewDataIssue
       $color="red";
    }
    if ($dataissues>0){
-      push(@l,[$app->T('untreaded DataIssues longer then 8 weeks'),
+      push(@l,[{
+                 detail=>$self->Self."::dataissue",
+                 id=>$primrec->{id}
+               },
+               $app->T('untreaded DataIssues longer then 8 weeks'),
                $dataissues,$color,$delta]);
    }
 
@@ -341,7 +349,11 @@ sub overviewDataIssue
    }
 
    if ($wfcount>0 && $wfcount!=$dataissues){
-      push(@wf,[$app->T('workflows untreaded longer then 8 weeks'),
+      push(@wf,[{
+                 detail=>$self->Self."::dataissue",
+                 id=>$primrec->{id}
+               },
+               $app->T('workflows untreaded longer then 8 weeks'),
                $wfcount,$color,$delta]);
    }
 
@@ -357,7 +369,11 @@ sub overviewDataIssue
    }
    my $delta=$app->calcPOffset($primrec,$hist,$keyname);
    if ($wfcount>0){
-      push(@wf,[$app->T('count of consequent ignored workflow'),
+      push(@wf,[{
+                 detail=>$self->Self."::dataissue",
+                 id=>$primrec->{id}
+               }, 
+               $app->T('count of consequent ignored workflow'),
                $wfcount,$color,$delta]);
    }
 
