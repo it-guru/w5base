@@ -5,3 +5,4 @@
 'Groupname'=>{de=>'Gruppenname'},
 'Mandator'=>{de=>'Mandant'},
 'Employee count'=>{de=>'Mitarbeiteranzahl'},
+'organisational user contact count'=>{de=>'organisatorische User-Kontakt-Anzahl'},

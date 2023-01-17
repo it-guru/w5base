@@ -93,12 +93,44 @@ sub new
                 depend        =>['grpid'],
                 searchable    =>0,
                 htmldetail    =>0,
+                readonly      =>1,
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
                    my @n=$self->getParent->getMembersOf($current->{grpid},
                                                       "REmployee","down");
                    return($#n+1);
+                }),
+
+      new kernel::Field::Number(
+                name          =>'orgusercount',
+                label         =>'organisational user contact count',
+                depend        =>['grpid'],
+                searchable    =>0,
+                htmldetail    =>0,
+                readonly      =>1,
+                onRawValue    =>sub{
+                   my $self=shift;
+                   my $current=shift;
+                   my $app=$self->getParent();
+                   my $fld=$self->getParent->getField("groupname");
+                   my $group=$fld->RawValue($current);
+                   my $n=undef;
+                   if ($group ne ""){
+                      my $o=$app->getPersistentModuleObject("base::lnkgrpuser");
+
+
+                      $o->SetFilter({group=>"$group $group.*",
+                                     rawnativroles=>[orgRoles()],
+                                     grpcistatusid=>\'4',
+                                     usercistatusid=>\'4'});
+                      $o->SetCurrentView(qw(userid grpid nativroles));
+                      my $d=$o->getHashIndexed(qw(userid));
+                      if (exists($d->{userid}) && ref($d->{userid}) eq "HASH"){
+                         $n=keys(%{$d->{userid}});
+                      }
+                   }
+                   return($n);
                 }),
 
       new kernel::Field::ContactLnk(
