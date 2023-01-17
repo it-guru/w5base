@@ -398,129 +398,134 @@ sub qcheckRecord
                      $mapos->ValidatedInsertRecord(\%new);
                   }
                }
-               #################################################################### 
+               ################################################################ 
                # assetid compare 
-               if (!in_array($dataobj->needVMHost(),$rec->{systemtype})){
-                  my $assetid=$parrec->{assetassetid};
-                  # special handling to detect the correct AssetID for a
-                  # system. Because posible wrong informations for ESX vm's,
-                  # it is needed to query eCMDB (ADOP-T)
-                  if ($parrec->{systemid} ne ""){
-                     my $vsys=$dataobj->getPersistentModuleObject(
-                               'tsadopt::vsys');
-                     $vsys->SetFilter({
-                        systemid=>$parrec->{systemid}
-                     });
-                     my ($vsysrec,$msg)=$vsys->getOnlyFirst(qw(id name 
-                                                               assetid));
-                     #if (!$vsys->Ping()){
-                     #   return(undef,{qmsg=>"ADOP-T not available - ".
-                     #                "assetid is not detectable"});
-                     #}
-                     if ($vsysrec->{assetid} ne ""){
-                        my $msg=$self->T('substituted assetid for %s '.
-                                       'from %s to %s based on ADOP-T');
-                        $msg=sprintf($msg,$parrec->{systemid},
-                                          $assetid,$vsysrec->{assetid});
-                        push(@qmsg,$msg);
-                        $assetid=$vsysrec->{assetid};
-                     }
-                  }
-                  if ($assetid ne ""){
-                     my $assetobj=getModuleObject($self->getParent->Config,
-                                                  'itil::asset');
-                     $assetobj->SetFilter({srcsys=>'AssetManager',
-                                           srcid=>$assetid});
-                     my @w5asset=$assetobj->getHashList(qw(ALL));
-                     my $foundactive;
-                     foreach my $a (@w5asset) {
-                        if ($a->{cistatusid}==3 || $a->{cistatusid}==4) {
-                           $foundactive++;
+               if ($rec->{itcloudareaid} eq ""){ # AssetID sync only if its no
+                                                 # Cloud related system
+                  if (!in_array($dataobj->needVMHost(),$rec->{systemtype})){
+                     my $assetid=$parrec->{assetassetid};
+                     # special handling to detect the correct AssetID for a
+                     # system. Because posible wrong informations for ESX vm's,
+                     # it is needed to query eCMDB (ADOP-T)
+                     if ($parrec->{systemid} ne ""){
+                        my $vsys=$dataobj->getPersistentModuleObject(
+                                  'tsadopt::vsys');
+                        $vsys->SetFilter({
+                           systemid=>$parrec->{systemid}
+                        });
+                        my ($vsysrec,$msg)=$vsys->getOnlyFirst(qw(id name 
+                                                                  assetid));
+                        #if (!$vsys->Ping()){
+                        #   return(undef,{qmsg=>"ADOP-T not available - ".
+                        #                "assetid is not detectable"});
+                        #}
+                        if ($vsysrec->{assetid} ne ""){
+                           my $msg=$self->T('substituted assetid for %s '.
+                                          'from %s to %s based on ADOP-T');
+                           $msg=sprintf($msg,$parrec->{systemid},
+                                             $assetid,$vsysrec->{assetid});
+                           push(@qmsg,$msg);
+                           $assetid=$vsysrec->{assetid};
                         }
                      }
-
-                     if ($#w5asset!=-1 && !$foundactive) {
-                        # set asset installed/active before IfComp
-                        my $a=$w5asset[0];
-                        my $oldcistatus=$a->{cistatusid};
-                        
-                        $assetobj->ValidatedUpdateRecord($a,
-                                           {cistatusid=>4,
-                                            databossid=>$rec->{databossid}},
-                                           {id=>\$a->{id}}); 
+                     if ($assetid ne ""){
+                        my $assetobj=getModuleObject($self->getParent->Config,
+                                                     'itil::asset');
+                        $assetobj->SetFilter({srcsys=>'AssetManager',
+                                              srcid=>$assetid});
+                        my @w5asset=$assetobj->getHashList(qw(ALL));
+                        my $foundactive;
+                        foreach my $a (@w5asset) {
+                           if ($a->{cistatusid}==3 || $a->{cistatusid}==4) {
+                              $foundactive++;
+                           }
+                        }
+               
+                        if ($#w5asset!=-1 && !$foundactive) {
+                           # set asset installed/active before IfComp
+                           my $a=$w5asset[0];
+                           my $oldcistatus=$a->{cistatusid};
+                           
+                           $assetobj->ValidatedUpdateRecord($a,
+                                              {cistatusid=>4,
+                                               databossid=>$rec->{databossid}},
+                                              {id=>\$a->{id}}); 
+                        }
+               
+                        $self->IfComp($dataobj,
+                                      $rec,"asset",
+                                      {assetassetid=>$assetid},"assetassetid",
+                                      $autocorrect,$forcedupd,$wfrequest,
+                                      \@qmsg,\@dataissue,\$errorlevel,
+                                      mode=>'leftouterlinkcreate',
+                                      onCreate=>{
+                                         comments=>
+                                            "automatically generated ".
+                                            "by QualityCheck",
+                                         cistatusid=>4,
+                                         allowifupdate=>1,
+                                         databossid=>$rec->{databossid},
+                                         mandatorid=>$rec->{mandatorid},
+                                         name=>$assetid,
+                                         srcsys=>'AssetManager',
+                                         srcid=>$assetid});
                      }
-
-                     $self->IfComp($dataobj,
-                                   $rec,"asset",
-                                   {assetassetid=>$assetid},"assetassetid",
-                                   $autocorrect,$forcedupd,$wfrequest,
-                                   \@qmsg,\@dataissue,\$errorlevel,
-                                   mode=>'leftouterlinkcreate',
-                                   onCreate=>{
-                                      comments=>
-                                         "automatically generated by QualityCheck",
-                                      cistatusid=>4,
-                                      allowifupdate=>1,
-                                      databossid=>$rec->{databossid},
-                                      mandatorid=>$rec->{mandatorid},
-                                      name=>$assetid,
-                                      srcsys=>'AssetManager',
-                                      srcid=>$assetid});
                   }
-               }
-               else{  # special VM Host-system handling - vhostsystem needs to sync
-                  my $assetid=$parrec->{assetassetid};
-                  if ($assetid ne ""){
-                     my $sys=$dataobj->ModuleObject("tsacinv::system");
-                     $sys->SetFilter({
-                        assetassetid=>\$assetid,
-                        status=>\'in operation',
-                        usage=>['OSY-I: KONSOLSYSTEM HYPERVISOR',
-                                'OSY-I: KONSOLSYSTEM VMWARE']
-                     });
-                     my @l=$sys->getHashList(qw(systemname systemid));
-                     if ($#l==-1){
-                        $sys->ResetFilter();
+                  else{  # special VM Host-system handling - 
+                         # vhostsystem needs to sync
+                     my $assetid=$parrec->{assetassetid};
+                     if ($assetid ne ""){
+                        my $sys=$dataobj->ModuleObject("tsacinv::system");
                         $sys->SetFilter({
                            assetassetid=>\$assetid,
                            status=>\'in operation',
-                           usage=>['OSY-I: KONSOLSYSTEM(BLADE&APPCOM)']
+                           usage=>['OSY-I: KONSOLSYSTEM HYPERVISOR',
+                                   'OSY-I: KONSOLSYSTEM VMWARE']
                         });
-                        @l=$sys->getHashList(qw(systemname systemid));
-                     }
-                     if ($#l!=0){
-                        my $m='can not find a related VMWARE KONSOLSYSTEM '.
-                                'in AssetManager';
-                        push(@dataissue,$m);
-                        push(@qmsg,$m);
-                        $errorlevel=3 if ($errorlevel<3);
-                     }
-                     else{
-                        my $hostsystemsystemid=$l[0]->{systemid};
-                        my $o=getModuleObject($self->getParent->Config(),
-                                              "itil::system");
-                        $o->SetFilter({systemid=>\$hostsystemsystemid});
-                        my @h=$o->getHashList(qw(name));
-                        if ($#h<0){
-                           push(@qmsg,'can not find needed '.
-                                      'vm host system in IT-Inventar: '.
-                                      $l[0]->{systemname}." ".
-                                      'SystemID: '.$l[0]->{systemid});
+                        my @l=$sys->getHashList(qw(systemname systemid));
+                        if ($#l==-1){
+                           $sys->ResetFilter();
+                           $sys->SetFilter({
+                              assetassetid=>\$assetid,
+                              status=>\'in operation',
+                              usage=>['OSY-I: KONSOLSYSTEM(BLADE&APPCOM)']
+                           });
+                           @l=$sys->getHashList(qw(systemname systemid));
+                        }
+                        if ($#l!=0){
+                           my $m='can not find a related VMWARE KONSOLSYSTEM '.
+                                   'in AssetManager';
+                           push(@dataissue,$m);
+                           push(@qmsg,$m);
                            $errorlevel=3 if ($errorlevel<3);
                         }
-                        if ($#h==0){
-                           $parrec->{vhostsystem}=$h[0]->{name};
+                        else{
+                           my $hostsystemsystemid=$l[0]->{systemid};
+                           my $o=getModuleObject($self->getParent->Config(),
+                                                 "itil::system");
+                           $o->SetFilter({systemid=>\$hostsystemsystemid});
+                           my @h=$o->getHashList(qw(name));
+                           if ($#h<0){
+                              push(@qmsg,'can not find needed '.
+                                         'vm host system in IT-Inventar: '.
+                                         $l[0]->{systemname}." ".
+                                         'SystemID: '.$l[0]->{systemid});
+                              $errorlevel=3 if ($errorlevel<3);
+                           }
+                           if ($#h==0){
+                              $parrec->{vhostsystem}=$h[0]->{name};
+                           }
                         }
                      }
+                     $self->IfComp($dataobj,
+                                   $rec,"vhostsystem",
+                                   $parrec,"vhostsystem",
+                                   $autocorrect,$forcedupd,$wfrequest,
+                                   \@qmsg,\@dataissue,\$errorlevel,
+                                   mode=>'string');
                   }
-                  $self->IfComp($dataobj,
-                                $rec,"vhostsystem",
-                                $parrec,"vhostsystem",
-                                $autocorrect,$forcedupd,$wfrequest,
-                                \@qmsg,\@dataissue,\$errorlevel,
-                                mode=>'string');
                }
-               #################################################################### 
+               ################################################################ 
 
                if (defined($parrec->{systemname})){
                   $parrec->{systemname}=lc($parrec->{systemname});
