@@ -223,7 +223,8 @@ sub getValidWebFunctions
    my ($self)=@_;
    return($self->SUPER::getValidWebFunctions(),
           "root","mobile","menutop","menuframe","msel","TableVersionChecker",
-          "LoginFail","IllegalTokenAccess","SkinSwitcher","setSkin");
+          "LoginFail","IllegalTokenAccess","SkinSwitcher","setSkin",
+          "logout");
 }
 
 #####################################################################
@@ -838,6 +839,19 @@ sub LoginFail
    #
    print $self->getParsedTemplate("tmpl/LoginFail");
    print ("</html>");
+}
+
+sub logout
+{
+   my $self=shift;
+
+   if ($ENV{REMOTE_USER} ne "anonymous" &&
+       $ENV{REMOTE_USER} ne ""){
+      $self->HtmlGoto("../../../public/base/menu/root");
+   }
+   else{
+      $self->HtmlGoto("./root");
+   }
 }
 
 sub SkinSwitcher
