@@ -77,11 +77,15 @@ sub createSplitHeader
       "\n";
    my $emailcategory=$rec->{emailcategory};
    $emailcategory=[$emailcategory] if (ref($emailcategory) ne "ARRAY");
+   my $opmode=$self->Config->Param("W5BaseOperationMode");
    foreach my $cat (@$emailcategory){
       $cat=trim($cat);
       if ($cat ne ""){
          $mail.="X-W5Category: $cat :X-W5Category\n";
-      }
+         $mail.="X-W5FullqualifiedCategory: ".      # use FullqualifiedCategory
+                $opmode.".".$cat.                   # to filter opmode+cat to
+                " :X-W5FullqualifiedCategory\n";    # bypass MS-Outlook filter
+      }                                             # limitations (no AND)
    }
 
    return($mail);

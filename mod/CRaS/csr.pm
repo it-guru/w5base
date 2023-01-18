@@ -1179,7 +1179,7 @@ sub doNotify
                emailbcc=>[
                   11634953080001,   # HV
                ],
-               emailcategory =>['CRaS']
+               emailcategory =>['CRaS','CRaS.'.$mode]
             );
          }
       }

@@ -116,6 +116,7 @@ sub NotifyContactDataModification
          $notifyparam{emailfrom}="\"W5Base Contact-Cleanup\" <>";
          $notifyparam{emailto}=[$targetid]; 
          $notifyparam{emailbcc}=[11634953080001];
+         $notifyparam{emailcategory}=['ContactCleanup','InvalidRefChk'];
          $notifyparam{lang}=$targetrec->{lang} ne "" ? 
                                 $targetrec->{lang} : $targetrec->{talklang};
          $notifyparam{lang}="en" if ($notifyparam{lang} eq "");
