@@ -454,6 +454,7 @@ sub NotifyAdmin
             $fakeFrom="\"$fakeFrom\" <>";
             $notiy{emailfrom}=$fakeFrom;
             $notiy{emailto}=$arec->{email};
+            $notiy{emailcategory}='GroupRelationExpiredAdminInfo';
             $notiy{name}=$self->T("admin info: relation expired").": ".$group;
             my $sitename=$self->Config->Param("SITENAME");
             if ($sitename ne ""){
@@ -530,6 +531,7 @@ sub NotifyUser
                }
             }
             $notiy{emailcc}=[keys(%admins)];
+            $notiy{emailcategory}='GroupRelationExpiredUserInfo';
             $notiy{name}=$self->T("relation nearly expired").": ".$group;
             if ($grec->{cistatusid}==6){
                $notiy{name}=$self->T("relation expired").": ".$group;

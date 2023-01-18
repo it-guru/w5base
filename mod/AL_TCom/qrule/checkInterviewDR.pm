@@ -414,7 +414,8 @@ sub qcheckRecord
                      msg(INFO,"set DRTestNotify tag");
                      msg(INFO,"DR Test planning needed for ".$rec->{name}.
                               " - deadline for test is $deadline");
-                     my $notifyparam={emailbcc=>11634953080001};
+                     my $notifyparam={emailbcc=>11634953080001,
+                                      emailcategory=>'DRTestPlanningNeeded'};
                      my $notifycontrol={};
                      $dataobj->NotifyWriteAuthorizedContacts($rec,{},
                                      $notifyparam,$notifycontrol,sub{
