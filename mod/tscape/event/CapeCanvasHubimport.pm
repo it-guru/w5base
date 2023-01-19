@@ -77,7 +77,14 @@ sub CapeCanvasHubimport
       $c++;
       my $icto=$irec->{archapplid};
       my $ictoid=$irec->{id};
-      my ($canvasidstr)=$irec->{canvas}=~m/^(\S{1,6})\s+/;
+      my $canvasorgstr=$irec->{canvas};
+      #my $canvasorgstr="TSI / ".$irec->{canvas};  # test with section
+
+      # remove posible existing Sektion (TSI,oder anderes Gerotz)
+      my $canvasstr=$canvasorgstr; 
+      $canvasstr=~s/^[a-z0-9 ]{1,6}\s*\/\s*//i;
+     
+      my ($canvasidstr)=$canvasstr=~m/^(\S{1,6})\s+/;
       my ($hubshort)=$irec->{organisation}=~m/^E-HUB-[0-9]+\s+(\S{2,4})\s+/;
       if ($hubshort eq ""){
          ($hubshort)=$irec->{organisation}=~m/^(\S{3})\s+/;
@@ -89,6 +96,10 @@ sub CapeCanvasHubimport
       my $canvasid;
       if (exists($canvas->{canvasid}->{$canvasidstr})){
          $canvasid=$canvas->{canvasid}->{$canvasidstr}->{id};
+      }
+      if (0){
+         printf STDERR ("canvas:'$canvasorgstr' idstr='$canvasidstr' ".
+                        "w5baseid='$canvasid'\n");
       }
       
       if (0){
