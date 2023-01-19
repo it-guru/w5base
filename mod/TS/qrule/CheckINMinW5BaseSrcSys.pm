@@ -13,9 +13,6 @@ Checks incident assignementgroup in ci's with srcsys=w5base
 =head3 HINTS
 
 A config-item which was created in Darwin and can or should be transferred to AssetManager, has to have a valid Incident Assignmentgroup.
-If it is a test/development system (or a test/development application), it 
-is recommended to capture an Incident Assignmentgroup - but it is 
-not mandatory.
 
 Beware! If the intention is to "refer" to a config. item in AssetManager (i.e. the mentioned CI is under the main responsibility of the IT-Division, or is generally maintained in AssetManager), then the CI may NOT be created anew. For this particular case you should use the function "Assetmanager Import" in Darwin.
 
@@ -28,9 +25,6 @@ You can see whether a CI was created in Darwin or AssetManager based on the fiel
 Ein Config-Item das innerhalb von Darwin per Neueingabe erzeugt
 wurde und nach AssetManager übertragen werden kann, muß eine
 gültige Incident Assignmentgroup aufweisen.
-Handelt es sich um ein Test-/Entwicklungssystem (oder eine
-Test-/Entwicklungsanwendung) ist die Erfassung einer Incident Assignmentgroup
-zu empfehlen - es ist aber nicht zwingend.
 
 ACHTUNG: Wenn auf Config-Item in AssetManager "verwiesen"
 werden soll (d.h. das betreffende CI steht unter der Hauptverantwortung
