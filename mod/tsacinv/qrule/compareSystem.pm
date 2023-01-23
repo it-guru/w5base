@@ -157,13 +157,16 @@ sub qcheckRecord
    #
    if (!defined($parrec)){      # pruefen ob wir bereits nach AM geschrieben
       # try to find parrec by srcsys and srcid
-      if ($rec->{srcsys} ne "AssetManager" && # snap of parrec is not allowed
-          $rec->{itcloudareaid} eq ""){       # if we got an MCOS constellation
+      if ($rec->{srcsys} ne "AssetManager"){       # if we got an MCOS constellation
          $par->ResetFilter();
          $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
          ($parrec)=$par->getOnlyFirst(qw(ALL));
       }
+      if (defined($parrec)){
+         $checksession->{EssentialsChangedCnt}++;
+      }
    }
+
 
 
    if (defined($parrec)){
