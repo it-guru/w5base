@@ -313,11 +313,22 @@ sub RawValue
             if (defined($d) && exists($d->{totaldays}) && $d->{totaldays}<8*7){
                $msg.=" but OK";
             }
+
+            my $usertz=$self->getParent->UserTimezone();
+            my $mdate=$issuerec->{mdate};
+            my $eventstart=$issuerec->{eventstart};
+            if ($mode eq "JSON" || $mode eq "JSONP"){
+               $mdate=$self->getParent->ExpandTimeExpression(
+                          $mdate,"ISO8601",$usertz,$usertz);
+               $eventstart=$self->getParent->ExpandTimeExpression(
+                          $eventstart,"ISO8601",$usertz,$usertz);
+            }
+
             $msg={
                dataissuestate=>$msg,
                id=>$issuerec->{id},
-               eventstart=>$issuerec->{eventstart},
-               mdate=>$issuerec->{mdate},
+               eventstart=>$eventstart,
+               mdate=>$mdate,
                dataissue=>$issuerec->{name},
                dataobj=>$self->getParent->SelfAsParentObject(),
                dataobjid=>$refid,
