@@ -82,6 +82,19 @@ sub qcheckRecord
 
    my $fiatfw=$dataobj->getPersistentModuleObject("tsfiat::firewall");
 
+   return({}) if ($fiatfw->isSuspended());
+   # if ping failed ...
+   # ??? - is ping on fiat implemented?
+   #if (!$fiatfw->Ping()){
+   #   # check if there are lastmsgs
+   #   # if there, send a message to interface partners
+   #   my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+   #   return({}) if ($infoObj->NotifyInterfaceContacts($fiatfw));
+   #   msg(ERROR,"no ping posible to ".$fiatfw->Self());
+   #   return({});
+   #}
+
+
    if (ref($rec->{ipaddresses}) ne "ARRAY" || $#{$rec->{ipaddresses}}==-1){
       my $msg="missing ip addresses";
       return(undef,{qmsg=>$msg});

@@ -32,6 +32,8 @@ sub FiatKernelLoad
 
    my $obj=getModuleObject($self->Config,"tsfiat::firewall");
 
+   return({exitcode=>1,exitmsg=>'suspended'}) if ($obj->isSuspended());
+
    my $start=NowStamp("en");
    my $d=$obj->getFirewallTable();
    foreach my $rec (@$d){
