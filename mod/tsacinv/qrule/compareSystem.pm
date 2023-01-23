@@ -127,27 +127,6 @@ sub qcheckRecord
    }
 
 
-   if (defined($parrec)){
-      if (lc($parrec->{status}) eq "out of operation"){
-         msg(INFO,"parrec for $rec->{systemid} found - but out of operation");
-         # jetzt checken wir mal das mdate des parrec - wenn das älter als
-         # 4 Wochen ist, dann machen wir local ein force cistatusid=6 
-         # draus - also ein automatisches "veraltet/gelöscht" setzen nach 
-         # 4 Wochen.
-         if ($rec->{cistatusid}<6){
-            my $d=CalcDateDuration($parrec->{mdate},NowStamp("en"));
-            #msg(INFO,"age=".Dumper($d));
-            if ($d->{totaldays}>4*7){
-               msg(WARN,"debug info - found long out of operation system ".
-                        "$rec->{systemid} in AssetManager and set cistatus=6");
-               $forcedupd->{cistatusid}="6";
-            }
-         }
-         $parrec=undef;
-      }
-   }
-
-
    if (!defined($parrec)){
       if ($rec->{systemid} eq "" && 
           $rec->{scapprgroupid} eq "" && # nur falls noch keine IAC gesetzt!
@@ -185,6 +164,33 @@ sub qcheckRecord
          ($parrec)=$par->getOnlyFirst(qw(ALL));
       }
    }
+
+
+   if (defined($parrec)){
+      if (lc($parrec->{status}) eq "out of operation"){
+         msg(INFO,"parrec for $rec->{systemid} found - but out of operation");
+         # jetzt checken wir mal das mdate des parrec - wenn das älter als
+         # 8 Wochen ist, dann machen wir local ein force cistatusid=6 
+         # draus - also ein automatisches "veraltet/gelöscht" setzen nach 
+         # 8 Wochen.
+         if ($rec->{cistatusid}<6){
+            my $d=CalcDateDuration($parrec->{mdate},NowStamp("en"));
+            #msg(INFO,"age=".Dumper($d));
+            if ($d->{totaldays}>8*7){
+               msg(WARN,"debug info - found long out of operation system ".
+                        "$rec->{systemid} in AssetManager and set cistatus=6");
+               $forcedupd->{cistatusid}="6";
+            }
+         }
+         $parrec=undef;
+      }
+   }
+
+
+
+
+
+
 
    #
    # Level 2
