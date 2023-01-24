@@ -44,6 +44,46 @@ sub new
             ignorecase        =>1,
             label             =>'Name'),
 
+      new kernel::Field::Select(
+            name              =>'cistatus',
+            htmleditwidth     =>'40%',
+            label             =>'CI-State',
+            searchable        =>0,
+            vjointo           =>'base::cistatus',
+            vjoinon           =>['cistatusid'=>'id'],
+            vjoindisp         =>'name'),
+
+      new kernel::Field::Link(
+            name              =>'cistatusid',
+            depend            =>['tags','name'],
+            onRawValue    =>sub {
+               my $self=shift;
+               my $current=shift;
+               my $tagsFld=$self->getParent->getField("tags",$current);
+               my $tags=$tagsFld->RawValue($current);
+               my $tpcDerivation=$self->getParent->Self();
+               $tpcDerivation=~s/::.*$//;
+
+               my $cistatusid="1";
+               if ($tpcDerivation eq "TPC1"){
+                  $cistatusid="4"; # in TPC1 every project is automatic active
+               }
+               else{
+                  if (ref($tags) eq "ARRAY"){
+                     foreach my $tag (@$tags){
+                        if (ref($tag) eq "HASH" &&
+                            $tag->{key} eq "projectname" &&
+                            $tag->{value} ne "" &&
+                            $tag->{value} eq $current->{name}){
+                           $cistatusid="4";
+                        }
+                     }
+                  }
+               }
+               return($cistatusid);
+            },
+            label             =>'CI-StateID'),
+
       new kernel::Field::TextDrop(     
             name              =>'appl',
             searchable        =>0,
@@ -91,7 +131,7 @@ sub new
             label             =>'Description'),
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name mdate));
+   $self->setDefaultView(qw(id name cistatus));
 
    return($self);
 }
@@ -154,6 +194,14 @@ sub DataCollector
          if (ref($data) ne "ARRAY"){
             $data=[$data];
          }
+#         map({
+#            my $cistatusid="3";
+#            $cistatusid="4" if ($tpcDerivation eq "TPC1");
+#
+#
+#            $_->{cistatusid}=$cistatusid;
+#
+#         } @$data);
          return($data);
       },
       onfail=>sub{
@@ -176,6 +224,11 @@ sub DataCollector
 
    return($d);
 }
+
+
+
+
+
 
 sub isViewValid
 {

@@ -714,7 +714,7 @@ sub TPC_CloudAreaSync
    if (1){
       $pro->ResetFilter();
       $pro->SetFilter({});
-      my @ss=$pro->getHashList(qw(id name applid));
+      my @ss=$pro->getHashList(qw(id name applid cistatusid));
       my @s;
       if ($#ss==-1){
          my $msg="no projects found in TPC - sync abborted";
@@ -722,6 +722,7 @@ sub TPC_CloudAreaSync
          return({exitcode=>1,exitmsg=>$msg});
       }
       foreach my $rec (@ss){
+         next if ($rec->{cistatusid} ne "4");
          my $crec={
             id=>$rec->{id},
             name=>$rec->{name},

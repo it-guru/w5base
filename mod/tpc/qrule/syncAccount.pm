@@ -101,10 +101,13 @@ sub qcheckRecord
    my $tpcprojectid=$rec->{srcid};  
    { 
       my $chk=getModuleObject($self->getParent->Config(),$tpccode."::project");
-      $chk->SetFilter({id=>$tpcprojectid});
+      $chk->SetFilter({id=>$tpcprojectid,cistatusid=>"4"});
       my @acc=$chk->getHashList(qw(id));
       if ($#acc==-1){
-         push(@qmsg,"TPC account invalid or not accessable");
+         my $msg="TPC account invalid or not accessable";
+         push(@qmsg,$msg);
+         push(@dataissue,$msg);
+         $errorlevel=3;
       }
    }
 
