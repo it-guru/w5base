@@ -566,24 +566,26 @@ sub displayDataIssue
                           "href=JavaScript:$onclick>".
                           $WfRec->{name}."</a>";
                if ($showall eq "1"){
-                  $wfidtmpl.="<br>".$WfRec->{fwdtargetname};
+                  $wfidtmpl.="<div class=noprint>";
+                  $wfidtmpl.=$WfRec->{fwdtargetname};
+                  $wfidtmpl.="</div>";
                }
                $wfidtmpl.="</td>"; 
                $wfidtmpl.="<td width=10% valign=top nowrap>".
-                          $statename."</td>"; 
+                          "<div class=noprint>".$statename."</div></td>"; 
                $wfidtmpl.="</tr>"; 
             }
             if ($#wfid>$#wfl){
                my $num=$#wfid-$#usewfid;
                $wfidtmpl.="<tr>"; 
-               $wfidtmpl.="<td colspan=2><br><br>".
+               $wfidtmpl.="<td colspan=2><br><br><div class=noprint>".
                           "<a class=exlink ".
                           "href=javascript:showFullDataIssue(this) ".
                           "title=\"".
                   $self->getParent->T("click to see full list","base::w5stat").
                           "\">... ($num ".
                           $self->getParent->T("more","base::w5stat").
-                          ")</a></td>"; 
+                          ")</a></div></td>"; 
                $wfidtmpl.="</tr>"; 
             }
             $wfidtmpl.="</table>";
