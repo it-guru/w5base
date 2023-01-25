@@ -1964,8 +1964,8 @@ sub findtemplvar
       my $title=$self->T("to logoff, please terminate your browser",
                          "kernel::App::Web");
       return("&bull; <a title=\"$title\" ".
-             "href=\"javascript:FakeBasicAuthLogoff()\" ".
-             "onclick=\"FakeBasicAuthLogoff()\">Logoff</a> &bull;");
+             "href=\"javascript:FakeBasicAuthLogoff('$title')\" ".
+             "onclick=\"return(FakeBasicAuthLogoff('$title'))\">Logoff</a> &bull;");
    }
    elsif ($var eq "SUPPORTINFO"){
       my $u=getModuleObject($self->Config,"base::user");
