@@ -794,7 +794,8 @@ sub FinishWrite
             $appl->NotifyWriteAuthorizedContacts($arec,{},{
                      dataobj=>$self->Self,
                      emailbcc=>11634953080001,
-                     dataobjid=>$carec->{id}
+                     dataobjid=>$carec->{id},
+                     emailcategory=>'CloudAreaProcesses'
                   },{},sub{
                my ($subject,$ntext);
                my $subject=$self->T("New Cloud-Area",'itil::itcloudarea');
@@ -814,7 +815,8 @@ sub FinishWrite
             my %notifyParam=(
                 dataobj=>$self->Self,
                 dataobjid=>$carec->{id},
-                emailbcc=>11634953080001
+                emailbcc=>11634953080001,
+                emailcategory=>'CloudAreaProcesses'
             );
             if ($crec->{notifysupport}){
                if ($crec->{supportid} ne ""){
