@@ -1574,10 +1574,10 @@ sub Validate
       $newrec->{allowifupdate}=1;
    }
    #######################################################################
-   if ($usertyp eq "service" && defined($newrec->{fullname})){
-      $newrec->{fullname}="service: ".$newrec->{fullname};
-   }
    my $fullname=effVal($oldrec,$newrec,"fullname");
+   if ($usertyp eq "service" && $fullname && !($fullname=~m/^service/)){
+      $newrec->{fullname}="service: ".$fullname;
+   }
    msg(INFO,"fullname=$fullname");
    if ($fullname eq "" || ($fullname=~m/;/)){
       $self->LastMsg(ERROR,"invalid given or resulted fullname");
