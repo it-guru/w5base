@@ -121,7 +121,7 @@ sub getPostibleValues
          map({push(@res,$_->{$joinidfield},$_->{$self->{vjoindisp}})} @l);
       }
       if ($self->{allowempty}==1){
-         unshift(@res,"","[".$self->getParent->T("none")."]");
+         unshift(@res,"",$self->getEmptyFrontendValue());
       }
       return(@res);
    }
@@ -492,6 +492,30 @@ sub Validate
    return({});
 }
 
+
+sub getEmptyFrontendValue
+{
+   my $self=shift;
+
+   my $t;
+
+   my $tr=$self->{translation};
+   $tr=$self->getParent->Self() if (!defined($tr));
+
+   if (exists($self->{emptyvalue})){
+      my $eval=$self->{emptyvalue};
+      if (exists($self->{transprefix})){
+         $eval=$self->{transprefix}.$eval;
+      }
+      my $translation=
+      $t=$self->getParent->T($eval,$tr);
+   }
+   else{
+      $t="[".$self->getParent->T("none")."]";
+   }
+   return($t);
+}
+
 sub FormatedResult
 {
    my $self=shift;
@@ -500,7 +524,7 @@ sub FormatedResult
    my $d=$self->RawValue($current);
 
    if (!defined($d) && $self->{allowempty}==1 && ($FormatAs=~m/^Html/)){
-      return("[".$self->getParent->T("none")."]");
+      return($self->getEmptyFrontendValue());
    }
    if (!defined($d)){
       if (defined($self->{value}) && in_array($self->{value},undef)){
