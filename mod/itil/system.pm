@@ -692,17 +692,97 @@ sub new
                 dataobjattr   =>'system.moniteam'),
 
       new kernel::Field::Select(
-                name          =>'itnormodel',
-                label         =>'NOR Model to use',
+                name          =>'reqitnormodel',
+                label         =>'required NOR solution model',
                 group         =>'sec',
+                htmleditwidth =>'180px',
+                emptyvalue    =>'0',
+                transprefix   =>'ApplInherit.',
                 searchable    =>0,
+                useNullEmpty  =>1,
                 allowempty    =>1,
-                vjoinon       =>['itnormodelid'=>'id'],
+                vjoinon       =>['reqitnormodelid'=>'id'],
                 vjointo       =>'itil::itnormodel',
                 vjoineditbase =>{'cistatusid'=>[3,4]},
                 vjoindisp     =>'name'),
 
       new kernel::Field::Link(
+                name          =>'reqitnormodelid',
+                group         =>'sec',
+                label         =>'required NORmodelID',
+                dataobjattr   =>'system.reqitnormodel'),
+
+      new kernel::Field::Text(
+                name          =>'targetitnormodel',
+                label         =>'target NOR solution model (calculated)',
+                group         =>'sec',
+                depend        =>['applications','reqitnormodelid'],
+                searchable    =>0,
+                readonly      =>1,
+                vjointo       =>'itil::itnormodel',
+                vjoinon       =>['targetitnormodelid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Interface(
+                name          =>'targetitnormodelid',
+                group         =>'sec',
+                depend        =>['applications','reqitnormodelid'],
+                label         =>'calc target NORmodelID',
+                onRawValue    =>sub {
+                    my $self   =shift;
+                    my $current=shift;
+
+                    if (ref($current)){
+                       my $reqitnormodelid=$current->{reqitnormodelid};
+                       return($reqitnormodelid) if ($reqitnormodelid ne "");
+                    }
+
+                    my $afld=$self->getParent->getField("applications",$current);
+                    my $appls=$afld->RawValue($current);
+                    my $oappl=$self->getParent->getPersistentModuleObject("appl","itil::appl");
+                    my $oinor=$self->getParent->getPersistentModuleObject("inor","itil::itnormodel");
+                    my %aid;
+                    foreach my $lrec (@$appls){
+                       $aid{$lrec->{applid}}++;
+                    }
+                    if (keys(%aid)){
+                       $oappl->SetFilter({id=>[keys(%aid)]});
+                       my @l=$oappl->getHashList(qw(id itnormodelid));
+                       my %norid;
+                       foreach my $arec (@l){
+                          $norid{$arec->{itnormodelid}}++;
+                       }
+                       if (keys(%norid)){
+                          $oinor->SetFilter({id=>[keys(%norid)]});
+                       }
+                       else{
+                          $oinor->SetFilter({name=>\'S'});
+                       }
+                    }
+                    else{
+                       $oinor->SetFilter({name=>\'S'});
+                    }
+                    my @norlist=$oinor->getHashList(qw(name id));
+                    if ($#norlist!=-1){
+                       return($norlist[0]->{id});
+                    }
+                    return(undef);
+                 }),
+
+
+      new kernel::Field::Select(
+                name          =>'itnormodel',
+                label         =>'implementied NOR solution model',
+                group         =>'sec',
+                searchable    =>0,
+                allowempty    =>1,
+                htmleditwidth =>'60px',
+                vjoinon       =>['itnormodelid'=>'id'],
+                vjointo       =>'itil::itnormodel',
+                vjoineditbase =>{'cistatusid'=>[3,4]},
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Interface(
                 name          =>'itnormodelid',
                 group         =>'sec',
                 label         =>'NORmodelID',
