@@ -1961,7 +1961,7 @@ sub findtemplvar
       if ($ENV{REMOTE_USER} eq "" || $ENV{REMOTE_USER} eq "anonymous"){
          return(" ");
       }
-      my $title=$self->T("to logoff, please terminate your browser",
+      my $title=$self->T("To logoff, please terminate your browser.",
                          "kernel::App::Web");
       return("&bull; <a title=\"$title\" ".
              "href=\"javascript:FakeBasicAuthLogoff('$title')\" ".
