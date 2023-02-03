@@ -14,14 +14,15 @@ NONE
 
 =head3 HINTS
 
-Verification of the use of EMEA?/X* identifiers and correction of
-possible misconfigurations.
+Verification of the use of EMEA?/X* identifiers and correction of possible misconfigurations.Service accounts are not allowed as identifiers for contact type "user".
 
 
 [de:]
 
-Überprüfung der Verwendung von EMEA?/X* Kennungen und Korrektur
-möglicher Fehlkonfigurationen.
+Überprüfung der Verwendung von EMEA?/X* Kennungen und Korrektur 
+möglicher Fehlkonfigurationen. Service Kennungen sind nicht als 
+Benutzerkennungen bei Kontakt Typ "user" erlaubt. 
+
 
 
 
@@ -123,8 +124,11 @@ sub qcheckRecord
          if (keys(%xaccount)){
             my $o=getModuleObject($dataobj->Config,"base::useraccount");
             foreach my $acc (keys(%xaccount)){
-               push(@qmsg,"drop account $acc");
-               $o->ValidatedDeleteRecord({account=>$acc});
+               push(@qmsg,"drop account: $acc");
+               $o->ValidatedDeleteRecord({
+                   account=>$acc,
+                   userid=>$rec->{userid}
+               });
             }
          }
       }

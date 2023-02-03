@@ -149,6 +149,19 @@ sub new
                 label         =>'API IP access control',
                 dataobjattr   =>'useraccount.ipacl')
    );
+   $self->{history}={
+      insert=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ],
+      delete=>[
+         {dataobj=>'base::user', id=>'userid',
+          field=>'account',as=>'accounts'}
+      ]
+   };
+
    $self->setWorktable("useraccount");
    $self->setDefaultView(qw(account contactfullname surname givenname));
    return($self);
