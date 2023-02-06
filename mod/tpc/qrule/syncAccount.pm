@@ -106,7 +106,7 @@ sub qcheckRecord
       if ($#acc==-1){
          my $msg="TPC account invalid or not accessable";
          push(@qmsg,$msg);
-         push(@dataissue,$msg);
+         #push(@dataissue,$msg);  # DataIssues for clouareas are not defined
          $errorlevel=3;
       }
    }
