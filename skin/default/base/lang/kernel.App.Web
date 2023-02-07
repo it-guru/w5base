@@ -42,5 +42,5 @@
 "your client ip is rejected by ipacl"=>{de=>"Ihre Client-IP-Adresse wurde von der IP Zugriffsbeschränkung abgelehnt"},
 'looks not like an email address'=>{de=>'sieht nicht wie eine E-Mail Adresse aus'},
 'nice try, email belongs to a service'=>{de=>'netter Versuch, die E-Mail gehört zu einem Service-Kontakt'},
-'nice try, email belongs to an deleted or locked contact'=>{de=>'netter Versuch, die E-Mail gehört zu einem gelöschten oder gesperrten Kontakt'},
+'The email belongs to a deleted or blocked contact! Please contact the 1st Level Support.'=>{de=>'Die E-Mail gehört zu einem gelöschten oder gesperrten Kontakt! Kontaktieren Sie bitte den 1st Level Support.'},
 'To logoff, please terminate your browser.'=>{de=>'Zum Abmelden, beenden Sie bitte ihren Web-Browser.'},

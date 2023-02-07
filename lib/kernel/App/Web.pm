@@ -1236,8 +1236,10 @@ sub HandleNewUser
                }
                if ($ok){
                   if ($chkrec->{cistatusid}>4){
-                     $self->LastMsg(ERROR,
-                     "nice try, email belongs to an deleted or locked contact");
+                     $self->LastMsg(ERROR,"The email belongs to a deleted ".
+                                          "or blocked contact! ".
+                                          "Please contact the ".
+                                          "1st Level Support.");
                      $ok=0; 
                   }
                }
