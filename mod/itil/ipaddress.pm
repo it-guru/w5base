@@ -364,7 +364,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'itcloudarea',
                 group         =>'default',
-                label         =>'Cloud Area',
+                label         =>'CloudArea',
                 htmldetail    =>'NotEmpty',
                 readonly      =>sub{
                    my $self=shift;
@@ -1112,7 +1112,7 @@ sub isParentOPvalid
          if ($#l!=0){
             if ($mode eq "write"){
                $self->LastMsg(ERROR,
-                              "invalid cloudarea reference to itcloudarea=".
+                              "invalid CloudArea reference to CloudAreaID=".
                               $itcloudareaid);
                return(0);
             }
@@ -1131,7 +1131,7 @@ sub isParentOPvalid
          if ($#l!=0){
             if ($mode eq "write"){
                $self->LastMsg(ERROR,
-                              "invalid cloud reference to itcloudarea=".
+                              "invalid cloud reference to CloudAreaID=".
                               $itcloudareaid);
                return(0);
             }

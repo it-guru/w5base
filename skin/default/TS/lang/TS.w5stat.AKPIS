@@ -133,7 +133,7 @@
 },
 'AKPIS.app.all.systems.filled'=>{
  de=>'Anzahl Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
- en=>'count of application with filled systems or cloudareas'
+ en=>'count of application with filled systems or CloudAreas'
 },
 'AKPIS.app.all.techchmapprgroup.filled'=>{
  de=>'Anzahl Anwendungen mit min. einer technischen Change-Approvergroup',
@@ -177,19 +177,19 @@
 },
 'AKPIS.app.top.systems.filled'=>{
  de=>'Anzahl Top-Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
- en=>'count of top application with filled systems or cloudareas'
+ en=>'count of top application with filled systems or CloudAreas'
 },
 'AKPIS.app.ibi.systems.filled'=>{
  de=>'Anzahl IBI relevanter Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
- en=>'count of ibi application with filled systems or cloudareas'
+ en=>'count of ibi application with filled systems or CloudAreas'
 },
 'AKPIS.app.prod.systems.filled'=>{
  de=>'Anzahl Produktions-Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
- en=>'count of production application with filled systems or cloudareas'
+ en=>'count of production application with filled systems or CloudAreas'
 },
 'AKPIS.app.nonprod.systems.filled'=>{
  de=>'Anzahl Non-Produktions-Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
- en=>'count of non-production application with filled systems or cloudareas'
+ en=>'count of non-production application with filled systems or CloudAreas'
 },
 'AKPIS.app.ibi.techchmapprgroup.filled'=>{
  de=>'Anzahl IBI-Anwendungen mit min. einer technischen Change-Approvergroup',

@@ -271,7 +271,7 @@ sub qcheckRecord
                }
                else{
                   msg(ERROR,"found AWS System $rec->{name} ".
-                            "on invalid cloudarea");
+                            "on invalid CloudArea");
                   die();
                }
             }

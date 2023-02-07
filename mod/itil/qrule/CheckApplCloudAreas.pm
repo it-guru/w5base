@@ -14,11 +14,11 @@ Validate if there are CloudAreas assigned to current application with CI-Status
 NONE
 
 =head3 HINTS
-If there are cloud areas assigned to the application, the are need to 
+If there are CloudAreas assigned to the application, the are need to 
 be set as "installed/active" from the application write enabled team
 to document the areas as used.
 
-If the cloud areas are assigned to the application in a wrong way, you
+If the CloudAreas are assigned to the application in a wrong way, you
 have to contact the cloud-admins to fix this mistake.
 
 If "unclean processes" are allowed with a cloud, the activation of 
@@ -129,7 +129,7 @@ sub qcheckRecord
 
    if ($#needToAct!=-1){
       $errorlevel=3;
-      my $msg="assigned cloud areas need to be activated";
+      my $msg="assigned CloudAreas need to be activated";
       push(@dataissue,$msg);
       push(@qmsg,$msg.":"); # add : to get a correct translation
       push(@qmsg,@needToAct);

@@ -103,7 +103,7 @@ sub qcheckRecord
          }
          if ($rec->{runon} eq "2"){   # now do itcloudarea checks
             if ($rec->{itcloudarea} eq ""){
-               push(@msg,"no cloudarea specified");
+               push(@msg,"no CloudArea specified");
             }
             else{
                my $c=getModuleObject($self->getParent->Config,
@@ -115,11 +115,11 @@ sub qcheckRecord
 
                if (!defined($itcrec)){
                   push(@msg,"application does not match application ".
-                            "in cloudarea");
+                            "in CloudArea");
                }
                else{
                   if ($itcrec->{cistatusid}>5 || $itcrec->{cistatusid}<3){
-                     push(@msg,"referenced cloudarea is not active");
+                     push(@msg,"referenced CloudArea is not active");
                   }
                }
             }

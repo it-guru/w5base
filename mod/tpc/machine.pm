@@ -431,7 +431,7 @@ sub Import
    }
 
    if ($sysrec->{projectId} ne ""){
-      msg(INFO,"try to add cloudarea to system ".$sysrec->{name});
+      msg(INFO,"try to add CloudArea to system ".$sysrec->{name});
       $cloudarea->SetFilter({cloudid=>$cloudrec->{id},
                              srcid=>\$sysrec->{projectId}
       });
@@ -460,7 +460,7 @@ sub Import
       if ($self->isDataInputFromUserFrontend()){
          # if import is from Job (W5Server f.e.) no error on missing
          # ca rec is needed - ca's are guranted by other processes
-         $self->LastMsg(ERROR,"missing cloudarea for TPC import of '%s'",$msg);
+         $self->LastMsg(ERROR,"missing CloudArea for TPC import of '%s'",$msg);
       }
       return(undef);
    }
@@ -488,7 +488,7 @@ sub Import
    #}
 
    if ($sysrec->{projectId} ne ""){
-      msg(INFO,"try to add cloudarea to system ".$sysrec->{name});
+      msg(INFO,"try to add CloudArea to system ".$sysrec->{name});
       $cloudarea->SetFilter({cloudid=>$cloudrec->{id},
                              srcid=>\$sysrec->{projectId}
       });

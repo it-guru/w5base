@@ -21,7 +21,7 @@ NONE
 
 [en:]
 
-An application usually runs on at least one logical system or cloud area. 
+An application usually runs on at least one logical system or CloudArea. 
 
 Step 1: Please make sure that the logical systems are already created in W5Base/Darwin.
 
@@ -36,7 +36,7 @@ the field to 'yes' if the application doesn't have any systems!
 The technical responsible of the application (TSM) usually knows which 
 systems were comissioned.
 
-A cloud area will be only tread as "system", if it is marked 
+A CloudArea will be only tread as "system", if it is marked 
 as "installed/active".
 
 In case of questions regarding handling W5Base/Darwin you can turn 

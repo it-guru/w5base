@@ -209,7 +209,7 @@ sub qcheckRecord
 
             my $w5itcloudarea;
             if ($parrec->{projectid} ne ""){
-               msg(INFO,"try to add cloudarea to system ".$rec->{name});
+               msg(INFO,"try to add CloudArea to system ".$rec->{name});
                my $cloudarea=getModuleObject($self->getParent->Config,
                                              "itil::itcloudarea");
                $cloudarea->SetFilter({srcsys=>\'tsotc::project',
@@ -225,7 +225,7 @@ sub qcheckRecord
                }
                else{
                   msg(ERROR,"found OTC System $rec->{name} ".
-                            "on invalid cloudarea");
+                            "on invalid CloudArea");
                }
             }
 

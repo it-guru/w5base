@@ -163,7 +163,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'cloudareas',
-                label         =>'Cloud-Areas',
+                label         =>'CloudAreas',
                 group         =>'areas',
                 forwardSearch =>1,
                 allowcleanup  =>1,
@@ -179,7 +179,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'notifysupport',
                 group         =>'control',
-                label         =>'notify support on cloudarea state change',
+                label         =>'notify support on CloudArea state change',
                 dataobjattr   =>'itcloud.notifysupport'),
 
       new kernel::Field::Boolean(
@@ -197,7 +197,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'allowinactsysimport',
                 group         =>'control',
-                label         =>'CI-Import for on inactive cloudarea',
+                label         =>'CI-Import for on inactive CloudArea',
                 dataobjattr   =>'itcloud.allowinactsysimport'),
 
 
@@ -628,7 +628,7 @@ sub Validate
    if (effChanged($oldrec,$newrec,"cistatusid")){
       if ($newrec->{cistatusid}>=5){
          if ($#{$oldrec->{cloudareas}}!=-1){
-            $self->LastMsg(ERROR,"there are existing cloud areas");
+            $self->LastMsg(ERROR,"there are existing CloudAreas");
             return(0);
          }
       }
@@ -656,7 +656,7 @@ sub ValidateDelete
    if ( $#{$rec->{cloudareas}}!=-1){
       $self->LastMsg(ERROR,
           "delete only posible, if there are no ".
-          "cloud areas");
+          "CloudAreas");
       return(0);
    }
 

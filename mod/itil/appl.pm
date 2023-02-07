@@ -568,7 +568,7 @@ sub new
 
       new kernel::Field::SubList(
                 name          =>'itcloudareas',
-                label         =>'Cloud Areas',
+                label         =>'CloudAreas',
                 group         =>'itcloudareas',
                 htmldetail    =>'NotEmpty',
                 vjoinbase     =>[{cistatusid=>"<=5"}],
@@ -2543,7 +2543,7 @@ sub Validate
                if ($newrec->{cistatusid}>5){
                   if ($#{$oldrec->{itcloudareas}}!=-1){
                      $self->LastMsg(ERROR,"this CI-Status change is only ".
-                                    "allowed without existing cloudarea");
+                                    "allowed without existing CloudAreas");
                      return(0);
                   }
                }

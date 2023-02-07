@@ -133,7 +133,7 @@ sub qcheckRecord
       if (!$dataobj->validateCloudAreaImportState(
                                           "CLOUDAREA: ".$rec->{fullname},
                                           undef,$rec,undef)){
-         my $msg="invalid cloudarea or application state for import";
+         my $msg="invalid CloudArea or application state for import";
          push(@qmsg,$msg);
       }
    }
@@ -249,7 +249,7 @@ sub qcheckRecord
             }
             if (!$dataobj->validateCloudAreaImportState(
                     "URL: ".$url,undef,$rec,undef)){
-               my $msg="invalid cloudarea or application state for import: ".
+               my $msg="invalid CloudArea or application state for import: ".
                        "URL: ".$url;
                push(@qmsg,$msg);
                $errorlevel=2 if ($errorlevel<2);
