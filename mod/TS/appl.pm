@@ -570,13 +570,13 @@ sub calcBaseApplicationExpertGroup
                 label=>$self->getParent->T("Projectmanager Development",
                                            'itil::ext::lnkcontact'),
             },
-            'itsem'=>{
-                userid=>[],
-                email=>[],
-                sindex=>$index++,
-                phonename=>[],
-                label=>"IT-Servicemanager"
-            },
+#            'itsem'=>{
+#                userid=>[],
+#                email=>[],
+#                sindex=>$index++,
+#                phonename=>[],
+#                label=>"IT-Servicemanager"
+#            },
             'opcanvasowner'=>{
                 userid=>[],
                 email=>[],
@@ -825,24 +825,24 @@ sub calcBaseApplicationExpertGroup
       }
    }
 
-   # add IT-SeM
-   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14074110550001
-   my @sid=();
-   foreach my $sysrec (@{$appl->getField("systems")->RawValue($rec)}){
-      push(@sid,$sysrec->{systemid}); 
-   }
-   my $o=getModuleObject($self->getParent->Config,"itil::system");
-   $o->SetFilter({id=>\@sid});
-   my @co=$o->getVal("conumber");
-   my $o=getModuleObject($self->getParent->Config,"itil::costcenter");
-   $o->SetFilter({name=>\@co});
-   foreach my $corec ($o->getHashList(qw(itsemid))){
-      if ($corec->{itsemid} ne ""){
-         if (!in_array($a{itsem}->{userid},$corec->{itsemid})){
-            push(@{$a{itsem}->{userid}},$corec->{itsemid});
-         }
-      }
-   }
+#   # add IT-SeM
+#   # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14074110550001
+#   my @sid=();
+#   foreach my $sysrec (@{$appl->getField("systems")->RawValue($rec)}){
+#      push(@sid,$sysrec->{systemid}); 
+#   }
+#   my $o=getModuleObject($self->getParent->Config,"itil::system");
+#   $o->SetFilter({id=>\@sid});
+#   my @co=$o->getVal("conumber");
+#   my $o=getModuleObject($self->getParent->Config,"itil::costcenter");
+#   $o->SetFilter({name=>\@co});
+#   foreach my $corec ($o->getHashList(qw(itsemid))){
+#      if ($corec->{itsemid} ne ""){
+#         if (!in_array($a{itsem}->{userid},$corec->{itsemid})){
+#            push(@{$a{itsem}->{userid}},$corec->{itsemid});
+#         }
+#      }
+#   }
 
    # add Capacitymanager
    # https://darwin.telekom.de/darwin/auth/base/workflow/ById/14074110550001
