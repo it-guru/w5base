@@ -47,7 +47,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'fullname',
-                label         =>'full qualified cloud area',
+                label         =>'full qualified CloudArea',
                 readonly      =>1,
                 htmldetail    =>'NotEmpty',
                 htmlwidth     =>'280px',
@@ -84,7 +84,7 @@ sub new
                    return(1) if (defined($rec));
                    return(0);
                 },
-                label         =>'cloud area name',
+                label         =>'CloudArea name',
                 dataobjattr   =>'qitcloudarea.name'),
 
       new kernel::Field::Select(
@@ -133,7 +133,7 @@ sub new
       new kernel::Field::Textarea(
                 name          =>'description',
                 searchable    =>0,
-                label         =>'Cloud Area description',
+                label         =>'CloudArea description',
                 dataobjattr   =>'qitcloudarea.description'),
 
       new kernel::Field::Textarea(
@@ -606,7 +606,7 @@ sub Validate
 
    my $name=effVal($oldrec,$newrec,"name");
    if ($name eq "" || haveSpecialChar($name)){
-      $self->LastMsg(ERROR,"invalid cloud area name '%s'",$name);
+      $self->LastMsg(ERROR,"invalid CloudArea name '%s'",$name);
       return(0);
    }
 
@@ -623,7 +623,7 @@ sub Validate
                return(0);
             }
             if (!$self->isWriteOnApplValid($applid,"default")){
-               $self->LastMsg(ERROR,"activation of cloudarea only allowed ".
+               $self->LastMsg(ERROR,"activation of CloudArea only allowed ".
                                     "for application writeables");
                return(0);
             }
@@ -798,7 +798,7 @@ sub FinishWrite
                      emailcategory=>'CloudAreaProcesses'
                   },{},sub{
                my ($subject,$ntext);
-               my $subject=$self->T("New Cloud-Area",'itil::itcloudarea');
+               my $subject=$self->T("New CloudArea",'itil::itcloudarea');
                $subject.=" ";
                $subject.=$carec->{fullname};
                my $ntext=$self->T("Dear databoss",'kernel::QRule');
@@ -829,15 +829,15 @@ sub FinishWrite
                my ($subject,$ntext);
                my $subject="??";
                if ($doNotify==2){
-                  $subject=$self->T("user deactivation of Cloud-Area",
+                  $subject=$self->T("user deactivation of CloudArea",
                                     'itil::itcloudarea');
                }
                if ($doNotify==3){
-                  $subject=$self->T("user activation of Cloud-Area",
+                  $subject=$self->T("user activation of CloudArea",
                                     'itil::itcloudarea');
                }
                if ($doNotify==4){
-                  $subject=$self->T("Cloud-Area order",'itil::itcloudarea');
+                  $subject=$self->T("CloudArea order",'itil::itcloudarea');
                }
                $subject.=" ";
                $subject.=$carec->{fullname};
@@ -976,7 +976,7 @@ sub validateCloudAreaImportState
                   my ($subject,$ntext);
                   my $subject=$self->T("automatic import rejected",
                                        'itil::itcloudarea')." - ".
-                              $self->T("invalid application in cloudarea",
+                              $self->T("invalid application in CloudArea",
                                        'itil::itcloudarea');
                   my $tmpl=$self->getParsedTemplate(
                              "tmpl/genericSystemImport_BadAppInCloudArea",{
@@ -991,7 +991,7 @@ sub validateCloudAreaImportState
             }
          }
          if ($self->isDataInputFromUserFrontend()){
-            $self->LastMsg(ERROR,"invalid appl record in cloudarea");
+            $self->LastMsg(ERROR,"invalid appl record in CloudArea");
          }
          return(undef);
       }
@@ -1107,7 +1107,7 @@ sub validateCloudAreaImportState
             my ($subject,$ntext);
             my $subject=$self->T("automatic import rejected",
                                  'itil::itcloudarea')." - ".
-                        $self->T("invalid cloudarea cistatus",
+                        $self->T("invalid CloudArea cistatus",
                                  'itil::itcloudarea');
 
             my $cloudnamereference=$cloudarearec->{fullname};
@@ -1132,7 +1132,7 @@ sub validateCloudAreaImportState
          });
       }
       if ($self->isDataInputFromUserFrontend()){
-         $self->LastMsg(ERROR,"invalid cloudarea cistatus");
+         $self->LastMsg(ERROR,"invalid CloudArea cistatus");
       }
       return(undef);
    }

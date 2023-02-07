@@ -704,7 +704,7 @@ sub new
                    }
                    return(1);
                 },
-                label         =>'Cloudarea',
+                label         =>'CloudArea',
                 vjointo       =>'itil::itcloudarea',
                 vjoineditbase =>{'cistatusid'=>[4]},
                 vjoinon       =>['itcloudareaid'=>'id'],
@@ -1692,7 +1692,7 @@ sub Validate
             $c->SetFilter({id=>\$cloudareaid,applid=>\$applid});
             my ($rec,$msg)=$c->getOnlyFirst(qw(applid));
             if (!defined($rec)){
-               $self->LastMsg(ERROR,"cloudarea application and instance ".
+               $self->LastMsg(ERROR,"CloudArea application and instance ".
                                     "application does not match");
                return(undef);
             }

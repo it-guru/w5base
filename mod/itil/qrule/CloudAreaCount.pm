@@ -87,13 +87,13 @@ sub qcheckRecord
        $rec->{cistatusid} eq "4" ||
        $rec->{cistatusid} eq "5"){
       if ($n==0){
-         my $msg='missing cloudarea relations';
+         my $msg='missing CloudArea relations';
          return(3,{qmsg=>[$msg],dataissue=>[$msg]});
       }
    }
    else{
       if ($n!=0){
-         my $msg='cloudarea relations are not allowed in current CI-Status';
+         my $msg='CloudArea relations are not allowed in current CI-Status';
          return(3,{qmsg=>[$msg],dataissue=>[$msg]});
       }
    }

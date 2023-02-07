@@ -1041,7 +1041,7 @@ sub new
                 group         =>'physys',
                 readonly      =>1,
                 htmldetail    =>'NotEmpty',
-                label         =>'Cloud Area',
+                label         =>'CloudArea',
                 vjointo       =>'itil::itcloudarea',
                 vjoinon       =>['itcloudareaid'=>'id'],
                 vjoindisp     =>'fullname',

@@ -108,7 +108,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'itcloudarea',
                 group         =>'default',
-                label         =>'Cloud Area',
+                label         =>'CloudArea',
                 htmldetail    =>'NotEmpty',
                 readonly      =>sub{
                    my $self=shift;
@@ -665,7 +665,7 @@ sub Validate
       $itca->SetFilter({id=>\$itcloudareaid});
       my ($carec,$msg)=$itca->getOnlyFirst(qw(ALL));
       if (!defined($carec)){
-         $self->LastMsg(ERROR,"invalid cloudareaid specified");
+         $self->LastMsg(ERROR,"invalid CloudAreaID specified");
          return(undef);
       }
       else{

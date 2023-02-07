@@ -671,7 +671,7 @@ sub genericSystemImport
    }
 
    if (!defined($cloudarea)){
-      $self->LastMsg(ERROR,"no cloudarea record for $srcsys import");
+      $self->LastMsg(ERROR,"no CloudArea record for $srcsys import");
       return(undef);
    }
 

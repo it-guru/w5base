@@ -14,15 +14,15 @@ Validate if there are CloudAreas assigned to valid application with CI-Status
 NONE
 
 =head3 HINTS
-If there are cloud areas assigned, the are need to 
+If there are CloudAreas assigned, the are need to 
 be set as "installed/active" from the application write enabled team
 to document the areas as used.
 
-If the cloud areas are assigned to the application in a wrong way, you
+If the CloudAreas are assigned to the application in a wrong way, you
 have to contact the cloud-admins to fix this mistake.
 
 If "unclean processes" are permitted for a cloud, then only a minimal 
-only a minimal check of the CI status of the cloud areas or the 
+only a minimal check of the CI status of the CloudAreas or the 
 applications or the applications listed therein is performed.
 
 

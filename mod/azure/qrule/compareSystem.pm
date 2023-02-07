@@ -152,7 +152,7 @@ sub qcheckRecord
 
             my $w5itcloudarea;
             if ($parrec->{subscriptionId} ne ""){
-               msg(INFO,"try to add cloudarea to system ".$rec->{name});
+               msg(INFO,"try to add CloudArea to system ".$rec->{name});
                my $cloudarea=getModuleObject($self->getParent->Config,
                                              "itil::itcloudarea");
                $cloudarea->SetFilter({srcsys=>\'AZURE',
@@ -168,7 +168,7 @@ sub qcheckRecord
                }
                else{
                   msg(ERROR,"found AZURE System $rec->{name} ".
-                            "on invalid cloudarea");
+                            "on invalid CloudArea");
                }
             }
             #
