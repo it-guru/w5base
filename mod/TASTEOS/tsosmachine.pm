@@ -91,6 +91,29 @@ sub new
             searchable         =>1,
             label              =>'risk Category Factor'),
 
+      new kernel::Field::Date(
+            name              =>'lastscan',
+            searchable        =>1,
+            label             =>'LastScanDate',
+            onRawValue        =>sub{
+                my $self=shift;
+                my $current=shift;
+                my $app=$self->getParent();
+                my $machineid=$current->{id};
+
+                my $d=$app->genericReadREST("machineresport",$machineid);
+                my $scanDate;
+                if (ref($d) eq "HASH" && ref($d->{report}) eq "HASH" &&
+                    exists($d->{report}->{scanDate})){
+                   my $dd=$app->ExpandTimeExpression(
+                              $d->{report}->{scanDate},
+                              undef,"GMT","GMT");
+                   $scanDate=$dd;
+                }
+
+                return($scanDate);
+            }),
+
       new kernel::Field::Text(
             name              =>'description',
             searchable        =>1,
@@ -131,6 +154,71 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 }
+
+
+
+sub genericReadREST
+{
+   my $self=shift;
+   my $data=shift;
+   my $machineid=shift;
+
+   my $d=$self->CollectREST(
+      dbname=>'TASTEOS',
+      requesttoken=>$data."/".$machineid,
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         $baseurl.="/"  if (!($baseurl=~m/\/$/));
+         my $dataobjurl=$baseurl."machines/".$machineid."/report";
+         $dataobjurl.="?format=JSON";
+         return($dataobjurl);
+      },
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+
+         my $h=[
+            'access-token'=>$apikey,
+            'Content-Type','application/json',
+         ];
+         return($h);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            return([],"200");
+         }
+       #  if ($code eq "400"){
+       #     my $json=eval('decode_json($content);');
+       #     if ($@ eq "" && ref($json) eq "HASH" &&
+       #         $json->{error}->{message} ne ""){
+       #        $self->LastMsg(ERROR,$json->{error}->{message});
+       #        return(undef);
+       #     }
+       #  }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data TasteOS response in genRead");
+         return(undef);
+      }
+   );
+   return($d);
+}
+
+
+
+
+
+
+
+
 
 
 
