@@ -1,2 +1,3 @@
 "invalid phonenumber format '%s'"=>{de=>"ungültiges Telefonnummern Format '%s'"},
+"senseless phonenumber '%s'"=>{de=>"sinnlose Telefonnummer '%s'"},
 

@@ -115,7 +115,7 @@ sub Validate
             my $mchk=$m;
             $mchk=~s/^\+//;
             $mchk=~s/[\s-]//g;
-            msg(INFO,"check number='$mchk'");
+            #msg(INFO,"check number='$mchk'");
             if (($mchk=~m/^(.)(\1)*$/) || 
                 ($mchk=~m/(.)(\1){6}/) ||
                 ($mchk=~m/23456/) ||
