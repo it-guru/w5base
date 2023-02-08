@@ -43,8 +43,10 @@ sub Validate
    my $newvallist=$newvalreq;
    $newvallist=[$newvallist] if (ref($newvallist) ne "ARRAY");
 
-   my $defPrefix="+1";
+   my $defPrefix="";
+   my $intdialprefix="";
    my $country="US";
+   my %prefixlist=();
    my $UserCache=$self->getParent->Cache->{User}->{Cache};
    if (defined($UserCache->{$ENV{REMOTE_USER}})){
       $UserCache=$UserCache->{$ENV{REMOTE_USER}}->{rec};
@@ -56,15 +58,21 @@ sub Validate
       my $o=getModuleObject($self->getParent->Config,"base::isocountry");
       if (defined($o)){
          $o->SetFilter({token=>\$country});
-         my ($crec,$msg)=$o->getOnlyFirst(qw(token dialprefix));
-         if (defined($crec) && $crec->{dialprefix} ne ""){
+         my ($crec,$msg)=$o->getOnlyFirst(qw(token dialprefix intdialprefix));
+         if (defined($crec)){
             $defPrefix=$crec->{dialprefix};
+            $intdialprefix=$crec->{intdialprefix};
+         }
+         $o->ResetFilter();
+         $o->SetFilter({dialprefix=>'!""'});
+         my @l=$o->getHashList(qw(dialprefix));
+         foreach my $rec (@l){
+            $prefixlist{$rec->{dialprefix}}++;
          }
       }
- 
-
    }
-   msg(INFO,"validating using country-Base $country with devprefix=$defPrefix");
+   # msg(INFO,"validating using country-Base $country ".
+   #          "with devprefix=$defPrefix");
 
 
    my $newvallist=[map({
@@ -79,19 +87,31 @@ sub Validate
             # normalice
             if (my ($pref,$num)=$m=~m/^([0-9\s]+)\/([0-9-\s]+)$/){
                $pref=~s/\s//g;
-               $pref=~s/^00([^0])/+49 $1/g;
-               $pref=~s/^0([^0])/+49 $1/g;
                $num=~s/\s//g;
                $m="$pref $num";
             }
             if (my ($num)=$m=~m/^([0-9\s]+)$/){
                $num=~s/\s//g;
-               $num=~s/^00([^0])/+49 $1/;
-               $num=~s/^0([^0])/+49 $1/;
-               $num=~s/^\+49 17([0-9]{1})/+49 17$1 /;
-               $num=~s/^\+49 16([0-9]{1})/+49 16$1 /;
+               #$num=~s/^\+49 17([0-9]{1})/+49 17$1 /;
+               #$num=~s/^\+49 16([0-9]{1})/+49 16$1 /;
                $m="$num";
             }
+            if ($intdialprefix ne ""){
+               $m=~s/^${intdialprefix}/+/x;
+            }
+
+            if ($m=~m/^0[^0]/){
+               $m=~s/^0/${defPrefix}/x;
+            }
+            foreach my $pref (keys(%prefixlist)){
+               my $qpref=$pref;
+               $qpref=~s/\+/\\+/g;
+               if ($m=~m/^${qpref}\s*/x){
+                  $m=~s/^${qpref}\s*/${pref} /x;
+                  last;
+               }
+            }
+
             my $mchk=$m;
             $mchk=~s/^\+//;
             $mchk=~s/[\s-]//g;

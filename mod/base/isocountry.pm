@@ -68,8 +68,17 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'dialprefix',
+                maxlength     =>'5',
+                htmleditwidth =>'40',
                 label         =>'internation calling prefix',
                 dataobjattr   =>'isocountry.callingprefix'),
+
+      new kernel::Field::Text(
+                name          =>'intdialprefix',
+                maxlength     =>'5',
+                htmleditwidth =>'40',
+                label         =>'internation dialing prefix (IDD)',
+                dataobjattr   =>'isocountry.intdialprefix'),
 
       new kernel::Field::Boolean(
                 name          =>'is_eu',
@@ -145,7 +154,7 @@ sub new
                 dataobjattr   =>'isocountry.realeditor'),
 
    );
-   $self->setDefaultView(qw(linenumber token fullname dialprefix 
+   $self->setDefaultView(qw(token fullname dialprefix  intdialprefix
                             cistatus cdate mdate));
    $self->setWorktable("isocountry");
    return($self);
@@ -208,6 +217,22 @@ sub Validate
       $self->LastMsg(ERROR,"invalid country name");
       return(0);
    }
+   my $dialprefix=effVal($oldrec,$newrec,"dialprefix");
+   my $mdialprefix=$dialprefix;
+   $mdialprefix=~s/[^0-9]//g;
+   $mdialprefix="+".$mdialprefix;
+   if ($dialprefix ne $mdialprefix){
+      $newrec->{dialprefix}=$mdialprefix;
+   }
+
+   my $intdialprefix=effVal($oldrec,$newrec,"intdialprefix");
+   my $mintdialprefix=$intdialprefix;
+   $mintdialprefix=~s/[^0-9]//g;
+   if ($intdialprefix ne $mintdialprefix){
+      $newrec->{intdialprefix}=$mintdialprefix;
+   }
+
+
 
    if (exists($newrec->{token}) ||
        exists($newrec->{name})  ){
