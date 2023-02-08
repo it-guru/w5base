@@ -845,3 +845,4 @@ CREATE TABLE objblacklist (
 alter table interview add themaresp bigint(20),add themaresp2 bigint(20);
 alter table postitnote add srcsys varchar(100) default 'w5base', add srcid varchar(100) default NULL,add srcload datetime default NULL, add UNIQUE KEY `srcsys` (srcsys,srcid);
 alter table isocountry add callingprefix varchar(100);
+alter table isocountry add intdialprefix varchar(10);

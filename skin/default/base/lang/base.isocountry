@@ -11,3 +11,4 @@
 'land of australia'=>{de=>'Land des australischen Kontinentes'},
 'land of asia'=>{de=>'Land des asiatischen Kontinentes'},
 'internation calling prefix'=>{de=>'Internationale Vorwahl'},
+'internation dialing prefix (IDD)'=>{de=>'Verkehrsausscheidungsziffer (VAZ)'}
