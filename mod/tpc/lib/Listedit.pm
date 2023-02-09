@@ -25,6 +25,7 @@ use kernel::Field;
 use kernel::Field::TextURL;
 use kernel::QRule;
 use Text::ParseWords;
+use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
 
 sub new
@@ -913,6 +914,9 @@ sub TPC_CloudAreaSync
 
    if ($#msg!=-1){
          my %notifyParam=();
+         my $informationHash=md5_base64(join("\n",@msg));
+         $notifyParam{infoHash}=$informationHash; # reduce
+                                                  # duped infos
          $itcloudobj->NotifyWriteAuthorizedContacts(
                       $tpccloudrec,{},
                       \%notifyParam,{},sub{

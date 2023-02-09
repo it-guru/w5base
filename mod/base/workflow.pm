@@ -1739,7 +1739,13 @@ sub Validate
       $newrec->{name}=substr($newrec->{name},0,125)."...";
       $origrec->{name}=$newrec->{name};
    }
-   if (!defined($oldrec) || $oldrec->{md5sechash} eq ""){ #generate a sec hash
+
+   #
+   # Attation: md5sechash can not be used for security-functionalities
+   #           in base::workflow::mailsend !!!
+   #
+   if ((!defined($oldrec) && !exists($newrec->{md5sechash})) ||
+       (defined($oldrec) && $oldrec->{md5sechash} eq "")){
       $newrec->{md5sechash}=md5_base64($newrec->{name}.rand().time().rand());
    }
 

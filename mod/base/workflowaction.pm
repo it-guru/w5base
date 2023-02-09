@@ -747,6 +747,24 @@ sub Notify
                 name     =>$name,
                 emailtext=>$text);
 
+   #
+   # If infoHash is specified, the Information will be checked, if
+   # the same information is within the last 24h is already mailed.
+   # If it is, not additional mail will be generated.
+   #
+   if (exists($param{infoHash}) &&
+       $param{infoHash} ne ""){ # reduce doublicate mails
+      $mailset{md5sechash}=$param{infoHash}; # md5sechash used as store
+      $wf->SetFilter({md5sechash=>\$mailset{md5sechash},
+                      createdate=>'>now-1d'});
+      my @l=$wf->getHashList(qw(createdate id));
+      if ($#l!=-1){
+         return();
+      }
+      $wf->ResetFilter();
+   }
+
+
    foreach my $target (qw(emailfrom emailto emailcc emailbcc)){
       if (exists($param{$target})){
          if (ref($param{$target}) ne "ARRAY"){
