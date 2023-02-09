@@ -110,7 +110,7 @@
 'an embedded systems can not have software installations'=>{de=>'Ein Embedded System darf keine Software-Installation aufweisen'},
 'an embedded systems can not have software instances'=>{de=>'Ein Embedded System darf keine Software-Instanzen aufweisen'},
 "invalid directory identifier '%s' specified"=>{de=>"ungültiger Directory Identifier '%s' angegeben"},
-'implementied NOR solution model'=>{de=>'implementiertes NOR-Lösungsmodel'},
+'implemented NOR solution model'=>{de=>'implementiertes NOR-Lösungsmodel'},
 'required NOR solution model'=>{de=>'erforderliches NOR-Lösungsmodel'},
 'ApplInherit.0'=>{de=>'erben aus Anwendung',en=>'inherit from application'},
 'target NOR solution model (calculated)'=>{de=>'Vorgabe NOR-Lösungsmodel (berechnet)'},
