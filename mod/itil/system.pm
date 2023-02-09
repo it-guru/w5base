@@ -772,7 +772,7 @@ sub new
 
       new kernel::Field::Select(
                 name          =>'itnormodel',
-                label         =>'implementied NOR solution model',
+                label         =>'implemented NOR solution model',
                 group         =>'sec',
                 searchable    =>0,
                 allowempty    =>1,
