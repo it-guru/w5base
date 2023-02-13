@@ -655,7 +655,8 @@ sub Validate
             }
          }
       }
-      if ($newrec->{cistatusid}<2){
+      if ($newrec->{cistatusid}<2 ||
+          (!defined($oldrec) && $newrec->{cistatusid}>2) ){
          if ($self->isDataInputFromUserFrontend() && 
              !$self->IsMemberOf("admin")){
             if (!$self->isWriteOnITCloudValid($itcloudid,"default")){
