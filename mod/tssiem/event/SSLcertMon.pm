@@ -44,7 +44,8 @@ sub SSLcertMon
    my $wfa=getModuleObject($self->Config,"base::workflowaction");
    my $user=getModuleObject($self->Config,"base::user");
 
-   my @datastreamview=qw(ictono ipaddress port protocol
+   my @datastreamview=qw(ictono applid 
+                                 ipaddress port protocol
                                  os
                                  sslparsedw5baseref
                                  sslparsedvalidfrom
@@ -184,10 +185,10 @@ sub SSLcertMon
 
       my $a=1;
       if (keys(%{$res->{invalid}})){
-         foreach my $icto (keys(%{$res->{invalid}})){
+         foreach my $ukey (keys(%{$res->{invalid}})){
             $ncnt++;
-            $self->doNotify($datastream,$wfa,$user,$appl,$icto,
-                            $res->{invalid}->{$icto});
+            $self->doNotify($datastream,$wfa,$user,$appl,
+                            $res->{invalid}->{$ukey});
          }
          #print Dumper($res);
 
@@ -250,7 +251,11 @@ sub analyseRecord
                   "$rec->{ipaddress}:$rec->{port}");
       }
       else{  # store in result structure 
-         $res->{invalid}->{$rec->{ictono}}->{$rec->{sslparsedserial}}={
+         my $key=$rec->{ictono};
+         $key="" if (!defined($key));
+         $key.="-" if ($key ne "" && $rec->{applid} ne "");
+         $key.=$rec->{applid} if ($rec->{applid} ne "");
+         $res->{invalid}->{$key}->{$rec->{sslparsedserial}}={
             sslserial=>$rec->{sslparsedserial},
             sslvalidtill=>$rec->{sslparsedvalidtill},
             ipaddress=>$rec->{ipaddress},
@@ -258,6 +263,7 @@ sub analyseRecord
             protocol=>$rec->{protocol},
             days=>$d->{days},
             ictono=>$rec->{ictono},
+            applid=>$rec->{applid},
             urlofcurrentrec=>$rec->{urlofcurrentrec}
          };
       }
@@ -273,14 +279,24 @@ sub doNotify
    my $wfa=shift;
    my $user=shift;
    my $appl=shift;
-   my $ictono=shift;
    my $rec=shift;
    my $debug="";
 
+
    #print STDERR "NOTIFY:".Dumper($rec);
+   my $applid=$rec->{applid};
+   my $ictono=$rec->{ictono};
 
    $appl->ResetFilter();
-   $appl->SetFilter({ictono=>\$ictono,cistatusid=>"<6"});
+   if ($applid ne ""){
+      $appl->SetFilter({id=>\$applid});
+   }
+   elsif($ictono ne ""){
+      $appl->SetFilter({ictono=>\$ictono,cistatusid=>"<6"});
+   }
+   else{
+      return();
+   }
 
    my @l=$appl->getHashList(qw(tsmid tsm2id applmgrid contacts opmid opm2id));
 
@@ -347,8 +363,8 @@ sub doNotify
       $wfa->Notify( "WARN",$subject,$tmpl, 
          emailto=>\@emailto, 
          emailbcc=>[
-            #11634953080001,   # HV
-            12663941300002    # Roland
+            11634953080001,   # HV
+            14224563420000,   # PB
          ],
          emailcategory =>['Qualys',
                           'tssiem::event::SSLcertMon',
