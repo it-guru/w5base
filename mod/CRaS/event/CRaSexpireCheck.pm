@@ -43,33 +43,50 @@ sub CRaSexpireCheck
 
    my $obj=$self->getPersistentModuleObject("csr","CRaS::csr");
 
-   $obj->SetFilter({state=>'4',ssslenddate=>"<now+21d"});
    my $wobj=$obj->Clone();
-   foreach my $rec ($obj->getHashList(qw(ALL))){
-      if ($rec->{sslexpnotify1} eq ""){
-         if ($obj->doNotify($rec->{id},"CERTEXPIRE1")){
-            $wobj->ValidatedUpdateRecord($rec,{
-               sslexpnotify1=>NowStamp("en"),
-               mdate=>$rec->{mdate}
-            },id=>\$rec->{id});
+   if (1){
+      $obj->SetFilter({state=>'4',ssslenddate=>"<now+21d"});
+      foreach my $rec ($obj->getHashList(qw(ALL))){
+         if ($rec->{sslexpnotify1} eq ""){
+            if ($obj->doNotify($rec->{id},"CERTEXPIRE1")){
+               $wobj->ValidatedUpdateRecord($rec,{
+                  sslexpnotify1=>NowStamp("en"),
+                  mdate=>$rec->{mdate}
+               },id=>\$rec->{id});
+            }
          }
-      }
-      else{
-         my $d=CalcDateDuration($rec->{ssslenddate},NowStamp("en"));
-         if ($d->{days}>6){
-            if ($rec->{sslexpnotify2} eq ""){
-               if ($obj->doNotify($rec->{id},"CERTEXPIRE2")){
-                  $wobj->ValidatedUpdateRecord($rec,{
-                     sslexpnotify2=>NowStamp("en"),
-                     mdate=>$rec->{mdate}
-                  },id=>\$rec->{id});
+         else{
+            my $d=CalcDateDuration($rec->{ssslenddate},NowStamp("en"));
+            if ($d->{days}>6){
+               if ($rec->{sslexpnotify2} eq ""){
+                  if ($obj->doNotify($rec->{id},"CERTEXPIRE2")){
+                     $wobj->ValidatedUpdateRecord($rec,{
+                        sslexpnotify2=>NowStamp("en"),
+                        mdate=>$rec->{mdate}
+                     },id=>\$rec->{id});
+                  }
                }
             }
          }
+         #print Dumper($rec);
       }
-      #print Dumper($rec);
-
    }
+   if (1){                      # switch all csrs with sslend longer then 14d
+      $obj->ResetFilter();      # in the past to disposed of wasted
+      $obj->SetFilter({state=>'4',ssslenddate=>"<now-14d"});
+
+      foreach my $rec ($obj->getHashList(qw(ALL))){
+         $W5V2::HistoryComments=$self->Self().
+                                " - CSR long time after end of cert";
+         $wobj->ValidatedUpdateRecord($rec,{
+            state=>"6"
+         },id=>\$rec->{id});
+         $W5V2::HistoryComments=undef;
+      }
+   }
+
+
+
    return({exitcode=>0});
 }
 
