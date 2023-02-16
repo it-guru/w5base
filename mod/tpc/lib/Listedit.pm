@@ -270,6 +270,10 @@ sub decodeFilter2Query4vRealize
                      $id=${$f->{$fn}};
                   }
                   else{
+                     if ($f->{$fn}=~m/^\s*".+"\s*$/){
+                        $f->{$fn}=~s/^\s*"//;
+                        $f->{$fn}=~s/"\s*$//;
+                     }
                      if (!($f->{$fn}=~m/[ *?]/)){
                         $id=$f->{$fn};
                      }
