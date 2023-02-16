@@ -355,9 +355,15 @@ sub qcheckRecord
 
                   my $m=getModuleObject($self->getParent->Config,
                                         $TPCenv."::machine");
+                  if ($m->isSuspended()){
+                     return(undef,{
+                            qmsg=>'TPC not available'
+                     }); # break qrule because TPC not available
+                  }
                   if (defined($m)){
                      $m->SetFilter({id=>$rec->{srcid}});
-                     my ($tpcrec)=$m->getOnlyFirst(qw(name));
+                     my ($tpcrec)=$m->getOnlyFirst(qw(name id projectId));
+
                      if (defined($tpcrec)){
                         if ($dataobj->ValidateSystemname($tpcrec->{name})){
                            $parrec->{systemname}=$tpcrec->{name};
@@ -365,6 +371,17 @@ sub qcheckRecord
                         else{
                            msg(INFO,"skip use of systemname '".
                                     $tpcrec->{name}."' from TPC ($TPCenv)");
+                        }
+                        if ($tpcrec->{projectId} ne ""){
+                           my $p=getModuleObject($self->getParent->Config,
+                                                 $TPCenv."::project");
+                           $p->SetFilter({id=>\$tpcrec->{projectId}});
+                           my ($tpcprec)=$p->getOnlyFirst(qw(name id applid));
+                           if (defined($tpcprec) && $tpcprec->{applid} ne ""){
+                              $self->updateCostCenterByApplId(
+                                 $rec,$parrec,$tpcprec->{applid}
+                              );
+                           }
                         }
                      }
                   }
@@ -994,6 +1011,26 @@ sub qcheckRecord
    }
    return($self->HandleWfRequest($dataobj,$rec,
                                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest));
+}
+
+
+sub  updateCostCenterByApplId
+{
+   my $self=shift;
+   my $rec=shift;
+   my $parrec=shift;
+   my $applid=shift;
+
+   my $o=getModuleObject($self->getParent->Config(),"itil::appl");
+   $o->SetFilter({id=>\$applid});
+   my ($apprec)=$o->getOnlyFirst(qw(name id conumber));
+   if (defined($apprec) && $apprec->{conumber} ne ""){
+      if ($parrec->{conumber} ne $apprec->{conumber}){
+         msg(INFO,"overwrite conumber ($apprec->{conumber}) from\n".
+                  "AssetManager by information from applid '$applid'");
+         $parrec->{conumber}=$apprec->{conumber};
+      }
+   }
 }
 
 
