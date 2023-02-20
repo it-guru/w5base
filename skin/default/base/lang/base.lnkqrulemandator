@@ -17,6 +17,6 @@
 "Mandator '%s' uses dataobject '%s', not '%s'"=>
    {de=>"Mandant '%s' benutzt das Datenobjekt '%s', nicht '%s'"},
 'Rule-State'=>{de=>'Regel-Status'},
-'activation full qualified label'=>{de=>'vollqualifiziere Aktivierungsbezeichnung'},
+'activation full qualified label'=>{de=>'vollqualifizierte Aktivierungsbezeichnung'},
 'individual attributes'=>{de=>'individuelle Attribute'},
 'fieldgroup.individualAttr'=>{de=>'individual Attribute',en=>'individual attributes'},

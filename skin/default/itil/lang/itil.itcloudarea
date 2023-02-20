@@ -6,7 +6,7 @@
 'fieldgroup.swinstances'=>{de=>'Software Instanzen',en=>'Software Instances'},
 'software instances'=>{de=>'Software Instanzen'},
 'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
-'full qualified CloudArea'=>{de=>'vollqualifiziere CloudArea'},
+'full qualified CloudArea'=>{de=>'vollqualifizierte CloudArea'},
 'CloudArea name'=>{de=>'CloudArea Name'},
 'Application'=>{de=>'Anwendung'},
 'no write access to specified cloud'=>{de=>'kein Schreibzugriff auf die angegebene Cloud'},

@@ -45,8 +45,8 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 
 [de:]
 
-Eine Anwendung läuft im Regelfall auf mindestens einem logischen System 
-oder einer Cloud-Area.
+Eine Anwendung läuft im Regelfall auf mindestens einem 
+logischen System oder einer CloudArea.
 
 Schritt 1: Überprüfen Sie bitte, ob die Systeme in W5Base/Darwin bereits angelegt sind.
 
@@ -61,8 +61,8 @@ Das Feld darf nur auf 'ja' gesetzt werden, wenn die Anwendung keine Systeme
 hinterlegt hat! Der technische Verantwortliche der Anwendung (TSM) 
 weiß in der Regel welche Systeme beauftragt wurden.
 
-Eine Cloud-Area wird nur als "System" angesehen, wenn diese als 
-"installiert/aktiv" markiert ist.
+Eine CloudArea wird nur als "System" angesehen, wenn diese 
+als "installiert/aktiv" markiert ist.
 
 Bei Fragen zum Umgang mit dem Tool können Sie sich 
 an den Darwin-Support wenden:
