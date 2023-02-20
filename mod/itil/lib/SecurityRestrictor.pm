@@ -68,7 +68,12 @@ sub getSecurityRestrictedAllowedSystemIDs
    my @appid=keys(%{$i->{id}});
    @appid=qw(-1) if ($#appid==-1);
    
-   $lappsys->SetFilter({applid=>\@appid});
+   $lappsys->SetFilter({
+      applid=>\@appid,
+      applcistatusid=>"<6",
+      systemcistatusid=>"<6",
+      cistatusid=>\'4'
+   });
    $lappsys->SetCurrentView(qw(systemsystemid));
    my $s=$lappsys->getHashIndexed("systemsystemid");
 
