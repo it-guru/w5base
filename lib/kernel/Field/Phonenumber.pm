@@ -85,31 +85,35 @@ sub Validate
                return(undef);
             }
             # normalice
-            if (my ($pref,$num)=$m=~m/^([0-9\s]+)\/([0-9-\s]+)$/){
-               $pref=~s/\s//g;
-               $num=~s/\s//g;
-               $m="$pref $num";
+            $m=~s/\s+/ /g;  #remove double spaces
+            $m=~s/-+/-/g;   #remove double - signs
+
+            # remove spaces and - in the first 4 signs (+ with 3 char int pref)
+            if (my ($cleaned,$rest)=$m=~m/(^.{4})(.*$)/){
+               $cleaned=~s/[- ]//g;
+               $m=$cleaned.$rest;
             }
-            if (my ($num)=$m=~m/^([0-9\s]+)$/){
-               $num=~s/\s//g;
-               #$num=~s/^\+49 17([0-9]{1})/+49 17$1 /;
-               #$num=~s/^\+49 16([0-9]{1})/+49 16$1 /;
-               $m="$num";
-            }
+
             if ($intdialprefix ne ""){
                $m=~s/^${intdialprefix}/+/x;
             }
-
             if ($m=~m/^0[^0]/){
                $m=~s/^0/${defPrefix}/x;
             }
+            my $foundIntPrefix=0;
             foreach my $pref (keys(%prefixlist)){
                my $qpref=$pref;
                $qpref=~s/\+/\\+/g;
                if ($m=~m/^${qpref}\s*/x){
                   $m=~s/^${qpref}\s*/${pref} /x;
+                  $foundIntPrefix++;
                   last;
                }
+            }
+            if (!$foundIntPrefix){
+               $self->getParent->LastMsg(ERROR,
+                            "unknown international phonenumber prefix '%s'",$m);
+               return(undef);
             }
 
             my $mchk=$m;
@@ -123,6 +127,11 @@ sub Validate
                 length($mchk)<8){
                $self->getParent->LastMsg(ERROR,
                             "senseless phonenumber '%s'",$m);
+               return(undef);
+            }
+            if (!($m=~m/^\+/)){
+               $self->getParent->LastMsg(ERROR,
+                            "no international phonenumber notation '%s'",$m);
                return(undef);
             }
          }
