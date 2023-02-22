@@ -1,3 +1,9 @@
 "invalid phonenumber format '%s'"=>{de=>"ungültiges Telefonnummern Format '%s'"},
 "senseless phonenumber '%s'"=>{de=>"sinnlose Telefonnummer '%s'"},
+"no international phonenumber notation '%s'"=>{
+  de=>"keine internationale Telefonnummernschreibweise '%s'"
+},
+"unknown international phonenumber prefix '%s'"=>{
+de=>"unbekannte internationale Vorwahl (Verkehrsausscheidungsziffer) '%s'"
+}
 
