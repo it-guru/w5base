@@ -38,3 +38,10 @@
 'approved relation to software id'=>{de=>'bestätigte Relation zu Software ID'},
 'approved relation to system id'=>{de=>'bestätigte Relation zu System ID'},
 'The AutoDiscovery System %s has detect this information (scandate) at'=>{de=>'Das AutoDiscovery System %s hat diese Information ermittelt (scandate) am '},
+'multiple software installations with the same version on same path are not allowed'=>{
+de=>'mehrere Software-Installationen mit der gleichen Version auf dem gleichen Installationspfad, sind nicht erlaubt'
+},
+'multiple software installations of the same software are only allowed with instpath specification'=>{
+de=>'mehrere Software-Installationen der gleichen Software sind nur mit Angabe des Installationspfades zulässig'
+}
+
