@@ -665,10 +665,18 @@ sub new
       new kernel::Field::Text(                         # a hidden field, to
                 name          =>'autodischint',        # track relation created
                 label         =>'AutoDiscovery Relation',  # needs to be in 
-                htmldetail    =>"NotEmpty",
-                group         =>'source',
+                uivisible     =>0,
                 searchable    =>0,
                 container     =>'additional'),             # allow write
+
+
+      new kernel::Field::Text(                         # a hidden field, to
+                name          =>'srcautodischint',     # track relation created
+                label         =>'AutoDiscovery Relation',  # needs to be in 
+                htmldetail    =>"NotEmpty",
+                group         =>'source',
+                alias         =>'autodischint',
+                searchable    =>0),             # allow write
 
       new kernel::Field::Container(
                 name          =>'additional',
