@@ -1,6 +1,12 @@
 Dear Sir or Madam,
 
-the CSR you entered has been successfully signed.
+The CSR '%SSLCERTCOMMON%' you collected was successfully signed.
+
+It can be downloaded from Darwin via the links below.
+
 
 %SIGCERT%
+(Link starts - after registration in Darwin - the download of the certificate)
+
+
 
