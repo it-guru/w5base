@@ -491,18 +491,61 @@ sub doTakeAutoDiscData
             my $softwareid=$initrelrec->{softwareid};
             if ($softwareid ne ""){
                #printf STDERR ("fifi 03 mapsel=$mapsel\n");
-               if ($mapsel=$swi->SecureValidatedInsertRecord({
-                      systemid=>$systemid,
-                      version=>$version,
-                      softwareid=>$softwareid,
-                      instpath=>$instpath,
-                      autodischint=>$autodischint,
-                      quantity=>1
-                   })){
-                  $exitcode=0;
+
+
+               my $alreadyExists=0;
+               if (!$alreadyExists){
+                  if ($instpath ne ""){
+                     $swi->ResetFilter();
+                     $swi->SetFilter({
+                        systemid=>\$systemid,
+                        version=>\$version,
+                        softwareid=>\$softwareid,
+                        instpath=>\$instpath
+                     });
+                     my @l=$swi->getHashList(qw(id));
+                     if ($#l!=-1){
+                        $alreadyExists=1;
+                        $swi->LastMsg(ERROR,
+                            "multiple software installations with the same ".
+                            "version on same path are not allowed");
+                     }
+                  }
+                  else{
+                     $swi->ResetFilter();
+                     $swi->SetFilter({
+                        systemid=>\$systemid,
+                        softwareid=>\$softwareid,
+                        instpath=>\$instpath
+                     });
+                     my @l=$swi->getHashList(qw(id));
+                     if ($#l!=-1){
+                        $alreadyExists=1;
+                        $swi->LastMsg(ERROR,
+                            "multiple software installations of the same ".
+                            "software are only allowed with instpath ".
+                            "specification");
+                     }
+                  }
+               }
+
+               if (!$alreadyExists){
+                  if ($mapsel=$swi->SecureValidatedInsertRecord({
+                         systemid=>$systemid,
+                         version=>$version,
+                         softwareid=>$softwareid,
+                         instpath=>$instpath,
+                         autodischint=>$autodischint,
+                         quantity=>1
+                      })){
+                     $exitcode=0;
+                  }
+                  else{
+                     $exitcode=100;
+                     ($exitmsg)=$swi->LastMsg();
+                  }
                }
                else{
-                  $exitcode=100;
                   ($exitmsg)=$swi->LastMsg();
                }
             }
