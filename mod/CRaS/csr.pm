@@ -1118,13 +1118,14 @@ sub doNotify
             if ($rec->{ssslcert} ne ""){
                my $fo=$self->getField("ssslcert",$rec);
                my $url=$fo->getDownloadUrl($rec,1);
-               $sigcert="\nSigned Cert:\n".$url."\n";
+               $sigcert="\nDownload Signed Cert:\n".$url."\n";
             }
            
             my $tmpl=$self->getParsedTemplate("tmpl/CRaS_Notify_$mode",{
                static=>{
                   CSRLINK=>$csrlink,
                   SIGCERT=>$sigcert,
+                  SSLCERTCOMMON=>$rec->{sslcertcommon}
                }
             });
 
