@@ -350,7 +350,7 @@ sub overviewDataIssue
 
    if ($wfcount>0 && $wfcount!=$dataissues){
       push(@wf,[{
-                 detail=>$self->Self."::dataissue",
+                 detail=>$self->Self."::wfact",
                  id=>$primrec->{id}
                },
                $app->T('workflows untreaded longer then 8 weeks'),
@@ -370,7 +370,7 @@ sub overviewDataIssue
    my $delta=$app->calcPOffset($primrec,$hist,$keyname);
    if ($wfcount>0){
       push(@wf,[{
-                 detail=>$self->Self."::dataissue",
+                 detail=>$self->Self."::wfact",
                  id=>$primrec->{id}
                }, 
                $app->T('count of consequent ignored workflow'),
