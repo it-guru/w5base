@@ -4,3 +4,4 @@
 },
 'emitting Application'=>{de=>'abgebende Anwendung'},
 'collecting Application'=>{de=>'aufnehmende Anwendung'},
+'approve check box not checked'=>{de=>'Bestätigungs-Checkbox nicht angekreuzt'},

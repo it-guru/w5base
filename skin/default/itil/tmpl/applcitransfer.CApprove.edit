@@ -1,0 +1,11 @@
+Please confirm for the collecting application '%CAPPL%'
+that this transfer should be carried out. <br><br>
+
+<input type=checkbox name=doit>
+Yes, I confirm that the transfer should be carried out
+<br>
+%LASTMSG%
+<center>
+<input type=submit style="cursor:pointer" name=save value="save">
+</center>
+

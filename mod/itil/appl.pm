@@ -595,7 +595,8 @@ sub new
                 group         =>'applurl',
                 vjointo       =>'itil::lnkapplurl',
                 vjoinon       =>['id'=>'applid'],
-                vjoindisp     =>['name']),
+                vjoindisp     =>['name'],
+                vjoininhash   =>['name','id']),
 
       new kernel::Field::SubList(
                 name          =>'addcis',
