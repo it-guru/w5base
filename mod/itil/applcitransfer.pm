@@ -37,6 +37,7 @@ sub new
                 name          =>'id',
                 sqlorder      =>'desc',
                 label         =>'W5BaseID',
+                group         =>'source',
                 dataobjattr   =>'applcitransfer.id'),
 
       new kernel::Field::RecordUrl(),
@@ -80,9 +81,88 @@ sub new
                                                    
       new kernel::Field::Textarea(
                 name          =>'configitems',
-                label         =>'Config-Items',
+                label         =>'Config-Item adresses',
+                group         =>'transitems',
                 searchable    =>0,
                 dataobjattr   =>'applcitransfer.configitems'),
+
+
+
+
+      new kernel::Field::Contact(
+                name          =>'eapplackuser',
+                group         =>'eapprove',
+                htmldetail    =>'NotEmpty',
+                label         =>'emitting application approver',
+                vjoinon       =>'eapplackuserid'),
+
+      new kernel::Field::Interface(
+                name          =>'eapplackuserid',
+                group         =>'eapprove',
+                htmldetail    =>'NotEmpty',
+                label         =>'emitting application approve userid',
+                dataobjattr   =>'applcitransfer.eappl_ack_user'),
+
+      new kernel::Field::Date(
+                name          =>'eapplackdate',
+                group         =>'eapprove',
+                htmldetail    =>'NotEmpty',
+                label         =>'emitting application approve date',
+                dataobjattr   =>'applcitransfer.eappl_ack_date'),
+
+      new kernel::Field::Textarea(
+                name          =>'eapplackcmnt',
+                group         =>'eapprove',
+                htmldetail    =>'NotEmpty',
+                label         =>'emitting application approve comment',
+                dataobjattr   =>'applcitransfer.eappl_ack_cmnt'),
+
+
+
+      new kernel::Field::Contact(
+                name          =>'capplackuser',
+                group         =>'capprove',
+                htmldetail    =>'NotEmpty',
+                label         =>'collecting application approver',
+                vjoinon       =>'capplackuserid'),
+
+      new kernel::Field::Interface(
+                name          =>'capplackuserid',
+                group         =>'capprove',
+                htmldetail    =>'NotEmpty',
+                label         =>'collecting application approve userid',
+                dataobjattr   =>'applcitransfer.cappl_ack_user'),
+
+      new kernel::Field::Date(
+                name          =>'capplackdate',
+                group         =>'capprove',
+                htmldetail    =>'NotEmpty',
+                label         =>'collecting application approve date',
+                dataobjattr   =>'applcitransfer.cappl_ack_date'),
+
+      new kernel::Field::Textarea(
+                name          =>'capplackcmnt',
+                group         =>'capprove',
+                htmldetail    =>'NotEmpty',
+                label         =>'collecting application approve comment',
+                dataobjattr   =>'applcitransfer.cappl_ack_cmnt'),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                                    
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -188,7 +268,7 @@ sub SecureValidate
    my $oldrec=shift;
    my $newrec=shift;
 
-printf STDERR ("fifi SecureValidate newrec=%s\n",Dumper($newrec));
+   #printf STDERR ("fifi SecureValidate newrec=%s\n",Dumper($newrec));
 
    return($self->SUPER::SecureValidate($oldrec,$newrec));
 }
@@ -203,7 +283,30 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-printf STDERR ("fifi Validate newrec=%s\n",Dumper($newrec));
+   if (!defined($oldrec) && !exists($newrec->{configitems})){
+      my $eapplid=effVal($oldrec,$newrec,"eapplid");
+      my $o=getModuleObject($self->Config,"itil::appl");
+      $o->SetFilter({id=>\$eapplid});
+      my ($eapplrec)=$o->getOnlyFirst(qw(systems swinstances applurl));
+
+      my %ci;
+      foreach my $srec (@{$eapplrec->{systems}}){
+         $ci{'itil::system::'.$srec->{systemid}}++;
+      }
+      foreach my $srec (@{$eapplrec->{swinstances}}){
+         $ci{'itil::swinstance::'.$srec->{id}}++;
+      }
+      foreach my $srec (@{$eapplrec->{applurl}}){
+         $ci{'itil::applurl::'.$srec->{id}}++;
+      }
+      $newrec->{configitems}=join("\n",sort(keys(%ci)));
+   }
+
+
+
+   my $a=$self->extractAdresses(effVal($oldrec,$newrec,"configitems"));
+
+   print STDERR Dumper($a);
   
    return(1);
 }
@@ -215,10 +318,82 @@ sub FinishWrite
    my $oldrec=shift;
    my $newrec=shift;
 
-printf STDERR ("fifi FinishWrite newrec=%s\n",Dumper($newrec));
+   if (!defined($oldrec)){
+      my $eapplid=$newrec->{eapplid};
+      my $capplid=$newrec->{capplid};
+      my $o=getModuleObject($self->Config,"itil::appl");
+      $o->SetFilter({id=>[$eapplid,$capplid]});
+      my @l=$o->getHashList(qw(ALL));
+
+      foreach my $arec (@l){
+         my $direction;
+         if ($eapplid==$arec->{id}){
+            $direction="EApprove";
+         }
+         if ($capplid==$arec->{id}){
+            $direction="CApprove";
+         }
+
+         $o->NotifyWriteAuthorizedContacts($arec,{},{
+                  dataobj=>$self->Self,
+                  emailbcc=>11634953080001,
+                  dataobjid=>effVal($oldrec,$newrec,"id"),
+                  emailcategory=>'CITransfer'
+               },{},sub{
+            my ($subject,$ntext);
+            my $subject=$self->T("CI Trans $direction",'itil::applcitransfer');
+            my $ntext=$self->T("Dear databoss",'kernel::QRule');
+            $ntext.=",\n\n";
+            $ntext.="Link:\n";
+
+            my $baseurl=$ENV{SCRIPT_URI};
+            $baseurl=~s#/(auth|public)/.*$##;
+            my $jobbaseurl=$self->Config->Param("EventJobBaseUrl");
+            if ($jobbaseurl ne ""){
+               $jobbaseurl=~s#/$##;
+               $baseurl=$jobbaseurl;
+            }
+            my $url=$baseurl;
+            if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+               $url=~s/^http:/https:/i;
+            }
+            $url.="/auth/itil/applcitransfer/".$direction."/".$newrec->{id};
+
+            $ntext.=$url."\n\n";
 
 
+            $ntext.=$newrec->{configitems};
+            return($subject,$ntext);
+         });
+      }
+   }
    return(1);
+}
+
+
+
+
+
+
+
+
+
+sub extractAdresses
+{
+   my $self=shift;
+   my $text=shift;
+   my %ci;
+
+   my @l=split(/\n/,$text);
+
+   foreach my $line (@l){
+      if (my ($obj,$id)=$line=~m/^(.*)::(.*)$/){
+         $ci{$obj}=[] if (!exists($ci{$obj}));
+         push(@{$ci{$obj}},$id) if (!in_array($ci{$obj},$id));
+      }
+   }
+
+   return(\%ci);
 }
 
 
@@ -267,6 +442,212 @@ sub isQualityCheckValid
    my $rec=shift;
    return(0);
 }
+
+
+sub getDetailBlockPriority
+{
+   my $self=shift;
+   return( qw(header default eapprove capprove transitems source));
+}
+
+
+
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   return($self->SUPER::getValidWebFunctions(@_),
+           "EApprove","CApprove","Approve");
+}
+
+
+sub Approve
+{
+   my $self=shift;
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css',
+                                   'kernel.App.Web.css' ],
+                           submodal=>1,
+                           js=>['toolbox.js','subModal.js','kernel.App.Web.js'],
+                           body=>1,form=>1);
+
+   my $id=Query->Param("id");
+   my $mode=Query->Param("mode");
+ 
+   $self->ResetFilter();
+   $self->SetFilter({id=>\$id});
+   my ($rec)=$self->getOnlyFirst(qw(ALL));
+
+   if (!defined($rec)){
+      print $self->noAccess();
+      return();
+   }
+
+   if (Query->Param("save")){
+      my $doit=Query->Param("doit");
+      if ($doit eq ""){
+         $self->LastMsg(ERROR,"approve check box not checked");
+      }
+      else{
+         # save approve
+         my $userid=$self->getCurrentUserId();
+         my %updrec;
+         if ($mode eq "EApprove"){
+            %updrec=(
+               eapplackuserid=>$userid,
+               eapplackdate=>NowStamp("en") 
+            );
+         }
+         if ($mode eq "CApprove"){
+            %updrec=(
+               capplackuserid=>$userid,
+               capplackdate=>NowStamp("en") 
+            );
+         }
+         $self->ValidatedUpdateRecord($rec,\%updrec,{id=>$rec->{id}});
+
+         # reread rec
+         $self->ResetFilter();
+         $self->SetFilter({id=>\$id});
+         ($rec)=$self->getOnlyFirst(qw(ALL));
+      }
+   }
+
+
+
+   printf("<div style=\"width:80%;min-width:200px;max-width:500px;".
+          "margin:auto\">");
+
+
+   print($self->getParsedTemplate("tmpl/applcitransfer.".$mode.".header",
+      {
+         static  =>{
+                  CAPPL=>$rec->{cappl},
+                  EAPPL=>$rec->{eappl}
+         }
+      }
+   ));
+   #
+   #
+   #
+   if ($mode eq "EApprove"){
+      if ($rec->{eapplackdate} eq ""){
+         print($self->getParsedTemplate("tmpl/applcitransfer.".$mode.".edit",
+            {
+               static  =>{
+                        CAPPL=>$rec->{cappl},
+                        EAPPL=>$rec->{eappl}
+               }
+            }
+         ));
+      }
+      else{
+         print($self->getParsedTemplate("tmpl/applcitransfer.".$mode.".show",
+            {
+               static  =>{
+                        CAPPL=>$rec->{cappl},
+                        EAPPL=>$rec->{eappl},
+                        CAPPLACKUSER=>$rec->{capplackuser},
+                        CAPPLACKDATE=>$rec->{capplackdate},
+                        EAPPLACKUSER=>$rec->{eapplackuser},
+                        EAPPLACKDATE=>$rec->{eapplackdate}
+               }
+            }
+         ));
+      }
+   }
+   if ($mode eq "CApprove"){
+      if ($rec->{capplackdate} eq ""){
+         print($self->getParsedTemplate("tmpl/applcitransfer.".$mode.".edit",
+            {
+               static  =>{
+                        CAPPL=>$rec->{cappl},
+                        EAPPL=>$rec->{eappl}
+               }
+            }
+         ));
+      }
+      else{
+         print($self->getParsedTemplate("tmpl/applcitransfer.".$mode.".show",
+            {
+               static  =>{
+                        CAPPL=>$rec->{cappl},
+                        EAPPL=>$rec->{eappl},
+                        CAPPLACKUSER=>$rec->{capplackuser},
+                        CAPPLACKDATE=>$rec->{capplackdate},
+                        EAPPLACKUSER=>$rec->{eapplackuser},
+                        EAPPLACKDATE=>$rec->{eapplackdate}
+               }
+            }
+         ));
+      }
+   }
+   ######################################################################
+
+   printf("<br>\n");
+   printf("<div style=\"border-style:solid;border-width:1px;".
+          "overflow:auto;height:100px;padding-left:5px\">\n");
+   printf("<xmp>%s</xmp>",$rec->{configitems});
+   printf("</div>");
+   printf("<br>\n");
+
+
+   ######################################################################
+
+   print($self->getParsedTemplate("tmpl/applcitransfer.signaturetext",
+      {
+         static  =>{
+                  CAPPL=>$rec->{cappl},
+                  RAPPL=>$rec->{cappl}
+         }
+      }
+   ));
+
+
+   printf("</div>");
+   print $self->HtmlPersistentVariables("id","mode");
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+
+
+
+sub EApprove
+{
+   my $self=shift;
+
+   my ($func,$p)=$self->extractFunctionPath();
+
+   if ($p ne ""){
+      $p=~s/[^0-9]//g;
+      $self->HtmlGoto("../Approve",post=>{id=>$p,mode=>$func});
+      return();
+   }
+   print $self->noAccess();
+   return();
+}
+
+
+sub CApprove
+{
+   my $self=shift;
+
+   my ($func,$p)=$self->extractFunctionPath();
+
+   if ($p ne ""){
+      $p=~s/[^0-9]//g;
+      $self->HtmlGoto("../Approve",post=>{id=>$p,mode=>$func});
+      return();
+   }
+   print $self->noAccess();
+   return();
+}
+
+
+
+
 
 
 

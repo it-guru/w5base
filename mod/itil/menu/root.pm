@@ -635,6 +635,11 @@ sub Init
                       "itil::riskmgmtbase",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itil.proc.applcitrans",
+                      "itil::applcitransfer",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("itil.network",
                       "itil::network",
                       defaultacl=>['valid_user']);
