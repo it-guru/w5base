@@ -89,7 +89,8 @@ sub CloudAreaSync
        push(@a,\%carec);
    }
    if ($#a==-1){
-      die("no appagile namespaces found - this seems to be a DB Bug");
+      msg(ERROR,"no appagile namespaces found - this seems to be a DB Bug");
+      exit(1);
    }
 
    $otcpro->SetFilter({
