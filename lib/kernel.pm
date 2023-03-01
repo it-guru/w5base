@@ -1355,7 +1355,7 @@ sub ExpandW5BaseDataLinks
    my $self=shift;
    my $FormatAs=shift;
    my $data=shift;
-   my @formats=qw(HtmlWfActionlog HtmlDetail);
+   my @formats=qw(HtmlWfActionlog HtmlDetail HtmlMail);
    return($data) if (!in_array(\@formats,$FormatAs));
 
    $data=~s#(w5base://([^\/]+)/([^\/]+)/([^\/]+)/([,0-9,a-z,A-Z_]+))#_ExpandW5BaseDataLinks($self,\@formats,$FormatAs,$1,$2,$3,$4,$5)#ge;
