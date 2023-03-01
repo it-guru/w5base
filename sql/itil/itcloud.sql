@@ -66,3 +66,4 @@ alter table itcloudarea add ipobjectexport int(1) default '1';
 alter table itcloud add ordersupport int(1) default '0',add deconssupport int(1) default '0',add allowinactsysimport int(1) default '0';
 alter table itcloud add appl bigint(20) default NULL;
 alter table itcloud add shortname varchar(20) default NULL;
+alter table itcloudarea add previousappl bigint(20);

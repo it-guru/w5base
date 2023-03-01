@@ -344,7 +344,15 @@ sub FinishWrite
             my $subject=$self->T("CI Trans $direction",'itil::applcitransfer');
             my $ntext=$self->T("Dear databoss",'kernel::QRule');
             $ntext.=",\n\n";
-            $ntext.="Link:\n";
+
+            $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
+            $ntext.="Approve notwendig ist.";
+            $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
+            $ntext.="Approve notwendig ist.";
+            $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
+            $ntext.="Approve notwendig ist.";
+            $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
+            $ntext.="Approve notwendig ist.";
 
             my $baseurl=$ENV{SCRIPT_URI};
             $baseurl=~s#/(auth|public)/.*$##;
@@ -358,11 +366,17 @@ sub FinishWrite
                $url=~s/^http:/https:/i;
             }
             $url.="/auth/itil/applcitransfer/".$direction."/".$newrec->{id};
+            $ntext.="ApprovalLink:\n".$url."\n\n\n";
 
-            $ntext.=$url."\n\n";
+            my $htmlConfigItems=$newrec->{configitems};
+            #$htmlConfigItems=~s/\n/<br>\n/g;
+            $htmlConfigItems=$self->ExpandW5BaseDataLinks("HtmlMail",$htmlConfigItems);
+            $ntext.="ConfigItems:\n".$htmlConfigItems."\n\n";
 
 
-            $ntext.=$newrec->{configitems};
+
+           # $ntext.=$newrec->{configitems};
+            $ntext.="DirectLink:";
             return($subject,$ntext);
          });
       }
@@ -387,7 +401,11 @@ sub extractAdresses
    my @l=split(/\n/,$text);
 
    foreach my $line (@l){
-      if (my ($obj,$id)=$line=~m/^(.*)::(.*)$/){
+      if (my ($obj,$id)=$line=~m/^w5base:\/\/([^\/]+)\/[^\/]+\/([^\/]+)\/.+$/){
+         $ci{$obj}=[] if (!exists($ci{$obj}));
+         push(@{$ci{$obj}},$id) if (!in_array($ci{$obj},$id));
+      }
+      elsif (my ($obj,$id)=$line=~m/^(.*)::(.*)$/){
          $ci{$obj}=[] if (!exists($ci{$obj}));
          push(@{$ci{$obj}},$id) if (!in_array($ci{$obj},$id));
       }
@@ -402,7 +420,7 @@ sub FinishDelete
    my $self=shift;
    my $oldrec=shift;
 
-printf STDERR ("fifi FinishDelete oldrec=%s\n",Dumper($oldrec));
+   #printf STDERR ("fifi FinishDelete oldrec=%s\n",Dumper($oldrec));
 
    return(1);
 }
@@ -588,7 +606,10 @@ sub Approve
    printf("<br>\n");
    printf("<div style=\"border-style:solid;border-width:1px;".
           "overflow:auto;height:100px;padding-left:5px\">\n");
-   printf("<xmp>%s</xmp>",$rec->{configitems});
+   my $htmlConfigItems=$rec->{configitems};
+   $htmlConfigItems=~s/\n/<br>\n/g;
+   $htmlConfigItems=$self->ExpandW5BaseDataLinks("HtmlDetail",$htmlConfigItems);
+   printf("%s",$htmlConfigItems);
    printf("</div>");
    printf("<br>\n");
 

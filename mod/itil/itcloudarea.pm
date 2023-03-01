@@ -130,6 +130,11 @@ sub new
                 selectfix     =>1,
                 dataobjattr   =>'qitcloudarea.appl'),
 
+      new kernel::Field::Link(
+                name          =>'previousapplid',   # store the last applid
+                selectfix     =>1,                  # for installed/aktive cloudarea
+                dataobjattr   =>'qitcloudarea.previousappl'),
+
       new kernel::Field::Textarea(
                 name          =>'description',
                 searchable    =>0,
@@ -186,7 +191,9 @@ sub new
                 vjoinbase     =>[{cistatusid=>"<=5"}],
                 vjointo       =>'itil::system',
                 vjoinon       =>['id'=>'itcloudareaid'],
-                vjoindisp     =>['name','systemid','cistatus']),
+                vjoindisp     =>['name','systemid','cistatus'],
+                vjoininhash   =>['name','cistatusid','id',
+                                 'systemid','srcsys','srcid']),
 
       new kernel::Field::SubList(
                 name          =>'swinstances',
@@ -230,10 +237,11 @@ sub new
       new kernel::Field::Interface(
                 name          =>'respapplid',
                 selectfix     =>1,
-                dataobjattr   =>'if (qitcloudarea.cistatus=3,'.
-                                'if (itcloud.allowinactsysimport=1,'.
-                                'itcloud.appl,null),'.
-                                'qitcloudarea.appl)'),
+                dataobjattr   =>"if (qitcloudarea.cistatus=3,".
+                                "if (qitcloudarea.previousappl is not null,".
+                                "qitcloudarea.previousappl,".
+                                "if (itcloud.allowinactsysimport=1,".
+                                "itcloud.appl,null)),qitcloudarea.appl)"),
 
       new kernel::Field::Creator(
                 name          =>'creator',
@@ -591,6 +599,9 @@ sub Validate
            $oldrec->{cistatusid} eq "6" )){
          $newrec->{cistatusid}="3";
       }
+      if (defined($oldrec) && $oldrec->{cistatusid} eq "4"){
+          $newrec->{previousapplid}=$oldrec->{applid};
+      }
    }
    my $autoactivation=0;
    if (!defined($oldrec) || effVal($oldrec,$newrec,"cistatusid") eq "3"
@@ -757,6 +768,32 @@ sub FinishWrite
             if (!defined($oldrec) || $oldrec->{cifirstactivation} eq ""){
                $doNotify=3;  # send activation mail only if they isn't send
             }                # already
+            my $oldapplid=$oldrec->{previousapplid};
+            if ($oldapplid eq ""){
+               $oldapplid=$oldrec->{respapplid};
+            } 
+            my $newapplid=effVal($oldrec,$newrec,"applid");
+            if ($oldapplid ne "" &&
+                $newapplid ne $oldapplid){ # responsibility change
+               msg(INFO,"responsibity change for $oldrec->{fullname} ".
+                        "$oldapplid -> $newapplid");
+               my $configitems="";
+               foreach my $srec (@{$oldrec->{systems}}){
+                  $configitems.="\n" if ($configitems ne "");
+                  $configitems.="w5base://itil::system/Show/".
+                                $srec->{id}."/fullname";
+               }
+               my $o=getModuleObject($self->Config,"itil::applcitransfer");
+               if ($configitems ne "" && defined($o)){
+                  $o->ValidatedInsertRecord({
+                     capplid=>$newapplid,
+                     eapplid=>$oldapplid,
+                     configitems=>$configitems
+                  });
+               }
+            }
+
+
          }
       }
       if ($oldrec->{cistatusid}==6 &&   # it it is a reactivateion without 
