@@ -73,14 +73,14 @@ sub CRaSexpireCheck
    }
    if (1){                      # switch all csrs with sslend longer then 14d
       $obj->ResetFilter();      # in the past to disposed of wasted
-      $obj->SetFilter({state=>'4',ssslenddate=>"<now-14d"});
+      $obj->SetFilter({rawstate=>'4',ssslenddate=>"<now-14d"});
 
       foreach my $rec ($obj->getHashList(qw(ALL))){
          $W5V2::HistoryComments=$self->Self().
                                 " - CSR long time after end of cert";
          $wobj->ValidatedUpdateRecord($rec,{
             state=>"6"
-         },id=>\$rec->{id});
+         },{id=>\$rec->{id}});
          $W5V2::HistoryComments=undef;
       }
    }
