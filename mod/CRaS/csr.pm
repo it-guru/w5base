@@ -347,11 +347,28 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'csr.ssslsubject'),
 
+      new kernel::Field::Interface(
+                name          =>'sslcertfilename',
+                label         =>'Download-Filename CSR',
+                depend        =>['name'],
+                onRawValue    =>sub {
+                    my $self   =shift;
+                    my $current=shift;
+                    my $fld=$self->getParent->getField("name");
+                    my $name=lc($fld->RawValue($current));
+                    $name=~s/\s*//g;
+                    $name=~s/[^a-z0-9_.-]//gi;
+                    $name=~s/^[^a-z0-9]+//i;
+                    $name="CertificateSigningRequest" if ($name eq "");
+                    return($name.".csr");
+                }),
+  
       new kernel::Field::File(
                 name          =>'sslcert',
                 label         =>'certificate request',
                 group         =>['detail','request'],
                 maxsize       =>65533,
+                filename      =>'sslcertfilename',
                 readonly      =>1,
                 searchable    =>0,
                 uploadable    =>0,
@@ -402,6 +419,7 @@ sub new
                     my $name=lc($fld->RawValue($current));
                     $name=~s/\s*//g;
                     $name=~s/[^a-z0-9_.-]//gi;
+                    $name=~s/^[^a-z0-9]+//i;
                     $name="SingedCert" if ($name eq "");
                     return($name.".pem");
                 }),
