@@ -147,21 +147,18 @@ sub new
                 label         =>'collecting application approve comment',
                 dataobjattr   =>'applcitransfer.cappl_ack_cmnt'),
 
+      new kernel::Field::Date(
+                name          =>'transferdt',
+                group         =>'transfer',
+                label         =>'Transferdate',
+                dataobjattr   =>'applcitransfer.transferdt'),
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      new kernel::Field::Textarea(
+                name          =>'transferlog',
+                group         =>'transfer',
+                htmldetail    =>'NotEmpty',
+                label         =>'Transferlog',
+                dataobjattr   =>'applcitransfer.transferlog'),
 
                                                    
       new kernel::Field::Text(
@@ -175,7 +172,7 @@ sub new
                 group         =>'source',
                 label         =>'Source-Id',
                 dataobjattr   =>'applcitransfer.srcid'),
-                                                   
+
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
@@ -291,23 +288,51 @@ sub Validate
 
       my %ci;
       foreach my $srec (@{$eapplrec->{systems}}){
-         $ci{'itil::system::'.$srec->{systemid}}++;
+         $ci{'w5base://itil::system/Show/'.$srec->{systemid}."/fullname"}++;
       }
       foreach my $srec (@{$eapplrec->{swinstances}}){
-         $ci{'itil::swinstance::'.$srec->{id}}++;
+         $ci{'w5base://itil::swinstance/Show/'.$srec->{id}."/fullname"}++;
       }
       foreach my $srec (@{$eapplrec->{applurl}}){
-         $ci{'itil::applurl::'.$srec->{id}}++;
+         $ci{'w5base://itil::applurl/Show/'.$srec->{id}."/fullname"}++;
       }
       $newrec->{configitems}=join("\n",sort(keys(%ci)));
    }
 
 
 
-   my $a=$self->extractAdresses(effVal($oldrec,$newrec,"configitems"));
+   #my $a=$self->extractAdresses(effVal($oldrec,$newrec,"configitems"));
 
-   print STDERR Dumper($a);
-  
+   return(1);
+}
+
+
+sub ProcessTransfer
+{
+   my $self=shift;
+   my $tlog=shift;
+   my $rec=shift;
+   my $eappl=shift;
+   my $cappl=shift;
+
+   my $items=$self->extractAdresses($rec->{'configitems'});
+
+   my $newdatabossid=$cappl->{databossid};
+
+   my $o=getModuleObject($self->Config,"itil::system");
+   my $op=$o->Clone();
+
+   my @ids=@{$items->{"itil::system"}};
+   $o->SetFilter({id=>\@ids});
+   foreach my $oldrec ($o->getHashList(qw(ALL))){
+      push(@$tlog,"transfer system $oldrec->{id} : $oldrec->{fullname}");
+      $op->ValidatedUpdateRecord($oldrec,
+         {databossid=>$newdatabossid},
+         {id=>$oldrec->{id}}
+      );
+   }
+
+
    return(1);
 }
 
@@ -353,6 +378,7 @@ sub FinishWrite
             $ntext.="Approve notwendig ist.";
             $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
             $ntext.="Approve notwendig ist.";
+            $ntext.="\n\n";
 
             my $baseurl=$ENV{SCRIPT_URI};
             $baseurl=~s#/(auth|public)/.*$##;
@@ -368,17 +394,37 @@ sub FinishWrite
             $url.="/auth/itil/applcitransfer/".$direction."/".$newrec->{id};
             $ntext.="ApprovalLink:\n".$url."\n\n\n";
 
-            my $htmlConfigItems=$newrec->{configitems};
-            #$htmlConfigItems=~s/\n/<br>\n/g;
-            $htmlConfigItems=$self->ExpandW5BaseDataLinks("HtmlMail",$htmlConfigItems);
-            $ntext.="ConfigItems:\n".$htmlConfigItems."\n\n";
+            my $htmlCIs=$newrec->{configitems};
+            $htmlCIs=$self->ExpandW5BaseDataLinks("HtmlMail",$htmlCIs);
+            $ntext.="ConfigItems:\n".$htmlCIs."\n\n";
 
+            $ntext.="\n";
 
-
-           # $ntext.=$newrec->{configitems};
             $ntext.="DirectLink:";
             return($subject,$ntext);
          });
+      }
+   }
+
+   if (effVal($oldrec,$newrec,"eapplackdate") ne "" &&
+       effVal($oldrec,$newrec,"capplackdate") ne "" &&
+       effVal($oldrec,$newrec,"transferdt") eq ""){
+      my $res;
+      my $userid=$self->getCurrentUserId();
+      my $id=effVal($oldrec,$newrec,"id");
+      my %p=(eventname=>'Process_applcistransfer',
+             spooltag=>'Process_applcistransfer-'.$id,
+             redefine=>'1',
+             retryinterval=>600,
+             firstcalldelay=>10,
+             eventparam=>$id,
+             userid=>$userid);
+      if (defined($res=$self->W5ServerCall("rpcCallSpooledEvent",%p)) &&
+         $res->{exitcode}==0){
+         msg(INFO,"Process_applcistransfer Event sent OK");
+      }
+      else{
+         msg(ERROR,"Process_applcistransfer Event sent failed");
       }
    }
    return(1);
@@ -465,7 +511,7 @@ sub isQualityCheckValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return( qw(header default eapprove capprove transitems source));
+   return( qw(header default eapprove capprove transitems transfer source));
 }
 
 
