@@ -6,7 +6,7 @@ Der Grund dafür ist, dass in der CloudArea keine gültige Anwendungsreferenz (W5B
 
 Als Datenverantwortlicher (oder Schreibberechtigter) der Cloud <b>%CLOUD%</b>, müssen Sie hier tätig werden und das Datenproblem beseitigen.
 
-<b><font color=red>Deployments in CloudAreas mit nicht aktiven Anwendungen können zu Security-Probelmen führen!</font></b>
+<b><font color=red>Deployments in CloudAreas mit nicht aktiven Anwendungen können zu Security-Problemen führen!</font></b>
 
 Falls Sie eine Fehlkonfiguation oder andere Probleme mit der CloudArea sehen, kontaktieren Sie ...
 %SUPPORTCONTACT%
