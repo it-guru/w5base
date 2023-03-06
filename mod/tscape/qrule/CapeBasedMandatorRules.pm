@@ -135,9 +135,11 @@ sub qcheckRecord
          my $grp;
          my $i=getModuleObject($dataobj->Config,"tscape::archappl");
          return(undef,undef) if ($i->isSuspended());
+         return(undef,undef) if (!$i->Ping());
          $i->SetFilter({archapplid=>\$icto});
          my ($ictor)=$i->getOnlyFirst(qw(organisation archapplid orgareaid
                                          orgarea));
+         return(undef,undef) if (!$i->Ping());
          if (defined($ictor) && $ictor->{organisation} ne ""){
             $grp=$ictor->{orgareaid};
          }

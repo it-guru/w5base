@@ -62,7 +62,7 @@ sub CapeICTOimport
       }
    }
    my $nicto=keys(%icto);
-   msg(INFO,"found  $nicto ictos");
+   msg(INFO,"found  $nicto ictos in it-inventory");
    my $agrp=getModuleObject($self->Config,"itil::applgrp");
    if ($agrp->isSuspended()){
       return({exitcode=>'100',exitmsg=>'suspended itil::applgrp'});
@@ -79,6 +79,16 @@ sub CapeICTOimport
    if ($i->isSuspended()){
       return({exitcode=>'100',exitmsg=>'suspended tscape::archappl'});
    }
+
+   if (!($i->Ping())){
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      if ($infoObj->NotifyInterfaceContacts($i)){
+         return({exitcode=>0,exitmsg=>'Interface notified'});
+      }
+      return({exitcode=>1,exitmsg=>'not all dataobjects available'});
+   }
+
+
    my $la=getModuleObject($self->Config,"itil::lnkapplgrpappl");
    if ($la->isSuspended()){
       return({exitcode=>'100',exitmsg=>'suspended itil::lnkapplgrpappl'});

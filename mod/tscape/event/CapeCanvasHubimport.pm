@@ -45,6 +45,15 @@ sub CapeCanvasHubimport
    my $i=getModuleObject($self->Config,"tscape::archappl");
    return({}) if ($i->isSuspended());
 
+   if (!($i->Ping())){
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      if ($infoObj->NotifyInterfaceContacts($i)){
+         return({exitcode=>0,exitmsg=>'Interface notified'});
+      }
+      return({exitcode=>1,exitmsg=>'not all dataobjects available'});
+   }
+
+
    my $vou=getModuleObject($self->Config,"TS::vou");
    return({}) if ($vou->isSuspended());
 
