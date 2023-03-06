@@ -213,7 +213,7 @@ sub checkWriteValid
    my $oldrec=shift;
    my $newrec=shift;
 
-   my $lnkapplappl=effVal($oldrec,$newrec,"tags");
+   my $lnkapplappl=effVal($oldrec,$newrec,"lnkapplappl");
 
    return(undef) if ($lnkapplappl eq "");
 
@@ -224,6 +224,7 @@ sub checkWriteValid
       if (defined($aclrec)){
          my @grplist=$lnkobj->isWriteValid($aclrec);
          if (grep(/^interfacetag$/,@grplist) ||
+             grep(/^tags$/,@grplist) ||
              grep(/^ALL$/,@grplist)){
             return(1);
          }
