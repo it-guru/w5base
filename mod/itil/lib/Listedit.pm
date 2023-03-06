@@ -1548,7 +1548,7 @@ sub NotifyInterfaceContacts
          ["technical contact","tech. ansprechpartner"],
          ["tech. contact","tech. kontakt"],
          ["techn. contact","techn. kontakt"],
-         ["project manager","projekt leiter"],
+         ["project manager","projekt leiter","projektleiter"],
          ["developer","entwickler"]
       );
 
