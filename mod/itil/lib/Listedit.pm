@@ -24,6 +24,7 @@ use kernel::DataObj::DB;
 use kernel::Field;
 use kernel::Field::TextURL;
 use kernel::CIStatusTools;
+use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB kernel::CIStatusTools);
 
 sub new
@@ -1543,9 +1544,14 @@ sub NotifyInterfaceContacts
       my @wordtags=(
          ["support contact","support kontakt"],
          ["technical contact","technischer ansprechpartner"],
+         ["technical contact","techn. ansprechpartner"],
+         ["technical contact","tech. ansprechpartner"],
+         ["tech. contact","tech. kontakt"],
+         ["techn. contact","techn. kontakt"],
          ["project manager","projekt leiter"],
          ["developer","entwickler"]
       );
+
 
 
       TARGETFOUND: foreach my $wordtags (@wordtags){
@@ -1593,19 +1599,27 @@ sub NotifyInterfaceContacts
           ($#notify_to!=-1 || $#notify_cc!=-1) && $dataobj->LastMsg()){
          my $subject="interface connect: ".$ifrec->{fullname};
 
+         my @lastmsg=$dataobj->LastMsg();
+
          my $tmpl="There are communication problems on interface ...\n\n".
                   "<b>".$ifrec->{fullname}."</b>\n\n".
                   "... with a W5Base system. Available references are:\n\n".
-                  "<font color=red>".join("\n",$dataobj->LastMsg())."\n".
+                  "<font color=red>".join("\n",@lastmsg)."\n".
                   "</font color=red>".
                   "\nThis mail is automaticly generated. ".
                   "Please do what is necessary to restore the ".
                   "accessibility of the application interface.\n";
+
+         my $informationHash=md5_base64(join("\n",@lastmsg));
+                                                  # reduce
+                                                  # duped infos to ifpartners
+
          $wfa->Notify("ERROR",$subject,$tmpl,
             emailto=>\@notify_to,
             emailcc=>\@notify_cc,
             dataobj=>"itil::lnkapplappl",
             dataobjid=>$ifrec->{id},
+            infoHash=>$informationHash,
             emailcategory =>['W5BaseInterfaces'],
             emailbcc=>[
                11634953080001, # HV
