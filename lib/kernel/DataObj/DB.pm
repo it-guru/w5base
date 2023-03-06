@@ -725,6 +725,26 @@ sub Ping
    my ($worktable,$workdb)=$self->getWorktable();
    $workdb=$self->{DB} if (!defined($workdb));
    return(0) if (!defined($workdb));
+   if (exists($self->{use_CountRecordPing}) && $self->{use_CountRecordPing}){
+      my $errors;
+      my $nRec;
+      {
+         open local(*STDERR), '>', \$errors;
+         $nRec=$self->CountRecords();
+      }
+      if ($nRec<$self->{use_CountRecordPing}){
+         $self->SilentLastMsg(ERROR,"minimum record count ".
+              $self->{use_CountRecordPing}." not reached in ".$self->Self);
+         if ($errors){
+            foreach my $emsg (split(/[\n\r]+/,$errors)){
+               $emsg=~s/^ERROR[: ]*//;
+               $self->SilentLastMsg(ERROR,$emsg);
+            }
+         }
+         return(0);
+      }
+   }  # CountRecordPing=10 means min. 10 Records needs to be found to Ping=OK
+
    return($workdb->Ping());
 }
 
