@@ -223,6 +223,7 @@ sub new
                 dataobjattr   =>"convert(VARCHAR,Last_Update,20)"),
    );
    $self->{use_distinct}=0;
+   $self->{use_CountRecordPing}=1;
    $self->{useMenuFullnameAsACL}=$self->Self;
    $self->setDefaultView(qw(archapplid name  shortname status w5appl));
    $self->setWorktable("V_DARWIN_EXPORT");
@@ -259,9 +260,6 @@ sub isQualityCheckValid
 
 
 
-
-
-
 sub getDetailBlockPriority
 {
    my $self=shift;
@@ -277,7 +275,6 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/appl.jpg?".$cgi->query_string());
 }
-         
 
 
 

@@ -91,6 +91,9 @@ sub qcheckRecord
    my @notifymsg;
 
    if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
+      my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
+      return(undef,undef) if ($par->isSuspended());
+      return(undef,undef) if (!$par->Ping());
       $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
       },{
          autosubject=>1,
@@ -98,8 +101,7 @@ sub qcheckRecord
          mode=>'QualityCheck',
          datasource=>'CAPE'
       },sub {
-         my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
-         return(undef,undef) if ($par->isSuspended());
+         $par->ResetFilter();
          $par->SetFilter({archapplid=>\$rec->{ictono}});
          my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
          return(undef,undef) if (!$par->Ping());

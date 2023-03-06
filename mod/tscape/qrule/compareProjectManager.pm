@@ -92,6 +92,9 @@ sub qcheckRecord
 
    if ($rec->{opmode} eq "prod" && $rec->{ictono} ne ""){
       delete($rec->{contacts}); # ensure contacts are new loaded
+      my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
+      return(undef,undef) if ($par->isSuspended());
+      return(undef,undef) if (!$par->Ping());
       $dataobj->NotifyWriteAuthorizedContacts($rec,undef,{
        #  emailcc=>['11634953080001'],
       },{
@@ -100,8 +103,7 @@ sub qcheckRecord
          mode=>'QualityCheck',
          datasource=>'CAPE'
       },sub {
-         my $par=getModuleObject($self->getParent->Config(),"tscape::archappl");
-         return(undef,undef) if ($par->isSuspended());
+         $par->ResetFilter();
          $par->SetFilter({archapplid=>\$rec->{ictono}});
          my ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
          return(undef,undef) if (!$par->Ping());
