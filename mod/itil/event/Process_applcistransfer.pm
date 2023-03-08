@@ -57,30 +57,31 @@ sub Process_applcistransfer
    $o->SetFilter({id=>\$id});
    my ($rec)=$o->getOnlyFirst(qw(ALL));
    if (defined($rec)){
-      if ($rec->{"eapplackdate"} ne "" &&
-          $rec->{"capplackdate"} ne "" &&
-          $rec->{"transferdt"} eq ""){
-         #msg(ERROR,"rec=%s".Dumper($rec));
-         my $items=$o->extractAdresses($rec->{'configitems'});
-         my $app=getModuleObject($self->Config,"itil::appl");
+      if ($rec->{"transferdt"} eq "" || 1){
+         if ($rec->{"eapplackdate"} ne "" &&
+             $rec->{"capplackdate"} ne ""){
+            #msg(ERROR,"rec=%s".Dumper($rec));
+            my $items=$o->extractAdresses($rec->{'configitems'});
+            my $app=getModuleObject($self->Config,"itil::appl");
 
-         $app->SetFilter({id=>[$rec->{"eapplid"},$rec->{"capplid"}]});
-         $app->SetCurrentView(qw(ALL));
-         my $arec=$app->getHashIndexed("id");
+            $app->SetFilter({id=>[$rec->{"eapplid"},$rec->{"capplid"}]});
+            $app->SetCurrentView(qw(ALL));
+            my $arec=$app->getHashIndexed("id");
 
-         my @tlog=();
-         my $res=$o->ProcessTransfer(\@tlog,$rec,
-            $arec->{$rec->{"eapplid"}},
-            $arec->{$rec->{"capplid"}}
-         );
+            my @tlog=();
+            my $res=$o->ProcessTransfer(\@tlog,$rec,
+               $arec->{id}->{$rec->{"eapplid"}},
+               $arec->{id}->{$rec->{"capplid"}}
+            );
 
-         my $op=$o->Clone();
-         $op->ValidatedUpdateRecord($rec,
-            {transferdt=>NowStamp("en"),transferlog=>join("\n",@tlog)},
-            {
-               id=>$rec->{id}
-            }
-         );
+            my $op=$o->Clone();
+            $op->ValidatedUpdateRecord($rec,
+               {transferdt=>NowStamp("en"),transferlog=>join("\n",@tlog)},
+               {
+                  id=>$rec->{id}
+               }
+            );
+         }
       }
    }
 

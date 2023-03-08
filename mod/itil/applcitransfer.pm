@@ -86,9 +86,6 @@ sub new
                 searchable    =>0,
                 dataobjattr   =>'applcitransfer.configitems'),
 
-
-
-
       new kernel::Field::Contact(
                 name          =>'eapplackuser',
                 group         =>'eapprove',
@@ -150,6 +147,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'transferdt',
                 group         =>'transfer',
+                htmldetail    =>'NotEmpty',
                 label         =>'Transferdate',
                 dataobjattr   =>'applcitransfer.transferdt'),
 
@@ -288,13 +286,13 @@ sub Validate
 
       my %ci;
       foreach my $srec (@{$eapplrec->{systems}}){
-         $ci{'w5base://itil::system/Show/'.$srec->{systemid}."/fullname"}++;
+         $ci{'w5base://itil::system/Show/'.$srec->{systemid}."/name"}++;
       }
       foreach my $srec (@{$eapplrec->{swinstances}}){
          $ci{'w5base://itil::swinstance/Show/'.$srec->{id}."/fullname"}++;
       }
       foreach my $srec (@{$eapplrec->{applurl}}){
-         $ci{'w5base://itil::applurl/Show/'.$srec->{id}."/fullname"}++;
+         $ci{'w5base://itil::lnkapplurl/Show/'.$srec->{id}."/fullname"}++;
       }
       $newrec->{configitems}=join("\n",sort(keys(%ci)));
    }
@@ -318,18 +316,89 @@ sub ProcessTransfer
    my $items=$self->extractAdresses($rec->{'configitems'});
 
    my $newdatabossid=$cappl->{databossid};
+   my $newapplid=$cappl->{id};
 
-   my $o=getModuleObject($self->Config,"itil::system");
-   my $op=$o->Clone();
+   my $lc=getModuleObject($self->Config,"base::lnkcontact");
 
-   my @ids=@{$items->{"itil::system"}};
-   $o->SetFilter({id=>\@ids});
-   foreach my $oldrec ($o->getHashList(qw(ALL))){
-      push(@$tlog,"transfer system $oldrec->{id} : $oldrec->{fullname}");
-      $op->ValidatedUpdateRecord($oldrec,
-         {databossid=>$newdatabossid},
-         {id=>$oldrec->{id}}
-      );
+   if (exists($items->{"itil::lnkapplurl"})){
+      my $o=getModuleObject($self->Config,"itil::lnkapplurl");
+      my @ids=@{$items->{"itil::lnkapplurl"}};
+      $o->SetFilter({id=>\@ids});
+      foreach my $oldrec ($o->getHashList(qw(ALL))){
+         if ($newapplid ne ""){
+            my $op=$o->Clone();
+            push(@$tlog,"set new applid on lnkapplurl ".
+                        "$oldrec->{id} : $oldrec->{fullname}");
+            $op->ValidatedUpdateRecord($oldrec,
+               {applid=>$newapplid},
+               {id=>$oldrec->{id}}
+            );
+         }
+      }
+   }
+   if (exists($items->{"itil::swinstance"})){
+      my $o=getModuleObject($self->Config,"itil::swinstance");
+      my @ids=@{$items->{"itil::swinstance"}};
+      $o->SetFilter({id=>\@ids});
+      foreach my $oldrec ($o->getHashList(qw(ALL))){
+         if ($newdatabossid ne ""){
+            my $op=$o->Clone();
+            push(@$tlog,"databoss set on swinstance ".
+                        "$oldrec->{id} : $oldrec->{fullname}");
+            $op->ValidatedUpdateRecord($oldrec,
+               {databossid=>$newdatabossid},
+               {id=>$oldrec->{id}}
+            );
+         }
+         if ($newapplid ne ""){
+            my $op=$o->Clone();
+            push(@$tlog,"set new applid on swinstance ".
+                        "$oldrec->{id} : $oldrec->{fullname}");
+            $op->ValidatedUpdateRecord($oldrec,
+               {applid=>$newapplid},
+               {id=>$oldrec->{id}}
+            );
+         }
+      }
+   }
+   if (exists($items->{"itil::system"})){
+      my $o=getModuleObject($self->Config,"itil::system");
+      my $lsys=getModuleObject($self->Config,"itil::lnkapplsystem");
+      my @ids=@{$items->{"itil::system"}};
+      $o->SetFilter({id=>\@ids});
+      foreach my $oldrec ($o->getHashList(qw(ALL))){
+         if ($newdatabossid ne ""){
+            my $op=$o->Clone();
+            push(@$tlog,"databoss set on system ".
+                        "$oldrec->{id} : $oldrec->{fullname}");
+            $op->ValidatedUpdateRecord($oldrec,
+               {databossid=>$newdatabossid},
+               {id=>$oldrec->{id}}
+            );
+         }
+         $lsys->SetFilter({applid=>[$eappl->{id}],systemid=>[$oldrec->{id}]});
+         foreach my $lrec ($lsys->getHashList(qw(ALL))){
+            my $op=$lsys->Clone();
+            push(@$tlog,"transfer appl for system ".
+                        "$oldrec->{id} : $oldrec->{fullname}");
+            $op->ValidatedUpdateRecord($oldrec,
+               {applid=>$cappl->{id}},
+               {id=>$lrec->{id}}
+            );
+         }
+         foreach my $crec (@{$oldrec->{contacts}}){
+            push(@$tlog,"delete contact ".$crec->{targetname}." system ".
+                        ": $oldrec->{name}");
+            $lc->ValidatedDeleteRecord($crec);
+         }
+         if (1){
+            my $op=$o->Clone();
+            push(@$tlog,"add default contacts from appl to ".
+                        "$oldrec->{name}");
+            $op->addDefContactsFromAppl($oldrec->{id},$cappl);
+         }
+         
+      }
    }
 
 
@@ -349,6 +418,12 @@ sub FinishWrite
       my $o=getModuleObject($self->Config,"itil::appl");
       $o->SetFilter({id=>[$eapplid,$capplid]});
       my @l=$o->getHashList(qw(ALL));
+      my $capplname;
+      my $eapplname;
+      foreach my $arec (@l){
+         $capplname=$arec->{name} if ($arec->{id} eq $capplid);
+         $eapplname=$arec->{name} if ($arec->{id} eq $eapplid);
+      }
 
       foreach my $arec (@l){
          my $direction;
@@ -367,17 +442,24 @@ sub FinishWrite
                },{},sub{
             my ($subject,$ntext);
             my $subject=$self->T("CI Trans $direction",'itil::applcitransfer');
+            if ($direction eq "CApprove"){
+               $subject.=" ".$capplname;
+            }
+            if ($direction eq "EApprove"){
+               $subject.=" ".$eapplname;
+            }
             my $ntext=$self->T("Dear databoss",'kernel::QRule');
             $ntext.=",\n\n";
 
-            $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
-            $ntext.="Approve notwendig ist.";
-            $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
-            $ntext.="Approve notwendig ist.";
-            $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
-            $ntext.="Approve notwendig ist.";
-            $ntext.="bla bla bla am Anfrang um zu erklären, dass ein ";
-            $ntext.="Approve notwendig ist.";
+            $ntext.=$self->getParsedTemplate(
+                    "tmpl/applcitransfer.".$direction.".prolog",
+               {
+                  static  =>{
+                           CAPPL=>$capplname,
+                           EAPPL=>$eapplname
+                  }
+               }
+            );
             $ntext.="\n\n";
 
             my $baseurl=$ENV{SCRIPT_URI};
@@ -558,18 +640,24 @@ sub Approve
          my $userid=$self->getCurrentUserId();
          my %updrec;
          if ($mode eq "EApprove"){
-            %updrec=(
-               eapplackuserid=>$userid,
-               eapplackdate=>NowStamp("en") 
-            );
+            if ($rec->{eapplackdate} eq ""){
+               %updrec=(
+                  eapplackuserid=>$userid,
+                  eapplackdate=>NowStamp("en") 
+               );
+            }
          }
          if ($mode eq "CApprove"){
-            %updrec=(
-               capplackuserid=>$userid,
-               capplackdate=>NowStamp("en") 
-            );
+            if ($rec->{capplackdate} eq ""){
+               %updrec=(
+                  capplackuserid=>$userid,
+                  capplackdate=>NowStamp("en") 
+               );
+            }
          }
-         $self->ValidatedUpdateRecord($rec,\%updrec,{id=>$rec->{id}});
+         if (keys(%updrec)){
+            $self->ValidatedUpdateRecord($rec,\%updrec,{id=>$rec->{id}});
+         }
 
          # reread rec
          $self->ResetFilter();
@@ -595,6 +683,14 @@ sub Approve
    #
    #
    #
+   print($self->getParsedTemplate("tmpl/applcitransfer.".$mode.".prolog",
+      {
+         static  =>{
+                  CAPPL=>$rec->{cappl},
+                  EAPPL=>$rec->{eappl}
+         }
+      }
+   ));
    if ($mode eq "EApprove"){
       if ($rec->{eapplackdate} eq ""){
          print($self->getParsedTemplate("tmpl/applcitransfer.".$mode.".edit",

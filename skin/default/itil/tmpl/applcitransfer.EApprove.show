@@ -1,5 +1,11 @@
 Emitting approval for application %EAPPL% already done by ...<br>
 %EAPPLACKUSER%<br>
-... at ...<br>
-%EAPPLACKDATE%<br>
+... at %EAPPLACKDATE%<br>
+<script language="JavaScript">
+window.setTimeout(function(){
+   window.location.pathname="/";
+
+},5000);
+</script>
+
 

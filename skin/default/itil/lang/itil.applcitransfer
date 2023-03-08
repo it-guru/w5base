@@ -2,6 +2,36 @@
   de=>'Anwendungs-Config-Item Transfer',
   en=>'Application ConfigItem Transfer'
 },
+'fieldgroup.transitems'=>{de=>'Config-Items',en=>'Config-Items'},
+'fieldgroup.transfer'=>{de=>'Transfer-Operation',en=>'Transfer-Operation'},
+'Transferdate'=>{de=>'Transfer-Datum'},
 'emitting Application'=>{de=>'abgebende Anwendung'},
 'collecting Application'=>{de=>'aufnehmende Anwendung'},
 'approve check box not checked'=>{de=>'Bestätigungs-Checkbox nicht angekreuzt'},
+'CI Trans CApprove'=>{
+ de=>'CI-Transfer-Genehmigung für aufnehmende Anwendung',
+ en=>'CI-Transfer-Approval for collecting application'
+},
+'CI Trans EApprove'=>{
+ de=>'CI-Transfer-Genehmigung für abgebende Anwendung',
+ en=>'CI-Transfer-Approval for emitting application'
+},
+'emitting application approver'=>{
+  de=>'abgebende Anwendung Genehmiger'
+},
+'collecting application approver'=>{
+  de=>'aufnehmend Anwendung Genehmiger'
+},
+'emitting application approve date'=>{
+  de=>'abgebende Anwendung Genehmigungsdatum'
+},
+'collecting application approve date'=>{
+  de=>'aufnehmend Anwendung Genehmigungsdatum'
+},
+'emitting application approve comment'=>{
+  de=>'abgebende Anwendung Genehmigungsbemerkung'
+},
+'collecting application approve comment'=>{
+  de=>'aufnehmend Anwendung Genehmigungsbemerkung'
+},
+
