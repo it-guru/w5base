@@ -3274,6 +3274,75 @@ sub QRuleSyncCloudSystem
 }
 
 
+sub addDefContactsFromAppl
+{
+   my $self=shift;
+   my $identifyby=shift;
+   my $w5applrec=shift;
+   my $curdataboss=shift;
+
+   $curdataboss=$w5applrec->{databossid} if (!defined($curdataboss));
+
+   my $SelfAsParentObject=$self->SelfAsParentObject();
+
+   my %addwr=();
+   foreach my $fld (qw(tsmid tsm2id opmid opm2id applmgrid 
+                       databossid contacts)){
+      if ($fld eq "contacts"){
+         foreach my $crec (@{$w5applrec->{contacts}}){
+            my $roles=$crec->{roles};
+            $roles=[$roles] if (ref($roles) ne "ARRAY");
+            if (in_array($roles,"write") &&
+                $crec->{targetid} ne ""){
+               $addwr{$crec->{target}}->{$crec->{targetid}}++;
+            }
+         } 
+      }
+      else{
+         if ($w5applrec->{$fld} ne "" && 
+             $w5applrec->{$fld} ne $curdataboss){
+            $addwr{'base::user'}->{$w5applrec->{$fld}}++;
+         }
+      }
+   }
+   my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
+   $lnkcontact->SetFilter({
+      refid=>\$identifyby,
+      parentobj=>[$SelfAsParentObject],
+   });
+   my @cur=$lnkcontact->getHashList(qw(ALL));
+   $lnkcontact->ResetFilter();
+   foreach my $ctype (keys(%addwr)){
+      foreach my $contactid (keys(%{$addwr{$ctype}})){
+         my @old=grep({
+            $_->{target} eq $ctype && $_->{targetid} eq $contactid
+         } @cur);
+         if ($#old==-1){
+            $lnkcontact->ValidatedInsertRecord({
+               target=>$ctype,
+               targetid=>$contactid,
+               roles=>['write'],
+               refid=>$identifyby,
+               comments=>"inherited by application",
+               parentobj=>$self->SelfAsParentObject()
+            });   
+         }
+         else{
+            my @curroles=$old[0]->{roles};
+            if (ref($curroles[0]) eq "ARRAY"){
+               @curroles=@{$curroles[0]};
+            }
+            if (!in_array(\@curroles,"write")){
+               $lnkcontact->ValidatedUpdateRecord($old[0],{
+                  roles=>[@curroles,'write'],
+               },{id=>\$old[0]->{id}});   
+            }
+         }
+      }
+   }
+}
+
+
 
 
 
