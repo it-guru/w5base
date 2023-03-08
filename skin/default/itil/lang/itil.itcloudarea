@@ -1,4 +1,4 @@
-'itil::itCloudArea'=>{de=>'CloudArea',en=>'CloudArea'},
+'itil::itcloudarea'=>{de=>'CloudArea',en=>'CloudArea'},
 'fieldgroup.appl'=>{de=>'Anwendungs-Informationen',en=>'Application informations'},
 'fieldgroup.cloudinfo'=>{de=>'Cloud-Informationen',en=>'Cloud informations'},
 'fieldgroup.inm'=>{de=>'Incident Management',en=>'Incident Management'},

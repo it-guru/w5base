@@ -138,6 +138,7 @@
 'itil.proc.mgmtitemgroup.lnkmgmtitemgroup'=>{de=>'Zuordnungen',en=>'Relations'},
 'itil.proc.mgmtitemgroup.lnkcontact'=>{de=>'Verkn. Kontakt',en=>'Link Contact'},
 'itil.proc.riskmgmt'=>{de=>'Risikomanagement',en=>'Riskmanagement'},
+'itil.proc.applcitrans'=>{de=>'Anw.-CI-Transfer',en=>'Appl-CI-Transfer'},
 'itu'=>{de=>'IT-Universum',en=>'IT-Universe'},
 'itu.cloud'=>{de=>'Cloud-Systeme',en=>'Cloud-Systems'},
 'itu.proc'=>{de=>'Workflow-Systeme',en=>'Workflow-Systems'},

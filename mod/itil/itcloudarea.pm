@@ -730,6 +730,7 @@ sub FinishWrite
    my $newrec=shift;
 
    my $doNotify=0;
+   msg(INFO,"FinishWrite itil::itcloudare");
    if (!defined($oldrec)){
       if (exists($newrec->{cistatusid}) &&
           $newrec->{cistatusid}==3){
@@ -761,6 +762,7 @@ sub FinishWrite
           $oldrec->{applid} ne $newrec->{applid}){
          $doNotify=1;
       }
+
       if ($oldrec->{cistatusid}!=4){
          if (defined($newrec) &&
              exists($newrec->{cistatusid}) &&
@@ -768,6 +770,8 @@ sub FinishWrite
             if (!defined($oldrec) || $oldrec->{cifirstactivation} eq ""){
                $doNotify=3;  # send activation mail only if they isn't send
             }                # already
+
+
             my $oldapplid=$oldrec->{previousapplid};
             if ($oldapplid eq ""){
                $oldapplid=$oldrec->{respapplid};
@@ -775,16 +779,22 @@ sub FinishWrite
             my $newapplid=effVal($oldrec,$newrec,"applid");
             if ($oldapplid ne "" &&
                 $newapplid ne $oldapplid){ # responsibility change
-               msg(INFO,"responsibity change for $oldrec->{fullname} ".
-                        "$oldapplid -> $newapplid");
+               msg(INFO,
+                   "responsibity application change for $oldrec->{fullname} ".
+                   "$oldapplid -> $newapplid");
                my $configitems="";
                foreach my $srec (@{$oldrec->{systems}}){
                   $configitems.="\n" if ($configitems ne "");
                   $configitems.="w5base://itil::system/Show/".
                                 $srec->{id}."/fullname";
                }
+               if ($configitems eq ""){
+                  msg(INFO,"itil::itcloudare no configitems to transfer");
+               }
                my $o=getModuleObject($self->Config,"itil::applcitransfer");
                if ($configitems ne "" && defined($o)){
+                  msg(INFO,
+                      "FinishWrite itil::itcloudare create transfer record");
                   $o->ValidatedInsertRecord({
                      capplid=>$newapplid,
                      eapplid=>$oldapplid,
@@ -792,7 +802,6 @@ sub FinishWrite
                   });
                }
             }
-
 
          }
       }
@@ -803,6 +812,7 @@ sub FinishWrite
           $newrec->{cistatusid} eq "4"){
          $doNotify=0;
       }
+
    }
    if ($doNotify){
       # send a mail to system/cluster databoss with cc on current user
