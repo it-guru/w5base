@@ -165,8 +165,7 @@ sub qcheckRecord
             cistatusid=>"<6"
          }]
       );
-      my @cursys=$sys->getHashList(qw(id srcid cistatusid));
-      #printf STDERR ("fifi cursys=%s\n",Dumper(\@cursys));
+      my @cursys=$sys->getHashList(qw(id srcid cistatusid itcloudareaid));
 
       my @delsys;
       my @inssys;
@@ -175,7 +174,8 @@ sub qcheckRecord
       foreach my $sysrec (@cursys){
          my $srcid=$sysrec->{srcid};
          if (exists($srcid{$srcid})){
-            if ($sysrec->{cistatusid} ne "4"){
+            if ($sysrec->{cistatusid} ne "4" ||
+                $sysrec->{itcloudareaid} ne $rec->{id}){
                $srcid{$srcid}->{op}="upd";
             }
             else{
@@ -195,6 +195,17 @@ sub qcheckRecord
          }
          elsif($srcid{$srcid}->{op} eq "upd"){
             push(@updsys,$srcid);
+         }
+      }
+
+      if ($#updsys!=-1){
+         $sys->ResetFilter();
+         $sys->SetFilter({srcsys=>'AWS',srcid=>\@updsys});
+         foreach my $oldrec ($sys->getHashList(qw(ALL))){
+            my $op=$sys->Clone();
+            $op->ValidatedUpdateRecord($oldrec,{
+                 cistatusid=>'4',itcloudareaid=>$rec->{id}
+            },{id=>$oldrec->{id}});
          }
       }
 
