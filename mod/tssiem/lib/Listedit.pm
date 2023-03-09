@@ -88,7 +88,8 @@ sub getSecscanFromSQL
          "order by launch_datetime desc),1,1,0) islatest,".
          "($PerspectiveDecode) scanperspective ".
          "from W5SIEM_secscan ".
-         "where launch_datetime>current_date-100 ".  #Scan needs from last 100d
+         "where importdate is not null and ".  #only secscans with fine data
+         "launch_datetime>current_date-100 ".  #Scan needs from last 100d
          "order by ictoid";
 
    return($d);

@@ -42,6 +42,15 @@ sub new
                 dataobjattr   =>"secscan.ictoid"),  # In Zukunft sollte die dann
                                             # irgendwann optional sein
 
+      new kernel::Field::TextDrop(
+                name          =>'appl',
+                label         =>'Application',
+                htmldetail    =>'NotEmpty',
+                group         =>'scan',
+                vjointo       =>'itil::appl',
+                vjoinon       =>['applid'=>'id'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::Text(
                 name          =>'itscanobjectid',
                 htmldetail    =>'NotEmpty',
@@ -307,7 +316,7 @@ sub new
 
       new kernel::Field::Text(
                 name          =>'scanname',
-                label         =>'Scan Title',
+                label         =>'Security Scan Title',
                 sqlorder      =>'NONE',
                 weblinkto     =>'tssiem::secscan',
                 weblinkon     =>['scanqref'=>'qref'],
@@ -317,14 +326,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'scanqref',
                 group         =>'scan',
-                label         =>'Scan-ID',
+                label         =>'Security Scan ID',
                 dataobjattr   =>'secscan.ref'),
 
       new kernel::Field::Link(
                 name          =>'scanid',
-                label         =>'Scan ID',
+                label         =>'Security Scan ID',
                 group         =>'scan',
-                dataobjattr   =>"secscan.id"),
+                dataobjattr   =>"secscan.ref"),
 
       new kernel::Field::Textarea(
                 name          =>'results',
