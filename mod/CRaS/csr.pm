@@ -172,6 +172,17 @@ sub new
                 label         =>'Application ID',
                 dataobjattr   =>'csr.applid'),
 
+      new kernel::Field::Select(
+                name          =>'caname',
+                label         =>'sign request CA',
+                selectfix     =>1,
+                htmleditwidth =>'150px',
+                group         =>['default','request'],
+                vjointo       =>'CRaS::ca',
+                vjoindisp     =>'name',
+                vjoinon       =>['caname'=>'name'],
+                dataobjattr   =>'csr.caname'),
+
       new kernel::Field::TextDrop(
                 name          =>'appl',
                 label         =>'related application',

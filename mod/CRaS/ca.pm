@@ -1,6 +1,6 @@
-package CRaS::csteam;
+package CRaS::ca;
 #  W5Base Framework
-#  Copyright (C) 2021  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2023  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -36,131 +36,128 @@ sub new
                 sqlorder      =>'desc',
                 group         =>'source',
                 label         =>'W5BaseID',
-                dataobjattr   =>'csteam.id'),
+                dataobjattr   =>'CRaSca.id'),
                                                   
       new kernel::Field::Text(
                 name          =>'name',
                 htmlwidth     =>'150px',
                 label         =>'Name',
-                dataobjattr   =>'csteam.name'),
+                dataobjattr   =>'CRaSca.name'),
 
+      new kernel::Field::Text(
+                name          =>'name',
+                htmlwidth     =>'150px',
+                label         =>'Name',
+                dataobjattr   =>'CRaSca.name'),
 
-      new kernel::Field::TextDrop(
-                name          =>'orgarea',
-                label         =>'oranisational area',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['orgareaid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+      new kernel::Field::Select(
+                name          =>'sprocess',
+                htmlwidth     =>'150px',
+                label         =>'sign process',
+                value         =>['STEAM','INTERNAL'],
+                transprefix   =>'SP.', 
+                dataobjattr   =>'CRaSca.signprocess'),
 
-      new kernel::Field::Link(
-                name          =>'orgareaid',
-                selectfix     =>1,
-                dataobjattr   =>'csteam.orgarea'),
+      new kernel::Field::Boolean(
+                name          =>'isdefault',
+                htmlwidth     =>'150px',
+                label         =>'Default',
+                dataobjattr   =>'CRaSca.isdefault'),
 
+      new kernel::Field::Text(
+                name          =>'valid_c',
+                htmlwidth     =>'150px',
+                label         =>'target C',
+                dataobjattr   =>'CRaSca.valid_c'),
 
-      new kernel::Field::TextDrop(
-                name          =>'grp',
-                label         =>'service team',
-                vjointo       =>'base::grp',
-                vjoineditbase =>{'cistatusid'=>[3,4]},
-                vjoinon       =>['grpid'=>'grpid'],
-                vjoindisp     =>'fullname'),
+      new kernel::Field::Text(
+                name          =>'valid_o',
+                htmlwidth     =>'150px',
+                label         =>'target O',
+                dataobjattr   =>'CRaSca.valid_o'),
 
-      new kernel::Field::Link(
-                name          =>'grpid',
-                selectfix     =>1,
-                dataobjattr   =>'csteam.grp'),
+      new kernel::Field::Text(
+                name          =>'valid_st',
+                htmlwidth     =>'150px',
+                label         =>'target ST',
+                dataobjattr   =>'CRaSca.valid_st'),
 
+      new kernel::Field::Text(
+                name          =>'valid_l',
+                htmlwidth     =>'150px',
+                label         =>'target L',
+                dataobjattr   =>'CRaSca.valid_l'),
 
       new kernel::Field::Textarea(
                 name          =>'comments',
                 label         =>'Comments',
-                dataobjattr   =>'csteam.comments'),
+                dataobjattr   =>'CRaSca.comments'),
 
-
-      new kernel::Field::Text(
-                name          =>'srcsys',
-                group         =>'source',
-                label         =>'Source-System',
-                dataobjattr   =>'csteam.srcsys'),
-                                                   
-      new kernel::Field::Text(
-                name          =>'srcid',
-                group         =>'source',
-                label         =>'Source-Id',
-                dataobjattr   =>'csteam.srcid'),
-                                                   
-      new kernel::Field::Date(
-                name          =>'srcload',
-                group         =>'source',
-                label         =>'Source-Load',
-                dataobjattr   =>'csteam.srcload'),
 
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Creation-Date',
-                dataobjattr   =>'csteam.createdate'),
+                dataobjattr   =>'CRaSca.createdate'),
                                                   
       new kernel::Field::MDate(
                 name          =>'mdate',
                 group         =>'source',
                 sqlorder      =>'desc',
                 label         =>'Modification-Date',
-                dataobjattr   =>'csteam.modifydate'),
+                dataobjattr   =>'CRaSca.modifydate'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
                 group         =>'source',
                 label         =>'primary sync key',
-                dataobjattr   =>"csteam.modifydate"),
+                dataobjattr   =>"CRaSca.modifydate"),
 
       new kernel::Field::Interface(
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(csteam.id,35,'0')"),
+                dataobjattr   =>"lpad(CRaSca.id,35,'0')"),
 
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
                 label         =>'Creator',
-                dataobjattr   =>'csteam.createuser'),
+                dataobjattr   =>'CRaSca.createuser'),
 
       new kernel::Field::Owner(
                 name          =>'owner',
                 group         =>'source',
                 label         =>'last Editor',
-                dataobjattr   =>'csteam.modifyuser'),
+                dataobjattr   =>'CRaSca.modifyuser'),
 
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
                 label         =>'Editor Account',
-                dataobjattr   =>'csteam.editor'),
+                dataobjattr   =>'CRaSca.editor'),
 
       new kernel::Field::RealEditor(
                 name          =>'realeditor',
                 group         =>'source',
                 label         =>'real Editor Account',
-                dataobjattr   =>'csteam.realeditor'),
+                dataobjattr   =>'CRaSca.realeditor'),
    
 
    );
-   $self->setDefaultView(qw(name id grp cdate mdate));
-   $self->setWorktable("csteam");
+   $self->setDefaultView(qw(name id cdate mdate));
+   $self->setWorktable("CRaSca");
    return($self);
 }
 
 
-sub getRecordImageUrl
-{
-   my $self=shift;
-   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/base/load/grp.jpg?".$cgi->query_string());
-}
+#sub getRecordImageUrl
+#{
+#   my $self=shift;
+#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+#   return("../../../public/base/load/grp.jpg?".$cgi->query_string());
+#}
 
 
 sub Validate
@@ -173,6 +170,13 @@ sub Validate
        $newrec->{name}=~m/^\s*$/){
       $self->LastMsg(ERROR,"invalid name specified");
       return(0);
+   }
+
+   if (effVal($oldrec,$newrec,"isdefault") ne "1"){
+      $newrec->{isdefault}=undef;
+      if (defined($oldrec) && !$oldrec->{isdefault}){
+         delete($newrec->{isdefault});
+      }
    }
    return(1);
 }
@@ -199,15 +203,12 @@ sub isViewValid
 }
 
 
-
 sub isQualityCheckValid
 {
    my $self=shift;
    my $rec=shift;
    return(0);
 }
-
-
 
 
 

@@ -57,6 +57,11 @@ sub Init
                       func=>'New',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("Tools.CRaS.ca",
+                      "CRaS::ca",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    return($self);
 }
 

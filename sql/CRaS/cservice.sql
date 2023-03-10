@@ -56,3 +56,22 @@ create table csr (
    FOREIGN KEY fk_csteam (csteam) REFERENCES csteam (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table csr add sslaltnames longtext;
+create table CRaSca (
+   PRIMARY KEY (id),
+   id             bigint(20) NOT NULL,
+   name           varchar(20) NOT NULL,
+   isdefault      int(1),   signprocess varchar(20) NOT NULL,
+   valid_c        varchar(255),
+   valid_o        varchar(255),
+   valid_st       varchar(255),
+   valid_l        varchar(255),
+   comments       longtext default NULL,
+   createdate     datetime NOT NULL default '0000-00-00 00:00:00',
+   modifydate     datetime NOT NULL default '0000-00-00 00:00:00',
+   createuser     bigint(20) NOT NULL default '0',
+   modifyuser     bigint(20) NOT NULL default '0',
+   editor         varchar(100) NOT NULL default '',
+   realeditor     varchar(100) NOT NULL default '',
+   UNIQUE KEY `name` (name), UNIQUE key `isdefault` (isdefault)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+alter table csr add caname varchar(20) not null;
