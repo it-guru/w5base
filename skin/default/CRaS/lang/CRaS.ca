@@ -1,0 +1,18 @@
+'CRaS::ca'=>{
+   de=>'CRaS: Certificate Authority (CA)',
+   en=>'CRaS: Certificate Authority (CA)',
+},
+'sign process'=>{de=>'Signierungsprozess'},
+'target C'=>{de=>'Vorgabe C'},
+'target O'=>{de=>'Vorgabe O'},
+'target ST'=>{de=>'Vorgabe ST'},
+'target L'=>{de=>'Vorgabe L'},
+'SP.STEAM'=>{
+   de=>'Service Team',
+   en=>'Service Team',
+},
+'SP.INTERNAL'=>{
+   de=>'internal',
+   en=>'internal',
+}
+
