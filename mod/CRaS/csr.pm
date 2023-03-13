@@ -372,6 +372,12 @@ sub new
                     $name=~s/^[^a-z0-9]+//i;
                     $name="CertificateSigningRequest" if ($name eq "");
                     return($name.".csr");
+                },
+                onFinishWrite=>sub{
+                   my $self=shift;
+                   my $oldrec=shift;
+                   my $newrec=shift;
+                   return(undef);
                 }),
   
       new kernel::Field::File(
@@ -760,45 +766,30 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-#   if ($self->isDataInputFromUserFrontend() && !defined($oldrec)){
-#      if ($newrec->{sslcert} eq ""){
-#$newrec->{sslcert}=<<EOF;
-#-----BEGIN CERTIFICATE REQUEST-----
-#MIIE9DCCAtwCAQAwga4xCzAJBgNVBAYTAkRFMQwwCgYDVQQIDANOUlcxDTALBgNV
-#BAcMBEJvbm4xITAfBgNVBAoMGERldXRzY2hlIFRlbGVrb20gSVQgR21iSDEXMBUG
-#A1UECwwOVGVsZWtvbS1JVCBQVkcxHjAcBgNVBAMMFXNob3BwbGFuZXIudGVsZWtv
-#bS5kZTEmMCQGCSqGSIb3DQEJARYXamFuLmthbmRhQHQtc3lzdGVtcy5jb20wggIi
-#MA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDBXfpSunBMPInekJ1tfVOq0shs
-#WHIjXEN+HhjSEgmYmER9h+Piy7nZ0FNlBR2Ii2bqwc64NTNarxUjHEc4751QEtFr
-#FZ89MNQpv0iQmtbvIEx0UYdzG/+m6HoHpPjFputw7Jh9iDe2r4FNjR5+rck66Dv2
-#noCtthhz/r+S4Rvj7DtK2igxflLHaujkivV70GF5bsP4HXqpo5r7DC22KsaBKqpF
-#6TI28O4VpZUTYXktaECJmaoLYzUr4dwZXTX2OufDJALu0azk6ZVFxhrJsXJAeJ8K
-#gqIcbkS+1+vtVg4/H5cfCQWNfw0M7eYl/tsk+L5CiRA1lXsb7J2+/5EZmgTnDhrL
-#Z++WsfhsFW8T+n1hI0TAlTfYCJ/TvYjHFhiM9EfaqMw9dC3id50K2W8OeDMaqy3G
-#P4iolbVhBaH8HYXRphpTObD5HEh4fRrNmjTHsSwOeJd/GrWY3m5okjtMhxy4Mp4a
-#9lyxBCHUMRoL4ycH69djIayMO5VUnwtxm2iZvNV/Iwct7odHyHhDDolbKinK5Zry
-#ZJGzib9HjiXcY2vU1Wc/YCGKTOyYtTgs7KG1MyQ8VAK1ge7trRw4EfgTVLZqXzZ6
-#NNqlcCHuZb6uKfWbbFFeUZjhabCrbogx+bSwzkRVCthP4WeKwlIJ1l2D3+eIDQ2k
-#k61yx/wZVmLJmNamMQIDAQABoAAwDQYJKoZIhvcNAQELBQADggIBAAkH6nr064K+
-#k1zekqu1c14poD5MJ3ObizY8RxsAcjpVFbXqPQxfU9vRbqMJRpgSc9DOtXyWxS+c
-#wNQlHgLiEIgyQ9W8LN+glg+g5t5QwuAbdd/qXXGQCyle8fkvXrkfV/GrDBKoC5Pi
-#BplZZdBAW0wwZKmyDpko0d5HjqMdxXGSZlECCoSeTh0v+82FbPca221f28jYJMSp
-#A12QugNO+TAm25+xAXU8ZkSl8AZL2Z8SYNTUgSQSYRc9pOr4w9xSCTH3jXBLYh64
-#OblTH+8GDl7+4tcTn+86Dm99iJV71/jddZslQM2mw6gWsvbGQn/djD1Dj35yM/Fn
-#q3asPXwmwZ33/AOCWrTsejfh6lO5Ujo28RtynqhLdw3WSrTc41bBIDiAL7gxW8yY
-#zP+Qs3xlphOqGlPHxuaeAKTXTHC2axa4GMSA15f+qSnVBhaBsfGew/SOqodbUCj5
-#teblY+jsRAPBrxO4cxQ/6aM5morEPNkeh4N86y6XIJBwH6Gn0ote92kk7X0331t0
-#sjE8ipHjZeA4R+4G/FuQotrxkge/KRjb5Q/mXW3/oKN/ZPI1zp+PHu6wSue8GIjF
-#7MOb5z/4YrkCfgfayYN9PVfuZfsg5gmESJil5SP/lfqz6mE9mvOTRc+IL4jSHdEh
-#m2U/7Rd5u0FxEoIjT84/wX1GIBmp0+sW
-#-----END CERTIFICATE REQUEST-----
-#EOF
-#      }
-#   }
-   #if (effVal($oldrec,$newrec,'shortdesc') eq '') {
-   #   $self->LastMsg(ERROR,"No brief description specified");
-   #   return(0);
-   #}
+
+   my $cao=getModuleObject($self->Config,'CRaS::ca');
+   my $caname=effVal($oldrec,$newrec,"caname");
+   my $carec;
+   if ($caname eq ""){
+      $cao->SetFilter({isdefault=>\'1'});
+      my ($rec)=$cao->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
+         $newrec->{caname}=$rec->{name};
+         $carec=$rec;
+      }
+   }
+   else{
+      $cao->SetFilter({name=>\$caname});
+      my ($rec)=$cao->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
+         $carec=$rec;
+      }
+   }
+   if (!defined($carec)){
+      $self->LastMsg(ERROR,"no target CA identifiable");
+      return(0);
+   }
+
 
    my $csteamaccess=0;
    if (!defined($oldrec)){
@@ -886,42 +877,21 @@ sub Validate
 
    if (effChangedVal($oldrec,$newrec,'sslcert')) {
       my $sslcertfile=effVal($oldrec,$newrec,"sslcert");
-
-      Crypt::PKCS10->setAPIversion(0);
-      my $pkcs;
-      # try multiple file formats
-      eval('$pkcs=Crypt::PKCS10->new($sslcertfile);');
-      if ($@ ne "") {
-         $self->LastMsg(ERROR,"Unknown file format - PKCS10 required");
+      my $crec=$self->unpackCertSignRequest(0,$sslcertfile);
+      if (!defined($crec)){
          return(0);      
       }
-   
-      # Subject
-      $newrec->{ssslsubject}=$pkcs->subject();
-
-      # Name
-      $newrec->{name}=$pkcs->commonName();
-      $newrec->{sslcertcommon}=$pkcs->commonName();
-      $newrec->{sslcertorg}=$pkcs->organizationName();
-
-      my @altnames;
-
-      if ($pkcs->can("extensionValue")){
-         my @names = $pkcs->extensionValue('subjectAltName' );
-         if ($#names==0 && ref($names[0]) eq "ARRAY"){
-            @names=@{$names[0]};
-         }
-         
-         foreach my $nrec (@names){
-            if ($nrec->{dNSName} ne ""){
-               push(@altnames,$nrec->{dNSName});
-            }
-         }
+      if ($self->verifyCSRtoCA(0,$carec,$crec)){
+         $newrec->{name}=$crec->{name};
+         $newrec->{sslcertorg}=$crec->{o} if ($crec->{o} ne "");
+         $newrec->{sslcertcommon}=$crec->{cn} if ($crec->{cn} ne "");
+         $newrec->{sslaltnames}=$crec->{altnames} if ($crec->{altnames} ne "");
       }
-      if ($#altnames!=-1){
-         $newrec->{sslaltnames}=join("; ",sort(@altnames));
+      else{
+         return(0);
       }
    }
+
    if (exists($newrec->{'ssslcert'})) {
       my $x509=$self->readPEM(effVal($oldrec,$newrec,'ssslcert'));
       if (!defined($x509)){
@@ -950,6 +920,157 @@ sub Validate
    return(1);
 }
 
+
+sub validateCertSignRequest
+{
+   my $self=shift;
+   my $carec=shift;
+   my $crec=shift;
+
+
+   return(0);
+}
+
+
+sub unpackCertSignRequest
+{
+   my $self=shift;
+   my $silent=shift;
+   my $sslcertfile=shift;
+
+   Crypt::PKCS10->setAPIversion(0);
+   my $pkcs;
+   # try multiple file formats
+   eval('$pkcs=Crypt::PKCS10->new($sslcertfile);');
+   if ($@ ne "") {
+      if (!$silent){
+         $self->LastMsg(ERROR,"Unknown file format - PKCS10 required");
+      }
+      return(undef);      
+   }
+   my $crec={};
+   
+   $crec->{subject}=$pkcs->subject();
+
+   if ($pkcs->can('commonName')){
+      $crec->{name}=$pkcs->commonName();
+      $crec->{cn}=$pkcs->commonName();
+   }
+   if ($pkcs->can('organizationName')){
+      $crec->{o}=$pkcs->organizationName();
+   }
+   if ($pkcs->can('organizationalUnitName')){
+      $crec->{ou}=$pkcs->organizationalUnitName();
+   }
+   if ($pkcs->can('countryName')){
+      $crec->{c}=$pkcs->countryName();
+   }
+   if ($pkcs->can('stateOrProvinceName')){
+      $crec->{st}=$pkcs->stateOrProvinceName();
+   }
+   if ($pkcs->can('localityName')){
+      $crec->{l}=$pkcs->localityName();
+   }
+
+   my @altnames;
+
+   if ($pkcs->can("extensionValue")){
+      my @names = $pkcs->extensionValue('subjectAltName' );
+      if ($#names==0 && ref($names[0]) eq "ARRAY"){
+         @names=@{$names[0]};
+      }
+      
+      foreach my $nrec (@names){
+         if ($nrec->{dNSName} ne ""){
+            push(@altnames,$nrec->{dNSName});
+         }
+      }
+   }
+   if ($#altnames!=-1){
+      $crec->{altnames}=join("; ",sort(@altnames));
+   }
+   return($crec);
+}
+
+sub verifyCSRtoCA
+{
+   my $self=shift;
+   my $silent=shift;
+   my $carec=shift;
+   my $crec=shift;
+
+   #printf STDERR ("carec=%s\n",Dumper($carec));
+   #printf STDERR ("crec=%s\n",Dumper($crec));
+
+   if ($carec->{valid_cn} ne ""){
+      my $matchvar=$carec->{valid_cn};
+      my $res;
+      eval("\$res=\$crec->{cn}=~m$matchvar;");
+      if (!($res)){
+         if (!($silent)){
+            $self->LastMsg(ERROR,"common name not allowed for requested CA");
+         }
+         return(0);
+      }
+   }
+
+   if ($carec->{valid_c} ne ""){
+      my $matchvar=$carec->{valid_c};
+      my $res;
+      eval("\$res=\$crec->{c}=~m$matchvar;");
+      if (!($res)){
+         if (!($silent)){
+            $self->LastMsg(ERROR,"country not allowed for requested CA");
+         }
+         return(0);
+      }
+   }
+
+   if ($carec->{valid_l} ne ""){
+      my $matchvar=$carec->{valid_l};
+      my $res;
+      eval("\$res=\$crec->{l}=~m$matchvar;");
+      if (!($res)){
+         if (!($silent)){
+            $self->LastMsg(ERROR,"location not allowed for requested CA");
+         }
+         return(0);
+      }
+   }
+
+   if ($carec->{valid_o} ne ""){
+      my $matchvar=$carec->{valid_o};
+      my $res;
+      eval("\$res=\$crec->{o}=~m$matchvar;");
+      if (!($res)){
+         if (!($silent)){
+            $self->LastMsg(ERROR,"organisation not allowed for requested CA");
+         }
+         return(0);
+      }
+   }
+
+   if ($carec->{valid_st} ne ""){
+      my $matchvar=$carec->{valid_st};
+      my $res;
+      eval("\$res=\$crec->{st}=~m$matchvar;");
+      if (!($res)){
+         if (!($silent)){
+            $self->LastMsg(ERROR,"state not allowed for requested CA");
+         }
+         return(0);
+      }
+   }
+
+   if ($crec->{ou} ne ""){
+      if (!($silent)){
+         $self->LastMsg(ERROR,"OU needs to be empty");
+      }
+      return(0);
+   }
+
+   return(1);
+}
 
 
 sub FinishWrite

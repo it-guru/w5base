@@ -65,27 +65,33 @@ sub new
                 dataobjattr   =>'CRaSca.isdefault'),
 
       new kernel::Field::Text(
+                name          =>'valid_cn',
+                htmlwidth     =>'150px',
+                label         =>'CN regex',
+                dataobjattr   =>'CRaSca.valid_cn'),
+
+      new kernel::Field::Text(
                 name          =>'valid_c',
                 htmlwidth     =>'150px',
-                label         =>'target C',
+                label         =>'C regex',
                 dataobjattr   =>'CRaSca.valid_c'),
 
       new kernel::Field::Text(
                 name          =>'valid_o',
                 htmlwidth     =>'150px',
-                label         =>'target O',
+                label         =>'O regex',
                 dataobjattr   =>'CRaSca.valid_o'),
 
       new kernel::Field::Text(
                 name          =>'valid_st',
                 htmlwidth     =>'150px',
-                label         =>'target ST',
+                label         =>'ST regex',
                 dataobjattr   =>'CRaSca.valid_st'),
 
       new kernel::Field::Text(
                 name          =>'valid_l',
                 htmlwidth     =>'150px',
-                label         =>'target L',
+                label         =>'L regex',
                 dataobjattr   =>'CRaSca.valid_l'),
 
       new kernel::Field::Textarea(
