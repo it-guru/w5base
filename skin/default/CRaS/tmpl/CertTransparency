@@ -1,0 +1,80 @@
+<div id=FRAME style="margin:5px">
+<div id=WORK style="padding:5px;border-style:solid;border-width:1px;boder-color:black">
+Query Common Name (CN): <b>%CN%</b>
+
+
+<div id=OUT style="margin-top:5px;padding:5px;border-style:solid;border-width:1px;boder-color:black;overflow:auto">
+</div>
+
+
+</div>
+<div style="text-align:right">
+Query Certificate Transparencty by <a target=_blank href="https://sectigo.com/">sectigo.com</a>
+</div>
+</div>
+
+<script language="JavaScript">
+function resizeHandler(){
+   $("#FRAME").height(10);
+   $("#OUT").height(10);
+   var h=$(document).height();
+   $("#FRAME").height(h-50);
+   $("#OUT").height(h-100);
+   $("#WORK").css({'height':'100%'});
+}
+
+function startSearch(){
+   $("#OUT").html("<center><img src=\"../../base/load/ajaxloader.gif\"></center>");
+
+   $.ajax({
+          url: 'CertTransparencyCall?CN=%CN%',
+          type: "GET",
+          dataType: "json",
+          success: function(result) {
+             var d="";
+             d+="<table border=1>";
+             d+="<tr>";
+             d+="<th width=80>from</th>";
+             d+="<th width=80>to</th>";
+             d+="<th>serial</th>";
+             d+="<th>issuer</th>";
+             d+="</tr>";
+             for(var c=0;c<result.length;c++){
+                console.log("result=",result[c]);
+                var from=result[c].not_before;
+                var to=result[c].not_after;
+                var id=result[c].id;
+                var serial=result[c].serial_number;
+                var issuer=result[c].issuer_name;
+
+                from=from.replace(/T.*$/,'');
+                to=to.replace(/T.*$/,'');
+                d+="<tr>";
+                d+="<td valign=top nowrap>"+from+"</td>";
+                d+="<td valign=top nowrap>"+to+"</td>";
+                d+="<td valign=top>"+
+                   "<a target=_blank href=\"https://crt.sh/?id="+id+
+                   "\">"+
+                   serial+
+                   "</a></td>";
+                d+="<td valign=top>"+issuer+"</td>";
+                d+="</tr>";
+             }
+             d+="</table>";
+             $("#OUT").html(d);
+          }
+   });      
+
+}
+
+$(window).resize(function() {
+  resizeHandler();
+});
+
+
+$(document).ready(function(){
+   $("body").css({'backgroundColor':'#eaeaea'});
+   setTimeout(function(){resizeHandler();},100);
+   setTimeout(function(){startSearch();},500);
+});
+</script>
