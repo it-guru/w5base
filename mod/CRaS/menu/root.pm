@@ -60,7 +60,7 @@ sub Init
    $self->RegisterObj("Tools.CRaS.ca",
                       "CRaS::ca",
                       func=>'MainWithNew',
-                      defaultacl=>['admin']);
+                      defaultacl=>['valid_user']);
 
    return($self);
 }
