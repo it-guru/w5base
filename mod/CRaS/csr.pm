@@ -74,6 +74,7 @@ sub new
                 name          =>'name',
                 label         =>'Name',
                 readonly      =>1,
+                htmlwidth     =>'200px',
                 group         =>'default',
                 dataobjattr   =>'csr.name'),
 
@@ -178,6 +179,12 @@ sub new
                 selectfix     =>1,
                 htmleditwidth =>'150px',
                 group         =>['default','request'],
+                readonly      =>sub{
+                   my $self=shift;
+                   my $rec=shift;
+                   return(1) if (defined($rec));
+                   return(0);
+                },
                 vjointo       =>'CRaS::ca',
                 vjoindisp     =>'name',
                 vjoinon       =>['caname'=>'name'],
@@ -373,7 +380,7 @@ sub new
                     $name="CertificateSigningRequest" if ($name eq "");
                     return($name.".csr");
                 },
-                onFinishWrite=>sub{
+                onFinishWrite=>sub{  # prevent error message on write
                    my $self=shift;
                    my $oldrec=shift;
                    my $newrec=shift;
@@ -429,6 +436,12 @@ sub new
                 name          =>'ssslcertfilename',
                 label         =>'Download-Filename signed certificate',
                 depend        =>['name'],
+                onFinishWrite=>sub{  # prevent error message on write
+                   my $self=shift;
+                   my $oldrec=shift;
+                   my $newrec=shift;
+                   return(undef);
+                },
                 onRawValue    =>sub {
                     my $self   =shift;
                     my $current=shift;
@@ -909,6 +922,35 @@ sub Validate
    }
 
 
+   if (effChanged($oldrec,$newrec,"state") && 
+       $newrec->{state} eq "5"){
+      my $sslcertfile=effVal($oldrec,$newrec,"sslcert");
+      my $crec;
+      my $csOK=0;
+      if (!defined($carec)){
+         $self->LastMsg(ERROR,"can not identify desired CA for renewal");
+         return(0);
+      }
+      if ($sslcertfile eq ""){
+         $self->LastMsg(ERROR,"no CSR detail informations for renewal");
+         return(0);
+      }
+      $crec=$self->unpackCertSignRequest(0,$sslcertfile);
+      if (!defined($crec)){
+         $self->LastMsg(ERROR,
+                        "can not decode CSR detail informations for renewal");
+         return(0);
+      }
+      if (!$self->verifyCSRtoCA(0,$carec,$crec)){
+         if (!$self->LastMsg()){
+            $self->LastMsg(ERROR,
+                        "CSR detail informations not allowed for CA renewal");
+         }
+         return(0);
+      }
+   }
+
+
    #
    # getCSTeamIDbyApplid muss vermutlich hier rein (da zukünftig
    # die Ermittlung des ServiceTeams von den CSR Daten (Erkennen,
@@ -992,6 +1034,17 @@ sub unpackCertSignRequest
    return($crec);
 }
 
+sub dumpCSRattributes
+{
+   my $self=shift;
+   my $crec=shift;
+
+   foreach my $k (sort(keys(%$crec))){
+      msg(INFO,"CSR $k = '".$crec->{$k}."'");
+   }
+
+}
+
 sub verifyCSRtoCA
 {
    my $self=shift;
@@ -1043,6 +1096,7 @@ sub verifyCSRtoCA
       my $res;
       eval("\$res=\$crec->{o}=~m$matchvar;");
       if (!($res)){
+         $self->dumpCSRattributes($crec);
          if (!($silent)){
             $self->LastMsg(ERROR,"organisation not allowed for requested CA");
          }
@@ -1107,7 +1161,8 @@ sub FinishWrite
       $newrec{state}="1";
       $self->ValidatedInsertRecord(\%newrec);
    }
-   if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4"){
+   if (effChanged($oldrec,$newrec,"state") && $newrec->{state} eq "4" ||
+                                              $newrec->{state} eq "6"){
      my $replacedrefno=effVal($oldrec,$newrec,"replacedrefno");
      if ($replacedrefno ne ""){
         $self->ResetFilter();
@@ -1398,8 +1453,152 @@ sub initSearchQuery
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return($self->SUPER::getValidWebFunctions(),"CAresponseHandler");
+   return($self->SUPER::getValidWebFunctions(),"CAresponseHandler",
+          'CertTransparency','CertTransparencyCall');
 }
+
+sub CertTransparencyCall
+{
+   my $self=shift;
+
+   my $CN=Query->Param("CN");
+
+   my $url="https://crt.sh/?CN=".$CN."&match==";
+
+   my @data=$self->DoRESTcall(
+      method=>'GET',    
+      url=>$url,
+      headers=>[
+         'Accept'=>'application/json'
+      ],
+      useproxy=>1,
+      verify_hostname=>0,
+      BasicAuthUser=>undef, BasicAuthPass=>undef,
+      format=>'JSON',
+      success=>sub{
+         # ignore JSON Data
+         #printf STDERR ("fifi success\n");
+      },
+      onfail=>sub{
+         print $self->HttpHeader("application/json");
+         printf ("[]\n");
+      },
+      preprocess=>sub{
+         my $self=shift;
+         my $respcontent=shift;
+         my $code=shift;
+         my $message=shift;
+         my $response=shift;
+         print $self->HttpHeader("application/json");
+         print $respcontent;
+         return($respcontent);
+      }
+   );
+
+
+
+
+}
+
+
+sub getHtmlDetailPageContent
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   my $page;
+   my $idname=$self->IdField->Name();
+   my $idval=$rec->{$idname};
+
+
+   if ($p eq "CertTransparency"){
+      $page.=<<EOF;
+<script language="JavaScript" type="text/javascript">
+addEvent(window,"load",function(){
+   setIFrameUrl();
+});
+addEvent(window,"resize",function(){
+   setIFrameUrl();
+});
+
+function setIFrameUrl(){
+   var w=window.innerWidth-20;
+   if (!w){
+      w=document.body.clientWidth-25;
+   }
+   if (w<580){
+      w=580;
+   }
+}
+
+</script>
+EOF
+
+      $page.="<iframe class=HtmlDetailPage name=HtmlDetailPage id=DISP01 ".
+            "src=\"CertTransparency?$idname=$idval\"></iframe>";
+      $page.=$self->HtmlPersistentVariables($idname);
+      return($page);
+   }
+
+   return($self->SUPER::getHtmlDetailPageContent($p,$rec));
+}
+
+
+
+
+
+sub getHtmlDetailPages
+{
+   my $self=shift;
+   my ($p,$rec)=@_;
+
+   my @l=$self->SUPER::getHtmlDetailPages($p,$rec);
+   if (defined($rec)){
+      push(@l,"CertTransparency"=>$self->T("CertTransparency"));
+   }
+   return(@l);
+}
+
+
+sub CertTransparency
+{
+   my $self=shift;
+   my $param=shift;
+
+   my $id=Query->Param("id");
+
+   $self->SetFilter({id=>\$id});
+   my ($rec)=$self->getOnlyFirst(qw(ALL));
+
+
+   my $d="";
+   $d.=$self->HttpHeader();
+   $d.=$self->HtmlHeader(body=>1,
+                           js=>['toolbox.js',
+                                'jquery.js'
+                                ],
+                           style=>['default.css','work.css',
+                                   'Output.HtmlDetail.css',
+                                   'kernel.App.Web.css']);
+
+   $d.=$self->getParsedTemplate("tmpl/CertTransparency",{
+      skinbase=>'CRaS',
+      static=>{
+         CN=>$rec->{name}
+      }
+   });
+
+
+
+
+   $d.=$self->HtmlBottom(body=>1);
+   print($d);
+   return(undef);
+}
+
+
+
+
 
 sub readPEM
 {

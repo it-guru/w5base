@@ -50,3 +50,15 @@
 'sigend state only allowed with singed cert file'=>{de=>'signiert Status nur zulässig mit signiertem Zertifikat'},
 'new record would be out of a serviceteam scope'=>{de=>'neuer Datensatz wäre nicht im Fokus eines ServiceTeams'},
 'sign request CA'=>{de=>'gewünschte CA'},
+'organisation not allowed for requested CA'=>{de=>'Organisation (O) ist für die geforderte CA nicht zulässig'},
+'no target CA identifiable'=>{de=>'keine Ziel CA identifizierbar'},
+'can not identify desired CA for renewal'=>{de=>'CA für Erneuerung nicht identifizierbar'},
+'no CSR detail informations for renewal'=>{de=>'kein CSR für Erneuerung vorhanden'},
+'can not decode CSR detail informations for renewal'=>{de=>'CSR für Erenuerung kann nicht decodiert werden'},
+'common name not allowed for requested CA'=>{de=>'Common name (CN) kann für die gewünschte CA nicht verwendet werden'},
+'country not allowed for requested CA'=>{de=>'Country (C) kann für die gewünschte CA nicht verwendet werden'},
+'location not allowed for requested CA'=>{de=>'Location (L) kann für die gewünschte CA nicht verwendet werden'},
+'state not allowed for requested CA'=>{de=>'State (ST) kann für die gewünschte CA nicht verwendet werden'},
+'OU needs to be empty'=>{de=>'OU darf nicht gewüllt/verwendet werden'},
+
+
