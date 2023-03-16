@@ -332,7 +332,7 @@ sub CryptoOut
          $self->ResetFilter();
          $self->SetFilter({userid=>\$userid,entryid=>\$id});
          my ($rec,$msg)=$self->getOnlyFirst(qw(realeditor cryptdata 
-                                               mdate comments));
+                                               mdate comments ));
          my $LastUpdate=$self->T("Last Update");
          $passxlog->ValidatedInsertRecord({name=>'password of '.
                                                  $erec->{account}.'@'.
@@ -340,7 +340,8 @@ sub CryptoOut
                                            entryid=>$id});
          print("<div class=passxinfo>");
          print("<table width=\"100%\" border=0>");
-         my $comments=$erec->{comments};
+         my $fld=$ent->getField("shortedcomments");
+         my $comments=$fld->RawValue($erec);
          $comments=" ($comments)" if (!($comments=~m/^\s*$/));
          print("<tr><td nowrap width=1% valign=top>Systemname:</td>".
                "<td>$erec->{name}$comments</td></tr>");
@@ -391,7 +392,7 @@ sub CryptoOut
          my $lastmsg=join("\n",$self->LastMsg());
          $lastmsg="<font color=red>$lastmsg</font>";
          printf("<div class=distinfo><pre>%s%s</pre></div>",
-                $lastmsg,$rec->{comments});
+                $lastmsg,$rec->{shortedcomments});
          printf("<input type=hidden name=userid value=\"$userid\">");
          foreach my $v (qw(p q n e dmp1 dmq1 verify coeff d)){
             my $mode="disabled";

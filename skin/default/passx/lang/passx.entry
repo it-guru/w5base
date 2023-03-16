@@ -10,3 +10,4 @@
 'actype.10'=>{de=>'Sonstiges',en=>'Misc'},
 'actype.11'=>{de=>'Privat',en=>'Private'},
 'account type'=>{de=>'Account Typ'},
+'shorted comments'=>{de=>'verkürzte Bemerkungen'},

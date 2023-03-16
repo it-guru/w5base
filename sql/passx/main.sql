@@ -69,7 +69,7 @@ CREATE TABLE passxacl (
   KEY id (refid),
   unique key aclmode (aclparentobj,refid,acltarget,aclmode,acltargetid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-alter table passxentry add comments varchar(80);
+alter table passxentry add comments longtext;
 CREATE TABLE passxlog (
   logid bigint(20) NOT NULL,
   entryid bigint(20) NOT NULL,
