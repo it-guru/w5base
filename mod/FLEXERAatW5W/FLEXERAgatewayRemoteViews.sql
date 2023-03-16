@@ -37,7 +37,9 @@ select
    FlexSystem.REALCOMPUTERNAME,
    lower(FlexSystem.REALCOMPUTERNAME) LW_REALCOMPUTERNAME,
    lower(FlexSystem.INSTANCECLOUDID) LW_INSTANCECLOUDID,
-   FlexSystem.W5BASEID SYSTEMW5BASEID
+   cast(
+      regexp_replace(FlexSystem.W5BASEID,'[^0-9].*$','') 
+   as int) SYSTEMW5BASEID
 from dbo.customDarwinExportDevice@flexerap FlexSystem;
 
 CREATE INDEX "FLEXERA_system_id1"
