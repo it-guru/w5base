@@ -98,6 +98,22 @@ sub new
                 dataobjattr =>'passxentry.quickpath'),
 
       new kernel::Field::Text(
+                name        =>'shortedcomments',
+                htmldetail  =>0,
+                readonly    =>0,
+                searchable  =>0,
+                depend      =>['comments'],
+                label       =>'shorted comments',
+                prepRawValue  =>sub{
+                   my $self=shift;
+                   my $d=shift;
+                   $d=~s/[\n\r]/ /g;
+                   $d=~s/ / /g;
+                   return(TextShorter($d,80,['INDICATED']));
+                },
+                dataobjattr =>'passxentry.comments'),
+
+      new kernel::Field::Textarea(
                 name        =>'comments',
                 label       =>'Comments',
                 dataobjattr =>'passxentry.comments'),
@@ -461,10 +477,10 @@ sub generateMenuTree
                      join(".",@curpath) eq join(".",@quickpath)){
                     my %mrec;
                     $mrec{label}=$rec->{account}.'@'.$rec->{name};
-                    if ($rec->{comments} ne ""){
+                    if ($rec->{shortedcomments} ne ""){
                        if ($mode eq "connector"){
                           $mrec{label}.="</a>";
-                          $mrec{label}.=" (".$rec->{comments}.")";
+                          $mrec{label}.=" (".$rec->{shortedcomments}.")";
                        }
                     }
                     $mrec{contextMenu}=$self->mkContextMenu($rec);
@@ -473,7 +489,7 @@ sub generateMenuTree
                     $mrec{entrytype}=$rec->{entrytype};
                     $mrec{name}=$rec->{name};
                     $mrec{account}=$rec->{account};
-                    $mrec{comments}=$rec->{comments};
+                    $mrec{comments}=$rec->{shortedcomments};
                     if ($mode eq "web" || $mode eq "connector"){
                        $mrec{parent}=$padd{join(".",@quickpath)};
                     }
@@ -499,10 +515,10 @@ sub generateMenuTree
 
 
 
-                    if ($rec->{comments} ne ""){
+                    if ($rec->{shortedcomments} ne ""){
                        if ($mode eq "connector"){ 
                           $mrec{label}.="</a>";
-                          $mrec{label}.=" (".$rec->{comments}.")";
+                          $mrec{label}.=" (".$rec->{shortedcomments}.")";
                        }
                     }
                     #$mrec{menuid}=$rec->{id};
@@ -510,7 +526,7 @@ sub generateMenuTree
                     $mrec{entrytype}=$rec->{entrytype};
                     $mrec{name}=$rec->{name};
                     $mrec{account}=$rec->{account};
-                    $mrec{comments}=$rec->{comments};
+                    $mrec{comments}=$rec->{shortedcomments};
                     #   $mrec{parent}=$padd{join(".",@quickpath)};
                     $mrec{href}=mkConnectorURL($rec);
                     $mrec{contextMenu}=$self->mkContextMenu($rec);
@@ -555,7 +571,7 @@ sub generateMenuTree
                  $mrec{label}=$rec->{account}.'@'.$rec->{name};
                  $mrec{menuid}=$rec->{id};
                  $mrec{entrytype}=$rec->{entrytype};
-                 $mrec{comments}=$rec->{comments};
+                 $mrec{comments}=$rec->{shortedcomments};
                  $mrec{name}=$rec->{name};
                  $mrec{account}=$rec->{account};
                  $targetml=\@ml;
@@ -608,7 +624,9 @@ sub generateMenuTree
                                 "\" \"$m->{label}\"";
                         $icon="mini.W5BasePassX.rdesk.xpm";
                      }
-                     $label.=" ($m->{comments})" if ($m->{comments} ne "");
+                     if ($m->{shortedcomments} ne ""){
+                        $label.=" ($m->{shortedcomments})";
+                     }
                      push(@{$targetm->{cmdentrys}},
                           {label=>$label,
                            hostname=>$m->{name},
@@ -676,8 +694,8 @@ sub generateMenuTree
                         $$d.=$intend."- type: separator\n";
                      }
                      my $title=$mrec->{label};
-                     if ($mrec->{comments} ne ""){
-                        $title.=" (".$mrec->{comments}.")";
+                     if ($mrec->{shortedcomments} ne ""){
+                        $title.=" (".$mrec->{shortedcomments}.")";
                      }
                      $$d.=$intend."- title: $title\n";
                      $$d.=$intend."  profile: Default\n";
