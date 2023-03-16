@@ -237,6 +237,12 @@ sub getStepObject
    $stepname=~s/[^a-z0-9:_]//gi;
    eval("\$obj=new $stepname(\$self);");
    if (!defined($obj)){
+      msg(ERROR,"getStepObject($stepname) can not be created\n$@\n");
+      $stepname="base::workflow::Archive::Archive";
+      eval("\$obj=new $stepname(\$self);");
+   }
+   
+   if (!defined($obj)){
       print STDERR msg(ERROR,"getStepObject($stepname):$@");
    }
 

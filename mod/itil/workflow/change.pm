@@ -737,6 +737,19 @@ sub Process
 
 
 #######################################################################
+package itil::workflow::change::postreflection;
+use vars qw(@ISA);
+use kernel;
+use kernel::WfStep;
+
+sub new
+{
+   return(undef);
+}
+
+
+
+#######################################################################
 package itil::workflow::change::publishpreview;
 use vars qw(@ISA);
 use kernel;
