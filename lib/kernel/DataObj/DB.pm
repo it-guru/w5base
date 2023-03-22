@@ -730,6 +730,7 @@ sub Ping
       my $nRec;
       {
          open local(*STDERR), '>', \$errors;
+         $self->ResetFilter();
          $nRec=$self->CountRecords();
       }
       if ($nRec<$self->{use_CountRecordPing}){
