@@ -925,15 +925,16 @@ sub TPC_CloudAreaSync
                       $tpccloudrec,{},
                       \%notifyParam,{},sub{
             my ($subject,$ntext);
-            my $subject="TPC CloudArea Sync";
+            my $subject=$tpccode." CloudArea Sync";
             my $tmpl=join("\n",@msg);
             return($subject,$tmpl);
          });
    }
+   my $nmsg=$#msg+1;
    $joblog->ValidatedUpdateRecord({id=>$jobid},
                                  {exitcode=>"0",
                                   exitmsg=>$exitmsg,
-                                  exitstate=>"ok - $ncnt messages"},
+                                  exitstate=>"ok - cnt:$ncnt/msg:$nmsg"},
                                  {id=>\$jobid});
 
    return({exitcode=>0,exitmsg=>'ok'});
