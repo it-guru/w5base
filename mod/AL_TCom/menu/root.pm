@@ -748,6 +748,10 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.proc.inmbusinessarea",
+                      "AL_TCom::inmbusinessarea",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj('AL_TCom::workflow::eventnotify$',
                       "base::workflow",
                       func=>'New',
