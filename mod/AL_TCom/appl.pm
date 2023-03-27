@@ -39,7 +39,19 @@ sub new
                 searchable    =>0,
                 label         =>'allow to send for (Herbeiruf)',
                 container     =>'additional'),
+
+      new kernel::Field::Text(
+                name          =>'inmbaname',
+                label         =>'Incident BusinessArea',
+                group         =>'inm',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                dataobjattr   =>"inmbusinessarea.baname")
+
    );
+
+
+
    $self->addDesasterRecoveryClassFields(); # from TS::appl as field template
    if (my $fobj=$self->getField("applowner")){
       $fobj->{uivisible}=0;
@@ -348,6 +360,21 @@ sub isViewValid
    @l=grep(!/$rregex/,@l);
    return(@l);
 }
+
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @flt=@_;
+   my $from=$self->SUPER::getSqlFrom($mode,@flt);
+
+   $from.=" left outer join inmbusinessarea ".
+          "on appl.id=inmbusinessarea.id";
+
+   return($from);
+}
+
 
 
 

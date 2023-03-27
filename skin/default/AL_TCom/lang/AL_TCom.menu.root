@@ -143,6 +143,7 @@
 'AL_TCom.proc.canvas'=>{de=>'Canvas Objekt',en=>'Canvas Object'},
 'AL_TCom.proc.canvas.relation'=>{de=>'Zuordnung',en=>'relation'},
 'AL_TCom.proc.canvas.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.proc.inmbusinessarea'=>{de=>'Incident BusinessArea',en=>'Incident BusinessArea'},
 'Reporting.amore'=>{de=>'@more',en=>'@more'},
 'itservices'=>{de=>'IT-Services Telekom IT',en=>'IT-Services Telekom IT'},
 'itservices.bps'=>{de=>'Geschäftsprozess',en=>'Businessprocess'},
