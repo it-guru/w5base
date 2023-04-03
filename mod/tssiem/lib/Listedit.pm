@@ -152,7 +152,8 @@ sub addICTOSecureFilter
    $userid=-1 if (!defined($userid) || $userid==0);
 
    if ($self->isDataInputFromUserFrontend()){
-      if (!$self->IsMemberOf([qw(admin w5base.tssiem.secscan.read)],
+      if (!$self->IsMemberOf([qw(admin w5base.tssiem.secscan.read
+                                 support)],
           "RMember")){
          my %pgrps=();
          my %grp=$self->getGroupsOf($ENV{REMOTE_USER},[orgRoles()],"both");
