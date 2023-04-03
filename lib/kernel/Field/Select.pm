@@ -269,6 +269,10 @@ sub FormatedDetail
              "newObject.style=e.style;".
              "newObject.id=e.id;".
              "e.parentNode.replaceChild(newObject,e);".
+             "addEvent(newObject,'keydown',function(e){".
+             "return(EnterSubmitEvtHandler(e,document.forms[0],DetailEditSave)".
+             ");});".
+             "newObject.focus();".
              "}".  
              "}".  
              "</script>";
