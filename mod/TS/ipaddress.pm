@@ -210,107 +210,54 @@ sub doAnalyse
       #msg(INFO,"try to query NOAH on ip $ipflt");
       if ($ipflt ne ""){
          $r->{query}->{ipaddr}=$ipflt;
-         my $noa=getModuleObject($self->Config,"tsnoah::ipaddress");
-         if (!defined($noa) || !$noa->Ping()){
+
+         my $neo=getModuleObject($self->Config,"neo::ipaddressAnalyse");
+
+         if (!defined($neo) || !$neo->Ping()){
             return({
                exitcode=>1,
-               exitmsg=>'error while connect to NOAH'
+               exitmsg=>'error while connect to NEO'
             });
          }
-         $noa->SetFilter({name=>$ipflt});
-         my @l=$noa->getHashList(qw(name systemname urlofcurrentrec));
+         $neo->SetFilter({cidr=>$ipflt,customer=>'CN-DTAG'});
+
+         my @l=$neo->getHashList(qw(ALL));
+         my @email;
          if ($#l!=-1){
-            $newcomments.="NOAH IP-Informations:\n".join("\n\n",map({
-               $_->{systemname}."\n".$_->{urlofcurrentrec};
+            $newcomments.="NEO IP-Informations:\n".join("\n\n",map({
+               my $str=$_->{component_dns}."\n".
+               $_->{urlofcurrentrec}."\n".
+               "VLAN Domain:".$_->{vlan_domain}."\n".
+               "Network comment:".$_->{network_comment}."\n".
+               $_->{component_servicenumb};
+              foreach my $contactv (qw(network_contact
+                                       network_contact2
+                                       subnet_contact 
+                                       subnet_contact2)){
+                 if ($_->{$contactv} ne ""){
+                    if (!in_array(\@email,$_->{$contactv})){
+                       push(@email,$_->{$contactv});
+                    }
+                 }
+              }
+              $str;
             } @l));
          }
-         if (1){
-            # now we try to find the correct networks
-            my @netmask=qw(0 0 0 0);
-            my @network=qw(0 0 0 0);
-            my @ipnetflt;
-            my @netareaflt;
-            foreach my $ipaddr (split(/[\s;]+/,$ipflt)){
-                my @okt=split(/\./,$ipaddr);
-                for(my $o=0;$o<=3;$o++){
-                   my $bitmask=128;
-                   for(my $bit=0;$bit<8;$bit++){
-                      $bitmask=(128>>$bit)|$bitmask;
-                      $netmask[$o]=$bitmask;
-                      my $netmask=join(".",@netmask);
-                      for(my $n=0;$n<4;$n++){
-                         $network[$n]=$okt[$n]&$netmask[$n];
-                      }
-                      my $network=join(".",@network);
-                      push(@ipnetflt,{
-                         name=>\$network,
-                         subnetmask=>\$netmask 
-                      });
-                      push(@netareaflt,{
-                         netaddr=>\$network,
-                         netmask=>\$netmask 
-                      });
-                   }
-                }
-            }
-            if ($#ipnetflt!=-1){
-               my $noa=getModuleObject($self->Config,"tsnoah::ipnet");
-               $noa->SetFilter(\@ipnetflt);
-               my @l=$noa->getHashList(qw(fullname name subnetmask
-                                          urlofcurrentrec email));
-               my $email;
-               if ($#l!=-1){
-                  foreach my $noahnet (@l){
-                     if ($email eq "" && $noahnet->{email} ne ""){
-                        $email=$noahnet->{email};
-                     }
-                  }
-                  if ($newcomments ne ""){
-                     $newcomments.="\n\n";
-                  }
-                  $newcomments.="NOAH IP-Networks:\n".join("\n\n",map({
-                     $_->{fullname}."\n".$_->{name}." ".
-                     "(".$_->{subnetmask}.")\n".
-                     $_->{urlofcurrentrec};
-                  } @l));
-               }
-               else{
-                  my $narea=getModuleObject($self->Config,"tsnoah::netrange");
 
-
-                  $narea->SetFilter(\@netareaflt);
-                  my @l=$narea->getHashList(qw(name name netmask netaddr
-                                             urlofcurrentrec email));
-                  if ($#l!=-1){
-                     foreach my $noahnet (@l){
-                        if ($email eq "" && $noahnet->{email} ne ""){
-                           $email=$noahnet->{email};
-                        }
-                     }
-                     if ($newcomments ne ""){
-                        $newcomments.="\n\n";
-                     }
-                     $newcomments.="NOAH IP-Netarea:\n".join("\n\n",map({
-                        $_->{name}."\n".$_->{netaddr}." ".
-                        "(".$_->{subnetmask}.")\n".
-                        $_->{urlofcurrentrec};
-                     } @l));
-                  }
-               }
-               if ($email ne ""){
-                  my $flt={emails=>\$email};
-                  $flt->{cistatusid}=[3,4,5];
-                  my $user=getModuleObject($self->Config,"base::user");
-                  $user->ResetFilter();
-                  $user->SetFilter($flt);
-                  my ($urec)=$user->getOnlyFirst(qw(userid));
-                  if (defined($urec)){
-                     $userid=$urec->{userid};
-                     $userid{$userid}++;
-                     if (!exists($cadmin{$userid})){
-                        $cadmin{$userid}++;
-                        push(@cadmin,$userid);
-                     }
+         if ($#email!=-1){
+            foreach my $email (@email){
+               my $flt={emails=>$email};
+               $flt->{cistatusid}=[3,4,5];
+               my $user=getModuleObject($self->Config,"base::user");
+               $user->ResetFilter();
+               $user->SetFilter($flt);
+               my ($urec)=$user->getOnlyFirst(qw(userid));
+               if (defined($urec)){
+                  $userid=$urec->{userid};
+                  $userid{$userid}++;
+                  if (!exists($cadmin{$userid})){
+                     $cadmin{$userid}++;
+                     push(@cadmin,$userid);
                   }
                }
             }
