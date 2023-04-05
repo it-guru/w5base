@@ -2,6 +2,10 @@
  de=>'NEO: IP-Adress-Analyse',
  en=>'NEO: IP-Address Analyse',
 },
+'fieldgroup.component'=>{
+  de=>'Komponente',
+  en=>'Component'
+},
 'fieldgroup.network'=>{
   de=>'Netzwerk (IP-SubNet-Gruppe)',
   en=>'Network (IP-SubNet-Group)'
