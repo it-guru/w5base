@@ -89,7 +89,7 @@ use charnames ':full';
              &hash2xml &xml2hash &effVal &effChanged &effChangedVal 
              &isDetailed
              &Debug &UTF8toLatin1 &Html2Latin1
-             &Datafield2Hash &Hash2Datafield &CompressHash
+             &Datafield2Hash &Hash2Datafield &CompressHash &FlattenHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
              &Dumper &CSV2Hash &ObjectRecordCodeResolver
              &FancyLinks &ExpandW5BaseDataLinks &mkInlineAttachment 
@@ -814,6 +814,34 @@ sub CompressHash
       }
    }
    return($h);
+}
+
+
+sub FlattenHash
+{
+   my $h=shift;
+   my $namespace=shift;
+
+   my %H;
+   if (!defined($namespace)){
+      $namespace="";
+   }
+   foreach my $k (keys(%$h)){
+       my $name=$namespace;
+       $name.="." if ($name ne "");
+       $name.=$k;
+       if (ref($h->{$k}) eq "HASH"){
+          my $sub=FlattenHash($h->{$k},$name); 
+          foreach my $subk (keys(%$sub)){
+             $H{$subk}=$sub->{$subk};
+          }
+          
+       }
+       else{
+          $H{$name}=$h->{$k};
+       }
+   }
+   return(\%H);
 }
 
 #
