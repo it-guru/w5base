@@ -1,0 +1,3 @@
+'itu.cfm.tardis'=>{de=>'Tardis',en=>'Tardis'},
+'itu.cfm.tardis.core'=>{de=>'Kernsystem',en=>'Kernel'},
+'itu.cfm.tardis.core.echo'=>{de=>'Echo',en=>'Echo'},
