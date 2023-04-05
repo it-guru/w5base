@@ -154,9 +154,12 @@ sub onFailNeoHandler
       eval('use JSON;my $j=new JSON;$jsoncontent=$j->decode($content)');
    }
 
-   if ($code eq "400"){
+   if ($code eq "400" || $code eq "500"){
       if (defined($jsoncontent)){
          $self->LastMsg(ERROR,"NEO call result: ".$jsoncontent->{errorMessage});
+      }
+      else{
+         $self->LastMsg(ERROR,"NEO call result unspecific error");
       }
       return(undef,$code);
    }
