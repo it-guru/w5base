@@ -1149,6 +1149,66 @@ sub ById
    $val=~s/^\///;
    $val="UNDEF" if ($val eq "");
    my %param;
+
+   if (lc($ENV{HTTP_ACCEPT}) eq "application/json"){
+      my $CurrentView=Query->Param("CurrentView");
+      Query->Reset();
+      my %flt=($idname=>\$val);
+      $self->ResetFilter();
+      my %view;
+      if ($CurrentView eq "" && $self->SecureSetFilter(\%flt)){
+         $self->SetCurrentOrder("NONE");
+         my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
+         if (defined($rec)){
+            my @viewgroups=$self->isViewValid($rec,format=>"nativeJSON");
+            my @fieldlist=$self->getFieldObjsByView(
+                                   [qw(ALL)],
+                                    current=>$rec,
+                                    output=>"nativeJSON");
+            for(my $c=0;$c<=$#fieldlist;$c++){
+               my $fld=$fieldlist[$c];
+               my $name=$fld->Name();
+               next if (!$fld->UiVisible("HtmlDetail",current=>$rec));
+               if (exists($fld->{htmldetail})){
+                  if ($fld->{htmldetail} eq "NotEmpty" ||
+                      $fld->{htmldetail} eq "NotEmptyOrEdit"){
+                     my $v=$fld->RawValue($rec);
+                     next if ($v eq "");
+                  }
+                  my $viewcnt=0;
+                  foreach my $currentfieldgroup (@viewgroups){
+                     my $group=$fld->{group};
+                     $group="default" if (!defined($group));
+                     $group=[$group] if (!ref($group) eq "ARRAY");
+                     if (in_array($group,$currentfieldgroup)){
+                        if ($fld->htmldetail("HtmlDetail", current=>$rec,
+                                     currentfieldgroup=>$currentfieldgroup)){
+                           $viewcnt++;
+                        }
+                     }
+                  }
+                  next if (!$viewcnt);
+               }
+               $view{$name}++;
+            }
+         }
+      }
+         
+      $self->ResetFilter();
+      $self->SecureSetFilter(\%flt);
+      Query->Param("search_".$idname=>$val);
+      $view{$idname}++;
+      if ($CurrentView ne ""){
+         Query->Param("CurrentView"=>$CurrentView);
+      }
+      else{
+         if (keys(%view)){
+            Query->Param("CurrentView"=>"(".join(",",sort(keys(%view))).")");
+         }
+      }
+      return($self->Result(ExternalFilter=>1));
+   }
+
    my $target="../Detail";
    while($val=~m/\//){
       if (my ($anker)=$val=~m/\/fieldgroup.([^\/]+)$/){
