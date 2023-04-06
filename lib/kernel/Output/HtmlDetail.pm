@@ -217,7 +217,7 @@ EOF
 }
 
 
-sub  calcViewMatrix
+sub  calcHtmlDetailViewMatrix
 {
    my ($self,$rec,$vMatrix,$fieldbase,$fieldlist,$viewgroups,
        $currentfieldgroup)=@_;
@@ -663,8 +663,10 @@ EOF
          fieldgrouplist=>[]     # resolved groups of a field
       };
                       
-      $self->calcViewMatrix($rec,$vMatrix,$fieldbase,\@fieldlist,$viewgroups,
-                            $currentfieldgroup);
+      $self->calcHtmlDetailViewMatrix(
+                $rec,$vMatrix,$fieldbase,\@fieldlist,$viewgroups,
+                $currentfieldgroup
+      );
 
       my $spec=$self->getParent->getParent->LoadSpec($rec);
       foreach my $group (@{$vMatrix->{grouplist}}){
