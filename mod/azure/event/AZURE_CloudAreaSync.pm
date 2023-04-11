@@ -142,7 +142,8 @@ sub AZURE_CloudAreaSync
    if (1){
       $subsc->ResetFilter();
       $subsc->SetFilter({});
-      my @ss=$subsc->getHashList(qw(subscriptionId id name w5baseid));
+      my @ss=$subsc->getHashList(qw(subscriptionId id name w5baseid
+                                    requestor state));
       my @s;
       my $n=$#ss+1;
 
@@ -169,6 +170,7 @@ sub AZURE_CloudAreaSync
 
       foreach my $rec (@ss){
          #next if ($rec->{name}=~m/test/i);
+         #next if ($rec->{subscriptionId} eq "4bbf1fb2-6316-462f-bac5-0d8d451f3ffd");
          if ($rec->{w5baseid}=~m/^[0-9]{3,20}$/){
           #  printf STDERR ("process: %s\n",$rec->{id});
           #  printf STDERR ("   name: %s\n",$rec->{name});
@@ -177,13 +179,15 @@ sub AZURE_CloudAreaSync
             push(@s,{
                subscriptionId=>$rec->{subscriptionId},
                name=>$rec->{name},
-               applid=>$rec->{w5baseid}
+               applid=>$rec->{w5baseid},
+               state=>lc($rec->{state}),
+               requestor=>$rec->{requestor}
             });
          }
       }
       $itcloudarea->ResetFilter();
       $itcloudarea->SetFilter({srcsys=>\$azurecode});
-      my @c=$itcloudarea->getHashList(qw(name itcloud applid
+      my @c=$itcloudarea->getHashList(qw(name itcloud applid 
                                          srcsys srcid cistatusid));
 
 
@@ -204,8 +208,12 @@ sub AZURE_CloudAreaSync
                my $bname=$b->{name};
                $bname=~s/\[.*\]$//;
                $bname=~s/[\s.]+/_/g;
+               my $cistatusuprange=[3,4];
+               if (lc($b->{state}) ne "enabled"){
+                  $cistatusuprange=[5];
+               }
                if ($aname eq $bname &&
-                   $a->{cistatusid}<6 &&
+                   in_array($cistatusuprange,$a->{cistatusid}) &&
                    $a->{applid} eq $b->{applid}){
                   $eq=1;   # alles gleich - da braucht man nix machen
                }
@@ -228,6 +236,9 @@ sub AZURE_CloudAreaSync
                      srcid   =>$newrec->{subscriptionId}
                   }
                };
+               if ($mode eq "insert" && $newrec->{requestor} ne ""){
+                  $oprec->{DATA}->{requestoraccount}=lc($newrec->{requestor});
+               }
                if (defined($oldrec)){
                   my $oldname=$oldrec->{name};
                   $oldname=~s/\[.*\]$//;
@@ -239,8 +250,17 @@ sub AZURE_CloudAreaSync
 
                if ($mode eq "insert"){
                   $oprec->{DATA}->{cistatusid}="3";
+                  if ($newrec->{state} ne "enabled"){  # diabled subscription
+                     $oprec->{OP}="invalid";           # will not be new insert
+                     $oprec->{DATA}->{cistatusid}="5";
+                  }
                }
+
                if ($mode eq "update"){
+                  if ($newrec->{state} ne "enabled" &&
+                      $oldrec->{cistatusid}!=5){
+                     $oprec->{DATA}->{cistatusid}="5";
+                  }
                   if ($oldrec->{cistatusid}==6){
                      $oprec->{DATA}->{cistatusid}="3";
                   }

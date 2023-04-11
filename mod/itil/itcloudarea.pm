@@ -754,7 +754,10 @@ sub FinishWrite
          if (defined($newrec) &&
              exists($newrec->{cistatusid}) &&
              $newrec->{cistatusid}==5){
-            $doNotify=2;
+            if ($W5V2::OperationContext ne "W5Server" &&
+                $W5V2::OperationContext ne "QualityCheck"){
+               $doNotify=2;
+            }
          }
       }
       if (defined($oldrec) && defined($newrec) &&
