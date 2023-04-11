@@ -57,6 +57,12 @@ sub new
             dataobjattr       =>'displayName',
             label             =>'Name'),
 
+      new kernel::Field::Text(     
+            name              =>'state',
+            ignorecase        =>1,
+            dataobjattr       =>'state',
+            label             =>'State'),
+
       new kernel::Field::TextDrop(
             name              =>'appl',
             searchable        =>0,
@@ -70,6 +76,11 @@ sub new
             name              =>'w5baseid',
             container         =>'tags',
             label             =>'Application W5BaseID'),
+
+      new kernel::Field::Interface(     
+            name              =>'requestor',
+            container         =>'tags',
+            label             =>'Requestor'),
 
       new kernel::Field::SubList(
                 name          =>'virtualmachines',
@@ -167,7 +178,8 @@ sub DataCollector
          my @data;
          foreach my $rawrec (@$data){
             my $rec;
-            foreach my $v (qw(id displayName subscriptionId tenantId tags)){
+            foreach my $v (qw(id displayName subscriptionId tenantId tags
+                              state)){
                if (exists($rawrec->{$v})){
                   $rec->{$v}=$rawrec->{$v};
                   if ($v eq "id"){

@@ -2,4 +2,6 @@
    de=>'Azure: Subscription',
    en=>'Azure: Subscription'
 },
+'fieldgroup.virtualmachines'=>{de=>'virtuelle Maschienen',en=>'virtual machines'},
 'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'State'=>{de=>'Status'},
