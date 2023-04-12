@@ -1885,6 +1885,58 @@ sub updateLnkapplsystem
 
 
 
+sub sslparsew5baseref
+{
+   my $self=shift;
+   my $issuer=shift;
+   my $serial=shift;
+   my $current=shift;
+
+   my $swi=$self->getParent->getPersistentModuleObject("w5swi",
+                                                       "itil::swinstance");
+
+   my $wal=$self->getParent->getPersistentModuleObject("w5wal",
+                                                       "itil::applwallet");
+
+   my $url=$self->getParent->getPersistentModuleObject("w5url",
+                                                       "itil::lnkapplurl");
+
+   $swi->SetFilter({
+      ssl_cert_issuerdn=>'"'.$issuer.'"',
+      ssl_cert_serialno=>'"'.$serial.'"',
+      cistatusid=>"<6"
+   });
+   my ($swirec,$msg)=$swi->getOnlyFirst(qw(urlofcurrentrec));
+   if (defined($swirec)){
+      return($swirec->{urlofcurrentrec});
+   }
+
+
+   $wal->SetFilter({
+      issuerdn=>'"'.$issuer.'"',
+      serialno=>'"'.$serial.'"'
+   });
+   my ($walrec,$msg)=$wal->getOnlyFirst(qw(urlofcurrentrec));
+   if (defined($walrec)){
+      return($walrec->{urlofcurrentrec});
+   }
+
+
+   $url->SetFilter({
+      ssl_cert_issuerdn=>'"'.$issuer.'"',
+      ssl_cert_serialno=>'"'.$serial.'"'
+   });
+   my ($urlrec,$msg)=$url->getOnlyFirst(qw(urlofcurrentrec));
+   if (defined($urlrec)){
+      return($urlrec->{urlofcurrentrec});
+   }
+
+
+   return(undef);
+}
+
+
+
 
 
 1;

@@ -47,7 +47,8 @@ sub CRaSexpireCheck
    if (1){
       $obj->SetFilter({state=>'4',ssslenddate=>"<now+21d"});
       foreach my $rec ($obj->getHashList(qw(ALL))){
-         if ($rec->{sslexpnotify1} eq ""){
+         if ($rec->{sslexpnotify1} eq "" && 
+             $rec->{sslparsedw5baseref} ne ""){
             if ($obj->doNotify($rec->{id},"CERTEXPIRE1")){
                $wobj->ValidatedUpdateRecord($rec,{
                   sslexpnotify1=>NowStamp("en"),
@@ -58,7 +59,8 @@ sub CRaSexpireCheck
          else{
             my $d=CalcDateDuration($rec->{ssslenddate},NowStamp("en"));
             if ($d->{days}>6){
-               if ($rec->{sslexpnotify2} eq ""){
+               if ($rec->{sslexpnotify2} eq "" && 
+                   $rec->{sslparsedw5baseref} ne ""){
                   if ($obj->doNotify($rec->{id},"CERTEXPIRE2")){
                      $wobj->ValidatedUpdateRecord($rec,{
                         sslexpnotify2=>NowStamp("en"),

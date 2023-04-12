@@ -469,6 +469,14 @@ sub new
                 allowdirect   =>1,
                 dataobjattr   =>'csr.ssslcert'),
 
+      new kernel::Field::TextURL(
+                name          =>'sslparsedw5baseref',
+                label         =>'SSL Cert W5Ref',
+                htmldetail    =>'NotEmpty',
+                group         =>'detail',
+                depend        =>["ssslissuerdn","ssslserialno"],
+                onRawValue    =>\&sslparsew5baseref),
+
 
       new kernel::Field::Text(
                 name          =>'srcsys',
@@ -771,6 +779,23 @@ sub getCSTeamIDbyApplid
    }
    return($csteamid,$csteamaccess);
 }
+
+
+sub sslparsew5baseref
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $issuer=$self->getParent->getField("ssslissuerdn")->RawValue($current);
+   my $serial=$self->getParent->getField("ssslserialno")->RawValue($current);
+
+   return(undef) if ($issuer eq "" || $serial eq "");
+
+   return(
+      itil::lib::Listedit::sslparsew5baseref($self,$issuer,$serial,$current)
+   );
+}
+
 
 
 sub Validate
