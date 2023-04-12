@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use tssiem::lib::Listedit;
+use itil::lib::Listedit;
 use kernel::Field;
 use Date::Parse;
 use kernel::date;
@@ -838,48 +839,10 @@ sub sslparsew5baseref
 
    my $issuer=$self->getParent->getField("sslparsedissuer")->RawValue($current);
    my $serial=$self->getParent->getField("sslparsedserial")->RawValue($current);
-
-   my $swi=$self->getParent->getPersistentModuleObject("w5swi",
-                                                       "itil::swinstance");
-
-   my $wal=$self->getParent->getPersistentModuleObject("w5wal",
-                                                       "itil::applwallet");
-
-   my $url=$self->getParent->getPersistentModuleObject("w5url",
-                                                       "itil::lnkapplurl");
-
-   $swi->SetFilter({
-      ssl_cert_issuerdn=>'"'.$issuer.'"',
-      ssl_cert_serialno=>'"'.$serial.'"',
-      cistatusid=>"<6"
-   });
-   my ($swirec,$msg)=$swi->getOnlyFirst(qw(urlofcurrentrec));
-   if (defined($swirec)){
-      return($swirec->{urlofcurrentrec});
-   }
-
-
-   $wal->SetFilter({
-      issuerdn=>'"'.$issuer.'"',
-      serialno=>'"'.$serial.'"'
-   });
-   my ($walrec,$msg)=$wal->getOnlyFirst(qw(urlofcurrentrec));
-   if (defined($walrec)){
-      return($walrec->{urlofcurrentrec});
-   }
-
-
-   $url->SetFilter({
-      ssl_cert_issuerdn=>'"'.$issuer.'"',
-      ssl_cert_serialno=>'"'.$serial.'"'
-   });
-   my ($urlrec,$msg)=$url->getOnlyFirst(qw(urlofcurrentrec));
-   if (defined($urlrec)){
-      return($urlrec->{urlofcurrentrec});
-   }
-
-
-   return(undef);
+   
+   return(
+      itil::lib::Listedit::sslparsew5baseref($self,$issuer,$serial,$current)
+   );
 }
 
 

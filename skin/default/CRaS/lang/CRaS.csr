@@ -60,5 +60,4 @@
 'location not allowed for requested CA'=>{de=>'Location (L) kann für die gewünschte CA nicht verwendet werden'},
 'state not allowed for requested CA'=>{de=>'State (ST) kann für die gewünschte CA nicht verwendet werden'},
 'OU needs to be empty'=>{de=>'OU darf nicht gewüllt/verwendet werden'},
-
-
+'SSL Cert W5Ref'=>{de=>'SSL-Zertifikat W5Ref'},
