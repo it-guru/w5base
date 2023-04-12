@@ -133,6 +133,7 @@ sub new
       new kernel::Field::Number(
                 name          =>'prio',
                 label         =>'Location prio',
+                htmldetail    =>'NotEmpty',
                 readonly      =>1,
                 depend        =>['id'],
                 onRawValue    =>\&calcLocationPrio),
@@ -434,12 +435,13 @@ sub calcLocationPrio
    my $self=shift;
    my $current=shift;
 
-   my $prio=3;
+   my $prio=undef;
 
    my $lnklocationgrp=getModuleObject($self->getParent->Config,
                                       "base::lnklocationgrp");
    $lnklocationgrp->SetFilter({locationid=>\$current->{id}});
    foreach my $relrec ($lnklocationgrp->getHashList(qw(relmode))){
+      $prio=3 if (!defined($prio));
       if (my ($lprio)=$relrec->{relmode}=~m/^RMbusinesrel(\d)$/){
          if ($lprio<$prio){
             $prio=$lprio;
