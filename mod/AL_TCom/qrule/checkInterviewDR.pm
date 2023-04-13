@@ -140,6 +140,54 @@ sub qcheckRecord
    my $tag=getModuleObject($self->getParent->Config,"itil::tag_appl");
    my $iarec=$self->readCurrentAnswers($ia,$rec);
 
+
+   my $drRiskAcceptance=0;
+   my @nameexpr;
+
+   my $ne=qr/^Risc_Acceptance_DR_Retirement_$rec->{ictono}_.+_(\d{8})\.pdf$/;
+   push(@nameexpr,$ne);
+
+   my $ne=qr/^Risk_Akzeptanz_DR_Retirement_$rec->{ictono}_.+_(\d{8})\.pdf$/;
+   push(@nameexpr,$ne);
+
+   if (exists($rec->{attachments}) &&
+       ref($rec->{attachments}) eq "ARRAY"){
+      foreach my $a (@{$rec->{attachments}}){
+         foreach my $ne (@nameexpr){
+            if (my ($date)=$a->{name}=~m/$ne/){
+               my ($y,$m,$d)=$date=~m/^([0-9]{4})([0-9]{2})([0-9]{2})$/;
+               my $qval;
+               my $dur;
+               my $age;
+               my $errors;
+               {
+                  open local(*STDERR), '>', \$errors;
+                  eval('$qval=$ia->ExpandTimeExpression('.
+                       '"$y-$m-$d 00:00:00","en");');
+                  if ($qval ne ""){
+                     $dur=CalcDateDuration($qval,$a->{cdate});
+                  }
+                  if (defined($dur)){
+                     $age=CalcDateDuration($a->{cdate},NowStamp("en"));
+                  }
+               }
+               if (defined($dur) && 
+                   $dur->{totaldays}>-15 &&
+                   $dur->{totaldays}<15 &&
+                   defined($age) &&
+                   $age->{totaldays}<180){
+                  $drRiskAcceptance++;
+               }
+            }
+         }
+      }
+   }
+
+
+
+
+
+
    $i->SetFilter({qtag=>'SOB*'});
    $i->SetCurrentView(qw(id qtag));
    $self->{intv}=$i->getHashIndexed("qtag");
@@ -217,7 +265,9 @@ sub qcheckRecord
                        {qtag}->{SOB_003})){
                my $msg="not existing Disaster-Recovery change number";
                push(@qmsg,$msg);
-               push(@dataissue,$msg);
+               if (!$drRiskAcceptance){
+                  push(@dataissue,$msg);
+               }
             }
          }
       }
@@ -254,8 +304,10 @@ sub qcheckRecord
             if ($duration->{days}<($maxagedays*-1)){
                my $msg="age of Disaster-Recovery Test violates SLA definition";
                push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+               if (!$drRiskAcceptance){
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
       }
@@ -265,8 +317,10 @@ sub qcheckRecord
       if (defined($duration) && $duration->{totaldays}>($maxagedays)){
          my $msg="missing last DR-Test date";
          push(@qmsg,$msg);
-         push(@dataissue,$msg);
-         $errorlevel=3 if ($errorlevel<3);
+         if (!$drRiskAcceptance){
+            push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
+         }
       }
    }
    if ($planday eq "" && $rec->{cdate} ne ""){
@@ -274,8 +328,10 @@ sub qcheckRecord
       if (defined($duration) && $duration->{totaldays}>($maxagedays*0.5)){
          my $msg="missing valid next DR-Test change planning";
          push(@qmsg,$msg);
-         push(@dataissue,$msg);
-         $errorlevel=3 if ($errorlevel<3);
+         if (!$drRiskAcceptance){
+            push(@dataissue,$msg);
+            $errorlevel=3 if ($errorlevel<3);
+         }
       }
    }
    msg(INFO,"$rec->{name}: lastday: ".$lastday);
@@ -292,8 +348,10 @@ sub qcheckRecord
             if (defined($duration) && $duration->{days}<-56){
                my $msg="Disaster-Recovery Test plan date is bevor last test";
                push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+               if (!$drRiskAcceptance){
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
          if ($#qmsg==-1 && $pday ne ""){
@@ -301,8 +359,10 @@ sub qcheckRecord
             if (defined($duration) && $duration->{days}<(($maxagedays/2)*-1)){
                my $msg="Disaster-Recovery Test plan date is in the past";
                push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+               if (!$drRiskAcceptance){
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
          if ($#qmsg==-1 && $lday ne ""){
@@ -310,8 +370,10 @@ sub qcheckRecord
             if (defined($duration) && $duration->{days}>90){
                my $msg="Disaster-Recovery last test is to far in the future";
                push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+               if (!$drRiskAcceptance){
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
          if ($#qmsg==-1 && $pday ne ""){
@@ -320,8 +382,10 @@ sub qcheckRecord
                my $msg=
                   "Disaster-Recovery Test plan date is to far in the future";
                push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+               if (!$drRiskAcceptance){
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
          if ($#qmsg==-1 && $pday ne "" && $lday ne ""){
@@ -330,8 +394,10 @@ sub qcheckRecord
                my $msg=
                   "Disaster-Recovery Test plan date is to far in the future";
                push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+               if (!$drRiskAcceptance){
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
             }
          }
 
@@ -404,8 +470,10 @@ sub qcheckRecord
                # Zieldatum des Changes nicht um den deadline Termin
                my $msg="missing valid next DR-Test change planning";
                push(@qmsg,$msg);
-               push(@dataissue,$msg);
-               $errorlevel=3 if ($errorlevel<3);
+               if (!$drRiskAcceptance){
+                  push(@dataissue,$msg);
+                  $errorlevel=3 if ($errorlevel<3);
+               }
                {
                   msg(INFO,"set DR-TestChange missing");
                   my $marker=$tag->getTag($rec->{id},
