@@ -131,6 +131,13 @@ sub new
                 dataobjattr   =>'CANVAS'),
 
 
+      new kernel::Field::Text(
+                name          =>'lcanvasseg',
+                label         =>'Lead Canvas Segment',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"substring(CANVAS,0,charindex('/',CANVAS))"),
+
+
       new kernel::Field::Contact(
                 name          =>'applmgr',
                 label         =>'Application Manager',
