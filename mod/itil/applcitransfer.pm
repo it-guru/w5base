@@ -229,6 +229,7 @@ sub new
    
 
    );
+   $self->LoadSubObjs("ext/finishCITransfer","finishCITransfer");
    $self->setDefaultView(qw(eappl cappl cdate));
    $self->setWorktable("applcitransfer");
    $self->{history}={
@@ -286,6 +287,7 @@ sub Validate
 
       my %ci;
       foreach my $srec (@{$eapplrec->{systems}}){
+         next if ($srec->{'reltyp'} ne 'direct'); # only direct can be switched
          $ci{'w5base://itil::system/Show/'.$srec->{systemid}."/name"}++;
       }
       foreach my $srec (@{$eapplrec->{swinstances}}){
@@ -313,13 +315,14 @@ sub ProcessTransfer
    my $eappl=shift;
    my $cappl=shift;
 
+
    my $items=$self->extractAdresses($rec->{'configitems'});
 
    my $newdatabossid=$cappl->{databossid};
    my $newapplid=$cappl->{id};
 
-   my $lc=getModuleObject($self->Config,"base::lnkcontact");
 
+   my $lc=getModuleObject($self->Config,"base::lnkcontact");
    if (exists($items->{"itil::lnkapplurl"})){
       my $o=getModuleObject($self->Config,"itil::lnkapplurl");
       my @ids=@{$items->{"itil::lnkapplurl"}};
@@ -333,6 +336,16 @@ sub ProcessTransfer
                {applid=>$newapplid},
                {id=>$oldrec->{id}}
             );
+         }
+         if ($newapplid ne ""){
+            foreach my $submod (sort(keys(%{$self->{finishCITransfer}}))){
+               $self->{finishCITransfer}->{$submod}->ProcessTransfer(
+                  'itil::lnkapplurl',
+                  $oldrec->{id},
+                  $oldrec->{applid},
+                  $newapplid
+               );
+            }
          }
       }
    }
@@ -359,6 +372,16 @@ sub ProcessTransfer
                {id=>$oldrec->{id}}
             );
          }
+         if ($newapplid ne ""){
+            foreach my $submod (sort(keys(%{$self->{finishCITransfer}}))){
+               $self->{finishCITransfer}->{$submod}->ProcessTransfer(
+                  'itil::swinstance',
+                  $oldrec->{id},
+                  $oldrec->{applid},
+                  $newapplid
+               );
+            }
+         }
       }
    }
    if (exists($items->{"itil::system"})){
@@ -376,15 +399,33 @@ sub ProcessTransfer
                {id=>$oldrec->{id}}
             );
          }
+         $lsys->ResetFilter();
          $lsys->SetFilter({applid=>[$eappl->{id}],systemid=>[$oldrec->{id}]});
          foreach my $lrec ($lsys->getHashList(qw(ALL))){
             my $op=$lsys->Clone();
+            if ($lrec->{id} eq ""){  # maybe a cluster or swinstance relation
+               push(@$tlog,"skip transfer appl for system ".
+                           "$oldrec->{id} : $lrec->{fullname}");
+               next;
+            }
             push(@$tlog,"transfer appl for system ".
                         "$oldrec->{id} : $oldrec->{fullname}");
-            $op->ValidatedUpdateRecord($oldrec,
-               {applid=>$cappl->{id}},
-               {id=>$lrec->{id}}
-            );
+
+            my $chkop=$lsys->Clone();
+            $chkop->ResetFilter();
+            $chkop->SetFilter({applid=>[$cappl->{id}],systemid=>[$oldrec->{id}]});
+            my ($curlinked)=$chkop->getOnlyFirst(qw(ALL));
+
+
+            if (defined($curlinked)){
+               $op->ValidatedDeleteRecord($oldrec);
+            }
+            else{
+               $op->ValidatedUpdateRecord($oldrec,
+                  {applid=>$cappl->{id}},
+                  {id=>$lrec->{id}}
+               );
+            }
          }
          foreach my $crec (@{$oldrec->{contacts}}){
             push(@$tlog,"delete contact ".$crec->{targetname}." system ".
@@ -397,7 +438,16 @@ sub ProcessTransfer
                         "$oldrec->{name}");
             $op->addDefContactsFromAppl($oldrec->{id},$cappl);
          }
-         
+         if ($newapplid ne ""){
+            foreach my $submod (sort(keys(%{$self->{finishCITransfer}}))){
+               $self->{finishCITransfer}->{$submod}->ProcessTransfer(
+                  'itil::system',
+                  $oldrec->{id},
+                  $eappl->{id},
+                  $cappl->{id}
+               );
+            }
+         }
       }
    }
 
@@ -460,7 +510,7 @@ sub FinishWrite
                   }
                }
             );
-            $ntext.="\n\n";
+            #$ntext.="\n\n";
 
             my $baseurl=$ENV{SCRIPT_URI};
             $baseurl=~s#/(auth|public)/.*$##;
