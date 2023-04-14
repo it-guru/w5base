@@ -3,7 +3,7 @@ Collecting approval for application %CAPPL% already done by ...<br>
 ... at %CAPPLACKDATE%<br>
 <script language="JavaScript">
 window.setTimeout(function(){
-   window.location.pathname="/";
+//   window.location.pathname="/";
 
 },5000);
 </script>

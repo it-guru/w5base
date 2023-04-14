@@ -3,7 +3,7 @@ Emitting approval for application %EAPPL% already done by ...<br>
 ... at %EAPPLACKDATE%<br>
 <script language="JavaScript">
 window.setTimeout(function(){
-   window.location.pathname="/";
+//   window.location.pathname="/";
 
 },5000);
 </script>
