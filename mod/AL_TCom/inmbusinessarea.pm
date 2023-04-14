@@ -71,6 +71,7 @@ sub new
                 name          =>'baname',
                 label         =>'BA Name',
                 group         =>'badata',
+                uploadable    =>0,
                 dataobjattr   =>"inmbusinessarea.baname"),
 
    );
