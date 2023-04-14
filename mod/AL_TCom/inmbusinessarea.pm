@@ -40,7 +40,7 @@ sub new
 
    #######################################################################
    # modify existing fields from parent
-   my @fullinherit=(qw(name mandator cistatus 
+   my @fullinherit=(qw(name mandator 
                        criticality customerprio 
                        applmgr databoss
                        opmode));
@@ -54,8 +54,8 @@ sub new
       if (defined($fldobj)){
          $fldobj->{readonly}=1;
          next if (in_array(\@fullinherit,$fldobj->Name()));
-         $fldobj->{searchable}=0;
          $fldobj->{htmldetail}=0;
+         $fldobj->{searchable}=0;
       }
    }
 
@@ -92,7 +92,7 @@ sub new
 
 
    $self->setWorktable("inmbusinessarea");  
-   $self->setDefaultView(qw(name applid opmode criticality inmbaname));
+   $self->setDefaultView(qw(name cistatus applid opmode criticality inmbaname));
 
    return($self);
 }
@@ -226,6 +226,22 @@ sub prepUploadFilterRecord
    }
    $self->SUPER::prepUploadFilterRecord($newrec);
 }
+
+
+sub initSqlWhere
+{
+   my $self=shift;
+   my $where=$self->SUPER::initSqlWhere(@_);
+   my $mode=shift;
+   return($where) if ($mode eq "delete");
+   return($where) if ($mode eq "insert");
+   return($where) if ($mode eq "update");
+   $where.=" and " if ($where ne "");
+   $where.="(appl.cistatus<'5' and appl.cistatus>'2')";
+   return($where);
+}
+
+
 
 
 

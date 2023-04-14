@@ -55,7 +55,8 @@ sub getSqlFrom
    my $self=shift;
    my $from="inmbusinessarea ".
             "join appl ".
-            "on appl.cistatus='4' and inmbusinessarea.id=appl.id";
+            "on appl.cistatus<'5' and appl.cistatus>'2' ".
+            "and inmbusinessarea.id=appl.id";
    return($from);
 }
 
