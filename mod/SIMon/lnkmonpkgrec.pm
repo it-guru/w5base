@@ -376,6 +376,20 @@ sub new
                 noselect      =>'1',
                 dataobjattr   =>'secsystemappl.opm2'),
 
+      new kernel::Field::Text(
+                name          =>'systemsrcsys',
+                htmldetail    =>'0',
+                readonly      =>1,
+                label         =>'System Source-System',
+                dataobjattr   =>'system.srcsys'),
+                                                   
+      new kernel::Field::Text(
+                name          =>'systemsrcid',
+                htmldetail    =>'0',
+                readonly      =>1,
+                label         =>'System Source-Id',
+                dataobjattr   =>'system.srcid'),
+                                                   
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
