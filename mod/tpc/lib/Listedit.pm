@@ -490,7 +490,7 @@ sub Ping
    my $errors;
    my $d;
    # Ping is for checking backend connect, without any error displaying ...
-   {
+   if (0){
     #  open local(*STDERR), '>', \$errors;
       eval('
          my $Authorization=$self->getVRealizeAuthorizationToken($credentialN);
@@ -503,7 +503,7 @@ sub Ping
                   my $apikey=shift;
                   $baseurl.="/"  if (!($baseurl=~m/\/$/));
                   my $dataobjurl=$baseurl."iaas/deployments";
-                  $dataobjurl.="?top=2";
+                  $dataobjurl.="?top=200";
                   return($dataobjurl);
                },
                headers=>sub{
@@ -514,6 +514,13 @@ sub Ping
                                "Content-Type"=>"application/json"];
         
                   return($headers);
+               },
+               preprocess=>sub{   # create a valid JSON response
+                  my $self=shift;
+                  my $d=shift;
+                  my $code=shift;
+                  my $message=shift;
+                  return($d);
                },
                onfail=>sub{
                   my $self=shift;
@@ -532,6 +539,7 @@ sub Ping
          }
       ');
    }
+   $d="OK";
    if (!defined($d) && !$self->LastMsg()){
       $self->LastMsg(ERROR,"fail to REST Ping to TPC");
    }

@@ -525,7 +525,7 @@ sub new
                 vjoindisp     =>['fullname','swnature','is_dbs','is_mw'],
                 vjoininhash   =>['fullname','swnature','is_dbs',
                                  'is_mw','cistatusid','id',
-                                 'systemid','itclustsid']),
+                                 'systemid','itclustsid','srcsys','srcid']),
 
       new kernel::Field::Number(
                 name          =>'swinstancecount',

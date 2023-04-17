@@ -99,6 +99,13 @@ sub DataCollector
  
          return($headers);
       },
+      preprocess=>sub{   # create a valid JSON response
+         my $self=shift;
+         my $d=shift;
+         my $code=shift;
+         my $message=shift;
+         return($d);
+      },
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
@@ -109,13 +116,14 @@ sub DataCollector
             $data=[];
          }
          map({
-            foreach my $k (%$const){
+            foreach my $k (keys(%$const)){
                $_->{$k}=$const->{$k};
             }
          } @$data);
          return($data);
       }
    );
+
 
    return($d);
 }
