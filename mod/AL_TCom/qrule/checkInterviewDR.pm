@@ -144,10 +144,10 @@ sub qcheckRecord
    my $drRiskAcceptance=0;
    my @nameexpr;
 
-   my $ne=qr/^Risc_Acceptance_DR_Retirement_$rec->{ictono}_.+_(\d{8})\.pdf$/;
+   my $ne=qr/^Exception_DR_Retirement_$rec->{ictono}_.+_(\d{8})\.pdf$/;
    push(@nameexpr,$ne);
 
-   my $ne=qr/^Risk_Akzeptanz_DR_Retirement_$rec->{ictono}_.+_(\d{8})\.pdf$/;
+   my $ne=qr/^Ausnahme_DR_Retirement_$rec->{ictono}_.+_(\d{8})\.pdf$/;
    push(@nameexpr,$ne);
 
    if (exists($rec->{attachments}) &&
