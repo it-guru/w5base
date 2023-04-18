@@ -77,6 +77,8 @@ sub isValidSoftwareInstallationMandatory
    my $self=shift;
    my $rec=shift;
 
+   return(0) if ($rec->{srcsys} eq "AssetManagerApplInstSAP");
+
    if ($rec->{swnature} eq "SAP/R3" ||
        $rec->{swnature} eq "SAP/R2"){
       msg(INFO,"no check needed on SAP Instances");

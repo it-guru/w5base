@@ -1,0 +1,5 @@
+'TS::qrule::AssetManagerInstanceContacts'=>{
+   de=>'Schreib-Kontakte ererben aus Anwendung bei AM-Instance-Import',
+   en=>'Write-contact inherit from application on AM-Instance-Import'
+},
+'contacts are edited by users'=>{de=>'Kontakte wurden durch User bearbeitet'},

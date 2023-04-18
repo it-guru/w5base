@@ -1,0 +1,8 @@
+'TS::qrule::AssetManagerInstanceImport'=>{
+  de=>'AssetManager SAP Instanz Import/Sync',
+  en=>'AssetManager SAP Instance Import/Sync'
+},
+'missing AssetManager import of logical system'=>{
+de=>'fehlender AssetManager Import des logischen Systems'
+},
+
