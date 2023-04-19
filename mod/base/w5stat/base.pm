@@ -699,7 +699,8 @@ sub processData
    my ($rec,$msg)=$user->getFirst(unbuffered=>1);
    if (defined($rec)){
       do{
-         $self->getParent->processRecord($statstream,'base::user',$dstrange,$rec,%param);
+         $self->getParent->processRecord($statstream,'base::user',
+                                         $dstrange,$rec,%param);
          $count++;
          ($rec,$msg)=$user->getNext();
       } until(!defined($rec));
@@ -709,11 +710,14 @@ sub processData
 
    if (my ($year,$month)=$dstrange=~m/^(\d{4})(\d{2})$/){
       my @wfstat=qw(id eventstart class step eventend stateid mandatorid
-                             fwdtarget fwdtargetid responsiblegrp mdate 
-                             createdate);
+                    fwdtarget fwdtargetid responsiblegrp mdate 
+                    createdate
+                    additional);
      
      
       my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+
+      $param{dataobj}=$wf;
      
       msg(INFO,"starting collect of base::workflow set1.1");
       $wf->SetFilter({eventend=>">=$month/$year AND <$month/$year+1M",
@@ -891,6 +895,12 @@ sub processRecord
                                  "base.DataIssue.IdList.open",$rec->{id});
             }
          }
+         my $dataissuemetric=[];
+         if (ref($rec->{additional}) eq "HASH" &&
+             exists($rec->{additional}->{dataissuemetric})){
+            $dataissuemetric=$rec->{additional}->{dataissuemetric};
+         }
+
          my $mandatorids=$rec->{mandatorid};
          $mandatorids=[$mandatorids] if (ref($mandatorids) ne "ARRAY");
          if ($#{$mandatorids}!=-1){
@@ -902,6 +912,12 @@ sub processRecord
                                               },"base.DataIssue.open",1);
                if ($rec->{stateid}!=5 && 
                    $rec->{class} eq "base::workflow::DataIssue"){ 
+                  foreach my $metric (@$dataissuemetric){
+                     $self->getParent->storeStatVar("Mandator",$mn,{
+                                                       nameid=>$mandatorid
+                                                    },
+                             "base.DataIssue.open.metric.".$metric,1);
+                  }
                   if ($age>259200){ # 1/2 Jahr
                      $self->getParent->storeStatVar("Mandator",$mn,{
                                                        nameid=>$mandatorid
@@ -913,6 +929,12 @@ sub processRecord
                                                        nameid=>$mandatorid
                                                     },
                                                     "base.DataIssue.sleep56",1);
+                     foreach my $metric (@$dataissuemetric){
+                        $self->getParent->storeStatVar("Mandator",$mn,{
+                                                          nameid=>$mandatorid
+                                                       },
+                                "base.DataIssue.sleep56.metric.".$metric,1);
+                     }
                   }
                   elsif ($age>40320){ # 4 Wochen
                      $self->getParent->storeStatVar("Mandator",$mn,{
@@ -980,6 +1002,10 @@ sub processRecord
                   elsif ($age>80640){ # 8 Wochen
                      $self->getParent->storeStatVar("Group",$resp,{},
                                                     "base.DataIssue.sleep56",1);
+                     foreach my $metric (@$dataissuemetric){
+                        $self->getParent->storeStatVar("Group",$resp,{},
+                                "base.DataIssue.sleep56.metric.".$metric,1);
+                     }
                   }
                   elsif ($age>40320){ # 4 Wochen
                      $self->getParent->storeStatVar("Group",$resp,{},
@@ -993,6 +1019,10 @@ sub processRecord
                else{
                   $self->getParent->storeStatVar("Group",$resp,{},
                                                  "base.DataIssue.notified",0);
+               }
+               foreach my $metric (@$dataissuemetric){
+                  $self->getParent->storeStatVar("Group",$resp,{},
+                          "base.DataIssue.open.metric.".$metric,1);
                }
             }
 
