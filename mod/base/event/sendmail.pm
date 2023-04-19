@@ -202,6 +202,11 @@ sub Sendmail
                        },
                        {
                          class=>'base::workflow::mailsend',
+                         state=>\'1',
+                         mdate=>"<now-48h"
+                       },
+                       {
+                         class=>'base::workflow::mailsend',
                          state=>\'4',
                          mdate=>"<now-12h"
                        }
