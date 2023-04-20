@@ -198,16 +198,19 @@ sub Sendmail
                        {
                          class=>'base::workflow::mailsend',
                          state=>\'6',
+                         isdeleted=>\'0',
                          mdate=>"<now-1h"
                        },
                        {
                          class=>'base::workflow::mailsend',
                          state=>\'1',
+                         isdeleted=>\'0',
                          mdate=>"<now-48h"
                        },
                        {
                          class=>'base::workflow::mailsend',
                          state=>\'4',
+                         isdeleted=>\'0',
                          mdate=>"<now-12h"
                        }
                      ]);
