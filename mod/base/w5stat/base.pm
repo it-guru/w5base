@@ -994,6 +994,11 @@ sub processRecord
          {
             my $resp=\@responsiblegrp;
             if ($rec->{class} eq "base::workflow::DataIssue"){ 
+               my $dataissuemetric=[];
+               if (ref($rec->{additional}) eq "HASH" &&
+                   exists($rec->{additional}->{dataissuemetric})){
+                  $dataissuemetric=$rec->{additional}->{dataissuemetric};
+               }
                if ($rec->{stateid}!=5){
                   if ($age>259200){ # 1/2 Jahr
                      $self->getParent->storeStatVar("Group",$resp,{},
