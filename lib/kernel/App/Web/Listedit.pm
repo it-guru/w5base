@@ -1154,6 +1154,7 @@ sub ById
 
    if (lc($ENV{HTTP_ACCEPT}) eq "application/json" ||
        $FormatAs eq "nativeJSON"){
+      $ENV{HTTP_ACCEPT}="application/json";
       my $CurrentView=Query->Param("CurrentView");
       Query->Reset();
       my %flt=($idname=>\$val);
