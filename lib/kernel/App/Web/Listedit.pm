@@ -1150,7 +1150,10 @@ sub ById
    $val="UNDEF" if ($val eq "");
    my %param;
 
-   if (lc($ENV{HTTP_ACCEPT}) eq "application/json"){
+   my $FormatAs=Query->Param("FormatAs");
+
+   if (lc($ENV{HTTP_ACCEPT}) eq "application/json" ||
+       $FormatAs eq "nativeJSON"){
       my $CurrentView=Query->Param("CurrentView");
       Query->Reset();
       my %flt=($idname=>\$val);
