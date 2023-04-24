@@ -1,0 +1,5 @@
+'TPC4::qrule::compareSystem'=>{de=>'TPC Abgleich log. System',en=>'TPC compare of log. system'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'missconfigurued MCOS system detected'=>{de=>'fehlkonfiguriertes MCOS System erkannt'},
+'no MCOS record in AssetManager found'=>{de=>'kein MCOS Systemdatensatz in AssetManager gefunden'},
+
