@@ -76,11 +76,6 @@ sub qcheckRecord
    my $errorlevel=0;
 
 
-   return(undef,undef) if ($rec->{itcloudshortname} ne "TPC1" &&
-                           $rec->{itcloudshortname} ne "TPC2");
-                          # migration from TPC to TPC1 will be done by
-                          # event/TPC1_CloudAreaSync
-
    return(undef,undef) if ($rec->{cistatusid}<4);
 
    my $tpccode=$rec->{itcloudshortname};
