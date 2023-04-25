@@ -76,6 +76,8 @@ sub qcheckRecord
    my $errorlevel=0;
 
 
+   return(undef,undef) if (!($rec->{itcloudshortname}=~m/^TPC\d+$/));
+
    return(undef,undef) if ($rec->{cistatusid}<4);
 
    my $tpccode=$rec->{itcloudshortname};
