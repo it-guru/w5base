@@ -2,7 +2,7 @@
 'on'=>{de=>'auf'},
 'mandatory'=>{de=>'notwendig'},
 'recommended'=>{de=>'empfohlen'},
-'The installation package'=>{de=>'Das Installationspacket'},
+'The installation package'=>{de=>'Das Installationspaket'},
 'needs to be installed'=>{de=>'muss installiert werden'},
 'should be installed'=>{de=>'sollte installiert werden'},
 'on logical system'=>{de=>'auf dem logischen System'},
