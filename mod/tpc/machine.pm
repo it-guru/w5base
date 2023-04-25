@@ -208,6 +208,7 @@ sub DataCollector
       "machines","id",
       $filterset
    );
+   my $dataobjurl;
    my $d=$self->CollectREST(
       dbname=>$credentialName,
       requesttoken=>$requesttoken,
@@ -216,7 +217,7 @@ sub DataCollector
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl."iaas/".$dbclass;
+         $dataobjurl=$baseurl."iaas/".$dbclass;
          return($dataobjurl);
       },
 
@@ -285,6 +286,10 @@ sub DataCollector
          if ($code eq "404"){  # 404 bedeutet nicht gefunden
             return([],"200");
          }
+         if ($code eq "403"){  # 403 Forbitten Problem 04/2023
+            msg(ERROR,"vRA Bug 403 forbitten on access '$dataobjurl'");
+            return([],"200");  # Workaround, to prevent Error Messages
+         }                     # in QualityChecks
          msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,"unexpected data TPC machine response");
          return(undef);

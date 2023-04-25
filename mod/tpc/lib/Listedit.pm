@@ -490,7 +490,7 @@ sub Ping
    my $errors;
    my $d;
    # Ping is for checking backend connect, without any error displaying ...
-   if (0){
+   if (1){
     #  open local(*STDERR), '>', \$errors;
       eval('
          my $Authorization=$self->getVRealizeAuthorizationToken($credentialN);
@@ -502,8 +502,7 @@ sub Ping
                   my $baseurl=shift;
                   my $apikey=shift;
                   $baseurl.="/"  if (!($baseurl=~m/\/$/));
-                  my $dataobjurl=$baseurl."iaas/deployments";
-                  $dataobjurl.="?top=200";
+                  my $dataobjurl=$baseurl."iaas/api/about";
                   return($dataobjurl);
                },
                headers=>sub{
@@ -539,7 +538,10 @@ sub Ping
          }
       ');
    }
-   $d="OK";
+   #
+   # $d muss ein HASH sein und den Key $d->{latestApiVersion} haben. Das
+   # könnte man noch verifizieren.
+   #
    if (!defined($d) && !$self->LastMsg()){
       $self->LastMsg(ERROR,"fail to REST Ping to TPC");
    }
