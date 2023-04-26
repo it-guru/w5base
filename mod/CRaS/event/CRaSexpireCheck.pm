@@ -53,7 +53,7 @@ sub CRaSexpireCheck
                $wobj->ValidatedUpdateRecord($rec,{
                   sslexpnotify1=>NowStamp("en"),
                   mdate=>$rec->{mdate}
-               },id=>\$rec->{id});
+               },{id=>\$rec->{id}});
             }
          }
          else{
@@ -65,7 +65,7 @@ sub CRaSexpireCheck
                      $wobj->ValidatedUpdateRecord($rec,{
                         sslexpnotify2=>NowStamp("en"),
                         mdate=>$rec->{mdate}
-                     },id=>\$rec->{id});
+                     },{id=>\$rec->{id}});
                   }
                }
             }

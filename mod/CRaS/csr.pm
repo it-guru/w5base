@@ -1227,6 +1227,8 @@ sub doNotify
 
    my $obj=$self->Clone();
 
+   my $mailcnt=0;
+
    $obj->ResetFilter();
    $obj->SetFilter({id=>\$csrid});
    my ($rec)=$obj->getOnlyFirst(qw(ALL));
@@ -1412,6 +1414,7 @@ sub doNotify
                ],
                emailcategory =>['CRaS','CRaS.'.$mode]
             );
+            $mailcnt++;
          }
       }
       if ($lastlang ne ""){
@@ -1426,7 +1429,7 @@ sub doNotify
 
    #printf STDERR ("Notify(%s)=%s\n",$mode,Dumper($rec));
 
-   return(1);
+   return($mailcnt);
 }
 
 
