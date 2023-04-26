@@ -44,7 +44,7 @@ sich auch in in der W5Base angemeldet haben.
 Die Anzahl der Untergruppen sind die Einheiten,
 die unter dem aktuellen Bereich angesiedelt sind.<br>
 <br>
-Die Mitarbeiter werden bei der Kennzahl "gesammt Userzahl"
+Die Mitarbeiter werden bei der Kennzahl "gesamt Userzahl"
 mitgezählt.
 </td>
 
