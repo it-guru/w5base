@@ -491,7 +491,7 @@ sub Ping
    my $d;
    # Ping is for checking backend connect, without any error displaying ...
    if (1){
-    #  open local(*STDERR), '>', \$errors;
+      open local(*STDERR), '>', \$errors;
       eval('
          my $Authorization=$self->getVRealizeAuthorizationToken($credentialN);
          if ($Authorization ne ""){
@@ -542,6 +542,7 @@ sub Ping
    # $d muss ein HASH sein und den Key $d->{latestApiVersion} haben. Das
    # könnte man noch verifizieren.
    #
+      print STDERR Dumper(\$d);
    if (!defined($d) && !$self->LastMsg()){
       $self->LastMsg(ERROR,"fail to REST Ping to TPC");
    }
