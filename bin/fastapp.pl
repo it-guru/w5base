@@ -47,6 +47,9 @@ my %SHELLENV;
 BEGIN{
    %SHELLENV=(%ENV);
 }
+END {
+   printf STDERR ("INFO: terminate fastappl.pl($$)\n");
+}
 
 use strict;
 use FindBin ;

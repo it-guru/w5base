@@ -85,6 +85,11 @@ sub RunWebApp
    my $objectkey=$ENV{'SCRIPT_NAME'}.":".$MOD;
 
 
+   if (exists($W5V2::ObjCache{$objectkey})){
+      if ($W5V2::ObjCache{$objectkey}->{Time}<time()-3500){
+         delete($W5V2::ObjCache{$objectkey});
+      }
+   }
    if (!exists($W5V2::ObjCache{$objectkey})){
       my $o=getModuleObject($instdir,$configname,$MOD);
       if (!defined($o)){
@@ -92,9 +97,9 @@ sub RunWebApp
          print(msg(ERROR,"can't create DataObject '$MOD'"));
          return(undef);
       }
-      $W5V2::ObjCache{$objectkey}=$o;
+      $W5V2::ObjCache{$objectkey}={Obj=>$o,Time=>time()};
    }
-   my $statedir=$W5V2::ObjCache{$objectkey}->Config->Param("LogState");
+   my $statedir=$W5V2::ObjCache{$objectkey}->{Obj}->Config->Param("LogState");
    my $havestate=undef;
    if ($statedir ne "" && -d $statedir ){
       my $f;
@@ -117,15 +122,15 @@ sub RunWebApp
          $havestate=undef;
       }
    }
-   my $opmode=$W5V2::ObjCache{$objectkey}->Config->Param("W5BaseOperationMode");
+   my $opmode=$W5V2::ObjCache{$objectkey}->{Obj}->Config->Param("W5BaseOperationMode");
    if (($opmode=~m/^offline/) || ($opmode=~m/^maintenance/)){
-      return($W5V2::ObjCache{$objectkey}->DisplayMaintenanceWindow());
+      return($W5V2::ObjCache{$objectkey}->{Obj}->DisplayMaintenanceWindow());
    }
-   return if (!$W5V2::ObjCache{$objectkey}->InitRequest(cgi=>$cgi));
+   return if (!$W5V2::ObjCache{$objectkey}->{Obj}->InitRequest(cgi=>$cgi));
 
-   my $bk=$W5V2::ObjCache{$objectkey}->Run();
+   my $bk=$W5V2::ObjCache{$objectkey}->{Obj}->Run();
    if ($W5V2::InvalidateGroupCache){
-      $W5V2::ObjCache{$objectkey}->InvalidateGroupCache();
+      $W5V2::ObjCache{$objectkey}->{Obj}->InvalidateGroupCache();
    }
 
    if ($havestate ne ""){
