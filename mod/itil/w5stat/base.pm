@@ -506,7 +506,8 @@ sub processData
    my ($rec,$msg)=$appl->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord($statstream,'itil::appl',$dstrange,$rec,%param);
+         $self->getParent->processRecord($statstream,'itil::appl',
+                                         $dstrange,$rec,%param);
          ($rec,$msg)=$appl->getNext();
          $count++;
       } until(!defined($rec));
@@ -521,8 +522,8 @@ sub processData
    my ($rec,$msg)=$swinstance->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord($statstream,'itil::swinstance',$dstrange,$rec,
-                                         %param);
+         $self->getParent->processRecord($statstream,'itil::swinstance',
+                                         $dstrange,$rec, %param);
          ($rec,$msg)=$swinstance->getNext();
          $count++;
       } until(!defined($rec));
@@ -546,6 +547,7 @@ sub processData
    }
    msg(INFO,"FINE of itil::system  $count records");
 
+
    my $asset=getModuleObject($self->getParent->Config,"itil::asset");
    $asset->SetFilter({cistatusid=>'<=4'});
    $asset->SetCurrentView(qw(ALL));
@@ -554,12 +556,33 @@ sub processData
    my ($rec,$msg)=$asset->getFirst();
    if (defined($rec)){
       do{
-         $self->getParent->processRecord($statstream,'itil::asset',$dstrange,$rec,%param);
+         $self->getParent->processRecord($statstream,'itil::asset',
+                                         $dstrange,$rec,%param);
          $count++;
          ($rec,$msg)=$asset->getNext();
       } until(!defined($rec));
    }
    msg(INFO,"FINE of itil::asset  $count records");
+
+
+   my $itcloud=getModuleObject($self->getParent->Config,"itil::itcloud");
+   $itcloud->SetFilter({cistatusid=>'<=4'});
+   $itcloud->SetCurrentView(qw(ALL));
+   $itcloud->SetCurrentOrder("NONE");
+   msg(INFO,"starting collect of itil::itcloud");$count=0;
+   my ($rec,$msg)=$itcloud->getFirst();
+   if (defined($rec)){
+      do{
+         $self->getParent->processRecord($statstream,'itil::itcloud',
+                                         $dstrange,$rec,%param);
+         $count++;
+         ($rec,$msg)=$itcloud->getNext();
+      } until(!defined($rec));
+   }
+   msg(INFO,"FINE of itil::itcloud  $count records");
+
+
+
 }
 
 
@@ -594,6 +617,16 @@ sub processRecord
                                         {nameid=>$rec->{id},
                                          nosplit=>1},
                                         "ITIL.System.Count",$systemcount);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.Application.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         method=>'ucount',
+                                         nosplit=>1},
+                                        "base.Databoss.Count",
+                                        $rec->{databossid});
       }
    }
    if ($module eq "itil::system"){
@@ -619,6 +652,16 @@ sub processRecord
       if ($rec->{cistatusid}<=5){
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "ITIL.Total.System.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.System.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         method=>'ucount',
+                                         nosplit=>1},
+                                        "base.Databoss.Count",
+                                        $rec->{databossid});
       }
    }
    if ($module eq "itil::swinstance"){
@@ -633,16 +676,64 @@ sub processRecord
       if ($rec->{cistatusid}<=5){
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "ITIL.Total.SWInstance.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.SWInstance.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         method=>'ucount',
+                                         nosplit=>1},
+                                        "base.Databoss.Count",
+                                        $rec->{databossid});
       }
    }
    if ($module eq "itil::asset"){
       if ($rec->{cistatusid}==4){
          $self->getParent->storeStatVar("Group",[$rec->{guardianteam}],{},
                                         "ITIL.Asset.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Asset.Count",1);
       }
       if ($rec->{cistatusid}<=5){
          $self->getParent->storeStatVar("Group",["admin"],{},
                                         "ITIL.Total.Asset.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.Asset.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         method=>'ucount',
+                                         nosplit=>1},
+                                        "base.Databoss.Count",
+                                        $rec->{databossid});
+      }
+   }
+   if ($module eq "itil::itcloud"){
+      if ($rec->{cistatusid}==4){
+         $self->getParent->storeStatVar("Group",[$rec->{swteam}],{},
+                                        "ITIL.Cloud.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Cloud.Count",1);
+      }
+      if ($rec->{cistatusid}<=5){
+         $self->getParent->storeStatVar("Group",["admin"],{},
+                                        "ITIL.Total.Cloud.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.Cloud.Count",1);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         method=>'ucount',
+                                         nosplit=>1},
+                                        "base.Databoss.Count",
+                                        $rec->{databossid});
       }
    }
    if ($module eq "base::workflow::active"){

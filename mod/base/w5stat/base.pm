@@ -910,6 +910,16 @@ sub processRecord
                $self->getParent->storeStatVar("Mandator",$mn,{
                                                  nameid=>$mandatorid
                                               },"base.DataIssue.open",1);
+               if ($rec->{fwdtarget} eq "base::user"){
+                  $self->getParent->storeStatVar(
+                       "Mandator",$mn,
+                       {nameid=>$mandatorid,
+                        method=>'ucount',
+                        nosplit=>1},
+                       "base.DataIssue.open.Databoss.Count",
+                       $rec->{fwdtargetid}
+                  );
+               }
                if ($rec->{stateid}!=5 && 
                    $rec->{class} eq "base::workflow::DataIssue"){ 
                   foreach my $metric (@$dataissuemetric){
@@ -923,6 +933,16 @@ sub processRecord
                                                        nameid=>$mandatorid
                                                     },
                                                     "base.DataIssue.dead",1);
+                     if ($rec->{fwdtarget} eq "base::user"){
+                        $self->getParent->storeStatVar(
+                             "Mandator",$mn,
+                             {nameid=>$mandatorid,
+                              method=>'ucount',
+                              nosplit=>1},
+                             "base.DataIssue.dead.Databoss.Count",
+                             $rec->{fwdtargetid}
+                        );
+                     }
                   }
                   elsif ($age>80640){ # 8 Wochen
                      $self->getParent->storeStatVar("Mandator",$mn,{
@@ -935,12 +955,32 @@ sub processRecord
                                                        },
                                 "base.DataIssue.sleep56.metric.".$metric,1);
                      }
+                     if ($rec->{fwdtarget} eq "base::user"){
+                        $self->getParent->storeStatVar(
+                             "Mandator",$mn,
+                             {nameid=>$mandatorid,
+                              method=>'ucount',
+                              nosplit=>1},
+                             "base.DataIssue.sleep56.Databoss.Count",
+                             $rec->{fwdtargetid}
+                        );
+                     }
                   }
                   elsif ($age>40320){ # 4 Wochen
                      $self->getParent->storeStatVar("Mandator",$mn,{
                                                        nameid=>$mandatorid
                                                     },
                                                     "base.DataIssue.sleep28",1);
+                     if ($rec->{fwdtarget} eq "base::user"){
+                        $self->getParent->storeStatVar(
+                             "Mandator",$mn,
+                             {nameid=>$mandatorid,
+                              method=>'ucount',
+                              nosplit=>1},
+                             "base.DataIssue.sleep28.Databoss.Count",
+                             $rec->{fwdtargetid}
+                        );
+                     }
                   }
                }
             }

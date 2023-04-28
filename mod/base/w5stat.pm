@@ -448,8 +448,8 @@ sub _storeStats
                   # use as is
                }
                elsif (ref($self->{stats}->{$group}->{$name}->{$v}) eq "HASH"){
-                  if ($self->{stats}->{$group}->{$name}->{$v}->{method} 
-                      eq "avg"){
+                  my $method=$self->{stats}->{$group}->{$name}->{$v}->{method};
+                  if ($method eq "avg"){
                      my @l;
                      if (ref($self->{stats}->{$group}->{$name}->{$v}->{data}) 
                          eq "ARRAY"){
@@ -464,6 +464,14 @@ sub _storeStats
                      else{
                         $self->{stats}->{$group}->{$name}->{$v}=0;
                      }
+                  }
+                  elsif ($method eq "ucount"){
+                     my $n="?";
+                     my $data=$self->{stats}->{$group}->{$name}->{$v}->{data};
+                     if (ref($data) eq "HASH"){
+                        $n=keys(%{$data});
+                     }
+                     $self->{stats}->{$group}->{$name}->{$v}=$n;
                   }
                   else{
                      $self->{stats}->{$group}->{$name}->{$v}="bad data";
@@ -663,6 +671,15 @@ sub storeStatVar
                      $self->{stats}->{$group}->{$key}->{$var}.=", ";
                   }
                   $self->{stats}->{$group}->{$key}->{$var}.=$val[0];
+               }
+               if (lc($method) eq "ucount"){
+                  if (!defined($self->{stats}->{$group}->{$key}->{$var})){
+                     $self->{stats}->{$group}->{$key}->{$var}={
+                        method=>'ucount',
+                        data=>{}
+                     };
+                  }
+                  $self->{stats}->{$group}->{$key}->{$var}->{data}->{$val[0]}++;
                }
                if (lc($method) eq "add"){
                   if (!defined($self->{stats}->{$group}->{$key}->{$var})){
