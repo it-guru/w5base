@@ -542,7 +542,6 @@ sub Ping
    # $d muss ein HASH sein und den Key $d->{latestApiVersion} haben. Das
    # könnte man noch verifizieren.
    #
-      print STDERR Dumper(\$d);
    if (!defined($d) && !$self->LastMsg()){
       $self->LastMsg(ERROR,"fail to REST Ping to TPC");
    }
