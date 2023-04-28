@@ -89,7 +89,16 @@ sub qcheckRecord
       type=>\'SAP'
    });
 
-   my @l=$amif->getHashList(qw(ALL));
+   my @preList=$amif->getHashList(qw(id child_applid parent 
+                                     child type mdate parent_applid));
+   my %uList;
+   foreach my $ifrec (@preList){
+      my $k=$ifrec->{parent_applid}.":".$ifrec->{child_applid};
+      if (!exists($uList{$k})){
+         $uList{$k}=$ifrec;
+      }
+   }
+   my @l=values(%uList);
 
 
    my %childapplid;
