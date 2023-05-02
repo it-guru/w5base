@@ -206,25 +206,25 @@ sub SendMyJobs
                $o->SetFilter({databossid=>$urec->{userid},cistatusid=>"<6"});
                foreach my $cirec ($o->getHashList(qw(id urlofcurrentrec 
                                                      name interviewst))){
-                  #print STDERR Dumper($cirec);
-                  if ($cirec->{interviewst}->{todo}>0 ||
-                      $cirec->{interviewst}->{outdated}>0){
-                     if ($openInterviews==0){
-                        push(@emailsubtitle,
-                            "<table cellspacing=5 border=0><tr><td><b><u>".
-                            $user->T("Current Config-Items with ".
-                                     "open or oudated answers:").
-                            "</b></u></td></tr></table>");
-                     }
-                     else{
-                        push(@emailsubtitle,"");
-                     }
-                     $openInterviews++;
-                     push(@emailtext,"$cirec->{name}\n".
-                                     "$cirec->{urlofcurrentrec}/Interview");
-                     push(@emailpostfix,"");
-                     push(@emailprefix,"");
-                  }
+                 # #print STDERR Dumper($cirec);
+                 # if ($cirec->{interviewst}->{todo}>0 ||
+                 #     $cirec->{interviewst}->{outdated}>0){
+                 #    if ($openInterviews==0){
+                 #       push(@emailsubtitle,
+                 #           "<table cellspacing=5 border=0><tr><td><b><u>".
+                 #           $user->T("Current Config-Items with ".
+                 #                    "open or oudated answers:").
+                 #           "</b></u></td></tr></table>");
+                 #    }
+                 #    else{
+                 #       push(@emailsubtitle,"");
+                 #    }
+                 #    $openInterviews++;
+                 #    push(@emailtext,"$cirec->{name}\n".
+                 #                    "$cirec->{urlofcurrentrec}/Interview");
+                 #    push(@emailpostfix,"");
+                 #    push(@emailprefix,"");
+                 # }
                }
             }
             $totaljobs+=$openInterviews;
