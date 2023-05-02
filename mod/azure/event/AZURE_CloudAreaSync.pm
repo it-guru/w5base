@@ -261,6 +261,11 @@ sub AZURE_CloudAreaSync
                       $oldrec->{cistatusid}!=5){
                      $oprec->{DATA}->{cistatusid}="5";
                   }
+                  if ($newrec->{state} eq "enabled" &&
+                      $oldrec->{cistatusid}!=3 &&
+                      $oldrec->{cistatusid}!=4){
+                     $oprec->{DATA}->{cistatusid}="3";
+                  }
                   if ($oldrec->{cistatusid}==6){
                      $oprec->{DATA}->{cistatusid}="3";
                   }
