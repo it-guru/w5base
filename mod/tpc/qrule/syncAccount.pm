@@ -132,7 +132,7 @@ sub qcheckRecord
          {
             srcsys=>['TPC','AssetManager'],   # AssetManager because MCOS!
             itcloudareaid=>$rec->{id},
-            cistatusid=>"<6"
+      #      cistatusid=>"<6"
          }]
       );
       my @cursys=$sys->getHashList(qw(id srcid srcsys cistatusid));
@@ -167,6 +167,14 @@ sub qcheckRecord
          }
       }
 
+      if ($#updsys!=-1){
+         $sys->ResetFilter();
+         $sys->SetFilter({itcloudareaid=>$rec->{id},srcid=>\@updsys});
+         my $op=$sys->Clone();
+         foreach my $rec ($sys->getHashList(qw(ALL))){
+            $op->ValidatedUpdateRecord($rec,{cistatusid=>4},{id=>\$rec->{id}});
+         }
+      }
       foreach my $srcid (@inssys){
          $par->ResetFilter();
          $par->SetFilter({id=>\$srcid});
@@ -180,7 +188,7 @@ sub qcheckRecord
       if (keys(%srcid) &&   # ensure, restcall get at least one result
           $#delsys!=-1){
          $sys->ResetFilter();
-         $sys->SetFilter(srcid=>\@delsys);
+         $sys->SetFilter({itcloudareaid=>$rec->{id},srcid=>\@delsys});
          my $op=$sys->Clone();
          foreach my $rec ($sys->getHashList(qw(ALL))){
             $op->ValidatedUpdateRecord($rec,{cistatusid=>6},{id=>\$rec->{id}});
