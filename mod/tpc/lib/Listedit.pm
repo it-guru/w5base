@@ -617,9 +617,9 @@ sub genReadTPChref
             my $content=shift;
             my $reqtrace=shift;
     
-           # if ($code eq "404"){  # 404 bedeutet nicht gefunden
-           #    return([],"200");
-           # }
+            if ($code eq "404"){  # 404 bedeutet nicht gefunden
+               return([],"200");
+            }
             msg(ERROR,$reqtrace);
             $self->LastMsg(ERROR,"unexpected data TPC response in genReadHref");
             return(undef);
