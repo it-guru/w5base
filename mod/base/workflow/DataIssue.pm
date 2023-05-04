@@ -233,6 +233,22 @@ sub setClearingDestinations
    my $clearinggrpvalid=0;
 
    my $grp=getModuleObject($self->Config,'base::grp');
+
+   if ($mandator ne ""){
+      $grp->ResetFilter();
+      $grp->SetFilter({grpid=>\$mandator,cistatusid=>4});
+      my ($mgrp,$msg)=$grp->getOnlyFirst(qw(grpid subunits));
+      if (defined($mgrp)){
+         foreach my $subgrp (@{$mgrp->{subunits}}){
+             if ($subgrp->{name} eq $clearinggrpname){
+                $clearinggrpname=$subgrp->{fullname};
+                last;
+             }
+         }
+      }
+   }
+
+   $grp->ResetFilter();
    $grp->SetFilter({fullname=>\$clearinggrpname,cistatusid=>4});
    my ($clearinggrp,$msg)=$grp->getOnlyFirst(qw(grpid));
 
@@ -245,6 +261,11 @@ sub setClearingDestinations
          $clearinggrpvalid=1;
       }
    }
+
+
+
+
+
 
    if (!$clearinggrpvalid) {
 
