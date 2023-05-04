@@ -150,6 +150,7 @@ sub qcheckRecord
       my $amapplrec=$cappldata->{applid}->{$applid};
       foreach my $sysrec (@{$amapplrec->{systems}}){
          my $systemid=$sysrec->{systemid};
+         next if (!($sysrec->{child}=~m/^SEC/i));
          next if ($systemid eq "");
          next if (!exists($sysids{$systemid}));
          my $prodcomp=$amapplrec->{prodcomp};
