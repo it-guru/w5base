@@ -348,6 +348,11 @@ sub qcheckRecord
 
 
                if ($parrec->{srcsys} eq "MCOS_FCI" &&
+                   $rec->{itcloudshortname} ne ""){
+                  delete($parrec->{conumber});
+               }
+                   
+               if ($parrec->{srcsys} eq "MCOS_FCI" &&
                    ($rec->{itcloudshortname}=~m/^TPC[0-9]/)){
                   my $TPCenv=$rec->{itcloudshortname};
                   # TPC MachineID in $rec->{srcid}=~m/^\S+-\S+-\S+-\S+-\S+$/
@@ -371,17 +376,6 @@ sub qcheckRecord
                         else{
                            msg(INFO,"skip use of systemname '".
                                     $tpcrec->{name}."' from TPC ($TPCenv)");
-                        }
-                        if ($tpcrec->{projectId} ne ""){
-                           my $p=getModuleObject($self->getParent->Config,
-                                                 $TPCenv."::project");
-                           $p->SetFilter({id=>\$tpcrec->{projectId}});
-                           my ($tpcprec)=$p->getOnlyFirst(qw(name id applid));
-                           if (defined($tpcprec) && $tpcprec->{applid} ne ""){
-                              $self->updateCostCenterByApplId(
-                                 $rec,$parrec,$tpcprec->{applid}
-                              );
-                           }
                         }
                      }
                   }
@@ -1014,24 +1008,6 @@ sub qcheckRecord
 }
 
 
-sub  updateCostCenterByApplId
-{
-   my $self=shift;
-   my $rec=shift;
-   my $parrec=shift;
-   my $applid=shift;
-
-   my $o=getModuleObject($self->getParent->Config(),"itil::appl");
-   $o->SetFilter({id=>\$applid});
-   my ($apprec)=$o->getOnlyFirst(qw(name id conumber));
-   if (defined($apprec) && $apprec->{conumber} ne ""){
-      if ($parrec->{conumber} ne $apprec->{conumber}){
-         msg(INFO,"overwrite conumber ($apprec->{conumber}) from\n".
-                  "AssetManager by information from applid '$applid'");
-         $parrec->{conumber}=$apprec->{conumber};
-      }
-   }
-}
 
 
 
