@@ -976,10 +976,13 @@ sub getFurtherArticles
    $excludeFAQ=[] if (!defined($excludeFAQ));
    $excludeFAQ=[$excludeFAQ] if (ref($excludeFAQ) ne "ARRAY");
 
+   my $langstr=$self->Lang();
+   $langstr.=" multilang";
+
    if ($words ne ""){
       if (!$wordMode){
          $self->ResetFilter();
-         $self->SecureSetFilter({kwords=>$words});
+         $self->SecureSetFilter({kwords=>$words,lang=>$langstr});
          $self->Limit(11);
          @fl=$self->getHashList(qw(mdate faqid name));
       }
@@ -1001,7 +1004,7 @@ sub getFurtherArticles
                my $qkeyword=quotemeta($keyword);
                next if (grep(/^$qkeyword$/i,@not));
                $self->ResetFilter();
-               $self->SecureSetFilter({kwords=>$keyword});
+               $self->SecureSetFilter({kwords=>$keyword,lang=>$langstr});
                $self->Limit(11);
                my @kl=$self->getHashList(qw(mdate faqid name));
                if ($#kl!=-1){
