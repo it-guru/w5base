@@ -977,6 +977,7 @@ sub getFurtherArticles
    $excludeFAQ=[$excludeFAQ] if (ref($excludeFAQ) ne "ARRAY");
 
    my $langstr=$self->Lang();
+   $langstr="en" if ($langstr eq "");
    $langstr.=" multilang";
 
    if ($words ne ""){
