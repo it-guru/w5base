@@ -1,0 +1,6 @@
+'itil::qrule::CloudAppInheritance'=>{
+ de=>'Ererbung von Informationen aus CloudArea-Anwendung',
+ en=>'Inheritance of informations from CloudArea-Application',
+},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+

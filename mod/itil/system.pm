@@ -3344,6 +3344,33 @@ sub addDefContactsFromAppl
 
 
 
+sub  updateCostCenterByApplId
+{
+   my $self=shift;
+   my $srcsys=shift;
+   my $rec=shift;
+   my $forcedupd=shift;
+   my $applid=shift;
+
+   my $o=getModuleObject($self->Config(),"itil::appl");
+   $o->SetFilter({id=>\$applid});
+   my ($apprec)=$o->getOnlyFirst(qw(name id conumber));
+   if (defined($apprec) && $apprec->{conumber} ne ""){
+      if ($rec->{conumber} ne $apprec->{conumber}){
+         msg(INFO,"overwrite conumber ($apprec->{conumber}) from\n".
+                  "$srcsys by information from applid '$applid'");
+         $forcedupd->{conumber}=$apprec->{conumber};
+      }
+   }
+}
+
+
+
+
+
+
+
+
 
 
 
