@@ -320,6 +320,21 @@ sub new
                 label         =>'additional quest data',
                 dataobjattr   =>'interview.addquerydata'),
 
+
+      new kernel::Field::Date(
+                name          =>'ifrom',
+                htmleditwidth =>'150',
+                group         =>'irange',
+                label         =>'interview time range from',
+                dataobjattr   =>'interview.ifrom'),
+
+      new kernel::Field::Date(
+                name          =>'ito',
+                htmleditwidth =>'150',
+                group         =>'irange',
+                label         =>'interview time range to',
+                dataobjattr   =>'interview.ito'),
+
       new kernel::Field::Boolean(
                 name          =>'allownotrelevant',
                 label         =>'allow not relevant',
@@ -569,10 +584,30 @@ sub Validate
 #      return(undef);
 #   }
    my $qtag=effVal($oldrec,$newrec,"qtag");
+   if ($qtag eq ""){
+      $newrec->{qtag}="Q".time();
+   }
+   $qtag=effVal($oldrec,$newrec,"qtag");
    if (($qtag=~m/\s/i) || length($qtag)<3){
       $self->LastMsg(ERROR,"invalid unique query tag specified"); 
       return(undef);
    }
+
+
+   my $ifrom=effVal($oldrec,$newrec,"ifrom");
+   my $ito=effVal($oldrec,$newrec,"ito");
+
+   if (exists($newrec->{ifrom}) || exists($newrec->{ito})){
+      if ($ifrom ne "" && $ito ne ""){
+         my $d=CalcDateDuration($ifrom,$ito);
+         if (!defined($d) || $d->{totalminutes}<0){
+            $self->LastMsg(ERROR,"invalid interview timerange"); 
+            return(undef);
+         }
+      }
+   }
+
+
   # my $questclust=trim(effVal($oldrec,$newrec,"questclust"));
   # if ($questclust=~m/^\s*$/i){
   #    $self->LastMsg(ERROR,"invalid question group specified"); 
@@ -665,7 +700,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("header","default","tech") if (!defined($rec));
+   return("header","default","irange","tech") if (!defined($rec));
    return("ALL");
 }
 
@@ -700,20 +735,20 @@ sub isWriteValid
   
    my $userid=$self->getCurrentUserId();
    if (!defined($rec)){
-      return("default","tech") if ($self->IsMemberOf("admin"));
+      return("default","tech","irange") if ($self->IsMemberOf("admin"));
       my $o=$self->Clone();
       $o->SetFilter([{contactid=>\$userid},
                      {contact2id=>\$userid}]);
       my ($rec,$msg)=$o->getOnlyFirst(qw(id));
       if (defined($rec)){
-         return("default","tech");
+         return("default","tech","irange");
       }
      
       return();
    }
 
 
-   return("default","tech") if ($rec->{owner} eq $userid ||
+   return("default","tech","irange") if ($rec->{owner} eq $userid ||
                                 $self->checkAnserWrite(0,$rec,undef,undef) ||
                                 $self->IsMemberOf("admin"));
    return();
@@ -1152,7 +1187,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","tech","source");
+   return("header","default","irange","tech","source");
 }
 
 
