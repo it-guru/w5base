@@ -266,7 +266,7 @@ sub new
       new kernel::Field::Select(
                 name          =>'necessverifyinterv',
                 default       =>'180',
-                value         =>['90','180','365','1095'],
+                value         =>['90','180','365','1095','1825','3650'],
                 transprefix   =>'AVI.',
                 htmleditwidth =>'130px',
                 label         =>'necessary answer verify interval',
