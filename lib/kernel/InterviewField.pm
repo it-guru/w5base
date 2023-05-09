@@ -77,8 +77,15 @@ sub getTotalActiveQuestions
    #my $icat=$ic->getHashIndexed(qw(id));  # cache categorie labels
 
    my $i=getModuleObject($self->getParent->Config,"base::interview");
-   $i->SetFilter({parentobj=>\$parentobj,
-                  cistatusid=>[3,4]});
+   $i->SetFilter([
+     {parentobj=>\$parentobj,cistatusid=>[3,4],ifrom=>"[EMPTY]",ito=>"[EMPTY]"},
+     {parentobj=>\$parentobj,cistatusid=>[3,4],
+                         ifrom=>"<now",ito=>"[EMPTY]"},
+     {parentobj=>\$parentobj,cistatusid=>[3,4],
+                         ifrom=>"[EMPTY]",ito=>">now"},
+     {parentobj=>\$parentobj,cistatusid=>[3,4],
+                         ifrom=>"<now",ito=>">now"}
+   ]);
    my $pwrite=$i->checkParentWrite($p,$rec);
    my @viewlist=$i->getParentViewgroups($p,$rec);
    my %boundpviewgroupAcl=$p->InterviewPartners($rec);
