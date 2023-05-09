@@ -61,11 +61,14 @@ sub new
                 name          =>'fullname',
                 label         =>'activation full qualified label',
                 htmldetail    =>0,
+                readonly      =>1,
+                uploadable    =>0,
                 dataobjattr   =>"concat(lnkqrulemandator.qrule,'-',".
                            "lnkqrulemandator.dataobj,'-',".
                            "if (lnkqrulemandator.mandator is null ".
                            "or lnkqrulemandator.mandator='0','ANY',".
-                           "if (mandator.name is null,'INVALID',mandator.name)))"),
+                           "if (mandator.name is null,'INVALID',".
+                           "mandator.name)))"),
                                                  
       new kernel::Field::Text(
                 name          =>'dataobjlabel',
