@@ -20,6 +20,8 @@
 'AVI.180'=>{de=>'ein halbes Jahr',en=>'half a year'},
 'AVI.365'=>{de=>'ein Jahr',en=>'one year'},
 'AVI.1095'=>{de=>'3 Jahre',en=>'three years'},
+'AVI.1825'=>{de=>'5 Jahre',en=>'five years'},
+'AVI.3650'=>{de=>'10 Jahre',en=>'ten years'},
 'QPRIO.'=>{de=>'undefiniert',en=>'unknown'},
 'QPRIO.1'=>{de=>'1 - hoch',en=>'1 - high'},
 'QPRIO.2'=>{de=>'2',en=>'2'},
