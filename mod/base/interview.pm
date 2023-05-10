@@ -1191,6 +1191,114 @@ sub getDetailBlockPriority
 }
 
 
+sub CleanupInterview
+{
+   my $self=shift;
+
+   msg(INFO,"CleanupInterview event");
+   my $op=$self->Clone();
+
+
+   #######################################################################
+   if (1){
+      $self->ResetFilter();         # in 7 Wochen und kleiner als 8 Wochen
+      $self->SetFilter({cistatusid=>'4',ito=>">now+49d AND <now+56d"});
+      $self->SetCurrentView(qw(ALL));
+
+      # fachlich: thematicresponsibleid
+      #
+      # admins: contactid contact2id
+
+      my ($rec,$msg)=$self->getFirst();
+      if (defined($rec)){
+         do{
+            #print STDERR Dumper($rec);
+            my %notifyParam=(emailbcc=>['11634953080001']);
+
+            $op->NotifyWriteAuthorizedContacts(
+                         $rec,{},
+                         \%notifyParam,{mode=>'WARN'},sub{
+               my ($subject,$ntext);
+               my $subject=$self->T("Interview question timerange near end");
+               my $text=$op->getParsedTemplate("tmpl/base.interview.OutOfTime",
+                            {
+                               static=>{
+                                  CAT=>$rec->{interviewcatlabel},
+                                  NAME=>$rec->{name}
+                               }
+                            });
+               return($subject,$text);
+            });
+
+
+            #$op->ValidatedUpdateRecord($rec,{cistatusid=>'6'},{
+            #   id=>\$rec->{id}
+            #});
+
+            ($rec,$msg)=$self->getNext();
+         } until(!defined($rec));
+      }
+   }
+   #######################################################################
+   if (1){
+      $self->ResetFilter();
+      $self->SetFilter({cistatusid=>'4',ito=>"<now-14d"});
+      $self->SetCurrentView(qw(ALL));
+
+      my ($rec,$msg)=$self->getFirst();
+      if (defined($rec)){
+         do{
+            $W5V2::HistoryComments="marked as deleted by CleanupInterview";
+            $op->ValidatedUpdateRecord($rec,{cistatusid=>'6'},{
+               id=>\$rec->{id}
+            });
+            $W5V2::HistoryComments=undef;
+            ($rec,$msg)=$self->getNext();
+         } until(!defined($rec));
+      }
+   }
+   #######################################################################
+
+
+   return({exitcode=>0});
+}
+
+
+sub getWriteAuthorizedContacts
+{
+   my $self=shift;
+   my $current=shift;
+   my $depend=shift;
+   my $maxlevel=shift;   # check against which maxresposelevel
+   my $resbuf=shift;     # hash to store result
+
+   printf STDERR ("getWriteAuthorizedContacts\n");
+
+   my $uid=$current->{contactid};
+   my $uid=$current->{contact2id};
+   my $uid=$current->{thematicresponsibleid};
+   my $responselevel=1;
+   foreach my $fld (qw(thematicresponsibleid contactid contact2id)){
+      if ($current->{$fld} ne ""){
+         if (!exists($resbuf->{$uid})){
+            my $uid=$current->{$fld};
+            $resbuf->{$uid}={
+               userid=>$uid,
+               responselevel=>$responselevel
+            };
+            $responselevel++;
+         }
+      }
+   }
+
+   return(
+      $self->SUPER::getWriteAuthorizedContacts(
+         $current,$depend,$maxlevel,$resbuf
+      )
+   );
+}
+
+
 
 
 
