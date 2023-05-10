@@ -40,10 +40,20 @@ sub Init
    $self->RegisterEvent("CleanupLnkGrpUser","LnkGrpUser");
    $self->RegisterEvent("CleanupAPIKeys","cleanAPIKeys");
    $self->RegisterEvent("CleanupWebFS","CleanupWebFS");
+   $self->RegisterEvent("CleanupInterview","CleanupInterview");
    $self->RegisterEvent("CleanupLnkContact","CleanupLnkContact");
    $self->RegisterEvent("CleanupLnkContactExp","CleanupLnkContactExp");
    $self->RegisterEvent("CleanupLnkMandatorContact","LnkMandatorContact");
    return(1);
+}
+
+
+sub CleanupInterview
+{
+   my $self=shift;
+
+   my $obj=getModuleObject($self->Config,"base::interview");
+   return($obj->CleanupInterview());
 }
 
 

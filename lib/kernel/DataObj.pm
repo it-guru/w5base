@@ -2371,14 +2371,18 @@ sub getWriteAuthorizedContacts
       my $user=getModuleObject($self->Config,"base::user");
       my @uid=map({$_->{userid}} @fill);
       $user->SetFilter({userid=>\@uid,cistatusid=>\'4'});
-      foreach my $urec ($user->getHashList(qw(fullname talklang email))){
-         $resbuf->{$urec->{userid}}->{fullname}=$urec->{fullname};
-         $resbuf->{$urec->{userid}}->{talklang}=$urec->{talklang};
-         $resbuf->{$urec->{userid}}->{email}=$urec->{email};
+      foreach my $urec ($user->getHashList(qw(fullname talklang email 
+                                              cistatusid))){
+         if ($urec->{cistatusid} eq "4"){
+            $resbuf->{$urec->{userid}}->{fullname}=$urec->{fullname};
+            $resbuf->{$urec->{userid}}->{talklang}=$urec->{talklang};
+            $resbuf->{$urec->{userid}}->{email}=$urec->{email};
+         }
+         else{
+            delete($resbuf->{$urec->{userid}});
+         }
       }
    }
-   
-   
 }
 
 
@@ -2561,6 +2565,10 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
    foreach my $to (keys(%mailto)) {
       delete($mailcc{$to}) if (exists($mailcc{$to}));
    }
+   if (keys(%mailto)==0 && keys(%mailcc)==0){
+      msg(INFO,"no mail targets - skip mailing");
+      return(0);
+   }
    $notifyparam{emailto}=[keys(%mailto)];
    $notifyparam{emailcc}=[keys(%mailcc)];
 
@@ -2626,6 +2634,7 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
    else{
       delete($ENV{HTTP_FORCE_LANGUAGE});
    }
+   return(1);
 }
 
 sub NotifiedValidatedUpdateRecord
