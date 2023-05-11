@@ -486,6 +486,8 @@ sub nativQualityCheck
    my $parent=$self->getParent->Clone;
    my $result;
    my %alldataissuemsg;
+   my $dataissueactiverulecount;
+   my $dataissuerulecount;
    my %dataupdate;
    my $checkStart=NowStamp("en");
 
@@ -538,6 +540,8 @@ sub nativQualityCheck
 
    CIRCQC: for(my $circQC=0;$circQC<3;$circQC++){
       %alldataissuemsg=(); # a new circulaer pass resets the old messages
+      $dataissueactiverulecount=0;
+      $dataissuerulecount=0;
       $param[0]->{EssentialsChangedCnt}=0;
       $param[0]->{EssentialsChanged}={};
       foreach my $qrulename (@$finalQruleList){
@@ -573,7 +577,13 @@ sub nativQualityCheck
             $resulttext="fail"      if (defined($qresult) && $qresult!=0);
             $resulttext="note"      if ($qresult==1);
             $resulttext="warn"      if ($qresult==2);
-            $resulttext="disabled" if (!defined($qresult));
+            if (!defined($qresult)){
+               $resulttext="disabled";
+            }
+            else{
+               $dataissueactiverulecount++;
+            }
+            $dataissuerulecount++;
             my $qrulelongname=$qrule->getName();
             my $hints=$qrule->getHints();
             my $havehints=$hints eq "" ? 0 : 1;
@@ -692,6 +702,8 @@ sub nativQualityCheck
                         srcload=>NowStamp("en"),
                         srcsys=>$affectedobject,
                         dataissuemetric=>[sort(keys(%alldataissuemsg))],
+                        dataissuerulecount=>$dataissuerulecount,
+                        dataissueactiverulecount=>$dataissueactiverulecount,
                         DATAISSUEOPERATIONSRC=>$directlnkmode};
             my $bk=$wf->Store(undef,$newrec);
             $result->{wfheadid}=$bk;
@@ -708,6 +720,8 @@ sub nativQualityCheck
                         realeditor=>$WfRec->{realeditor},
                         srcload=>NowStamp("en"),
                         dataissuemetric=>[sort(keys(%alldataissuemsg))],
+                        dataissuerulecount=>$dataissuerulecount,
+                        dataissueactiverulecount=>$dataissueactiverulecount,
                         detaildescription=>$detaildescription};
             my $bk=$wf->Store($WfRec,$newrec);
             $result->{wfheadid}=$WfRec->{id};
