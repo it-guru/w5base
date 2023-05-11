@@ -133,6 +133,16 @@ sub getDynamicFields
                              label              =>'DataIssue Metrics',
                              container          =>'additional'),
                    new kernel::Field::Link(  
+                             name               =>'dataissuerulecount',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'DataIssue total rule count',
+                             container          =>'additional'),
+                   new kernel::Field::Link(  
+                             name               =>'dataissueactiverulecount',
+                             translation        =>'base::workflow::DataIssue',
+                             label              =>'DataIssue active rule count',
+                             container          =>'additional'),
+                   new kernel::Field::Link(  
                              name               =>'DATAISSUEOPERATIONSRC',
                              translation        =>'base::workflow::DataIssue',
                              label              =>'DataIssue Source',
