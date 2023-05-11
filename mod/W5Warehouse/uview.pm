@@ -73,7 +73,15 @@ sub new
                 name          =>'ifacetable',
                 label         =>'Interface Table',
                 ignorecase    =>1,
-                dataobjattr   =>"regexp_replace(all_views.view_name,'^.*?_','')"),
+                dataobjattr   =>"regexp_replace(all_views.view_name,".
+                                "'^.*?_','')"),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'FQ Interface Table',
+                ignorecase    =>1,
+                dataobjattr   =>"regexp_replace(all_views.view_name,".
+                                "'^([^_]+)_','\\1.')"),
 
       new kernel::Field::Textarea(
                 name          =>'viewcommand',
@@ -92,9 +100,10 @@ sub new
                 onRawValue    =>sub{
                    my $self=shift;
                    my $current=shift;
+                   my $viewcommand=$current->{viewcommand};
+                   $viewcommand=~s/\s*$//s;
                    my $n="create or replace view \"".$current->{name}."\"".
-                          " as\n".
-                          $current->{viewcommand}.";\n\n";
+                          " as\n".$viewcommand.";\n\n";
                    $n.="grant select on \"$current->{name}\" to W5I;\n";
                    if ($current->{ifaceuser} ne "" &&
                        $current->{ifaceuser} ne "[UNDEF]"){
