@@ -896,10 +896,51 @@ sub processRecord
             }
          }
          my $dataissuemetric=[];
+         my $dataissuerulecnt=0;
          if (ref($rec->{additional}) eq "HASH" &&
              exists($rec->{additional}->{dataissuemetric})){
             $dataissuemetric=$rec->{additional}->{dataissuemetric};
          }
+         if (ref($rec->{additional}) eq "HASH" &&
+             exists($rec->{additional}->{dataissueactiverulecount})){
+            $dataissuerulecnt=$rec->{additional}->{dataissueactiverulecount};
+            if (ref($dataissuerulecnt) eq "ARRAY"){
+               $dataissuerulecnt=$dataissuerulecnt->[0];
+            }
+         }
+         my $dataissuefailcnt=$#{$dataissuemetric}+1;
+         my $dataissuefailpct=0;
+         if ($dataissuerulecnt>0){
+            $dataissuefailpct=int($dataissuefailcnt*100.0/$dataissuerulecnt);
+         }
+         if ($dataissuefailpct<=10.0){
+            $dataissuefailpct=10;
+         }
+         elsif($dataissuefailpct<=20.0){
+            $dataissuefailpct=20;
+         }
+         elsif($dataissuefailpct<=30.0){
+            $dataissuefailpct=30;
+         }
+         elsif($dataissuefailpct<=50.0){
+            $dataissuefailpct=50;
+         }
+         elsif($dataissuefailpct<=60.0){
+            $dataissuefailpct=60;
+         }
+         elsif($dataissuefailpct<=70.0){
+            $dataissuefailpct=70;
+         }
+         elsif($dataissuefailpct<=80.0){
+            $dataissuefailpct=80;
+         }
+         elsif($dataissuefailpct<=90.0){
+            $dataissuefailpct=90;
+         }
+         else{
+            $dataissuefailpct=99;
+         }
+         $dataissuefailcnt=sprintf("%02d",$dataissuefailcnt);
 
          my $mandatorids=$rec->{mandatorid};
          $mandatorids=[$mandatorids] if (ref($mandatorids) ne "ARRAY");
@@ -922,6 +963,16 @@ sub processRecord
                }
                if ($rec->{stateid}!=5 && 
                    $rec->{class} eq "base::workflow::DataIssue"){ 
+                  $self->getParent->storeStatVar("Mandator",$mn,{
+                                                    nameid=>$mandatorid
+                                                 },
+                          "base.DataIssue.open.failcnt.".$dataissuefailcnt,1);
+                  if ($dataissuefailpct>0){
+                     $self->getParent->storeStatVar("Mandator",$mn,{
+                                                       nameid=>$mandatorid
+                                                    },
+                          "base.DataIssue.open.failpct.".$dataissuefailpct,1);
+                  }
                   foreach my $metric (@$dataissuemetric){
                      $self->getParent->storeStatVar("Mandator",$mn,{
                                                        nameid=>$mandatorid
@@ -949,6 +1000,16 @@ sub processRecord
                                                        nameid=>$mandatorid
                                                     },
                                                     "base.DataIssue.sleep56",1);
+                     $self->getParent->storeStatVar("Mandator",$mn,{
+                                                       nameid=>$mandatorid
+                                                    },
+                         "base.DataIssue.sleep56.failcnt.".$dataissuefailcnt,1);
+                     if ($dataissuefailpct>0){
+                        $self->getParent->storeStatVar("Mandator",$mn,{
+                                                          nameid=>$mandatorid
+                                                       },
+                         "base.DataIssue.sleep56.failpct.".$dataissuefailpct,1);
+                     }
                      foreach my $metric (@$dataissuemetric){
                         $self->getParent->storeStatVar("Mandator",$mn,{
                                                           nameid=>$mandatorid
