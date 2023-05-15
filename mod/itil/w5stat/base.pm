@@ -82,19 +82,32 @@ sub overviewW5Base
    my $app=$self->getParent();
    my @l;
 
-   my @flds=("ITIL.Total.Application.Count"=>'W5Base total application count',
-             "ITIL.Total.Asset.Count"      =>'W5Base total asset count',
-             "ITIL.Total.System.Count"     =>'W5Base total system count');
-  
+   my @flds=(
+      "ITIL.Total.Application.Count"=>'W5Base total application count',
+      "ITIL.Total.Asset.Count"      =>'W5Base total asset count',
+      "ITIL.Total.System.Count"     =>'W5Base total system count',
+      "ITIL.Total.SWInstance.Count" =>'W5Base total software-instance count',
+      "ITIL.Total.Cloud.Count"      =>'W5Base total cloud count',
+   );
+
+   push(@l,[$app->T('Config-Items statistics'),undef]);
+ 
+   my $total=0; 
    while(my $k=shift(@flds)){
       my $label=shift(@flds);
       my $val=0;
       if (defined($primrec->{stats}->{$k})){
          $val=$primrec->{stats}->{$k}->[0];
+         $total+=$val;
          my $color="black";
          push(@l,[$app->T($label),$val,$color,undef]);
       }
    }   
+   push(@l,["<b>Total primary Config-Item count</b>",$total,"black",undef]);
+
+
+
+
    return(@l);
 }
 

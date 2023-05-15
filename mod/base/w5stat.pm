@@ -859,7 +859,7 @@ EOF
                    defined($P{$p}->{opcode}) && 
                    ($rtag eq $p || $requesttag eq "ALL")){
                   my ($d,$ovdata)=
-                         &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist);
+                         &{$P{$p}->{opcode}}($P{$p}->{obj},$primrec,$hist,$p);
                   if ($requesttag eq "ALL"){
                       my $requesttag=$P{$p}->{module}."::".$p;
                       if ($requesttag ne "base::w5stat::overview::overview" &&
@@ -1417,7 +1417,8 @@ EOF
          if (defined($P{$p}->{opcode})){
             my $prec=$P{$p};
             my $opcode=$P{$p}->{opcode};
-            my $show=&{$opcode}($self->{w5stat}->{$prec->{module}},$primrec);
+            my $show=&{$opcode}($self->{w5stat}->{$prec->{module}},
+                                $primrec,undef,$p);
             if ($show){
                my %mrec;
                my $tag=$prec->{module}."::".$p;
@@ -1569,6 +1570,7 @@ sub calcPOffset
    my $self=shift;
    my ($primrec,$hist,$name)=@_;
    my $delta;
+
 
    if (defined($hist->{lastdstrange})){
       $name=[$name] if (ref($name) ne "ARRAY");

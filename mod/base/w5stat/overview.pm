@@ -53,11 +53,12 @@ sub processOverviewRecords
    my $P=shift;
    my $primrec=shift;
    my $hist=shift;
+   my $p=shift;
 
    foreach my $p (sort({$P->{$a}->{prio} <=> $P->{$b}->{prio}} keys(%{$P}))){
       my $prec=$P->{$p};
       if (defined($prec) && defined($prec->{overview})){
-         if (my @ov=&{$prec->{overview}}($prec->{obj},$primrec,$hist)){
+         if (my @ov=&{$prec->{overview}}($prec->{obj},$primrec,$hist,$p)){
             push(@{$ovdata},@ov);
          }
       }
@@ -67,7 +68,7 @@ sub processOverviewRecords
 sub displayOverview
 {
    my $self=shift;
-   my ($primrec,$hist)=@_;
+   my ($primrec,$hist,$p)=@_;
    my $app=$self->getParent();
    my $d="";
 
@@ -86,7 +87,7 @@ sub displayOverview
       }
    }
    my $P={@Presenter};
-   $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist);
+   $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist,$p);
    my $grp=getModuleObject($app->Config,"base::grp");
    if (defined($primrec->{nameid}) && $primrec->{nameid} ne "" 
        && $primrec->{sgroup} eq "Group"){
@@ -97,6 +98,7 @@ sub displayOverview
          foreach my $grprec (@l){
             my ($primrec,$hist)=$app->LoadStatSet(grpid=>$grprec->{grpid},
                                                    $month);
+
             if (defined($primrec)){
                push(@ovdata,[$primrec->{fullname}]);
                $self->processOverviewRecords(\@ovdata,$P,$primrec,$hist);
