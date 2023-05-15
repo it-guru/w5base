@@ -48,6 +48,16 @@ sub getPresenter
                          prio=>2,
                          group=>['Group']
                       },
+          'dicurstructure'=>{
+                         opcode=>\&displayDataIssueStructure,
+                         prio=>10,
+                         group=>['Mandator']
+                      },
+          'dioldstructure'=>{
+                         opcode=>\&displayDataIssueStructure,
+                         prio=>10,
+                         group=>['Mandator']
+                      },
           'wfact'=>{
                          opcode=>\&displayWorkflowActivity,
                          prio=>3,
@@ -265,7 +275,7 @@ sub displayW5Base
 sub overviewDataIssue
 {
    my $self=shift;
-   my ($primrec,$hist)=@_;
+   my ($primrec,$hist,$p)=@_;
    my $app=$self->getParent();
    my @l;
    return() if ($primrec->{dstrange}=~m/KW/);
@@ -384,6 +394,8 @@ sub overviewDataIssue
 
    return(@l);
 }
+
+
 
 sub displayWorkflowActivity
 {
@@ -611,6 +623,88 @@ function showFullDataIssue()
 }
 </script>
 EOF
+   return($d);
+}
+
+
+sub displayDataIssueStructure
+{
+   my $self=shift;
+   my ($primrec,$hist,$p)=@_;
+   my $app=$self->getParent();
+   return() if ($primrec->{dstrange}=~m/KW/);
+
+   my $prefix="base.DataIssue.open.metric.";
+   if ($p eq "dioldstructure"){
+      $prefix="base.DataIssue.sleep56.metric.";
+   }
+   my $qprefix=quotemeta($prefix);
+
+
+   my @metric;
+   $metric[0]={};
+   $metric[1]={};
+
+   my $mpos=0;
+
+   foreach my $statrec ($primrec,$hist->{lastdstrange}){
+      if (ref($statrec->{stats}) eq "HASH"){
+         foreach my $k (%{$statrec->{stats}}){
+            next if (!($k=~m/^$qprefix/));
+            my $name=$k;
+            $name=~s/^$qprefix//;
+            $metric[$mpos]->{$name}=$statrec->{stats}->{$k};
+            if (ref($metric[$mpos]->{$name}) eq "ARRAY"){
+               $metric[$mpos]->{$name}=$metric[$mpos]->{$name}->[0];
+            }
+         }
+      }
+      $mpos++;
+   }
+
+
+
+   my @kl=keys(%{$metric[0]});
+   @kl=sort({
+      my $bk=$metric[0]->{$b} <=> $metric[0]->{$a};
+
+      $bk;
+   } @kl);
+
+
+   my $d="p=$p";
+   my $d="";
+
+
+   $d.="<br>";
+   $d.="<table border=1>";
+   foreach my $k (@kl){
+      my $pDelta="";
+      if (exists($metric[1]->{$k})){
+         my $oldv=$metric[1]->{$k};
+         my $curv=$metric[0]->{$k};
+         my $delta=$metric[1]->{$k}-$metric[0]->{$k};
+         if ($delta!=0.0){
+            my $direction=1;
+            if ($delta<0){
+               $direction=-1;
+               $delta=abs($delta);
+            }
+            my $percent=int($delta*100/$oldv)*$direction;
+            $percent="+".$percent if ($direction>0);
+            $pDelta=" (".$percent."%)";
+         }
+      }
+      $d.="<tr>";
+      $d.="<td>".$k."<br>(".$self->getParent->T($k,$k).")</td>";
+      $d.="<td>".$metric[0]->{$k}.$pDelta."</td>";
+      $d.="</tr>";
+   }
+   $d.="</table>";
+
+
+   
+
    return($d);
 }
 

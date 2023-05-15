@@ -19,3 +19,5 @@
 'Workflows untreaded longer then a half year'=>{de=>'Workflows länger als ein halbes Jahr unbearbeitet'},
 'unprocessed DataIssue Workflows'=>{de=>'DataIssue Workflows, die noch nicht abgeschlossen sind'},
 'untreaded DataIssues longer then 8 weeks'=>{de=>'DataIssue Workflows, die länger als 8 Wochen unbearbeitet sind'},
+'base::w5stat::base::dicurstructure'=>{de=>'DataIssue;aktuell',en=>'DataIssue;current'},
+'base::w5stat::base::dioldstructure'=>{de=>'DataIssue;langzeit',en=>'DataIssue;long'},
