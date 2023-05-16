@@ -22,3 +22,6 @@
 'count of physical systems'=>{de=>'Anzahl physische Systeme'},
 'count of changes by businessteam'=>{de=>'Anzahl Changes des Betriebsteam'},
 'changes'=>{de=>'Anzahl Changes'},
+'Config-Items statistics'=>{de=>'Config-Item Statistiken'},
+'Total primary Config-Item count'=>{de=>'Gesamtanzahl primär Config-Items'},
+'data responsibility'=>{de=>'Datenverantwortung'},

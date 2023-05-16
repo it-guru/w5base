@@ -155,7 +155,7 @@ sub displayOverview
       if ($#{$rec}!=0){
          my $color="black";
          if (!defined($rec->[1])){
-            $text="<u>".$text."</u>";
+            $text="<div style=\"margin-top:4px\"><u>".$text."</u></div>";
             if ($subloopcnt>1){
                #$text="<div style='width:1px;height:2px'></div>".$text;
             }
