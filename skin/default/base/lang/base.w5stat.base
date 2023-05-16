@@ -21,3 +21,5 @@
 'untreaded DataIssues longer then 8 weeks'=>{de=>'DataIssue Workflows, die länger als 8 Wochen unbearbeitet sind'},
 'base::w5stat::base::dicurstructure'=>{de=>'DataIssue;aktuell',en=>'DataIssue;current'},
 'base::w5stat::base::dioldstructure'=>{de=>'DataIssue;langzeit',en=>'DataIssue;long'},
+'base::w5stat::base::dicurstructure::LONG'=>{de=>'DataIssue Struktur - aktuelle Situation',en=>'DataIssue Structure - current situation'},
+'base::w5stat::base::dioldstructure::LONG'=>{de=>'DataIssue Struktur - Langzeit',en=>'DataIssue Structure - longtime'},

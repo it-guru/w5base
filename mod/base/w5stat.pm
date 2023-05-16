@@ -1577,13 +1577,16 @@ sub calcPOffset
       my $lst;
       my $cur;
       foreach my $keyname (@$name){
-         if ($primrec->{stats}->{$keyname}->[0]>0){
-            $cur+=$primrec->{stats}->{$keyname}->[0];
-         }
-
-         if ($hist->{lastdstrange}->{stats}->{$keyname}->[0]>0){
-            $lst+=$hist->{lastdstrange}->{stats}->{$keyname}->[0];
-         }
+         my $curval;
+         my $histval;
+        
+         my $curval=$primrec->{stats}->{$keyname};
+         $curval=$curval->[0] if (ref($curval) eq "ARRAY"); 
+         $cur+=$curval if ($curval>0);
+         
+         my $histval=$hist->{lastdstrange}->{stats}->{$keyname};
+         $histval=$histval->[0] if (ref($histval) eq "ARRAY");
+         $lst+=$histval if ($histval>0);
       }
       if (defined($lst) && defined($cur)){
          $delta=floor(($cur-$lst)*100.0/$lst);

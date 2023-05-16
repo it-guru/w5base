@@ -296,7 +296,7 @@ sub overviewDataIssue
    if ($dataissues>($users*0.4) && $dataissues>5){
       $color="red";
    }
-   if ($primrec->{sgroup} eq "Group"){
+   if ($primrec->{sgroup} eq "Group" || $primrec->{sgroup} eq "Mandator"){
       push(@l,[{
                  detail=>$self->Self."::dataissue",
                  id=>$primrec->{id}
@@ -634,11 +634,35 @@ sub displayDataIssueStructure
    my $app=$self->getParent();
    return() if ($primrec->{dstrange}=~m/KW/);
 
-   my $prefix="base.DataIssue.open.metric.";
+   my $prefix="base.DataIssue.open.";
    if ($p eq "dioldstructure"){
-      $prefix="base.DataIssue.sleep56.metric.";
+      $prefix="base.DataIssue.sleep56.";
    }
    my $qprefix=quotemeta($prefix);
+
+   my $DATABOSSCOUNT="???";
+   my $DIDBOSSCOUNT="???";
+   my $DIDBOSSPCT="";
+
+   if (exists($primrec->{stats}->{"base.Databoss.Count"})){
+      $DATABOSSCOUNT=$primrec->{stats}->{"base.Databoss.Count"};
+      $DATABOSSCOUNT=$DATABOSSCOUNT->[0] if (ref($DATABOSSCOUNT) eq "ARRAY");
+   }
+   if (exists($primrec->{stats}->{$prefix."Databoss.Count"})){
+      $DIDBOSSCOUNT=$primrec->{stats}->{$prefix."Databoss.Count"};
+      $DIDBOSSCOUNT=$DIDBOSSCOUNT->[0] if (ref($DIDBOSSCOUNT) eq "ARRAY");
+   }
+   if ($DATABOSSCOUNT>0){
+      my $pct=int($DIDBOSSCOUNT*100/$DATABOSSCOUNT);
+      if ($pct>0){
+         $DIDBOSSPCT=" ($pct\%)";
+      }
+   }
+
+
+   $prefix.="metric.";
+   my $qprefix=quotemeta($prefix);
+
 
 
    my @metric;
@@ -646,6 +670,9 @@ sub displayDataIssueStructure
    $metric[1]={};
 
    my $mpos=0;
+
+   my @statrec=($primrec);
+   push(@statrec,$hist->{lastdstrange}) if (defined($hist->{lastdstrange}));
 
    foreach my $statrec ($primrec,$hist->{lastdstrange}){
       if (ref($statrec->{stats}) eq "HASH"){
@@ -676,8 +703,27 @@ sub displayDataIssueStructure
    my $d="";
 
 
+
+
+
+   my $d=$app->getParsedTemplate("tmpl/base.w5stat.base.".$p,
+                                 {current=>$primrec,
+                                  static=>{
+                                       DATABOSSCOUNT=>$DATABOSSCOUNT,
+                                       DIDBOSSCOUNT=>$DIDBOSSCOUNT,
+                                       DIDBOSSPCT=>$DIDBOSSPCT,
+                                          },
+                                  skinbase=>"base"});
+
    $d.="<br>";
-   $d.="<table border=1>";
+   $d.="<table class=\"statTab sortableTable\" style=\"width:99%\">";
+   $d.="<thead>";
+   $d.="<tr>";
+   $d.="<th width=80% align=left>QRule injury</th>";
+   $d.="<th>&nbsp;</th>";
+   $d.="<th width=1%>&nbsp;</th>";
+   $d.="</tr>";
+   $d.="</thead>";
    foreach my $k (@kl){
       my $pDelta="";
       if (exists($metric[1]->{$k})){
@@ -690,14 +736,37 @@ sub displayDataIssueStructure
                $direction=-1;
                $delta=abs($delta);
             }
-            my $percent=int($delta*100/$oldv)*$direction;
-            $percent="+".$percent if ($direction>0);
-            $pDelta=" (".$percent."%)";
+            my $percent=int($delta*100/$oldv)*$direction*-1;
+            if ($percent!=0){
+               if ($direction<0 && $percent>200){
+                  $percent=">+200%";
+               }
+               else{
+                  $percent="+".$percent if ($direction<0);
+                  $percent.="%";
+               }
+               if ($direction<0){
+                  $percent="<font color=red>".$percent."</font>";
+               }
+               $pDelta=" (".$percent.")";
+            }
          }
       }
       $d.="<tr>";
-      $d.="<td>".$k."<br>(".$self->getParent->T($k,$k).")</td>";
-      $d.="<td>".$metric[0]->{$k}.$pDelta."</td>";
+      $d.="<td>";
+
+      my $lablestr=$k;
+      my $trlabel=$self->getParent->T($k,$k);
+      if ($lablestr ne $trlabel){
+         $lablestr="<a href=\"../qrule/ById/$k\" ".
+                   "title=\"$k\" target=_blank>".$trlabel."</a>";
+      }
+      $d.=$lablestr;
+
+      $d.="</td>";
+
+      $d.="<td align=right>".$metric[0]->{$k}."</td>";
+      $d.="<td align=right>".$pDelta."</td>";
       $d.="</tr>";
    }
    $d.="</table>";

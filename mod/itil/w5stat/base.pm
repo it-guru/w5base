@@ -91,19 +91,49 @@ sub overviewW5Base
    );
 
    push(@l,[$app->T('Config-Items statistics'),undef]);
- 
-   my $total=0; 
+
+   my @statrec=($primrec);
+   push(@statrec,$hist->{lastdstrange}) if (defined($hist->{lastdstrange}));
+
+   my %kpaths=@flds; 
+   my @kpaths=keys(%kpaths);
+   foreach my $statrec ($primrec,$hist->{lastdstrange}){
+      my $total=0; 
+      if (ref($statrec->{stats}) eq "HASH"){
+         foreach my $k (@kpaths){
+            my $val=0;
+            if (defined($statrec->{stats}->{$k})){
+               $val=$statrec->{stats}->{$k};
+               $val=$val->[0] if (ref($val) eq "ARRAY");
+               $statrec->{stats}->{$k}=$val;
+               $total+=$val;
+            }
+         }   
+      }
+      $statrec->{stats}->{'ITIL.Total.Count'}=$total;
+   }
+
    while(my $k=shift(@flds)){
       my $label=shift(@flds);
-      my $val=0;
       if (defined($primrec->{stats}->{$k})){
-         $val=$primrec->{stats}->{$k}->[0];
-         $total+=$val;
+         my $val=$primrec->{stats}->{$k};
          my $color="black";
-         push(@l,[$app->T($label),$val,$color,undef]);
+         my $delta=$app->calcPOffset($primrec,$hist,[$k]);
+         push(@l,[$app->T($label),$val,$color,$delta]);
       }
-   }   
-   push(@l,["<b>Total primary Config-Item count</b>",$total,"black",undef]);
+   }
+
+   my $total=$primrec->{stats}->{'ITIL.Total.Count'};
+   my $delta=$app->calcPOffset($primrec,$hist,\@kpaths);
+
+
+   push(@l,["<b>".
+            $app->T("Total primary Config-Item count").
+            "</b>",$total,"black",$delta]);
+
+
+#   push(@l,[$app->T('data responsibility'),undef]);
+
 
 
 
