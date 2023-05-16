@@ -902,6 +902,7 @@ sub Validate
       $ip6str=$name;
    }
    else{
+      msg(ERROR,"invalid IP-Address write request for '$chkname'");
       $self->LastMsg(ERROR,$self->T($errmsg,"itil::lib::Listedit"));
       return(0);
    }
