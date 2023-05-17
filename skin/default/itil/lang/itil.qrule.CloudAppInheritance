@@ -3,4 +3,4 @@
  en=>'Inheritance of informations from CloudArea-Application',
 },
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
-
+'costelement different to application'=>{de=>'Kontierungsobjekt differiert zur Anwendung'},

@@ -3351,15 +3351,25 @@ sub  updateCostCenterByApplId
    my $rec=shift;
    my $forcedupd=shift;
    my $applid=shift;
+   my $autocorrect=shift;
+   my $qmsg=shift;
 
    my $o=getModuleObject($self->Config(),"itil::appl");
    $o->SetFilter({id=>\$applid});
    my ($apprec)=$o->getOnlyFirst(qw(name id conumber));
    if (defined($apprec) && $apprec->{conumber} ne ""){
       if ($rec->{conumber} ne $apprec->{conumber}){
-         msg(INFO,"overwrite conumber ($apprec->{conumber}) from\n".
-                  "$srcsys by information from applid '$applid'");
-         $forcedupd->{conumber}=$apprec->{conumber};
+         if ($autocorrect){
+            msg(INFO,"overwrite conumber ($apprec->{conumber}) from\n".
+                     "$srcsys by information from applid '$applid'");
+            $forcedupd->{conumber}=$apprec->{conumber};
+         }
+         else{
+            if (ref($qmsg) eq "ARRAY"){
+               push(@$qmsg,"costelement different to application: ".
+                    $apprec->{conumber});
+            }
+         }
       }
    }
 }
