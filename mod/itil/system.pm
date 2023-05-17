@@ -3353,6 +3353,7 @@ sub  updateCostCenterByApplId
    my $applid=shift;
    my $autocorrect=shift;
    my $qmsg=shift;
+   my $dataissue=shift;
 
    my $o=getModuleObject($self->Config(),"itil::appl");
    $o->SetFilter({id=>\$applid});
@@ -3366,6 +3367,8 @@ sub  updateCostCenterByApplId
          }
          else{
             if (ref($qmsg) eq "ARRAY"){
+               push(@$dataissue,"costelement different to application: ".
+                    $apprec->{conumber});
                push(@$qmsg,"costelement different to application: ".
                     $apprec->{conumber});
             }
