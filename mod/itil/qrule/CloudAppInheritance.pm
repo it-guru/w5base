@@ -107,7 +107,7 @@ sub qcheckRecord
       $dataobj->updateCostCenterByApplId($cloudshortname,
          $rec,$forcedupd,$carec->{applid},$autocorrect,\@qmsg,\@dataissue
       );
-      $errorlevel=1 if ($#dataissue!=-1);
+      $errorlevel=4 if ($#dataissue!=-1);
    }
 
    my @result=$self->HandleQRuleResults("CloudAreaInheritance",
