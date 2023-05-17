@@ -105,9 +105,9 @@ sub qcheckRecord
    my ($carec)=$ca->getOnlyFirst(qw(id applid));
    if (defined($carec) && $carec->{applid} ne ""){
       $dataobj->updateCostCenterByApplId($cloudshortname,
-         $rec,$forcedupd,$carec->{applid},$autocorrect,\@dataissue
+         $rec,$forcedupd,$carec->{applid},$autocorrect,\@qmsg,\@dataissue
       );
-      $errorlevel=2 if ($#dataissue!=-1);
+      $errorlevel=1 if ($#dataissue!=-1);
    }
 
    my @result=$self->HandleQRuleResults("CloudAreaInheritance",
