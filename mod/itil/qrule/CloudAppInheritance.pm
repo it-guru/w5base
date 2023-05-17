@@ -15,12 +15,12 @@ NONE
 
 =head3 HINTS
 
-From the application associated with the CloudArea, the
-Attributes...
+The attributes ...
 
-- cost assignment object
+ -cost assignment object 
 
-... to the CIs imported from the CloudArea.
+... is taken over from the application associated with the CloudArea 
+on CIs imported from the CloudArea.
 
 
 
@@ -105,7 +105,7 @@ sub qcheckRecord
    my ($carec)=$ca->getOnlyFirst(qw(id applid));
    if (defined($carec) && $carec->{applid} ne ""){
       $dataobj->updateCostCenterByApplId($cloudshortname,
-         $rec,$forcedupd,$carec->{applid}
+         $rec,$forcedupd,$carec->{applid},$autocorrect,\@qmsg
       );
    }
 
