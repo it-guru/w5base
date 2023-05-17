@@ -17,7 +17,7 @@ NONE
 
 The attributes ...
 
- -cost assignment object 
+- cost assignment object 
 
 ... is taken over from the application associated with the CloudArea 
 on CIs imported from the CloudArea.
@@ -105,8 +105,9 @@ sub qcheckRecord
    my ($carec)=$ca->getOnlyFirst(qw(id applid));
    if (defined($carec) && $carec->{applid} ne ""){
       $dataobj->updateCostCenterByApplId($cloudshortname,
-         $rec,$forcedupd,$carec->{applid},$autocorrect,\@qmsg
+         $rec,$forcedupd,$carec->{applid},$autocorrect,\@dataissue
       );
+      $errorlevel=2 if ($#dataissue!=-1);
    }
 
    my @result=$self->HandleQRuleResults("CloudAreaInheritance",
