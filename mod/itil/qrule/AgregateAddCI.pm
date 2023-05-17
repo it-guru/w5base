@@ -14,11 +14,11 @@ NONE
 
 =head3 HINTS
 
-Agregate Addtional CIs from associated CIs to Application CI
+Aggregate additional CIs from associated CIs to Application CI
 
 [de:]
 
-Agregieren der zustätzlich verwendeten CIs aus den zugehörigen
+Aggregieren der zusätzlich verwendeten CIs aus dem zugehörigen 
 CIs ins Anwendungs CI.
 
 =cut
