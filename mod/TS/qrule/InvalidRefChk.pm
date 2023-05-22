@@ -124,6 +124,7 @@ sub setReferencesToNull
    if ((!defined($contactrec) || $contactrec->{cistatusid}==7) ||
        (defined($contactrec) && $contactrec->{cistatusid}==6)){
       my $contact_old_enought=1;
+      my $contact_age_days;
       if (defined($contactrec) && exists($contactrec->{mdate}) &&
           $contactrec->{mdate} ne "" &&
           $contactrec->{cistatusid}==6){   # only cistatusid==6 gets a check
@@ -132,73 +133,73 @@ sub setReferencesToNull
          my $max=7*4;  # check only if application record is older than 4 weeks
          if (!defined($d) || $d->{days}<$max){
             $contact_old_enought=0;
+            $contact_age_days=$d->{days};
             #msg(INFO,"contact is bad but not old enouth");
          }
       }
-
-      if ($contact_old_enought){
-         if (defined($idfield)){
-            my $idname=$idfield->Name();
-            if ($ref->{type} ne "ContactLnk"){
-               if ($ref->{type} ne "Databoss" ||
-                   (exists($rec->{cistatusid}) &&  # if record is marked as 
-                    $rec->{cistatusid}>5)){        # delete, databoss can
-                                                   # be set to NULL
-                  if (!defined($contactrec) || 
-                      $contactrec->{cistatusid}==7 
-                     # || ($contactrec->{cistatusid}==6 &&  # cleanup if chkrec
-                     #  exists($rec->{cistatusid}) &&       # self is already
-                     #  $rec->{cistatusid}>5)               # marked as delete
-                      ){
-                     # nur entsorgte Rollen sollen geNULLt werden
-                     # https://darwin.telekom.de/darwin/auth/base/workflow/ById/15053783010001
-                     if ($dataobj->UpdateRecord({$ref->{rawfield}=>undef},
-                                            {$idname=>\$rec->{$idname}})){
-                        $dataobj->StoreUpdateDelta("update",
-                           {$ref->{rawfield}=>$rec->{$ref->{rawfield}},
-                            $idname=>$rec->{$idname}},
-                           {$ref->{rawfield}=>undef,
-                            $idname=>$rec->{$idname}},
-                            $self->Self().
-                            "\nContact cistatus=$contactrec->{cistatusid}");
-                        $self->NotifyContactDataModification("roledel",
-                                                      $dataobj,$reason,$ref,
-                                                      $rec,$contactrec);
-                        $ReferenceIsStillInvalid=0;
-                     }
+      if (defined($idfield)){
+         my $idname=$idfield->Name();
+         if ($ref->{type} ne "ContactLnk"){
+            if ($ref->{type} ne "Databoss" ||
+                (exists($rec->{cistatusid}) &&  # if record is marked as 
+                 $rec->{cistatusid}>5)){        # delete, databoss can
+                                                # be set to NULL
+               if (!defined($contactrec) || 
+                   $contactrec->{cistatusid}==7 
+                  # || ($contactrec->{cistatusid}==6 &&  # cleanup if chkrec
+                  #  exists($rec->{cistatusid}) &&       # self is already
+                  #  $rec->{cistatusid}>5)               # marked as delete
+                   ){
+                  # nur entsorgte Rollen sollen geNULLt werden
+                  # https://darwin.telekom.de/darwin/auth/base/workflow/ById/15053783010001
+                  if ($dataobj->UpdateRecord({$ref->{rawfield}=>undef},
+                                         {$idname=>\$rec->{$idname}})){
+                     $dataobj->StoreUpdateDelta("update",
+                        {$ref->{rawfield}=>$rec->{$ref->{rawfield}},
+                         $idname=>$rec->{$idname}},
+                        {$ref->{rawfield}=>undef,
+                         $idname=>$rec->{$idname}},
+                         $self->Self().
+                         "\nContact cistatus=$contactrec->{cistatusid}");
+                     $self->NotifyContactDataModification("roledel",
+                                                   $dataobj,$reason,$ref,
+                                                   $rec,$contactrec);
+                     $ReferenceIsStillInvalid=0;
                   }
                }
-               else{
-                  # set lastknownbossid as new databoss
-                  my @lastknownboss;
-                  if ($contactrec->{lastknownpbossid} ne ""){
-                     push(@lastknownboss,sort(split(/\s+/,
-                                             $contactrec->{lastknownpbossid})));
-                  }
-                  if ($contactrec->{lastknownbossid} ne ""){
-                     push(@lastknownboss,sort(split(/\s+/,
-                                              $contactrec->{lastknownbossid})));
-                  }
-                  BLOOP: foreach my $lastbossid (@lastknownboss){
-                     my $o=getModuleObject($dataobj->Config,"base::user");
-                     $o->SetFilter({userid=>\$lastbossid});
-                     my ($newbossrec,$msg)=$o->getOnlyFirst(qw(usertyp 
-                                                               cistatusid
-                                                               groups)); 
-                     my $is_currently_boss=0;
-                     if (ref($newbossrec) eq "HASH" &&
-                         ref($newbossrec->{groups}) eq "ARRAY"){
-                        foreach my $grprec (@{$newbossrec->{groups}}){
-                           if (ref($grprec->{roles}) eq "ARRAY" &&
-                               grep(/^RBoss$/,@{$grprec->{roles}})){
-                              $is_currently_boss++;
-                           }
+            }
+            else{
+               # set lastknownbossid as new databoss
+               my @lastknownboss;
+               if ($contactrec->{lastknownpbossid} ne ""){
+                  push(@lastknownboss,sort(split(/\s+/,
+                                          $contactrec->{lastknownpbossid})));
+               }
+               if ($contactrec->{lastknownbossid} ne ""){
+                  push(@lastknownboss,sort(split(/\s+/,
+                                           $contactrec->{lastknownbossid})));
+               }
+               BLOOP: foreach my $lastbossid (@lastknownboss){
+                  my $o=getModuleObject($dataobj->Config,"base::user");
+                  $o->SetFilter({userid=>\$lastbossid});
+                  my ($newbossrec,$msg)=$o->getOnlyFirst(qw(usertyp 
+                                                            cistatusid
+                                                            groups)); 
+                  my $is_currently_boss=0;
+                  if (ref($newbossrec) eq "HASH" &&
+                      ref($newbossrec->{groups}) eq "ARRAY"){
+                     foreach my $grprec (@{$newbossrec->{groups}}){
+                        if (ref($grprec->{roles}) eq "ARRAY" &&
+                            grep(/^RBoss$/,@{$grprec->{roles}})){
+                           $is_currently_boss++;
                         }
                      }
-                     if (defined($newbossrec) &&
-                         $is_currently_boss>0 &&
-                         $newbossrec->{cistatusid} eq "4" &&
-                         $newbossrec->{usertyp} eq "user"){
+                  }
+                  if (defined($newbossrec) &&
+                      $is_currently_boss>0 &&
+                      $newbossrec->{cistatusid} eq "4" &&
+                      $newbossrec->{usertyp} eq "user"){
+                     if ($contact_old_enought){
                         my $bk=$dataobj->UpdateRecord({
                               $ref->{rawfield}=>$lastbossid
                            },{$idname=>\$rec->{$idname}});
@@ -211,18 +212,28 @@ sub setReferencesToNull
                               $self->Self().
                               "\nDataboss replace by lastknownbossid");
                            $self->NotifyContactDataModification(
-                                                         "databosschange",
-                                                         $dataobj,$reason,$ref,
-                                                         $rec,$contactrec,
-                                                         $lastbossid);
+                                                      "databosschange",
+                                                      $dataobj,$reason,$ref,
+                                                      $rec,$contactrec,
+                                                      $lastbossid);
                            $ReferenceIsStillInvalid=0;
                            last BLOOP;
                         }
                      }
+                     elsif ($contact_age_days>14){
+                        $self->NotifyContactDataModification(
+                                                   "lastbossnotify",
+                                                   $dataobj,$reason,$ref,
+                                                   $rec,$contactrec,
+                                                   $lastbossid);
+                        last BLOOP;
+                     }
                   }
                }
             }
-            else{
+         }
+         else{
+            if ($contact_old_enought){
                my $o=getModuleObject($dataobj->Config(),"base::lnkcontact");
                $o->SetFilter({id=>\$ref->{rawrecid}});
                my ($oldrec,$msg)=$o->getOnlyFirst(qw(ALL)); 
@@ -238,9 +249,9 @@ sub setReferencesToNull
                $ReferenceIsStillInvalid=0;
             }
          }
-         else{
-            Stacktrace();
-         }
+      }
+      else{
+         Stacktrace();
       }
    }
    return($ReferenceIsStillInvalid);
