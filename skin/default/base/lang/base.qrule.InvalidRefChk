@@ -5,3 +5,6 @@
 'remove of contact entry'=>{de=>'Entfernung eines Kontakeintrages'},
 'databoss handover to you'=>{de=>'Übergabe der Datenverantwortung'},
 'void role field'=>{de=>'Entfernung eines Rolleneintrages'},
+'imminent databoss handover to you'=>{
+  de=>'Drohende Datenverantwortung führ Sie'
+},

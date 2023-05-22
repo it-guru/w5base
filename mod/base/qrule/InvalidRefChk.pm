@@ -106,9 +106,13 @@ sub NotifyContactDataModification
    if ($operation eq "databosschange"){
       $targetid=$add;
    }
+   if ($operation eq "lastbossnotify"){
+      $targetid=$add;
+   }
    my %notifyparam;
    my $notifycontrol={};
    if ($targetid ne ""){
+      my $notifymode="INFO";
       my $user=getModuleObject($dataobj->Config(),"base::user");
       $user->SetFilter(userid=>\$targetid);
       my ($targetrec)=$user->getOnlyFirst(qw(fullname email lang talklang));
@@ -137,6 +141,11 @@ sub NotifyContactDataModification
          elsif ($operation eq "contactdel"){
             $subject=$dataobj->T("remove of contact entry");
          }
+         elsif ($operation eq "lastbossnotify"){
+            $subject=$dataobj->T("imminent databoss handover to you");
+            $notifymode="WARN";
+         }
+
          my $fld=$dataobj->getRecordHeaderField();
          my $datarecname="???";
          my $fieldname="???";
@@ -176,7 +185,8 @@ sub NotifyContactDataModification
                $notifycontrol->{wfact}=getModuleObject($dataobj->Config,
                                                        "base::workflowaction");
             }
-            $notifycontrol->{wfact}->Notify("INFO",$subject,$text,%notifyparam);
+            $notifycontrol->{wfact}->Notify($notifymode,
+                                            $subject,$text,%notifyparam);
          }
          if (defined($lastlang)){
             $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
