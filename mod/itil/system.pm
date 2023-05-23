@@ -44,6 +44,20 @@ sub new
       $vmifexp="if (0";
    }
 
+   $self->{locktables}="system write,".
+                       "lnkcontact write,".
+                       "lnkcontact as secsystemlnkcontact write,".
+                       "costcenter as secsystemcostcenter write,".
+                       "lnkapplsystem as secsystemlnkapplsystem write,".
+                       "appl as secsystemappl write,".
+                       "itcloud write,".
+                       "system as vsystem write,".
+                       "asset as vasset write,".
+                       "itcloudarea write,".
+                       "lnkapplsystem write, ".
+                       "asset write,".
+                       "history write ";
+
 
    $self->AddFields(
       new kernel::Field::Linenumber(
@@ -2894,6 +2908,7 @@ sub QRuleSyncCloudSystem
                id=>"!".$rec->{id}
             });
             my $freenum=1;
+            $fnddataobj->lockWorktable();
             foreach my $chkrec ($fnddataobj->getHashList(qw(name))){
                my $chkname=$basename.${AutoScaleSep}.
                            sprintf("%04d",$freenum);
@@ -2901,10 +2916,14 @@ sub QRuleSyncCloudSystem
                   $freenum++;
                }
             }
-            if ($freenum<9000){
-               unshift(@$sysnamelist,$basename.${AutoScaleSep}.
-                    sprintf("%04d",$freenum));
+            if ($freenum<9000){            # on vsystem not woring - mysqlbug!
+               my $assysname=$basename.${AutoScaleSep}.sprintf("%04d",$freenum);
+               if ($fnddataobj->ValidatedUpdateRecord($rec,{name=>$assysname},
+                                                      {id=>\$rec->{id}})){
+                  unshift(@$sysnamelist,$assysname);
+               }
             }
+            $fnddataobj->unlockWorktable();
          }
       }
 

@@ -1155,14 +1155,16 @@ sub lockWorktable
    my $locktables;
    if (defined($tables)){
       if (ref($tables) eq "ARRAY"){
-         $locktables=join(",",@$tables);
+         $locktables=join(",",map({$_." write"} @$tables));
       }
       else{
          $locktables=$tables;
       }
    }
+   else{
+      $locktables=$worktable." write,history write";
+   }
    msg(DEBUG,"lock $locktables");
-   $locktables=$locktables." write" if ($locktables ne "");
    if (exists($self->{locktables})){
       $locktables=$self->{locktables};
    }
