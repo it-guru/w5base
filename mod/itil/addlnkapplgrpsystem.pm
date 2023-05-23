@@ -63,11 +63,6 @@ sub new
                 vjoindisp     =>'fullname',
                 dataobjattr   =>'applgrp.fullname'),
 
-      new kernel::Field::Link(
-                name          =>'applgrpid',
-                label         =>'ApplicationGroupID',
-                dataobjattr   =>'addlnkapplgrpsystem.applgrp'),
-
       new kernel::Field::Select(
                 name          =>'applgrpcistatus',
                 readonly      =>1,
@@ -90,9 +85,14 @@ sub new
                 vjoindisp     =>'name',
                 dataobjattr   =>'system.name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Text(
+                name          =>'applgrpid',
+                label         =>'ApplicationGroup W5BaseID',
+                dataobjattr   =>'addlnkapplgrpsystem.applgrp'),
+
+      new kernel::Field::Text(
                 name          =>'systemid',
-                label         =>'SystemID',
+                label         =>'System W5BaseID',
                 dataobjattr   =>'addlnkapplgrpsystem.system'),
 
       new kernel::Field::Select(
