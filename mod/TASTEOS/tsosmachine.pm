@@ -123,11 +123,21 @@ sub new
             name              =>'salt',
             label             =>'MachineID create salt'),
 
+      new kernel::Field::Link(
+            name              =>'w5systemid',
+            label             =>'System W5BaseID'),
+
+
    );
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name description));
    return($self);
 }
+
+
+
+
+
 
 sub isViewValid
 {
@@ -226,6 +236,36 @@ sub DataCollector
 {
    my $self=shift;
    my $filterset=shift;
+
+   foreach my $fset (values(%$filterset)){
+      foreach my $flt (@{$fset}){
+         if (ref($flt) eq "HASH"){
+            if (exists($flt->{w5systemid})){
+               my $id=$flt->{w5systemid};
+               if ($id ne ""){
+                  my $o=$self->getPersistentModuleObject("w5add",
+                           "itil::addlnkapplgrpsystem");
+                  $o->SetFilter({systemid=>$id});
+                  my @l=$o->getHashList(qw(applgrpid systemid additional));
+                  foreach my $srec (@l){
+                     my $machineId;
+                     if (ref($srec->{additional}) eq "HASH"){
+                        my $a=$srec->{additional};
+                        if (exists($a->{TasteOS_MachineID})){
+                           $machineId=$a->{TasteOS_MachineID};
+                        }
+                     }
+                     $machineId=$machineId->[0] if (ref($machineId) eq "ARRAY");
+                     if ($machineId ne ""){
+                        $flt->{id}=$machineId;
+                     }
+                  }
+               }
+               delete($flt->{w5systemid});
+            }
+         }
+      }
+   }
 
 
    return(undef) if (!$self->genericSimpleFilterCheck4TASTEOS($filterset));
@@ -505,6 +545,56 @@ sub DeleteRecord
    }
    return(undef);
 }
+
+sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
+{
+   my $self=shift;
+   my @res=();
+
+   $self->SetCurrentView(qw(id systemid name lastscan));
+
+
+   my ($rec,$msg)=$self->getFirst();
+   if (defined($rec)){
+      do{
+
+         #####################################################################
+         #my %e=(
+         #   section=>'SYSTEMNAME',
+         #   scanname=>$rec->{systemname}, 
+         #   quality=>-50,    # relativ schlecht verlässlich
+         #   processable=>1,
+         #   forcesysteminst=>1  # MUSS System zugeordnet sein
+         #);
+         #push(@res,\%e);
+         #####################################################################
+
+         if ($#res==-1){
+            if ($rec->{lastscan} ne ""){
+               my %e=(
+                  section=>'SOFTWARE',
+                  scanname=>"TasteOS-Agent",
+                  scanextra2=>"1.0.0",
+                  quality=>2,    # schlechter als AM
+                  processable=>1,
+                  backendload=>$rec->{lastscan},
+                  autodischint=>$self->Self.": ".$rec->{id}.
+                                ": ".$rec->{systemid}.
+                                ": ".$rec->{name}
+               );
+               # TasteOS Rec
+               $e{forcesysteminst}=1;
+               $e{allowautoremove}=1;
+               $e{quality}=100; 
+               push(@res,\%e);
+            }
+         }
+         ($rec,$msg)=$self->getNext();
+      } until(!defined($rec));
+   }
+   return(@res);
+}
+
 
 
 
