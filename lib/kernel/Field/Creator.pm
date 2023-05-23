@@ -66,12 +66,16 @@ sub preProcessFilter
       delete($hflt->{$field});
    }
 
-   if (!ref($hflt->{$field}) && $hflt->{$field} ne ""){
-      if (!($hflt->{$field}=~m/^\d+$/)){
-         my $u=getModuleObject($self->getParent->Config,"base::user");
-         $u->SetFilter({fullname=>$hflt->{$field}});
-         $hflt->{$field}=[map({$_->{userid}} $u->getHashList(qw(userid)))];
-         $changed++;
+   if (defined($hflt->{$field}) &&
+       !ref($hflt->{$field}) && $hflt->{$field} ne ""){
+      if (!($hflt->{$field} eq "[LEER]" || $hflt->{$field} eq "[EMPTY]" ||
+            $hflt->{$field} eq "![LEER]" || $hflt->{$field} eq "![EMPTY]")){
+         if (!($hflt->{$field}=~m/^\d+$/)){
+            my $u=getModuleObject($self->getParent->Config,"base::user");
+            $u->SetFilter({fullname=>$hflt->{$field}});
+            $hflt->{$field}=[map({$_->{userid}} $u->getHashList(qw(userid)))];
+            $changed++;
+         }
       }
    }
 
