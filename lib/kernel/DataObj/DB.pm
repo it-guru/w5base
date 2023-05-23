@@ -1145,6 +1145,44 @@ sub getWorktable
 }
 
 
+sub lockWorktable
+{
+   my $self=shift;
+   my $tables=shift;
+   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   my ($worktable,$workdb)=$self->getWorktable();
+   $workdb=$self->{DB} if (!defined($workdb));
+   my $locktables;
+   if (defined($tables)){
+      if (ref($tables) eq "ARRAY"){
+         $locktables=join(",",@$tables);
+      }
+      else{
+         $locktables=$tables;
+      }
+   }
+   msg(DEBUG,"lock $locktables");
+   $locktables=$locktables." write" if ($locktables ne "");
+   if (exists($self->{locktables})){
+      $locktables=$self->{locktables};
+   }
+   $workdb->do("lock tables $locktables");
+   my $lockFail=$workdb->getErrorMsg();
+   if ($lockFail eq ""){
+      return(undef);
+   }
+   return($lockFail);
+}
+
+sub unlockWorktable
+{
+   my $self=shift;
+   my ($worktable,$workdb)=$self->getWorktable();
+   $workdb=$self->{DB} if (!defined($workdb));
+   $workdb->do("unlock tables");
+}
+
+
 
 
 package kernel::DataObj::DB::rec;

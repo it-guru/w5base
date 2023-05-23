@@ -136,14 +136,9 @@ sub ValidatedUpdateRecord
       msg(INFO,"no data changes found");
       return($self->SUPER::ValidatedUpdateRecord($oldrec,$newrec,@filter));
    }
-   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
-   my ($worktable,$workdb)=$self->getWorktable();
-   $workdb=$self->{DB} if (!defined($workdb));
-   my $locktables=$self->{locktables};
-   $locktables=$worktable." write" if (!defined($locktables));
-   $workdb->do("lock tables $locktables");
-   if ($workdb->getErrorMsg() eq ""){
-      msg(DEBUG,"lock $locktables");
+
+   my $lockFail=$self->lockWorktable();
+   if (!defined($lockFail)){
       my @dep=(\%{$oldrec});
       my @loadlist=($oldrec->{$idfield});
       my @fieldlist=qw(fullname parentid name);
@@ -168,7 +163,7 @@ sub ValidatedUpdateRecord
                                             {$idfield=>$dep[$c]->{$idfield}});
          if (!$bak){
             if ($c==0){
-               $workdb->do("unlock tables"); 
+               $self->unlockWorktable();
                return($bak);
             }
             $writefailon=$c;
@@ -181,14 +176,14 @@ sub ValidatedUpdateRecord
             $self->SUPER::ValidatedUpdateRecord($dep[$c],$writerec,
                                             {$idfield=>$dep[$c]->{$idfield}});
          }
-         $workdb->do("unlock tables"); 
+         $self->unlockWorktable();
          return(undef);
       }
-      $workdb->do("unlock tables"); 
+      $self->unlockWorktable();
      
       return($bak);
    }
-   $self->LastMsg(ERROR,"can't lock tables: ".$workdb->getErrorMsg);
+   $self->LastMsg(ERROR,"can't lock tables: ".$lockFail);
    return(undef);
 }
 
