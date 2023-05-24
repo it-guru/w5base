@@ -261,6 +261,9 @@ sub DataCollector
                      }
                   }
                }
+               if (!defined($flt->{id})){
+                  $flt->{id}="-1";
+               }
                delete($flt->{w5systemid});
             }
          }
