@@ -44,7 +44,30 @@ sub Init
    $self->RegisterEvent("CleanupLnkContact","CleanupLnkContact");
    $self->RegisterEvent("CleanupLnkContactExp","CleanupLnkContactExp");
    $self->RegisterEvent("CleanupLnkMandatorContact","LnkMandatorContact");
+
+   $self->RegisterEvent("CleanupSampleMultiEvent1","CleanupSampleMultiEvent1");
+   $self->RegisterEvent("Cleanup","CleanupSampleMultiEvent1");
+
+   $self->RegisterEvent("CleanupSampleMultiEvent2","CleanupSampleMultiEvent2");
+   $self->RegisterEvent("Cleanup","CleanupSampleMultiEvent2");
    return(1);
+}
+
+
+sub CleanupSampleMultiEvent1
+{
+   my $self=shift;
+   msg(INFO,"CleanupMultiEvent1:1");
+
+   return({exitcode=>0});
+}
+
+sub CleanupSampleMultiEvent2
+{
+   my $self=shift;
+   msg(INFO,"CleanupMultiEvent2:2");
+
+   return({exitcode=>0});
 }
 
 
