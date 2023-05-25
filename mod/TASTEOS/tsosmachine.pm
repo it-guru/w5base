@@ -572,24 +572,34 @@ sub extractAutoDiscData      # SetFilter Call ist Job des Aufrufers
          #push(@res,\%e);
          #####################################################################
 
-         if ($#res==-1){
+         if ($#res==-1){  # read only first entry
             if ($rec->{lastscan} ne ""){
-               my %e=(
-                  section=>'SOFTWARE',
-                  scanname=>"TasteOS-Agent",
-                  scanextra2=>"1.0.0",
-                  quality=>2,    # schlechter als AM
-                  processable=>1,
-                  backendload=>$rec->{lastscan},
-                  autodischint=>$self->Self.": ".$rec->{id}.
-                                ": ".$rec->{systemid}.
-                                ": ".$rec->{name}
-               );
-               # TasteOS Rec
-               $e{forcesysteminst}=1;
-               $e{allowautoremove}=1;
-               $e{quality}=100; 
-               push(@res,\%e);
+               my $d=CalcDateDuration($rec->{lastscan},NowStamp("en"));
+               if (defined($d)){
+                  msg(INFO,"found TasteOS scan for '".$rec->{name}."' ".
+                           "with age of ".$d->{totaldays});
+                  if ($d->{totaldays}<9){
+                     my %e=(
+                        section=>'SOFTWARE',
+                        scanname=>"TasteOS-Agent",
+                        scanextra2=>"1.0.0",
+                        quality=>2,    # schlechter als AM
+                        processable=>1,
+                        backendload=>$rec->{lastscan},
+                        autodischint=>$self->Self.": ".$rec->{id}.
+                                      ": ".$rec->{systemid}.
+                                      ": ".$rec->{name}
+                     );
+                     # TasteOS Rec
+                     $e{forcesysteminst}=1;
+                     $e{allowautoremove}=1;
+                     $e{quality}=100; 
+                     push(@res,\%e);
+                  }
+               }
+            }
+            else{
+               msg(INFO,"TasteOS entry found but without lastscan");
             }
          }
          ($rec,$msg)=$self->getNext();
