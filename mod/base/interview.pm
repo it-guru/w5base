@@ -1220,9 +1220,21 @@ sub CleanupInterview
                          \%notifyParam,{mode=>'WARN'},sub{
                my ($subject,$ntext);
                my $subject=$self->T("Interview question timerange near end");
+               my $contactstring=$rec->{thematicresponsible};
+               if ($rec->{contact} ne ""){
+                  $contactstring=$rec->{contact};
+               }
+               if ($rec->{contact2} ne ""){
+                  if ($contactstring ne ""){
+                     $contactstring.=" ".$self->T("or")." ";
+                  }
+                  $contactstring.=$rec->{contact2};
+               }
+               
                my $text=$op->getParsedTemplate("tmpl/base.interview.OutOfTime",
                             {
                                static=>{
+                                  CONTACTSTRING=>$contactstring,
                                   CAT=>$rec->{interviewcatlabel},
                                   NAME=>$rec->{name}
                                }
@@ -1272,16 +1284,11 @@ sub getWriteAuthorizedContacts
    my $maxlevel=shift;   # check against which maxresposelevel
    my $resbuf=shift;     # hash to store result
 
-   printf STDERR ("getWriteAuthorizedContacts\n");
-
-   my $uid=$current->{contactid};
-   my $uid=$current->{contact2id};
-   my $uid=$current->{thematicresponsibleid};
    my $responselevel=1;
    foreach my $fld (qw(thematicresponsibleid contactid contact2id)){
       if ($current->{$fld} ne ""){
+         my $uid=$current->{$fld};
          if (!exists($resbuf->{$uid})){
-            my $uid=$current->{$fld};
             $resbuf->{$uid}={
                userid=>$uid,
                responselevel=>$responselevel

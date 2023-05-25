@@ -67,3 +67,4 @@
 'interview time range to'=>{de=>'Interviewzeitraum bis'},
 'invalid interview timerange'=>{de=>'ungültiger Interviewzeitraum'},
 'Interview question timerange near end'=>{de=>'Interview-Frage Zeitraum nähert sich dem Ende'},
+'or'=>{de=>'oder'},
