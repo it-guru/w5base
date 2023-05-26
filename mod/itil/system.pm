@@ -56,7 +56,7 @@ sub new
                        "itcloudarea write,".
                        "lnkapplsystem write, ".
                        "asset write,".
-                       "history write ";
+                       "history write,iomap write";
 
 
    $self->AddFields(
