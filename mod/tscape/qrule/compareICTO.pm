@@ -46,8 +46,8 @@ to be set to "yes" and you are not allowed to enter an
 ICTO-ID, i.e. you must delete the actual ICTO-ID, if one 
 has been given already.  If the existing entry in the 
 field "Application is not IT architecture relevant" has to 
-be changed, please contact the mailbox "FMB Telekom IT SACM" 
-mailto:FMB.FMB-Telekom-IT-SACM@t-systems.com
+be changed, please contact the mailbox "FMB SACM.TelekomIT" 
+ mailto:SACM.TelekomIT@telekom.de
 
 The rule which lead to this issue won't be executed on 
 this application anymore. 
@@ -89,7 +89,8 @@ relevant" auf "ja" gesetzt werden und es darf keine
 ICTO-ID angegeben werden. Muss eine Änderung des vorhandenen 
 Eintrages an dem Feld "Anwendung ist nicht IT-Architektur relevant" 
 vorgenommen werden, so kontaktieren Sie bitte das 
-Postfach "FMB Telekom IT SACM" mailto:FMB.FMB-Telekom-IT-SACM@t-systems.com
+Postfach "FMB SACM.TelekomIT"
+ mailto:SACM.TelekomIT@telekom.de
 
 Die Regel, die zu diesem Data-Issue führte, wird dann auf 
 die Anwendung nicht mehr angewendet.
