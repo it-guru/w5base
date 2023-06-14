@@ -35,3 +35,4 @@
 'bad faq article vote'=>{de=>'FAQ Artikel schlecht bewertet'},
 'feedback to last editor'=>{de=>'Feedback an letzten Bearbeiter'},
 'click to send feedback to last editor'=>{de=>'klicken um Feedback an letzten Bearbeiter zu senden'},
+'last editor email'=>{de=>'Letzter Bearbeiter E-Mail'},
