@@ -26,9 +26,9 @@ Release of Basesetup (Release-/Patchmanagement Compliance):<br>
 },
 'fieldgroup.roadmap'=>{
 de=>'
-Weiterführende Hinweise/Hilfen unter: <a target=_blank href="https://mywiki.telekom.de/pages/viewpage.action?spaceKey=techlib&title=HW-SW-Roadmap+EN_SP_MISPC">HW-SW-Roadmap</a><br>
+Weiterführende Hinweise/Hilfen unter: <a target=_blank href="https://wiki.telekom.de/pages/viewpage.action?pageId=953454285">HW-SW-Roadmap</a><br>
 ',
 en=>'
-further informations at: <a target=_blank href="https://mywiki.telekom.de/pages/viewpage.action?spaceKey=techlib&title=HW-SW-Roadmap+EN_SP_MISPC">HW-SW-Roadmap</a><br>
+further informations at: <a target=_blank href="https://wiki.telekom.de/pages/viewpage.action?pageId=953454285">HW-SW-Roadmap</a><br>
 '
 },
