@@ -1541,7 +1541,7 @@ sub Validate
       $newrec->{name}=$name;
    }
    $name=~s/\./_/g;
-   if ($name eq "" || ($name=~m/[^+-a-z0-9\._]/i) || length($name)>40){
+   if ($name eq "" || ($name=~m/[^+-a-z0-9\._\/]/i) || length($name)>40){
       $self->LastMsg(ERROR,"invalid instance name");
       return(0);
    }
