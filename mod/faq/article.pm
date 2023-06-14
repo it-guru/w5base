@@ -33,7 +33,7 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{MainSearchFieldLines}=3;
+   $param{MainSearchFieldLines}=2;
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
@@ -73,7 +73,7 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'published',
                 label         =>'Published',
-                searchable    =>0,
+                searchable    =>1,
                 dataobjattr   =>'faq.published'),
 
       new kernel::Field::Htmlarea(
@@ -188,6 +188,7 @@ sub new
                 group         =>'sig',
                 htmldetail    =>0,
                 readonly      =>1,
+                searchable    =>0,
                 label         =>'last editor email',
                 dataobjattr   =>'ownercontact.email'),
 
