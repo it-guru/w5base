@@ -20,15 +20,20 @@ NONE
 
 [en:]
 
-Listed certificates are going to expire in a few days or have already expired.
+This quality rule checks when a certificate expires. 
+Information will be sent promptly based on the selected parameters.
+A DataIssue is generated 14 days before the certificate expires.
+
 To avoid restrictions they have to be renewed as soon as possible.
 
 [de:]
 
-Aufgelistete Zertifikate laufen in wenigen Tagen ab,
-oder sind bereits abgelaufen.
-Um Beeinträchtigungen zu vermeiden,
-müssen diese kurzfristig aktualisiert werden.
+Diese Qualitätsregel prüft, wann ein Zertifikat ausläuft. 
+Entsprechend der gewählten Parameter wird zeitnah eine Information verschickt.
+14 Tage vor Ablauf des Zertifikates wird ein DataIssue erzeugt.
+
+Um Beeinträchtigungen zu vermeiden, müssen die aufgeführten
+Zertifikate kurzfristig aktualisiert/erneuert werden.
 
 
 =cut
