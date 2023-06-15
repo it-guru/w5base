@@ -477,9 +477,37 @@ sub checkacl
                   $context->{$rec->{fid}}->{read}=1;
                }
                else{
-                  my @rgrps=$pobj->isViewValid($prec);
-                  if (in_array(\@rgrps,[qw(ALL attachments)])){
-                     $context->{$rec->{fid}}->{read}=1;
+                  if ($rec->{isprivate}){
+                     if (exists($prec->{contacts}) &&
+                         ref($prec->{contacts}) eq "ARRAY"){
+                        my %grps=$pobj->getGroupsOf($ENV{REMOTE_USER},
+                                                    ["RMember"],"both");
+                        my @grpids=keys(%grps);
+                        CLOOP: foreach my $contact (@{$prec->{contacts}}){
+                           if ($contact->{target} eq "base::user" &&
+                               $contact->{targetid} ne $userid){
+                              next;
+                           }
+                           if ($contact->{target} eq "base::grp"){
+                              my $grpid=$contact->{targetid};
+                              next if (!grep(/^$grpid$/,@grpids));
+                           }
+                           my @roles=($contact->{roles});
+                           if (ref($contact->{roles}) eq "ARRAY"){
+                              @roles=@{$contact->{roles}};
+                           }
+                           if (grep(/^privread$/,@roles)){
+                              $context->{$rec->{fid}}->{read}=1;
+                              last CLOOP;
+                           }
+                        }
+                     }
+                  }
+                  else{
+                     my @rgrps=$pobj->isViewValid($prec);
+                     if (in_array(\@rgrps,[qw(ALL attachments)])){
+                        $context->{$rec->{fid}}->{read}=1;
+                     }
                   }
                }
             }
