@@ -1649,10 +1649,16 @@ sub readPEM
 
       # Issuer
       my $iobjs=$x509->issuer_name->entries();
+
       $oprec{ssslissuer}=$self->formatedMultiline($iobjs);
       $oprec{ssslissuerdn}=$x509->issuer();
 
       # Name
+      my $iobjs=$x509->subject_name->entries();
+      #foreach my $iobj (@$iobjs){
+      #    printf STDERR ("PEM field %s = %s\n",$iobj->type(),$iobj->value());
+      #}
+
       my ($cn)=grep({$_->type() eq 'CN'} @$iobjs);
       if (defined($cn)){
          $oprec{ssslcertcommon}=$cn->value();
@@ -1684,7 +1690,6 @@ sub doCAresponseHandler
    my $mailtext=$q->{mailtext};
    $mailtext=~s/\r\n/\n/gs;
    my @mailtext=split(/\n/,$mailtext);
-
 
    # interpret mailtext
    my $incert=0;
@@ -1754,14 +1759,20 @@ sub doCAresponseHandler
    }
    if ($result{exitcode}==0 && exists($oprec{refno})){
       $self->ResetFilter();
-      $self->SetFilter({refno=>\$oprec{refno}});
+      my %flt=(refno=>\$oprec{refno});
+      my $searchExt="";
+      if (exists($oprec{ssslcertcommon})){
+         $flt{sslcertcommon}=\$oprec{ssslcertcommon};
+         $searchExt=" and CommonName from PEM"
+      }
+      $self->SetFilter(\%flt);
       my @l=$self->getHashList(qw(ALL));
       if ($#l==0){
          $oprec{csrrec}=$l[0];
       }
       else{
          $result{exitcode}=300;
-         $result{exitmsg}="unable to find csr by refno";
+         $result{exitmsg}="unable to find csr by refno".$searchExt;
       }
    }
    if ($result{exitcode}==0 && exists($oprec{ssslcertcommon}) &&
@@ -1796,6 +1807,8 @@ sub doCAresponseHandler
          }
       }
    }
+
+   #print STDERR Dumper(\%oprec);
 
 
    if ($result{exitcode}==0 && exists($oprec{csrrec})){
