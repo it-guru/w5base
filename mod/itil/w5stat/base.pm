@@ -655,6 +655,9 @@ sub processRecord
 
    return() if ($statstream ne "default");
 
+   my $qruleact=$self->getParent->getPersistentModuleObject("lnkqrule",
+                                                     "base::lnkqrulemandator");
+
    if ($module eq "itil::appl"){
       my $name=$rec->{name};
       if ($rec->{cistatusid}==4){
@@ -678,6 +681,27 @@ sub processRecord
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
                                         "ITIL.Total.Application.Count",1);
+         ######################################################################
+         # QRule count for ::appl
+         $qruleact->SetFilter([{
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::appl',
+            expiration=>'>now'
+         },
+         {
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::appl',
+            expiration=>undef
+         }]);
+         $qruleact->SetCurrentView(qw(id));
+         my $nrule=$qruleact->SoftCountRecords();
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Application.QRuleCount",$nrule);
+         ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          method=>'ucount',
@@ -713,6 +737,27 @@ sub processRecord
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
                                         "ITIL.Total.System.Count",1);
+         ######################################################################
+         # QRule count for ::system
+         $qruleact->SetFilter([{
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::system',
+            expiration=>'>now'
+         },
+         {
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::system',
+            expiration=>undef
+         }]);
+         $qruleact->SetCurrentView(qw(id));
+         my $nrule=$qruleact->SoftCountRecords();
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.System.QRuleCount",$nrule);
+         ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          method=>'ucount',
@@ -737,6 +782,27 @@ sub processRecord
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
                                         "ITIL.Total.SWInstance.Count",1);
+         ######################################################################
+         # QRule count for ::swinstance
+         $qruleact->SetFilter([{
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::swinstance',
+            expiration=>'>now'
+         },
+         {
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::swinstance',
+            expiration=>undef
+         }]);
+         $qruleact->SetCurrentView(qw(id));
+         my $nrule=$qruleact->SoftCountRecords();
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.SWInstance.QRuleCount",$nrule);
+         ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          method=>'ucount',
@@ -761,6 +827,27 @@ sub processRecord
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
                                         "ITIL.Total.Asset.Count",1);
+         ######################################################################
+         # QRule count for ::asset
+         $qruleact->SetFilter([{
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::asset',
+            expiration=>'>now'
+         },
+         {
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::asset',
+            expiration=>undef
+         }]);
+         $qruleact->SetCurrentView(qw(id));
+         my $nrule=$qruleact->SoftCountRecords();
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Asset.QRuleCount",$nrule);
+         ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          method=>'ucount',
@@ -785,6 +872,27 @@ sub processRecord
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
                                         "ITIL.Total.Cloud.Count",1);
+         ######################################################################
+         # QRule count for ::itcloud
+         $qruleact->SetFilter([{
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::itcloud',
+            expiration=>'>now'
+         },
+         {
+            mandatorid=>\$rec->{mandatorid},
+            cistatusid=>\'4',
+            dataobj=>'*::itcloud',
+            expiration=>undef
+         }]);
+         $qruleact->SetCurrentView(qw(id));
+         my $nrule=$qruleact->SoftCountRecords();
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Cloud.QRuleCount",$nrule);
+         ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          method=>'ucount',
