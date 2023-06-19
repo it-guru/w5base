@@ -132,7 +132,21 @@ sub overviewW5Base
             "</b>",$total,"black",$delta]);
 
 
-#   push(@l,[$app->T('data responsibility'),undef]);
+
+
+
+   my $total=$primrec->{stats}->{'ITIL.Total.Count'};
+   my $dicnt=$primrec->{stats}->{'base.DataIssue.open'};
+   if (ref($dicnt) eq "ARRAY"){
+      $dicnt=$dicnt->[0];
+   }
+   
+   if ($total>0){  # prevent divsion by zero
+      my $dipct=sprintf("%.1lf",100-($dicnt*100/$total));
+      push(@l,["DataQuality",undef]);
+      push(@l,[$app->T("DataIssue free primary Config-Items")
+               ,$dipct.'%',"black",""]);
+   }
 
 
 

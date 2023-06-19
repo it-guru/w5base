@@ -154,7 +154,7 @@ sub getStatSelectionBox
    }
 
    my %grp=$app->getGroupsOf($ENV{REMOTE_USER},
-           ['RCFManager','RCFManager2'],"down");
+           ['RCFManager','RCFManager2','RCFOperator'],"down");
    if (keys(%grp)){
       my $m=getModuleObject($app->Config,"base::mandator");
       $m->SetFilter({grpid=>[keys(%grp)],
@@ -660,10 +660,11 @@ sub displayDataIssueStructure
    }
 
 
-   $prefix.="metric.";
-   my $qprefix=quotemeta($prefix);
 
-
+   #######################################################################
+   my $lprefix=$prefix;
+   $lprefix.="metric.";
+   my $qlprefix=quotemeta($lprefix);
 
    my @metric;
    $metric[0]={};
@@ -677,9 +678,9 @@ sub displayDataIssueStructure
    foreach my $statrec ($primrec,$hist->{lastdstrange}){
       if (ref($statrec->{stats}) eq "HASH"){
          foreach my $k (%{$statrec->{stats}}){
-            next if (!($k=~m/^$qprefix/));
+            next if (!($k=~m/^$qlprefix/));
             my $name=$k;
-            $name=~s/^$qprefix//;
+            $name=~s/^$qlprefix//;
             $metric[$mpos]->{$name}=$statrec->{stats}->{$k};
             if (ref($metric[$mpos]->{$name}) eq "ARRAY"){
                $metric[$mpos]->{$name}=$metric[$mpos]->{$name}->[0];
@@ -689,18 +690,48 @@ sub displayDataIssueStructure
       $mpos++;
    }
 
-
-
-   my @kl=keys(%{$metric[0]});
-   @kl=sort({
+   my @metrickl=keys(%{$metric[0]});
+   @metrickl=sort({
       my $bk=$metric[0]->{$b} <=> $metric[0]->{$a};
 
       $bk;
-   } @kl);
+   } @metrickl);
+   #######################################################################
+   my $lprefix=$prefix;
+   $lprefix.="failcnt.";
+   my $qlprefix=quotemeta($lprefix);
 
+   my @failcnt;
+   $failcnt[0]={};
+   $failcnt[1]={};
 
-   my $d="p=$p";
-   my $d="";
+   my $mpos=0;
+
+   my @statrec=($primrec);
+   push(@statrec,$hist->{lastdstrange}) if (defined($hist->{lastdstrange}));
+
+   foreach my $statrec ($primrec,$hist->{lastdstrange}){
+      if (ref($statrec->{stats}) eq "HASH"){
+         foreach my $k (%{$statrec->{stats}}){
+            next if (!($k=~m/^$qlprefix/));
+            my $name=$k;
+            $name=~s/^$qlprefix//;
+            $failcnt[$mpos]->{$name}=$statrec->{stats}->{$k};
+            if (ref($failcnt[$mpos]->{$name}) eq "ARRAY"){
+               $failcnt[$mpos]->{$name}=$failcnt[$mpos]->{$name}->[0];
+            }
+         }
+      }
+      $mpos++;
+   }
+
+   my @failcntkl=keys(%{$failcnt[0]});
+   @failcntkl=sort({
+      my $bk=$failcnt[0]->{$b} <=> $failcnt[0]->{$a};
+
+      $bk;
+   } @failcntkl);
+   #######################################################################
 
 
 
@@ -716,15 +747,19 @@ sub displayDataIssueStructure
                                   skinbase=>"base"});
 
    $d.="<br>";
+
+
+
    $d.="<table class=\"statTab sortableTable\" style=\"width:99%\">";
    $d.="<thead>";
    $d.="<tr>";
-   $d.="<th width=80% align=left>QRule injury</th>";
+   $d.="<th width=80% align=left>".
+       $app->T("QRule injury")."</th>";
    $d.="<th>&nbsp;</th>";
    $d.="<th width=1%>&nbsp;</th>";
    $d.="</tr>";
    $d.="</thead>";
-   foreach my $k (@kl){
+   foreach my $k (@metrickl){
       my $pDelta="";
       if (exists($metric[1]->{$k})){
          my $oldv=$metric[1]->{$k};
@@ -770,6 +805,75 @@ sub displayDataIssueStructure
       $d.="</tr>";
    }
    $d.="</table>";
+   $d.="<br>";
+   $d.=$app->T("MSG100");
+
+
+   $d.="<table class=\"statTab sortableTable\" style=\"width:99%\">";
+   $d.="<thead>";
+   $d.="<tr>";
+   $d.="<th width=80% align=left>".
+       $app->T("count of qrule injuries")."</th>";
+   $d.="<th>&nbsp;</th>";
+   $d.="<th width=1%>&nbsp;</th>";
+   $d.="</tr>";
+   $d.="</thead>";
+   foreach my $k (@failcntkl){
+      my $pDelta="";
+      if (exists($failcnt[1]->{$k})){
+         my $oldv=$failcnt[1]->{$k};
+         my $curv=$failcnt[0]->{$k};
+         my $delta=$failcnt[1]->{$k}-$failcnt[0]->{$k};
+         if ($delta!=0.0){
+            my $direction=1;
+            if ($delta<0){
+               $direction=-1;
+               $delta=abs($delta);
+            }
+            my $percent=int($delta*100/$oldv)*$direction*-1;
+            if ($percent!=0){
+               if ($direction<0 && $percent>200){
+                  $percent=">+200%";
+               }
+               else{
+                  $percent="+".$percent if ($direction<0);
+                  $percent.="%";
+               }
+               if ($direction<0){
+                  $percent="<font color=red>".$percent."</font>";
+               }
+               $pDelta=" (".$percent.")";
+            }
+         }
+      }
+      $d.="<tr>";
+      $d.="<td>";
+
+      my $lablestr=$k;
+      my $trlabel=$self->getParent->T($k,$k);
+      if ($lablestr ne $trlabel){
+         $lablestr="<a href=\"../qrule/ById/$k\" ".
+                   "title=\"$k\" target=_blank>".$trlabel."</a>";
+      }
+      $d.=$lablestr;
+
+      $d.="</td>";
+
+      $d.="<td align=right>".$failcnt[0]->{$k}."</td>";
+      $d.="<td align=right>".$pDelta."</td>";
+      $d.="</tr>";
+   }
+   $d.="</table>";
+   $d.="<br>";
+
+
+
+
+
+
+
+
+
 
 
    
