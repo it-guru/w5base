@@ -23,3 +23,9 @@
 'base::w5stat::base::dioldstructure'=>{de=>'DataIssue;langzeit',en=>'DataIssue;long'},
 'base::w5stat::base::dicurstructure::LONG'=>{de=>'DataIssue Struktur - aktuelle Situation',en=>'DataIssue Structure - current situation'},
 'base::w5stat::base::dioldstructure::LONG'=>{de=>'DataIssue Struktur - Langzeit',en=>'DataIssue Structure - longtime'},
+'QRule injury'=>{de=>'QRule-Verletzung'},
+'count of qrule injuries'=>{de=>'Anzahl QRule Verletzungen'},
+'MSG100'=>{
+de=>'Im Folgenden werden die Anzahl der QRule Verletzungen pro DataIssue ins Verhältnis gesetzt',
+en=>''
+},
