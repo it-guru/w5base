@@ -317,6 +317,9 @@ sub doQualityCheck
                   msg(ERROR,"error messages while check of ".
                             $stateparam->{idname}."='".$curid."' in ".
                             $dataobj->Self());
+                  foreach my $emsg (@l){
+                     msg(ERROR,$emsg);
+                  }
                }
                $self->LastMsg("");
             }
