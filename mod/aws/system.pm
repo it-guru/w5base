@@ -287,7 +287,7 @@ sub DataCollector
       my $eclass=blessed($_);
       if ($eclass eq "Paws::Exception"){
          if ($_->code ne "InvalidInstanceID.NotFound"){ # no error - if EC2ID 
-            push(@errStack,"(".$_->code.") :".$_->message);  # not found
+            push(@errStack,"(".$_->code."): ".$_->message);  # not found
          }
       }
       else{
