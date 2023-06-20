@@ -141,6 +141,14 @@ sub new
             htmldetail        =>'NotEmpty',
             label             =>'vmId'),
 
+      new kernel::Field::Text(
+                name          =>'idpath',
+                htmlwidth     =>'150',
+                searchable    =>0,
+                FieldHelpType =>'GenericConstant',
+                group         =>'source',
+                label         =>'Azure-IdPath'),
+
       new kernel::Field::Text(     
             name              =>'resourceGroup',
             ignorecase        =>1,
@@ -250,6 +258,7 @@ sub DataCollector
                $rec->{subscriptionId}=$idpath[1];
                $rec->{resourceGroup}=$idpath[3];
             }
+            $rec->{idpath}=$rec->{vmId}.'@'.$rec->{subscriptionId};
 
             #if (in_array(\@view,[qw(ALL cpucount memory)])){
             #   $rec->{cpucount}=1;
@@ -444,7 +453,13 @@ sub Import
       $importname=$param->{importname};
       $importname=~s/\s//i; # prevent wildcard and or filters
       if ($importname ne ""){
-         $flt={id=>$importname};
+         if (my ($vmId,$subscriptionId)=$importname
+             =~m/^([a-z0-9-]+)\@([a-z0-9-]+)$/){
+            $flt={vmId=>$vmId,subscriptionId=>$subscriptionId};
+         }
+         else{
+            $flt={id=>$importname};
+         }
       }
       else{
          return(undef);
@@ -510,7 +525,7 @@ sub Import
       initialname=>$sysrec->{vmId},
       altname=>$sysrec->{vmId},
       id=>$sysrec->{id},
-      srcid=>$sysrec->{id},
+      srcid=>$sysrec->{vmId}.'@'.$sysrec->{subscriptionId},
       ipaddresses=>[values(%ipaddresses)]
    };
 
@@ -540,9 +555,17 @@ sub Import
       checkForSystemExistsFilter=>sub{  # Nachfrage ob Reuse System-Candidat not
          my $osys=shift;                # exists in srcobj
          my $srcid=$osys->{srcid};
-         return({id=>\$srcid});
+
+         if (my ($vmId,$subscriptionId)=$srcid
+             =~m/^([a-z0-9-]+)\@([a-z0-9-]+)$/){
+            return({vmId=>$vmId,subscriptionId=>$subscriptionId});
+         }
+         else{
+            return({id=>\$srcid});
+         }
       }
    };
+#printf STDERR ("ImportRec:%s\n",Dumper($ImportRec));
    my $ImportObjects={   # Objects are in seperated Structur for better Dumping
       itcloud=>$itcloud,
       itcloudarea=>$cloudarea,

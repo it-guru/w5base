@@ -94,8 +94,16 @@ sub qcheckRecord
    #
    if (!defined($parrec)){      # pruefen ob wir bereits nach AZURE geschrieben
       # try to find parrec by srcsys and srcid
+
       $par->ResetFilter();
-      $par->SetFilter({id=>\$rec->{srcid}});
+      if (my ($vmId,$subscriptionId)=$rec->{srcid}
+          =~m/^([a-z0-9-]+)\@([a-z0-9-]+)$/){
+         $par->SetFilter({vmId=>$vmId,subscriptionId=>$subscriptionId});
+      }
+      else{
+         $par->SetFilter({id=>\$rec->{srcid}});
+         return({id=>\$rec->{srcid}});
+      }
       ($parrec)=$par->getOnlyFirst(qw(ALL));
    }
 
