@@ -2062,6 +2062,7 @@ sub ValidateSystemname
    if (length($name)<3 ||length($purename)>63 || haveSpecialChar($name) ||
        ($name=~m/^\d+$/) || 
        ($name=~m/[:,.+~^"%§]/)){  # only a number as system name ist not ok
+      msg(ERROR,"invalid systemname in ValidateSystemname '$name'");
       return(0);
    }
    return(1);
