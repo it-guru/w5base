@@ -700,7 +700,13 @@ sub processRecord
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
-                                        "ITIL.Application.QRuleCount",$nrule);
+                                        "ITIL.Total.Application.QRuleCount",
+                                        $nrule);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.QRuleCount",
+                                        $nrule);
          ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
@@ -756,7 +762,13 @@ sub processRecord
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
-                                        "ITIL.System.QRuleCount",$nrule);
+                                        "ITIL.Total.System.QRuleCount",
+                                        $nrule);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.QRuleCount",
+                                        $nrule);
          ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
@@ -801,7 +813,13 @@ sub processRecord
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
-                                        "ITIL.SWInstance.QRuleCount",$nrule);
+                                        "ITIL.Total.SWInstance.QRuleCount",
+                                        $nrule);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.QRuleCount",
+                                        $nrule);
          ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
@@ -846,7 +864,13 @@ sub processRecord
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
-                                        "ITIL.Asset.QRuleCount",$nrule);
+                                        "ITIL.Total.Asset.QRuleCount",
+                                        $nrule);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.QRuleCount",
+                                        $nrule);
          ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
@@ -891,7 +915,13 @@ sub processRecord
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
                                          nosplit=>1},
-                                        "ITIL.Cloud.QRuleCount",$nrule);
+                                        "ITIL.Total.Cloud.QRuleCount",
+                                        $nrule);
+         $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
+                                        {nameid=>$rec->{mandatorid},
+                                         nosplit=>1},
+                                        "ITIL.Total.QRuleCount",
+                                        $nrule);
          ######################################################################
          $self->getParent->storeStatVar("Mandator",[$rec->{mandator}],
                                         {nameid=>$rec->{mandatorid},
