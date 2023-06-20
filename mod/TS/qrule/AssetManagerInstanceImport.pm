@@ -143,6 +143,7 @@ sub qcheckRecord
 
    my @swisoll;
    my %CurSrcidList;
+   my %sysnameProcessed;
    foreach my $childrec (@l){
       my $applid=$childrec->{child_applid};
       next if ($applid eq "");
@@ -153,7 +154,9 @@ sub qcheckRecord
          next if (!($sysrec->{child}=~m/^SEC/i));
          next if ($systemid eq "");
          next if (!exists($sysids{$systemid}));
+         next if (exists($sysnameProcessed{$sysids{$systemid}->{name}}));
          my $prodcomp=$amapplrec->{prodcomp};
+         $prodcomp=~s/\s*standalone\s*//;
          $prodcomp=~s/ /_/g;
          $prodcomp=$prodcomp."@" if ($prodcomp ne "");
          my $instancename=$childrec->{child};
@@ -173,6 +176,7 @@ sub qcheckRecord
             srcsys=>$srcsys,
             srcid=>$childrec->{child_applid}.":".$sysids{$systemid}->{systemid}
          };
+         $sysnameProcessed{$sysids{$systemid}->{name}}++; 
          $CurSrcidList{$swrec->{srcid}}++;
          push(@swisoll,$swrec);
          
