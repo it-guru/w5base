@@ -295,7 +295,9 @@ sub DataCollector
       }
    };
    if ($#errStack!=-1){
-      $self->LastMsg(ERROR,@errStack);
+      foreach my $emsg (@errStack){
+         $self->LastMsg(ERROR,"errStack:".$emsg);
+      }
       return(undef);
    }
    return(\@result);
