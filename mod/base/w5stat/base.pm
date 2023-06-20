@@ -1220,10 +1220,6 @@ sub processRecord
                                               },"base.DataIssue.open",1);
                $self->getParent->storeStatVar("Mandator",$mn,{
                                                  nameid=>$mandatorid
-                                              },"base.DataIssue.rule.active",
-                                              $dataissuerulecnt);
-               $self->getParent->storeStatVar("Mandator",$mn,{
-                                                 nameid=>$mandatorid
                                               },"base.DataIssue.rule.violated",
                                               $dataissuefailcnt);
                if ($rec->{fwdtarget} eq "base::user"){
