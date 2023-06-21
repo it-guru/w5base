@@ -2059,10 +2059,24 @@ sub ValidateSystemname
 
    my $purename=$name;
    $purename=~s/\[[0-9]+\]\s*$//;
-   if (length($name)<3 ||length($purename)>63 || haveSpecialChar($name) ||
-       ($name=~m/^\d+$/) || 
-       ($name=~m/[:,.+~^"%§]/)){  # only a number as system name ist not ok
-      msg(ERROR,"invalid systemname in ValidateSystemname '$name'");
+   if (length($name)<3){
+      msg(ERROR,"invalid systemname in ValidateSystemname '$name' - to short");
+      return(0);
+   }
+   if (length($purename)>63){
+      msg(ERROR,"invalid systemname in ValidateSystemname '$name' - to long");
+      return(0);
+   }
+   if (haveSpecialChar($name)){
+      msg(ERROR,"invalid systemname in ValidateSystemname '$name' - special");
+      return(0);
+   }
+   if ( ($name=~m/^\d+$/) ){
+      msg(ERROR,"invalid systemname in ValidateSystemname '$name' - only num");
+      return(0);
+   }
+   if (($name=~m/[:,.+~^"%§]/)){  
+      msg(ERROR,"invalid systemname in ValidateSystemname '$name' - signs");
       return(0);
    }
    return(1);
