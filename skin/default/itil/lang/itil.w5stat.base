@@ -31,3 +31,5 @@
 'W5Base total asset count'=>{de=>'W5Base Gesammtanzahl Hardware'},
 'W5Base total software-instance count'=>{de=>'W5Base Gesammtanzahl Software-Instanzen'},
 'W5Base total cloud count'=>{de=>'W5Base Gesammtanzahl Clouds'},
+'Total QRule count related to primary Config-Items'=>{de=>'Gesammtanzahl QRules mit primär CIs verknüpft'},
+'Total not violated QRules at primary Config-Items'=>{de=>'Gesammtanzahl nicht verletzter QRules an primär CIs'},

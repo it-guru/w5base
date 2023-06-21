@@ -131,22 +131,39 @@ sub overviewW5Base
             $app->T("Total primary Config-Item count").
             "</b>",$total,"black",$delta]);
 
-
-
-
-
    my $total=$primrec->{stats}->{'ITIL.Total.Count'};
    my $dicnt=$primrec->{stats}->{'base.DataIssue.open'};
    if (ref($dicnt) eq "ARRAY"){
       $dicnt=$dicnt->[0];
    }
    
+   push(@l,["DataQuality",undef]);
+   my $totalRuleCount=$primrec->{stats}->{'ITIL.Total.QRuleCount'};
+   if (ref($totalRuleCount) eq "ARRAY"){
+      $totalRuleCount=$totalRuleCount->[0];
+   }
+   my $delta=$app->calcPOffset($primrec,$hist,"ITIL.Total.QRuleCount");
+   push(@l,[$app->T("Total QRule count related to primary Config-Items")
+            ,$totalRuleCount,"black",$delta]);
+
    if ($total>0){  # prevent divsion by zero
-      my $dipct=sprintf("%.1lf",100-($dicnt*100/$total));
-      push(@l,["DataQuality",undef]);
+      my $dipct=sprintf("%.2lf",100-($dicnt*100/$total));
       push(@l,[$app->T("DataIssue free primary Config-Items")
                ,$dipct.'%',"black",""]);
    }
+
+
+   my $totalRuleVio=$primrec->{stats}->{'base.DataIssue.rule.violated'};
+   if (ref($totalRuleVio) eq "ARRAY"){
+      $totalRuleVio=$totalRuleVio->[0];
+   }
+   if ($totalRuleCount>0){
+      my $dipct=sprintf("%.2lf",100-($totalRuleVio*100/$totalRuleCount));
+      push(@l,[$app->T("Total not violated QRules at primary Config-Items")
+               ,$dipct.'%',"black",""]);
+   }
+
+
 
 
 
