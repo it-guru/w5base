@@ -209,7 +209,7 @@ sub DataCollector
                       type=>$instance->{InstanceType},
                       accountid=>$AWSAccount,
                       region=>$AWSRegion,
-                      name=>$tag{Name},
+                      name=>$instance->{InstanceId},
                       tags=>\%tag,
                       autoscalinggroup=>$tag{'aws:autoscaling:groupName'},
                       cdate=>$cdate,
@@ -217,6 +217,9 @@ sub DataCollector
                               $AWSAccount.'@'.
                               $AWSRegion,
                   };
+                  if (length($tag{Name})>2){
+                     $rec->{name}=$tag{Name};
+                  }
                   if (in_array(\@view,"status")){
                      my $status="unknown";
                      my $DIRes =
