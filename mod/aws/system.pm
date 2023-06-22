@@ -449,13 +449,6 @@ sub Import
       ipaddresses=>$sysrec->{ipaddresses}
    };
 
-   if ($sysimporttempl->{autoscalinggroup} ne "" &&
-       $sysimporttempl->{name} ne "" &&
-       ($sysimporttempl->{name}=~m/[^a-z0-9-]/) &&
-       !($sysimporttempl->{autoscalinggroup}=~m/[^a-z0-9-]/)){
-      $sysimporttempl->{name}=$sysimporttempl->{autoscalinggroup};
-   }
-       
    if (exists($sysrec->{tags})){
       if (exists($sysrec->{tags}->{'eks:nodegroup-name'}) &&
           $sysrec->{tags}->{'eks:nodegroup-name'} ne ""){
@@ -464,12 +457,14 @@ sub Import
       }
    }
 
-
-
-
-
-
-
+   if ($sysimporttempl->{autoscalinggroup} ne "" &&
+       $sysimporttempl->{name} ne "" &&
+       (length($sysimporttempl->{autoscalinggroup})<40) &&
+       ($sysimporttempl->{name}=~m/[^a-z0-9-]/) &&
+       !($sysimporttempl->{autoscalinggroup}=~m/[^a-z0-9-]/)){
+      $sysimporttempl->{name}=$sysimporttempl->{autoscalinggroup};
+      $sysimporttempl->{name}=~s/[^a-z0-9_-]/_/gi;
+   }
 
 
    my $appl=getModuleObject($self->Config,"TS::appl");
