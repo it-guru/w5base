@@ -2858,14 +2858,26 @@ sub initialImportFillup
                  $_->{target} eq $ctype && $_->{targetid} eq $contactid
               } @cur);
               if ($#old==-1){
-                 $lnkcontact->ValidatedInsertRecord({
-                    target=>$ctype,
-                    targetid=>$contactid,
-                    roles=>['write'],
-                    refid=>$id,
-                    comments=>"inherited by application",
-                    parentobj=>$self->SelfAsParentObject()
-                 });   
+                 my $cobj=$self->getPersistentModuleObject("I:".$ctype,$ctype);
+                 my $crec;
+                 if ($ctype eq "base::user"){
+                    $cobj->SetFilter({userid=>\$contactid,cistatusid=>\'4'});
+                    ($crec)=$cobj->getOnlyFirst(qw(ALL));
+                 }
+                 if ($ctype eq "base::grp"){
+                    $cobj->SetFilter({grpid=>\$contactid,cistatusid=>\'4'});
+                    ($crec)=$cobj->getOnlyFirst(qw(ALL));
+                 }
+                 if (defined($crec)){
+                    $lnkcontact->ValidatedInsertRecord({
+                       target=>$ctype,
+                       targetid=>$contactid,
+                       roles=>['write'],
+                       refid=>$id,
+                       comments=>"inherited by application",
+                       parentobj=>$self->SelfAsParentObject()
+                    });   
+                 }
               }
               else{
                  my @curroles=$old[0]->{roles};
