@@ -147,7 +147,13 @@ sub qcheckRecord
    my $ne=qr/^Exception_DR_Retirement_$rec->{ictono}_.+_(\d{8})\.pdf$/;
    push(@nameexpr,$ne);
 
+   my $ne=qr/^Exception_DR_Migration_$rec->{ictono}_.+_(\d{8})\.pdf$/;
+   push(@nameexpr,$ne);
+
    my $ne=qr/^Ausnahme_DR_Retirement_$rec->{ictono}_.+_(\d{8})\.pdf$/;
+   push(@nameexpr,$ne);
+
+   my $ne=qr/^Ausnahme_DR_Migration_$rec->{ictono}_.+_(\d{8})\.pdf$/;
    push(@nameexpr,$ne);
 
    if (exists($rec->{attachments}) &&
