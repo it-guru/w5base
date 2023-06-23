@@ -149,7 +149,7 @@ sub new
                 htmldetail    =>'NotEmptyOrEdit',
                 vjoindisp     =>'selector'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'pbusinessprocessid',
                 dataobjattr   =>'businessprocess.pbusinessprocess'),
 
