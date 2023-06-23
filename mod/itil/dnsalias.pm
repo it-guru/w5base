@@ -133,7 +133,7 @@ sub new
                 name          =>'replkeysec',
                 group         =>'source',
                 label         =>'secondary sync key',
-                dataobjattr   =>"lpad(dnsalias.id,35,'0')")
+                dataobjattr   =>"lpad(dnsalias.id,35,'0')"),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
