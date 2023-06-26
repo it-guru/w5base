@@ -211,16 +211,11 @@ sub mkAcFtpRecSystem
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
 
-   # Wir "sehen" manche Assets nicht mehr - ist ein Problem
-   #return(undef) if ($arec->{assetid} eq "");
    my $nsys=1;
-#   if ($rec->{srcsys} eq "AWS" ||
-#       $rec->{srcsys} eq "Azure" ||
-#       ($rec->{srcsys}=~m/^TPC/) ){  # For clouds the SystemPartOfAsset calc
-#      $nsys=100;                     # makes no sense, because AssetManager
-#   }                                 # can only handle 0.01 (100 sys per Asset)
-#   elsif ($rec->{assetid} ne ""){
-if (1){
+   if ($rec->{itcloudareaid} eq ""){  # For clouds the SystemPartOfAsset calc
+      $nsys=100;                     # makes no sense, because AssetManager
+   }                                 # can only handle 0.01 (100 sys per Asset)
+   elsif ($rec->{assetid} ne ""){
       my $s=getModuleObject($self->Config,"itil::system");
       $s->SetFilter({assetid=>$rec->{assetid},
                      cistatusid=>"<6"});
