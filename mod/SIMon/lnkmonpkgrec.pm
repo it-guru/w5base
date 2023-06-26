@@ -113,7 +113,7 @@ sub new
                 name          =>'needrefresh',
                 label         =>'kg Restriction',
                 readonly      =>1,
-                dataobjattr   =>"if (".
+                dataobjattr   =>"if (lnksimonpkgrec.id is not null AND ".
                                 "lnksimonpkgrec.modifydate<".
                                 "simonpkg.modifydate,".
                                 "1,0)"),

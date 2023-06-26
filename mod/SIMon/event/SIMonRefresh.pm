@@ -139,14 +139,19 @@ sub SIMonNotify
             }
             else{
                $text.=$opobj->T("should be installed");
-               $text.="<b>(recomented)</b>";
+               $text.="<b>(recommended)</b>";
             }
+            $text.=".\n\n";
+            $text.=$opobj->T("Target");
             $text.=" ";
             $text.=$opobj->T("on logical system");
             $text.=" ";
             $text.="<b>".$rec->{system}."</b>.\n\n";
             if ($rec->{reqtarget} eq "MAND"){
-               $text.=$opobj->T("If there are reasons, why the software can not be installed or you would not install the software, you can write a exception justification at");
+               $text.=$opobj->T("If there are reasons, why the software ".
+                                "can not be installed or you would not ".
+                                "install the software, you can write a ".
+                                "exception justification at");
                $text.="\n";
                $text.=$rec->{urlofcurrentrec}."\n";
                $text.="\n";
@@ -216,7 +221,7 @@ sub SIMonRefresh
    else{
       $datastream->SetFilter([
         {id=>\undef,systemcdate=>"<now-14d"},
-        {needrefresh=>\'1',systemcdate=>"<now-14d"}
+        {needrefresh=>\'1'}
       ]);
    }
 
