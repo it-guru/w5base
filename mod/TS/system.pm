@@ -1158,11 +1158,7 @@ sub genericSystemImport
       }
       else{
          if ($srec->{autoscalinggroup} ne ""){
-            my $namenum;
-            ($namenum)=$srec->{name}=~m/-as([0-9]+)$/;
-            if ($namenum>1){   # prevent notification, if only a namerange is
-               $w5autoscalegroupextend=1;  # extended
-            }
+            $w5autoscalegroupextend=1;  # extended
          }
 
          if (!$w5autoscalegroupextend){

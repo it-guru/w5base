@@ -2919,48 +2919,13 @@ sub QRuleSyncCloudSystem
       $sysnamelist=[$sysnamelist] if (ref($sysnamelist) ne "ARRAY");
 
       my $sysname=$sysnamelist->[0];
-      if ($parrec->{autoscalinggroup} ne "" &&
-          length($sysname)<55){ # AutoScale naming only on short basename
-         # calculate autoscaling name
-         my $AutoScaleSep="-as";
-         my $basename=$sysname;
-         if ($rec->{name}=~m/${basename}${AutoScaleSep}[0-9]{4}$/i){
-            unshift(@$sysnamelist,$rec->{name}); # system has already an 
-         }                               # AutoScale name suffix
-         else{
-            # find a new free autoscale name $basename-as000 schema
-            my $fnddataobj=$self->Clone();
-            $fnddataobj->SetFilter({
-               name=>"${basename}${AutoScaleSep}????",
-               id=>"!".$rec->{id}
-            });
-            my $freenum=1;
-            $fnddataobj->lockWorktable();
-            foreach my $chkrec ($fnddataobj->getHashList(qw(name))){
-               my $chkname=$basename.${AutoScaleSep}.
-                           sprintf("%04d",$freenum);
-               if (lc($chkrec->{name}) eq lc($chkname)){
-                  $freenum++;
-               }
-            }
-            if ($freenum<9000){            # on vsystem not woring - mysqlbug!
-               my $assysname=$basename.${AutoScaleSep}.sprintf("%04d",$freenum);
-               if ($fnddataobj->ValidatedUpdateRecord($rec,{name=>$assysname},
-                                                      {id=>\$rec->{id}})){
-                  unshift(@$sysnamelist,$assysname);
-               }
-            }
-            $fnddataobj->unlockWorktable();
-         }
-      }
-
 
       my $parsysname;
       my $parshortdesc;
       NAMECHK: foreach my $orgsysname (@$sysnamelist){
          if (!defined($parshortdesc)){
             $parshortdesc=UTF8toLatin1($orgsysname);
-            $parshortdesc=~s/[^a-z0-9_-]//gi; # remove non ASC Char
+            $parshortdesc=~s/[^a-z0-9_\@ -]//gi; # remove non ASC Char
          }
          my $sysname=lc($orgsysname);
          if ($sysname=~m/^\S{5,32}\s/){  # Wenn der Name am Anfang steht und
@@ -2969,7 +2934,7 @@ sub QRuleSyncCloudSystem
          $sysname=~s/\s/_/g;
          $sysname=UTF8toLatin1($sysname);
          $sysname=~s/\..*$//; # remove posible Domain part 
-         $sysname=~s/[^a-z0-9_-]//gi; # remove non ASC Char
+         $sysname=~s/[^a-z0-9_\@-]//gi; # remove non ASC Char
          if (length($sysname)>50){
             $sysname=substr($sysname,0,50);
          }
