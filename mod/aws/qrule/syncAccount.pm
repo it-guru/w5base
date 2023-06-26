@@ -163,6 +163,10 @@ sub qcheckRecord
          {
             srcid=>"i-*".'@'..$awsaccountid.'@'.$awsregion,
             cistatusid=>"<6"
+         },
+         {
+            itcloudareaid=>\$rec->{id},
+            cistatusid=>"<6"
          }]
       );
       my @cursys=$sys->getHashList(qw(id srcid cistatusid itcloudareaid));
@@ -209,11 +213,7 @@ sub qcheckRecord
          }
       }
 
-      $par->ResetFilter();
-      foreach my $srcid (@inssys){
-         push(@qmsg,"import $srcid");
-         $par->Import({importname=>$srcid});
-      }
+      #printf STDERR ("AWS:delsys=%s\n",Dumper(\@delsys));
       if (keys(%srcid) &&   # ensure, restcall get at least one result
           $#delsys!=-1){
          $sys->ResetFilter();
@@ -223,9 +223,15 @@ sub qcheckRecord
             $op->ValidatedUpdateRecord($rec,{cistatusid=>6},{id=>\$rec->{id}});
          }
       }
+
+      $par->ResetFilter();
+      foreach my $srcid (@inssys){
+         push(@qmsg,"import $srcid");
+         $par->Import({importname=>$srcid});
+      }
       delete($rec->{ipaddresses}); # reload ips
-      #printf STDERR ("allip=%s\n",Dumper(\%allip));
-      #printf STDERR ("ipaddresses=%s\n",Dumper($rec->{ipaddresses}));
+      #printf STDERR ("AWS:allip=%s\n",Dumper(\%allip));
+      #printf STDERR ("AWS:ipaddresses=%s\n",Dumper($rec->{ipaddresses}));
 
 
       my $net=getModuleObject($self->getParent->Config(),"itil::network");

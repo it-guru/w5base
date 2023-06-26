@@ -184,16 +184,13 @@ sub qcheckRecord
          else{
             my @sysname=();
             my $sysname=lc($parrec->{name});
-            if ($parrec->{name} eq "" &&
-                $parrec->{autoscalinggroup} ne "" &&
-                !($parrec->{autoscalinggroup}=~m/[^a-z0-9-]/)){
-               $sysname=$parrec->{autoscalinggroup};
-            }elsif ($parrec->{autoscalinggroup} ne "" &&
-                $parrec->{name} ne "" &&
-                ($parrec->{name}=~m/[^a-z0-9-]/) &&
-                !($parrec->{autoscalinggroup}=~m/[^a-z0-9-]/)){
-               $sysname=$parrec->{autoscalinggroup};
+            if (($parrec->{name} eq "" || ($parrec->{name}=~m/[^a-z0-9-]/i)) &&
+                $parrec->{autoscalinggroup} ne ""){
+               my $autoscalinggroup=$parrec->{autoscalinggroup};
+               $autoscalinggroup=~s/[^a-z0-9-]/_/g;
+               $sysname=$parrec->{id}.'@'.$autoscalinggroup;
             }
+           
 
             if ($sysname ne ""){
                push(@sysname,$sysname);

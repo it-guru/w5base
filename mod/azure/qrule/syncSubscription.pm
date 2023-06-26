@@ -115,7 +115,7 @@ sub qcheckRecord
       my %srcid;
       foreach my $irec (@l){
          push(@id,$irec->{id});
-         $srcid{$irec->{id}}={
+         $srcid{$irec->{idpath}}={
             cdate=>$irec->{cdate}
          };
       }
@@ -163,10 +163,20 @@ sub qcheckRecord
          }
       }
 
+      if (keys(%srcid) &&   # ensure, restcall get at least one result
+          $#delsys!=-1){
+         $sys->ResetFilter();
+         $sys->SetFilter(srcid=>\@delsys);
+         my $op=$sys->Clone();
+         foreach my $rec ($sys->getHashList(qw(ALL))){
+            $op->ValidatedUpdateRecord($rec,{cistatusid=>6},{id=>\$rec->{id}});
+         }
+      }
+
       $par->ResetFilter();
       foreach my $srcid (@inssys){
          $par->ResetFilter();
-         $par->SetFilter({id=>$srcid}); # reread record to prevent error msg
+         $par->SetFilter({idpath=>$srcid}); # reread record to prevent error msg
                                         # on fast deleted systems
          my @l=$par->getHashList(qw(name
                                     id zone vmId
@@ -179,15 +189,6 @@ sub qcheckRecord
             else{
                push(@qmsg,"import: ".$importrec->{id});
             }
-         }
-      }
-      if (keys(%srcid) &&   # ensure, restcall get at least one result
-          $#delsys!=-1){
-         $sys->ResetFilter();
-         $sys->SetFilter(srcid=>\@delsys);
-         my $op=$sys->Clone();
-         foreach my $rec ($sys->getHashList(qw(ALL))){
-            $op->ValidatedUpdateRecord($rec,{cistatusid=>6},{id=>\$rec->{id}});
          }
       }
    }
