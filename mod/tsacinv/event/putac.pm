@@ -337,14 +337,23 @@ sub SendXmlToAM_system
    ($fh{interface},    $filename{interface}            )=$self->InitTransfer();
 
    $system->SetFilter(\%filter);
+
+   my @idList=$system->getHashList(qw(id));
+
+
+
    $system->SetCurrentView(qw(ALL));
 
    my ($rec,$msg)=$system->getFirst(unbuffered=>1);
 
    my $acnew=0;
    my $acnewback=0;
-   if (defined($rec)){
-      do{
+
+   foreach my $idRec (@idList){
+      $system->ResetFilter();
+      $system->SetFilter({id=>\$idRec->{id}});
+      my ($rec,$msg)=$system->getOnlyFirst(qw(ALL));
+      if (defined($rec)){
          my $t0=Time::HiRes::time();
          msg(INFO,"Start of Record");
          if ($rec->{asset} ne "" && $rec->{acinmassingmentgroup} ne ""){
@@ -368,10 +377,7 @@ sub SendXmlToAM_system
          my $t1=Time::HiRes::time();
          my $top=$t1-$t0;
          msg(INFO,"End of Record in time top=$top");
-
-         
-         ($rec,$msg)=$system->getNext();
-      } until(!defined($rec));
+      }
    }
    msg(INFO,"count status: acnew=$acnew acnewback=$acnewback");
    $self->TransferFile($fh{system},$filename{system},"logsys");
