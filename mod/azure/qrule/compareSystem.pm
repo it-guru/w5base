@@ -92,6 +92,7 @@ sub qcheckRecord
    #
    # Level 1
    #
+   my $oldSrcId=0;
    if (!defined($parrec)){      # pruefen ob wir bereits nach AZURE geschrieben
       # try to find parrec by srcsys and srcid
 
@@ -101,12 +102,16 @@ sub qcheckRecord
          $par->SetFilter({vmId=>$vmId,subscriptionId=>$subscriptionId});
       }
       else{
+         msg(WARN,"using old srcid process for $rec->{id}");
          $par->SetFilter({id=>\$rec->{srcid}});
-         return({id=>\$rec->{srcid}});
+         $oldSrcId++;
+         #return({id=>\$rec->{srcid}});
       }
       ($parrec)=$par->getOnlyFirst(qw(ALL));
    }
-
+   if ($oldSrcId && defined($parrec)){
+      $forcedupd->{srcid}=$parrec->{vmId}.'@'.$parrec->{subscriptionId};
+   }
 
    if ($rec->{cistatusid}==6 && defined($parrec)){
       # das kann auftreten, wenn die AZURE Datenbank temporär Rotz-Daten 

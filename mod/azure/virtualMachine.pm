@@ -551,6 +551,7 @@ sub Import
       cloudrec=>$cloudrec,
       cloudarearec=>$w5carec,
       imprec=>$sysimporttempl,
+      srcidFieldname=>'idpath',
       srcsys=>'AZURE',
       checkForSystemExistsFilter=>sub{  # Nachfrage ob Reuse System-Candidat not
          my $osys=shift;                # exists in srcobj
@@ -574,11 +575,11 @@ sub Import
       srcobj=>$self
    };
 
-   #printf STDERR ("ImportRec(imprec):%s\n",Dumper($ImportRec->{imprec}));
+   printf STDERR ("ImportRec(imprec):%s\n",Dumper($ImportRec->{imprec}));
    my $ImportResult=$system->genericSystemImport($ImportObjects,$ImportRec);
    #printf STDERR ("ImportResult:%s\n",Dumper($ImportResult));
    if ($ImportResult){
-      $ImportResult->{IdentifedBy};
+      return($ImportResult->{IdentifiedBy});
    }
    return();
 }
