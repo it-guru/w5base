@@ -69,10 +69,13 @@ select distinct
 from "mview_FLEXERA_system" FlexSystem
    join "itil::system" system on 
       FlexSystem.lw_realcomputername=system.name and
-         not system.srcsys in ('AWS')
+         not system.srcsys in ('AWS','AZURE')
       or (system.srcid like
           FlexSystem.lw_instancecloudid||'@%@%' and
           system.srcsys='AWS')
+      or (system.srcid like
+          FlexSystem.lw_instancecloudid||'@%' and
+          system.srcsys='AZURE')
 where FlexSystem.DeviceStatus='ACTIVE';
 
 CREATE INDEX "FLEXERA_system2w5system_id1"
