@@ -252,29 +252,29 @@
  en=>'count of non production application with filled tsm'
 },
 'AKPIS.app.prod.count'=>{
- de=>'Gesammtanzahl Produktions Anwendungen',
+ de=>'Gesamtanzahl Produktions Anwendungen',
  en=>'overall count of production application'
 },
 'AKPIS.app.nonprod.count'=>{
- de=>'Gesammtanzahl Non-Produktions Anwendungen',
+ de=>'Gesamtanzahl Non-Produktions Anwendungen',
  en=>'overall count of non-production application'
 },
 'AKPIS.app.ibi.count'=>{
- de=>'Gesammtanzahl IBI relevanter Anwendungen',
+ de=>'Gesamtanzahl IBI relevanter Anwendungen',
  en=>'overall count of ibi application'
 },
 'AKPIS.app.top.count'=>{
- de=>'Gesammtanzahl Top-Anwendungen',
+ de=>'Gesamtanzahl Top-Anwendungen',
  en=>'overall count of top application'
 },
 
 
 'AKPIS.asset.in_all_app.count'=>{
- de=>'Gesammtanzahl Asset in allen Anwendungen',
+ de=>'Gesamtanzahl Asset in allen Anwendungen',
  en=>'overall count of assets in applications'
 },
 'AKPIS.asset.in_all_app.dataissue.exists'=>{
- de=>'Gesammtanzahl Asset mit aktivem DataIssue in allen Anwendungen',
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in allen Anwendungen',
  en=>'overall count of assets with active DataIssue in all applications'
 },
 'AKPIS.asset.in_all_app.eohs.count'=>{
@@ -294,11 +294,11 @@
  en=>'overall count of assets with exceeded planned decostruction date in all applications'
 },
 'AKPIS.asset.in_ibi_app.count'=>{
- de=>'Gesammtanzahl Asset in IBI Anwendungen',
+ de=>'Gesamtanzahl Asset in IBI Anwendungen',
  en=>'overall count of assets in IBI applications'
 },
 'AKPIS.asset.in_ibi_app.dataissue.exists'=>{
- de=>'Gesammtanzahl Asset mit aktivem DataIssue in IBI Anwendungen',
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in IBI Anwendungen',
  en=>'overall count of assets with active DataIssue in IBI applications'
 },
 'AKPIS.asset.in_ibi_app.eohs.count'=>{
@@ -318,11 +318,11 @@
  en=>'overall count of assets with exceeded planned decostruction date in IBI applications'
 },
 'AKPIS.asset.in_nonprod_app.count'=>{
- de=>'Gesammtanzahl Asset in NonProduktions-Anwendungen',
+ de=>'Gesamtanzahl Asset in NonProduktions-Anwendungen',
  en=>'overall count of assets in non-production applications'
 },
 'AKPIS.asset.in_nonprod_app.dataissue.exists'=>{
- de=>'Gesammtanzahl Asset mit aktivem DataIssue in NonProduktions-Anwendungen',
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in NonProduktions-Anwendungen',
  en=>'overall count of assets with active DataIssue in non-production applications'
 },
 'AKPIS.asset.in_nonprod_app.eohs.count'=>{
@@ -342,11 +342,11 @@
  en=>'overall count of assets with exceeded planned decostruction date in non-production applications'
 },
 'AKPIS.asset.in_prod_app.count'=>{
- de=>'Gesammtanzahl Asset in Produktions-Anwendungen',
+ de=>'Gesamtanzahl Asset in Produktions-Anwendungen',
  en=>'overall count of assets in production applications'
 },
 'AKPIS.asset.in_prod_app.dataissue.exists'=>{
- de=>'Gesammtanzahl Asset mit aktivem DataIssue in Produktions-Anwendungen',
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in Produktions-Anwendungen',
  en=>'overall count of assets with active DataIssue in production applications'
 },
 'AKPIS.asset.in_prod_app.eohs.count'=>{
@@ -366,11 +366,11 @@
  en=>'overall count of assets with exceeded planned decostruction date in production applications'
 },
 'AKPIS.asset.in_top_app.count'=>{
- de=>'Gesammtanzahl Asset in Top-Anwendungen',
+ de=>'Gesamtanzahl Asset in Top-Anwendungen',
  en=>'overall count of assets in top applications'
 },
 'AKPIS.asset.in_top_app.dataissue.exists'=>{
- de=>'Gesammtanzahl Asset mit aktivem DataIssue in Top-Anwendungen',
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in Top-Anwendungen',
  en=>'overall count of assets with active DataIssue in top applications'
 },
 'AKPIS.asset.in_top_app.eohs.count'=>{
