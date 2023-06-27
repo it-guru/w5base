@@ -219,21 +219,34 @@ sub decodeFilter2Query4azure
                         $id=$f->{$fn};
                      }
                   }
-                  $const->{$fn}=$id;
-                  if ($dbclass=~m/\{$fn\}/){
-                     $dbclass=~s/\{$fn\}/$id/g;
-                  }
-                  else{
-                     if ($fn eq $idfield){
-                        $dbclass=azure::lib::Listedit::W5BaseID2AzID($id);
+                  if ($fn eq "idpath"){
+                     if (my ($vmId,$subscriptionId)=
+                $id=~m/^\s*([a-z0-9-]{30,40})\s*\@\s*([a-z0-9-]{30,40})\s*$/){
+                        delete($f->{$fn});
+                        $f->{vmId}=$vmId;
+                        $const->{vmId}=$vmId;
+                        $f->{subscriptionId}=$subscriptionId;
+                        $const->{subscriptionId}=$subscriptionId;
                      }
                   }
+                  $const->{$fn}=$id;
             }
          }
       }
+      foreach my $fn (keys(%$const)){
+          my $id=$const->{$fn};
+          if ($dbclass=~m/\{$fn\}/){
+             $dbclass=~s/\{$fn\}/$id/g;
+          }
+          else{
+             if ($fn eq $idfield){
+                $dbclass=azure::lib::Listedit::W5BaseID2AzID($id);
+             }
+          }
+      }
    }
    else{
-      printf STDERR ("invalid Filterset in $self:%s\n",Dumper($filter));
+      msg(ERROR,"invalid Filterset in $self:".Dumper($filter));
       $self->LastMsg(ERROR,"invalid filterset for Azure query");
       return(undef);
    }

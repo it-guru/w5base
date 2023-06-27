@@ -109,7 +109,7 @@ sub qcheckRecord
 
       $par->SetFilter({subscriptionId=>$azureSubscriptionId});
 
-      my @l=$par->getHashList(qw(id cdate));
+      my @l=$par->getHashList(qw(id idpath cdate));
 
       my @id;
       my %srcid;
@@ -163,6 +163,18 @@ sub qcheckRecord
          }
       }
 
+
+      if ($#updsys!=-1){
+         $sys->ResetFilter();
+         $sys->SetFilter({srcsys=>'AZURE',srcid=>\@updsys});
+         foreach my $oldrec ($sys->getHashList(qw(ALL))){
+            my $op=$sys->Clone();
+            $op->ValidatedUpdateRecord($oldrec,{
+                 cistatusid=>'4',itcloudareaid=>$rec->{id}
+            },{id=>$oldrec->{id}});
+         }
+      }
+
       if (keys(%srcid) &&   # ensure, restcall get at least one result
           $#delsys!=-1){
          $sys->ResetFilter();
@@ -176,8 +188,13 @@ sub qcheckRecord
       $par->ResetFilter();
       foreach my $srcid (@inssys){
          $par->ResetFilter();
-         $par->SetFilter({idpath=>$srcid}); # reread record to prevent error msg
-                                        # on fast deleted systems
+         if ($srcid=~m/^\s*([a-z0-9-]{30,40})\s*\@\s*([a-z0-9-]{30,40})\s*$/){
+            $par->SetFilter({idpath=>$srcid}); 
+         }
+         else{
+            $par->SetFilter({id=>$srcid}); 
+         }
+ 
          my @l=$par->getHashList(qw(name
                                     id zone vmId
                                     subscriptionId ipaddresses ));

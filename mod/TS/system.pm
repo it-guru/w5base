@@ -602,6 +602,14 @@ sub genericSystemImport
    my $sysrec=$impparam->{imprec};
    my $srcsys=$impparam->{srcsys};
 
+   if (!exists($sysrec->{srcid})){
+      $sysrec->{srcid}=$sysrec->{id};
+   }
+   my $srcidFieldname="id";
+   if (exists($impparam->{srcidFieldname})){
+      $srcidFieldname=$impparam->{srcidFieldname}; 
+   }
+
    # DataObjects
    my $itcloud=$impobjs->{itcloud};   
    my $cloudarea=$impobjs->{itcloudarea};   
@@ -670,8 +678,9 @@ sub genericSystemImport
    my $w5sysrecmodified=0;
    my $w5autoscalegroupextend=0;
    $sys->ResetFilter();
-   $sys->SetFilter({srcsys=>\$srcsys,srcid=>\$sysrec->{id}});
+   $sys->SetFilter({srcsys=>\$srcsys,srcid=>\$sysrec->{srcid}});
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
+
 
    if (!defined($w5sysrec)){   # srcid update kandidaten (schneller Redeploy)
       my @flt;
@@ -703,7 +712,7 @@ sub genericSystemImport
       push(@flt,{
         name=>$searchname,
         srcsys=>\$srcsys,
-        srcid=>'!'.$sysrec->{id}  # erzeugt SQL Fehler im Darwin Kern!!!
+        srcid=>'!'.$sysrec->{srcid}  # erzeugt SQL Fehler im Darwin Kern!!!
       });
 
       push(@flt,{          # if system is alread create by hand with systemname
@@ -723,7 +732,7 @@ sub genericSystemImport
                push(@flt,{
                  id=>\$oldiprec->{systemid},
                  srcsys=>\$srcsys,
-                 srcid=>'!'.$sysrec->{id}
+                 srcid=>'!'.$sysrec->{srcid}
                });
             }
          }
@@ -882,7 +891,6 @@ sub genericSystemImport
       my %newrec=();
       my $userid;
 
-
       if ($self->isDataInputFromUserFrontend() &&   # only admins (and databoss)
                                                     # can force
           !$self->IsMemberOf("admin")) {            # reimport over webrontend
@@ -975,7 +983,7 @@ sub genericSystemImport
    else{
       msg(INFO,"try to import new with databoss $curdataboss ...");
       my $newrec={name=>$sysrec->{id},
-                  srcid=>$sysrec->{id},
+                  srcid=>$sysrec->{srcid},
                   autoscalinggroup=>$sysrec->{autoscalinggroup},
                   autoscalingsubgroup=>$sysrec->{autoscalingsubgroup},
                   srcsys=>$srcsys,
