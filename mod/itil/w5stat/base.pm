@@ -153,7 +153,7 @@ sub overviewW5Base
    }
 
 
-   my $totalRuleVio=$primrec->{stats}->{'base.DataIssue.rule.violated'};
+   my $totalRuleVio=$primrec->{stats}->{'base.DataIssue.open.rule.violated'};
    if (ref($totalRuleVio) eq "ARRAY"){
       $totalRuleVio=$totalRuleVio->[0];
    }

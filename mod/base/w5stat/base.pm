@@ -1220,7 +1220,7 @@ sub processRecord
                                               },"base.DataIssue.open",1);
                $self->getParent->storeStatVar("Mandator",$mn,{
                                                  nameid=>$mandatorid
-                                              },"base.DataIssue.rule.violated",
+                                              },"base.DataIssue.open.rule.violated",
                                               $dataissuefailcnt);
                if ($rec->{fwdtarget} eq "base::user"){
                   $self->getParent->storeStatVar(
@@ -1271,6 +1271,10 @@ sub processRecord
                                                        nameid=>$mandatorid
                                                     },
                                                     "base.DataIssue.sleep56",1);
+                     $self->getParent->storeStatVar("Mandator",$mn,{
+                                                 nameid=>$mandatorid
+                                              },"base.DataIssue.sleep56.rule.violated",
+                                              $dataissuefailcnt);
                      $self->getParent->storeStatVar("Mandator",$mn,{
                                                        nameid=>$mandatorid
                                                     },
