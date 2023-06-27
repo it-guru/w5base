@@ -727,7 +727,7 @@ sub displayDataIssueStructure
 
    my @failcntkl=keys(%{$failcnt[0]});
    @failcntkl=sort({
-      my $bk=$failcnt[0]->{$b} <=> $failcnt[0]->{$a};
+      my $bk=$failcnt[0]->{$a} <=> $failcnt[0]->{$b};
 
       $bk;
    } @failcntkl);
@@ -774,7 +774,7 @@ sub displayDataIssueStructure
             my $percent=int($delta*100/$oldv)*$direction*-1;
             if ($percent!=0){
                if ($direction<0 && $percent>200){
-                  $percent=">+200%";
+                  $percent="&gt;+200%";
                }
                else{
                   $percent="+".$percent if ($direction<0);
