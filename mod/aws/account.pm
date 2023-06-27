@@ -221,7 +221,7 @@ sub TriggerEndpoint
                 spooltag=>'AWS_QualityCheck-'.$carec->{id},
                 redefine=>'1',
                 retryinterval=>310,
-                firstcalldelay=>490,
+                firstcalldelay=>490+300,
                 maxretry=>12,
                 eventparam=>$carec->{id},
                 userid=>$userid);

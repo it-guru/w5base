@@ -309,7 +309,7 @@ sub TriggerEndpoint
                 spooltag=>'AZURE_QualityCheck-'.$carec->{id},
                 redefine=>'1',
                 retryinterval=>310,
-                firstcalldelay=>290,
+                firstcalldelay=>290+300,
                 maxretry=>13,
                 eventparam=>$carec->{id},
                 userid=>$userid);
