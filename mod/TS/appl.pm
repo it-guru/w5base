@@ -30,7 +30,7 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'acinmassignmentgroupid',
                 group         =>'control',
                 label         =>'Incident Assignmentgroup ID',
