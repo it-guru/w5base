@@ -128,7 +128,7 @@ sub new
                 label         =>'Support Contact',
                 vjoinon       =>['supportid'=>'userid']),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'supportid',
                 dataobjattr   =>'itcloud.support'),
 
