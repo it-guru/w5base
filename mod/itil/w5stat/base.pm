@@ -82,85 +82,112 @@ sub overviewW5Base
    my $app=$self->getParent();
    my @l;
 
-   my @flds=(
-      "ITIL.Total.Application.Count"=>'W5Base total application count',
-      "ITIL.Total.Asset.Count"      =>'W5Base total asset count',
-      "ITIL.Total.System.Count"     =>'W5Base total system count',
-      "ITIL.Total.SWInstance.Count" =>'W5Base total software-instance count',
-      "ITIL.Total.Cloud.Count"      =>'W5Base total cloud count',
-   );
+   if ($primrec->{sgroup} eq "Mandator"){
+      my @flds=(
+         "ITIL.Total.Application.Count"=>'W5Base total application count',
+         "ITIL.Total.Asset.Count"      =>'W5Base total asset count',
+         "ITIL.Total.System.Count"     =>'W5Base total system count',
+         "ITIL.Total.SWInstance.Count" =>'W5Base total software-instance count',
+         "ITIL.Total.Cloud.Count"      =>'W5Base total cloud count',
+      );
 
-   push(@l,[$app->T('Config-Items statistics'),undef]);
+      push(@l,[$app->T('Config-Items statistics'),undef]);
 
-   my @statrec=($primrec);
-   push(@statrec,$hist->{lastdstrange}) if (defined($hist->{lastdstrange}));
+      my @statrec=($primrec);
+      push(@statrec,$hist->{lastdstrange}) if (defined($hist->{lastdstrange}));
 
-   my %kpaths=@flds; 
-   my @kpaths=keys(%kpaths);
-   foreach my $statrec ($primrec,$hist->{lastdstrange}){
-      my $total=0; 
-      if (ref($statrec->{stats}) eq "HASH"){
-         foreach my $k (@kpaths){
-            my $val=0;
-            if (defined($statrec->{stats}->{$k})){
-               $val=$statrec->{stats}->{$k};
-               $val=$val->[0] if (ref($val) eq "ARRAY");
-               $statrec->{stats}->{$k}=$val;
-               $total+=$val;
-            }
-         }   
+      my %kpaths=@flds; 
+      my @kpaths=keys(%kpaths);
+      foreach my $statrec ($primrec,$hist->{lastdstrange}){
+         my $total=0; 
+         if (ref($statrec->{stats}) eq "HASH"){
+            foreach my $k (@kpaths){
+               my $val=0;
+               if (defined($statrec->{stats}->{$k})){
+                  $val=$statrec->{stats}->{$k};
+                  $val=$val->[0] if (ref($val) eq "ARRAY");
+                  $statrec->{stats}->{$k}=$val;
+                  $total+=$val;
+               }
+            }   
+         }
+         $statrec->{stats}->{'ITIL.Total.Count'}=$total;
       }
-      $statrec->{stats}->{'ITIL.Total.Count'}=$total;
-   }
 
-   while(my $k=shift(@flds)){
-      my $label=shift(@flds);
-      if (defined($primrec->{stats}->{$k})){
-         my $val=$primrec->{stats}->{$k};
-         my $color="black";
-         my $delta=$app->calcPOffset($primrec,$hist,[$k]);
-         push(@l,[$app->T($label),$val,$color,$delta]);
+      while(my $k=shift(@flds)){
+         my $label=shift(@flds);
+         if (defined($primrec->{stats}->{$k})){
+            my $val=$primrec->{stats}->{$k};
+            my $color="black";
+            my $delta=$app->calcPOffset($primrec,$hist,[$k]);
+            push(@l,[$app->T($label),$val,$color,$delta]);
+         }
       }
-   }
 
-   my $total=$primrec->{stats}->{'ITIL.Total.Count'};
-   my $delta=$app->calcPOffset($primrec,$hist,\@kpaths);
-
-
-   push(@l,["<b>".
-            $app->T("Total primary Config-Item count").
-            "</b>",$total,"black",$delta]);
-
-   my $total=$primrec->{stats}->{'ITIL.Total.Count'};
-   my $dicnt=$primrec->{stats}->{'base.DataIssue.open'};
-   if (ref($dicnt) eq "ARRAY"){
-      $dicnt=$dicnt->[0];
-   }
-   
-   push(@l,["DataQuality",undef]);
-   my $totalRuleCount=$primrec->{stats}->{'ITIL.Total.QRuleCount'};
-   if (ref($totalRuleCount) eq "ARRAY"){
-      $totalRuleCount=$totalRuleCount->[0];
-   }
-   my $delta=$app->calcPOffset($primrec,$hist,"ITIL.Total.QRuleCount");
-   push(@l,[$app->T("Total QRule count related to primary Config-Items")
-            ,$totalRuleCount,"black",$delta]);
-
-   if ($total>0){  # prevent divsion by zero
-      my $dipct=sprintf("%.2lf",100-($dicnt*100/$total));
-      push(@l,[$app->T("DataIssue free primary Config-Items")
-               ,$dipct.'%',"black",""]);
-   }
+      my $total=$primrec->{stats}->{'ITIL.Total.Count'};
+      my $delta=$app->calcPOffset($primrec,$hist,\@kpaths);
 
 
-   my $totalRuleVio=$primrec->{stats}->{'base.DataIssue.open.rule.violated'};
-   if (ref($totalRuleVio) eq "ARRAY"){
-      $totalRuleVio=$totalRuleVio->[0];
-   }
-   if ($totalRuleCount>0){
-      my $dipct=sprintf("%.2lf",100-($totalRuleVio*100/$totalRuleCount));
-      push(@l,[$app->T("Total not violated QRules at primary Config-Items")
-               ,$dipct.'%',"black",""]);
+      push(@l,["<b>".
+               $app->T("Total primary Config-Item count").
+               "</b>",$total,"black",$delta]);
+
+      my $total=$primrec->{stats}->{'ITIL.Total.Count'};
+      my $dicnt=$primrec->{stats}->{'base.DataIssue.open'};
+      if (ref($dicnt) eq "ARRAY"){
+         $dicnt=$dicnt->[0];
+      }
+
+      my $dis56cnt=$primrec->{stats}->{'base.DataIssue.sleep56'};
+      if (ref($dis56cnt) eq "ARRAY"){
+         $dis56cnt=$dis56cnt->[0];
+      }
+      
+      push(@l,["DataQuality",undef]);
+
+      if ($total>0){  # prevent divsion by zero
+         my $dipct=sprintf("%.2lf",100-($dicnt*100/$total));
+         push(@l,[$app->T("DataIssue free primary Config-Items")
+                  ,$dipct.'%',"black",""]);
+      }
+
+      if ($total>0){  # prevent divsion by zero
+         my $dipct=sprintf("%.2lf",100-($dis56cnt*100/$total));
+         push(@l,[$app->T("primary Config-Items without longtime DataIssue")
+                  ,$dipct.'%',"black",""]);
+      }
+
+      my $totalRuleCount=$primrec->{stats}->{'ITIL.Total.QRuleCount'};
+      if (ref($totalRuleCount) eq "ARRAY"){
+         $totalRuleCount=$totalRuleCount->[0];
+      }
+      my $delta=$app->calcPOffset($primrec,$hist,"ITIL.Total.QRuleCount");
+      push(@l,[$app->T("Total QRule count related to primary Config-Items")
+               ,$totalRuleCount,"black",$delta]);
+
+
+      my $totalRuleVio=$primrec->{stats}->{'base.DataIssue.open.rule.violated'};
+      if (ref($totalRuleVio) eq "ARRAY"){
+         $totalRuleVio=$totalRuleVio->[0];
+      }
+      if ($totalRuleCount>0){
+         my $dipct=sprintf("%.2lf",100-($totalRuleVio*100/$totalRuleCount));
+         push(@l,[
+            $app->T("Proportion not violated QRules at primary Config-Items"),
+                    $dipct.'%',"black",""]
+         );
+      }
+      my $tRuleVioLt=
+           $primrec->{stats}->{'base.DataIssue.sleep56.rule.violated'};
+      if (ref($tRuleVioLt) eq "ARRAY"){
+         $tRuleVioLt=$tRuleVioLt->[0];
+      }
+      if ($totalRuleCount>0){
+         my $dipct=sprintf("%.2lf",100-($tRuleVioLt*100/$totalRuleCount));
+         push(@l,[$app->T("Proportion not violated QRules by ".
+                          "longtime DataIssues at primary Config-Items")
+                  ,$dipct.'%',"black",""]);
+      }
    }
 
 

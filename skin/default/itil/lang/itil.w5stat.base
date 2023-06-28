@@ -32,4 +32,7 @@
 'W5Base total software-instance count'=>{de=>'W5Base Gesamtanzahl Software-Instanzen'},
 'W5Base total cloud count'=>{de=>'W5Base Gesamtanzahl Clouds'},
 'Total QRule count related to primary Config-Items'=>{de=>'Gesamtanzahl QRules mit primär CIs verknüpft'},
-'Total not violated QRules at primary Config-Items'=>{de=>'Gesamtanzahl nicht verletzter QRules an primär CIs'},
+'Proportion not violated QRules at primary Config-Items'=>{de=>'Anteil nicht verletzter QRules an primär CIs'},
+'Proportion not violated QRules by longtime DataIssues at primary Config-Items'=>{de=>'Anteil nicht verletzter QRules durch Langzeit-DataIssues an primär CIs'},
+'primary Config-Items without longtime DataIssue'=>{de=>'primär Config-Items ohne Langzeit-DataIssue'},
+
