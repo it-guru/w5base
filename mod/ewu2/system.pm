@@ -612,6 +612,9 @@ sub Import
                   allowifupdate=>1,
                   mandatorid=>$mandatorid,
                   cistatusid=>4};
+      if (exists($param->{databossid})){
+         $newrec->{databossid}=$param->{databossid};
+      }
       if ($sysrec->{type} eq "VirtualMachine"){
          $systype="virtualizedSystem";
          if ($sysrec->{vhostname} eq "" || $sysrec->{hostingcsid} eq ""){
@@ -651,55 +654,7 @@ sub Import
                            "missing PhysicalElement reference");
             return(undef);
          }
-         my $ass=getModuleObject($self->Config,"itil::asset");
-         $ass->SetFilter({
-            srcsys=>'EWU2',
-            srcid=>$sysrec->{physicalelementid}
-         });
-         my ($hwrec,$msg)=$ass->getOnlyFirst(qw(ALL));
-         if (!defined($hwrec)){
-            my $dlass=getModuleObject($self->Config,"ewu2::asset");
-            $dlass->SetFilter({
-               id=>\$sysrec->{physicalelementid}
-            });
-            my ($arec,$msg)=$dlass->getOnlyFirst(qw(ALL));
-            if ($arec->{serialno} eq ""){
-               $self->LastMsg(ERROR,"EWU2 incomplete: ".
-                              "missing asset attribut serialno for autoimport");
-               return(undef);
-            }
-            if ($arec->{commonname} eq "" ||
-                $arec->{locationid} eq "" ||
-                $arec->{deleted} eq "1"   ||
-                $arec->{serialno} eq ""){
-               $self->LastMsg(ERROR,"EWU2 incomplete: ".
-                              "missing asset attributes for autoimport");
-               return(undef);
-            }
-            my $newarec={
-               name=>$arec->{commonname},
-               serialno=>$arec->{serialno},
-               cistatusid=>4,
-               allowifupdate=>1,
-               mandatorid=>$mandatorid,
-               locationid=>$arec->{locationid},
-               srcsys=>'EWU2',
-               srcid=>$sysrec->{physicalelementid}
-            };
-            my $identifyby=$ass->ValidatedInsertRecord($newarec);
-            if ($identifyby eq ""){
-               $self->LastMsg(ERROR,"EWU2 incomplete: ".
-                              "asset autoimport incomplete");
-               return(undef);
-            }
-            $ass->ResetFilter();
-            $ass->SetFilter({
-               srcsys=>'EWU2',
-               srcid=>$sysrec->{physicalelementid}
-            });
-            ($hwrec,$msg)=$ass->getOnlyFirst(qw(ALL));
-         }
-
+         my ($hwrec,$msg)=$self->ImportAsset($sysrec->{physicalelementid});
 
          if (!defined($hwrec)){
             $self->LastMsg(ERROR,"EWU2 incomplete: ".
@@ -751,6 +706,66 @@ sub Import
    }
    return($identifyby);
 }
+
+sub ImportAsset
+{
+   my $self=shift;
+   my $physicalelementid=shift;
+   my $mandatorid=shift;
+   my $databossid=shift;
+
+
+   my $ass=getModuleObject($self->Config,"itil::asset");
+   $ass->SetFilter({ srcsys=>'EWU2', srcid=>\$physicalelementid });
+   my ($hwrec,$msg)=$ass->getOnlyFirst(qw(ALL));
+   if (!defined($hwrec)){
+      my $dlass=getModuleObject($self->Config,"ewu2::asset");
+      $dlass->SetFilter({id=>\$physicalelementid});
+      my ($arec,$msg)=$dlass->getOnlyFirst(qw(ALL));
+      if ($arec->{serialno} eq ""){
+         $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                        "missing asset attribut serialno for autoimport");
+         return(undef);
+      }
+      if ($arec->{commonname} eq "" ||
+          $arec->{locationid} eq "" ||
+          $arec->{deleted} eq "1"   ||
+          $arec->{serialno} eq ""){
+         $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                        "missing asset attributes for autoimport");
+         return(undef);
+      }
+      my $newarec={
+         name=>$arec->{commonname},
+         serialno=>$arec->{serialno},
+         cistatusid=>4,
+         allowifupdate=>1,
+         locationid=>$arec->{locationid},
+         srcsys=>'EWU2',
+         srcid=>$physicalelementid
+      };
+      if (defined($databossid)){
+         $newarec->{databossid}=$databossid;
+      }
+      if (defined($mandatorid)){
+         $newarec->{mandatorid}=$mandatorid;
+      }
+      my $identifyby=$ass->ValidatedInsertRecord($newarec);
+      if ($identifyby eq ""){
+         $self->LastMsg(ERROR,"EWU2 incomplete: ".
+                        "asset autoimport incomplete");
+         return(undef);
+      }
+      $ass->ResetFilter();
+      $ass->SetFilter({ srcsys=>'EWU2', srcid=>\$physicalelementid });
+      ($hwrec,$msg)=$ass->getOnlyFirst(qw(ALL));
+   }
+
+   return($hwrec,$msg);
+}
+
+
+
 
 1;
 
