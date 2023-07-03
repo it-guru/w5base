@@ -48,6 +48,12 @@ sub new
 
       new kernel::Field::RecordUrl(),
                                                  
+      new kernel::Field::Link(
+                name          =>'fullname',
+                label         =>'fullname',
+                searchable    =>0,
+                dataobjattr   =>"concat(simonpkg.name,' @ ',system.name)"),
+
       new kernel::Field::TextDrop(
                 name          =>'system',
                 htmlwidth     =>'150px',
@@ -841,6 +847,14 @@ sub FinishWrite
    }
    return($bak);
 }
+
+sub isDeleteValid
+{
+   my $self=shift;
+   return(1) if ($self->IsMemberOf("admin"));
+   return(0);
+}
+
 
 
 
