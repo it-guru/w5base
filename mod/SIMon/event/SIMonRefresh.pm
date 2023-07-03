@@ -128,11 +128,12 @@ sub SIMonNotify
             my $text="";
 
             $text.=$opobj->T("The installation package");
-            $text.=" ";
+            $text.="...\n\n   ";
             $text.="<b>";
             $text.=$rec->{monpkg};
-            $text.="</b>";
-            $text.=" ";
+            $text.="</b>\n";
+            $text.="   ".$rec->{urlofcurrentrec}."\n";
+            $text.="\n.... ";
             if ($rec->{monpkgrestrictarget} eq "MAND"){
                $text.=$opobj->T("needs to be installed");
                $text.="<b>(mandatory)</b>";
@@ -160,6 +161,7 @@ sub SIMonNotify
                                                 $urec->{talklang});
             if ($notifycomments ne ""){
                $text.="\n";
+               $text.=$opobj->T("Installation-Hints").":\n";
                $text.=$notifycomments."\n\n";
             }
             my $mode="INFO";

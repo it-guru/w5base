@@ -6,3 +6,5 @@
 'needs to be installed'=>{de=>'muss installiert werden'},
 'should be installed'=>{de=>'sollte installiert werden'},
 'on logical system'=>{de=>'auf dem logischen System'},
+'Target'=>{de=>'Ziel ist'},
+'Installation-Hints'=>{de=>'Installations-Hinweise'},
