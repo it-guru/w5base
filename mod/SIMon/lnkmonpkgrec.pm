@@ -31,6 +31,8 @@ sub new
 {
    my $type=shift;
    my %param=@_;
+
+   $param{MainSearchFieldLines}=4;
    my $self=bless($type->SUPER::new(%param),$type);
 
    
@@ -70,6 +72,20 @@ sub new
                 dataobjattr   =>'system.id',
                 selectfix     =>1,
                 wrdataobjattr =>'lnksimonpkgrec.system'),
+
+      new kernel::Field::Select(
+                name          =>'systemcistatus',
+                label         =>'System CI-Status',
+                readonly      =>1,
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['systemcistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Link(
+                name          =>'systemcistatusid',
+                label         =>'System CI-Status ID',
+                dataobjattr   =>'system.id',
+                selectfix     =>1),
 
       new kernel::Field::Text(
                 name          =>'applicationnames',
@@ -854,6 +870,18 @@ sub isDeleteValid
    return(1) if ($self->IsMemberOf("admin"));
    return(0);
 }
+
+
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_systemcistatus"))){
+     Query->Param("search_systemcistatus"=>
+                  "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
+   }
+}
+
+
 
 
 
