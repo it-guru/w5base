@@ -6,5 +6,5 @@
 'databoss handover to you'=>{de=>'Übergabe der Datenverantwortung'},
 'void role field'=>{de=>'Entfernung eines Rolleneintrages'},
 'imminent databoss handover to you'=>{
-  de=>'Drohende Datenverantwortung führ Sie'
+  de=>'Drohende Datenverantwortungzuweisung'
 },

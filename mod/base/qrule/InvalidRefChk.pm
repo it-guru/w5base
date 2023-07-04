@@ -69,6 +69,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::QRule;
+use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::QRule);
 
 sub new
@@ -175,6 +176,14 @@ sub NotifyContactDataModification
          if (defined($idfield)){
             $notifyparam{dataobj}=$dataobj->Self();
             $notifyparam{dataobjid}=$rec->{$idfield->Name()};
+         }
+         if ($operation eq "lastbossnotify"){
+            my $str=$operation.':'.$notifyparam{dataobj}.
+                    ':'.$notifyparam{dataobjid}.':'.
+                    join(",",@{$notifyparam{emailto}});
+            my $informationHash=md5_base64($str);
+            printf STDERR ("fifi add information hash str: %s\n",$str);
+            $notifyparam{infoHash}=$informationHash;
          }
          my ($package,$filename,$line)=caller();
          if ($package ne ""){
