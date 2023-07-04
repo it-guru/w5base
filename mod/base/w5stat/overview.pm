@@ -92,7 +92,15 @@ sub displayOverview
    if (defined($primrec->{nameid}) && $primrec->{nameid} ne "" 
        && $primrec->{sgroup} eq "Group"){
       my $month=$primrec->{dstrange};
-      $grp->SetFilter({parentid=>\$primrec->{nameid}});
+
+      $grp->SetFilter([
+         {
+            parentid=>\$primrec->{nameid},is_orggrp=>\'1'
+         },
+         {
+            parentid=>\$primrec->{nameid},is_projectgrp=>\'1'
+         },
+      ]);
       my @l=$grp->getHashList(qw(fullname grpid));
       if ($#l!=-1){
          foreach my $grprec (@l){
@@ -149,7 +157,7 @@ sub displayOverview
          if ($extdesc ne ""){
             $extdesc="($extdesc)";
          }
-     }
+      }
 
 
       if ($#{$rec}!=0){
