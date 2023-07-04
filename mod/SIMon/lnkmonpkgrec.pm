@@ -84,7 +84,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'systemcistatusid',
                 label         =>'System CI-Status ID',
-                dataobjattr   =>'system.id',
+                dataobjattr   =>'system.cistatus',
                 selectfix     =>1),
 
       new kernel::Field::Text(
