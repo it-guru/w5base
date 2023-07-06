@@ -450,7 +450,7 @@ sub getPosibleActions
    }
    if ($isadmin){
       push(@l,"wfbreak");
-      push(@l,"wfforward");
+      #push(@l,"wfforward");
    }
    return(@l);
 }
@@ -477,6 +477,42 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/base/load/issue.jpg?".$cgi->query_string());
 }
+
+
+sub ValidatePostpone    #validate postpone operation
+{
+   my $self=shift;
+   my $WfRec=shift;
+   my $Postpone=shift;
+   my $dFromNow=shift;
+   my $dFromStart=shift;
+
+   my $cdate=$WfRec->{createdate};
+   my $d1=CalcDateDuration($cdate,NowStamp("en"));
+
+   if ($d1->{totaldays}>182){
+      $self->LastMsg(ERROR,
+        "DataIssue postpone not allowed starting from 6 months after creation");
+      return(0);
+   }
+   if ($dFromNow->{totaldays}>8*7){
+      $self->LastMsg(ERROR,
+          "DataIssue postpone allowed only for max 8 weeks");
+      return(0);
+   }
+   #msg(INFO,"ValidatePostpone in DataIssue d1=".Dumper($d1));
+   #msg(INFO,"ValidatePostpone in DataIssue Postpone=$Postpone");
+   #msg(INFO,"ValidatePostpone in DataIssue dFromNow=".Dumper($dFromNow));
+   #msg(INFO,"ValidatePostpone in DataIssue dFromStart=".Dumper($dFromStart));
+
+   my $stdRes=$self->SUPER::ValidatePostpone(
+      $WfRec,$Postpone,$dFromNow,$dFromStart
+   );
+   return(0) if (!$stdRes);
+
+   return(1);
+}
+
 
 
 #######################################################################
