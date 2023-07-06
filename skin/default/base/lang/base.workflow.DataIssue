@@ -11,4 +11,9 @@
 'wfdireproc'=>{de=>'Nachbearbeitung angef.',en=>'reprocess request'},
 'Involved CostCenter'=>{de=>'beteiligte Kostenstelle'},
 'Involved Accounting Area'=>{de=>'beteiligter Buchungskreis'},
-
+'DataIssue postpone not allowed starting from 6 months after creation'=>{
+  de=>'DataIssue Zurückstellung nicht erlaubt, ab 6 Monaten nach Erstellung'
+},
+'DataIssue postpone allowed only for max 8 weeks'=>{
+  de=>'DataIssue Zurückstellung nur für max. 8 Wochen möglich',
+}
