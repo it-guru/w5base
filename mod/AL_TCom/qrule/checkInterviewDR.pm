@@ -128,9 +128,7 @@ sub qcheckRecord
    my $errorlevel=0;
 
 
-   return(0) if ($rec->{cistatusid}!=3 && 
-                 $rec->{cistatusid}!=4 &&
-                 $rec->{cistatusid}!=5);
+   return(0) if ( $rec->{cistatusid}!=4 );
 
    return(undef) if ($rec->{opmode} ne "prod");
 
