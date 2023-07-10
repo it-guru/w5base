@@ -1000,10 +1000,13 @@ sub processData
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-            $self->getParent->processRecord($statstream,'base::workflow::active',
-                                            $dstrange,$rec,%param);
-            $count++;
-            $c++;
+            if (!($rec->{W5StatNotRelevant})){
+               $self->getParent->processRecord($statstream,
+                                               'base::workflow::active',
+                                               $dstrange,$rec,%param);
+               $count++;
+               $c++;
+            }
             ($rec,$msg)=$wf->getNext();
          } until(!defined($rec));
       }
@@ -1021,10 +1024,13 @@ sub processData
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-            $self->getParent->processRecord($statstream,'base::workflow::active',
-                                            $dstrange,$rec,%param);
-            $count++;
-            $c++;
+            if (!($rec->{W5StatNotRelevant})){
+               $self->getParent->processRecord($statstream,
+                                               'base::workflow::active',
+                                               $dstrange,$rec,%param);
+               $count++;
+               $c++;
+            }
             ($rec,$msg)=$wf->getNext();
          } until(!defined($rec));
       }
@@ -1042,8 +1048,7 @@ sub processData
       my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
       if (defined($rec)){
          do{
-            if ($rec->{fwdtargetid} ne "15632883160001"){ # temp Hack for 
-                                                          # secfinding wf test
+            if (!($rec->{W5StatNotRelevant})){
                $self->getParent->processRecord($statstream,
                                                'base::workflow::notfinished',
                                                $dstrange,$rec,%param);
