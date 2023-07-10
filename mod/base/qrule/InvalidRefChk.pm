@@ -182,7 +182,6 @@ sub NotifyContactDataModification
                     ':'.$notifyparam{dataobjid}.':'.
                     join(",",@{$notifyparam{emailto}});
             my $informationHash=md5_base64($str);
-            printf STDERR ("fifi add information hash str: %s\n",$str);
             $notifyparam{infoHash}=$informationHash;
          }
          my ($package,$filename,$line)=caller();
