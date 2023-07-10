@@ -130,16 +130,19 @@ sub getDynamicFields
                    new kernel::Field::Link(  
                              name               =>'dataissuemetric',
                              translation        =>'base::workflow::DataIssue',
+                             history            =>0,
                              label              =>'DataIssue Metrics',
                              container          =>'additional'),
                    new kernel::Field::Link(  
                              name               =>'dataissuerulecount',
                              translation        =>'base::workflow::DataIssue',
+                             history            =>0,
                              label              =>'DataIssue total rule count',
                              container          =>'additional'),
                    new kernel::Field::Link(  
                              name               =>'dataissueactiverulecount',
                              translation        =>'base::workflow::DataIssue',
+                             history            =>0,
                              label              =>'DataIssue active rule count',
                              container          =>'additional'),
                    new kernel::Field::Link(  
@@ -268,13 +271,10 @@ sub setClearingDestinations
       if ($#clearingcontacts!=-1) {
          $newrec->{fwdtarget}='base::grp';
          $newrec->{fwdtargetid}=$clearinggrp->{grpid};
+         $newrec->{W5StatNotRelevant}=1;
          $clearinggrpvalid=1;
       }
    }
-
-
-
-
 
 
    if (!$clearinggrpvalid) {

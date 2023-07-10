@@ -813,6 +813,15 @@ sub new
                 label         =>'postponed until',
                 container     =>'headref'),
                                   
+      new kernel::Field::Boolean(
+                name          =>'W5StatNotRelevant',
+                searchable    =>0,
+                htmldetail    =>0,
+                uivisible     =>0,
+                group         =>'state',
+                label         =>'not relevant for w5stat',
+                container     =>'headref'),
+                                  
       new kernel::Field::Text(
                 name          =>'autocopymode',
                 searchable    =>0,
