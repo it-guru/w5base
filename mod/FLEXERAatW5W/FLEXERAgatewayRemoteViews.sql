@@ -135,3 +135,36 @@ grant select on "W5I_FLEXERA_instsoftware" to W5I;
 create or replace synonym W5I.FLEXERA_instsoftware for "W5I_FLEXERA_instsoftware";
 
 
+-- drop materialized view "mview_FLEXERA_instsoftwareraw";
+create materialized view "mview_FLEXERA_instsoftwareraw"
+   refresh complete start with sysdate
+   next sysdate+(1/24)*18
+   as
+select ID,FLEXERADEVICEID,
+       PRODUCTNAME, PUBLISHERNAME,
+       DISPLAYNAME, EDITION,  FULLNAME,CLASSIFICATION
+       VERSION, 
+       VERSIONRAW, 
+       VERSIONWEIGHT,
+       "SoftwareTitleID"            SOFTWARETITLEID,
+       "File_Evidence"              FILE_EVIDENCE,
+       "File_Evidence_File_Version" FILE_EVIDENCE_FILE_VERSION,
+       "Installer_Evidence"         INSTALLER_EVIDENCE,
+       INSTDATE, 
+       INVENTORYDATE,
+       DISCDATE
+from dbo.customDarwinExportDeviceInstRAW@flexerap;
+
+CREATE INDEX "FLEXERA_instsoftwareraw_id1"
+   ON "mview_FLEXERA_instsoftwareraw"(id) online;
+CREATE INDEX "FLEXERA_instsoftwareraw_id2"
+   ON "mview_FLEXERA_instsoftwareraw"(flexeradeviceid) online;
+
+create or replace view "W5I_FLEXERA_instsoftwareraw" as
+select "mview_FLEXERA_instsoftwareraw".*
+from "mview_FLEXERA_instsoftwareraw";
+
+grant select on "W5I_FLEXERA_instsoftwareraw" to W5I;
+create or replace synonym W5I.FLEXERA_instsoftwareraw for "W5I_FLEXERA_instsoftwareraw";
+
+
