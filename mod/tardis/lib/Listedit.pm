@@ -53,7 +53,7 @@ sub deriveIrisUrl
    my $dataurl=shift;
    my $irisPath="/auth/realms/default/protocol/openid-connect/token";
 
-   $dataurl=~s#//stargate-#//iris-#;
+   $dataurl=~s#//stargate([\.-])#//iris$1#;
    $dataurl=resplaceURLPath($dataurl,$irisPath);
 
 
