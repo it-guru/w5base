@@ -153,6 +153,7 @@ sub new
                 vjoindisp     =>['appl','applcistatus','reltyp','fraction'],
                 vjoininhash   =>['appl','applcistatusid','mandatorid',
                                  'applid','businessteam','id','cistatusid',
+                                 'applcustomerprio','applcriticality',
                                  'srcsys','srcid','reltyp']),
 
       new kernel::Field::Text(
