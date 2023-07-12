@@ -207,8 +207,15 @@ sub qcheckRecord
          $sys->SetFilter({srcsys=>'AWS',srcid=>\@updsys});
          foreach my $oldrec ($sys->getHashList(qw(ALL))){
             my $op=$sys->Clone();
+            my $newTempName=$oldrec->{srcid};
+            $newTempName=~s/\@.*$//;  # get an sure not used name
+            # if a logical system should be reactivate, it is posible
+            # the name is already used by an other system - with the 
+            # newTempName this Problem gets resolved.
             $op->ValidatedUpdateRecord($oldrec,{
-                 cistatusid=>'4',itcloudareaid=>$rec->{id}
+                 name=>$newTempName,
+                 cistatusid=>'4',
+                 itcloudareaid=>$rec->{id}
             },{id=>$oldrec->{id}});
          }
       }
