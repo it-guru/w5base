@@ -102,7 +102,9 @@ sub qcheckRecord
          $par->SetFilter({vmId=>$vmId,subscriptionId=>$subscriptionId});
       }
       else{
-         msg(WARN,"using old srcid process for $rec->{id}");
+         if ($rec->{cistatusid}<6){
+            msg(WARN,"Using old Azure srcid process for $rec->{id}");
+         }
          $par->SetFilter({id=>\$rec->{srcid}});
          $oldSrcId++;
          #return({id=>\$rec->{srcid}});
