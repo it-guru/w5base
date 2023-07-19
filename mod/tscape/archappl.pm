@@ -226,6 +226,7 @@ sub new
                 name          =>'mdate',
                 group         =>'source',
                 sqlorder      =>'none',    # in MSSQL zwingend!
+                timezone      =>'CET',
                 label         =>'Modification-Date',
                 dataobjattr   =>"convert(VARCHAR,Last_Update,20)"),
    );
