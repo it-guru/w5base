@@ -122,6 +122,7 @@ sub new
                 group         =>'source',
                 sqlorder      =>'none',    # in MSSQL zwingend!
                 label         =>'Modification-Date',
+                timezone      =>'CET',
                 dataobjattr   =>'convert(VARCHAR,APP_Last_Update,20)'),
 
    );
