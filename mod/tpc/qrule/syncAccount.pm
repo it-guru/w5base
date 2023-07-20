@@ -172,7 +172,10 @@ sub qcheckRecord
          $sys->SetFilter({itcloudareaid=>$rec->{id},srcid=>\@updsys});
          my $op=$sys->Clone();
          foreach my $rec ($sys->getHashList(qw(ALL))){
-            $op->ValidatedUpdateRecord($rec,{cistatusid=>4},{id=>\$rec->{id}});
+            $op->ValidatedUpdateRecord($rec,{
+               name=>$rec->{id},   # give a temp name for reactivation to
+               cistatusid=>4       # ensure reactivation works
+            },{id=>\$rec->{id}});
          }
       }
       foreach my $srcid (@inssys){
