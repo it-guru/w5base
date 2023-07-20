@@ -833,7 +833,7 @@ sub genericSystemImport
             my ($oldrec,$msg)=$sys->getOnlyFirst(qw(ALL));
             if (defined($oldrec)){
                my $updrec={
-                  srcid=>$sysrec->{id},
+                  srcid=>$sysrec->{srcid},
                   srcsys=>$srcsys
                };
                if ($oldrec->{cistatusid} ne "4"){
