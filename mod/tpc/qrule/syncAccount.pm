@@ -173,8 +173,8 @@ sub qcheckRecord
          my $op=$sys->Clone();
          foreach my $rec ($sys->getHashList(qw(ALL))){
             $op->ValidatedUpdateRecord($rec,{
-               name=>$rec->{id},   # give a temp name for reactivation to
-               cistatusid=>4       # ensure reactivation works
+               name=>$rec->{srcid},   # give a temp name for reactivation to
+               cistatusid=>4          # ensure reactivation works
             },{id=>\$rec->{id}});
          }
       }
