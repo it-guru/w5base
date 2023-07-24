@@ -3240,14 +3240,16 @@ sub addDefContactsFromAppl
                $cobj->SetFilter({grpid=>\$contactid,cistatusid=>\'4'});
                ($crec)=$cobj->getOnlyFirst(qw(ALL));
             }
-            $lnkcontact->ValidatedInsertRecord({
-               target=>$ctype,
-               targetid=>$contactid,
-               roles=>['write'],
-               refid=>$identifyby,
-               comments=>"inherited by application",
-               parentobj=>$self->SelfAsParentObject()
-            });   
+            if (defined($crec)){
+               $lnkcontact->ValidatedInsertRecord({
+                  target=>$ctype,
+                  targetid=>$contactid,
+                  roles=>['write'],
+                  refid=>$identifyby,
+                  comments=>"inherited by application",
+                  parentobj=>$self->SelfAsParentObject()
+               });   
+            }
          }
          else{
             my @curroles=$old[0]->{roles};
