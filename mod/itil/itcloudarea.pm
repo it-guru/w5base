@@ -479,10 +479,10 @@ sub checkAutoactivation
    my $oldrec=shift;
    my $newrec=shift;
 
-   if (defined($oldrec) && $oldrec->{cifirstactivation} ne ""){
+   if (effVal($oldrec,$newrec,"cifirstactivation") ne ""){
       if (!effChanged($oldrec,$newrec,"applid")){
          msg(INFO,"Autoactivation of $oldrec->{fullname} by 1stact ".
-                  $oldrec->{cifirstactivation});
+                  effVal($oldrec,$newrec,"cifirstactivation"));
          $newrec->{cistatusid}="4";
          return(1);
       }
@@ -603,6 +603,22 @@ sub Validate
           $newrec->{previousapplid}=$oldrec->{applid};
       }
    }
+   if (defined($oldrec) &&                # reactivation of a previous
+       $oldrec->{cistatusid} eq "6" &&    # marked as deleted cloudarea
+       defined($newrec) &&
+       exists($newrec->{cistatusid}) &&
+       $newrec->{cistatusid}<6){
+      my $dd=CalcDateDuration($oldrec->{mdate},NowStamp("en"));
+      if (!defined($dd) || $dd->{totaldays}>28){
+         $newrec->{previousapplid}=undef;
+         $newrec->{cifirstactivation}=undef;
+         msg(WARN,"reactivation of an old (>28d) CloudArea (".
+                  effVal($oldrec,$newrec,"id").")");
+         msg(WARN,"with exclude of all previousappl and cifirstactivation");
+      }
+   }
+
+
    my $autoactivation=0;
    if (!defined($oldrec) || effVal($oldrec,$newrec,"cistatusid") eq "3"
                          || effVal($oldrec,$newrec,"cistatusid") eq "4"){
