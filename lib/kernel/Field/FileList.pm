@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::MenuTree;
+use URI::Escape qw( uri_escape );
 @ISA    = qw(kernel::Field);
 
 
@@ -152,7 +153,17 @@ sub ListFiles
          $clone{description}="$t";
          
          $clone{href}="ViewProcessor/load/$self->{name}/".
-                      "$refid/$clone{fid}/$clone{name}";
+                      "$refid/$clone{fid}/";
+
+         my $cleanName=$clone{name};
+         $cleanName=~s/\///g;
+         $cleanName=~s/\.\.//g;
+         $cleanName=uri_escape($cleanName);
+         $cleanName=~s/\%20/+/g;    # %20 makes problems in Apache rewrite
+         # https://stackoverflow.com/questions/75684314/ah10411-error-managing-spaces-and-20-in-apache-mod-rewrite
+         $clone{href}.=$cleanName;
+         
+
          if ($mode eq "FileListMode.DELENT"){
             $clone{labelprefix}="<input type=checkbox name=delid$clone{fid}>";
          }
