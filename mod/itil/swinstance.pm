@@ -683,7 +683,7 @@ sub new
                 vjoinon       =>['itclustsid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'itclustsid',
                 selectfix     =>1,
                 group         =>'runon',
@@ -710,7 +710,7 @@ sub new
                 vjoinon       =>['itcloudareaid'=>'id'],
                 vjoindisp     =>'fullname'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'itcloudareaid',
                 selectfix     =>1,
                 group         =>'runon',
