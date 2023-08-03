@@ -143,7 +143,7 @@ sub CleanupWasted
 {
    my $self=shift;
    my $CleanupWasted=$self->getParent->Config->Param("CleanupWasted");
-   $CleanupWasted="<now-5Y" if ($CleanupWasted eq "");
+   $CleanupWasted="<now-2Y" if ($CleanupWasted eq "");
 
    my @objlist=$self->getParent->globalObjectList();
    foreach my $obj (@objlist){
