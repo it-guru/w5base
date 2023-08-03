@@ -2926,8 +2926,8 @@ sub QRuleSyncCloudSystem
       }
 
 
-      #printf STDERR ("parrec ips=%s\n",Dumper($parrec->{ipaddresses}));
-      #printf STDERR ("rec ips=%s\n",Dumper($rec->{ipaddresses}));
+      printf STDERR ("parrec ips=%s\n",Dumper($parrec->{ipaddresses}));
+      printf STDERR ("rec ips=%s\n",Dumper($rec->{ipaddresses}));
 
       my $netarea={};
       my $net=getModuleObject($self->Config(),"itil::network");
@@ -2991,10 +2991,14 @@ sub QRuleSyncCloudSystem
                     }
                     elsif ($mode eq "delete"){
                        my $networkid=$oldrec->{networkid};
-                       return({OP=>$mode,
-                               MSG=>"delete ip $oldrec->{name} ".
+                       return({OP=>"update",
+                               MSG=>"delete(mark as deleted) ".
+                                    "ip $oldrec->{name} ".
                                    "from W5Base",
                                DATAOBJ=>'itil::ipaddress',
+                               DATA=>{
+                                cistatusid   =>"6",
+                               },
                                IDENTIFYBY=>$oldrec->{id},
                                });
                     }
