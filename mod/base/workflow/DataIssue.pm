@@ -426,6 +426,10 @@ sub getPosibleActions
    my @l=();
    my $iscurrent=$self->isCurrentForward($WfRec);
 
+   if ($iscurrent){
+      push(@l,"iscurrent");
+   }
+
    if ($stateid==2 || $stateid==4){
       push(@l,"wfaddlnote");
    }
