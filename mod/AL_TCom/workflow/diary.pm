@@ -726,6 +726,7 @@ sub Process
       if (!($note=~m/^\s*$/) && $WfRec->{detaildescription}=~m/^\s*$/){
          $fwd{detaildescription}=$note;
       }
+      my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
       if ($self->getParent->StoreRecord($WfRec,$newstep,{
                                 %fwd,
                                 step=>$newstep,
