@@ -3,9 +3,7 @@
 'AL_TCom::workflow::diary::tip'=>{
               de=>'Das Betriebstagebuch dient zur Dokumentation von '.
                   'Projektarbeiten oder allgemeinen Veränderungen '.
-                  'in bestimmten Anwendungen. Für die Telekom IT müssen '.
-                  'im speziellen die P800 relevanten Aufwände '.
-                  'dokumentiert werden.',
+                  'in bestimmten Anwendungen.'
                   },
 
 'Application'=>{de=>'Anwendung'},

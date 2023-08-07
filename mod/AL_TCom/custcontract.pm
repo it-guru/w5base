@@ -29,17 +29,6 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-   $self->AddFields(
-      new kernel::Field::Select(
-                name          =>'p800opmode',
-                transprefix   =>'KS.',
-                htmleditwidth =>'250px',
-                searchable    =>0,
-                value         =>['','prod','eta'],
-                label         =>'Telekom concern standard operation mode',
-                container     =>'additional')
-   );
-
 
    return($self);
 }

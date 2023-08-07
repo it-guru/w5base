@@ -177,12 +177,10 @@ sub getPosibleActions
    my $userid=$self->getParent->getCurrentUserId();
    my @l=($self->SUPER::getPosibleActions($WfRec));
    @l=grep(!/^wffinish$/,@l);
-   if ($WfRec->{state}>20){   # wenn schon ein P800 rep freigeben, dann  nix
+   if ($WfRec->{state}>20){   
       if (defined($WfRec) &&
           ref($WfRec->{affectedcontractid}) eq "ARRAY" &&
           $#{$WfRec->{affectedcontractid}}!=-1){
-         my @p800ids;
-
          if ($self->getParent->IsMemberOf("admin")){
             push(@l,"reactivate");
          }
@@ -728,71 +726,9 @@ sub Process
       if (!($note=~m/^\s*$/) && $WfRec->{detaildescription}=~m/^\s*$/){
          $fwd{detaildescription}=$note;
       }
-      my %p800mod=();
-      my $newstep=$self->getParent->getStepByShortname('wfclose',$WfRec);
-      if (ref($WfRec->{affectedcontractid}) eq "ARRAY" &&
-          $#{$WfRec->{affectedcontractid}}!=-1){  # P800 Check only needed, if
-         my $tcomcodcomments;                   # there are existing contracts
-         my $tcomworktime;
-         if ($WfRec->{tcomcodrelevant} eq "" ||
-             $WfRec->{tcomcodrelevant} eq "yes"){
-          
-            if ($WfRec->{tcomcodcause} eq "" ||
-                $WfRec->{tcomcodcause} eq "undef"){
-               $self->getParent->LastMsg(ERROR,
-                                         "no correct P800 cause selection");
-               return(0);
-            }
-            if ($WfRec->{tcomcodcomments} eq "" && $note ne ""){
-               $p800mod{tcomcodcomments}=$note;
-               $tcomcodcomments=$p800mod{tcomcodcomments};
-            }
-            else{
-               $tcomcodcomments=$WfRec->{tcomcodcomments}; 
-            }
-         }
-        
-        
-         if ($WfRec->{tcomworktime}<10){
-            my $fa=$self->getParent->getField("shortactionlog");
-            my $al=$fa->RawValue($WfRec);
-            my $def=0;
-            if (defined($al) && ref($al) eq "ARRAY"){
-               foreach my $action (@$al){ 
-                  if (ref($action) eq "HASH"){
-                     $def+=$action->{effort};
-                  }
-               }
-            }
-            $def=10 if ($def<10);
-            $p800mod{tcomworktime}=$def if ($WfRec->{tcomworktime}<10);
-            $tcomworktime=$p800mod{tcomworktime};
-         }
-         else{
-            $tcomworktime=$WfRec->{tcomworktime};
-         }
-         $p800mod{tcomcodrelevant}="yes" if ($WfRec->{tcomcodrelevant} eq "");
-        
-         #
-         # check P800 requirements
-         # https://darwin.telekom.de/darwin/auth/base/workflow/ById/12391987130002
-         #
-         if ($WfRec->{tcomcodrelevant} eq "" ||
-             $WfRec->{tcomcodrelevant} eq "yes"){
-            if ($tcomworktime>1200 && length($tcomcodcomments)<20){
-               my $wth=sprintf("%.2lf",$tcomworktime/60);
-               $wth=~s/\./,/g;
-               $self->getParent->LastMsg(ERROR,
-                         'P800 worktime %sh needs detailed description',$wth);
-               return(0);
-            }
-         }
-      }
-
       if ($self->getParent->StoreRecord($WfRec,$newstep,{
                                 %fwd,
                                 step=>$newstep,
-                                %p800mod,
                                 eventend=>NowStamp("en"),
                                 stateid=>17})){
          if ($self->getParent->getParent->Action->StoreRecord(
