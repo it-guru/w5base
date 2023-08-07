@@ -2926,8 +2926,8 @@ sub QRuleSyncCloudSystem
       }
 
 
-      printf STDERR ("parrec ips=%s\n",Dumper($parrec->{ipaddresses}));
-      printf STDERR ("rec ips=%s\n",Dumper($rec->{ipaddresses}));
+      #printf STDERR ("parrec ips=%s\n",Dumper($parrec->{ipaddresses}));
+      #printf STDERR ("rec ips=%s\n",Dumper($rec->{ipaddresses}));
 
       my $netarea={};
       my $net=getModuleObject($self->Config(),"itil::network");
