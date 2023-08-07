@@ -838,8 +838,10 @@ sub genericSystemImport
                };
                if ($oldrec->{cistatusid} ne "4"){
                   $updrec->{cistatusid}="4";
-                  printf STDERR ("DEBUG: reactivation with %s\n",
-                                 Dumper($updrec));
+                  if (lc($updrec->{srcsys}) eq "azure"){
+                     printf STDERR ("reactivation with %s\n",
+                                    Dumper($updrec));
+                  }
                }
                if ($sys->ValidatedUpdateRecord($oldrec,$updrec,
                    {id=>\$oldrec->{id}})) {
