@@ -313,8 +313,6 @@ sub new
                                             AL_TCom::workflow::change
                                             AL_TCom::workflow::problem
                                             AL_TCom::workflow::incident
-                                            AL_TCom::workflow::P800
-                                            AL_TCom::workflow::P800special
                                             )];
    $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
 

@@ -30,26 +30,6 @@ sub isPostReflector
    return(undef) if (!defined($rec));
    
    if (defined($rec) && 
-       ref($rec->{affectedcontractid}) eq "ARRAY" &&
-       $#{$rec->{affectedcontractid}}!=-1){
-      my @p800ids;
-      if (my ($y,$m)=$rec->{eventend}=~m/^(\d{4})-(\d{2})-.*$/){
-         foreach my $contractid (@{$rec->{affectedcontractid}}){
-            push(@p800ids,"$m/$y-$contractid");
-         }
-         if ($#p800ids!=-1){
-            my $wf=$self->getPersistentModuleObject("p800repcheck",
-                                                    "base::workflow");
-            $wf->SetFilter({srcid=>\@p800ids,
-                            stateid=>\'8',
-                            srcsys=>\"AL_TCom::event::mkp800"});
-            my @l=$wf->getHashList(qw(id));
-            return() if ($#l!=-1);
-         }
-      }
-   }
-
-   if (defined($rec) && 
        ref($rec->{affectedapplicationid}) eq "ARRAY" &&
        $#{$rec->{affectedapplicationid}}!=-1 &&
        $self->getParent->IsMemberOf("admin","w5base.cod")){

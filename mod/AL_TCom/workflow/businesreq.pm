@@ -93,17 +93,6 @@ sub Validate
                   }
                }
             }
-            if ($newrec->{tcomworktime} eq ""){
-               $self->LastMsg(ERROR,"no P800 effort derivable");
-               return(undef);
-            }
-         }
-         my $tcomworktime=effVal($oldrec,$newrec,"tcomworktime");
-         my $tcomcodcomments=effVal($oldrec,$newrec,"tcomcodcomments");
-         if (length($tcomcodcomments)<20 && $tcomworktime>1200){
-            $self->LastMsg(ERROR,
-                           "P800 effort more than 20h needs detail comments");
-            return(undef);
          }
       }
    }
