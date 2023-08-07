@@ -10,7 +10,6 @@
 'opmeasure'=>{de=>'Betriebsmaßnahme',en=>'Operations measure'},
 'change'=>{de=>'Changemanagement'},
 'incident'=>{de=>'Incidentmanagement'},
-'eventnotify'=>{de=>'Ereignismeldungen'},
 'From'=>{de=>'von'},
 'To'=>{de=>'bis'},
 'missing query param to prozess this request'=>{de=>'zwingende Abfrageparameter wurden nicht angegeben'},

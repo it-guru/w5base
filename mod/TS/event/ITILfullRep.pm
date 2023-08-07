@@ -152,18 +152,7 @@ sub ITILfullRep
                           affectedapplicationid=>[keys(%{$t->{id}})]},
                  order=>'NONE',
                  view=>[qw(name id eventstart eventend
-                           detaildescription)]},
-
-                {DataObj=>'base::workflow',
-                 sheet=>'Ereignismeldung',
-                 filter=>{eventend=>$eventend,
-                          isdeleted=>'0',
-                          class=>'AL_TCom::workflow::eventnotify',
-                          affectedapplicationid=>[keys(%{$t->{id}})]},
-                 order=>'NONE',
-                 view=>[qw(name id wffields.eventstatclass 
-                           eventstart eventend
-                           wffields.eventdesciption)]},
+                           detaildescription)]}
                 );
 
    $out->Process(@control);

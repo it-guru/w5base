@@ -688,12 +688,6 @@ sub Init
                       param=>'WorkflowClass=itil::workflow::processreq',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj('itil::workflow::eventnotify$',
-                      "base::workflow",
-                      func=>'New',
-                      param=>'WorkflowClass=itil::workflow::eventnotify',
-                      defaultacl=>['admin']);
-
    $self->RegisterObj('itil::QuickFind::appl$',
                       "itil::QuickFind::appl",
                       defaultacl=>['valid_user']);

@@ -313,7 +313,6 @@ sub new
                                             AL_TCom::workflow::change
                                             AL_TCom::workflow::problem
                                             AL_TCom::workflow::incident
-                                            AL_TCom::workflow::eventnotify
                                             AL_TCom::workflow::P800
                                             AL_TCom::workflow::P800special
                                             )];
@@ -972,11 +971,6 @@ sub calcWorkflowStart
    }
    if (grep(/^itil::workflow::opmeasure$/,@l)){
       $r->{'itil::workflow::opmeasure'}={
-                                          name=>'Formated_affectedapplication'
-                                       };
-   }
-   if (grep(/^AL_TCom::workflow::eventnotify$/,@l)){
-      $r->{'AL_TCom::workflow::eventnotify'}={
                                           name=>'Formated_affectedapplication'
                                        };
    }
