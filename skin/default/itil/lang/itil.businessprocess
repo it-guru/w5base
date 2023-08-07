@@ -2,6 +2,5 @@
 'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
 'fieldgroup.businessservices'=>{de=>'Businessservices',en=>'Businessservices'},
 'fieldgroup.systems'=>{de=>'Systems',en=>'Systems'},
-'eventnotify'=>{de=>'Ereignismeldung',en=>'Eventnotification'},
 'Applications'=>{de=>'Anwendungen'},
 'Business process'=>{de=>'Geschäftsprozess'},

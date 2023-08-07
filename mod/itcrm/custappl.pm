@@ -452,7 +452,6 @@ sub new
                                             AL_TCom::workflow::businesreq
                                             THOMEZMD::workflow::businesreq
                                             AL_TCom::workflow::change
-                                            AL_TCom::workflow::eventnotify
                                             AL_TCom::workflow::incident)];
    $self->{history}={
       update=>[

@@ -96,7 +96,6 @@ sub doCrono
    my ($wfrec,$msg)=$wf->getFirst(unbuffered=>1);
    if (defined($wfrec)){
       do{
-         #msg(INFO,"wfid=".Dumper($wfrec->{affectedcontractid}));
          my $contractid=$wfrec->{affectedcontractid};
          $contractid=[$contractid] if (ref($contractid) ne "ARRAY");
          foreach my $cid (@{$contractid}){
@@ -108,9 +107,6 @@ sub doCrono
             }
             elsif ($wfrec->{class}=~m/::problem$/){
                $wfstat{$cid}->{TotalProblemWorkflowCount}++;
-            }
-            elsif ($wfrec->{class}=~m/::eventnotify$/){
-               $wfstat{$cid}->{TotalEventnotifyWorkflowCount}++;
             }
             foreach my $k (keys(%{$wfstat{$cid}})){
                $wfstatkeys{$k}++;

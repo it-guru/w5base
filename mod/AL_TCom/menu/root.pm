@@ -752,12 +752,6 @@ sub Init
                       "AL_TCom::inmbusinessarea",
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj('AL_TCom::workflow::eventnotify$',
-                      "base::workflow",
-                      func=>'New',
-                      param=>'WorkflowClass=AL_TCom::workflow::eventnotify',
-                      defaultacl=>['admin']);
-
    $self->RegisterObj('AL_TCom::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',
