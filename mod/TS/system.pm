@@ -838,10 +838,10 @@ sub genericSystemImport
                };
                if ($oldrec->{cistatusid} ne "4"){
                   $updrec->{cistatusid}="4";
-                  if (lc($updrec->{srcsys}) eq "azure"){
-                     printf STDERR ("reactivation with %s\n",
-                                    Dumper($updrec));
-                  }
+                  #if (lc($updrec->{srcsys}) eq "azure"){
+                  #   printf STDERR ("reactivation with %s\n",
+                  #                  Dumper($updrec));
+                  #}
                }
                if ($sys->ValidatedUpdateRecord($oldrec,$updrec,
                    {id=>\$oldrec->{id}})) {
@@ -859,7 +859,7 @@ sub genericSystemImport
    my $identifyby;
    if (defined($w5sysrec)){
       if (uc($w5sysrec->{srcsys}) eq uc($srcsys) &&
-          $w5sysrec->{srcid} eq $sysrec->{id}){
+          $w5sysrec->{srcid} eq $sysrec->{srcid}){
          my $msg=sprintf($self->T("Systemname '%s' already imported in W5Base"),
                          $w5sysrec->{name});
          if ($w5sysrec->{cistatusid} ne "4" || $w5sysrecmodified){
@@ -917,8 +917,8 @@ sub genericSystemImport
       if ($w5sysrec->{srcsys} ne $srcsys){
          $newrec{srcsys}=$srcsys;
       }
-      if ($w5sysrec->{srcid} ne $sysrec->{id}){
-         $newrec{srcid}=$sysrec->{id};
+      if ($w5sysrec->{srcid} ne $sysrec->{srcid}){
+         $newrec{srcid}=$sysrec->{srcid};
       }
       if ($w5sysrec->{systemtype} ne "standard"){
          $newrec{systemtype}="standard";
