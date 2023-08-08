@@ -722,10 +722,13 @@ sub Ipv6Expand
    my $self=shift;
    my $ip=shift;
 
+   my $orgip=$ip;
+
    my @unformat;
 
 
    if (1){ # Handling for muliple 0 blocks in :: sequence
+      $ip.="0" if ($ip=~m/:$/);
       my @blks=split(/:/,$ip);
       my $n=$#blks+1;
       if ($n<8){
@@ -736,8 +739,9 @@ sub Ipv6Expand
       # verify expand:
       my @blks=split(/:/,$ip);
       if ($#blks!=7){
-         msg(ERROR,"ipv6 Expand error: $ip");
-         Stacktrace();
+         msg(ERROR,"ipv6 Expand error: $orgip");
+         Stacktrace(1);
+         return(undef);
       }
    }
 
