@@ -5359,9 +5359,16 @@ sub DoRESTcall
          $d=$xmltree;
       }
       else{
-         eval('$d=decode_json($respcontent);');
+         #eval('$d=decode_json($respcontent);');  # problems if coding is wron
+         eval('$d=from_json($respcontent,{utf8=>1});');
+         if ($@=~m/Wide character in subroutine entry/){    # if response is 
+            eval('$d=from_json($respcontent,{utf8=>0});');  # wrong coded
+         }
          if ($@ ne ""){
+            my $jsonParseError=$@;
             if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+               msg(ERROR,"JSON parse error: $jsonParseError");
+               $respcontent=TextShorter($respcontent,80,["INDICATED"]);
                msg(ERROR,"can not parse JSON content:\n".$respcontent);
             }
             return(undef);
