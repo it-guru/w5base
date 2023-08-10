@@ -82,16 +82,53 @@ sub SIMonNotify
                   " curstate=".$rec->{curinststate});
          my %emailto; 
          my %emailcc; 
-         if ($rec->{admid} ne ""){
-            $emailto{$rec->{admid}}++;
-            $emailcc{$rec->{adm2id}}++ if ($rec->{adm2id} ne "");
-            $emailcc{$rec->{databossid}}++ if ($rec->{databossid} ne "");
+
+         my %tsm;
+         my %tsm2;
+         my %applmgr;
+
+         my %applid;
+         my $las=$datastream->getPersistentModuleObject("itil::lnkapplsystem");
+         $las->SetFilter({systemid=>$rec->{systemid},applcistatusid=>"<6"});
+         my @l=$las->getHashList(qw(applid));
+         foreach my $r (@l){
+            $applid{$r->{applid}}++ if ($r->{applid} ne "");
          }
-         else{
-            $emailto{$rec->{databossid}}++ if ($rec->{databossid} ne "");
+         my $apo=$datastream->getPersistentModuleObject("itil::appl");
+         $apo->SetFilter({id=>[keys(%applid)],cistatusid=>"<6"});
+         my @l=$apo->getHashList(qw(tsmid tsm2id applmgrid));
+         foreach my $r (@l){
+            $tsm{$r->{tsmid}}++ if ($r->{tsmid} ne "");
+            $tsm2{$r->{tsm2id}}++ if ($r->{tsm2id} ne "");
+            $tsm2{$r->{applmgrid}}++ if ($r->{applmgrid} ne "");
+         }
+         if (keys(%tsm)){   # known - so we addres him at first
+            foreach my $tsmid (keys(%tsm)){
+               $emailto{$tsmid}++ if ($tsmid ne "");
+            }
+            $emailcc{$rec->{databossid}}++ if ($rec->{databossid} ne "");
             $emailcc{$rec->{adm2id}}++ if ($rec->{adm2id} ne "");
             $emailcc{$rec->{admid}}++ if ($rec->{admid} ne "");
          }
+         else{              # alternativ process without tsm
+            if ($rec->{admid} ne ""){
+               $emailto{$rec->{admid}}++;
+               $emailcc{$rec->{adm2id}}++ if ($rec->{adm2id} ne "");
+               $emailcc{$rec->{databossid}}++ if ($rec->{databossid} ne "");
+            }
+            else{
+               $emailto{$rec->{databossid}}++ if ($rec->{databossid} ne "");
+               $emailcc{$rec->{adm2id}}++ if ($rec->{adm2id} ne "");
+               $emailcc{$rec->{admid}}++ if ($rec->{admid} ne "");
+            }
+         }
+         foreach my $tsm2id (keys(%tsm2)){
+            $emailcc{$tsm2id}++ if ($tsm2id ne "");
+         }
+         foreach my $applmgrid (keys(%applmgr)){
+            $emailcc{$applmgrid}++ if ($applmgrid ne "");
+         }
+
          my @emailto=keys(%emailto);
          my @emailcc;
 
