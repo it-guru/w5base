@@ -103,13 +103,21 @@ sub new
 
                 my $d=$app->genericReadREST("machineresport",$machineid);
                 my $scanDate;
-                if (ref($d) eq "HASH" && ref($d->{report}) eq "HASH" &&
-                    exists($d->{report}->{scanDate})){
-                   my $dd=$app->ExpandTimeExpression(
-                              $d->{report}->{scanDate},
-                              undef,"GMT","GMT");
-                   $scanDate=$dd;
+                if (ref($d) eq "ARRAY"){
+                   SCLOOP: foreach my $screc (@{$d}){
+                      if (ref($screc->{reportTypes}) eq "ARRAY" &&
+                          in_array($screc->{reportTypes},"INVENTORY")){
+                         my $scD=$screc->{scanDate};
+                         if ($scD ne ""){
+                            my $dd=$app->ExpandTimeExpression($scD,
+                                       undef,"GMT","GMT");
+                            $scanDate=$dd;
+                            last SCLOOP;
+                         }
+                      }
+                   }
                 }
+
 
                 return($scanDate);
             }),
@@ -181,7 +189,7 @@ sub genericReadREST
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl."machines/".$machineid."/report";
+         my $dataobjurl=$baseurl."machines/".$machineid."/reports";
          $dataobjurl.="?format=JSON";
          return($dataobjurl);
       },
