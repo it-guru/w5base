@@ -120,6 +120,35 @@ sub initWorkbook
       $self->{'format'}={};
       $self->{'fcolors'}={};
       $self->{'maxlen'}=[];
+      my $app=$self->getParent()->getParent();
+      my $objname=$app->T($app->Self(),$app->Self());
+      my $now=NowStamp("en");
+      my $qval=$app->ExpandTimeExpression("$now+28d");
+      $qval=~s/\s.*$//;
+
+      my $author=$ENV{REMOTE_USER};
+      my $userid=$app->getCurrentUserId();
+
+      if ($userid ne ""){
+         my $o=getModuleObject($app->Config,"base::user");
+         if (defined($o)){
+            $o->SetFilter({userid=>\$userid});
+            my ($urec,$msg)=$o->getOnlyFirst(qw(fullname)); 
+            if (defined($urec)){
+               $author=$urec->{fullname};
+            }
+         }
+      }
+
+      my $comment=sprintf($app->T('This file must be deleted after %s .',
+                          'kernel::Output::XlsV01'),$qval);
+
+      $self->{'workbook'}->set_properties(
+         title    => $app->T('XLS Export from','kernel::Output::XlsV01').
+                     ' '.$objname,
+         author   => $author,
+         comments => $comment,
+      );
       return($self->{'workbook'});
    }
    return(undef);
