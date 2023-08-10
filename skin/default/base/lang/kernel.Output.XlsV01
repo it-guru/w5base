@@ -1,2 +1,8 @@
 'Output to XLS'=>{de=>'Ausgabe als XLS'},
-'Writes the data in Excel/XLS Format.'=>{de=>'Erzeugt eine Ausgabe Datei im XLS/Excel Format.'}
+'Writes the data in Excel/XLS Format.'=>{de=>'Erzeugt eine Ausgabe Datei im XLS/Excel Format.'},
+'This file must be deleted after %s .'=>{
+  de=>'Diese Datei muss nach dem %s gelöscht werden.'
+},
+'XLS Export from'=>{
+  de=>'XLS Export aus'
+},
