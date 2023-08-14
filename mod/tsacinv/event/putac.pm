@@ -271,6 +271,10 @@ sub mkAcFtpRecSystem
    if ($rec->{mandator}=~m/^TelekomIT.*/){
       $acrec->{LogSys}->{SC_Location_ID}="4787.0000.0000";
    }
+   elsif ($rec->{mandator}=~m/^T-Systems.*/){
+      $acrec->{LogSys}->{SC_Location_ID}="B065.0091.0023";
+      # TS-TSIG_DE_FRANKFURT-AM-MAIN_HAHNSTR.-43
+   }
    else{
       return();
    }
