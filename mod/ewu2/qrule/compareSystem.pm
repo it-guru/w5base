@@ -96,7 +96,7 @@ sub qcheckRecord
    if (!defined($parrec)){      # pruefen ob wir bereits nach AM geschrieben
       # try to find parrec by srcsys and srcid
       $par->ResetFilter();
-      $par->SetFilter({id=>\$rec->{srcid},status=>\'up'});
+      $par->SetFilter({id=>\$rec->{srcid}});
       ($parrec)=$par->getOnlyFirst(qw(ALL));
    }
 
@@ -115,7 +115,19 @@ sub qcheckRecord
    if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
        $rec->{cistatusid}==5){
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "EWU2"){
-         if (!defined($parrec)){
+         if (defined($parrec) && lc($parrec->{status}) ne "up"){
+            if ($parrec->{vhostname} ne "" &&   # only for VMs on VM-hosts
+                $parrec->{vhostname} ne "-"){
+               my $d=CalcDateDuration($parrec->{mdate},NowStamp("en"));
+               if (defined($d) && $d->{totaldays}>14){
+                  push(@qmsg,'auto deactivation of ewu2 logical system');
+                  $forcedupd->{cistatusid}="6";
+                  $checksession->{EssentialsChangedCnt}++;
+               }
+            }
+         }
+
+         if (!defined($parrec) || lc($parrec->{status}) ne "up"){
             push(@qmsg,'given DevLabSystemID not found as up in ewu2');
             push(@dataissue,'given DevLabSystemID not found as up in ewu2');
             $errorlevel=3 if ($errorlevel<3);

@@ -3,7 +3,7 @@
 
 'no systemid specified'=>{de=>'keine SystemID definiert'},
 'given systemid not found as active in EWU2'=>{de=>'angegebene SystemID im EWU2 nicht aktiv'},
-
+'given DevLabSystemID not found as up in ewu2'=>{de=>'angegebene DevLabSystemID im EWU2 nicht aktiv(up)'},
 'no assetid specified'=>{de=>'keine AssetID definiert'},
 'given assetid not found as active in EWU2'=>{de=>'angegebene AssetID konnte im EWU2 nicht aktiv'},
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
@@ -13,3 +13,4 @@
 'different data, but automatic update temporary deactivated'=>{
    de=>'unterschiedliche Daten, aber automatisches Update vorübergehend deaktiviviert'
 },
+'auto deactivation of ewu2 logical system'=>{de=>'automatische Deaktivierung des EWU2 systems'},
