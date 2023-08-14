@@ -116,14 +116,11 @@ sub qcheckRecord
        $rec->{cistatusid}==5){
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq "EWU2"){
          if (defined($parrec) && lc($parrec->{status}) ne "up"){
-            if ($parrec->{vhostname} ne "" &&   # only for VMs on VM-hosts
-                $parrec->{vhostname} ne "-"){
-               my $d=CalcDateDuration($parrec->{mdate},NowStamp("en"));
-               if (defined($d) && $d->{totaldays}>14){
-                  push(@qmsg,'auto deactivation of ewu2 logical system');
-                  $forcedupd->{cistatusid}="6";
-                  $checksession->{EssentialsChangedCnt}++;
-               }
+            my $d=CalcDateDuration($parrec->{mdate},NowStamp("en"));
+            if (defined($d) && $d->{totaldays}>14){
+               push(@qmsg,'auto deactivation of ewu2 logical system');
+               $forcedupd->{cistatusid}="6";
+               $checksession->{EssentialsChangedCnt}++;
             }
          }
 
