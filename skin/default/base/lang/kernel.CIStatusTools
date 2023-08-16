@@ -210,5 +210,8 @@ de=>'Schwingung/Flippen des CI-Status erkannt - '.
 },
 "you are not authorized to set this state - please try to use 'on order'"=>{
   de=>"Sie sind nicht berechtigt, diesen CI-Status zu vergeben - versuchen Sie 'bestellt/angefordert'"
+},
+"can't find a unique name for key '\%s' with value '\%s' in '\%s'"=>{
+ de=>"kein eindeutiger Name für '\%s' mit Wert '\%s' in '\%s'"
 }
 
