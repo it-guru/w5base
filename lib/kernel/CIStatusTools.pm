@@ -134,30 +134,57 @@ sub HandleCIStatusModification
       foreach my $primarykey (@primarykey){
          if (defined($newrec->{$primarykey})){
             my $found=0;
-            for(my $c=0;$c<=1000;$c++){
-               my $chkname=$newrec->{$primarykey};
-               $chkname=~s/\[\d+\]$//;
-               $chkname.="[$c]";
-               $self->SetFilter($primarykey=>\$chkname);
-               my $chkid=$self->getVal($idfield);
-               if (!defined($chkid)){
-                  $newrec->{$primarykey}=$chkname;
-                  $found++;
-                  if (!$altnamechanged){
-                     foreach my $altname (@altname){
-                        next if ($altname eq "");
-                        my $altval=effVal($oldrec,$newrec,$altname);
-                        $altval=~s/\[\d*?\]$//;
-                        $newrec->{$altname}=$altval."[$c]"; 
+            my $basechkname=$newrec->{$primarykey};
+            $basechkname=~s/\[\d+\]$//;
+            my $mdatefield=$self->getField("mdate"); 
+            FINDLOOP: for(my $dropLoop=0;$dropLoop<=1;$dropLoop++){
+               for(my $c=0;$c<=999;$c++){
+                  my $chkname=$basechkname;
+                  $chkname.="[$c]";
+                  $self->ResetFilter();
+                  $self->SetFilter($primarykey=>\$chkname);
+                  my $chkid=$self->getVal($idfield);
+                  if (!defined($chkid)){
+                     $newrec->{$primarykey}=$chkname;
+                     $found++;
+                     if (!$altnamechanged){
+                        foreach my $altname (@altname){
+                           next if ($altname eq "");
+                           my $altval=effVal($oldrec,$newrec,$altname);
+                           $altval=~s/\[\d*?\]$//;
+                           $newrec->{$altname}=$altval."[$c]"; 
+                        }
+                        $altnamechanged++;
                      }
-                     $altnamechanged++;
+                     last FINDLOOP;
                   }
-                  last;
                }
+               if (!$found){
+                  if (!defined($mdatefield)){ # no mdate - so 
+                     last FINDLOOP;           # we can' select drops candidates
+                  }
+                  else{
+                     my $dropchkname=$basechkname."[*";
+                     $self->ResetFilter();
+                     $self->SetFilter({$primarykey=>$dropchkname});
+                     $self->SetCurrentOrder("+mdate");
+                     my ($droprec,$msg)=$self->getOnlyFirst($idfield);
+                     if (defined($droprec) && !defined($msg)){
+                        msg(WARN,"drop record $droprec->{$idfield} in ".
+                                 $self->Self()." to get free name [999]");
+                        $self->BulkDeleteRecord({
+                           $idfield=>\$droprec->{$idfield}
+                        });
+                     }
+                  }
+               }
+               printf STDERR ("fifi findloop $found $dropLoop\n");
             }
             if (!$found){
-               $self->LastMsg(ERROR,"can't find a unique name for '%s'",
-                              $primarykey);
+               $self->LastMsg(ERROR,
+                              "can't find a unique name for key '%s' ".
+                              "with value '%s' in '%s'",
+                              $primarykey,$basechkname,$self->Self());
                return(0);
             }
          }
