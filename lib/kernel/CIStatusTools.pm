@@ -178,7 +178,6 @@ sub HandleCIStatusModification
                      }
                   }
                }
-               printf STDERR ("fifi findloop $found $dropLoop\n");
             }
             if (!$found){
                $self->LastMsg(ERROR,
