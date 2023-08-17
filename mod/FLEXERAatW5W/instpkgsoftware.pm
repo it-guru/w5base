@@ -177,6 +177,18 @@ sub new
                 label         =>'extended support until',
                 dataobjattr   =>'EXTENDEDSUPPORTUNTIL'),
 
+      new kernel::Field::SubList(
+                name          =>'instpkgsoftware',
+                label         =>'installed Packaged-Software',
+                group         =>'evidence',
+                vjointo       =>'FLEXERAatW5W::softwareevidence',
+                htmldetail    =>'NotEmpty',
+                vjoinon       =>['id'=>'id'],
+                vjoindisp     =>['file_evidence','file_evidence_file_version',
+                                 'installer_evidence'],
+                vjoininhash   =>['id','file_evidence',
+                                 'installer_evidence',]),
+
       new kernel::Field::Date(
                 name          =>'swinstdate',
                 group         =>'source',
@@ -265,7 +277,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default software support source));
+   return(qw(header default software evidence support source));
 }  
 
 1;
