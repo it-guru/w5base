@@ -1,0 +1,4 @@
+'itu.cloud.caas'=>{de=>'CaaS',en=>'CaaS'},
+'itu.cloud.caas.cloud'=>{de=>'CloudUmgebung',en=>'CloudEnv'},
+'itu.cloud.caas.project'=>{de=>'Projekt',en=>'Project'},
+'itu.cloud.caas.url'=>{de=>'URL',en=>'URL'},
