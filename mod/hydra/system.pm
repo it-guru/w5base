@@ -40,6 +40,7 @@ sub new
                                     isapplserver isworkstation isinfrastruct 
                                     isprinter   
                                     isbackupsrv isdatabasesrv iswebserver 
+                                    ismailserver
                                     isrouter
                                     isnetswitch isterminalsrv isnas
                                     isloadbalacer isclusternode isembedded)],
@@ -92,7 +93,8 @@ sub doQueryHydra
 
    $qRec->{systemclass}={};
    foreach my $v (qw(isapplserver isworkstation isinfrastruct isprinter
-                     isbackupsrv isdatabasesrv iswebserver isrouter
+                     isbackupsrv isdatabasesrv iswebserver ismailserver
+                     isrouter
                      isnetswitch isterminalsrv isnas 
                      isloadbalacer isclusternode isembedded)){
       $qRec->{systemclass}->{$v}=$rec->{$v};
