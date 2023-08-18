@@ -40,14 +40,17 @@ sub Init
    
    $self->RegisterObj("itu.cloud.caas.cloud",
                       "caas::cloud",
+                      prio=>1000,
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("itu.cloud.caas.project",
                       "caas::project",
+                      prio=>2000,
                       defaultacl=>['valid_user']);
    
    $self->RegisterObj("itu.cloud.caas.url",
                       "caas::url",
+                      prio=>3000,
                       defaultacl=>['valid_user']);
    
    return($self);

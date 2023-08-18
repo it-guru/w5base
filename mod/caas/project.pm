@@ -39,38 +39,63 @@ sub new
 
 
    $self->AddFields(
-      new kernel::Field::Linenumber(
-                name          =>'linenumber',
-                label         =>'No.'),
-
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Id(
-                name          =>'id',
-                group         =>'source',
-                label         =>'id'),
+            name              =>'id',
+            group             =>'source',
+            label             =>'id'),
                                                   
       new kernel::Field::Text(
-                name          =>'cloudid',
-                label         =>'CloudID',
-                dataobjattr   =>'cloudId'),
+            name              =>'name',
+            label             =>'Name',
+            dataobjattr       =>'name'),
 
       new kernel::Field::Text(
-                name          =>'name',
-                label         =>'Name',
-                dataobjattr   =>'fullName'),
+            name              =>'oname',
+            label             =>'original Name',
+            dataobjattr       =>'fullName'),
 
       new kernel::Field::Text(
-                name          =>'cluster',
-                label         =>'Cluster',
-                htmldetail    =>'NotEmpty',
-                dataobjattr   =>'cluster'),
+            name              =>'cloudid',
+            label             =>'CloudID',
+            dataobjattr       =>'cloudId'),
+
+      new kernel::Field::TextDrop(
+            name              =>'appl',
+            searchable        =>0,
+            vjointo           =>'itil::appl',
+            vjoinon           =>['applid'=>'id'],
+            searchable        =>0,
+            vjoindisp         =>'name',
+            label             =>'W5Base Application'),
 
       new kernel::Field::Text(
-                name          =>'project',
-                label         =>'Projectname',
-                htmldetail    =>'NotEmpty',
-                dataobjattr   =>'project'),
+            name              =>'applid',
+            label             =>'Application W5BaseID',
+            dataobjattr       =>'applicationId'),
+
+      new kernel::Field::Text(
+            name              =>'cluster',
+            label             =>'Cluster',
+            htmldetail        =>'NotEmpty',
+            dataobjattr       =>'cluster'),
+
+      new kernel::Field::Text(
+            name              =>'project',
+            label             =>'Projectname',
+            htmldetail        =>'NotEmpty',
+            dataobjattr       =>'project'),
+
+      new kernel::Field::SubList(
+            name              =>'urls',
+            group             =>'urls',
+            label             =>'URLs',
+            searchable        =>'0',
+            htmldetail        =>'NotEmpty',
+            vjointo           =>'caas::url',
+            vjoinon           =>['id'=>'projectid'],
+            vjoindisp         =>['name']),
 
    );
    $self->{'data'}=\&DataCollector;
@@ -114,7 +139,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return("header","default","soure");
+   return("header","default","urls","soure");
 }
 
 
@@ -137,9 +162,12 @@ sub DataCollector
 
    my @view=$self->GetCurrentView();
 
+   my ($flt,$requestToken)=$self->simplifyFilterSet($filterset);
+   return(undef) if (!defined($flt));
+
    my $d=$self->CollectREST(
       dbname=>$CredName,
-      requesttoken=>"QC".time(),
+      requesttoken=>$requestToken,
       url=>sub{
          my $self=shift;
          my $baseurl=shift;
@@ -183,6 +211,9 @@ sub DataCollector
                   $rec->{operationalModel}=undef;
                }
                $rec->{operationalModel}=uc($rec->{operationalModel});
+               $rec->{name}=$rec->{fullName};
+               $rec->{name}=~s/[^a-z0-9\/\(\)-]/_/gi;
+               $rec->{name}=TextShorter($rec->{name},70);
             }
          }
          return();
