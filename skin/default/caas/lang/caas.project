@@ -2,3 +2,7 @@
  de=>'CaaS: Project',
  en=>'CaaS: Projekt',
 },
+'fieldgroup.urls'=>{
+ de=>'Kommunikations-URLs',
+ en=>'Communication-URLs',
+}

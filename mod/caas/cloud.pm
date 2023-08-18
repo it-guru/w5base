@@ -142,10 +142,14 @@ sub DataCollector
 
    my @view=$self->GetCurrentView();
 
+   my ($flt,$requestToken)=$self->simplifyFilterSet($filterset);
+   return(undef) if (!defined($flt));
+
+
 
    my $d=$self->CollectREST(
       dbname=>$CredName,
-      requesttoken=>"Q".time(),
+      requesttoken=>$requestToken,
       url=>sub{
          my $self=shift;
          my $baseurl=shift;
