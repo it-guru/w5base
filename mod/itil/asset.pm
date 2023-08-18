@@ -970,6 +970,8 @@ sub preQualityCheckRecord
    my $self=shift;
    my $rec=shift;
 
+printf STDERR ("fifi preQual\n");
+
    if ($rec->{cistatusid}>=6){
       my ($uniquesuff)=$rec->{name}=~m/(\[[0-9]+\])$/;
       if ($self->getField("srcid")){
@@ -990,9 +992,11 @@ sub preQualityCheckRecord
                         mdate=>$newmdate,
                         srcid=>$rec->{srcid}.$uniquesuff
                      },{$idfield->Name()=>$id});
-                     $rec->{srcid}=$rec->{srcid}.$uniquesuff;
-                     $rec->{mdate}=$newmdate;
-                  }
+                     #$rec->{srcid}=$rec->{srcid}.$uniquesuff;
+                     $rec->{mdate}=$newmdate;  # eigentlich nicht notwendig,
+                                               # da mit dem Patch  685daa5c
+                                               # bereits oldrec aktualisiert
+                  }                            # wird.
                }
             }
          }
