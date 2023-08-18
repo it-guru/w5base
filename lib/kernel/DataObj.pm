@@ -19,6 +19,7 @@ package kernel::DataObj;
 use strict;
 use vars qw(@ISA);
 use Class::ISA;
+use UUID::Tiny ':std';
 use kernel;
 use kernel::App;
 use kernel::WSDLbase;
@@ -202,6 +203,85 @@ sub SetFilter
    $self->Limit(0);
    $self->{use_distinct}=1 if (!exists($self->{use_distinct}));
    return($self->_SetFilter("FILTER",@_));
+}
+
+sub simplifyFilterSet
+{
+   my $self=shift;
+   my $filterset=shift;
+   my $mode=shift;
+
+   $mode=[$mode] if (ref($mode) ne "ARRAY");
+
+   # mode  
+   # NOARRAYRESOLVE
+   # NOSCALARRESOLVE
+   # NOREMOVEQUOTES
+   # TIMECACHE60   # default
+   # TIMECACHE10
+   
+
+   if (ref($filterset) ne "HASH"){
+      $self->LastMsg(ERROR,"query filterset misstructured");
+      return(undef);
+   }
+
+   if (keys(%{$filterset})!=1){
+      $self->LastMsg(ERROR,"multiple filter names not supported");
+      return(undef);
+   }
+   my @f=%{$filterset};
+   my $onlyOneFlt=$f[1];
+   if (ref($onlyOneFlt) eq "ARRAY"){
+      if ($#{$onlyOneFlt}!=0){
+         $self->LastMsg(ERROR,"multiple OR filters supported");
+         return(undef);
+      }
+      $onlyOneFlt=$onlyOneFlt->[0];
+   } 
+   if (ref($onlyOneFlt) ne "HASH"){
+      $self->LastMsg(ERROR,"no final HASH filter - this is not suppored");
+      return(undef);
+   }
+   my %fltDup=%{$onlyOneFlt};
+
+
+   my @qparam;
+   
+   foreach my $k (sort(keys(%fltDup))){
+      if (ref($fltDup{$k}) eq "ARRAY"){
+         if (!in_array($mode,"NOARRAYRESOLVE")){
+            $fltDup{$k}=join(" ",map({
+                $_=~s/^"//; 
+                $_=~s/"$//; 
+                $_;
+            } @{$fltDup{$k}}));
+         }
+      }
+      if (ref($fltDup{$k}) eq "SCALAR"){
+         if (!in_array($mode,"NOSCALARRESOLVE")){
+            my $v=${$fltDup{$k}};
+            $fltDup{$k}=$v;
+         }
+      }
+      else{
+         if (!in_array($mode,"NOREMOVEQUOTES")){
+            my $v=$fltDup{$k};
+            $v=~s/^"//;
+            $v=~s/"$//;
+            $fltDup{$k}=$v;
+         }
+      }
+      push(@qparam,$k,$fltDup{$k});
+   }
+   my $qstring=join("|",@qparam);
+   my $time=time();
+   my $modtime=$time % 60;
+   my $ttime=$time-$modtime;
+   my $queryToken=create_uuid(UUID_V3,$ttime.":".$qstring)   ;
+
+
+   return(\%fltDup,$queryToken);
 }
 
 sub _preProcessFilter
