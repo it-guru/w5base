@@ -970,8 +970,6 @@ sub preQualityCheckRecord
    my $self=shift;
    my $rec=shift;
 
-printf STDERR ("fifi preQual\n");
-
    if ($rec->{cistatusid}>=6){
       my ($uniquesuff)=$rec->{name}=~m/(\[[0-9]+\])$/;
       if ($self->getField("srcid")){
