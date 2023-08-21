@@ -139,10 +139,10 @@ sub getTardisAuthorizationToken
       };
      
       if (exists($d->{expires_in})){
-         $cacheTPCauthRec->{Expiration}=time()+$d->{expires_in};
+         $cacheTPCauthRec->{Expiration}=time()+$d->{expires_in}-10;
       }
       else{
-         $cacheTPCauthRec->{Expiration}=time()+600;
+         $cacheTPCauthRec->{Expiration}=time()+290;
       }
       $gc->{$gckey}=$cacheTPCauthRec;
 
