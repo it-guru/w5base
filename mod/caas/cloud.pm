@@ -56,6 +56,11 @@ sub new
                 dataobjattr   =>'fullName'),
 
       new kernel::Field::Text(
+                name          =>'fancyname',
+                label         =>'fancy name',
+                dataobjattr   =>'fancyname'),
+
+      new kernel::Field::Text(
                 name          =>'env',
                 label         =>'Environment',
                 htmldetail    =>'NotEmpty',
@@ -191,6 +196,9 @@ sub DataCollector
                if ($rec->{operationalModel} eq "unknown"){
                   $rec->{operationalModel}=undef;
                }
+               $rec->{fancyname}=$rec->{fullName};
+               $rec->{fancyname}=~s/^caas-/CaaS-/;
+               $rec->{fancyname}=~s/-([^-]+)$/-\U\1/i;
                $rec->{operationalModel}=uc($rec->{operationalModel});
             }
          }
