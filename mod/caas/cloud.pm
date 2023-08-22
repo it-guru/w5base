@@ -203,6 +203,22 @@ sub DataCollector
             }
          }
          return();
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "503"){  # 503 means not all CaaS Envs are available
+            $self->SilentLastMsg(ERROR,"HTTP 503 - ".
+                                       "incomplete result from backend system");
+            return(undef,"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data CaaS cloud response");
+         return(undef);
       }
    );
 

@@ -5,4 +5,7 @@
 'fieldgroup.urls'=>{
  de=>'Kommunikations-URLs',
  en=>'Communication-URLs',
+},
+'HTTP 503 - incomplete result from backend system'=>{
+de=>'HTTP 503 - unvollständiges Ergebnis vom Backend-System'
 }
