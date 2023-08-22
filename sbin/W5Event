@@ -141,6 +141,11 @@ else{
       if ($exitcode ne "0"){
          msg(ERROR,"exitcode $exitcode: $exitmsg");
       }
+      if ($self->Config->Param("W5BaseOperationMode") ne "prod" &&
+          $self->Config->Param("W5BaseOperationMode") ne "online" &&
+          $exitmsg ne ""){
+         msg(INFO,"exitcode $exitcode: $exitmsg");
+      }
    }
    exit(0);
 }
