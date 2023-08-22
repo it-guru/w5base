@@ -700,6 +700,90 @@ sub isRoleMultiUsed
 }
 
 
+sub copyContacts
+{
+   my $self=shift;
+   my $src=shift;
+   my $dstdataobj=shift;
+   my $dstid=shift;
+   my $inscomment=shift;
+
+   if (ref($src) eq "ARRAY"){
+      my %addrole;
+      foreach my $crec (@$src){
+         my $roles=$crec->{roles};
+         $addrole{$crec->{target}}->{$crec->{targetid}}=$roles; 
+      }
+      $src=\%addrole;
+   }
+
+   foreach my $ctype (keys(%$src)){
+      foreach my $contactid (keys(%{$src->{$ctype}})){
+         if (ref($src->{$ctype}->{$contactid}) ne "ARRAY"){
+            my $roles=$src->{$ctype}->{$contactid};
+            $src->{$ctype}->{$contactid}=[$roles];
+         }
+      }
+   }
+
+   $self->ResetFilter();
+   $self->SetFilter({
+      refid=>\$dstid,
+      parentobj=>[$dstdataobj],
+   });
+   my @cur=$self->getHashList(qw(ALL));
+   $self->ResetFilter();
+   foreach my $ctype (keys(%$src)){
+      foreach my $contactid (keys(%{$src->{$ctype}})){
+         my @old=grep({
+            $_->{target} eq $ctype && $_->{targetid} eq $contactid
+         } @cur);
+         if ($#old==-1){
+            my $cobj=$self->getPersistentModuleObject("I:".$ctype,$ctype);
+            my $crec;
+            if ($ctype eq "base::user"){
+               $cobj->SetFilter({userid=>\$contactid,cistatusid=>\'4'});
+               ($crec)=$cobj->getOnlyFirst(qw(ALL));
+            }
+            if ($ctype eq "base::grp"){
+               $cobj->SetFilter({grpid=>\$contactid,cistatusid=>\'4'});
+               ($crec)=$cobj->getOnlyFirst(qw(ALL));
+            }
+            if (defined($crec)){
+               $self->ValidatedInsertRecord({
+                  target=>$ctype,
+                  targetid=>$contactid,
+                  roles=>$src->{$ctype}->{$contactid},
+                  refid=>$dstid,
+                  comments=>$inscomment,
+                  parentobj=>$dstdataobj
+               });
+            }
+         }
+         else{
+            my @curroles=$old[0]->{roles};
+            if (ref($curroles[0]) eq "ARRAY"){
+               @curroles=@{$curroles[0]};
+            }
+            my $changed=0;
+            foreach my $addrole (@{$src->{$ctype}->{$contactid}}){
+               if (!in_array(\@curroles,$addrole)){
+                  push(@curroles,$addrole);
+                  $changed++;
+               }
+            }
+            if ($changed){
+               $self->ValidatedUpdateRecord($old[0],{
+                  roles=>[@curroles],
+               },{id=>\$old[0]->{id}});
+            }
+         }
+      }
+   }
+   return(0);
+}
+
+
 
 
 

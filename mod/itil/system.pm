@@ -3221,53 +3221,19 @@ sub addDefContactsFromAppl
          }
       }
    }
-   my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
-   $lnkcontact->SetFilter({
-      refid=>\$identifyby,
-      parentobj=>[$SelfAsParentObject],
-   });
-   my @cur=$lnkcontact->getHashList(qw(ALL));
-   $lnkcontact->ResetFilter();
-   foreach my $ctype (keys(%addwr)){
-      foreach my $contactid (keys(%{$addwr{$ctype}})){
-         my @old=grep({
-            $_->{target} eq $ctype && $_->{targetid} eq $contactid
-         } @cur);
-         if ($#old==-1){
-            my $cobj=$self->getPersistentModuleObject("I:".$ctype,$ctype);
-            my $crec;
-            if ($ctype eq "base::user"){
-               $cobj->SetFilter({userid=>\$contactid,cistatusid=>\'4'});
-               ($crec)=$cobj->getOnlyFirst(qw(ALL));
-            }
-            if ($ctype eq "base::grp"){
-               $cobj->SetFilter({grpid=>\$contactid,cistatusid=>\'4'});
-               ($crec)=$cobj->getOnlyFirst(qw(ALL));
-            }
-            if (defined($crec)){
-               $lnkcontact->ValidatedInsertRecord({
-                  target=>$ctype,
-                  targetid=>$contactid,
-                  roles=>['write'],
-                  refid=>$identifyby,
-                  comments=>"inherited by application",
-                  parentobj=>$self->SelfAsParentObject()
-               });   
-            }
-         }
-         else{
-            my @curroles=$old[0]->{roles};
-            if (ref($curroles[0]) eq "ARRAY"){
-               @curroles=@{$curroles[0]};
-            }
-            if (!in_array(\@curroles,"write")){
-               $lnkcontact->ValidatedUpdateRecord($old[0],{
-                  roles=>[@curroles,'write'],
-               },{id=>\$old[0]->{id}});   
-            }
-         }
+
+   foreach my $target (keys(%addwr)){
+      foreach my $targetid (keys(%{$addwr{$target}})){
+         $addwr{$target}->{$targetid}=['write'];
       }
    }
+
+   my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
+   $lnkcontact->copyContacts(\%addwr,
+      $self->SelfAsParentObject(),$identifyby,
+      "inherited by application"
+   );
+
 }
 
 
