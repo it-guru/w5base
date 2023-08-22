@@ -776,6 +776,7 @@ sub ProcessOpList
             }
             else{
                $op->{IDENTIFYBY}=$id;
+               $op->{OP}.=".successful";
                msg(INFO,"insert id ok = $id");
             }
          }
@@ -813,6 +814,7 @@ sub ProcessOpList
                                Dumper(\@priorizedOpList));
                   }
                   else{
+                     $op->{OP}.=".successful";
                      msg(INFO,"update id ok = $id");
                   }
                }
@@ -830,6 +832,7 @@ sub ProcessOpList
                my ($oldrec,$msg)=$dataobj->getOnlyFirst(qw(ALL));
                if (defined($oldrec)){ # if not found, record is already deleted
                   my $id=$dataobj->ValidatedDeleteRecord($oldrec);
+                  $op->{OP}.=".successful";
                   msg(INFO,"delete id ok = $id");
                }
             }
