@@ -35,15 +35,39 @@ sub CaaS_CloudAreaSync
 {
    my $self=shift;
 
-
-
-   #######################################################################
-   # CaaS Cloud-Enviroment-Sync
-   #######################################################################
-
    my $caasCloud=getModuleObject($self->Config,"caas::cloud");
+   my $caasCloudArea=getModuleObject($self->Config,"caas::project");
+
+   #######################################################################
+   # Check stale retry state (exitcode=-1)
+   #######################################################################
+
+   my $staleRetry=0;
+   my $joblog=getModuleObject($self->Config,"base::joblog");
+   $joblog->SetFilter({name=>[$self->Self()."::CaaS_CloudAreaSync"],
+                       exitcode=>'!0',
+                       cdate=>'>now-6h'});
+   $joblog->SetCurrentOrder('cdate');
+   my @jobList=$joblog->getHashList(qw(id exitcode cdate));
+   if ($#jobList!=-1){
+      $staleRetry=$#jobList+1;
+      foreach my $jrec (@jobList){
+         $staleRetry-- if ($jrec->{exitcode}!=0);
+      }
+      $staleRetry=1 if (!$staleRetry); # only if all are not 0 - stale is given
+   }
+
+   #######################################################################
+   # Load all CaaS BaseData for Sync
+   #######################################################################
+
    $caasCloud->SetFilter({});
    my @tobeClouds=$caasCloud->getHashList(qw(id name fancyname));
+
+   if ($#tobeClouds==0 && $tobeClouds[0]->{id} eq "-1"){
+      return({exitcode=>'-1',
+              msg=>'WARN: CaaS cloudlist temporary incomplete'});
+   }
 
    if ($#tobeClouds<1){
       msg(ERROR,"CaaS_CloudAreaSync not enough Cloud-Enviroments ".
@@ -52,12 +76,44 @@ sub CaaS_CloudAreaSync
    }
 
 
-   my $itcloud=getModuleObject($self->Config,"itil::itcloud");
+   $caasCloudArea->SetFilter({});
+   my @tobeCloudAreas=$caasCloudArea->getHashList(qw(id name applid 
+                                                     cloudid cluster project));
 
-   $itcloud->SetFilter({shortname=>'CAAS',cistatusid=>'4'});
+   if ($#tobeCloudAreas<10){
+      if (!$staleRetry){
+         my @lastmsg=$caasCloudArea->LastMsg();
+         if (grep(/ HTTP 503 /,@lastmsg)){
+            return({exitcode=>'-1',
+                    msg=>'WARN: CaaS projectlist temporary incomplete'}); 
+         }
+      }
+      else{
+         $self->LastMsg(ERROR,"interface in stale retry longer then 6h");
+      }
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      if ($infoObj->NotifyInterfaceContacts($caasCloudArea)){
+         return({exitcode=>-1,exitmsg=>'Interface notified'});
+      }
+      msg(ERROR,"CaaS_CloudAreaSync not enough CloudAreas (Projects) ".
+                "on CaaS API found");
+      return({exitcode=>'1'});
+   }
+
+
+   #######################################################################
+   # CaaS Cloud-Enviroment-Sync
+   #######################################################################
+
+   my $itcloud=getModuleObject($self->Config,"TS::itcloud");
+
+   $itcloud->SetFilter({shortname=>'CAAS',cistatusid=>'4 2 3'});
    my @baseFields=qw(databossid platformrespid securityrespid supportid 
-                     shortname srcid srcsys mandatorid);
-   my @currClouds=$itcloud->getHashList(qw(+cdate name cistatusid),@baseFields);
+                     shortname srcid srcsys mandatorid
+                     can_iaas can_saas can_paas
+                     acinmassignmentgroupid);
+   my @currClouds=$itcloud->getHashList(qw(+cdate name cistatusid),@baseFields,
+                                        (qw(contacts)));
 
    if ($#currClouds==-1){
       msg(ERROR,"CaaS_CloudAreaSync only working with one ".
@@ -93,7 +149,7 @@ sub CaaS_CloudAreaSync
          if ($mode eq "insert" || $mode eq "update"){
             my $oprec={
                OP=>$mode,
-               DATAOBJ=>'itil::itcloud',
+               DATAOBJ=>'TS::itcloud',
                DATA=>{
                   srcsys     => $self->Self(),
                   srcid      => $newrec->{id},
@@ -103,7 +159,9 @@ sub CaaS_CloudAreaSync
                $oprec->{DATA}->{name}=$newrec->{fancyname};
                $oprec->{DATA}->{cistatusid}='4';
                foreach my $dupFld (qw(databossid securityrespid platformrespid
-                                      supportid shortname)){
+                                      supportid shortname mandatorid
+                                      can_iaas can_saas can_paas
+                                      acinmassignmentgroupid)){
                   $oprec->{DATA}->{$dupFld}=$currClouds[0]->{$dupFld};
                }
             }
@@ -131,6 +189,20 @@ sub CaaS_CloudAreaSync
    );
    if (!$res){
       my $opres=ProcessOpList($itcloud,\@opList);
+      my $lnkcontact=getModuleObject($self->Config,"base::lnkcontact");
+      foreach my $op (@opList){
+         if ($op->{OP} eq "insert.successful" &&
+             $op->{IDENTIFYBY} ne ""){
+            my $id=$op->{IDENTIFYBY};
+            # add contacts to new created cloudareas
+            #printf STDERR ("add contacts to %s\n%s\n",
+            #               $id,Dumper($currClouds[0]->{contacts}));
+            $lnkcontact->copyContacts($currClouds[0]->{contacts},
+               $itcloud->SelfAsParentObject(),$id,
+               "inherited from CaaS Tmpl-Cloud"
+            );
+         }
+      }
    }
    #######################################################################
 
@@ -149,23 +221,25 @@ sub CaaS_CloudAreaSync
    # CaaS CloudArea-Sync
    #######################################################################
 
-   my $caasCloudArea=getModuleObject($self->Config,"caas::project");
-   $caasCloudArea->SetFilter({});
-   my @tobeCloudAreas=$caasCloudArea->getHashList(qw(id name applid cloudid));
 
-   if ($#tobeCloudAreas<10){
-      msg(ERROR,"CaaS_CloudAreaSync not enough CloudAreas (Projects) ".
-                "on CaaS API found");
-      return({exitcode=>'1'});
-   }
-
-
-   my $itcloudarea=getModuleObject($self->Config,"itil::itcloudarea");
+   my $itcloudarea=getModuleObject($self->Config,"TS::itcloudarea");
 
    $itcloudarea->SetFilter({srcsys=>$self->Self()});
    my @currCloudAreas=$itcloudarea->getHashList(qw(id 
                                cloudid srcsys srcid name fullname));
 
+
+   my %CaaSproj;
+
+   foreach my $prec (@tobeCloudAreas){
+      $CaaSproj{$prec->{id}}={
+         cloudid=>$prec->{cloudid},
+         id=>$prec->{id},
+         cluster=>$prec->{cluster},
+         project=>$prec->{project},
+         cloud=>$w5cloud->{srcid}->{$prec->{cloudid}}
+      }
+   }
    my @opList=();
    my $res=kernel::QRule::OpAnalyse(
       sub{  # comperator
@@ -193,7 +267,7 @@ sub CaaS_CloudAreaSync
             my $w5cloudid=$w5cloud->{srcid}->{$newrec->{cloudid}}->{id};
             my $oprec={
                OP=>$mode,
-               DATAOBJ=>'itil::itcloudarea',
+               DATAOBJ=>'TS::itcloudarea',
                DATA=>{
                   srcsys     => $self->Self(),
                   srcid      => $newrec->{id},
@@ -225,7 +299,7 @@ sub CaaS_CloudAreaSync
          elsif ($mode eq "delete"){
             my $oprec={
                OP=>"update",
-               DATAOBJ=>'itil::itcloudarea',
+               DATAOBJ=>'TS::itcloudarea',
                IDENTIFYBY=>$oldrec->{id},
                DATA=>{
                   cistatusid  =>6
@@ -273,11 +347,46 @@ sub CaaS_CloudAreaSync
          ##################################################################
          # check if there is an old cloudarea which is already active
          if ($opList[$c]->{OP} eq "insert" ){
+            # Wir brauchen prod/test -> CaaS-test/CaaS-production
+            # den Cluster und den Namen des Projektes. Das mit :xxx am
+            # Ende der u.U. vorhandenen CloudArea wird ignoriert (das scheint
+            # der Namespace zu sein - und der wird nicht mehr nach Darwin
+            # transferiert.
+            #print STDERR ("Rec:%s\n",Dumper($opList[$c]));
+            #$opList[$c]->{OP}="invalid";
+            my $CaaSrec=$CaaSproj{$opList[$c]->{DATA}->{srcid}};
+            my $opmode="unknown";
+            if ($CaaSrec->{cloud}->{name}=~m/-test-/){
+               $opmode="CaaS-test";
+            }
+            elsif ($CaaSrec->{cloud}->{name}=~m/-prod-/){
+               $opmode="CaaS-production";
+            }
+            my $cluster=$CaaSrec->{cluster};
+            my $name=$CaaSrec->{project};
 
+            my $pattern="CaaS-DTIT.".$name.'@'.$opmode.'('.$cluster.'):*';
+            $pattern=~s/\s/?/g;
 
+            #print STDERR Dumper($CaaSrec);
+            #printf STDERR ("opmode=%s cluster=%s name=%s\n",
+            #               $opmode,$cluster,$name);
+            #printf STDERR ("fullname pattern=%s\n",$pattern);
 
-
-
+            $itcloudarea->ResetFilter();
+            $itcloudarea->SetFilter({
+               fullname=>$pattern,
+               cistatusid=>"<6",
+               applid=>$opList[$c]->{DATA}->{applid}
+            });
+            my ($carec,$msg)=$itcloudarea->getOnlyFirst(
+                               qw(id cistatusid applid cifirstactivation));
+            if (defined($carec) && $carec->{cistatusid}==4 &&
+                $carec->{cifirstactivation} ne ""){
+               $opList[$c]->{DATA}->{cistatusid}="4";
+               $opList[$c]->{DATA}->{cifirstactivation}=
+                      $carec->{cifirstactivation};
+            }
          }
       }
    }
@@ -285,6 +394,23 @@ sub CaaS_CloudAreaSync
    if (!$res){
       my $opres=ProcessOpList($itcloudarea,\@opList);
    }
+
+   if (1){ # cleanup old cloudareas on "old" CaaS-DTIT Cloud
+      $itcloudarea->ResetFilter();
+      $itcloudarea->SetFilter({
+         cloud=>"CaaS-DTIT",
+         cistatusid=>"<6",
+      });
+      my @cleanAreas=$itcloudarea->getHashList(qw(ALL));
+      foreach my $oldrec (@cleanAreas){
+         my $op=$itcloudarea->Clone();
+         $op->ValidatedUpdateRecord($oldrec,{cistatusid=>'6'},
+                                    {id=>$oldrec->{id}});
+      }
+   }
+
+
+
 
 
    #printf STDERR ("opList=%s\n",Dumper(\@opList));
