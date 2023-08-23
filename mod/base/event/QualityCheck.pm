@@ -313,13 +313,17 @@ sub doQualityCheck
             if ($self->LastMsg()>0){
                my @l=$self->LastMsg();
                #printf STDERR ("fifi x %s\n\n",join("\n",@l));
-               if (grep(/error/i,@l)){
+               my @emsgs=grep(/error/i,@l);
+               if ($#emsgs!=-1){
                   msg(ERROR,"error messages while check of ".
                             $stateparam->{idname}."='".$curid."' in ".
                             $dataobj->Self());
-                  foreach my $emsg (@l){
-                     msg(ERROR,$emsg);
-                  }
+                  printf STDERR ("emsgs debug dump: %s\n",Dumper(\@emsgs));
+                  foreach my $emsg (@emsgs){
+                     if (!$emsg=~m/^ERROR:/){  # report only messages, which
+                        msg(ERROR,$emsg);      # not already ERROR: messages
+                     }                         # (which are should already
+                  }                            # print to STDERR - i hope)
                }
                $self->LastMsg("");
             }
