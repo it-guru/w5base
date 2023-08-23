@@ -278,7 +278,7 @@ sub simplifyFilterSet
    my $time=time();
    my $modtime=$time % 60;
    my $ttime=$time-$modtime;
-   my $queryToken=create_uuid(UUID_V3,$ttime.":".$qstring)   ;
+   my $queryToken=uuid_to_string(create_uuid(UUID_V3,$ttime.":".$qstring));
 
 
    return(\%fltDup,$queryToken);
