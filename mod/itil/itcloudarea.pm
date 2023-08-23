@@ -589,9 +589,12 @@ sub Validate
          }
       }
       # reset cifirstactivation if applid is changed
-      my $cifirstactivation=effVal($oldrec,$newrec,"cifirstactivation");
-      if ($cifirstactivation ne ""){
-         $newrec->{cifirstactivation}=undef;
+      if (defined($oldrec) || #allow cifirstactivation insert from W5Server Jobs
+          $self->isDataInputFromUserFrontend()){ 
+         my $cifirstactivation=effVal($oldrec,$newrec,"cifirstactivation");
+         if ($cifirstactivation ne ""){
+            $newrec->{cifirstactivation}=undef;
+         }
       }
       if (defined($oldrec) && (             # reset to available, if appl
            $oldrec->{cistatusid} eq "4" ||  # is changed
