@@ -1,0 +1,6 @@
+'caas::qrule::CaaS_Project_URLvalidate'=>{
+  de=>'CaaS Projekt URL Prüfung',
+  en=>'CaaS Project URL validate'
+},
+'removing URL due not exists on CaaS anymore'=>{de=>'Entfernung der URL, da sie in der CaaS nicht mehr existiert'},
+

@@ -24,6 +24,7 @@ use kernel::App::Web::Listedit;
 use kernel::DataObj::Static;
 use kernel::Field;
 use MIME::Base64;
+use UUID::Tiny ':std';
 use kernel::Field::TextURL;
 use Text::ParseWords;
 use Time::HiRes qw(usleep);
@@ -39,6 +40,11 @@ sub new
 
 
    $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'id',
+                label         =>'ID',
+                dataobjattr   =>'id'),
+
       new kernel::Field::Text(
                 name          =>'name',
                 label         =>'URL',
@@ -172,6 +178,8 @@ sub DataCollector
                if (exists($flt->{projectid}) && $flt->{projectid} ne ""){
                   $rec->{projectid}=$flt->{projectid};
                }
+               $rec->{id}=uuid_to_string(create_uuid(UUID_V3,
+                                         $rec->{url}.'@'.$rec->{projectid})) ;
             }
          }
          return();
