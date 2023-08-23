@@ -1,7 +1,7 @@
 'Tools.passx'=>{de=>'PassX',en=>'PassX'},
 'Tools.passx.log'=>{de=>'Logs',en=>'Logs'},
 'Tools.passx.connector'=>{de=>'Verbindungsmanager',en=>'Connector'},
-'Tools.passx.entry'=>{de=>'Zuganskennungen',en=>'Access accounts'},
+'Tools.passx.entry'=>{de=>'Zugangskennungen',en=>'Access accounts'},
 'Tools.passx.entry.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.passx.new'=>{de=>'Neueingabe',en=>'New'},
 'Tools.passx.entry.acl'=>{de=>'Zugriffssteuerung',en=>'Access-Control'},
