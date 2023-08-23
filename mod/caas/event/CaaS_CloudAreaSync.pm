@@ -78,8 +78,8 @@ sub CaaS_CloudAreaSync
 
    $caasCloudArea->SetFilter({});
    my @tobeCloudAreas=$caasCloudArea->getHashList(qw(id name applid 
-                                                     cloudid cluster project));
-
+                                                     cloudid cluster project
+                                                     requestoraccount));
    if ($#tobeCloudAreas<10){
       if (!$staleRetry){
          my @lastmsg=$caasCloudArea->LastMsg();
@@ -126,21 +126,23 @@ sub CaaS_CloudAreaSync
       sub{  # comperator
          my ($a,$b)=@_;   # a=lnkadditionalci b=aus AM
          my $eq;          # undef= nicht gleich
-         if ( $a->{id} eq $b->{srcid} ||
-              lc($a->{name}) eq lc($b->{fancyname})){
+         if ( $a->{srcid} eq $b->{id} ){
             $eq=0;  # rec found - aber u.U. update notwendig
             my $aname=$a->{name};
             $aname=~s/\[.*\]$//;
-            my $bname=$b->{name};
-            $bname=~s/\s+/_/g;
-            if ($aname eq $bname &&
-                $a->{cistatusid}<6 &&
+
+            if ($a->{cistatusid}<6 &&
                 $a->{mandatorid} eq $currClouds[0]->{mandatorid} &&
                 $a->{srcid} eq $b->{id}  &&
-                $a->{name} eq $b->{fancyname}  &&
+                $aname eq $b->{fancyname}  &&
                 $a->{srcsys} eq $self->Self()){
                $eq=1;   # alles gleich - da braucht man nix machen
             }
+         }
+         else{
+            if ( lc($a->{name}) eq lc($b->{fancyname}) ){  # equal but need
+               $eq=0;                                      # sure update (at
+            }                                              # leased srcid)
          }
          return($eq);
       },
@@ -151,11 +153,11 @@ sub CaaS_CloudAreaSync
                OP=>$mode,
                DATAOBJ=>'TS::itcloud',
                DATA=>{
-                  srcsys     => $self->Self(),
-                  srcid      => $newrec->{id},
                }
             };
             if ($mode eq "insert"){
+               $oprec->{DATA}->{srcid}=$newrec->{id};
+               $oprec->{DATA}->{srcsys}=$self->Self();
                $oprec->{DATA}->{name}=$newrec->{fancyname};
                $oprec->{DATA}->{cistatusid}='4';
                foreach my $dupFld (qw(databossid securityrespid platformrespid
@@ -166,6 +168,12 @@ sub CaaS_CloudAreaSync
                }
             }
             if ($mode eq "update"){
+               if ($oldrec->{srcid} ne $newrec->{id}){
+                  $oprec->{DATA}->{srcid}=$newrec->{id};
+               }
+               if ($oldrec->{srcsys} ne $self->Self()){
+                  $oprec->{DATA}->{srcsys}=$self->Self();
+               }
                if ($oldrec->{name} ne $newrec->{fancyname}){
                   $oprec->{DATA}->{name}=$newrec->{fancyname};
                }
@@ -236,6 +244,7 @@ sub CaaS_CloudAreaSync
          cloudid=>$prec->{cloudid},
          id=>$prec->{id},
          cluster=>$prec->{cluster},
+         requestoraccount=>$prec->{requestoraccount},
          project=>$prec->{project},
          cloud=>$w5cloud->{srcid}->{$prec->{cloudid}}
       }
@@ -269,17 +278,23 @@ sub CaaS_CloudAreaSync
                OP=>$mode,
                DATAOBJ=>'TS::itcloudarea',
                DATA=>{
-                  srcsys     => $self->Self(),
-                  srcid      => $newrec->{id},
                }
             };
             if ($mode eq "insert"){
+               $oprec->{DATA}->{srcid}=$newrec->{id};
+               $oprec->{DATA}->{srcsys}=$self->Self();
                $oprec->{DATA}->{cloudid}=$w5cloudid;
                $oprec->{DATA}->{name}=$newrec->{name};
                $oprec->{DATA}->{applid}=$newrec->{applid};
                $oprec->{DATA}->{cistatusid}='3';
             }
             if ($mode eq "update"){
+               if ($oldrec->{srcid} ne $newrec->{id}){
+                  $oprec->{DATA}->{srcid}=$newrec->{id};
+               }
+               if ($oldrec->{srcsys} ne $self->Self()){
+                  $oprec->{DATA}->{srcsys}=$self->Self();
+               }
                if ($oldrec->{applid} ne $newrec->{applid}){
                   $oprec->{DATA}->{applid}=$newrec->{applid};
                }
@@ -386,6 +401,17 @@ sub CaaS_CloudAreaSync
                $opList[$c]->{DATA}->{cistatusid}="4";
                $opList[$c]->{DATA}->{cifirstactivation}=
                       $carec->{cifirstactivation};
+               $opList[$c]->{DATA}->{requestoraccount}="itil::itcloudarea::".
+                                                      $carec->{id};
+            }
+         }
+         if ($opList[$c]->{OP} eq "insert"){
+            if ($opList[$c]->{DATA}->{cistatusid} ne "4"){
+               my $CaaSrec=$CaaSproj{$opList[$c]->{DATA}->{srcid}};
+               if ($CaaSrec->{requestoraccount} ne ""){
+                  $opList[$c]->{DATA}->{requestoraccount}=
+                        $CaaSrec->{requestoraccount};
+               }
             }
          }
       }
@@ -409,10 +435,6 @@ sub CaaS_CloudAreaSync
       }
    }
 
-
-
-
-
    #printf STDERR ("opList=%s\n",Dumper(\@opList));
    #######################################################################
 
@@ -423,7 +445,7 @@ sub CaaS_CloudAreaSync
    #printf STDERR ("s=%s\n",Dumper(\@tobeCloudAreas));
 
 
-   return({exitcode=>'1'});
+   return({exitcode=>'0'});
 }
 
 
