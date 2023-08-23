@@ -87,6 +87,12 @@ sub new
             htmldetail        =>'NotEmpty',
             dataobjattr       =>'project'),
 
+      new kernel::Field::Text(
+            name              =>'requestoraccount',
+            label             =>'requestor account',
+            htmldetail        =>'NotEmpty',
+            dataobjattr       =>'requestorAccount'),
+
       new kernel::Field::SubList(
             name              =>'urls',
             group             =>'urls',
@@ -195,6 +201,7 @@ sub DataCollector
 
          my @atomicSpecs=qw(cluster project);
          if (ref($data) eq "ARRAY"){
+            #print STDERR Dumper($data);
             foreach my $rec (@$data){
                foreach my $k (@atomicSpecs){
                   $rec->{$k}=undef;
