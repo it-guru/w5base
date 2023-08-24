@@ -1551,7 +1551,10 @@ sub Validate
             if (!($sshkey=~m/^\s*$/)){
                $sshkey=~s/^\s*//;
                $sshkey=~s/\s*$//;
-               if ($sshkey=~m/^ssh-(dss|rsa|ed25519|dsa)\s+\S{50,600}/){
+               if (($sshkey=~m/^ssh-(dss|rsa|ed25519|dsa)
+                               \s+\S{50,600}/x) ||
+                   ($sshkey=~m/^(ecdsa-sha2-nistp256)
+                               \s+\S{50,600}/x)){
                   $k{$sshkey}=1;
                }
                else{
