@@ -162,6 +162,8 @@ sub DataCollector
          my $data=shift;
          my @atomicSpecs=qw(domain port schema);
 
+         my @fltdata=();
+
          if (ref($data) eq "ARRAY"){
             foreach my $rec (@$data){
                foreach my $k (@atomicSpecs){
@@ -180,7 +182,12 @@ sub DataCollector
                }
                $rec->{id}=uuid_to_string(create_uuid(UUID_V3,
                                          $rec->{url}.'@'.$rec->{projectid})) ;
+               next if ($rec->{domain}=~m/^\s*$/);
+               next if ($rec->{domain}=~m/\s/);
+               next if (!($rec->{domain}=~m/\./));
+               push(@fltdata,$rec);
             }
+            @{$data}=@fltdata;
          }
          return();
       }
