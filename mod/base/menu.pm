@@ -829,6 +829,20 @@ sub _mobileShowSubMenu
 sub LoginFail
 {
    my $self=shift;
+
+   if ($ENV{HTTP_ACCEPT}=~m#/json$#i){
+      print $self->HttpHeader("application/json");
+      my %d=(
+                  exitcode=>-1,
+                  exitmsg=>'LoginFail'
+      );
+      eval('use JSON; print(encode_json(\%d));');
+      if ($@ ne ""){
+         die("LoinFail Page as JSON Data failed: $@");
+      }
+      return(undef);
+   }
+
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>[]);  # Styles are not posible (path problem)
    #
