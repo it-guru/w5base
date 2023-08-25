@@ -1060,6 +1060,7 @@ sub NameSelector
             name=>{
                typ=>'STRING',
                mandatory=>1,
+               path=>0,
                init=>'w5'
             }
          },undef,\&doNameSelector,@_)
