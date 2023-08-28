@@ -36,7 +36,7 @@ sub Init
 
    $self->RegisterObj("itu.cloud.caas",
                       "tmpl/welcome",
-                      defaultacl=>['admin']);
+                      defaultacl=>['admin','support']);
    
    $self->RegisterObj("itu.cloud.caas.cloud",
                       "caas::cloud",
