@@ -143,8 +143,8 @@ sub qcheckRecord
 
    my @swisoll;
    my %CurSrcidList;
-   my %sysnameProcessed;
    foreach my $childrec (@l){
+      my %sysnameProcessed;
       my $applid=$childrec->{child_applid};
       next if ($applid eq "");
       next if (!exists($cappldata->{applid}->{$applid}));
