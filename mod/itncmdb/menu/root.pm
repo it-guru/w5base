@@ -36,7 +36,7 @@ sub Init
 
    $self->RegisterObj("itu.cfm.itncmdb",
                       "tmpl/welcome",
-                      defaultacl=>['admin']);
+                      defaultacl=>['admin','support']);
 
    $self->RegisterObj("itu.cfm.itncmdb.asset",
                       "itncmdb::asset",
