@@ -70,7 +70,21 @@ sub CaaS_CloudAreaSync
    }
 
    if ($#tobeClouds<1){
-      msg(ERROR,"CaaS_CloudAreaSync not enough Cloud-Enviroments ".
+      if (!$staleRetry){
+         my @lastmsg=$caasCloud->LastMsg();
+         if (grep(/ HTTP 503 /,@lastmsg)){
+            return({exitcode=>'-1',
+                    msg=>'WARN: CaaS cloudlist temporary incomplete'}); 
+         }
+      }
+      else{
+         $self->LastMsg(ERROR,"interface in stale retry longer then 6h");
+      }
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      if ($infoObj->NotifyInterfaceContacts($caasCloud)){
+         return({exitcode=>-1,exitmsg=>'Interface notified'});
+      }
+      msg(ERROR,"CaaS_CloudAreaSync not enough Clouds (CloudEnviroments) ".
                 "on CaaS API found");
       return({exitcode=>'1'});
    }
