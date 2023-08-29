@@ -765,7 +765,8 @@ sub getHashList
       } until(!defined($rec));
    }
    if ($msg ne "" && $msg ne "Limit reached"){
-      msg(INFO,"getHashList: (".join(",",caller()).") msg=$msg");
+      msg(INFO,"getHashList: (".$self->Self()." <- ".join(",",caller()).") ".
+          "msg=".$msg);
    }
    return(@l) if (wantarray());
    return(\@l);
