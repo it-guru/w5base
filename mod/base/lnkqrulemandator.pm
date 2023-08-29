@@ -132,7 +132,7 @@ sub new
                 vjoinon       =>['qruleid'=>'id'],
                 vjoindisp     =>'code'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'qruleid',
                 label         =>'QRule-ID',
                 dataobjattr   =>'lnkqrulemandator.qrule'),
