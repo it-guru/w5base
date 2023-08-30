@@ -55,20 +55,24 @@ sub onRawValue
    my $totalcnt=$#{$total}+1;
    my $todo=0;
    my $outdated=0;
+   my %pendingInterviewPartner=();
    if ($totalcnt>0){
       foreach my $q (@{$total}){
          if (!exists($answered->{interviewid}->{$q->{id}})){
             $todo++;
+            $pendingInterviewPartner{$q->{boundpcontact}}->{todo}++;
          }
          else{
             if ($answered->{interviewid}->{$q->{id}}->{needverify}){
                $outdated++;
+               $pendingInterviewPartner{$q->{boundpcontact}}->{outdated}++;
             }
          }
       }
    }
    my $state={TotalActiveQuestions=>$total,
               total=>$totalcnt, todo=>$todo, outdated=>$outdated,
+              pendingInterviewPartner=>\%pendingInterviewPartner,
               AnsweredQuestions=>$answered};
    my %qStat;
    tie(%qStat,'kernel::Field::InterviewState::qStat',%$state);

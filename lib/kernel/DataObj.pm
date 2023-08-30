@@ -1492,6 +1492,11 @@ sub FinishDelete
    if (defined($idfield) && $self->Self() ne "base::history"){
       my $id=$idfield->RawValue($oldrec);
       if ($id ne ""){
+         #####################################################################
+         # todo: BulkDelete interviewCache
+
+
+         #####################################################################
          my $history=getModuleObject($self->Config,"base::history");
          $history->BulkDeleteRecord({dataobject=>[$self->SelfAsParentObject()],
                                      dataobjectid=>\$id});

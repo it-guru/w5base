@@ -510,6 +510,60 @@ sub nativQualityCheck
    $parent->preQualityCheckRecord($rec,@param);
 
 
+   my $interviewst=$parent->getField("interviewst",$rec);
+   my $idfield=$parent->IdField();
+   my $objname=$parent->SelfAsParentObject();
+
+   if (defined($idfield) && 
+       defined($interviewst)){ # handle interview state cache
+      my $sseconds=Time::HiRes::time();
+      my $id=$rec->{$idfield->Name()};
+
+
+      #
+      #  Current cache for id+objname load
+      #
+
+
+      my $d=$interviewst->RawValue($rec);
+      if ($d->{todo}>0 || $d->{outdated}>0){
+
+         my %ipartner=$parent->InterviewPartners($rec);
+         my @pendingInterviewPartner=(''); # always add default (databoss)
+         if (ref($d->{pendingInterviewPartner}) eq "HASH"){
+            push(@pendingInterviewPartner,
+                 keys(%{$d->{pendingInterviewPartner}}));
+         }
+         my %uids;
+         foreach my $ipname (@pendingInterviewPartner){
+            my $u=$ipartner{$ipname};
+            $u=[$u] if (ref($u) ne "ARRAY");
+            foreach my $id (@$u){
+               $uids{$id}++;
+            }
+         }
+         foreach my $uid (keys(%uids)){
+            msg(INFO,"OpenInterview: $objname - $id ask uid=$uid");
+         }
+      }
+      #######################################################################
+      # do corrections in Cache table
+
+
+
+
+      my $eseconds=Time::HiRes::time();
+      msg(INFO,sprintf("interview cache calculation time = %.2lf\n",
+                       $eseconds-$sseconds));
+   }
+   else{
+      ####################################################################
+      # BulkDelete cache for objname (ensure no cache entries, if iterview
+      # is undeployed for objname
+   }
+
+
+
    #
    # Das Enrichment Verfahren kann vorraussichtlich NICHT den
    # preQualityCheckRecord ersetzen.
