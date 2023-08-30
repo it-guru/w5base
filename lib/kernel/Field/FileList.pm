@@ -722,6 +722,7 @@ sub RawValue
          $clone{label}=$clone{name};
          $clone{href}="ViewProcessor/load/$self->{name}/".
                       "$refid/$clone{fid}/$clone{name}";
+         $clone{href}=~s/\s/_/g;
          push(@filelist,\%clone);
       }
    }
