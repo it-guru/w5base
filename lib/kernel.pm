@@ -1078,7 +1078,7 @@ sub getConfigObject($$$)
    if (exists($W5V2::Config->{$configkey})){
       return($W5V2::Config->{$configkey}->{Config});
    }
-   msg(INFO,"(re)read config for base '$basemod' from package '$package'");
+   #msg(INFO,"(re)read config for base '$basemod' from package '$package'");
    my $config=new kernel::config();
    if (!$config->readconfig($instdir,$configname,$basemod)){
       if ($ENV{SERVER_SOFTWARE} ne ""){
