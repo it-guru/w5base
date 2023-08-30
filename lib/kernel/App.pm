@@ -1131,7 +1131,9 @@ sub Log
                }
             }
             else{
-               msg(INFO,"reopen logfile '$target' at PID $$");
+               if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+                  msg(INFO,"reopen logfile '$target' at PID $$");
+               }
                if ($fh->open(">>$target")){
                   $fh->autoflush();
                   $LogCache->{$facility}->{file}=$target; 
