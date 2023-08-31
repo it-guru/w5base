@@ -22,6 +22,7 @@ use Time::HiRes qw(gettimeofday);
 use Class::ISA;
 use kernel;
 use kernel::Field;
+use kernel::QRule;
 use kernel::DataObj::Static;
 use kernel::App::Web::Listedit;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
@@ -513,17 +514,18 @@ sub nativQualityCheck
    my $interviewst=$parent->getField("interviewst",$rec);
    my $idfield=$parent->IdField();
    my $objname=$parent->SelfAsParentObject();
+   my $itodo=getModuleObject($self->Config,"base::interviewtodocache");
 
    if (defined($idfield) && 
        defined($interviewst)){ # handle interview state cache
       my $sseconds=Time::HiRes::time();
       my $id=$rec->{$idfield->Name()};
-
-
       #
       #  Current cache for id+objname load
       #
-
+      $itodo->SetFilter({dataobject=>\$objname,dataobjectid=>\$id});
+      my @currIToDo=$itodo->getHashList(qw(dataobject dataobjectid userid id));
+      my @tobeIToDo=();
 
       my $d=$interviewst->RawValue($rec);
       if ($d->{todo}>0 || $d->{outdated}>0){
@@ -544,14 +546,59 @@ sub nativQualityCheck
          }
          foreach my $uid (keys(%uids)){
             msg(INFO,"OpenInterview: $objname - $id ask uid=$uid");
+            push(@tobeIToDo,{
+               dataobject=>$objname,
+               dataobjectid=>$id,
+               userid=>$uid
+            });
          }
       }
       #######################################################################
       # do corrections in Cache table
-
-
-
-
+      my @opList=();
+      my $res=kernel::QRule::OpAnalyse(
+         sub{  # comperator
+            my ($a,$b)=@_;   
+            my $eq;          # undef= nicht gleich
+            if ( $a->{dataobject} eq $b->{dataobject} &&
+                 $a->{dataobjectid} eq $b->{dataobjectid} &&
+                 $a->{userid} eq $b->{userid}){
+               $eq=1;  # rec found und keine Update notwendig (update not sup)
+            }
+            return($eq);
+         },
+         sub{  # oprec generator
+            my ($mode,$oldrec,$newrec,%p)=@_;
+            if ($mode eq "insert" || $mode eq "update"){
+               my $oprec={
+                  OP=>$mode,
+                  DATAOBJ=>'base::interviewtodocache',
+                  DATA=>{
+                     dataobject=>$newrec->{dataobject},
+                     dataobjectid=>$newrec->{dataobjectid},
+                     userid=>$newrec->{userid},
+                  }
+               };
+               if ($mode eq "update"){
+                  $oprec->{IDENTIFYBY}=$oldrec->{id};
+               }
+               return($oprec);
+            }
+            elsif ($mode eq "delete"){
+               my $oprec={
+                  OP=>$mode,
+                  DATAOBJ=>'base::interviewtodocache',
+                  IDENTIFYBY=>$oldrec->{id}
+               };
+               return($oprec);
+            }
+            return(undef);
+         },
+         \@currIToDo,\@tobeIToDo,\@opList
+      );
+      if (!$res){
+         my $opres=ProcessOpList($itodo,\@opList);
+      }
       my $eseconds=Time::HiRes::time();
       msg(INFO,sprintf("interview cache calculation time = %.2lf\n",
                        $eseconds-$sseconds));
@@ -560,6 +607,9 @@ sub nativQualityCheck
       ####################################################################
       # BulkDelete cache for objname (ensure no cache entries, if iterview
       # is undeployed for objname
+      $itodo->BulkDeleteRecord({
+          dataobject=>[$self->SelfAsParentObject()],
+      });
    }
 
 

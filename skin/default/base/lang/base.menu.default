@@ -74,6 +74,7 @@
 'sysadm.qmgmt.qrule'=>{de=>'Q-Regel',en=>'Q-Rule'},
 'sysadm.qmgmt.interview'=>{de=>'CI-Interview',en=>'CI-Interview'},
 'sysadm.qmgmt.interview.cat'=>{de=>'Kategorien',en=>'Categorie'},
+'sysadm.qmgmt.interview.todocache'=>{de=>'ToDoCache',en=>'ToDoCache'},
 'sysadm.qmgmt.interview.cat.new'=>{de=>'Neueingabe',en=>'New'},
 'sysadm.qmgmt.interanswer'=>{de=>'Interview-Antworten',en=>'Interview Answers'},
 'sysadm.qmgmt.interview.new'=>{de=>'Neueingabe',en=>'New'},

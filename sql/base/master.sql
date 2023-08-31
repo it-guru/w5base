@@ -847,3 +847,14 @@ alter table postitnote add srcsys varchar(100) default 'w5base', add srcid varch
 alter table isocountry add callingprefix varchar(100);
 alter table isocountry add intdialprefix varchar(10);
 alter table interview add ifrom datetime, add ito datetime,add key(ifrom), add key(ito);
+create table interviewtodocache (
+  id           bigint(20) NOT NULL,
+  userid       bigint(20) NOT NULL,
+  dataobject   varchar(128) NOT NULL,
+  dataobjectid varchar(80) NOT NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (id),
+  KEY name (dataobject,dataobjectid),key userid(userid),
+  FOREIGN KEY (userid) REFERENCES contact (userid) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
