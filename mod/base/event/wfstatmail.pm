@@ -51,9 +51,9 @@ sub SendMyJobs
    my $user=getModuleObject($self->Config,"base::user");
    my @flt;
    $flt[0]={usertyp=>['user','service'],cistatusid=>\'4'};
-   #$flt->{fullname}="vogl* bichler* *hanno.ernst*";
+   #$flt[0]->{fullname}="vogl* bichler* *hanno.ernst*";
    #$flt->{fullname}="ladegast* ernst*";
-   #$flt[0]->{fullname}="vogler*";
+   #$flt[0]->{userid}=12260596620002;
    if ($#target==-1){
       #
       # basierend auf der Entscheidung des MC AL DTAG werden die
@@ -201,30 +201,38 @@ sub SendMyJobs
             }
             my $openInterviews=0;
 
-            foreach my $objname  (qw(base::location itil::appl itil::system)){
+            my $itodo=getModuleObject($self->Config,"base::interviewtodocache");
+            $itodo->SetFilter({userid=>$urec->{userid}});
+            $itodo->SetCurrentView(qw(dataobject dataobjectid));
+            my $itodos=$itodo->getHashIndexed("dataobject");
+            foreach my $objname  (keys(%{$itodos->{dataobject}})){
                my $o=getModuleObject($self->Config,$objname);
-               $o->SetFilter({databossid=>$urec->{userid},cistatusid=>"<6"});
-               foreach my $cirec ($o->getHashList(qw(id urlofcurrentrec 
-                                                     name interviewst))){
-                 # #print STDERR Dumper($cirec);
-                 # if ($cirec->{interviewst}->{todo}>0 ||
-                 #     $cirec->{interviewst}->{outdated}>0){
-                 #    if ($openInterviews==0){
-                 #       push(@emailsubtitle,
-                 #           "<table cellspacing=5 border=0><tr><td><b><u>".
-                 #           $user->T("Current Config-Items with ".
-                 #                    "open or oudated answers:").
-                 #           "</b></u></td></tr></table>");
-                 #    }
-                 #    else{
-                 #       push(@emailsubtitle,"");
-                 #    }
-                 #    $openInterviews++;
-                 #    push(@emailtext,"$cirec->{name}\n".
-                 #                    "$cirec->{urlofcurrentrec}/Interview");
-                 #    push(@emailpostfix,"");
-                 #    push(@emailprefix,"");
-                 # }
+               my $idfield=$o->IdField();
+               my $itodosList=$itodos->{dataobject}->{$objname};
+               $itodosList=[$itodosList] if (ref($itodosList) ne "ARRAY");
+               foreach my $todorec (@{$itodosList}){
+                  $o->SetFilter({$idfield->Name()=>$todorec->{dataobjectid}});
+                  foreach my $cirec ($o->getHashList(qw(ALL))){
+                  #   if ($cirec->{interviewst}->{todo}>0 ||
+                  #       $cirec->{interviewst}->{outdated}>0){
+                      if (1){  # answer direct from cache
+                        if ($openInterviews==0){
+                           push(@emailsubtitle,
+                               "<table cellspacing=5 border=0><tr><td><b><u>".
+                               $user->T("Current Config-Items with ".
+                                        "open or oudated answers:").
+                               "</b></u></td></tr></table>");
+                        }
+                        else{
+                           push(@emailsubtitle,"");
+                        }
+                        $openInterviews++;
+                        push(@emailtext,"$cirec->{name}\n".
+                                        "$cirec->{urlofcurrentrec}/Interview");
+                        push(@emailpostfix,"");
+                        push(@emailprefix,"");
+                     }
+                  }
                }
             }
             $totaljobs+=$openInterviews;

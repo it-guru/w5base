@@ -1493,9 +1493,12 @@ sub FinishDelete
       my $id=$idfield->RawValue($oldrec);
       if ($id ne ""){
          #####################################################################
-         # todo: BulkDelete interviewCache
-
-
+         # BulkDelete interviewCache
+         my $itodo=getModuleObject($self->Config,"base::interviewtodocache");
+         $itodo->BulkDeleteRecord({
+            dataobject=>[$self->SelfAsParentObject()],
+            dataobjectid=>\$id
+         });
          #####################################################################
          my $history=getModuleObject($self->Config,"base::history");
          $history->BulkDeleteRecord({dataobject=>[$self->SelfAsParentObject()],

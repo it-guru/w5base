@@ -443,6 +443,10 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("sysadm.qmgmt.interview.todocache",
+                      "base::interviewtodocache",
+                      defaultacl=>['admin']);
+
    $self->RegisterObj("sysadm.qmgmt.interanswer",
                       "base::interanswer",
                       defaultacl=>['admin']);
