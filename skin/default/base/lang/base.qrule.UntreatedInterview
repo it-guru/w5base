@@ -1,0 +1,7 @@
+'base::qrule::UntreatedInterview'=>{
+  de=>'Überwachung der CI-Interview Antworten',
+  en=>'Monitoring CI interview responses'
+},
+'there are open/outdated interview questions'=>{
+  de=>'Es liegen unbeantwortet/veraltete Interview Fragen vor'
+}
