@@ -51,26 +51,54 @@ sub readconfig
    my $configfile=shift;
    my $basemod=shift;
    my $sub=shift;
-   $self->{c}->setPreLoad("$instdir/etc/w5base/$basemod/default.conf",
-                          "$instdir/etc/w5base/default.conf");
+
+   my $kernelConfig=$self; # save reference for use in DB read param
+
+   $self->{c}->setPreLoad(
+      "$instdir/etc/w5base/$basemod/default.conf",
+      "$instdir/etc/w5base/default.conf",
+      sub {
+         my $self=shift;
+         my $currentconfig=shift;  # target hash for current Config load
+
+         my $RereadInterval=$self->getRereadInterval();
+         $currentconfig->{INSTDIR}=$instdir;
+         if (defined($RereadInterval)){
+            if ($RereadInterval<=1){        # this is the first (Pre)read
+               $self->setRereadInterval(2); # at this level, it's not sure, all
+            }                               # minimum config parameters are in
+            else{                           # $kernelConfig
+               $self->setRereadInterval(600);
+               # now $kernelConfig is working with internal data
+               my $o=getModuleObject($kernelConfig,"base::location");
+               if (defined($o) && $o->Ping()){
+                  msg(INFO,"now reading dynamic config from base::dynConfig");
+               }
+            }
+         }
+      }
+   );
+   $self->{c}->setRereadInterval(1);  # initial Re
    my $bk=$self->{c}->readconfig($configfile);
-   if ($bk){
-      $self->{c}->setParam("INSTDIR",$instdir);
-   }
    return($bk);
 }
 
-sub debug
-{
-   my $self=shift;
-   return($self->{c}->readconfig(@_));
-}
+#
+# scheint nicht mehr 
+#
+#sub debug
+#{
+#   my $self=shift;
+#   return($self->{c}->readconfig(@_));
+#}
+#
+#sub LoadIntoCurrentConfig
+#{
+#   my $self=shift;
+#   return($self->{c}->readconfig(@_));
+#}
 
-sub LoadIntoCurrentConfig
-{
-   my $self=shift;
-   return($self->{c}->readconfig(@_));
-}
+
 
 sub Param($)
 {
