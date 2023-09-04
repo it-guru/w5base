@@ -34,7 +34,22 @@ sub new
    }
    $self->{currrentconfig}={};
    $self->{configname}=undef;
+   $self->{reareadinterval}=undef;
    bless($self,$type);
+}
+
+sub setRereadInterval
+{
+   my $self=shift;
+   my $t=shift;
+   $self->{reareadinterval}=$t;
+   return($t);
+}
+
+sub getRereadInterval
+{
+   my $self=shift;
+   return($self->{reareadinterval});
 }
 
 sub setPreLoad
@@ -45,6 +60,17 @@ sub setPreLoad
    }
    else{
       $self->{'preload'}=[@_];
+   }
+}
+
+sub setPostLoad
+{
+   my $self=shift;
+   if (ref($_[0]) eq "ARRAY"){
+      $self->{'postload'}=$_[0];
+   }
+   else{
+      $self->{'postload'}=[@_];
    }
 }
 
@@ -65,6 +91,26 @@ sub readconfig
    if (!$sub){
       $self->{configname}=$configfile;
    }
+   if (!exists($self->{currrentconfig})){
+      $self->{currrentconfig}={};
+   }
+
+   return($self->genericReadConfig($self->{currrentconfig}));
+}
+
+
+
+
+sub genericReadConfig
+{
+   my $self=shift;
+   my $targetConfig=shift;
+   my $configfile=$self->{configname};
+   my $sub=shift;
+
+   if (!$sub){
+      $self->{configname}=$configfile;
+   }
    $configfile.=".conf" if (!($configfile=~m/\.conf$/));
    if (!$sub){
       my $config=$self->{configname};
@@ -72,23 +118,40 @@ sub readconfig
          $config=~s/\.[^\.]*$//;
          $config=~s/^.*\///;
       }
-      $self->{currrentconfig}={CONFIG=>$config};
+      %{$targetConfig}=( 
+         CONFIG=>$config,
+         ConfigLastReadTime=>time()
+      );
       if (ref($self->{preload}) eq "ARRAY"){
          foreach my $f (@{$self->{preload}}){
-            if ( -f $f){
-               $self->LoadIntoCurrentConfig($self->{currrentconfig},$f);
+            if (ref($f) eq "CODE"){
+               &{$f}($self,$targetConfig);
+            }
+            else{
+               if ( -f $f ){
+                  $self->LoadIntoCurrentConfig($targetConfig,$f);
+               }
             }
          }
       }
    }
 
-   my $back=$self->LoadIntoCurrentConfig($self->{currrentconfig},$configfile);
+   my $back=$self->LoadIntoCurrentConfig($targetConfig,$configfile);
    if ($back){
       if ($self->{sysconfdir} ne ""){
-         my $gconfdir="$self->{sysconfdir}/$self->{currrentconfig}->{CONFIG}";
+         my $gconfdir=$self->{sysconfdir}."/".$targetConfig->{CONFIG};
          if ( -f "$gconfdir/global.conf"){
-            $self->LoadIntoCurrentConfig($self->{currrentconfig},
-                                         "$gconfdir/global.conf");
+            $self->LoadIntoCurrentConfig($targetConfig,"$gconfdir/global.conf");
+         }
+      }
+      foreach my $f (@{$self->{postload}}){
+         if (ref($f) eq "CODE"){
+            &{$f}($self,$targetConfig);
+         }
+         else{
+            if ( -f $f ){
+               $self->LoadIntoCurrentConfig($targetConfig,$f);
+            }
          }
       }
       delete($self->{conffile});
@@ -225,6 +288,19 @@ sub Param($)
    my $name=shift;
    my $varset;
    $name=uc($name);
+
+   if (defined($self->{reareadinterval})){
+      if (exists($self->{currrentconfig}->{ConfigLastReadTime}) &&
+          $self->{currrentconfig}->{ConfigLastReadTime}+
+           $self->{reareadinterval}<time()){
+         my %tempConfig;
+         my $bk=$self->genericReadConfig(\%tempConfig);
+         if ($bk){ # reread seems to be OK
+            $self->{currrentconfig}=\%tempConfig;
+         }
+         $self->{currrentconfig}->{ConfigLastReadTime}=time();
+      }
+   }
 
    if (exists($self->{currrentconfig}->{$name})){
       $varset=$self->{currrentconfig};
