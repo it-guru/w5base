@@ -1069,11 +1069,13 @@ sub getConfigObject($$$)
    $W5V2::Config={} if (!defined($W5V2::Config));
    my $configkey="$configname::$basemod";
 
-   if (exists($W5V2::Config->{$configkey})){
-      if ($W5V2::Config->{$configkey}->{Time}<time()-3500){
-         delete($W5V2::Config->{$configkey});
-      }
-   }
+   # handling of reread config is now handeled by W5FastConfig.pm
+   # at setPreLoad method - so it works in W5Server context too.
+   # if (exists($W5V2::Config->{$configkey})){
+   #   if ($W5V2::Config->{$configkey}->{Time}<time()-3500){
+   #      delete($W5V2::Config->{$configkey});
+   #   }
+   # }
 
    if (exists($W5V2::Config->{$configkey})){
       return($W5V2::Config->{$configkey}->{Config});
