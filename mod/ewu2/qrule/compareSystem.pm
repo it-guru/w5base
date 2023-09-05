@@ -142,16 +142,28 @@ sub qcheckRecord
                });
                my ($vmrec,$msg)=$sys->getOnlyFirst(qw(ALL));
                if (!defined($vmrec)){
-                  my $pid=$par->Import({
-                      importname=>$parrec->{vhostsystemname},
-                      databossid=>$rec->{databossid}
-                  });
-                  if (defined($pid)){
-                     $forcedupd->{vhostsystemid}=$pid;
-                     $checksession->{EssentialsChangedCnt}++;
+                  $par->ResetFilter();
+                  $par->SetFilter({id=>\$parrec->{hostingcsid},
+                                   status=>"up"});
+                  my ($newVMHostrec,$msg)=$par->getOnlyFirst(qw(ALL));
+                  if (defined($newVMHostrec)){
+                     msg(INFO,"try to import $parrec->{hostingcsid}");
+                     my $pid=$par->Import({
+                         importname=>$parrec->{hostingcsid},
+                         databossid=>$rec->{databossid},
+                         mandatorid=>$rec->{mandatorid}
+                     });
+                     if (defined($pid)){
+                        $forcedupd->{vhostsystemid}=$pid;
+                        $checksession->{EssentialsChangedCnt}++;
+                     }
+                     else{
+                        # DataIssue
+                     }
                   }
                   else{
-                     # DataIssue
+                     msg(INFO,"new vmhost $parrec->{hostingcsid} is not up -".
+                              " import disabled");
                   }
                }
                else{
