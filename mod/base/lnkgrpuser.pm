@@ -778,7 +778,7 @@ sub RoleSyncIn
                   $uidfound++;
                }
                else{
-                  push($r,$rulerole);
+                  push(@$r,$rulerole);
                   $updrec{$crec->{userid}}=[$crec,{
                      userid=>$crec->{userid},
                      grpid=>$crec->{grpid},
