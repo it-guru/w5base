@@ -158,6 +158,11 @@ sub Validate
    if (exists($newrec->{datamodel})){
       $newrec->{datamodel}=~s/[^a-zA-Z_0-9-]/_/g;
    }
+   if (!defined($oldrec)){
+      if (!exists($newrec->{param}) || !defined($newrec->{param})){
+         $newrec->{param}=""; #prevent DB Waring on longtext NULLs
+      }                       #result Field 'param' doesn't have a default value
+   }
    return(1);
 }
 
