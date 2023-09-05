@@ -585,24 +585,31 @@ sub Import
       #   $self->LastMsg(WARN,"Can't import Supervisor as Admin");
       #}
       # check 5: find id of mandator "extern"
-      my $mand=getModuleObject($self->Config,"base::mandator");
-      $mand->SetFilter({name=>"extern"});
-      my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
-      if (!defined($mandrec)){
-         $self->LastMsg(ERROR,"Can't find mandator extern");
-         return(undef);
-      }
-      my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write","direct");
-      my $mandatorid=$mandrec->{grpid};
-      if (in_array(\@mandators,200)){
-         $mandatorid=200;
+      my $mandatorid;
+      if (exists($param->{mandatorid})){
+         $mandatorid=$param->{mandatorid};
       }
       else{
-         $mandatorid=$mandators[0];
-      }
-      if ($mandatorid eq ""){
-         $self->LastMsg(ERROR,"Can't find any mandator");
-         return(undef);
+         my $mand=getModuleObject($self->Config,"base::mandator");
+         $mand->SetFilter({name=>"extern"});
+         my ($mandrec,$msg)=$mand->getOnlyFirst(qw(grpid));
+         if (!defined($mandrec)){
+            $self->LastMsg(ERROR,"Can't find mandator extern");
+            return(undef);
+         }
+         my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"write",
+                                             "direct");
+         $mandatorid=$mandrec->{grpid};
+         if (in_array(\@mandators,200)){
+            $mandatorid=200;
+         }
+         else{
+            $mandatorid=$mandators[0];
+         }
+         if ($mandatorid eq ""){
+            $self->LastMsg(ERROR,"Can't find any mandator");
+            return(undef);
+         }
       }
 
       my $systype="standard";
