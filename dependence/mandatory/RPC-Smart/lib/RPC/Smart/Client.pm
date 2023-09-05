@@ -74,12 +74,18 @@ sub Call
          $self->Connect();
          return(undef) if (!$self->{sock});
       }
-      eval("\$XML=new XML::Smart({root=>{'call'=>\$method,param=>\$param}});");
-    
-      $XML->{root}{call}{method}=$method;
-      $XML->{root}{call}{param}=$param;
+      # newer Version of XML::Smart do not support initial XML structures on
+      # on constructor - so it is need to rewrite it in a compatible version
+      #eval("\$XML=new XML::Smart({root=>{'call'=>\$method,param=>\$param}});");
+      eval("\$XML=new XML::Smart();");
+      if (defined($XML) && $@ eq ""){
+         $XML->{root}{call}{method}=$method;
+         $XML->{root}{call}{param}=$param;
+      }
+      else{
+         die("can not create XML::Smart object - $@");
+      }
       my $sock=$self->{sock};
-      #printf STDERR ("date=%s",$XML->data);
       printf $sock ("%s",$XML->data);
     
       while(my $l=<$sock>){
