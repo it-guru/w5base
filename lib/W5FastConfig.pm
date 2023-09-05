@@ -92,10 +92,18 @@ sub readconfig
       $self->{configname}=$configfile;
    }
    if (!exists($self->{currrentconfig})){
-      $self->{currrentconfig}={};
+      $self->{currrentconfig}={
+         ConfigRereadCount=>0
+      };
    }
 
-   return($self->genericReadConfig($self->{currrentconfig}));
+   my $bk=$self->genericReadConfig($self->{currrentconfig});
+
+   #
+   # Check, if Config is complete - if not, do a second genericReadConfig
+   #
+
+   return($bk);
 }
 
 
@@ -293,7 +301,9 @@ sub Param($)
       if (exists($self->{currrentconfig}->{ConfigLastReadTime}) &&
           $self->{currrentconfig}->{ConfigLastReadTime}+
            $self->{reareadinterval}<time()){
-         my %tempConfig;
+         my %tempConfig=(
+            ConfigRereadCount=>$self->{currrentconfig}->{ConfigRereadCount}+1
+         );
          my $bk=$self->genericReadConfig(\%tempConfig);
          if ($bk){ # reread seems to be OK
             $self->{currrentconfig}=\%tempConfig;

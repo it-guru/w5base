@@ -63,22 +63,22 @@ sub readconfig
 
          my $RereadInterval=$self->getRereadInterval();
          $currentconfig->{INSTDIR}=$instdir;
-         if (defined($RereadInterval)){
-            if ($RereadInterval<=1){        # this is the first (Pre)read
-               $self->setRereadInterval(2); # at this level, it's not sure, all
-            }                               # minimum config parameters are in
-            else{                           # $kernelConfig
-               $self->setRereadInterval(600);
-               # now $kernelConfig is working with internal data
-               my $o=getModuleObject($kernelConfig,"base::location");
-               if (defined($o) && $o->Ping()){
-                  msg(INFO,"now reading dynamic config from base::dynConfig");
-               }
-            }
-         }
+        # if (defined($RereadInterval)){
+        #    if ($RereadInterval<=1){        # this is the first (Pre)read
+        #       $self->setRereadInterval(2); # at this level, it's not sure, all
+        #    }                               # minimum config parameters are in
+        #    else{                           # $kernelConfig
+        #       $self->setRereadInterval(600);
+        #       # now $kernelConfig is working with internal data
+        #       my $o=getModuleObject($kernelConfig,"base::location");
+        #       if (defined($o) && $o->Ping()){
+        #          msg(INFO,"now reading dynamic config from base::dynConfig");
+        #       }
+        #    }
+        # }
       }
    );
-   $self->{c}->setRereadInterval(1);  # initial Re
+   $self->{c}->setRereadInterval(600);  # initial Re
    my $bk=$self->{c}->readconfig($configfile);
    return($bk);
 }
