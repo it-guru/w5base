@@ -140,7 +140,7 @@ sub qcheckRecord
             }
          }
          $fwlist{$fwid}->{comments}="Interfaces:\n".join("\n",
-                sort(keys($fwlist{$fwid}->{ifname})));
+                sort(keys(%{$fwlist{$fwid}->{ifname}})));
          if ($fullname ne ""){
             $fwlist{$fullname}={
                name=>$fullname,
