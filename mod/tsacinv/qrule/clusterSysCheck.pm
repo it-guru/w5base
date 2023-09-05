@@ -86,7 +86,8 @@ sub qcheckRecord
 
 
    return(0,undef) if ($rec->{cistatusid}!=4);
-   if ($rec->{systemid} ne $rec->{srcid}){ # this indicates a MCOS System
+   if ($rec->{systemid} ne "" &&
+       $rec->{systemid} ne $rec->{srcid}){ # this indicates a MCOS System
       return(undef,{qmsg=>'MCOS constellation detected'});
    }
    if ($rec->{systemid} ne "" && $rec->{srcsys} eq "AssetManager"){
