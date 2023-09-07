@@ -1,0 +1,2 @@
+Based on
+https://community.hetzner.com/tutorials/apache-ssl-client-auth
