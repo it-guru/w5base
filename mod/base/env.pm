@@ -34,7 +34,49 @@ sub new
 sub getValidWebFunctions
 {
    my ($self)=@_;
-   return(qw(Main));
+   return(qw(Main ParsedConfig));
+}
+
+sub ParsedConfig
+{
+   my ($self)=@_;
+
+   my $cfg=$self->Config();
+
+   if (!$self->IsMemberOf("admin") &&
+       !$self->IsMemberOf("support")){
+      print($self->noAccess());
+      return();
+   }
+
+   if ($ENV{HTTP_ACCEPT}=~m/\/json$/){
+      print $self->HttpHeader("application/json");
+   }
+   if ($ENV{HTTP_ACCEPT}=~m/\/plain$/){
+      print $self->HttpHeader("text/plain");
+   }
+   print $self->HttpHeader("text/html");
+   
+   print $self->HtmlHeader(title=>"Config",body=>1);
+   print("<b># Config</b><br><br>");
+   foreach my $var (sort($self->Config()->varlist())){
+      my $p=$self->Config->Param($var);
+      if (ref($p) eq "HASH"){
+         foreach my $k (sort(keys(%$p))){
+            my $val=$p->{$k};
+            $val=~s/>/&gt;/g;
+            $val=~s/</&lt;/g;
+            printf ("%s[%s] = \"%s\"<br>",$var,$k,$val);
+         }
+      }
+      else{
+         my $val=$p;
+         $val=~s/>/&gt;/g;
+         $val=~s/</&lt;/g;
+         printf ("%s = \"%s\"<br>",$var,$val);
+      }
+   }
+   print $self->HtmlBottom(body=>1);
 }
 
 sub Main
