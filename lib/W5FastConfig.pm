@@ -220,6 +220,36 @@ sub LoadIntoCurrentConfig
          printf STDERR ("ERROR: %s\n",$@);
          return(1);
       }
+      if ($self->{conffile}=~m/^https:/){
+         my $SSL_cert_file=$currentconfig->{SSL_CERT_FILE};
+         my $SSL_key_file=$currentconfig->{SSL_KEY_FILE};
+         my $SSL_passwd_cb=$currentconfig->{SSL_KEY_PASS};
+         my %ssl_opts=();
+
+         if (ref($SSL_cert_file) eq "HASH"){
+            $SSL_cert_file=$SSL_cert_file->{w5config};
+         }
+         if (ref($SSL_key_file) eq "HASH"){
+            $SSL_key_file=$SSL_key_file->{w5config};
+         }
+         if (ref($SSL_passwd_cb) eq "HASH"){
+            $SSL_passwd_cb=$SSL_passwd_cb->{w5config};
+         }
+         if (defined($SSL_cert_file) && $SSL_cert_file ne ""){
+            $ssl_opts{SSL_cert_file}=$SSL_cert_file;
+         }
+         if (defined($SSL_key_file) && $SSL_key_file ne ""){
+            $ssl_opts{SSL_key_file}=$SSL_key_file;
+         }
+         if (defined($SSL_passwd_cb) && $SSL_passwd_cb ne ""){
+            $ssl_opts{SSL_passwd_cb}=sub{return($SSL_passwd_cb);};
+         }
+         if (keys(%ssl_opts)){
+            #$ssl_opts{SSL_verify_mode}=0;
+            $ua->ssl_opts(%ssl_opts);
+         }
+      }
+
       my $res=$ua->get($self->{conffile});
       if (defined($res) && $res->is_success()){
          print $F $res->decoded_content();

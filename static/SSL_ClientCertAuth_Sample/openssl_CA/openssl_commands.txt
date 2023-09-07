@@ -1,0 +1,13 @@
+# Create CA Key and CA pem
+openssl genrsa -out MyOwnCA.key 4096
+openssl req -x509 -new -nodes -key MyOwnCA.key -sha256 -days 9999 -out MyOwnCA.pem
+
+# Create 1st Client Cert
+openssl genrsa -out MyClientCert1.key 4096
+openssl req -new -key MyClientCert1.key -out MyClientCert1.csr
+
+# ... and sign it with your CA MyOwnCA
+openssl x509 -req -in MyClientCert1.csr -CA MyOwnCA.pem -CAkey MyOwnCA.key -CAcreateserial -out MyClientCert1.pem -days 9999 -sha256
+
+# convert the Client Cert (.pem) in .pfx to use it f.e. in WebBrowsers
+openssl pkcs12 -export -out MyClientCert1.pfx -inkey MyClientCert1.key -in MyClientCert1.pem
