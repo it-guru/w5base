@@ -1,0 +1,16 @@
+#!/bin/bash
+BINDIR=$(dirname $0)
+
+JAR="$BINDIR/../lib/rover-ctl.jar"
+
+
+java -Dcom.sun.security.enableAIAcaIssuers=true -jar $JAR $@
+if [ $? -eq 0 ]
+then
+  echo "Success"
+  exit 0
+else
+  echo "Failure" >&2
+  exit 1
+fi
+
