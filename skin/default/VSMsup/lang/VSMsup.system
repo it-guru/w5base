@@ -1,5 +1,0 @@
-'VSMsup::system'=>{de=>'VSM Support Tool',en=>'VSM Support Tool'},
-'fieldgroup.am'=>{de=>'AssetManager CDS Verknüpfung',en=>'AssetManager CDS relation'},
-'fieldgroup.amlocation'=>{de=>'AssetManager Standort-Parameter',en=>'AssetManager Location-Parameters'},
-'fieldgroup.w5basedata'=>{de=>'W5Base Verknüpfung',en=>'W5Base relation'},
-
