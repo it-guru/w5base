@@ -130,8 +130,6 @@ from schain
       on "tsacinv::system".assetassetid="tsacinv::asset".assetid
    join "tsacinv::location"
       on "tsacinv::asset".locationid="tsacinv::location".locationid
-   join "tsacinv::asset"
-       on "tsacinv::system".assetassetid="tsacinv::asset".assetid
    join "tsacinv::model"
        on "tsacinv::asset".lmodelid="tsacinv::model".lmodelid
    left outer join "W5I_VSMsup__locmap_of"
