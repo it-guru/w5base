@@ -1145,6 +1145,12 @@ sub Log
             }
             umask($oldumask);
          }
+         elsif ($target eq "SYSLOG"){
+            eval('use Sys::Syslog qw(:DEFAULT setlogsock);');
+            if ($@ eq ""){
+               $LogCache->{$facility}->{syslog}=1; 
+            }
+         }
       }
       else{
          if (!grep(/^-{0,1}$facility$/,@logfac) &&
@@ -1154,6 +1160,15 @@ sub Log
       }
    }
    if (defined($LogCache->{$facility})){
+      if ((defined($LogCache->{$facility}) &&
+          exists($LogCache->{$facility}->{syslog}))){
+         eval('
+            openlog("w5base.".$facility,"ndelay,pid", "local0");
+            syslog("info",@_);
+            closelog();
+
+         ');
+      }
       if ((defined($LogCache->{$facility}) &&
           exists($LogCache->{$facility}->{usemsg})) || $W5V2::Debug){
          msg($mode,@_);
