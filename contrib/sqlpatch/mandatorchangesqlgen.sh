@@ -6,8 +6,8 @@ NEWGRPID="200"
 for t in $(mysql -NBf -e "select a.table_name from information_schema.columns a 
                           where a.column_name='mandator' and 
                           column_type='bigint(20)';"); do
-   if [ "$t" != "lnkqrulemandator" ]; then
+#   if [ "$t" != "lnkqrulemandator" ]; then
       echo "update $t set mandator=${NEWGRPID} where mandator in (${OLDGRPID});"
-   fi
+#   fi
 done
 ) | mysql -f
