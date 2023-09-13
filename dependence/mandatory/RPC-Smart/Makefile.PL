@@ -11,5 +11,5 @@ WriteMakefile(
         PREREQ_PRINT    => 1,
 	MAN3PODS	=> {},
         PREREQ_PM => { 'Data::Dumper'=> 0,
-                       'XML::Smart'  => '1.6.9' }
+                       'IPC::SharedMem'  => '2.0' }
 );
