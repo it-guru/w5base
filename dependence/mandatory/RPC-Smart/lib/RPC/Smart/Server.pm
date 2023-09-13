@@ -6,8 +6,11 @@ sub new
 {
    my ($class,$size)=@_;
    my $self={size=>$size};
-   #$self->{mem}=new IPC::SharedMem(0,$size,IPC_CREAT|IPC_PRIVATE);
-   $self->{mem}=new IPC::SharedMem(IPC_PRIVATE,$self->{size},IPC_CREAT|IPC_EXCL|0600);
+   $self->{mem}=new IPC::SharedMem(
+       IPC_PRIVATE,
+       $self->{size},
+       IPC_CREAT|IPC_EXCL|0600
+   );
    $self->{mem}->attach();
    $self->{mem}->remove();
    return(bless($self,$class));
@@ -34,6 +37,9 @@ sub fetch
 
 sub DESTROY
 {
+   my $self=shift;
+   
+   $self->{mem}->detach();
    my $bk=$self->{mem}->remove();
    return(0);
 }
@@ -119,8 +125,8 @@ sub run_dequeue
       foreach my $pid (keys(%{$tasks})){
          if (exists($tasks->{$pid}->{end})){
             if ($tasks->{$pid}->{end}<time()-60){
-             #  printf STDERR ("run_dequeue PID $pid cleanup:%s\n",
-             #                 Dumper($tasks->{$pid}));
+               #printf STDERR ("run_dequeue PID $pid cleanup:%s\n",
+               #               Dumper($tasks->{$pid}));
                delete($tasks->{$pid});
             }
          }
