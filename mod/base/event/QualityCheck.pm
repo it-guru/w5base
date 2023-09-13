@@ -312,18 +312,17 @@ sub doQualityCheck
             $c++;
             if ($self->LastMsg()>0){
                my @l=$self->LastMsg();
-               #printf STDERR ("fifi x %s\n\n",join("\n",@l));
-               my @emsgs=grep(/error/i,@l);
+               my @emsgs=grep(/error/i,@l);  # find out messages with error in
                if ($#emsgs!=-1){
-                  msg(ERROR,"error messages while check of ".
-                            $stateparam->{idname}."='".$curid."' in ".
-                            $dataobj->Self());
-                  printf STDERR ("emsgs debug dump: %s\n",Dumper(\@emsgs));
-                  foreach my $emsg (@emsgs){
-                     if (!$emsg=~m/^ERROR:/){  # report only messages, which
-                        msg(ERROR,$emsg);      # not already ERROR: messages
-                     }                         # (which are should already
-                  }                            # print to STDERR - i hope)
+                  @emsgs=grep(!/^ERROR:/,@emsgs); # remove messages, which are
+                  if ($#emsgs!=-1){               # already printed (or Silent)
+                     msg(ERROR,"error messages while check of ".
+                               $stateparam->{idname}."='".$curid."' in ".
+                               $dataobj->Self());
+                     foreach my $emsg (@emsgs){ # print "normal" messages, which
+                        msg(ERROR,$emsg);       # have error in it - but not 
+                     }                          # starting with ERROR:       
+                  }
                }
                $self->LastMsg("");
             }
