@@ -127,7 +127,11 @@ sub initWorkbook
       $qval=~s/\s.*$//;
 
       my $author=$ENV{REMOTE_USER};
-      my $userid=$app->getCurrentUserId();
+      my $userid;
+
+      if ($app->can("getCurrentUserId")){
+         $userid=$app->getCurrentUserId();
+      }
 
       if ($userid ne ""){
          my $o=getModuleObject($app->Config,"base::user");
