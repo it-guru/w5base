@@ -1,0 +1,11 @@
+add ...
+
+[defaults]
+inventory=~/ansible.inventory.w5base.pl
+
+
+... to .ansible.cfg
+
+Bevore use, call ...
+
+./ansible.inventory.w5base.pl --webuser=X-API-Key --webpass=xxx --base=https://w5base.site.net/siteconfig/auth --application="w5base/darwin w5warehouse" --store
