@@ -455,7 +455,14 @@ sub tieRec
       my $fobj=$self->getField($fname);
       next if (!defined($fobj));
       if (exists($fobj->{dataobjattr}) && exists($rec->{$fobj->{dataobjattr}})){
-         $trrec->{$fname}=$rec->{$fobj->{dataobjattr}};
+         if ($fobj->Type()=~m/^.{0,1}Date$/){
+            my $d=$rec->{$fobj->{dataobjattr}};
+            my $stamp=$self->ExpandTimeExpression($d,"en","GMT","GMT");
+            $trrec->{$fname}=$stamp;
+         }
+         else{
+            $trrec->{$fname}=$rec->{$fobj->{dataobjattr}};
+         }
       }
       if (defined($fobj->{depend})){
          if (ref($fobj->{depend}) ne "ARRAY"){
