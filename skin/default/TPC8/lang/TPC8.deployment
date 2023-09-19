@@ -1,0 +1,6 @@
+'TPC8::deployment'=>{
+  de=>'TPC8: Deployment',
+  en=>'TPC8: Deployment'
+},
+'fieldgroup.resources'=>{de=>'Resourcen',en=>'Resources'},
+
