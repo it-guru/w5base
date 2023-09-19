@@ -538,19 +538,31 @@ sub nativQualityCheck
          }
          my %uids;
          foreach my $ipname (@pendingInterviewPartner){
-            my $u=$ipartner{$ipname};
-            $u=[$u] if (ref($u) ne "ARRAY");
-            foreach my $id (@$u){
-               $uids{$id}++;
+            if (exists($ipartner{$ipname})){
+               my $u=$ipartner{$ipname};
+               $u=[$u] if (ref($u) ne "ARRAY");
+               foreach my $id (@$u){
+                  if ($id ne ""){
+                     $uids{$id}++;
+                  }
+               }
             }
          }
-         foreach my $uid (keys(%uids)){
-            msg(INFO,"OpenInterview: $objname - $id ask uid=$uid");
-            push(@tobeIToDo,{
-               dataobject=>$objname,
-               dataobjectid=>$id,
-               userid=>$uid
-            });
+         if (keys(%uids)){
+            my $uobj=getModuleObject($self->Config,"base::user");
+            foreach my $uid (keys(%uids)){
+               $uobj->ResetFilter();
+               $uobj->SetFilter({cistatusid=>"<6 AND >3",userid=>\$uid});
+               my ($urec,$msg)=$uobj->getOnlyFirst(qw(userid));
+               if (defined($urec)){
+                  msg(INFO,"OpenInterview: $objname - $id ask uid=$uid");
+                  push(@tobeIToDo,{
+                     dataobject=>$objname,
+                     dataobjectid=>$id,
+                     userid=>$uid
+                  });
+               }
+            }
          }
       }
       #######################################################################
