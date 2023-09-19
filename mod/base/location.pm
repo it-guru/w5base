@@ -578,18 +578,20 @@ sub Validate
    my $label=trim(effVal($oldrec,$newrec,"label"));
    my $address1=trim(effVal($oldrec,$newrec,"address1"));
    my $zipcode=trim(effVal($oldrec,$newrec,"zipcode"));
-   
-   my $loc=getModuleObject($self->Config,"base::isocountry");
-   $loc->SetFilter({token=>\$country});
-   my ($rec,$msg)=$loc->getOnlyFirst(qw(zipcodeexp));
-   if (defined($rec)){
-      my $zipcodeexp=$rec->{zipcodeexp};
-      if (!($zipcodeexp=~m/^\s*$/)){
-         my $chk;
-         eval("\$chk=\$zipcode=~m$zipcodeexp;");
-         if ($@ ne "" || !($chk)){
-            $self->LastMsg(ERROR,"invalid zipcode '\%s'",$zipcode);
-            return(undef);
+  
+   if (effChanged($oldrec,$newrec,"zipcode")){ 
+      my $loc=getModuleObject($self->Config,"base::isocountry");
+      $loc->SetFilter({token=>\$country});
+      my ($rec,$msg)=$loc->getOnlyFirst(qw(zipcodeexp));
+      if (defined($rec)){
+         my $zipcodeexp=$rec->{zipcodeexp};
+         if (!($zipcodeexp=~m/^\s*$/)){
+            my $chk;
+            eval("\$chk=\$zipcode=~m$zipcodeexp;");
+            if ($@ ne "" || !($chk)){
+               $self->LastMsg(ERROR,"invalid zipcode '\%s'",$zipcode);
+               return(undef);
+            }
          }
       }
    }
