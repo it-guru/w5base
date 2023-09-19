@@ -1743,6 +1743,19 @@ sub ExpandTimeExpression
       $fail=0;
    }
    elsif (($Y,$M,$D,$h,$m,$s)=$val=~
+          m/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z/){
+      $val=~s/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z//;
+      eval('$time=Mktime("GMT",$Y,$M,$D,$h,$m,$s);'); # SRC is allays GMT
+      if ($@ ne ""){                                  # in LDAP Timestamps
+         $self->LastMsg(ERROR,"ilegal search expression '%s'",
+                                         $orgval);
+         return(undef);
+      }
+      ($Y,$M,$D,$h,$m,$s)=Localtime($dsttimezone,$time);
+      $found=1;
+      $fail=0;
+   }
+   elsif (($Y,$M,$D,$h,$m,$s)=$val=~
           m/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/){
       $val=~s/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})//;
       eval('$time=Mktime($srctimezone,$Y,$M,$D,$h,$m,$s);');

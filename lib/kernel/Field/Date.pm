@@ -400,63 +400,73 @@ sub getBackendName
       return(undef);
    }
    if ($mode eq "select"){
-      $_=$db->DriverName();
-      case: {
-         /^mysql$/i and do {
-            return("date_add($self->{dataobjattr},interval 0 second)");
-         };
-         /^oracle$/i and do {
-            return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS')");
-         };
-         /^odbc$/i and do {
-            return("$self->{dataobjattr}");
-         };
-         /^db2$/i and do {
-            return("$self->{dataobjattr}");
-         };
-         /^pg$/i and do {
-            return("$self->{dataobjattr}");
-         };
-         do {
-            msg(ERROR,"conversion for date on driver '$_' not defined ToDo!");
-            return(undef);
-         };
+      if ($db->can("DriverName")){
+         $_=$db->DriverName();
+         case: {
+            /^mysql$/i and do {
+               return("date_add($self->{dataobjattr},interval 0 second)");
+            };
+            /^oracle$/i and do {
+               return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS')");
+            };
+            /^odbc$/i and do {
+               return("$self->{dataobjattr}");
+            };
+            /^db2$/i and do {
+               return("$self->{dataobjattr}");
+            };
+            /^pg$/i and do {
+               return("$self->{dataobjattr}");
+            };
+            do {
+               msg(ERROR,"conversion for date on ".
+                         "driver '$_' not defined ToDo!");
+               return(undef);
+            };
+         }
+      }
+      else{
+         return("$self->{dataobjattr}");
       }
    }
    if ($mode eq "order"){
       my $ordername=shift;
 
       return(undef) if (lc($self->{sqlorder}) eq "none");
-      $_=$db->DriverName();
-      case: {   # did not works on tsinet Oracle database
-         /^oracle$/i and do {
-            my $sqlorder="";
-            if (defined($self->{sqlorder})){
-               $sqlorder=$self->{sqlorder};
-            }
-            if ($sqlorder eq ""){
-               $sqlorder="desc";
-            }
-            if ($sqlorder ne "none" && ($ordername=~m/^-/)){  # absteigend
-               $sqlorder="desc";
-            }
-            if ($sqlorder ne "none" && ($ordername=~m/^\+/)){  # aufsteigend
-               $sqlorder="asc";
-            }
-
-            if ($self->getParent->{use_distinct}){
-               return("to_char($self->{dataobjattr},'YYYY-MM-DD HH24:MI:SS') ".
-                      "$sqlorder ".
+      if (defined($db) && $db->can("DriverName")){
+         $_=$db->DriverName();
+         case: {   # did not works on tsinet Oracle database
+            /^oracle$/i and do {
+               my $sqlorder="";
+               if (defined($self->{sqlorder})){
+                  $sqlorder=$self->{sqlorder};
+               }
+               if ($sqlorder eq ""){
+                  $sqlorder="desc";
+               }
+               if ($sqlorder ne "none" && ($ordername=~m/^-/)){  # absteigend
+                  $sqlorder="desc";
+               }
+               if ($sqlorder ne "none" && ($ordername=~m/^\+/)){  # aufsteigend
+                  $sqlorder="asc";
+               }
+        
+               if ($self->getParent->{use_distinct}){
+                  return("to_char($self->{dataobjattr},".
+                         "'YYYY-MM-DD HH24:MI:SS') ".
+                         "$sqlorder ".
+                         "NULLS FIRST"); # needed for QualityChecks
+               }
+               # ordering on nativ fields gets better performance then ordering
+               # on a funktion. The result should be the same (but indexes 
+               # can be used) - but if select distinct is used, you have to 
+               # use the same exprestion as 
+               # in select (Oracle rules are mysterious)
+               return("$self->{dataobjattr} $sqlorder ".
                       "NULLS FIRST"); # needed for QualityChecks
-            }
-            # ordering on nativ fields gets better performance then ordering
-            # on a funktion. The result should be the same (but indexes can be
-            # used) - but if select distinct is used, you have to use the same
-            # exprestion as in select (Oracle rules are mysterious)
-            return("$self->{dataobjattr} $sqlorder ".
-                   "NULLS FIRST"); # needed for QualityChecks
-
-         };
+        
+            };
+         }
       }
       return($self->SUPER::getBackendName($mode,$db,$ordername));
    }
