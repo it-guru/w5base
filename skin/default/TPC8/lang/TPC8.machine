@@ -1,0 +1,6 @@
+'TPC8::machine'=>{
+   de=>'TPC8: Maschine',
+   en=>'TPC8: Machine'
+},
+'fieldgroup.tags'=>{de=>'Tags'},
+'generic name'=>{de=>'generischer Name'},
