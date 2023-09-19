@@ -107,6 +107,9 @@ sub doQueryHydra
          networktag=>$iprec->{networktag}
       });
    }
+   if ($#{$qRec->{ipaddress}}==-1){
+      return(0); # queries without IP-Adresses are sensless
+   }             # Info from Guo Chuan per Mail
 
    my $effectiveprio=99;
    foreach my $arec (@{$applications}){
