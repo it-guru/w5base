@@ -239,6 +239,13 @@ sub new
                                    label      =>'Sex',
                                    dataobjattr=>'tSex'),
 
+      new kernel::Field::Date(     name       =>'ddismissal',
+                                   group      =>'status',
+                                   dayonly    =>1,
+                                   searchable =>0,
+                                   label      =>'date of dismissal',
+                                   dataobjattr=>'tDateOfDismissal'),
+
       new kernel::Field::Text(     name       =>'lang',
                                    group      =>'status',
                                    label      =>'preferrredLanguage',
