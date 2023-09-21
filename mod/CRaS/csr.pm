@@ -1086,7 +1086,29 @@ sub verifyCSRtoCA
       eval("\$res=\$crec->{cn}=~m$matchvar;");
       if (!($res)){
          if (!($silent)){
-            $self->LastMsg(ERROR,"common name not allowed for requested CA");
+            $self->LastMsg(ERROR,
+                           "common name '%s' not allowed for requested CA",
+                           "CN=".$crec->{cn});
+         }
+         return(0);
+      }
+   }
+   if ($crec->{altnames} ne ""){
+      my @altList=split(/\s*[,;]\s*/,$crec->{altnames});
+      my @invalidNames;
+      my $matchvar=$carec->{valid_cn};
+      foreach my $aname (@altList){
+         my $res;
+         eval("\$res=\$aname=~m$matchvar;");
+         if (!($res)){
+            push(@invalidNames,$aname);
+         }
+      }
+      if ($#invalidNames!=-1){
+         if (!($silent)){
+            $self->LastMsg(ERROR,
+                           "altname '%s' not allowed for requested CA",
+                           "subjectAltName=".join("; ",@invalidNames));
          }
          return(0);
       }
@@ -1098,7 +1120,8 @@ sub verifyCSRtoCA
       eval("\$res=\$crec->{c}=~m$matchvar;");
       if (!($res)){
          if (!($silent)){
-            $self->LastMsg(ERROR,"country not allowed for requested CA");
+            $self->LastMsg(ERROR,"country '%s' not allowed for requested CA",
+                                 "C=".$crec->{c});
          }
          return(0);
       }
@@ -1110,7 +1133,8 @@ sub verifyCSRtoCA
       eval("\$res=\$crec->{l}=~m$matchvar;");
       if (!($res)){
          if (!($silent)){
-            $self->LastMsg(ERROR,"location not allowed for requested CA");
+            $self->LastMsg(ERROR,"location '%s' not allowed for requested CA",
+                                 "L=".$crec->{l});
          }
          return(0);
       }
@@ -1123,7 +1147,9 @@ sub verifyCSRtoCA
       if (!($res)){
          $self->dumpCSRattributes($crec);
          if (!($silent)){
-            $self->LastMsg(ERROR,"organisation not allowed for requested CA");
+            $self->LastMsg(ERROR,
+                           "organisation '%s' not allowed for requested CA",
+                           "O=".$crec->{o});
          }
          return(0);
       }
@@ -1135,7 +1161,8 @@ sub verifyCSRtoCA
       eval("\$res=\$crec->{st}=~m$matchvar;");
       if (!($res)){
          if (!($silent)){
-            $self->LastMsg(ERROR,"state not allowed for requested CA");
+            $self->LastMsg(ERROR,"state '%s' not allowed for requested CA",
+                                 "ST=".$crec->{st});
          }
          return(0);
       }
