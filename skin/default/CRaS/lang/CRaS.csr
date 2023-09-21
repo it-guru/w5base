@@ -62,3 +62,5 @@
 'OU needs to be empty'=>{de=>'OU darf nicht gewüllt/verwendet werden'},
 'SSL Cert W5Ref'=>{de=>'SSL-Zertifikat W5Ref'},
 "altname '%s' not allowed for requested CA"=>{de=>"Alternativer CN/Subject (%s) ist für die geforderte CA nicht zulässig"},
+"existing CSRs with the same CN - please ensure cleanup (maybe through service team)"=>{de=>'Bestehende CSRs mit demselben CN - bitte für Bereinigung sorgen (eventuell Serviceteam einschalten)'},
+

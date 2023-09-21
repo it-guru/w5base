@@ -975,6 +975,20 @@ sub Validate
       }
    }
 
+   if (!defined($oldrec) && $newrec->{name} ne ""){
+      my $name=$newrec->{name};
+      my $obj=$self->Clone();
+      $obj->SetFilter({name=>\$name,ssslenddate=>">now+56d",state=>'3 4 5'});
+      my @l=$obj->getHashList(qw(id));
+      if ($#l!=-1){
+         $self->LastMsg(ERROR,
+                   "existing CSRs with the same CN - ".
+                   "please ensure cleanup (maybe through service team)");
+         return(0);
+      }
+   }
+
+
 
    #
    # getCSTeamIDbyApplid muss vermutlich hier rein (da zukünftig
@@ -1238,6 +1252,20 @@ sub FinishWrite
          # notify service team abount new request
          my $csrid=effVal($oldrec,$newrec,"id");
          $self->doNotify($csrid,"NEWCERT");
+      }
+   }
+
+   if (!defined($oldrec) && $newrec->{name} ne ""){
+      my $name=$newrec->{name};
+      my $obj=$self->Clone();
+      $obj->SetFilter({name=>\$name,ssslenddate=>">now-28d AND <now+56d",
+                       state=>'3 4 5'});
+      my @l=$obj->getHashList(qw(ALL));
+      if ($#l!=-1){
+         my $op=$self->Clone();
+         foreach my $orec (@l){
+            $op->ValidatedUpdateRecord($orec,{state=>'6'},{id=>$orec->{id}});
+         }
       }
    }
 
