@@ -2541,11 +2541,24 @@ sub Validate
          my $oldcistatusid=$oldrec->{cistatusid};
          if (defined($newrec) && exists($newrec->{cistatusid})){
             if ($oldcistatusid>=3 && $oldcistatusid<=5){
-               if ($newrec->{cistatusid}>5){
-                  if ($#{$oldrec->{itcloudareas}}!=-1){
-                     $self->LastMsg(ERROR,"this CI-Status change is only ".
-                                    "allowed without existing CloudAreas");
-                     return(0);
+               if ($self->isDataInputFromUserFrontend() &&
+                   !$self->IsMemberOf("admin") ){
+                  if ($newrec->{cistatusid}>5){
+                     if ($#{$oldrec->{itcloudareas}}!=-1){
+                        $self->LastMsg(ERROR,"this CI-Status change is only ".
+                                       "allowed without existing CloudAreas");
+                        return(0);
+                     }
+                     if ($#{$oldrec->{systems}}!=-1){
+                        $self->LastMsg(ERROR,"this CI-Status change is only ".
+                                  "allowed without existing logical systems");
+                        return(0);
+                     }
+                     if ($#{$oldrec->{swinstances}}!=-1){
+                        $self->LastMsg(ERROR,"this CI-Status change is only ".
+                               "allowed without existing software instances");
+                        return(0);
+                     }
                   }
                }
             }
