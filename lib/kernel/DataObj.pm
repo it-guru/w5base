@@ -5512,32 +5512,53 @@ sub CollectREST
    my %p=@_;
 
    my $cachetime=$p{cachetime};
-   $cachetime=10 if (!defined($cachetime));
+   $cachetime=30 if (!defined($cachetime));
 
-   my $token="JSON";
-   $token=$p{requesttoken} if (defined($p{requesttoken}));
-   # requesttoken is needed, to identify query in query-cache
-
-   my $c=$self->Context();
-
-   if (!exists($c->{"RESTCallResult.$token"}) || 
-       $c->{"RESTCallResult.$token"}->{t}<time()-$cachetime){
-      my $dbname=$p{dbname};
-      my ($baseurl,$apikey,$apiuser,$base);
-      if ($dbname ne ""){
-         ($baseurl,$apikey,$apiuser,$base)=$self->GetRESTCredentials($dbname);
-         if (!defined($baseurl) || !defined($apikey)){
-            return(undef);
-         }
-      }
-      my $dataobjurl=$p{url};
-      if (ref($p{url}) eq "CODE"){
-         $dataobjurl=&{$p{url}}($self,$baseurl,$apikey,$apiuser,$base);
-      }
-      if (!defined($dataobjurl)){
-         $self->LastMsg(ERROR,"no REST URL can be created");
+   my $dbname=$p{dbname};
+   my ($baseurl,$apikey,$apiuser,$base);
+   if ($dbname ne ""){
+      ($baseurl,$apikey,$apiuser,$base)=$self->GetRESTCredentials($dbname);
+      if (!defined($baseurl) || !defined($apikey)){
          return(undef);
       }
+   }
+   my $dataobjurl=$p{url};
+   if (ref($p{url}) eq "CODE"){
+      $dataobjurl=&{$p{url}}($self,$baseurl,$apikey,$apiuser,$base);
+   }
+   if (!defined($dataobjurl)){
+      $self->LastMsg(ERROR,"no REST URL can be created");
+      return(undef);
+   }
+
+   my $token="REQUEST:".$dataobjurl.":".time();
+   $p{method}="GET" if (!exists($p{method}));
+   if ($p{method} eq "GET"){
+      $token=$dataobjurl;
+   }
+   $token=$p{requesttoken} if (defined($p{requesttoken}));
+   # requesttoken is needed, to identify query in query-cache
+   
+   my $c=$self->Context();
+   if (1){  # better Caching process
+      $W5V2::RESTCache={} if (!defined($W5V2::RESTCache));
+      my $globalCache=$W5V2::RESTCache;
+      my $globalKey=$self->Self().".Cache";
+      $globalCache->{$globalKey}={} if (!defined($globalCache->{$globalKey}));
+      $c=$globalCache->{$globalKey};
+   }
+   foreach my $k (keys(%{$c})){ # cleanup cache
+      if ($c->{$k}->{t}<time()-$cachetime){
+         delete($c->{$k});
+      }
+   }
+   
+   #msg(INFO,"CollectREST: Cache address=$c - token='$token'");
+
+   if (!exists($c->{"RESTCallResult.$token"}) || 
+       $c->{"RESTCallResult.$token"}->{t}<time()-$cachetime ||
+       $p{method} eq "POST"){  # no Caching for posts
+
       my $Headers=[];
       if ($p{headers}){
          $Headers=&{$p{headers}}($self,$baseurl,$apikey,$apiuser,$base);
@@ -5547,7 +5568,6 @@ sub CollectREST
       if ($p{content}){
          $Content=&{$p{content}}($self,$baseurl,$apikey,$apiuser,$base)
       }
-      $p{method}="GET" if (!exists($p{method}));
       $p{format}="JSON" if (!exists($p{format}));
       $p{verify_hostname}="1" if (!exists($p{verify_hostname}));
 
@@ -5567,6 +5587,9 @@ sub CollectREST
          DATA=>\@data,
          t=>time()
       };
+   }
+   else{
+      #msg(INFO,"CollectREST: Cache access to token '$token'");
    }
    if (exists($c->{"RESTCallResult.$token"})){
       if (wantarray()){
