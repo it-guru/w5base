@@ -47,6 +47,7 @@ sub new
                 htmldetail    =>0,
                 searchable    =>0,
                 readonly      =>1,
+                allowempty    =>1,
                 onRawValue    =>\&doQueryHydra),
    );
    $self->setDefaultView(qw(name cistatus mdate foundinhydra));
@@ -160,6 +161,20 @@ sub doQueryHydra
          my $self=shift;
          my $data=shift;
          return($data);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "503" || $code eq "500"){  # wengen IF Instabilität
+            return({found=>undef},"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data Hydra response");
+         return(undef);
       }
    );
 
@@ -168,6 +183,11 @@ sub doQueryHydra
        exists($d->{found}) &&
        $d->{found}==1){
       return(1);
+   }
+   if (ref($d) eq "HASH" &&
+       exists($d->{found}) &&
+       !defined($d->{found})){
+      return(undef);
    }
    return(0);
 }
