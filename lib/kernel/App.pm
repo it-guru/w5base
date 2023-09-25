@@ -1243,12 +1243,17 @@ sub LastMsg
    my $caller=caller();
 
    $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
+   $gc->{LastErrorMsgCount}=0 if (!exists($gc->{LastErrorMsgCount}));
    if (defined($type)){
       if ($type eq ""){
          $gc->{LastMsg}=[];
+         $gc->{LastErrorMsgCount}=0;
       }
       else{
          msg(INFO,"LastMsg '%s' caller=$caller",$format);
+         if ($type eq ERROR){
+            $gc->{LastErrorMsgCount}++;
+         }
          push(@{$gc->{LastMsg}},msg($type,$self->T($format,$caller),@p));
       }
    }
@@ -1258,6 +1263,16 @@ sub LastMsg
       }
    }
    return($#{$gc->{LastMsg}}+1);
+}
+
+
+
+sub LastErrorMsgCount     # Error message count, which are not silent
+{
+   my $self=shift;
+   my $gc=globalContext();
+   $gc->{LastErrorMsgCount}=0 if (!exists($gc->{LastErrorMsgCount}));
+   return($gc->{LastErrorMsgCount});
 }
 
 
@@ -1275,6 +1290,7 @@ sub SilentLastMsg
    if (defined($type)){
       if ($type eq ""){
          $gc->{LastMsg}=[];
+         $gc->{LastErrorMsgCount}=0;
       }
       else{
          push(@{$gc->{LastMsg}},

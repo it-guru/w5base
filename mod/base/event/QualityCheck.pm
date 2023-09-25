@@ -315,7 +315,8 @@ sub doQualityCheck
                my @emsgs=grep(/error/i,@l);  # find out messages with error in
                if ($#emsgs!=-1){
                   @emsgs=grep(!/^ERROR:/,@emsgs); # remove messages, which are
-                  if ($#emsgs!=-1){               # already printed (or Silent)
+                  if ($#emsgs!=-1 ||              # already printed (or Silent)
+                      $self->LastErrorMsgCount()){
                      msg(ERROR,"error messages while check of ".
                                $stateparam->{idname}."='".$curid."' in ".
                                $dataobj->Self());
