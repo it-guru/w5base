@@ -1,0 +1,6 @@
+"missing constant query '%s' parameters"=>{
+   de=>"fehlende mindest Kontanten '%s' in der Abfrage"
+},
+"missing constant query '%s' parameter"=>{
+   de=>"fehlende mindest Kontante '%s' in der Abfrage"
+}
