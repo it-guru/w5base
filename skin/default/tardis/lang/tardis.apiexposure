@@ -1,0 +1,8 @@
+'tardis::apiexposure'=>{
+  de=>'TARDIS: API Veröffntlichung',
+  en=>'TARDIS: API Exposure',
+},
+'fieldgroup.subscripteds'=>{
+  de=>'API Abboniert von',
+  en=>'API Subscription by',
+}
