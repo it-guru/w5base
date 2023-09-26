@@ -1,0 +1,13 @@
+'tardis::application'=>{
+  de=>'TARDIS: Application',
+  en=>'TARDIS: Application'
+},
+'fieldgroup.subscriptions'=>{
+  de=>'API Abonnierungen',
+  en=>'API Subscriptions',
+},
+'fieldgroup.exposures'=>{
+  de=>'API Veröffentlichungen',
+  en=>'API Exposures',
+},
+

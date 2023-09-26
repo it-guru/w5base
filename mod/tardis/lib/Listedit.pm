@@ -33,6 +33,7 @@ sub new
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+printf STDERR ("new in  tardis::lib::Listedit\n");
    return($self);
 }
 
