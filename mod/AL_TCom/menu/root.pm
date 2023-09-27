@@ -52,11 +52,6 @@ sub Init
                       param=>'WorkflowClass=AL_TCom::workflow::riskmgmt',
                       defaultacl=>['DTAG']);
 
-   $self->RegisterObj('AL_TCom::MyW5Base::ChangeFuture$',
-                      'AL_TCom::MyW5Base::ChangeFuture$',
-                      func=>'Main',
-                      defaultacl=>['admin']);
-
    $self->RegisterObj('AL_TCom::MyW5Base::ChangeNotChmMgr$',
                       'AL_TCom::MyW5Base::ChangeNotChmMgr$',
                       func=>'Main',
