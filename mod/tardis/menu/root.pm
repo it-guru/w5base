@@ -42,8 +42,20 @@ sub Init
                       "tmpl/welcome",
                       defaultacl=>['admin']);
    
-   $self->RegisterObj("itu.cfm.tardis.core.echo",
-                      "tardis::echo",
+   $self->RegisterObj("itu.cfm.tardis.appl",
+                      "tardis::application",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cfm.tardis.appl.exp",
+                      "tardis::apiexposure",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cfm.tardis.appl.exp.subs",
+                      "tardis::apisubscripted",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itu.cfm.tardis.appl.subs",
+                      "tardis::apisubscription",
                       defaultacl=>['valid_user']);
 
    return($self);
