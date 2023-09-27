@@ -13,3 +13,4 @@
 
 'all reference Costcenters'=>{de=>'alle referenzierten Kontierungsobjekte'},
 'planned DigitalHub/ServiceHub'=>{de=>'geplanter DigitalHub/ServiceHub'},
+'Organisation Domain'=>{de=>'Organisations-Domain'},
