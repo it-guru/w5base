@@ -176,7 +176,6 @@ sub DataCollector
          return($data);
       }
    );
-print STDERR ("subscripted:".Dumper($d));
 
    return($d);
 }
