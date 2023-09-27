@@ -125,6 +125,13 @@ sub new
 
 
       new kernel::Field::Text(
+                name          =>'orgdomain',
+                label         =>'Organisation Domain',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>'Org_Domain'),
+
+
+      new kernel::Field::Text(
                 name          =>'canvas',
                 label         =>'Canvas ID',
                 htmldetail    =>'NotEmpty',
