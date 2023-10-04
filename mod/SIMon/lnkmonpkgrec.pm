@@ -138,7 +138,10 @@ sub new
                 dataobjattr   =>"if (lnksimonpkgrec.id is not null AND ".
                                 "lnksimonpkgrec.modifydate<".
                                 "simonpkg.modifydate,".
-                                "1,0)"),
+                                "if (system.cistatus>5 AND ". # prevent refresh
+                                "lnksimonpkgrec.reqtarget='NEDL'". # of deleted
+                                ",0,1)".                           # systems
+                                ",0)"),               
 
       new kernel::Field::Select(
                 name          =>'reqtarget',
