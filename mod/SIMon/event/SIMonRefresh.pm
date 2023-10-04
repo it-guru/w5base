@@ -57,15 +57,28 @@ sub SIMonNotify
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
    my $opobj=$datastream->Clone();
 
-   $datastream->SetFilter({
-      cistatusid=>[3,4],
-      cdate=>"<now-1d",     # das muss in der Prod min. 14 Tage sein
-      reqtarget=>['RECO','MAND'],
-      curinststate=>\'NOTFOUND',
-      exceptreqtxt=>'',     # noch keine Ausnahme beantragt
-      needrefresh=>\'0',    # notwendig falls die rules angepasst wurden
-      notifydate=>\undef
-   });
+   if (exists($param{debug})){
+      $datastream->SetFilter({
+         system=>$param{debug},
+         reqtarget=>['RECO','MAND'],
+         curinststate=>\'NOTFOUND',
+         exceptreqtxt=>'',     # noch keine Ausnahme beantragt
+         needrefresh=>\'0'     # notwendig falls die rules angepasst wurden
+      });
+
+   }
+   else{
+      $datastream->SetFilter({
+         cistatusid=>[3,4],
+         cdate=>"<now-14d",    # das muss in der Prod min. 14 Tage sein
+         reqtarget=>['RECO','MAND'],
+         curinststate=>\'NOTFOUND',
+         exceptreqtxt=>'',     # noch keine Ausnahme beantragt
+         needrefresh=>\'0',    # notwendig falls die rules angepasst wurden
+         notifydate=>\undef
+      });
+   }
+
 
 
 
@@ -195,10 +208,11 @@ sub SIMonNotify
                $text.="\n";
             }
             my $notifycomments=extractLangEntry($rec->{notifycomments},
-                                                $urec->{talklang});
+                                                $urec->{talklang},
+                                                100000,1);
             if ($notifycomments ne ""){
                $text.="\n";
-               $text.=$opobj->T("Installation-Hints").":\n";
+               $text.="<b><u>".$opobj->T("Installation-Hints").":</u></b>\n";
                $text.=$notifycomments."\n\n";
             }
             my $mode="INFO";
