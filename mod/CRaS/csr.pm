@@ -975,10 +975,13 @@ sub Validate
       }
    }
 
-   if (!defined($oldrec) && $newrec->{name} ne ""){
+   if (!defined($oldrec) && $newrec->{name} ne "" && $newrec->{refno} ne ""){
       my $name=$newrec->{name};
       my $obj=$self->Clone();
-      $obj->SetFilter({name=>\$name,ssslenddate=>">now+56d",state=>'3 4 5'});
+      $obj->SetFilter({name=>\$name,
+                  ssslenddate=>">now AND <now+56d",
+                  state=>'3 4 5'
+      });
       my @l=$obj->getHashList(qw(id));
       if ($#l!=-1){
          $self->LastMsg(ERROR,
@@ -1255,7 +1258,7 @@ sub FinishWrite
       }
    }
 
-   if (!defined($oldrec) && $newrec->{name} ne ""){
+   if (!defined($oldrec) && $newrec->{name} ne "" && $newrec->{refno} eq ""){
       my $name=$newrec->{name};
       my $obj=$self->Clone();
       $obj->SetFilter({name=>\$name,ssslenddate=>">now-28d AND <now+56d",
