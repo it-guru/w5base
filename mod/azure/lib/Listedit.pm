@@ -251,7 +251,7 @@ sub decodeFilter2Query4azure
       return(undef);
    }
    if (!exists($qparam{'api-version'})){
-      $qparam{'api-version'}="2020-01-01";
+      $qparam{'api-version'}="2022-12-01";
    }
 
    if ($self->{_LimitStart}==0 && $self->{_Limit}>0 &&
