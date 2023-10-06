@@ -139,7 +139,6 @@ sub DataCollector
    my ($dbclass,$requesttoken)=$self->decodeFilter2Query4azure(
       "subscriptions","id",
       $filterset,{
-        '$expand'=>'properties'
       }
    );
    my $d=$self->CollectREST(
