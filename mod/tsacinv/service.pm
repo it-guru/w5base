@@ -92,6 +92,11 @@ sub new
                 htmlwidth     =>50,
                 dataobjattr   =>'"unit"'),
                               
+      new kernel::Field::Boolean(
+                name          =>'bmonthly',
+                label         =>'monthly factured service',
+                dataobjattr   =>'"bmonthly"'),
+                              
       new kernel::Field::Text(
                 name          =>'description',
                 label         =>'Service Description',

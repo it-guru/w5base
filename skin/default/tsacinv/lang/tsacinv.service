@@ -10,3 +10,4 @@
 'Unit'=>{de=>'Einheit'},
 'CostCenter'=>{de=>'Kontierungsobjekt'},
 'sender CostCenter'=>{de=>'Sender Kontierungsobjekt'},
+'monthly factured service'=>{de=>'monatlich fakturierter Service'},

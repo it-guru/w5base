@@ -533,7 +533,8 @@ sub new
                 forwardSearch =>1,
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>[qw(longname type ammount unit)],
-                vjoininhash   =>['name','type','longname','ammount']),
+                vjoininhash   =>['name','type','longname','ammount',
+                                 'bmonthly']),
 
       new kernel::Field::SubList(
                 name          =>'services',
@@ -544,7 +545,8 @@ sub new
                 vjoinbase     =>[{'isdelivered'=>\'1'}],
                 vjoinon       =>['lcomputerid'=>'lcomputerid'],
                 vjoindisp     =>[qw(longname type ammount unit)],
-                vjoininhash   =>['name','type','longname','ammount']),
+                vjoininhash   =>['name','type','longname','ammount',
+                                 'bmonthly']),
 
 
       new kernel::Field::SubList(
