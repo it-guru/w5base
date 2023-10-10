@@ -618,6 +618,7 @@ sub process_engine
                msg("INFO","import $first");
 
                my $linepos=0;
+               my $readline=0;
            
                push(@{$pStack->[1]->{CMDSTACK}},
                   "SET AUTOCOMMIT=0;",
@@ -665,7 +666,15 @@ sub process_engine
                         if ($line=~m/^\s*LOCK\s+TABLES\s+\S+\s+WRITE\s*;\s*$/i){
                            $lckCmd++;
                         }
-                        push(@{$pStack->[1]->{CMDSTACK}},$line."\n") if (!$lckCmd);
+                        if (!$lckCmd){
+                           $readline++;
+                           push(@{$pStack->[1]->{CMDSTACK}},$line."\n");
+                        }
+                        if (!($readline % 5000)){
+                           push(@{$pStack->[1]->{CMDSTACK}},"commit;");
+                           push(@{$pStack->[1]->{CMDSTACK}},"START TRANSACTION;");
+                        }
+                      
                      }
                      else{
                         $streameof++; 
@@ -955,7 +964,14 @@ if (lc($mode) eq "export"){
          msg("ERROR","no files or directory for import!");
          exit(1);
       }
-      process_engine(\@files,$dir);
+      my @sfiles=sort({
+         my $sz_a=-s $a;
+         my $sz_b=-s $b;
+         $sz_b<=>$sz_a;
+      }  @files);
+
+
+      process_engine(\@sfiles,$dir);
    }else{
       msg("ERROR","$db not exists!");
       exit(1);
