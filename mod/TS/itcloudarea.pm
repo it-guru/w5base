@@ -46,6 +46,21 @@ sub new
                 vjoindisp     =>'fullname')
    );
 
+   $self->AddFields(
+      new kernel::Field::Text(
+                name          =>'applictono',
+                htmldetail    =>0,
+                uploadable    =>0,
+                readonly      =>1,
+                group         =>'appl',
+                explore       =>150,
+                label         =>'Applications ICTO-ID',
+                dataobjattr   =>'appl.ictono'),
+     insertafter=>'appl'
+   );
+
+
+
 
    return($self);
 }
