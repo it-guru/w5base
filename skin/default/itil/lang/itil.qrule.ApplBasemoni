@@ -1,0 +1,11 @@
+'itil::qrule::ApplBasemoni'=>{
+ de=>'Überprüfung der Befüllung von Anwendungs Basismonitoring',
+ en=>'Validation of filled Application Base Monitoring',
+},
+'no application base monitoring selected'=>{
+  de=>'kein Anwendungs Basismonitoring ausgewählt'
+},
+'no application base monitoring status selected'=>{
+  de=>'kein Anwendungs Basismonitoring Status ausgewählt'
+}
+
