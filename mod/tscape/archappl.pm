@@ -131,20 +131,6 @@ sub new
                 dataobjattr   =>'Org_Domain'),
 
 
-      new kernel::Field::Text(
-                name          =>'canvas',
-                label         =>'Canvas ID',
-                htmldetail    =>'NotEmpty',
-                dataobjattr   =>'CANVAS'),
-
-
-      new kernel::Field::Text(
-                name          =>'lcanvasseg',
-                label         =>'Lead Canvas Segment',
-                htmldetail    =>'NotEmpty',
-                dataobjattr   =>"substring(CANVAS,0,charindex('/',CANVAS))"),
-
-
       new kernel::Field::Contact(
                 name          =>'applmgr',
                 label         =>'Application Manager',

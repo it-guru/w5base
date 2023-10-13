@@ -181,60 +181,6 @@ sub new
                     return($spocitstabiid);
                 }),
 
-      new kernel::Field::Text(
-                name          =>'canvasid',
-                label         =>'CanvasID',
-                htmleditwidth =>'80px',
-                size          =>'3',
-                readonly      =>1,
-                group         =>'canvas',
-                vjointo       =>'TS::lnkcanvas',
-                vjoinon       =>['id'=>'vouid'],
-                vjoindisp     =>'canvascanvasid'),
-
-
-      new kernel::Field::Contact(
-                name          =>'canvasownerbu',
-                group         =>'canvas',
-                AllowEmpty    =>1,
-                readonly      =>1,
-                label         =>'Canvas Owner - Business',
-                vjoinon       =>'canvasownerbuid'),
-
-      new kernel::Field::Link(
-                name          =>'canvasownerbuid',
-                group         =>'canvas',
-                vjointo       =>'TS::lnkcanvas',
-                vjoinon       =>['id'=>'vouid'],
-                vjoindisp     =>'canvasownerid'),
-
-
-
-      new kernel::Field::Contact(
-                name          =>'canvasownerit',
-                readonly      =>1,
-                group         =>'canvas',
-                label         =>'Canvas Owner - IT',
-                vjoinon       =>'canvasowneritid'),
-
-      new kernel::Field::Link(
-                name          =>'canvasowneritid',
-                vjointo       =>'TS::lnkcanvas',
-                vjoinon       =>['id'=>'vouid'],
-                vjoindisp     =>'canvasowneritid'),
-
-
-      new kernel::Field::SubList(
-                name          =>'canvas',
-                label         =>'Canvas relations',
-                htmlwidth     =>'300px',
-                group         =>'canvas',
-                readonly      =>1,
-                vjointo       =>'TS::lnkcanvas',
-                vjoinon       =>['id'=>'vouid'],
-                vjoindisp     =>['canvas','fraction','ictono']),
-
-
       new kernel::Field::Textarea(
                 name          =>'description',
                 label         =>'Description',
@@ -492,7 +438,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default vouattr subvous 
-             canvas contacts respappl appl comments source));
+             contacts respappl appl comments source));
 }
 
 
@@ -559,30 +505,6 @@ sub Validate
       }
    }
 
-   if (exists($newrec->{canvasid})){
-      my $canvasid=$newrec->{canvasid};
-      if ($canvasid ne ""){
-         if ($canvasid=~m/^[0-9]+$/){
-            if ($canvasid<100){
-               $canvasid=sprintf("C%02d",$canvasid);
-            }
-            else{
-               $canvasid=sprintf("C%03d",$canvasid);
-            }
-         }
-         $canvasid=uc($canvasid);
-         if ((!($canvasid=~m/^C[0-9]{2,3}$/) &&
-              !($canvasid=~m/^[A-Z]{1,3}$/)) ||
-             length($canvasid)>4){
-            $self->LastMsg(ERROR,"invalid format of CanvasID");
-            return(0);
-         }
-         if ($newrec->{canvasid} ne $canvasid){
-            $newrec->{canvasid}=$canvasid;
-         }
-      }
-   }
-
 
 
    if ($self->isDataInputFromUserFrontend() && !$self->IsMemberOf("admin")){
@@ -619,7 +541,7 @@ sub isViewValid
    my $rec=shift;
    return("default") if (!defined($rec));
    if ($rec->{cistatusid}<3){
-      return("default","header","history","vouattr","canvas",
+      return("default","header","history","vouattr",
              "contacts","comments","source");
    }
 

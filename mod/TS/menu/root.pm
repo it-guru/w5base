@@ -389,20 +389,6 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
-   $self->RegisterObj("itts.proc.canvas",
-                      "TS::canvas",
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itts.proc.canvas.relation",
-                      "TS::lnkcanvas",
-                      func=>'MainWithNew',
-                      defaultacl=>['valid_user']);
-
-   $self->RegisterObj("itts.proc.canvas.new",
-                      "TS::canvas",
-                      func=>'New',
-                      defaultacl=>['valid_user']);
-
    $self->RegisterObj("itts.kern.projectroom.new",
                       "itil::projectroom",
                       func=>'New',

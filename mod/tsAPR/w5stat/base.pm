@@ -50,7 +50,7 @@ sub getPresenter
           'APR'=>{
                          opcode=>\&displayAPR,
                          overview=>undef,
-                         group=>['Application','Group','Canvas'],
+                         group=>['Application','Group'],
                          prio=>5100,
                       }
          );
@@ -339,7 +339,6 @@ sub displayAPR
       }
    }
    if ($rmostat->{sgroup} eq "Group" ||
-       $rmostat->{sgroup} eq "Canvas" ||
        $rmostat->{sgroup} eq "Application"){
       foreach my $color (keys(%colors)){
          foreach my $prefix (qw(
@@ -736,18 +735,9 @@ sub processRecord
    return() if ($statstream ne "APR");
 
    if ($module eq "tsAPR::appl"){
-      my %canvas;
       msg(INFO,"APR Processs $rec->{name}");
       $self->getParent->Trace("");
       $self->getParent->Trace("Processing: ".$rec->{name});
-      my $o=$app->getPersistentModuleObject("TS::lnkcanvasappl");
-      $o->SetFilter({applid=>\$rec->{id}});
-      foreach my $crec ($o->getHashList(qw(canvas canvascanvasid 
-                                           canvasid fraction))){
-         $canvas{$crec->{canvasid}}={
-            name=>$crec->{canvascanvasid}.": ".$crec->{canvas}
-         };
-      }
       my %systemid=();
       my @systemid=();
       my @w5sysid=();
@@ -1064,13 +1054,6 @@ sub processRecord
             $self->getParent->storeStatVar("Group",
                \@repOrg,{},"APR.Appl.Count",1
             );
-            foreach my $canvasid (keys(%canvas)){
-               $self->getParent->storeStatVar("Canvas",
-                                              [$canvas{$canvasid}->{name}],
-                                              {nosplit=>1,
-                                               nameid=>$canvasid},
-                                              "APR.Appl.Count",1);
-            }
             $self->getParent->storeStatVar("Application",
                [$rec->{name}],{
                   nosplit=>1,nameid=>$rec->{id}
@@ -1080,12 +1063,6 @@ sub processRecord
             foreach my $k (keys(%$appkpi)){
                $self->getParent->storeStatVar("Group",\@repOrg,{},
                                               $k,$appkpi->{$k});
-               foreach my $canvasid (keys(%canvas)){
-                  $self->getParent->storeStatVar("Canvas",
-                                                 [$canvas{$canvasid}->{name}],
-                                                 {},
-                                                 $k,$appkpi->{$k});
-               }
             }
          }
       }
