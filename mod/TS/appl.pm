@@ -574,22 +574,6 @@ sub calcBaseApplicationExpertGroup
 #                phonename=>[],
 #                label=>"IT-Servicemanager"
 #            },
-            'opcanvasowner'=>{
-                userid=>[],
-                email=>[],
-                sindex=>$index++,
-                phonename=>[],
-                label=>$self->getParent->T("Canvas Owner",'TS::appl'),
-                sublabel=>$self->getParent->T("(operational)",'TS::appl')
-            },
-            'opcanvasownerit'=>{
-                userid=>[],
-                email=>[],
-                sindex=>$index++,
-                phonename=>[],
-                label=>$self->getParent->T("Canvas Owner IT",'TS::appl'),
-                sublabel=>$self->getParent->T("(operational)",'TS::appl')
-            },
             'opbusinessowner'=>{
                 userid=>[],
                 email=>[],
@@ -687,8 +671,6 @@ sub calcBaseApplicationExpertGroup
       my $vou=getModuleObject($self->getParent->Config,"TS::vou");
       $vou->SetFilter({reprgrp=>\@flt});
       my ($vourec,$msg)=$vou->getOnlyFirst(qw(
-                   canvasownerbuid 
-                   canvasowneritid
                    leaderitid
                    leaderid
                    spocitstabiid
@@ -702,28 +684,6 @@ sub calcBaseApplicationExpertGroup
          foreach my $uid (@{$spocitstabiid}){
             if ($uid ne ""){
                push(@{$a{SPOCITStabi}->{userid}},$uid);
-            }
-         }
-
-         my $canvasownerbuid=$vourec->{canvasownerbuid};
-         if (ref($canvasownerbuid) ne "ARRAY"){
-            $canvasownerbuid=[$canvasownerbuid];
-         }
-         foreach my $uid (@{$canvasownerbuid}){
-            if ($uid ne ""){
-               push(@{$a{opcanvasowner}->{userid}},$uid);
-            }
-         }
-
-
-
-         my $canvasowneritid=$vourec->{canvasowneritid};
-         if (ref($canvasowneritid) ne "ARRAY"){
-            $canvasowneritid=[$canvasowneritid];
-         }
-         foreach my $uid (@{$canvasowneritid}){
-            if ($uid ne ""){
-               push(@{$a{opcanvasownerit}->{userid}},$uid);
             }
          }
 

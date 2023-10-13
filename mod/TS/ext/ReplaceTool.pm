@@ -41,13 +41,6 @@ sub getControlRecord
              target       =>'databoss',
              idfield      =>'databossid',
              targetlabel  =>'name'
-           },
-           canvasdataboss=>{
-             replaceoptype=>'base::user',
-             dataobj      =>'TS::canvas',
-             target       =>'databoss',
-             idfield      =>'databossid',
-             targetlabel  =>'name'
            }
          ];
    return($d);

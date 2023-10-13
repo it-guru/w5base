@@ -63,15 +63,6 @@ sub getPosibleRoles
                                                $self->Self),
             );
    }
-   if ($parentobj=~m/^.+::canvas$/ ||
-       (defined($self->getParent) &&
-        defined($self->getParent->getParent) &&
-       $self->getParent->getParent->Self()=~m/^.+::canvas$/)){
-      return(
-             "write"           =>$self->getParent->T("write",
-                                                     $self->Self)
-            );
-   }
    return();
 }
 

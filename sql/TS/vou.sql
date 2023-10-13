@@ -106,3 +106,9 @@ create table subvou (
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
 alter table subvou add description varchar(128);
+drop table lnkcanvas;
+drop table canvas;
+alter table vou drop column canvasid;
+alter table vou drop column canvasfield;
+alter table vou drop column canvasownerbuid;
+alter table vou drop column canvasowneritid;
