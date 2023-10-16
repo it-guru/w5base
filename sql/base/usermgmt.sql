@@ -448,3 +448,5 @@ alter table grpindivfld add rdonly int(1) default '0',add fldbehavior varchar(20
 alter table grp  add is_projectgrp  int(1) default '0';
 alter table contact add lastknownpboss char(128) default NULL;
 alter table phonenumber add showpublic int(1) default '1';
+alter table contact add planneddismissaldate datetime default NULL;
+alter table contact add notifieddismissaldate datetime default NULL;

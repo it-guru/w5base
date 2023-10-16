@@ -166,3 +166,5 @@
 'create new key'=>{de=>'neuen Key erzeugen'},
 'delete key'=>{de=>'API-Key löschen'},
 'Modify/View API Keys'=>{de=>'Änderung/Anzeigen von API-Keys'},
+'planned dismissal date'=>{de=>'geplanter Ausscheidezeitpunkt'},
+'notified dismissal date'=>{de=>'Benachrichtigung über Ausscheidezeitpunkt'},

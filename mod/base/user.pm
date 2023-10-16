@@ -886,6 +886,38 @@ sub new
                 label         =>'Last-External-Seen',
                 dataobjattr   =>'contact.lastexternalseen'),
 
+
+      new kernel::Field::Date(
+                name          =>'planneddismissaldate',
+                readonly      =>1,
+                group         =>'userro',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                dayonly       =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'planned dismissal date',
+                dataobjattr   =>'contact.planneddismissaldate'),
+
+      new kernel::Field::Date(
+                name          =>'notifieddismissaldate',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'userro',
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                dayonly       =>1,
+                label         =>'notified dismissal date',
+                dataobjattr   =>'contact.notifieddismissaldate'),
+
+
       new kernel::Field::Date(
                 name          =>'lastlogon',
                 readonly      =>1,
