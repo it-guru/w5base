@@ -524,6 +524,17 @@ sub qcheckRecord
             $forcedupd->{salutation}="m";
          }
       }
+      if ($rec->{planneddismissaldate} ne "" &&
+          $ciamrec->{ddismissal} eq ""){
+         $forcedupd->{planneddismissaldate}=undef;
+      }
+      if ($rec->{planneddismissaldate} eq "" &&
+          $ciamrec->{ddismissal} ne "" ||
+          $rec->{planneddismissaldate} ne $ciamrec->{ddismissal}){
+         $forcedupd->{planneddismissaldate}=$ciamrec->{ddismissal};
+      }
+
+
       if ($ciamrec->{country} eq ""){
          $ciamrec->{country}=undef;
       }
