@@ -77,10 +77,10 @@ sub CaaS_CloudAreaSync
                     msg=>'WARN: CaaS cloudlist temporary incomplete'}); 
          }
       }
-      else{
-         # Store this info silent
-         $self->SilentLastMsg(ERROR,"interface in stale retry longer then 6h");
-      }
+      #else{
+      #   # Store this info silent
+      #   $self->SilentLastMsg(ERROR,"interface in stale retry longer then 6h");
+      #}
       my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
       if ($infoObj->NotifyInterfaceContacts($caasCloud)){
          return({exitcode=>-1,exitmsg=>'Interface notified'});
