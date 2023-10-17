@@ -78,7 +78,8 @@ sub CaaS_CloudAreaSync
          }
       }
       else{
-         $self->LastMsg(ERROR,"interface in stale retry longer then 6h");
+         # Store this info silent
+         $self->SilentLastMsg(ERROR,"interface in stale retry longer then 6h");
       }
       my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
       if ($infoObj->NotifyInterfaceContacts($caasCloud)){
