@@ -43,7 +43,8 @@ sub CISearchResult
    if (grep(/^ci$/,@$stag) &&
        (!defined($tag) || grep(/^$tag$/,qw(user contact kontakt)))){
       my $flt=[{fullname=>"*$searchtext*",cistatusid=>"<=5",
-                usertyp=>['user','extern']}];
+                usertyp=>['user','extern']},
+               {userid=>\"$searchtext",cistatusid=>"<=5"}];
       my $dataobj=getModuleObject($self->getParent->Config,"base::user");
       $dataobj->SetFilter($flt);
       my $limit=10;
