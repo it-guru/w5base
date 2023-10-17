@@ -585,7 +585,7 @@ sub qcheckRecord
                      $nameok=0;
                      my $m='System name from AssetManager is already in use'.
                            'by another system - '.
-                           'contact the AM Assignment group or its members '
+                           'contact the AM Assignment group or its members '.
                            'or leaders so that a unique system name can be '.
                            'assigned!';
                      push(@qmsg,$m);
