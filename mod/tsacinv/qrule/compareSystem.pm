@@ -583,7 +583,7 @@ sub qcheckRecord
                   my ($chkrec,$msg)=$dataobj->getOnlyFirst(qw(id name));
                   if (defined($chkrec)){
                      $nameok=0;
-                     my $m='System name from AssetManager is already in use'.
+                     my $m='System name from AssetManager is already in use '.
                            'by another system - '.
                            'contact the AM Assignment group or its members '.
                            'or leaders so that a unique system name can be '.
