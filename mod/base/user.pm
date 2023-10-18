@@ -57,7 +57,7 @@ sub new
       new kernel::Field::Contact(
                 name          =>'fullname',
                 htmlwidth     =>'280',
-                group         =>'name',
+                group         =>'default',
                 readonly      =>1,
                 prepRawValue  =>sub{
                    my $self=shift;
@@ -81,6 +81,15 @@ sub new
                    }
                    return($d);
                 },
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my $app=$self->getParent;
+                   my %param=@_;
+                   return(0) if ($mode eq "HtmlDetail" && 
+                                 !defined($param{current}));
+                   return(1);
+                },
                 vjoinon       =>'userid',
                 label         =>'Fullname',
                 dataobjattr   =>'contact.fullname'),
@@ -88,7 +97,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'phonename',
                 htmlwidth     =>'280',
-                group         =>'name',
+                group         =>'default',
                 readonly      =>1,
                 searchable    =>0,
                 htmldetail    =>0,
@@ -118,7 +127,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'purename',
                 htmlwidth     =>'280',
-                group         =>'name',
+                group         =>'default',
                 readonly      =>1,
                 searchable    =>0,
                 htmldetail    =>0,
@@ -139,9 +148,10 @@ sub new
                 name          =>'usertyp',
                 label         =>'Usertype',
                 selectfix     =>1,
+                jsonchanged   =>\&getOnChangedScript,
                 htmleditwidth =>'100px',
                 default       =>'extern',
-                value         =>[qw(extern service user function)],
+                value         =>[qw(extern service user function genericAPI)],
                 dataobjattr   =>'contact.usertyp'),
 
       new kernel::Field::Link(
@@ -153,7 +163,7 @@ sub new
                 name          =>'cistatus',
                 htmleditwidth =>'40%',
                 explore       =>100,
-                group         =>['name','default','admcomments'],
+                group         =>['default','admcomments'],
                 readonly      =>sub{
                    my $self=shift;
                    my $rec=shift;
@@ -177,7 +187,8 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'cistatusid',
-                group         =>'name',
+                group         =>'default',
+                default       =>'2',
                 label         =>'CI-StateID',
                 dataobjattr   =>'contact.cistatus'),
 
@@ -196,14 +207,29 @@ sub new
                 label         =>'Salutation',
                 searchable    =>0,
                 transprefix   =>'SAL.',
-                group         =>'name',
+                group         =>'default',
                 default       =>'',
+                htmldetail    =>sub{
+                   my $mode=shift;
+                   my $app=$self->getParent;
+                   my %param=@_;
+                   my $usertyp=Query->Param("Formated_usertyp");
+                   if (defined($param{current}) && 
+                       defined($param{current}->{usertyp})){
+                      $usertyp=$param{current}->{usertyp};
+                   }
+                   return(0) if ($usertyp eq "service" ||
+                                 $usertyp eq "function" ||
+                                 $usertyp eq "genericAPI");
+                   return(1);
+                },
                 htmleditwidth =>'90px',
                 value         =>["","f","m"],
                 dataobjattr   =>'contact.salutation'),
 
       new kernel::Field::Text(
                 name          =>'givenname',
+                depend        =>['usertyp'],
                 readonly      =>sub{
                                    my $self=shift;
                                    my $current=shift;
@@ -212,14 +238,28 @@ sub new
                                    }
                                    return(1);
                                 },
-                group         =>'name',
+                group         =>'default',
+                htmldetail    =>sub{
+                   my $mode=shift;
+                   my $app=$self->getParent;
+                   my %param=@_;
+                   my $usertyp=Query->Param("Formated_usertyp");
+                   if (defined($param{current}) && 
+                       defined($param{current}->{usertyp})){
+                      $usertyp=$param{current}->{usertyp};
+                   }
+                   return(0) if ($usertyp eq "service" ||
+                                 $usertyp eq "function" ||
+                                 $usertyp eq "genericAPI");
+                   return(1);
+                },
                 explore       =>200,
                 label         =>'Givenname',
                 dataobjattr   =>'contact.givenname'),
                                   
       new kernel::Field::Text(
                 name          =>'surname',
-                group         =>'name',
+                group         =>'default',
                 explore       =>300,
                 depend        =>['usertyp'],
                 readonly      =>sub{
@@ -231,6 +271,50 @@ sub new
                                    return(1);
                                 },
                 label         =>'Surname',
+                htmldetail    =>sub{
+                   my $mode=shift;
+                   my $app=$self->getParent;
+                   my %param=@_;
+                   my $usertyp=Query->Param("Formated_usertyp");
+                   if (defined($param{current}) && 
+                       defined($param{current}->{usertyp})){
+                      $usertyp=$param{current}->{usertyp};
+                   }
+                   return(0) if ($usertyp eq "service" ||
+                                 $usertyp eq "function" ||
+                                 $usertyp eq "genericAPI");
+                   return(1);
+                },
+                dataobjattr   =>'contact.surname'),
+
+      new kernel::Field::Text(
+                name          =>'contactdesc',
+                group         =>'default',
+                explore       =>300,
+                depend        =>['usertyp'],
+                readonly      =>sub{
+                                   my $self=shift;
+                                   my $current=shift;
+                                   if ($current->{usertyp} ne "function"){
+                                      return(0);
+                                   }
+                                   return(1);
+                                },
+                label         =>'contact description',
+                htmldetail    =>sub{
+                   my $mode=shift;
+                   my $app=$self->getParent;
+                   my %param=@_;
+                   my $usertyp=Query->Param("Formated_usertyp");
+                   if (defined($param{current}) && 
+                       defined($param{current}->{usertyp})){
+                      $usertyp=$param{current}->{usertyp};
+                   }
+                   return(1) if ($usertyp eq "service" ||
+                                 $usertyp eq "function" ||
+                                 $usertyp eq "genericAPI");
+                   return(0);
+                },
                 dataobjattr   =>'contact.surname'),
 
       new kernel::Field::Email(
@@ -1105,11 +1189,28 @@ sub new
    return($self);
 }
 
+
+sub getOnChangedScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+if (mode=="onchange"){
+   document.forms[0].submit();
+}
+EOF
+   return($d);
+}
+
+
+
 sub initSqlWhere
 {
    my $self=shift;
    my $mode=shift;  # prevent list of contact entries of type=altemail
-   my $where="contact.usertyp in ('extern','service','user','function')";
+   my $where="contact.usertyp ".
+             "in ('extern','service','user','function','genericAPI')";
    return($where);
 }
 
@@ -1662,7 +1763,7 @@ sub FinishWrite
 
    if (exists($newrec->{cistatusid}) && 
        $newrec->{cistatusid}==7 &&
-       $oldrec->{cistatusid}!=7){
+       (defined($oldrec) && $oldrec->{cistatusid}!=7)){
       my $userid=$oldrec->{userid};
       my $j=getModuleObject($self->Config,"base::useraccount");
       $j->BulkDeleteRecord({'userid'=>\$userid});
@@ -1679,6 +1780,19 @@ sub FinishWrite
    }
    $self->NotifyAddOrRemoveObject($oldrec,$newrec,"fullname",
                                   "STEVuserchanged",110000001);
+
+   if (!defined($oldrec) && defined($newrec) &&
+       $newrec->{usertyp} eq "genericAPI"){
+      my $curUser=$ENV{REMOTE_USER};
+      if ($curUser ne "" && $curUser ne "anonymous"){
+         my $o=getModuleObject($self->Config,"base::usersubst");
+         $o->ValidatedInsertRecord({
+            userid=>$newrec->{userid},
+            dstaccount=>$curUser,
+            active=>1
+         });
+      }
+   }
 
    return(1);
 }
@@ -1707,7 +1821,7 @@ sub isViewValid
 {
    my $self=shift;
    my $rec=shift;
-   return("default","header") if (!defined($rec));
+   return("default","name","header") if (!defined($rec));
    return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
    my @pic;
    my $userid=$self->getCurrentUserId();
@@ -1738,6 +1852,13 @@ sub isViewValid
    elsif ($rec->{usertyp} eq "service"){
       @gl=qw(header name default comments groups nativcontact usersubst 
              userid userro control userparam qc);
+      if ($self->IsMemberOf(["admin","support"])){
+         push(@gl,"history");
+      }
+   }  
+   elsif ($rec->{usertyp} eq "genericAPI"){
+      @gl=qw(header name default comments nativcontact usersubst 
+             userid userro control userparam qc usersubst source);
       if ($self->IsMemberOf(["admin","support"])){
          push(@gl,"history");
       }
@@ -2190,6 +2311,8 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
+   return(qw(header default name)) if ($param{mode} eq "HtmlDetail" &&
+                                       !defined($param{current}));
    return(qw(header name picture default admcomments 
              comments nativcontact office 
              officeacc private personrelated introdution contacts
