@@ -119,8 +119,19 @@ sub Validate
    if (defined($oldrec)){
       $olduserid=$oldrec->{userid};
    }
-   if (!$self->IsMemberOf("admin")){
-      my $curuserid=$self->getCurrentUserId();
+   my $o=getModuleObject($self->Config,"base::user"); 
+   $o->SetFilter({userid=>$olduserid});
+   my ($urec,$msg)=$o->getOnlyFirst(qw(creator usertyp));
+   if (!defined($urec)){
+      $self->LastMsg(ERROR,"invalid urec refernce $olduserid");
+      return(0);
+   }
+   
+
+
+   my $curuserid=$self->getCurrentUserId();
+   if ((!$self->IsMemberOf("admin")) &&
+       (!($urec->{usertyp} eq "genericAPI" && $urec->{creator} eq $curuserid))){
       if ($userid ne $curuserid || $userid ne $olduserid){
          $self->LastMsg(ERROR,
                         "you are not authorized to create or modifiy ".
