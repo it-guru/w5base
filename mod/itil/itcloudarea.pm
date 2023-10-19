@@ -685,6 +685,10 @@ sub Validate
             }
          }
       }
+      if (defined($oldrec) && $oldrec->{cistatusid}==4 && 
+          $newrec->{cistatusid}==6){
+         $newrec->{previousapplid}=undef;
+      }
       if ($newrec->{cistatusid}<2 ||
           (!defined($oldrec) && $newrec->{cistatusid}>2) ){
          if ($self->isDataInputFromUserFrontend() && 
@@ -815,11 +819,16 @@ sub FinishWrite
                }
                my $o=getModuleObject($self->Config,"itil::applcitransfer");
                if ($configitems ne "" && defined($o)){
+                  my $cloudareaname=effVal($oldrec,$newrec,"fullname");
+                  my $urlofcurrec=effVal($oldrec,$newrec,"urlofcurrentrec");
                   msg(INFO,
                       "FinishWrite itil::itcloudare create transfer record");
                   $o->ValidatedInsertRecord({
                      capplid=>$newapplid,
                      eapplid=>$oldapplid,
+                     comments=>"This transfer is triggered by application ".
+                               "change in CloudArea '".$cloudareaname."' at ".
+                               $urlofcurrec,
                      configitems=>$configitems
                   });
                }
