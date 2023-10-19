@@ -241,10 +241,15 @@ sub FormatedResult
    my $FormatAs=shift;
    my %param=@_;
 
-
    return($self->getSubListData($current,$FormatAs,%param));
 }
 
+
+#
+# very bad programmed - but getLineSubListData is called, if the SubList
+# should be formated as Line. This should be migrated to getSubListData (but
+# i don't know a quick methode
+#
 sub getLineSubListData
 {
    my $self=shift;
@@ -260,6 +265,7 @@ sub getLineSubListData
          return("undefined");
       }
       my $srcval=$srcfield->RawValue($current);
+      return(undef) if (!defined($srcval));
       my $loadfield=$self->{vjoinon}->[1];
       $self->vjoinobjInit();
 
