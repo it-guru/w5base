@@ -173,7 +173,7 @@ sub new
                 group         =>'w5basedata',
                 label         =>'W5BaseID',
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>'FLEXERA_system2w5system.w5baseid'),
+                dataobjattr   =>'UFLEXERA_system2w5system.w5baseid'),
 
       new kernel::Field::Text(
                 name          =>'w5systemname',
@@ -304,9 +304,11 @@ sub getSqlFrom
    my $from="";
 
    $from.="$worktable  ".
-          "left outer join FLEXERA_system2w5system ".
+          "left outer join (".
+             "select distinct FLEXERADEVICEID,W5BASEID ".
+             "from FLEXERA_system2w5system) UFLEXERA_system2w5system ".
           "on $worktable.FLEXERASYSTEMID=".
-          "FLEXERA_system2w5system.FLEXERADEVICEID ";
+          "UFLEXERA_system2w5system.FLEXERADEVICEID ";
 
    return($from);
 }
