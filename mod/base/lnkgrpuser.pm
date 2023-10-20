@@ -574,6 +574,23 @@ sub Validate
    my $origrec=shift;
 
 
+   if (!defined($oldrec) || effChanged($oldrec,$newrec,"userid")){
+      my $userid=effVal($oldrec,$newrec,"userid");
+      my $o=getModuleObject($self->Config,"base::user");
+      $o->SetFilter({userid=>\$userid});
+      my ($rec,$msg)=$o->getOnlyFirst("userid","usertyp");
+      if (!defined($rec)){
+         $self->LastMsg(ERROR,"userid invalid");
+         return(undef);
+      }
+      if (defined($rec) && $rec->{usertyp} eq "genericAPI"){
+         $self->LastMsg(ERROR,"genericAPI contacts are not allowed ".
+                              "to assign to groups");
+         return(undef);
+      }
+   }
+
+
    if (effVal($oldrec,$newrec,"grpid")==0){
       $self->LastMsg(ERROR,"invalid group specified");
       return(undef);

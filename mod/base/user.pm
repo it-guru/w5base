@@ -210,6 +210,7 @@ sub new
                 group         =>'default',
                 default       =>'',
                 htmldetail    =>sub{
+                   my $self=shift;
                    my $mode=shift;
                    my $app=$self->getParent;
                    my %param=@_;
@@ -240,6 +241,7 @@ sub new
                                 },
                 group         =>'default',
                 htmldetail    =>sub{
+                   my $self=shift;
                    my $mode=shift;
                    my $app=$self->getParent;
                    my %param=@_;
@@ -272,6 +274,7 @@ sub new
                                 },
                 label         =>'Surname',
                 htmldetail    =>sub{
+                   my $self=shift;
                    my $mode=shift;
                    my $app=$self->getParent;
                    my %param=@_;
@@ -302,6 +305,7 @@ sub new
                                 },
                 label         =>'contact description',
                 htmldetail    =>sub{
+                   my $self=shift;
                    my $mode=shift;
                    my $app=$self->getParent;
                    my %param=@_;
@@ -1557,6 +1561,14 @@ sub Validate
          return(0);
       }
    }
+   if (effChangedVal($oldrec,$newrec,"usertyp") &&
+       $newrec->{usertyp} eq "genericAPI"){
+      if ($#{$oldrec->{groups}}!=-1){
+         $self->LastMsg(ERROR,
+                        "usertyp change not allowed with existing groups");
+         return(0);
+      }
+   }
 
 
 
@@ -1878,16 +1890,24 @@ sub isViewValid
        !(($rec->{managedbyid}!=1 && $rec->{managedbyid}!=0) &&
          $self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"down"))){
       if ($secstate<2){
-         @gl=grep(/^(name|admcomments|header)$/,@gl);
+         my @flt=qw(name admcomments header);
+         my $flt=join("|",@flt);
+         @gl=grep(/^($flt)$/x,@gl);
       }
       elsif ($secstate<3){
-         @gl=grep(/^(name|admcomments|header|office|default|groups|contacts|
-                     comments|nativcontact|userid|qc)$/x,@gl);
+         my @flt=qw(name admcomments header office default groups contacts 
+                     comments nativcontact userid qc);
+         push(@flt,"usersubst") if ($rec->{usertyp} eq "service" ||
+                                    $rec->{usertyp} eq "genericAPI");
+         my $flt=join("|",@flt);
+         @gl=grep(/^($flt)$/x,@gl);
       }
       elsif ($secstate<4){
-         @gl=grep(/^(name|admcomments|header|office|officeacc|private|contacts|
-                     default|groups|comments|nativcontact|userid|
-                     control|qc|userro|history)$/x,@gl);
+         my @flt=qw(name admcomments header office officeacc private contacts 
+                     default groups comments nativcontact userid usersubst 
+                     control qc userro history);
+         my $flt=join("|",@flt);
+         @gl=grep(/^($flt)$/x,@gl);
       }
    }
    if ($userid==$rec->{userid}){
@@ -1904,7 +1924,8 @@ sub isViewValid
                      if (grep(/^$orole$/,@{$grp->{roles}})){
                         if ($self->IsMemberOf($grp->{grpid},
                                               ["RBoss","RBoss2"],"direct")){
-                           push(@gl,"personrelated","introdution","private","history",
+                           push(@gl,"personrelated","introdution","private",
+                                    "history",
                                     "officeacc","interview");
                         }
                      }
