@@ -113,25 +113,24 @@ sub addVisualLink
    my $onclick;
    my $target;
    my $qstr;
-   if (ref($param) eq "HASH"){
-      my %param=%$param;
-      $param{AllowClose}=1;
+
+   if ($dataobj->can("generateContextMap")){
       my $detailx=$dataobj->DetailX();
       my $detaily=$dataobj->DetailY();
-      $target="../../".$dataobj->Self()."/Visual";
+      $target="../../".$dataobj->Self()."/Map/".$param;
       $target=~s/::/\//g;
-      $qstr=kernel::cgi::Hash2QueryString(%param);
-     
-      $onclick="openwin(\"$target?$qstr\",\"_blank\",".
+      
+      $onclick="openwin(\"$target\",\"_blank\",".
                   "\"height=$detaily,width=$detailx,toolbar=no,status=no,".
-                  "resizable=yes,scrollbars=no\")";
+                  "resizable=yes,scrollbars=no\");return(false);";
+
+
+      $d.="<img align=right border=0 ".
+          "src=\"../../../public/base/load/visual_small.gif\">";
+      $d="<div style=\"float:right;margin:2px\">".
+         "<a class=sublink href=\"$target\" onclick='$onclick'>".
+         $d."</a></div>";
    }
-
-
-   $d.="<img align=right border=0 ".
-       "src=\"../../../public/base/load/visual_small.gif\">";
-   $d="<div style=\"float:right;margin:2px\"><a class=sublink href=\"$target?$qstr\">".
-      $d."</a></div>";
 
    return($d);
 }
