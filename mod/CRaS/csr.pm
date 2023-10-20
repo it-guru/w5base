@@ -1258,7 +1258,8 @@ sub FinishWrite
       }
    }
 
-   if (!defined($oldrec) && $newrec->{name} ne "" && $newrec->{refno} eq ""){
+   if (!defined($oldrec) && $newrec->{name} ne "" && 
+       $newrec->{refno} eq "" && $newrec->{replacedrefno} eq ""){
       my $name=$newrec->{name};
       my $obj=$self->Clone();
       $obj->SetFilter({name=>\$name,ssslenddate=>">now-28d AND <now+56d",
