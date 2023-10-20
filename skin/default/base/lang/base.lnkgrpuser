@@ -25,3 +25,6 @@
 'Group Modification-Date'=>{de=>'Gruppen Bearbeitungszeitpunkt'},
 'Contact CI-State'=>{de=>'Kontakt CI-Status'},
 'Contact Modification-Date'=>{de=>'Kontakt Bearbeitungszeitpunkt'},
+'genericAPI contacts are not allowed to assign to groups'=>{
+  de=>'genericAPI Kontakte drüfen nicht Gruppen zugewiesen werden'
+}
