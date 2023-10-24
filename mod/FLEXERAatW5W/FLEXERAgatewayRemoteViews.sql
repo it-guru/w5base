@@ -9,7 +9,7 @@ select
    FlexSystem.FLEXERADEVICEID flexerasystemid,
    upper(FlexSystem.DEVICESTATUS) DEVICESTATUS,
    FlexSystem.UUID,
-   FlexSystem.TENANTID,
+   FlexSyste.TENANTID,
    FlexSystem.SYSTEMNAME,
    lower(FlexSystem.SYSTEMNAME) LW_SYSTEMNAME,
    FlexSystem.SYSTEMOS,
@@ -62,27 +62,66 @@ create materialized view "mview_FLEXERA_system2w5system"
    refresh complete start with sysdate
    next sysdate+(1/24)*2
    as
-select distinct
-   FlexSystem.FLEXERADEVICEID,
-   FlexSystem.SYSTEMNAME,
-   system.id w5baseid
-from "mview_FLEXERA_system" FlexSystem
-   join "itil::system" system on 
-      FlexSystem.lw_realcomputername=system.name and
-         not system.srcsys in ('AWS','AZURE')
-      or (system.srcid like
+with 
+FlexSystem as ( 
+select "mview_FLEXERA_system".flexeradeviceid,
+       "mview_FLEXERA_system".systemname,
+       "mview_FLEXERA_system".lw_realcomputername,
+       "mview_FLEXERA_system".lw_instancecloudid,
+       "mview_FLEXERA_system".RealComputername,
+       "mview_FLEXERA_system".ipaddrlist
+from "mview_FLEXERA_system" 
+where "mview_FLEXERA_system".DeviceStatus='ACTIVE' and
+      lower("mview_FLEXERA_system".RealComputername)<>'localhost' and
+      lower("mview_FLEXERA_system".systemname)<>'localhost'),
+W5BaseSystem as (
+select "itil::system".id w5baseid,
+       "itil::system".name,"itil::system".srcsys,"itil::system".srcid,
+       "itil::ipaddress".name ipaddr,
+       "itil::system".cdate
+   from "itil::system" 
+      left outer join "itil::ipaddress" 
+         on "itil::ipaddress".systemid="itil::system".id
+where ("itil::system".cistatusid in (3,4,5) or
+      ("itil::system".cistatusid=6 and
+       "itil::system".mdate>current_date-28)) and
+      "itil::ipaddress".cistatusid=4 and
+      "itil::system".name<>'localhost'),
+Level1Link as (
+select 
+       FlexSystem.flexeradeviceid,
+       FlexSystem.systemname,
+       W5BaseSystem.w5baseid,
+       W5BaseSystem.cdate,
+       ROW_NUMBER() OVER ( PARTITION BY flexeradeviceid ORDER BY W5BaseSystem.cdate) rn
+ from FlexSystem
+ join W5BaseSystem on
+      (FlexSystem.lw_realcomputername=W5BaseSystem.name and
+         not W5BaseSystem.srcsys in ('AWS','AZURE') and
+       FlexSystem.ipaddrlist like '%'||W5BaseSystem.ipaddr||'%'  
+       -- if name matching is used, at least one ip must match 
+       -- ipaddrlist too
+       )
+      or (W5BaseSystem.srcid like
           FlexSystem.lw_instancecloudid||'@%@%' and
-          system.srcsys='AWS')
-      or (system.srcid like
+          W5BaseSystem.srcsys='AWS')
+      or (W5BaseSystem.srcid like
           FlexSystem.lw_instancecloudid||'@%' and
-          system.srcsys='AZURE')
-where FlexSystem.DeviceStatus='ACTIVE';
+          W5BaseSystem.srcsys='AZURE')),
+FinalFlex2System as (
+select flexeradeviceid,
+       systemname,
+       w5baseid
+from Level1Link
+where rn=1) -- if multiple systems matched, use 1st one created in W5Base
+select * from FinalFlex2System;
 
 CREATE INDEX "FLEXERA_system2w5system_id1"
    ON "mview_FLEXERA_system2w5system"(FLEXERADEVICEID) online;
 
 grant select on "mview_FLEXERA_system2w5system" to W5I;
-create or replace synonym W5I.FLEXERA_system2w5system for "mview_FLEXERA_system2w5system";
+create or replace synonym W5I.FLEXERA_system2w5system 
+       for "mview_FLEXERA_system2w5system";
 
 
 ' W5I_FLEXERA__systemidmap_of fällt demnächst weg!
