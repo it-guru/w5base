@@ -1951,8 +1951,11 @@ sub getHtmlDetailPages
    if (defined($rec) && $rec->{cistatusid}==7){
       return($self->SUPER::getHtmlDetailPages($p,$rec));
    }
-   return($self->SUPER::getHtmlDetailPages($p,$rec),
-          "RView"=>$self->T("Rights overview"));
+   my @pages=$self->SUPER::getHtmlDetailPages($p,$rec);
+   if (defined($rec) && $rec->{cistatusid}>2 && $rec->{cistatusid}<7){
+      push(@pages,"RView"=>$self->T("Rights overview"));
+   }
+   return(@pages);
 }
 
 
@@ -2182,10 +2185,12 @@ sub APIKeys
    printf("}");
    printf("</script>");
    if (defined($urec)){
+      my $allowAPIkeyAccess=$self->allowAPIkeyAccess($urec);;
       my $ua=getModuleObject($self->Config,"base::useraccount");
       print $self->getParsedTemplate("tmpl/base.contact.APIKeys.head");
       if ($self->IsMemberOf("admin") ||
-          $self->getCurrentUserId()==$urec->{userid}){ 
+          $self->getCurrentUserId()==$urec->{userid} ||
+          $allowAPIkeyAccess){ 
          my $ipaddr=Query->Param("ipaddr");
          $ipaddr=~s/[^0-9a-f.:, ]/x/gi;
          if ((my $dropid=Query->Param("dropid")) ne ""){
@@ -2340,25 +2345,48 @@ sub getDetailBlockPriority
              userparam control groups usersubst userid userro ));
 }
 
+sub allowAPIkeyAccess
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $allowAPIkeyAccess=0;
+
+   if (defined($rec) && $rec->{usertyp} eq "genericAPI"){
+      foreach my $rec (@{$rec->{usersubst}}){
+         if ($ENV{REMOTE_USER} eq $rec->{dstaccount} &&
+             $rec->{active} eq "1"){
+            $allowAPIkeyAccess++;
+         }
+      }
+   }
+
+   return($allowAPIkeyAccess);
+}
+
 sub getDetailFunctions
 {
    my $self=shift;
    my $rec=shift;
    my $userid=$self->getCurrentUserId();
    my @f;
-   if ($self->getCurrentSecState()>1){ 
+   if (defined($rec) && ( ($self->getCurrentSecState()>1 && (
+                            $rec->{ssh1publickey} ne "" || 
+                            $rec->{ssh2publickey} ne ""))  || 
+                         ($userid==$rec->{userid} ||
+                          $self->IsMemberOf("admin")))){ 
       push(@f,($self->T("SSH Public Key")=>'SSHPublicKey'));
    }
+
+   my $allowAPIkeyAccess=$self->allowAPIkeyAccess($rec);;
+
    if (defined($rec) &&
-       $rec->{userid} eq $userid || $self->IsMemberOf("admin")){
-      if ($self->getCurrentSecState()>1){ 
+       ($rec->{userid} eq $userid || 
+        $self->IsMemberOf("admin") ||
+        $allowAPIkeyAccess)){
+      if ($self->getCurrentSecState()>1 || $allowAPIkeyAccess>0){ 
          push(@f,($self->T("API-Keys")=>'APIKeys'));
       }
-   }
-   if (!defined($rec) || ($rec->{ssh1publickey} eq "" && 
-                          $rec->{ssh2publickey} eq "" &&
-       !($self->IsMemberOf("admin")) && !($userid==$rec->{userid}))){
-      return($self->SUPER::getDetailFunctions($rec));
    }
    return(@f,$self->SUPER::getDetailFunctions($rec));
 }
