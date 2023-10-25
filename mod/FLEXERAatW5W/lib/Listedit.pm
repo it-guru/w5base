@@ -63,6 +63,7 @@ sub initSqlWhere
                               DTAG.GHQ.VTI.DTIT.IT.E-DTO.E-DTOPL
                               DTAG.GHQ.VTI.DTIT.IT.IT-SC3.IT-SC3_CH.IT-SC3_CHi
                               DTAG.GHQ.VTI.DTIT.IT.IT-SC3.IT-SC3_CH.IT-SC3_CHh  
+                              DTAG.GHQ.VTI.DTIT.IT.IT-SC3.IT-SC3_CH.IT-SC3_CHg
                               DTAG.TSY.INT.DTIT_HU.E.HU-IT-3-CA.HU-IT-3-CAc
                               )],
           "RMember","up") ){
