@@ -50,43 +50,23 @@ sub NSO_Kundensys_Rep
    msg(INFO,"start Report to $param{'filename'}");
    my $t0=time();
  
-   $flt{'status'}='"!out of operation"';
+   $flt{'cistatusid'}='4';
 
    %param=kernel::XLSReport::StdReportParamHandling($self,%param);
    my $out=new kernel::XLSReport($self,$param{'filename'});
    
    $out->initWorkbook();
 
-   my @view=qw(systemname 
-               systemid 
-               status 
-               systemos
-               assignmentgroup
-               virtualization
-               srcid
-               assetmodelname
-               assetpowerinput
-               assetmmaint
-               assetmaintlevel
-               installdate
-               compdeprstart
-               assetassetid 
-               assetserialno
-               assetmodelname tsacinv_locationfullname
-               acmdbcontract acmdbcontractnumber
-               applicationnames
-               dynorderedservices);
+   my @view=qw(id name opmode);
 
 
    my @control;
-   foreach my $conumber (qw(9100011982 1300002400 9100014541)){
-      push(@control,{
-         sheet=>$conumber,
-         DataObj=>'tsacinv::system',
-         filter=>{%flt,conumber=>\$conumber},
-         view=>[@view]
-      });
-   }
+   push(@control,{
+      sheet=>"FileAttachReport",
+      DataObj=>'AL_TCom::appl',
+      filter=>{%flt},
+      view=>[@view]
+   });
    $out->Process(@control);
    my $trep=time()-$t0;
    msg(INFO,"end Report to $param{'filename'} ($trep sec)");
