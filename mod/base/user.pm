@@ -1838,9 +1838,7 @@ sub isViewValid
    my @pic;
    my $userid=$self->getCurrentUserId();
    my @gl;
-   #if ($userid eq $rec->{userid} || $self->IsMemberOf("admin")){
-   #   push(@pic,"picture");
-   #}
+   my $allowAPIkeyAccess=$self->allowAPIkeyAccess($rec);;
    if ($self->IsMemberOf(["admin","support"])){
       push(@pic,"picture","roles","interview","history");
    }
@@ -1891,6 +1889,7 @@ sub isViewValid
          $self->IsMemberOf($rec->{managedbyid},["RContactAdmin"],"down"))){
       if ($secstate<2){
          my @flt=qw(name admcomments header);
+         push(@flt,"usersubst","control","userro") if ($allowAPIkeyAccess);
          my $flt=join("|",@flt);
          @gl=grep(/^($flt)$/x,@gl);
       }
@@ -1899,6 +1898,7 @@ sub isViewValid
                      comments nativcontact userid qc);
          push(@flt,"usersubst") if ($rec->{usertyp} eq "service" ||
                                     $rec->{usertyp} eq "genericAPI");
+         push(@flt,"usersubst","control","userro") if ($allowAPIkeyAccess);
          my $flt=join("|",@flt);
          @gl=grep(/^($flt)$/x,@gl);
       }
