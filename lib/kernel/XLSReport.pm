@@ -131,11 +131,12 @@ sub Process
          $DataObj->SetCurrentOrder($sqlorder);
       }
       my $sheetname=$self->crec('sheet');
-
-      my $sheetname=$self->crec('sheet');
       if ($sheetname eq ""){
          $sheetname=$DataObj->T($DataObj->Self(),$DataObj->Self());
       }
+      $self->Context->{Linenumber}=0;
+      $self->Context->{Recordnumber}=0;
+
       my $line=1;
       my $unbuffered=$self->crec('unbuffered');
       $unbuffered=1 if (!defined($unbuffered));
@@ -143,6 +144,7 @@ sub Process
       if (defined($rec)){
          my $reproccount=0;
          do{
+            $self->Context->{Linenumber}++;
             my @recordview=$DataObj->getFieldObjsByView($self->crec('view'),
                                                         current=>$rec);
             my $recordPreProcessor=$self->{crec}->{'recPreProcess'};
@@ -159,7 +161,7 @@ sub Process
                }
             }
             if ($res){
-               if ($line==1){
+               if ($self->Context->{Linenumber}==1){
                   $out->addSheet($sheetname);
                }
                my $fieldbase={};
@@ -172,7 +174,9 @@ sub Process
                   }
                }
                $out->ProcessLine(undef,["ALL"],$rec,\@recordview,
-                                 $fieldbase,$line++,undef);
+                                 $fieldbase,$self->Context->{Recordnumber},
+                                 undef);
+               $self->Context->{Recordnumber}++;
             }
             if ($doNext){
                ($rec,$msg)=$DataObj->getNext();
@@ -183,7 +187,7 @@ sub Process
             }
          } until(!defined($rec));
       }
-      if ($line>1){
+      if ($self->Context->{Linenumber}>1){
          $out->ProcessBottom(undef,undef,"",{});
          $out->ProcessHead(undef,undef,"",{});
       }
