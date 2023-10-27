@@ -927,7 +927,8 @@ sub StoreFilehandle
       while (my $bytesread=read($fh,$buffer,1024)) {
          $sz+=length($buffer);
          if ($sz>$maxw5doc){
-            $self->LastMsg(ERROR,"Attachment upload is limited to %d bytes per file",
+            $self->LastMsg(ERROR,
+                           "Attachment upload is limited to %d bytes per file",
                            $maxw5doc);
             return(undef);
          }
@@ -940,7 +941,8 @@ sub StoreFilehandle
    while (my $bytesread=read($fh,$buffer,1024)) {
       $sz+=length($buffer);
       if ($sz>$maxw5doc){
-         $self->LastMsg(ERROR,"Attachment upload is limited to %d bytes per file",
+         $self->LastMsg(ERROR,
+                        "Attachment upload is limited to %d bytes per file",
                         $maxw5doc);
          return(undef);
       }
@@ -1203,8 +1205,10 @@ sub browser
                   $select.=">";
                }
                $select.="</div>";
-               my $t=$self->ExpandTimeExpression($fl->{mdate},$self->Lang()).
-                     " GMT by $fl->{editor}";
+               my $userTZ=$self->UserTimezone();
+               my $t=$self->ExpandTimeExpression($fl->{mdate},$self->Lang(),
+                                                 "GMT",$userTZ).
+                     " by $fl->{editor}";
                $list.=sprintf("<div class=fileline>$select<a class=filelink ".
                               "href=\"$prefix%s$post\" ".
                               "title=\"$t\">%s%s</a></div>\n",
