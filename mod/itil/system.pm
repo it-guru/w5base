@@ -3202,6 +3202,7 @@ sub addDefContactsFromAppl
    my $SelfAsParentObject=$self->SelfAsParentObject();
 
    my %addwr=();
+   my %addrd=();
    foreach my $fld (qw(tsmid tsm2id opmid opm2id applmgrid 
                        databossid contacts)){
       if ($fld eq "contacts"){
@@ -3211,6 +3212,10 @@ sub addDefContactsFromAppl
             if (in_array($roles,"write") &&
                 $crec->{targetid} ne ""){
                $addwr{$crec->{target}}->{$crec->{targetid}}++;
+            }
+            if (in_array($roles,["read","privread"]) &&
+                $crec->{targetid} ne ""){
+               $addrd{$crec->{target}}->{$crec->{targetid}}++;
             }
          } 
       }
@@ -3225,6 +3230,19 @@ sub addDefContactsFromAppl
    foreach my $target (keys(%addwr)){
       foreach my $targetid (keys(%{$addwr{$target}})){
          $addwr{$target}->{$targetid}=['write'];
+      }
+   }
+   foreach my $target (keys(%addrd)){
+      foreach my $targetid (keys(%{$addrd{$target}})){
+         if (!defined($addwr{$target})){
+            $addwr{$target}={};
+         }
+         if (!defined($addwr{$target}->{$targetid})){
+            $addwr{$target}->{$targetid}=[];
+         }
+         if (!in_array($addwr{$target}->{$targetid},"read")){
+            push(@{$addwr{$target}->{$targetid}},"read");
+         }
       }
    }
 
