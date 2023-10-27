@@ -1,0 +1,5 @@
+'base::qrule::checkDismissalDate'=>{
+ de=>'Prüfung des geplanten Ausscheidedatums',
+ en=>'Check of planned dismissal date'
+},
+
