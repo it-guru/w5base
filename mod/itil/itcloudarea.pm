@@ -547,7 +547,8 @@ sub Validate
       $self->LastMsg(ERROR,"invalid cloud record");
       return(0);
    }
-   if ($crec->{cistatusid} ne "3" && $crec->{cistatusid} ne "4"){
+   if (!defined($oldrec) && 
+       $crec->{cistatusid} ne "3" && $crec->{cistatusid} ne "4"){
       $self->LastMsg(ERROR,"invalid cistate in cloud record");
       return(0);
    }
