@@ -1569,8 +1569,11 @@ sub Validate
          return(0);
       }
    }
-
-
+   if (effChangedVal($oldrec,$newrec,"planneddismissaldate")){
+      if (effVal($oldrec,$newrec,"notifieddismissaldate") ne ""){
+         $newrec->{notifieddismissaldate}=undef;
+      }
+   }
 
    if ($usertyp ne "service" &&
        effVal($oldrec,$newrec,"surname") eq "" &&
