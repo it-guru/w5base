@@ -16,15 +16,22 @@ NONE
 =head3 HINTS
 
 [en:]
-The field 'Application Base Monitoring' is mandatory to fill,
-if the application is productive and the CI status is 'installed/active',
-'available/in project' or 'inactive/stored'.
+
+Please enter in the block "Monitoring and SLA":
+
+a) In the field "Application Base Monitoring", enter the tool used for monitoring.
+
+b) In the field "Application Base Monitoring Status" whether this tool is used with or without an auto-ticket function.
 
 
 [de:]
-Das Feld 'Anwendungs Basismonitoring' ist zwingend zu befüllen, 
-wenn die Anwendung Produktiv ist und der CI-Status 'installiert/aktiv',
-'verfügbar/in Projektierung' oder 'zeitweise inaktiv' ist.
+
+Bitte tragen Sie im Block Monitoring und SLA/Überwachung:
+
+a) im Feld Anwendungs Basismonitoring das zum Monitoring verwendete Tool aus.
+
+b) Im Feld Anwendungs Basismonitoring Status ob dieses Tool mit oder ohne einer Autoticket Funktion genutzt wird.
+
 
 =cut
 #######################################################################
@@ -71,9 +78,7 @@ sub qcheckRecord
    my $dataobj=shift;
    my $rec=shift;
 
-   return(undef,undef) if ($rec->{cistatusid}!=4 && 
-                      $rec->{cistatusid}!=3 &&
-                      $rec->{cistatusid}!=5);
+   return(undef,undef) if ($rec->{cistatusid}!=4);
    if ($rec->{opmode} eq "prod"){
       my @msg;
       if ($rec->{applbasemoniname} eq ""){
