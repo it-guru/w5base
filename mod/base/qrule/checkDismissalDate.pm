@@ -81,16 +81,16 @@ sub qcheckRecord
    return(undef) if ($rec->{planneddismissaldate} eq "");
 
 
-   printf STDERR ("fifi: planneddismissaldate=%s\n",
-                  $rec->{planneddismissaldate});
-   printf STDERR ("fifi: notifieddismissaldate=%s\n",
-                  $rec->{notifieddismissaldate});
+   #printf STDERR ("fifi: planneddismissaldate=%s\n",
+   #               $rec->{planneddismissaldate});
+   #printf STDERR ("fifi: notifieddismissaldate=%s\n",
+   #               $rec->{notifieddismissaldate});
 
    if ($rec->{notifieddismissaldate} eq ""){
       my $off=CalcDateDuration(NowStamp("en"),$rec->{planneddismissaldate});
-      print STDERR Dumper($off);
+      #print STDERR Dumper($off);
       if ($off->{totaldays}>28 && $off->{totaldays}<(7*12)){ # zwischen 4-12W
-         printf STDERR ("check if notification is needed\n");
+         #printf STDERR ("check if notification is needed\n");
          my $lastknownbossid=$rec->{lastknownbossid};
          my @lastknownbossid=split(/[,\s]+/,$lastknownbossid);
          my $lastknownpbossid=$rec->{lastknownpbossid};
@@ -127,7 +127,7 @@ sub qcheckRecord
             $obj->SetCurrentView($idfield->Name());
             my $n=$obj->SoftCountRecords();
             $foundRefs+=$n;
-            printf STDERR ("fifi %s = n=%s\n",$chk->{dataobj},$n); 
+            #printf STDERR ("fifi %s = n=%s\n",$chk->{dataobj},$n); 
          }
          if ($foundRefs==0){
             #nothing found - and no notification needed
@@ -135,7 +135,7 @@ sub qcheckRecord
          }
          else{
             # f.e. 14436098220000
-            printf STDERR ("NNEEEDD NOTIFY: $id = $foundRefs\n");
+            #printf STDERR ("NNEEEDD NOTIFY: $id = $foundRefs\n");
             if ($#boss!=-1){ 
                my $wfa=getModuleObject($dataobj->Config,"base::workflowaction");
                my %talklang;
@@ -167,10 +167,23 @@ sub qcheckRecord
                   $notifyparam{emailcc}=\@cleanemailcc;
                   $notifyparam{emailbcc}=[11634953080001];
         
-                  printf STDERR ("sending Notification in $lang\n");
-                  printf STDERR ("sending To:@cleanemailto\n");
-                  printf STDERR ("sending Cc:@cleanemailcc\n");
-                  $wfa->Notify("WARN","Aussscheiden","Machwas",%notifyparam);
+                  #printf STDERR ("sending Notification in $lang\n");
+                  #printf STDERR ("sending To:@cleanemailto\n");
+                  #printf STDERR ("sending Cc:@cleanemailcc\n");
+                  my $subject=$dataobj->T(
+                     "Request for clarification of data responsibility").": ".
+                     $rec->{fullname};
+                  my $tmpl="tmpl/bossnotify.checkDismissalDate";
+                  my $ddate=$rec->{planneddismissaldate};
+                  $ddate=~s/\s.*$//;
+                  my $txt=$dataobj->getParsedTemplate($tmpl,{
+                     static=>{
+                        USERNAME=>$rec->{fullname},
+                        DISMISSALDATE=>$ddate
+        
+                     }
+                  });
+                  $wfa->Notify("WARN",$subject,$txt,%notifyparam);
                }
                if (defined($lastlang)){
                   $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;
@@ -178,12 +191,14 @@ sub qcheckRecord
                else{
                   delete($ENV{HTTP_FORCE_LANGUAGE});
                }
-               #$forcedupd->{notifieddismissaldate}=NowStamp("en");
+               $forcedupd->{notifieddismissaldate}=NowStamp("en");
+               $checksession->{EssentialsChangedCnt}=0;
             }
          }
       }
       elsif ($off->{totaldays}<28){ # Notication Window is ended
          $forcedupd->{notifieddismissaldate}=NowStamp("en");
+         $checksession->{EssentialsChangedCnt}=0;
       }
    }
 
