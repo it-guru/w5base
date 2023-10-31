@@ -206,6 +206,7 @@ sub TriggerEndpoint
    my $userid=$self->getCurrentUserId();
    my $AccountID=$q->{AccountID}; 
    my $OP=$q->{OP};
+   my $awsregion='eu-central-1';
 
    if ($AccountID ne "" && (
         ($OP=~m/add/i) ||
@@ -216,11 +217,17 @@ sub TriggerEndpoint
                       srcid=>\$AccountID,
                       cistatusid=>'4'});
       my ($carec,$msg)=$ca->getOnlyFirst(qw(ALL));
-
-
-      msg(INFO,"AWS TriggerEndpoint:".$q->Dumper());
-
+      msg(INFO,"AWS TriggerEndpoint:".Dumper($q));
+             
       if (defined($carec)){
+         if ($OP=~m/add/i){
+            if ($q->{InstanceID} ne ""){
+               my $idpath=$q->{InstanceID}.'@'.$AccountID.'@'.$awsregion;
+               my $o=getModuleObject($self->Config,"aws::system");
+               $o->Import({importname=>$idpath});
+            }
+         }
+
          my %p=(eventname=>'AWS_QualityCheck',
                 spooltag=>'AWS_QualityCheck-'.$carec->{id},
                 redefine=>'1',

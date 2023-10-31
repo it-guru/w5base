@@ -304,7 +304,7 @@ sub TriggerEndpoint
                       cistatusid=>'4'});
       my ($carec,$msg)=$ca->getOnlyFirst(qw(ALL));
       if (defined($carec)){
-         msg(INFO,"AZURE TriggerEndpoint:".$q->Dumper());
+         msg(INFO,"AZURE TriggerEndpoint:".Dumper($q));
 
 
          my %p=(eventname=>'AZURE_QualityCheck',
