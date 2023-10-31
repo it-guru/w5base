@@ -216,6 +216,10 @@ sub TriggerEndpoint
                       srcid=>\$AccountID,
                       cistatusid=>'4'});
       my ($carec,$msg)=$ca->getOnlyFirst(qw(ALL));
+
+
+      msg(INFO,"AWS TriggerEndpoint:".$q->Dumper());
+
       if (defined($carec)){
          my %p=(eventname=>'AWS_QualityCheck',
                 spooltag=>'AWS_QualityCheck-'.$carec->{id},
