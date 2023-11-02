@@ -66,8 +66,9 @@ sub new
                 vjoinon       =>['cistatusid'=>'id'],
                 vjoindisp     =>'name'),
 
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'cistatusid',
+                default       =>'2',
                 label         =>'CI-StateID',
                 dataobjattr   =>'simonpkg.cistatus'),
 
@@ -232,6 +233,11 @@ sub new
          'local'
       ]
    };
+
+   $self->{CI_Handling}={uniquename=>"name",
+                         activator=>["admin","w5base.SIMon.monpkg"],
+                         uniquesize=>255};
+
    $self->setDefaultView(qw(name cistatus restrictarget mdate));
    $self->setWorktable("simonpkg");
    return($self);
@@ -329,6 +335,27 @@ sub Validate
 }
 
 
+sub SecureValidate
+{
+   my $self=shift;
+   my $oldrec=shift;
+   my $newrec=shift;
+   my $wrgroups=shift;
+
+   my $userid=$self->getCurrentUserId();
+   if (defined($oldrec) && $oldrec->{userid}==$userid){
+      delete($newrec->{cistatusid});
+   }
+   else{
+      if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+         return(0);
+      }
+   }
+   return($self->SUPER::SecureValidate($oldrec,$newrec,$wrgroups));
+}
+
+
+
 
 sub SecureSetFilter
 {
@@ -345,6 +372,7 @@ sub SecureSetFilter
       push(@flt,[
          {mandatorid=>\@mandators},
          {databossid=>$userid},
+         {creator=>$userid},
          {sectargetid=>\$userid,sectarget=>\'base::user',
           secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
                     "*roles=?read?=roles*"},
@@ -357,17 +385,19 @@ sub SecureSetFilter
 }
 
 
-
-
 sub FinishWrite
 {
    my $self=shift;
    my $oldrec=shift;
    my $newrec=shift;
-   my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
-   $self->NotifyOnCIStatusChange($oldrec,$newrec);
-   return($bak);
+   if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
+      return(0);
+   }
+
+   return(1);
 }
+
+
 
 
 sub getRecordImageUrl
