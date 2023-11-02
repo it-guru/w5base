@@ -396,6 +396,8 @@ sub new
                        "wfhead write, ".
                        "objblacklist write, ".
                        "wfkey write, wfaction write, iomap write, ".
+                       "filemgmt write, ".
+                       "phonenumber write, ".
                        "history write";
    return($self);
 }
