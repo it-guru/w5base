@@ -1601,11 +1601,37 @@ sub NotifyInterfaceContacts
 
          my @lastmsg=$dataobj->LastMsg();
 
+         my $configPrefixText=".";
+         my $configKey;
+
+         if ($dataobj->can("getWorktable")){
+            my ($worktable,$workdb)=$dataobj->getWorktable();
+            if (defined($workdb)){
+               my $dbname=$workdb->{dbname};
+               if ($dbname ne ""){
+                  $configKey=$dbname;
+               }
+            }
+         }
+         if ($dataobj->can("getCredentialName")){
+            my $credentialName=$dataobj->getCredentialName();
+            if ($credentialName ne ""){
+               $configKey=$credentialName;
+            }
+         }
+         if ($configKey){
+            $configPrefixText="and access credentials are readed from ".
+                              "Config-Key <b>\"$configKey\"</b>.";
+         }
+
          my $tmpl="There are communication problems on interface ...\n\n".
                   "<b>".$ifrec->{fullname}."</b>\n\n".
                   "... with a W5Base system. Available references are:\n\n".
                   "<font color=red>".join("\n",@lastmsg)."\n".
                   "</font color=red>".
+                  "\n".
+                  "The communication was requested for W5Base DataObj ".
+                  "<b>$W5DATAOBJ</b> $configPrefixText \n".
                   "\nThis mail is automaticly generated. ".
                   "Please do what is necessary to restore the ".
                   "accessibility of the application interface.\n";
