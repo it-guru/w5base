@@ -105,7 +105,8 @@ sub AMConfigBugRep
    
    $out->initWorkbook();
 
-   my @view=qw(systemid status systemname systemola assetassetid customerlink 
+   my @view=qw(systemid cdate status systemname systemola 
+               assetassetid customerlink 
                srcsys usage assignmentgroup iassignmentgroup);
 
    my $dataobj=getModuleObject($self->Config,"tsacinv::system");
@@ -182,7 +183,8 @@ sub AMConfigBugRep
       DataObj=>$dataobj,
       unbuffered=>0,
       filter=>{%flt},
-      view=>[@view]
+      view=>[@view],
+      order=>"cdate"
    });
 
 
@@ -196,10 +198,28 @@ sub AMConfigBugRep
       DataObj=>$hwdataobj,
       unbuffered=>0,
       filter=>{status=>"!wasted",deleted=>\'0',assetid=>\@multipleInvoiceOnly},
-      view=>[qw(assetid status assignmentgroup 
+      view=>[qw(assetid cdate status assignmentgroup 
                 tsacinv_locationfullname modelname)]
    });
 
+
+   my %oldInBuildFlt=%flt;
+
+   $oldInBuildFlt{'status'}='"in build"';
+   delete($oldInBuildFlt{'usage'});
+   $oldInBuildFlt{'cdate'}="<now-1Y";
+
+
+
+
+   push(@control,{
+      sheet=>"longInBuild",
+      DataObj=>$dataobj,
+      unbuffered=>0,
+      filter=>{%oldInBuildFlt},
+      view=>[@view],
+      order=>"cdate"
+   });
 
 
 
