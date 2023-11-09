@@ -169,3 +169,4 @@
 'planned dismissal date'=>{de=>'geplanter Ausscheidezeitpunkt'},
 'notified dismissal date'=>{de=>'Benachrichtigung über Ausscheidezeitpunkt'},
 'contact description'=>{de=>'Kontaktbezeichnung'},
+'user query 24h abort count'=>{de=>'Abfragenabbrüche der letzten 24h'},
