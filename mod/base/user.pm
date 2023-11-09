@@ -1015,6 +1015,16 @@ sub new
                 onRawValue    =>\&getLastLogon,
                 label         =>'Last-Logon'),
 
+      new kernel::Field::Number(
+                name          =>'userquerybreakcount',
+                group         =>'userro',
+                readonly      =>1,
+                label         =>'user query 24h abort count',
+                dataobjattr   =>"(select count(*) from userquerybreak where ".
+                                "userquerybreak.userid=contact.userid and ".
+                                "userquerybreak.createdate>".
+                                   "DATE_SUB(NOW(), INTERVAL 24 HOUR))"),
+
       new kernel::Field::Text(
                 name          =>'lastlang',
                 readonly      =>1,

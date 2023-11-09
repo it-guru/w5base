@@ -553,7 +553,8 @@ sub _LoadUserInUserCache
                                cistatusid secstate ipacl pagelimit
                                dialermode dialerurl dialeripref
                                email usersubst usertyp winsize winhandling
-                               dateofvsnfd));
+                               dateofvsnfd
+                               userquerybreakcount));
          if (defined($rec)){
             if ($rec->{ipacl} ne ""){
                $rec->{ipacl}=[split(/[;,]\s*/,$rec->{ipacl})];
