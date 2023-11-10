@@ -156,7 +156,7 @@ sub SecScanMon
             if ($skiplevel==0 ||  # = no records to skip
                 $skiplevel==3){   # = all skips are done
                my $d=CalcDateDuration($rec->{sdate},NowStamp("en"));
-               if ($d->{totaldays}>4.0){
+               if ($d->{totaldays}>10.0){
                  # msg(WARN,"skip notify for scan ".$rec->{id}." due scan ".
                  #          "to far (".$d->{totaldays}." days) in the past");
                  # msg(WARN,Dumper($rec));
