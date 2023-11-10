@@ -389,6 +389,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itts.proc.orgdom",
+                      "TS::orgdom",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("itts.proc.orgdom.relation",
+                      "TS::lnkorgdomappl",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("itts.kern.projectroom.new",
                       "itil::projectroom",
                       func=>'New',

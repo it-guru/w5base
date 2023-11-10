@@ -719,6 +719,14 @@ sub Init
                       func=>'New',
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.proc.orgdom",
+                      "TS::orgdom",
+                      defaultacl=>['valid_user']);
+
+   $self->RegisterObj("AL_TCom.proc.orgdom.relation",
+                      "TS::lnkorgdomappl",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("AL_TCom.proc.inmbusinessarea",
                       "AL_TCom::inmbusinessarea",
                       defaultacl=>['valid_user']);

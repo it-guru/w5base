@@ -130,6 +130,28 @@ sub new
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>'Org_Domain'),
 
+      new kernel::Field::Text(
+                name          =>'lorgdomainseg',
+                label         =>'Lead OrgDomain Segment',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"trim(substring(Org_Domain,0,".
+                                "charindex('/',Org_Domain)))"),
+
+      new kernel::Field::Text(
+                name          =>'orgdomainid',
+                label         =>'OrgDomainID',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"trim(substring(Org_Domain,".
+                                "charindex('/',Org_Domain)+1,".
+                                "charindex('-',Org_Domain)-".
+                                "charindex('/',Org_Domain)-2))"),
+
+      new kernel::Field::Text(
+                name          =>'orgdomainname',
+                label         =>'OrgDomainName',
+                htmldetail    =>'NotEmpty',
+                dataobjattr   =>"trim(right(Org_Domain,len(Org_Domain)-".
+                                "charindex('-',Org_Domain)))"),
 
       new kernel::Field::Contact(
                 name          =>'applmgr',
