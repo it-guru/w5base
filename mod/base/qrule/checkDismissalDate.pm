@@ -89,7 +89,7 @@ sub qcheckRecord
    if ($rec->{notifieddismissaldate} eq ""){
       my $off=CalcDateDuration(NowStamp("en"),$rec->{planneddismissaldate});
       #print STDERR Dumper($off);
-      if ($off->{totaldays}>28 && $off->{totaldays}<(7*12)){ # zwischen 4-12W
+      if ($off->{totaldays}>7 && $off->{totaldays}<(7*12)){ # zwischen 1-12W
          #printf STDERR ("check if notification is needed\n");
          my $lastknownbossid=$rec->{lastknownbossid};
          my @lastknownbossid=split(/[,\s]+/,$lastknownbossid);
