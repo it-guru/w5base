@@ -140,6 +140,8 @@
 'AL_TCom.proc.riskmgmt'=>{de=>'Risikomanagement',en=>'Riskmanagement'},
 'AL_TCom.proc.vou'=>{de=>'virtuelle Org-Einheit',en=>'virtual Org-Unit'},
 'AL_TCom.proc.vou.new'=>{de=>'Neueingabe',en=>'New'},
+'AL_TCom.proc.orgdom'=>{de=>'OrgDomain',en=>'OrgDomain'},
+'AL_TCom.proc.orgdom.relation'=>{de=>'Zuordnung',en=>'Relation'},
 'AL_TCom.proc.canvas'=>{de=>'Canvas Objekt',en=>'Canvas Object'},
 'AL_TCom.proc.canvas.relation'=>{de=>'Zuordnung',en=>'relation'},
 'AL_TCom.proc.canvas.new'=>{de=>'Neueingabe',en=>'New'},

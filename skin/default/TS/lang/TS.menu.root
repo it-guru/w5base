@@ -93,6 +93,8 @@
 'itts.proc.canvas.new'=>{de=>'Neueingabe',en=>'New'},
 'itts.proc.vou'=>{de=>'virt. Org-Einheit',en=>'virt. Org-Unit'},
 'itts.proc.vou.new'=>{de=>'Neueingabe',en=>'New'},
+'itts.proc.orgdom'=>{de=>'OrgDomain',en=>'OrgDomain'},
+'itts.proc.orgdom.relation'=>{de=>'Zuordnung',en=>'Relation'},
 'sysadm.qmgmt.tsinterview'=>{de=>'Deutsche Telekom CI-Interview',
                              en=>'Deutsche Telekom CI-Interview'},
 'sysadm.qmgmt.tsinterview.new'=>{de=>'Neueingabe',

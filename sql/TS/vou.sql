@@ -112,3 +112,51 @@ alter table vou drop column canvasid;
 alter table vou drop column canvasfield;
 alter table vou drop column canvasownerbuid;
 alter table vou drop column canvasowneritid;
+create table orgdom (
+  id         bigint(20) not null,
+  orgdomid    varchar(10), lseg varchar(10),
+  name        varchar(40) not null,
+  cistatus    int(2)      NOT NULL,
+  databoss    bigint(20)  default NULL,
+  description longtext    default NULL,
+  comments    blob,
+  additional  longtext    default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  lastqcheck datetime default NULL,
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  primary key(id),unique(orgdomid,name),
+  UNIQUE KEY `srcsys` (srcsys,srcid),
+  key(lastqcheck)
+) ENGINE=INNODB;
+create table lnkorgdom (
+  id         bigint(20) not null,
+  orgdomid   bigint(20) not null,
+  ictoid     varchar(20) not null,
+  vouid      bigint(20),
+  ictono     varchar(20) not null,
+  fraction   double(8,2) default '100.00',
+  comments    blob,
+  additional  longtext    default NULL,
+  createdate datetime NOT NULL default '0000-00-00 00:00:00',
+  modifydate datetime NOT NULL default '0000-00-00 00:00:00',
+  createuser bigint(20) NOT NULL default '0',
+  modifyuser bigint(20) NOT NULL default '0',
+  editor varchar(100) NOT NULL default '',
+  realeditor varchar(100) NOT NULL default '',
+  lastqcheck datetime default NULL,
+  srcsys     varchar(100) default 'w5base',
+  srcid      varchar(20) default NULL,
+  srcload    datetime    default NULL,
+  primary key(id),unique(orgdomid,ictoid,vouid),
+  UNIQUE KEY `srcsys` (srcsys,srcid),
+  # FOREIGN KEY fk_vou (vouid) REFERENCES vou (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_orgdom (orgdomid) REFERENCES orgdom (id) ON DELETE CASCADE,
+  key(lastqcheck)
+) ENGINE=INNODB;
