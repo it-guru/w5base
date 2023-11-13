@@ -1152,7 +1152,10 @@ sub new
                 subeditmsk    =>'subedit.user',
                 vjointo       =>'base::usersubst',
                 vjoinon       =>['userid'=>'userid'],
-                vjoindisp     =>['dstaccount','active','cdate']),
+                vjoindisp     =>['dstaccount','active','cdate'],
+                vjoininhash   =>['dstaccount','active','cdate',
+                                 'usersubstcontactusertyp',
+                                 'usersubstcontactcistatusid']),
 
       new kernel::Field::Text(
                 name          =>'allphones',
@@ -2190,7 +2193,7 @@ sub APIKeys
    print $self->HtmlHeader(style=>['default.css','work.css',
                                    'kernel.App.Web.css'],
                            body=>1,form=>1,
-                           title=>$self->T("Modify/View API Keys"));
+                           title=>$self->T("Modify/View W5BaseAPI Keys"));
    printf("<script language=JavaScript>");
    printf("function dropAPI(id){");
    printf(" document.forms[0].elements['dropid'].value=id;");
@@ -2249,7 +2252,8 @@ sub APIKeys
          printf("</table>");
 
          @msglist=map({quoteHtml($_)} @msglist);
-         $msg="<div class=lastmsg>".join("<br>\n",map({
+         $msg="<div class=lastmsg style=\"margin-left:3px\">".
+              join("<br>\n",map({
            if ($_=~m/^ERROR/){
               $_="<font style=\"color:red;\">".$_."</font>";
            }
@@ -2288,6 +2292,34 @@ sub APIKeys
       printf("</div>");
    }
    print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+sub preQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+   my $param=shift;
+
+print STDERR Dumper($param);
+
+   if ($rec->{cistatusid}==4){
+      if ($rec->{usertyp} eq "genericAPI"){
+         my $allOk=0;
+         foreach my $srec (@{$rec->{usersubst}}){
+            if ($srec->{usersubstcontactusertyp} eq "user" &&
+                $srec->{usersubstcontactcistatusid}==4){
+               $allOk++;
+            }
+         }
+         if (!$allOk){
+            $self->ValidatedUpdateRecord($rec,{cistatusid=>6},{
+                   userid=>\$rec->{userid}
+            });
+         }
+      }
+   }
+
 }
 
 sub SSHPublicKey

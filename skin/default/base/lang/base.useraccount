@@ -8,3 +8,4 @@
 'Password'=>{ de=>'Passwort (MySQL Hash)',en=>'Password (MySQL Hash)'},
 "invalid account name '%s' specified"=>{de=>"ungültiger Anmeldename/Benutzerkennung '%s'"},
 'DetailChangePassword'=>{de=>'Passwort ändern',en=>'change password'},
+'apikey needs IP-Address binding'=>{de=>'API-Keys benötigen eine IP-Adress-Zuorndung/Festlegung'},

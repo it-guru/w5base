@@ -88,6 +88,16 @@ sub new
                 vjoinon       =>['dstaccount'=>'account'],
                 vjoindisp     =>'account'),
 
+      new kernel::Field::Text(
+                name          =>'usersubstcontactusertyp',
+                label         =>'subst contact usertyp',
+                dataobjattr   =>'substcontact.usertyp'),
+
+      new kernel::Field::Text(
+                name          =>'usersubstcontactcistatusid',
+                label         =>'subst contact cistatusid',
+                dataobjattr   =>'substcontact.cistatus'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 label         =>'Creation-Date',
@@ -103,7 +113,11 @@ sub getSqlFrom
    my $self=shift;
    my ($worktable,$workdb)=$self->getWorktable();
    return("$worktable left outer join contact ".
-          "on $worktable.userid=contact.userid ");
+          "on $worktable.userid=contact.userid ".
+          "left outer join useraccount ".
+          "on $worktable.account=useraccount.account ".
+          "left outer join contact as substcontact ".
+          "on useraccount.userid=substcontact.userid");
 }
 
 
@@ -126,8 +140,12 @@ sub Validate
       $self->LastMsg(ERROR,"invalid urec refernce $olduserid");
       return(0);
    }
-   
 
+   if (effVal($oldrec,$newrec,"dstaccount") eq $ENV{REAL_REMOTE_USER} &&
+       $ENV{REAL_REMOTE_USER} ne $ENV{REMOTE_USER}){
+      $self->LastMsg(ERROR,"not allowed to modify current substitution");
+      return(0);
+   }
 
    my $curuserid=$self->getCurrentUserId();
    if ((!$self->IsMemberOf("admin")) &&
@@ -142,6 +160,24 @@ sub Validate
 
    return(1);
 }
+
+
+
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if ($rec->{dstaccount} eq $ENV{REAL_REMOTE_USER} &&
+       $ENV{REAL_REMOTE_USER} ne $ENV{REMOTE_USER}){
+      $self->LastMsg(ERROR,"not allowed to modify current substitution");
+      return(0);
+   }
+
+   return(1);
+}
+
+
 
 
 sub isViewValid
