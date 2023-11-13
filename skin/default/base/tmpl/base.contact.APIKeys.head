@@ -1,10 +1,13 @@
+<div style="float:right;margin: 3px;">
+<img border="0" alt="Help Icon" src="../../../public/base/load/help.gif" style="cursor:pointer"  onclick="parent.openwin('../../faq/QuickFind/globalHelp?stags=article&searchtext=W5Base%20API&AutoSearch=1','_help','height=570,width=680,toolbar=no,status=no,resizable=yes,scrollbars=auto');return(false);">
+</div>
+
 <div style="width:100%;margin:5px">
-<center>
-<b>The API-Key Feature is experimental and currently without any supported!!!</b>
-</center>
-<br>
 API Keys allowing technical Access to the current user contact rights
 by specifing "X-API-Token" HTTP-Header and using the /public/ url-Path.<br>
+<br>
+It is <font color=red><b>not permitted to set up application interfaces</b></font> via the API keys on user contacts. Such data interfaces must always be established via service contacts.<br>
+<br>
 API Keys are automaticly deleted, if the are longer then 10 days unused.
 An API-Key needs always an IP-Binding (max. 5 IP-Adresses) which needs to be specified on create.
 </div>
