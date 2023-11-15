@@ -108,7 +108,6 @@ sub getITENOSAuthorizationToken
             return(undef);
          }
       );
-print STDERR Dumper($d);
       if (!defined($d)){
          return(undef);
       }

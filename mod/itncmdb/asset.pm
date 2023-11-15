@@ -139,6 +139,13 @@ sub DataCollector
    my $Authorization=$self->getITENOSAuthorizationToken($credentialName);
 
 
+   my $datapath="cmdb/pServer";
+
+   if (exists($flt->{id})){
+      $datapath=$datapath."/".$flt->{id};
+   }
+
+
    my $dataobjurl;
    my $d=$self->CollectREST(
       dbname=>$credentialName,
@@ -149,7 +156,9 @@ sub DataCollector
          my $baseurl=shift;
          my $apikey=shift;
          $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         $dataobjurl=$baseurl."cmdb/pServer";
+         $dataobjurl=$baseurl.$datapath;
+#printf STDERR ("dataobjurl=%s\n",$dataobjurl);
+
          return($dataobjurl);
       },
       headers=>sub{
@@ -183,6 +192,9 @@ sub DataCollector
          my $statusline=shift;
          my $content=shift;
          my $reqtrace=shift;
+
+#printf STDERR ("code=$code content=$content\n");
+
 
 #         if ($code eq "404"){  # 404 bedeutet nicht gefunden
 #            return([],"200");
