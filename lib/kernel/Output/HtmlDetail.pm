@@ -274,6 +274,19 @@ sub  calcHtmlDetailViewMatrix
             }
          }
       }
+      elsif ($fieldlist->[$c]->{htmldetail} eq "Admin"){
+         if ($self->getParent->getParent->IsMemberOf("admin") 
+             && defined($rec)){
+            $vMatrix->{htmldetailof}->[$c]=1;
+         }
+      }
+      elsif ($fieldlist->[$c]->{htmldetail} eq "AdminOrSupport" ){
+         if (($self->getParent->getParent->IsMemberOf("admin") ||
+              $self->getParent->getParent->IsMemberOf("support")) 
+             && defined($rec)){
+            $vMatrix->{htmldetailof}->[$c]=1;
+         }
+      }
       else{ 
          $vMatrix->{htmldetailof}->[$c]=
             $fieldlist->[$c]->htmldetail("HtmlDetail",
