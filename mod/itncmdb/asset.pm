@@ -37,6 +37,7 @@ sub new
       new kernel::Field::Id(     
             name              =>'id',
             searchable        =>1,
+            RestFilterType    =>'CONST2PATH',
             group             =>'source',
             align             =>'left',
             dataobjattr       =>'pserverUid',
@@ -81,10 +82,46 @@ sub new
             label             =>'pserverCustomer'),
 
       new kernel::Field::Text(     
-            name              =>'pserverLocation',
+            name              =>'Location_address1',
             searchable        =>0,
-            dataobjattr       =>'pserverLocation',
-            label             =>'pserverLocation'),
+            dataobjattr       =>'Location_address1',
+            label             =>'Location_address1'),
+
+      new kernel::Field::Text(     
+            name              =>'Location_country',
+            searchable        =>0,
+            dataobjattr       =>'Location_country',
+            label             =>'Location_country'),
+
+      new kernel::Field::Text(     
+            name              =>'Location_zipcode',
+            searchable        =>0,
+            dataobjattr       =>'Location_zipcode',
+            label             =>'Location_zipcode'),
+
+      new kernel::Field::Text(     
+            name              =>'Location_location',
+            searchable        =>0,
+            dataobjattr       =>'Location_location',
+            label             =>'Location_location'),
+
+      new kernel::Field::Text(
+                name          =>'w5locid',
+                label         =>'W5Base Location ID',
+                group         =>'w5baselocation',
+                searchable    =>0,
+                depend        =>[qw(Location_location Location_address1 
+                                    Location_country  Location_zipcode)],
+                onRawValue    =>\&findW5LocID),
+
+      new kernel::Field::TextDrop(
+                name          =>'w5loc_name',
+                group         =>'w5baselocation',
+                label         =>'W5Base Location: Fullname',
+                vjointo       =>\'base::location',
+                vjoindisp     =>'name',
+                vjoinon       =>['w5locid'=>'id'],
+                searchable    =>0),
 
       new kernel::Field::Text(     
             name              =>'pserverManufacturer',
@@ -104,14 +141,22 @@ sub new
             dataobjattr       =>'pserverSerialNo',
             label             =>'pserverSerialNo'),
 
-      new kernel::Field::Text(     
-            name              =>'numberOfDuplicates',
+      new kernel::Field::CDate(
+            name              =>'cdate',
+            group             =>'source',
+            sqlorder          =>'desc',
+            label             =>'Creation-Date',
+            dataobjattr       =>'cdate'),
+
+      new kernel::Field::Textarea(
+            name              =>'srcrec',
             searchable        =>0,
-            dataobjattr       =>'numberOfDuplicates',
-            label             =>'numberOfDuplicates'),
+            htmldetail        =>"AdminOrSupport",
+            group             =>'source',
+            dataobjattr       =>'srcrec',
+            label             =>'original source record')
 
    );
-   $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name));
    return($self);
 }
@@ -122,6 +167,49 @@ sub getCredentialName
    my $self=shift;
 
    return("ITNCMDB");
+}
+
+
+sub findW5LocID
+{
+   my $self=shift;
+   my $current=shift;
+
+   my $p="Location_";
+
+   my $loc=getModuleObject($self->getParent->Config,"base::location");
+   my $address1=$self->getParent->getField("${p}address1")->RawValue($current);
+   my $location=$self->getParent->getField("${p}location")->RawValue($current);
+   my $zipcode=$self->getParent->getField("${p}zipcode")->RawValue($current);
+   my $country=$self->getParent->getField("${p}country")->RawValue($current);
+   my $newrec;
+   $newrec->{country}=$country;
+   $newrec->{location}=$location;
+   $newrec->{address1}=$address1;
+   $newrec->{zipcode}=$zipcode;
+   $newrec->{cistatusid}="4";
+
+   return(undef) if ($newrec->{address1}=~m/^\s*$/);
+
+   foreach my $k (keys(%$newrec)){
+      delete($newrec->{$k}) if (!defined($newrec->{$k}));
+   }
+   my $d;
+   my @locid=$loc->getIdByHashIOMapped($self->getParent->Self,$newrec,
+                                       DEBUG=>\$d,
+                                       ForceLikeSearch=>1);
+
+   if ($newrec->{zipcode} ne "" && $#locid==-1){ # try without zipcode
+      delete($newrec->{zipcode});
+      @locid=$loc->getIdByHashIOMapped($self->getParent->Self,$newrec,
+                                       DEBUG=>\$d,
+                                       ForceLikeSearch=>1);
+   }
+
+   if ($#locid!=-1){
+      return(\@locid);
+   }
+   return(undef);
 }
 
 
@@ -138,15 +226,21 @@ sub DataCollector
    my $credentialName=$self->getCredentialName();
    my $Authorization=$self->getITENOSAuthorizationToken($credentialName);
 
+   my @curView=$self->getCurrentView();
 
-   my $datapath="cmdb/pServer";
+   my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
+      "/cmdb/pServer",  # Path-Templ with var
+      $filterset,
+      {
+      }
+   );
 
-   if (exists($flt->{id})){
-      $datapath=$datapath."/".$flt->{id};
+   if (!defined($restFinalAddr)){
+      if (!$self->LastMsg()){
+         $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
+      }
+      return(undef);
    }
-
-
-   my $dataobjurl;
    my $d=$self->CollectREST(
       dbname=>$credentialName,
       requesttoken=>$requestToken,
@@ -155,10 +249,8 @@ sub DataCollector
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
-         $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         $dataobjurl=$baseurl.$datapath;
-#printf STDERR ("dataobjurl=%s\n",$dataobjurl);
-
+         $baseurl=~s#/$##;
+         my $dataobjurl=$baseurl.$restFinalAddr;
          return($dataobjurl);
       },
       headers=>sub{
@@ -179,33 +271,33 @@ sub DataCollector
              ref($data->{returnData}) eq "ARRAY"){
             my @l;
             foreach my $rec (@{$data->{returnData}}){
+               if (in_array(\@curView,[qw(ALL srcrec)])){
+                  my $jsonfmt=new JSON();
+                  $jsonfmt->property(latin1 => 1);
+                  $jsonfmt->property(utf8 => 0);
+                  $jsonfmt->pretty(1);
+                  my $d=$jsonfmt->encode($rec);
+                  $rec->{srcrec}=$d;
+               }
+               if (in_array(\@curView,[qw(ALL cdate)])){
+                  $rec->{cdate}=$rec->{vserverCreationDate};
+               }
+               $rec->{Location_address1}="";
+               $rec->{Location_address1}.=$rec->{pserverStreet};
+               if ($rec->{Location_address1} ne ""){
+                  if ($rec->{pserverHouseNo} ne ""){
+                     $rec->{Location_address1}.=" ".
+                              $rec->{pserverHouseNo};
+                  }
+               }
+               $rec->{Location_country}="DE";
+               $rec->{Location_zipcode}=$rec->{pserverPostalCode};
+               $rec->{Location_location}=$rec->{pserverCity};
                push(@l,$rec);
             }
-            #print STDERR Dumper($l[0]);
             return(\@l);
          }
          return(undef);
-      },
-      onfail=>sub{
-         my $self=shift;
-         my $code=shift;
-         my $statusline=shift;
-         my $content=shift;
-         my $reqtrace=shift;
-
-#printf STDERR ("code=$code content=$content\n");
-
-
-#         if ($code eq "404"){  # 404 bedeutet nicht gefunden
-#            return([],"200");
-#         }
-#         if ($code eq "403"){  # 403 Forbitten Problem 04/2023
-#            msg(ERROR,"vRA Bug 403 forbitten on access '$dataobjurl'");
-#            return([],"200");  # Workaround, to prevent Error Messages
-#         }                     # in QualityChecks
-#         msg(ERROR,$reqtrace);
-#         $self->LastMsg(ERROR,"unexpected data TPC machine response");
-#         return(undef);
       }
 
    );
@@ -451,7 +543,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default tags source));
+   return(qw(header default  w5baselocation tags source));
 }
 
 

@@ -38,6 +38,7 @@ sub new
       new kernel::Field::Id(     
             name              =>'id',
             searchable        =>1,
+            RestFilterType    =>'CONST2PATH',
             group             =>'source',
             align             =>'left',
             dataobjattr       =>'vserverUid',
@@ -66,7 +67,6 @@ sub new
 
       new kernel::Field::Text(     
             name              =>'vserverOs',
-            searchable        =>0,
             dataobjattr       =>'vserverOs',
             label             =>'vserverOs'),
 
@@ -83,19 +83,33 @@ sub new
             label             =>'vserverCpucount'),
 
       new kernel::Field::Text(     
-            name              =>'numberOfDuplicates',
-            searchable        =>0,
-            dataobjattr       =>'numberOfDuplicates',
-            label             =>'numberOfDuplicates'),
+            name              =>'vserverCustomerIp',
+            dataobjattr       =>'vserverCustomerIp',
+            label             =>'vserverCustomerIp'),
 
       new kernel::Field::Textarea(     
             name              =>'vserverRemark',
             searchable        =>0,
             dataobjattr       =>'vserverRemark',
-            label             =>'vserverRemark')
+            label             =>'vserverRemark'),
+
+      new kernel::Field::CDate(
+            name              =>'cdate',
+            group             =>'source',
+            sqlorder          =>'desc',
+            label             =>'Creation-Date',
+            dataobjattr       =>'cdate'),
+
+      new kernel::Field::Textarea(     
+            name              =>'srcrec',
+            searchable        =>0,
+            htmldetail        =>"AdminOrSupport",
+            group             =>'source',
+            dataobjattr       =>'srcrec',
+            label             =>'original source record')
 
    );
-   $self->{'data'}=\&DataCollector;
+ #  $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name datacenter));
    return($self);
 }
@@ -119,16 +133,26 @@ sub DataCollector
    my ($flt,$requestToken)=$self->simplifyFilterSet($filterset);
    return(undef) if (!defined($flt));
 
+   my @curView=$self->getCurrentView();
+
    my $credentialName=$self->getCredentialName();
    my $Authorization=$self->getITENOSAuthorizationToken($credentialName);
 
-   my $datapath="cmdb/vServer";
 
-   if (exists($flt->{id})){
-      $datapath=$datapath."/".$flt->{id};
+   my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
+      "/cmdb/vServer",  # Path-Templ with var
+      $filterset,
+      {
+      }
+   );
+
+   if (!defined($restFinalAddr)){
+      if (!$self->LastMsg()){
+         $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
+      }
+      return(undef);
    }
 
-   my $dataobjurl;
    my $d=$self->CollectREST(
       dbname=>$credentialName,
       requesttoken=>$requestToken,
@@ -137,9 +161,8 @@ sub DataCollector
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
-         $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         $dataobjurl=$baseurl.$datapath;
-#printf STDERR ("dataobjurl=%s\n",$dataobjurl);
+         $baseurl=~s#/$##;
+         my $dataobjurl=$baseurl.$restFinalAddr;
          return($dataobjurl);
       },
       headers=>sub{
@@ -154,40 +177,29 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-#print STDERR Dumper($data);
 
          if (ref($data) eq "HASH" &&
              exists($data->{returnData}) &&
              ref($data->{returnData}) eq "ARRAY"){
             my @l;
             foreach my $rec (@{$data->{returnData}}){
+               if (in_array(\@curView,[qw(ALL srcrec)])){
+                  my $jsonfmt=new JSON();
+                  $jsonfmt->property(latin1 => 1);
+                  $jsonfmt->property(utf8 => 0);
+                  $jsonfmt->pretty(1);
+                  my $d=$jsonfmt->encode($rec);
+                  $rec->{srcrec}=$d;
+               }
+               if (in_array(\@curView,[qw(ALL cdate)])){
+                  $rec->{cdate}=$rec->{vserverCreationDate};
+               }
                push(@l,$rec);
             }
-            #print STDERR Dumper($l[0]);
             return(\@l);
          }
          return(undef);
-      },
-      onfail=>sub{
-         my $self=shift;
-         my $code=shift;
-         my $statusline=shift;
-         my $content=shift;
-         my $reqtrace=shift;
-
-#printf STDERR ("code=$code content=$content\n");
-#         if ($code eq "404"){  # 404 bedeutet nicht gefunden
-#            return([],"200");
-#         }
-#         if ($code eq "403"){  # 403 Forbitten Problem 04/2023
-#            msg(ERROR,"vRA Bug 403 forbitten on access '$dataobjurl'");
-#            return([],"200");  # Workaround, to prevent Error Messages
-#         }                     # in QualityChecks
-#         msg(ERROR,$reqtrace);
-#         $self->LastMsg(ERROR,"unexpected data ITENOS machine response");
-#         return(undef);
       }
-
    );
 
    return($d);
