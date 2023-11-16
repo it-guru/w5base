@@ -20,13 +20,13 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
-use kernel::DataObj::Static;
+use kernel::DataObj::REST;
 use kernel::Field;
 use kernel::Field::TextURL;
 use kernel::QRule;
 use Text::ParseWords;
 use MIME::Base64;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::REST);
 
 sub new
 {
@@ -63,7 +63,7 @@ sub getITENOSAuthorizationToken
                $dataobjurl.="/";
             }
             $dataobjurl.="token";
-            msg(INFO,"request Authorization at $dataobjurl");
+            #msg(INFO,"request Authorization at $dataobjurl");
             return($dataobjurl);
          },
          content=>sub{
