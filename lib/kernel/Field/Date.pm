@@ -48,6 +48,12 @@ sub FormatedDetail
    my $dayoffset;
    my $timeonly;
 
+   # central hack to handel iso stamps 2022-01-25T12:00:00Z (REST)
+   if (defined($d) && $d ne ""){
+      $d=~s/^([0-9]{4}-[0-9]{2}-[0-9]{2})T  
+             ([0-9]{2}:[0-9]{2}:[0-9]{2})Z?$/$1 $2/x;
+   }
+
    my $usertimezone=$ENV{HTTP_FORCE_TZ};
    if (!defined($usertimezone)){
       $usertimezone=$self->getParent->UserTimezone();
