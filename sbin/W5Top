@@ -9,10 +9,11 @@ use kernel::config;
 use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
-use vars qw($opt_v $opt_h $opt_autokill $opt_c $configname);
+use vars qw($opt_v $opt_h $opt_autokill $opt_fastkill $opt_c $configname);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
                         'autokill'=>\$opt_autokill,
+                        'fastkill'=>\$opt_fastkill,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
 
@@ -150,7 +151,7 @@ foreach my $apid (@apid){
       close(F);
    }
 }
-#print STDERR Dumper(\%stat);
+print STDERR Dumper(\%stat);
 
 
 foreach my $apid (@apid){
@@ -159,7 +160,9 @@ foreach my $apid (@apid){
       # fifi
       #$stat{$apid}->{duration}=99999 if ($stat{$apid}->{user} ne "");
        
-      if ($stat{$apid}->{duration}>600 || $userpcount{$stat{$apid}->{user}}>1){
+      if ($stat{$apid}->{duration}>600 || 
+          ($opt_fastkill && $stat{$apid}->{duration}>3) ||
+          $userpcount{$stat{$apid}->{user}}>1){
          my $user=getModuleObject($curconfig,"base::user");
          my $modlong=$user->T($stat{$apid}->{mod},$stat{$apid}->{mod});
          $consolemsg.=sprintf("WARN: found long (%dsec) running request at ".
@@ -181,7 +184,7 @@ foreach my $apid (@apid){
             $killtimeout=$urec->{killtimeout};
          }
          if ($killtimeout<600){
-            $killtimeout=1000;
+            $killtimeout=600;
          }
          my $forcekill=0;
          if ($stat{$apid}->{user} ne "" &&
@@ -200,6 +203,7 @@ foreach my $apid (@apid){
             }
          }
          if ($stat{$apid}->{duration}>10800 || 
+             ($opt_fastkill && $stat{$apid}->{duration}>3) ||
              $stat{$apid}->{duration}>$killtimeout){
             msg(INFO,"initiate KILL process for $apid");
             if ($forcekill){
