@@ -4,7 +4,7 @@ TRIGGERURL="https://w5base-testenv.telekom.de/darwin/auth/azure/subscription"
 FUNCTION="TriggerEndpoint"
 
 
-cat << EOF | curl -sn \
+cat << EOF | curl -sn --write-out "HTTP Code: %{http_code}\n" \
              "$TRIGGERURL/$FUNCTION" \
              --header "Content-Type: application/json" \
              --header "Accept: application/json" \
