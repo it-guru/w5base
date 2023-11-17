@@ -4,5 +4,7 @@ your request to W5Base-System '%sitename%' at module '%modlong()%' runs longer t
 
 This situation can happen, if you do query request, which create very large result sets. It is also possible that the database backend at the used module is slow or is hanging.
 
+If a process-kill happens to many times within 24h, your account (contact) will be temporary locked. This lock can not be removed, also not from admins.
+
 To prevent this, design your query requests with a smaller expected result set.
 
