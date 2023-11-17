@@ -4,5 +4,7 @@ ihre Abfrage auf dem W5Base-System '%sitename()%' im Modul '%modlong()%' hatte e
 
 Diese Situation kann auftreten, wenn Sie eine Abfrage durchführen, die extrem große Ergebnislisten erzeugt. Desweiteren kann es sein, dass zum Zeitpunkt der Abfrage das Datenbank-Endsystem sehr träge geantwortet hat oder eine Fehlfunktion auf dem Datenbanksystem vorlag.
 
+Wenn ein Abfrage-Abbruch innerhalb von 24 Stunden zu oft vorkommt, wird Ihr User-Account (Kontakt) vorübergehend gesperrt. Diese Sperre kann nicht aufgehoben werden, auch nicht von Admins.
+
 Um das Abbrechen von Abfragen zu vermeiden, wählen Sie bitte Ihre Abfrage Filter so, dass möglichst kleine Ergebnislisten erzeugt werden bzw. teilen Sie Ihre Anfrage in mehrere kleinere Anfragen auf.
 

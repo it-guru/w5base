@@ -151,7 +151,7 @@ foreach my $apid (@apid){
       close(F);
    }
 }
-print STDERR Dumper(\%stat);
+#print STDERR Dumper(\%stat);
 
 
 foreach my $apid (@apid){
@@ -284,7 +284,8 @@ foreach my $apid (@apid){
                      }
                      else{
                         printf STDERR ("%s\n",$consolemsg);
-                        printf STDERR ("ERROR: exitcode of call was not zero!\n");
+                        printf STDERR ("ERROR: ".
+                                       "exitcode of call was not zero!\n");
                      }
                   }
                }
