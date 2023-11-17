@@ -588,12 +588,22 @@ sub ValidateCaches
        defined($UserCache->{$ENV{REMOTE_USER}}) &&
        defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid})){ 
       if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}!=4 ||
+          ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{userquerybreakcount} ne "" 
+           &&
+           $UserCache->{$ENV{REMOTE_USER}}->{rec}->{userquerybreakcount}>10) ||
           $UserCache->{$ENV{REMOTE_USER}}->{rec}->{gtcack} eq ""){
          if (Query->Param("MOD") eq "base::interface"){
             printf("Status: 403 Forbidden - ".
                    "account needs to be activated with web browser\n");
             printf("Content-type: text/xml\n\n".
                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            return(0);
+         }
+         elsif($ENV{HTTP_ACCEPT} eq "application/json"){
+            printf("Status: 403 Forbidden - ".
+                   "account locked\n");
+            printf("Content-type: application/json\n\n".
+                   "[]\n");
             return(0);
          }
          else{
