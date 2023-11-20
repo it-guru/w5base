@@ -1454,7 +1454,7 @@ sub new
                 vjointo       =>'itil::tag_system',
                 vjoinon       =>['id'=>'refid'],
                 vjoindisp     =>['name','value'],
-                vjoininhash   =>['name','id','mdate','cdate']),
+                vjoininhash   =>['name','value','id','mdate','cdate','uname']),
 
       new kernel::Field::SubList(
                 name          =>'applicationteams',

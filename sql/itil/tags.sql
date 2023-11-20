@@ -46,7 +46,7 @@ create table tag_system (
   KEY name (name),
   UNIQUE KEY `uname` (uname,refid),
   FOREIGN KEY refrecord (refid)
-  REFERENCES appl (id) ON DELETE CASCADE,
+  REFERENCES system (id) ON DELETE CASCADE,
   KEY refid (refid),
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

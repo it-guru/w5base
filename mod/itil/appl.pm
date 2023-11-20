@@ -626,7 +626,7 @@ sub new
                 vjointo       =>'itil::tag_appl',
                 vjoinon       =>['id'=>'refid'],
                 vjoindisp     =>['name','value'],
-                vjoininhash   =>['name','id','mdate','cdate']),
+                vjoininhash   =>['name','value','id','mdate','cdate','uname']),
 
       new kernel::Field::Text(
                 name          =>'businessteambossid',
