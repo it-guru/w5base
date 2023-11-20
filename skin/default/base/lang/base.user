@@ -170,3 +170,4 @@
 'notified dismissal date'=>{de=>'Benachrichtigung über Ausscheidezeitpunkt'},
 'contact description'=>{de=>'Kontaktbezeichnung'},
 'user query 24h abort count'=>{de=>'Abfragenabbrüche der letzten 24h'},
+'IP-Address(es):'=>{de=>'IP-Adresse(n):'},
