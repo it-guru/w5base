@@ -1547,6 +1547,9 @@ sub Validate
          $newrec->{givenname}="";
       }
    }
+   if (exists($newrec->{contactdesc}) && $newrec->{contactdesc} ne ""){
+      $newrec->{surname}=$newrec->{contactdesc};
+   }
    if ($usertyp eq "function" || $usertyp eq "service"){
       foreach my $v (qw(office_mobile
                         private_street
