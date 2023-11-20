@@ -90,17 +90,17 @@ sub qcheckRecord
    my @dataissue;
    my $errorlevel=0;
 
+   my $realsrcsys=$rec->{itcloudshortname};
+
    return(undef,undef) if ($rec->{srcsys} ne "TPC" &&
-                           !($rec->{srcsys}=~m/^TPC\d+$/));
+                           !($realsrcsys=~m/^TPC\d+$/));
 
    if (lc($rec->{srcsys}) eq "tpc"){ # migration TPC->TPC1
       $dataobj->ValidatedUpdateRecord($rec,{srcsys=>'TPC1'},{id=>$rec->{id}});
       $rec->{srcsys}="TPC1";
    }
 
-
-
-   my $TPCenv=$rec->{srcsys};
+   my $TPCenv=$realsrcsys;
 
    my ($parrec,$msg);
    my $par=getModuleObject($self->getParent->Config(),$TPCenv."::machine");
@@ -129,15 +129,49 @@ sub qcheckRecord
    #      $forcedupd->{srcload}=undef;
    #   }
    #}
-   if ($rec->{cistatusid}==6 && defined($parrec)){
-      # das kann auftreten, wenn die TPC Datenbank temporär Rotz-Daten 
-      # hatte (d.h. es fehlten einfach Systeme, die in Wirklichkeit noch
-      # da waren.
-      $forcedupd->{cistatusid}=4;
+   if (defined($parrec)){
+      if ($rec->{cistatusid}==6){
+         # das kann auftreten, wenn die TPC Datenbank temporär Rotz-Daten 
+         # hatte (d.h. es fehlten einfach Systeme, die in Wirklichkeit noch
+         # da waren.
+         $forcedupd->{cistatusid}=4;
+      }
+      # $parrec->{ismcos};
+      my $tags=getModuleObject($dataobj->Config,"itil::tag_system");
+      if ($parrec->{ismcos}){
+         if (!in_array($rec->{alltags},[{uname=>\"isMCOS",value=>\"1"}])){
+            $tags->ValidatedInsertRecord({
+               refid=>$rec->{id},
+               name =>'isMCOS',
+               uname=>'isMCOS',
+               value=>'1',
+               ishidden=>1
+            });
+         }
+      }
+      else{
+         if (in_array($rec->{alltags},[{uname=>\"isMCOS"}])){
+            $tags->BulkDeleteRecord({
+               refid=>$rec->{id},
+               uname=>'isMCOS',
+               ishidden=>1
+            });
+         }
+      }
    }
-   if ($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
-       $rec->{cistatusid}==5 ||
-       (exists($forcedupd->{cistatusid}) && $forcedupd->{cistatusid}==4)){
+   if (!defined($parrec)){
+      return(undef,undef) if (!$par->Ping());
+      $forcedupd->{cistatusid}=6;
+      push(@qmsg,
+         'set system CI-Status to disposed of waste due missing on TPC');
+   }
+
+
+
+   if (($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
+        $rec->{cistatusid}==5 ||
+        (exists($forcedupd->{cistatusid}) && $forcedupd->{cistatusid}==4)) &&
+       ($rec->{srcsys}=~m/^TPC\d+$/)){
       if ($rec->{srcid} ne "" && $rec->{srcsys} eq $TPCenv){
          if (!defined($parrec)){
             return(undef,undef) if (!$par->Ping());
