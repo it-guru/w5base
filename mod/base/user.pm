@@ -2244,9 +2244,13 @@ sub APIKeys
          printf("<hr>");
          printf("<table margin=5 border=0 width=100%>");
          printf("<tr>");
+         printf("<td width=1%% nowrap>%s</td>",
+                $self->T("IP-Address(es):"));
          printf("<td><input type=text ".
                 "style=\"width:100%\" value=\"%s\" name=ipaddr></td>",$ipaddr);
-         printf("<td width=1%><input type=submit value=\"%s\" name=add></td>",
+         printf("<td width=1%>".
+                "<input style=\"cursor:pointer\" ".
+                 "type=submit value=\"%s\" name=add></td>",
                     $self->T("create new key"));
          printf("</tr>");
          printf("</table>");
