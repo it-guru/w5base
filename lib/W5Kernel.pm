@@ -213,15 +213,37 @@ sub in_array
    my ($arr,$search_for) = @_;
 
    $arr=[$arr] if (ref($arr) ne "ARRAY");
-   my %items;
-   map({$items{$_}++} @$arr); # create a hash out of the array values
-   if (ref($search_for) eq "ARRAY"){
-      foreach my $search_for_loop (@$search_for){
-         return(1) if (exists($items{$search_for_loop}));
+   if (ref($search_for) eq "ARRAY" && ref($search_for->[0]) eq "HASH"){
+      # search in array of hashes ($search_for must be array of hashes)
+      my $found=0;
+      foreach my $chkrec (@$arr){
+         if (ref($chkrec) eq "HASH"){
+            foreach my $matchrec (@{$search_for}){
+               foreach my $mkey (keys(%$matchrec)){
+                  next if (!exists($chkrec->{$mkey}));
+                  if (ref($matchrec->{$mkey}) eq "SCALAR"){
+                     if (${$matchrec->{$mkey}} eq $chkrec->{$mkey}){
+                        $found++;
+                     }
+                  }
+               }
+            }
+         }
       }
-      return(0);
+      return($found);
    }
-   return(exists($items{$search_for})?1:0);
+   else{
+      my %items;
+      map({$items{$_}++} @$arr); # create a hash out of the array values
+      if (ref($search_for) eq "ARRAY"){
+         foreach my $search_for_loop (@$search_for){
+            return(1) if (exists($items{$search_for_loop}));
+         }
+         return(0);
+      }
+      return(exists($items{$search_for})?1:0);
+   }
+   return(0);
 }
 
 sub array_insert
