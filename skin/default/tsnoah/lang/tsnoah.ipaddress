@@ -1,6 +1,0 @@
-'tsnoah::ipaddress'=>{de=>'NOAH: IP-Adresse',en=>'NOAH: IP-Address'},
-'IP-Address'=>{de=>'IP-Adresse'},
-'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Adressen'},
-'is primary'=>{de=>'primär'},
-'Customer'=>{de=>'Kunde'},
-'CustomerId'=>{de=>'KundeId'},
