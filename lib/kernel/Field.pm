@@ -1343,7 +1343,8 @@ sub FormatedDetailDereferncer
 
    if (ref($d) && ($FormatAs ne "JSON" && $FormatAs ne "SOAP")){
       if (ref($self->{dereference}) eq "CODE"){
-         return(&{$self->{dereference}}($self,$current,$FormatAs,$d));
+         my @result=&{$self->{dereference}}($self,$current,$FormatAs,$d);
+         return(@result);
       }
       if (ref($d) eq "ARRAY"){
          if (exists($self->{vjoinconcat}) && $self->{vjoinconcat} ne ""){
@@ -1363,6 +1364,12 @@ sub FormatedDetailDereferncer
          }
          elsif (exists($d->{'RawValue'})){
             $d=$d->{'RawValue'};
+         }
+         if (($FormatAs=~m/^Html/)){
+            my $htmlD=Dumper($d);
+            $htmlD=~s/^\$VAR1\s*=\s*{/{/s;
+            $htmlD=~s/;\s*$//s;
+            $d="<xmp>".$htmlD."</xmp>";;
          }
       }
    }
