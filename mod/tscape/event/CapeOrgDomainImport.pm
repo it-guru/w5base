@@ -83,7 +83,7 @@ sub CapeOrgDomainImport
                                    respvorg orgareaid organisation
                                    orgdomainid orgdomainname)
    );
-   if (0){  # sync orgdom Table
+   if (1){  # sync orgdom Table
       foreach my $irec (@capeData){
          next if (!($irec->{orgdomainid}=~m/^DOM/)); # C is rotz
          next if ($irec->{orgdomainid} eq "");
