@@ -54,17 +54,17 @@ sub new
                                                   
       new kernel::Field::Text(
                 name          =>'orgdomid',
-                label         =>'OrgDomainID',
+                label         =>'Organisation Domain',
                 htmleditwidth =>'80px',
                 size          =>'3',
                 dataobjattr   =>'orgdom.orgdomid'),
 
-      new kernel::Field::Text(
-                name          =>'lseg',
-                label         =>'lead Segment',
-                htmleditwidth =>'80px',
-                size          =>'3',
-                dataobjattr   =>'orgdom.lseg'),
+      #new kernel::Field::Text(
+      #          name          =>'lseg',
+      #          label         =>'lead Segment',
+      #          htmleditwidth =>'80px',
+      #          size          =>'3',
+      #          dataobjattr   =>'orgdom.lseg'),
 
       new kernel::Field::Text(
                 name          =>'name',
@@ -97,26 +97,25 @@ sub new
                                 "orgdom.name".
                                 ")"),
 
-#      new kernel::Field::SubList(
-#                name          =>'ictorelations',
-#                label         =>'ICTO Relations',
-#                htmlwidth     =>'300px',
-#                group         =>'ictorelations',
-#                searchable    =>0,
-#                vjointo       =>'TS::lnkorgdom',
-#                vjoinon       =>['id'=>'orgdomid'],
-#                vjoindisp     =>['icto','fraction','vou']),
+      new kernel::Field::SubList(
+                name          =>'ictorelations',
+                label         =>'ICTO Relations',
+                htmlwidth     =>'300px',
+                group         =>'ictorelations',
+                searchable    =>0,
+                vjointo       =>'TS::lnkorgdomappl',
+                vjoinon       =>['id'=>'orgdomid'],
+                vjoindisp     =>['ictono','fraction','vou']),
 
-#      new kernel::Field::SubList(
-#                name          =>'applications',
-#                label         =>'Applications',
-#                group         =>'ictorelations',
-#                searchable    =>1,
-#                htmldetail    =>0,
-#                readonly      =>1,
-#                vjointo       =>'TS::lnkorgdomappl',
-#                vjoinon       =>['id'=>'orgdomid'],
-#                vjoindisp     =>['appl']),
+      new kernel::Field::SubList(
+                name          =>'applications',
+                label         =>'Applications',
+                group         =>'ictorelations',
+                searchable    =>1,
+                readonly      =>1,
+                vjointo       =>'TS::lnkorgdomappl',
+                vjoinon       =>['id'=>'orgdomid'],
+                vjoindisp     =>['appl']),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
