@@ -2308,8 +2308,6 @@ sub preQualityCheckRecord
    my $rec=shift;
    my $param=shift;
 
-print STDERR Dumper($param);
-
    if ($rec->{cistatusid}==4){
       if ($rec->{usertyp} eq "genericAPI"){
          my $allOk=0;
