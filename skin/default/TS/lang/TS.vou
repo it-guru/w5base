@@ -27,4 +27,10 @@
 'Canvas relations'=>{de=>'Canvas Zuordnungen'},
 'deactivation is only allowed for w5base.TS.vou members'=>{
   de=>'Deaktivierungen sind nur durch Mitglieder von w5base.TS.vou möglich'
-}
+},
+'fieldgroup.orgdoms'=>{
+ de=>'Organisations-Domains',
+ en=>'Organisation-Domains'
+},
+'Organisation-Domains'=>{de=>'Organisations-Domains'},
+

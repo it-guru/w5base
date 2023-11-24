@@ -244,6 +244,17 @@ sub new
                 group         =>'contacts'),
 
       new kernel::Field::SubList(
+                name          =>'orgdoms',
+                label         =>'Organisation-Domains',
+                htmlwidth     =>'300px',
+                group         =>'orgdoms',
+                searchable    =>0,
+                vjointo       =>'TS::lnkorgdomappl',
+                vjoinon       =>['id'=>'vouid'],
+                vjoindisp     =>['orgdomorgdomid','orgdom']),
+
+
+      new kernel::Field::SubList(
                 name          =>'respapplications',
                 label         =>'responsible applications',
                 htmlwidth     =>'300px',
@@ -438,7 +449,7 @@ sub getDetailBlockPriority
 {
    my $self=shift;
    return(qw(header default vouattr subvous 
-             contacts respappl appl comments source));
+             contacts orgdoms respappl appl comments source));
 }
 
 

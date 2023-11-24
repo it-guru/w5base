@@ -61,16 +61,17 @@ sub CapeOrgDomainImport
    my $orgdomo=getModuleObject($self->Config,"TS::orgdom");
    return({}) if ($orgdomo->isSuspended());
 
-   my $lnkorgdom=getModuleObject($self->Config,"TS::lnkorgdomappl");
+   my $lnkorgdom=getModuleObject($self->Config,"TS::lnkorgdom");
    return({}) if ($lnkorgdom->isSuspended());
 
 
    $vou->SetFilter({cistatusid=>"<6"});
-   $vou->SetCurrentView(qw( id shortname ));
+   $vou->SetCurrentView(qw( id shortname rorgid ));
    my $v=$vou->getHashIndexed(qw(shortname));
 
+
    $orgdomo->SetFilter({cistatusid=>"<6"});
-   $orgdomo->SetCurrentView(qw( id orgdomid name lseg cistatusid ));
+   $orgdomo->SetCurrentView(qw( id orgdomid name cistatusid ));
    my $orgdom=$orgdomo->getHashIndexed(qw(orgdomid));
 
    my $norgdom={};
@@ -78,163 +79,180 @@ sub CapeOrgDomainImport
    my $iname=$i->Self();
    $i->SetFilter({status=>'"!Retired"'});
 
-   my @capeData=$i->getHashList(qw(archapplid id
-                                   respvorg orgarea orgareaid organisation
-                                   lorgdomainseg orgdomainid orgdomainname)
+   my @capeData=$i->getHashList(qw(archapplid id 
+                                   respvorg orgareaid organisation
+                                   orgdomainid orgdomainname)
    );
-   foreach my $irec (@capeData){
-      next if (!($irec->{orgdomainid}=~m/^DOM/)); # C is rotz
-      next if ($irec->{orgdomainid} eq "");
-
-
-      my $domrec={
-         cistatusid=>'4',
-         lseg=>$irec->{lorgdomainseg},
-         name=>$irec->{orgdomainname},
-         orgdomid=>$irec->{orgdomainid}
-      };
-      if (!defined($norgdom->{$irec->{orgdomainid}})){
-         $norgdom->{$irec->{orgdomainid}}=$domrec;
+   if (0){  # sync orgdom Table
+      foreach my $irec (@capeData){
+         next if (!($irec->{orgdomainid}=~m/^DOM/)); # C is rotz
+         next if ($irec->{orgdomainid} eq "");
+    
+         my $domrec={
+            cistatusid=>'4',
+            name=>$irec->{orgdomainname},
+            orgdomid=>$irec->{orgdomainid}
+         };
+         if (!defined($norgdom->{$irec->{orgdomainid}})){
+            $norgdom->{$irec->{orgdomainid}}=$domrec;
+         }
+         if ($irec->{orgareaid} ne ""){
+            $norgdom->{$irec->{orgdomainid}}->{orgareaid}->{$irec->{orgareaid}}++;
+         }
       }
-      if ($irec->{orgareaid} ne ""){
-         $norgdom->{$irec->{orgdomainid}}->{orgareaid}->{$irec->{orgareaid}}++;
-      }
-   }
-
-   my @opList;
-   my $res=OpAnalyse(
-         sub{  # comperator
-            my ($a,$b)=@_;   # a=lnkadditionalci b=aus AM
-            my $eq;
-            if ($a->{orgdomid}  eq $b->{orgdomid}){
-               $eq=0;
-               # eq=0 = Satz gefunden und es wird ein Update gemacht
-               if ($a->{cistatusid} eq $b->{cistatusid} &&
-                   $a->{lseg} eq $b->{lseg}){
-                  $eq=1;
-                  # eq=1 = alles super - kein Update notwendig
+    
+      my @opList;
+      my $res=OpAnalyse(
+            sub{  # comperator
+               my ($a,$b)=@_;   # a=lnkadditionalci b=aus AM
+               my $eq;
+               if ($a->{orgdomid}  eq $b->{orgdomid}){
+                  $eq=0;
+                  # eq=0 = Satz gefunden und es wird ein Update gemacht
+                  if ($a->{cistatusid} eq $b->{cistatusid}){
+                     $eq=1;
+                     # eq=1 = alles super - kein Update notwendig
+                  }
                }
-            }
-            return($eq);
-         },
-         sub{  # oprec generator
-           my ($mode,$oldrec,$newrec,%p)=@_;
-           if ($mode eq "insert" || $mode eq "update"){
-              my $oprec={
-                 OP=>$mode,
-                 MSG=>"$mode  $newrec->{orgdomid} in W5Base",
-                 DATAOBJ=>'TS::orgdom',
-                 DATA=>{
-                    name      =>$newrec->{name},
-                    cistatusid=>$newrec->{cistatusid},
-                    lseg      =>$newrec->{lseg},
-                    orgdomid  =>$newrec->{orgdomid}
+               return($eq);
+            },
+            sub{  # oprec generator
+              my ($mode,$oldrec,$newrec,%p)=@_;
+              if ($mode eq "insert" || $mode eq "update"){
+                 my $oprec={
+                    OP=>$mode,
+                    MSG=>"$mode  $newrec->{orgdomid} in W5Base",
+                    DATAOBJ=>'TS::orgdom',
+                    DATA=>{
+                       name      =>$newrec->{name},
+                       cistatusid=>$newrec->{cistatusid},
+                       orgdomid  =>$newrec->{orgdomid}
+                    }
+                 };
+                 if ($mode eq "update"){
+                    $oprec->{IDENTIFYBY}=$oldrec->{id};
                  }
-              };
-              if ($mode eq "update"){
-                 $oprec->{IDENTIFYBY}=$oldrec->{id};
+                 return($oprec);
               }
-              return($oprec);
-           }
-           elsif ($mode eq "delete"){
-               my $id=$oldrec->{id};
-               return(undef) if ($oldrec->{cistatusid}>4);
-               return({OP=>"update",
-                       DATA=>{
-                          cistatusid=>'6'
-                       },
-                       MSG=>"delete ip $oldrec->{name} ".
-                            "from W5Base",
-                       DATAOBJ=>'TS::orgdom',
-                       IDENTIFYBY=>$oldrec->{id},
-                       });
-            }
-            return(undef);
-         },
-         [values(%{$orgdom->{orgdomid}})],[values(%$norgdom)],\@opList
-   );
-   if (!$res){
-      my $opres=ProcessOpList($orgdomo,\@opList);
+              elsif ($mode eq "delete"){
+                  my $id=$oldrec->{id};
+                  return(undef) if ($oldrec->{cistatusid}>4);
+                  return({OP=>"update",
+                          DATA=>{
+                             cistatusid=>'6'
+                          },
+                          MSG=>"delete ip $oldrec->{name} ".
+                               "from W5Base",
+                          DATAOBJ=>'TS::orgdom',
+                          IDENTIFYBY=>$oldrec->{id},
+                          });
+               }
+               return(undef);
+            },
+            [values(%{$orgdom->{orgdomid}})],[values(%$norgdom)],\@opList
+      );
+      if (!$res){
+         my $opres=ProcessOpList($orgdomo,\@opList);
+      }
+    
    }
 
    $orgdomo->ResetFilter();
-   $orgdomo->SetFilter({cistatusid=>"<6"});
-   $orgdomo->SetCurrentView(qw( id orgdomid name lseg cistatusid ));
+   $orgdomo->SetFilter({});
+   $orgdomo->SetCurrentView(qw(id orgdomid name cistatusid ));
    my $orgdom=$orgdomo->getHashIndexed(qw(orgdomid));
 
-   my $lnkod=$lnkorgdom->getHashList(qw(ALL));
+   my %sMap;
+   my %iMap;
 
+   $lnkorgdom->ResetFilter();
+   $lnkorgdom->SetFilter({});
 
+   my @lnkod=$lnkorgdom->getHashList(qw(vouid orgdomid id ictoid ictono));
+   foreach my $rec (@lnkod){
+      my $vouid=$rec->{vouid};
+      my $orgdomid=$rec->{orgdomid};
+      my $ictono=$rec->{ictono};
+      my $ictoid=$rec->{ictoid};
+      $iMap{"iMap:".$orgdomid."-".$ictoid."-".$vouid}={
+         vouid=>$vouid,
+         ictono=>$ictono,
+         ictoid=>$ictoid,
+         orgdomid=>$orgdomid,
+         id=>$rec->{id}
+      };
+   }
 
+   # create master mapping between vouid (W5BaseID Hub) and orgdomid (W5BaseID OrgDomain)
+   foreach my $irec (@capeData){
+      my ($CapeHubShortname)=$irec->{organisation}=~m/^\S*HUB\S+\s+(\S{3})\s+/;
+      next if ($CapeHubShortname eq "");
+      if (exists($v->{shortname}->{$CapeHubShortname})){
+         my $w5vouid=$v->{shortname}->{$CapeHubShortname}->{id};
+         my $orgdomainShortName=$irec->{orgdomainid};
+         if (exists($orgdom->{orgdomid}->{$orgdomainShortName})){
+            my $w5orgdomid=$orgdom->{orgdomid}->{$orgdomainShortName}->{id};
+            #printf STDERR ("archapplid=%s orgdomainShortName=%s hubshort=%s w5vouid=%s w5orgdomid=%s\n",
+            #          $irec->{archapplid},$orgdomainShortName,$CapeHubShortname,$w5vouid,$w5orgdomid);   
+            my $ictono=$irec->{id};
+            my $ictoid=$irec->{archapplid};
+            $sMap{"sMap:".$w5orgdomid."-".$ictono."-".$w5vouid}={
+               vouid=>$w5vouid,
+               ictono=>$ictoid,
+               ictoid=>$ictono,
+               orgdomid=>$w5orgdomid
+            };
+         }
+      }
+      else{
+        # msg(ERROR,"unknown HUP shortname from ".$irec->{archapplid}."/".$CapeHubShortname);
+      }
+   }
 
-
-
-
-
-#      $c++;
-#      my $icto=$irec->{archapplid};
-#      my $ictoid=$irec->{id};
-#      my $orgdomorgstr=$irec->{orgdom};
-#      #my $orgdomorgstr="TSI / ".$irec->{orgdom};  # test with section
-#
-#      # remove posible existing Sektion (TSI,oder anderes Gerotz)
-#      my $orgdomstr=$orgdomorgstr; 
-#      $orgdomstr=~s/^[a-z0-9 ]{1,6}\s*\/\s*//i;
-#     
-#      my ($orgdomidstr)=$orgdomstr=~m/^(\S{1,6})\s+/;
-#      my ($hubshort)=$irec->{organisation}=~m/^E-HUB-[0-9]+\s+(\S{2,4})\s+/;
-#      if ($hubshort eq ""){
-#         ($hubshort)=$irec->{organisation}=~m/^(\S{3})\s+/;
-#      }
-#      my $vouid;
-#      if (exists($v->{shortname}->{$hubshort})){
-#         $vouid=$v->{shortname}->{$hubshort}->{id};
-#      }
-#      my $orgdomid;
-#      if (exists($orgdom->{orgdomid}->{$orgdomidstr})){
-#         $orgdomid=$orgdom->{orgdomid}->{$orgdomidstr}->{id};
-#      }
-#      if (0){
-#         printf STDERR ("orgdom:'$orgdomorgstr' idstr='$orgdomidstr' ".
-#                        "w5baseid='$orgdomid'\n");
-#      }
-#      
-#      if (0){
-#         printf STDERR (
-#             "%03d %-8s %-8s %-3s hub=%-3s vou=%s orgdom=%s\n",
-#             $c,$icto,$ictoid,$orgdomidstr,$hubshort,$vouid,$orgdomid
-#         );
-#         printf STDERR ("rec[$c]=%s\n",Dumper($irec));
-#      }
-#
-#      my $newrec={
-#         ictoid=>$ictoid,
-#         vouid=>$vouid,
-#         orgdomid=>$orgdomid,
-#         srcsys=>$iname,
-##         srcload=>NowStamp("en")
-#      };
-#
-#      $lnkorgdom->ResetFilter();
-#      $lnkorgdom->SetFilter({ictoid=>\$newrec->{ictoid}});
-#      my @l=$lnkorgdom->getHashList(qw(ALL));
-#      if ($#l>0){
-#         msg(WARN,"something went wron - somebody has ass manuell entries");
-#         msg(WARN,"to lnkorgdom for ICTO $newrec->{ictoid}");
-#         foreach my $oldrec (@l){
-#            $lnkorgdom->ValidatedDeleteRecord($oldrec,{id=>\$oldrec->{id}});
-#         }
-#      }
-#      if ($orgdomid ne ""){
-#         $lnkorgdom->ResetFilter();
-#         $lnkorgdom->ValidatedInsertOrUpdateRecord($newrec,{
-#            ictoid=>\$newrec->{ictoid}
-#         });
-#      }
-#      # manuell erstellte Einträge werden gelöscht bzw. überschrieben 
-#      # da Cape aktuell als Master angesehen werden soll
-#   }
-   #$lnkorgdom->BulkDeleteRecord({'srcload'=>"<\"$start\"",srcsys=>\$iname});
+   if (1){
+      my @opList;
+      my $res=OpAnalyse(
+            sub{  # comperator
+               my ($a,$b)=@_;   # a=lnkadditionalci b=aus AM
+               my $eq;
+               if ($a->{vouid}  eq $b->{vouid} &&
+                   $a->{orgdomid}  eq $b->{orgdomid} &&
+                   $a->{ictoid}  eq $b->{ictoid} ){
+                  $eq=1;
+               }
+               return($eq);
+            },
+            sub{  # oprec generator
+              my ($mode,$oldrec,$newrec,%p)=@_;
+              if ($mode eq "insert" || $mode eq "update"){
+                 my $oprec={
+                    OP=>$mode,
+                    DATAOBJ=>'TS::lnkorgdom',
+                    DATA=>{
+                       vouid     =>$newrec->{vouid},
+                       orgdomid  =>$newrec->{orgdomid},
+                       ictoid    =>$newrec->{ictoid},
+                       ictono    =>$newrec->{ictono}
+                    }
+                 };
+                 return($oprec);
+              }
+              elsif ($mode eq "delete"){
+                 my $oprec={
+                    OP=>$mode,
+                    DATAOBJ=>'TS::lnkorgdom',
+                    IDENTIFYBY=>$oldrec->{id}
+                 };
+                 return($oprec);
+              }
+              return(undef);
+            },
+            [values(%iMap)],[values(%sMap)],\@opList
+      );
+      if (!$res){
+         my $opres=ProcessOpList($orgdomo,\@opList);
+      }
+   }
    return({exitcode=>0});
 }
 

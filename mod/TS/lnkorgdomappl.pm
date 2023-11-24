@@ -30,7 +30,7 @@ sub new
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
 
-   
+   $self->{use_distinct}=1; 
 
    $self->AddFields(
       new kernel::Field::TextDrop(
@@ -47,9 +47,10 @@ sub new
                 label         =>'OrgDomainID',
                 dataobjattr   =>'lnkorgdom.orgdomid'),
 
-      new kernel::Field::Interface(
+      new kernel::Field::Text(
                 name          =>'orgdomorgdomid',
                 label         =>'OrgDomain OrgDomainID',
+                htmlwidth     =>'180px',
                 dataobjattr   =>'orgdom.orgdomid'),
 
       new kernel::Field::Text(
@@ -58,6 +59,13 @@ sub new
                 uploadable    =>0,
                 label         =>'ICTO-ID',
                 dataobjattr   =>'lnkorgdom.ictono'),
+
+      new kernel::Field::Text(
+                name          =>'ictoid',
+                htmldetail    =>0,
+                uploadable    =>0,
+                label         =>'ICTO internal ID',
+                dataobjattr   =>'lnkorgdom.ictoid'),
 
       new kernel::Field::Text(
                 name          =>'appl',
@@ -87,7 +95,11 @@ sub new
                 vjointo       =>'TS::vou',
                 vjoinon       =>['vouid'=>'id'],
                 vjoindisp     =>'fullname',
-                dataobjattr   =>'vou.name'),
+                dataobjattr   =>"concat(".
+                                "vou.shortname,".
+                                "if (vou.name<>'','-',''),".
+                                "vou.name".
+                                ")"),
                                                    
       new kernel::Field::TextDrop(
                 name          =>'voushort',
