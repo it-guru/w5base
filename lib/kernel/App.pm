@@ -79,7 +79,7 @@ sub Config
 
 
 #
-# Call to ensure, not to many edit operation occured at
+# Call to ensure, not too many edit operation occured at
 # one second
 #
 sub setTimePerEditStamp

@@ -320,7 +320,7 @@ sub Import
    }
    my @import=split(/[,;\s]+/,$import);
    if ($#import>3){
-      $self->LastMsg(ERROR,"to many import elements specified");
+      $self->LastMsg(ERROR,"too many import elements specified");
       return();
    }
    my $co=getModuleObject($self->Config,"TS::costcenter");

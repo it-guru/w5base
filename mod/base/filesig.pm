@@ -412,7 +412,7 @@ sub store
                         my @l=$u->getHashList(qw(userid posix 
                                           email ssh1publickey ssh2publickey));
                         if ($#l>100){
-                           $errormsg="to many accounts selected";
+                           $errormsg="too many accounts selected";
                         }
                         else{
                            foreach my $urec (@l){

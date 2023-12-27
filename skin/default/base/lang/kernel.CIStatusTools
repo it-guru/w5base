@@ -189,7 +189,7 @@ Das Config-Item "%s" %swurde auf "%s" durch den User "%s" umbenannt.
 Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nicht abgefragt werden darf.
 '},
 'argumentation'=>{de=>'Begründung'},
-'to many inactivations - '.
+'too many inactivations - '.
   'create admin request to approve this operation'=>{
 de=>'zuviele Inaktivierungen - '.
     'Operation muss durch Admin-Request angefordert werden'
