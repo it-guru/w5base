@@ -301,7 +301,7 @@ sub _validateCIStatusHistoryActivity
       if ($oldrec->{cistatusid} eq "4" && 
           ($newrec->{cistatusid}<4  || $newrec->{cistatusid}>4)){
          if ($inactcount>3 || $sameop>2 || $tinactcount>1){
-            $self->LastMsg(ERROR,"to many inactivations - ".
+            $self->LastMsg(ERROR,"too many inactivations - ".
                               "create admin request to approve this operation");
             return(0),
          }

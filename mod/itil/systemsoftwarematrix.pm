@@ -105,7 +105,7 @@ sub calcFieldListInMatrix
       $sw->Limit(105);
       my @l=$sw->getHashList(qw(name id));
       if ($#l>100){
-         return(0,"to many software columns");
+         return(0,"too many software columns");
       }
       $p->getField("swinstmatrix")->{'SWFIELDS'}=\@l;
    }

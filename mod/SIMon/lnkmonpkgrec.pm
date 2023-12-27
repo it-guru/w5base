@@ -704,7 +704,7 @@ sub Validate
       if (effChanged($oldrec,$newrec,"exceptreqtxt")){
          if (effVal($oldrec,$newrec,"rejectcnt")>3){
             $self->LastMsg(ERROR,"no further exception requests allowed - ".
-                                 "to many rejects");
+                                 "too many rejects");
             return(undef);
          }
          if (effVal($oldrec,$newrec,"exceptreqtxt") eq ""){
