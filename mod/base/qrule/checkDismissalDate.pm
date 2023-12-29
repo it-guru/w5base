@@ -166,6 +166,7 @@ sub qcheckRecord
                   $notifyparam{emailto}=\@cleanemailto;
                   $notifyparam{emailcc}=\@cleanemailcc;
                   $notifyparam{emailbcc}=[11634953080001];
+                  $notifyparam{emailcategory}=['DataRespClarification'];
         
                   #printf STDERR ("sending Notification in $lang\n");
                   #printf STDERR ("sending To:@cleanemailto\n");
