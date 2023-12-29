@@ -2660,6 +2660,12 @@ sub NotifyWriteAuthorizedContacts   # write an info to databoss and contacts
    }
    $notifyparam{emailto}=[keys(%mailto)];
    $notifyparam{emailcc}=[keys(%mailcc)];
+   $notifyparam{emailcategory}=['AutoDataUpdate'];
+   if ($notifycontrol->{datasource} ne ""){
+      my $datasource=$notifycontrol->{datasource};
+      $datasource=~s/\s/_/g;
+      push(@{$notifyparam{emailcategory}},'AutoDataUpdate_'.$datasource);
+   }
 
    my $lastlang;
    if ($ENV{HTTP_FORCE_LANGUAGE} ne ""){
