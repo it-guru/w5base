@@ -94,33 +94,7 @@ sub new
       new kernel::Field::Date(
             name              =>'lastscan',
             searchable        =>1,
-            label             =>'LastScanDate',
-            onRawValue        =>sub{
-                my $self=shift;
-                my $current=shift;
-                my $app=$self->getParent();
-                my $machineid=$current->{id};
-
-                my $d=$app->genericReadREST("machineresport",$machineid);
-                my $scanDate;
-                if (ref($d) eq "ARRAY"){
-                   SCLOOP: foreach my $screc (@{$d}){
-                      if (ref($screc->{reportTypes}) eq "ARRAY" &&
-                          in_array($screc->{reportTypes},"INVENTORY")){
-                         my $scD=$screc->{scanDate};
-                         if ($scD ne ""){
-                            my $dd=$app->ExpandTimeExpression($scD,
-                                       undef,"GMT","GMT");
-                            $scanDate=$dd;
-                            last SCLOOP;
-                         }
-                      }
-                   }
-                }
-
-
-                return($scanDate);
-            }),
+            label             =>'LastScanDate'),
 
       new kernel::Field::Text(
             name              =>'description',
@@ -175,60 +149,60 @@ sub getRecordImageUrl
 
 
 
-sub genericReadREST
-{
-   my $self=shift;
-   my $data=shift;
-   my $machineid=shift;
-
-   my $d=$self->CollectREST(
-      dbname=>'TASTEOS',
-      requesttoken=>$data."/".$machineid,
-      url=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         $baseurl.="/"  if (!($baseurl=~m/\/$/));
-         my $dataobjurl=$baseurl."machines/".$machineid."/reports";
-         $dataobjurl.="?format=JSON";
-         return($dataobjurl);
-      },
-      headers=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-
-         my $h=[
-            'access-token'=>$apikey,
-            'Content-Type','application/json',
-         ];
-         return($h);
-      },
-      onfail=>sub{
-         my $self=shift;
-         my $code=shift;
-         my $statusline=shift;
-         my $content=shift;
-         my $reqtrace=shift;
-
-         if ($code eq "404"){  # 404 bedeutet nicht gefunden
-            return([],"200");
-         }
-       #  if ($code eq "400"){
-       #     my $json=eval('decode_json($content);');
-       #     if ($@ eq "" && ref($json) eq "HASH" &&
-       #         $json->{error}->{message} ne ""){
-       #        $self->LastMsg(ERROR,$json->{error}->{message});
-       #        return(undef);
-       #     }
-       #  }
-         msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TasteOS response in genRead");
-         return(undef);
-      }
-   );
-   return($d);
-}
+#sub genericReadREST
+#{
+#   my $self=shift;
+#   my $data=shift;
+#   my $machineid=shift;
+#
+#   my $d=$self->CollectREST(
+#      dbname=>'TASTEOS',
+#      requesttoken=>$data."/".$machineid,
+#      url=>sub{
+#         my $self=shift;
+#         my $baseurl=shift;
+#         my $apikey=shift;
+#         $baseurl.="/"  if (!($baseurl=~m/\/$/));
+#         my $dataobjurl=$baseurl."machines/".$machineid."/reports";
+#         $dataobjurl.="?format=JSON";
+#         return($dataobjurl);
+#      },
+#      headers=>sub{
+#         my $self=shift;
+#         my $baseurl=shift;
+#         my $apikey=shift;
+#
+#         my $h=[
+#            'access-token'=>$apikey,
+#            'Content-Type','application/json',
+#         ];
+#         return($h);
+#      },
+#      onfail=>sub{
+#         my $self=shift;
+#         my $code=shift;
+#         my $statusline=shift;
+#         my $content=shift;
+#         my $reqtrace=shift;
+#
+#         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+#            return([],"200");
+#         }
+#       #  if ($code eq "400"){
+#       #     my $json=eval('decode_json($content);');
+#       #     if ($@ eq "" && ref($json) eq "HASH" &&
+#       #         $json->{error}->{message} ne ""){
+#       #        $self->LastMsg(ERROR,$json->{error}->{message});
+#       #        return(undef);
+#       #     }
+#       #  }
+#         msg(ERROR,$reqtrace);
+#         $self->LastMsg(ERROR,"unexpected data TasteOS response in genRead");
+#         return(undef);
+#      }
+#   );
+#   return($d);
+#}
 
 
 
@@ -348,18 +322,20 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-
          if (ref($data) eq "ARRAY"){
             map({
-                      $_->{systemid}=$query->{systemid};
-                   } @{$data});
-            return($data);
+                $_->{systemid}=$query->{systemid};
+            } @{$data});
          }
          else{  # zugriff direkt über den GET Request auf EINE machine
             $data->{systemid}=$data->{systemId}; # fixup API Bug
-            return([$data]);
+            $data=[$data];
          }
-         return(undef);
+         map({
+             $_->{lastscan}=$self->ExpandTimeExpression(
+                                $_->{lastScanDate},undef,"GMT");;
+         } @{$data});
+         return($data);
       }
    ));
 }
