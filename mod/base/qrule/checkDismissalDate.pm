@@ -100,7 +100,7 @@ sub qcheckRecord
             $boss{$userid}++;
          }
          my @boss=sort(grep(!/^\s*$/,keys(%boss)));
-         printf STDERR ("check boss=@boss\n");
+         #printf STDERR ("check boss=@boss\n");
 
          my @o=$dataobj->getCheckObjects();
          @o=grep({($_->{ctrlrec}->{idfield} eq "databossid" &&
