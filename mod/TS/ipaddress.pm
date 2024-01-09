@@ -78,8 +78,6 @@ sub doAnalyse
    my %cadmin;
    my %tadmin;
    my @refurl;
-   my @applcadminfields=qw(applmgrid);
-   my @appltadminfields=qw(tsmid tsm2id opmid opm2id);
    my $notes;
    my %networks;
    my $r={};
@@ -115,7 +113,7 @@ sub doAnalyse
          network=>$iprec->{network},
          networkid=>$iprec->{networkid}
       };
-      if (ref($iprec->{applications}) eq "ARRAY"){
+      if (ref($iprec->{applications}) eq "ARRAY"){   # this is slow !!!
          foreach my $applrec (@{$iprec->{applications}}){
             if ($applrec->{applid} ne ""){
                $applid{$applrec->{applid}}++;
@@ -143,17 +141,15 @@ sub doAnalyse
          if ($r->{databossid} ne ""){
             my $userid=$r->{databossid};
             $userid{$userid}++;
-            if (!exists($cadmin{$userid})){
-               $cadmin{$userid}++;
+            if (!in_array(\@cadmin,$userid)){
                push(@cadmin,$userid);
             }
          }
          if ($r->{admid} ne ""){
             my $userid=$r->{admid};
             $userid{$userid}++;
-            if (!exists($tadmin{$userid}) &&
-                !exists($cadmin{$userid})){
-               $tadmin{$userid}++;
+            if (!in_array(\@tadmin,$userid) &&
+                !in_array(\@cadmin,$userid)){
                push(@tadmin,$userid);
             }
          }
@@ -201,7 +197,7 @@ sub doAnalyse
 
 
    if (!keys(%applid) && 
-       !keys(%cadmin) && !keys(%tadmin)){  # Query NOAH - if IP is not in Darwin
+       $#cadmin==-1 && $#tadmin==-1){  # Query NOAH - if IP is not in Darwin
       #msg(INFO,"start handling unknown ip adresses");
       my $newcomments="";
       my $ipflt=$param->{ipaddr};
@@ -255,8 +251,7 @@ sub doAnalyse
                if (defined($urec)){
                   $userid=$urec->{userid};
                   $userid{$userid}++;
-                  if (!exists($cadmin{$userid})){
-                     $cadmin{$userid}++;
+                  if (!in_array(\@cadmin,$userid)){
                      push(@cadmin,$userid);
                   }
                }
@@ -268,109 +263,19 @@ sub doAnalyse
       }
    }
 
-   # now all applications are detected
-   my @applrec;
+   my @criticality;
+   my @ictono;
 
-   if (keys(%applid)){
-      my $appl=getModuleObject($self->Config,"itil::appl");
-      $appl->ResetFilter();
-      $appl->SetFilter({
-         cistatusid=>"<6", 
-         id=>[keys(%applid)]
-      });
-      my @appls=$appl->getHashList(qw(+cdate name urlofcurrentrec),
-                                @applcadminfields,@appltadminfields);
-      foreach my $a (@appls){
-         push(@applrec,{
-            name=>$a->{name},
-            urlofcurrentrec=>$a->{urlofcurrentrec},
-            tsmid=>$a->{tsmid},
-            opmid=>$a->{opmid},
-            tsm2id=>$a->{tsm2id},
-            opm2id=>$a->{opm2id},
-            applmgrid=>$a->{applmgrid}
-         });
-         foreach my $fld (@applcadminfields,@appltadminfields){
-            $userid{$a->{$fld}}++;
-         }
-      }
-   }
-   if (keys(%userid)){
-      my @userid=grep(!/^\s*$/,keys(%userid));
-      my $flt={};
-      $flt->{cistatusid}=[3,4,5];
-      $flt->{userid}=\@userid;
-      my $user=getModuleObject($self->Config,"base::user");
-      $user->ResetFilter();
-      $user->SetFilter($flt);
-      $user->SetCurrentView(qw(fullname posix dsid email userid));
-      $userid=$user->getHashIndexed(qw(userid));
-   }
-   # create prio list of cadmin tadmin
-   if ($#applrec!=-1){
-      foreach my $arec (@applrec){
-         my $cadminset=0;
-         foreach my $fld (@applcadminfields){
-            if (exists($userid->{userid}->{$arec->{$fld}}) &&
-                !exists($cadmin{$arec->{$fld}})){
-               $cadmin{$arec->{$fld}}++;
-               push(@cadmin,$userid->{userid}->{$arec->{$fld}});
-               $cadminset++;
-            }
-         }
-         foreach my $fld (@appltadminfields){
-            if (exists($userid->{userid}->{$arec->{$fld}}) &&
-                !exists($tadmin{$arec->{$fld}})){
-               $tadmin{$arec->{$fld}}++;
-               push(@tadmin,$userid->{userid}->{$arec->{$fld}});
-            }
-         }
-         if ($cadminset){
-            if (!in_array(\@indication,"application: ".$arec->{name})){
-               unshift(@indication,"application: ".$arec->{name});
-            }
-            if (!in_array(@refurl,$arec->{urlofcurrentrec})){
-               unshift(@refurl,$arec->{urlofcurrentrec});
-            }
-         }
-         else{
-            if (!in_array(@refurl,$arec->{urlofcurrentrec})){
-               push(@refurl,$arec->{urlofcurrentrec});
-            }
-         }
-      }
-   }
-
-   {
-      my @cadminuser;
-      foreach my $admrec (@cadmin){
-         if (ref($admrec)){
-            push(@cadminuser,$admrec);
-         }
-         else{
-            if (exists($userid->{userid}->{$admrec})){
-               push(@cadminuser,$userid->{userid}->{$admrec});
-            }
-         }
-      }
-      @cadmin=@cadminuser;
-   }
-
-   {
-      my @tadminuser;
-      foreach my $admrec (@tadmin){
-         if (ref($admrec)){
-            push(@tadminuser,$admrec);
-         }
-         else{
-            if (exists($userid->{userid}->{$admrec})){
-               push(@tadminuser,$userid->{userid}->{$admrec});
-            }
-         }
-      }
-      @tadmin=@tadminuser;
-   }
-
+   $self->finalizeAnalysedContacts(
+      [keys(%applid)],
+      \%userid,
+      \@indication,
+      \@cadmin,
+      \@tadmin,
+      \@criticality,
+      \@ictono,
+      \@refurl,
+   );
 
 
 
@@ -386,6 +291,14 @@ sub doAnalyse
    if ($#refurl!=-1){
       $r->{refurl}=\@refurl;
    }
+   if ($#ictono!=-1){
+      $r->{ictono}=\@ictono;
+   }
+   if ($#criticality!=-1){
+      $r->{criticality}=$criticality[0];
+   }
+
+
    if (keys(%networks)){
       $r->{networks}=[values(%networks)];
    }
@@ -406,6 +319,154 @@ sub doAnalyse
       exitcode=>0,
       exitmsg=>'OK'
    });
+}
+
+
+sub finalizeAnalysedContacts
+{
+   my $self=shift;
+   my $applid=shift;       # applids  - found appl relations
+   my $userid=shift;       # all used userids
+   my $indication=shift;   # object indications
+   my $cadmin=shift;       # contact admins
+   my $tadmin=shift;       # tech admins
+   my $criticality=shift;  # result criticalid (compressed to one)
+   my $ictono=shift;       # ictos
+   my $refurl=shift;       # refurl
+
+   my @applcadminfields=qw(applmgrid);
+   my @appltadminfields=qw(tsmid tsm2id opmid opm2id);
+
+   # now all applications are detected
+   my %CRMap;
+   my @applrec;
+
+   if ($#{$applid}!=-1){
+      my $appl=getModuleObject($self->Config,"TS::appl");
+      my $CRvalue=$appl->getField("criticality")->{value};
+      $appl->ResetFilter();
+      $appl->SetFilter({
+         cistatusid=>"<6", 
+         id=>$applid
+      });
+      for(my $c=0;$c<$#{$CRvalue};$c++){
+         $CRMap{$CRvalue->[$c]}=$c;
+      }
+      my @appls=$appl->getHashList(qw(+cdate name urlofcurrentrec 
+                                       criticality ictono),
+                                @applcadminfields,@appltadminfields);
+
+      foreach my $a (@appls){
+         push(@applrec,{
+            name=>$a->{name},
+            criticality=>$a->{criticality},
+            ictono=>$a->{ictono},
+            urlofcurrentrec=>$a->{urlofcurrentrec},
+            tsmid=>$a->{tsmid},
+            opmid=>$a->{opmid},
+            tsm2id=>$a->{tsm2id},
+            opm2id=>$a->{opm2id},
+            applmgrid=>$a->{applmgrid}
+         });
+         foreach my $fld (@applcadminfields,@appltadminfields){
+            $userid->{$a->{$fld}}++;
+         }
+      }
+   }
+   my $useridrec;
+   if (keys(%$userid)){
+      my @userid=grep(!/^\s*$/,keys(%$userid));
+      my $flt={};
+      $flt->{cistatusid}=[3,4,5];
+      $flt->{userid}=\@userid;
+      my $user=getModuleObject($self->Config,"base::user");
+      $user->ResetFilter();
+      $user->SetFilter($flt);
+      $user->SetCurrentView(qw(fullname posix dsid email userid));
+      $useridrec=$user->getHashIndexed(qw(userid));
+   }
+
+
+
+
+   # create prio list of cadmin tadmin
+   if ($#applrec!=-1){
+      foreach my $arec (@applrec){
+         my $crit=$arec->{criticality};
+         if ($crit ne ""){
+            if ($#{$criticality}==-1 ||
+                $CRMap{$criticality->[0]}<$CRMap{$crit}){
+               $criticality->[0]=$crit;
+            }
+         }
+         if ($arec->{ictono} ne ""){
+            if (!in_array($ictono,$arec->{ictono})){
+               push(@$ictono,$arec->{ictono});
+            }
+         }
+         my $cadminset=0;
+         foreach my $fld (@applcadminfields){
+            if (exists($useridrec->{userid}->{$arec->{$fld}}) &&
+                !in_array($cadmin,$arec->{$fld})){
+               push(@$cadmin,$arec->{$fld});
+               $cadminset++;
+            }
+         }
+         foreach my $fld (@appltadminfields){
+            if (exists($useridrec->{userid}->{$arec->{$fld}}) &&
+                !in_array($tadmin,$arec->{$fld})){
+               push(@$tadmin,$arec->{$fld});
+            }
+         }
+         if ($cadminset){
+            if (!in_array($indication,"application: ".$arec->{name})){
+               unshift(@$indication,"application: ".$arec->{name});
+            }
+            if (!in_array($refurl,$arec->{urlofcurrentrec})){
+               unshift(@$refurl,$arec->{urlofcurrentrec});
+            }
+         }
+         else{
+            if (!in_array($refurl,$arec->{urlofcurrentrec})){
+               push(@$refurl,$arec->{urlofcurrentrec});
+            }
+         }
+      }
+   }
+   {
+      my @cadminuser;
+      foreach my $admrec (@$cadmin){
+         if (ref($admrec)){
+            push(@cadminuser,$admrec);
+         }
+         else{
+            if (exists($useridrec->{userid}->{$admrec})){
+               push(@cadminuser,$useridrec->{userid}->{$admrec});
+            }
+         }
+      }
+      @$cadmin=@cadminuser;
+   }
+
+   {
+      my @tadminuser;
+      foreach my $admrec (@$tadmin){
+         if (ref($admrec)){
+            push(@tadminuser,$admrec);
+         }
+         else{
+            if (exists($useridrec->{userid}->{$admrec})){
+               push(@tadminuser,$useridrec->{userid}->{$admrec});
+            }
+         }
+      }
+      @$tadmin=@tadminuser;
+   }
+
+   if ($#{$criticality}>=0){
+      map({s/^CR//} @$criticality);
+   }
+
 }
 
 

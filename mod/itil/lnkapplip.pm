@@ -93,19 +93,49 @@ sub SecureSetFilter
 sub getSqlFrom
 {
    my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+
+   my $ipaddressrest="";
+
+   if ($mode eq "select"){
+      foreach my $f (@filter){
+         if (ref($f) eq "HASH"){
+            if (exists($f->{ipaddressid}) && $f->{ipaddressid}=~m/^\d+$/){
+               $f->{ipaddressid}=[$f->{ipaddressid}];
+            }
+            if (ref($f->{ipaddressid}) eq "SCALAR"){
+               my $str=${$f->{ipaddressid}};
+               $f->{ipaddressid}=[$str];
+            }
+            if (ref($f->{ipaddressid}) eq "ARRAY" &&
+                $#{$f->{ipaddressid}}==0){
+               my $id=$f->{ipaddressid}->[0];
+               $id=~s/[^0-9]//;
+               $ipaddressrest="and ipaddress.id='$id'";
+            }
+         }
+      }
+   }
+
+
+
    my $from=<<EOF;
 ( select lnkapplsystem.appl applid,ipaddress.id as ipid
       from lnkapplsystem,ipaddress
       where lnkapplsystem.system=ipaddress.system 
             and lnkapplsystem.cistatus='4'
+            $ipaddressrest
    union
    select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
       from lnkitclustsvcappl,ipaddress 
       where lnkitclustsvcappl.itclustsvc=ipaddress.lnkitclustsvc
+            $ipaddressrest
    union
    select itcloudarea.appl applid,ipaddress.id ipid 
       from itcloudarea,ipaddress 
       where itcloudarea.id=ipaddress.itcloudarea
+            $ipaddressrest
    union
    select lnkitclustsvcappl.appl applid,ipaddress.id ipid 
       from lnkitclustsvcappl
@@ -117,6 +147,7 @@ sub getSqlFrom
               on lnkitclustsvc.id=lnkitclustsvcsyspolicy.itclustsvc 
                  and lnkitclustsvcsyspolicy.system=system.id 
       where system.cistatus<=4 and itclust.cistatus<=4 
+            $ipaddressrest
             and ( (lnkitclustsvcsyspolicy.runpolicy is null and 
                    itclust.defrunpolicy<>'deny') or 
                   (lnkitclustsvcsyspolicy.runpolicy is not null and 
