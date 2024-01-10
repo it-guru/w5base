@@ -158,10 +158,11 @@ sub doAnalyse
 
    my @l=$self->getHashList(qw(
       id respappl respapplid fullname cloud name
-      itcloudshortname srcid
+      itcloudshortname srcid systems
    )); 
 
    my %applid;
+   my %systemid;
    foreach my $rec (@l){
       if (ref($r->{itcloudareas}) ne "ARRAY"){
          $r->{itcloudareas}=[];
@@ -176,13 +177,18 @@ sub doAnalyse
       if ($rec->{respapplid} ne ""){
          $applid{$rec->{respapplid}}++;
       }
+      foreach my $sysrec (@{$rec->{systems}}){
+         $systemid{$sysrec->{id}}++;
+      }
    }
 
    my @criticality;
    my @ictono;
+   my %opmode;
 
    $self->finalizeAnalysedContacts(
       [keys(%applid)],
+      [keys(%systemid)],
       \%userid,
       \@indication,
       \@cadmin,
@@ -190,6 +196,7 @@ sub doAnalyse
       \@criticality,
       \@ictono,
       \@refurl,
+      \%opmode
    );
 
    if ($#indication!=-1){
@@ -209,6 +216,9 @@ sub doAnalyse
    }
    if ($#criticality!=-1){
       $r->{criticality}=$criticality[0];
+   }
+   if (keys(%opmode)){
+      $r->{opmode}=\%opmode;
    }
    if (keys(%applid)){
       $r->{related}=[

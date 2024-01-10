@@ -1967,6 +1967,7 @@ sub finalizeAnalysedContacts
 {
    my $self=shift;
    my $applid=shift;       # applids  - found appl relations
+   my $systemid=shift;     # systemids (w5baseids)
    my $userid=shift;       # all used userids
    my $indication=shift;   # object indications
    my $cadmin=shift;       # contact admins
@@ -1974,14 +1975,33 @@ sub finalizeAnalysedContacts
    my $criticality=shift;  # result criticalid (compressed to one)
    my $ictono=shift;       # ictos
    my $refurl=shift;       # refurl
+   my $opmode=shift;
 
    my @applcadminfields=qw(applmgrid);
    my @appltadminfields=qw(tsmid tsm2id opmid opm2id);
+   my @opmodefields=qw(
+      isprod istest isdevel iseducation isapprovtest isreference iscbreakdown
+   );
 
    # now all applications are detected
    my %CRMap;
    my @applrec;
 
+   if ($#{$systemid}!=-1){
+      my $sys=getModuleObject($self->Config,"TS::system");
+      $sys->ResetFilter();
+      $sys->SetFilter({cistatusid=>[3,4],id=>$systemid});
+      foreach my $sysrec ($sys->getHashList(@opmodefields)){
+         foreach my $fld (@opmodefields){
+           if (!exists($opmode->{$fld})){
+              $opmode->{$fld}=0;
+           }
+           if ($sysrec->{$fld}){
+              $opmode->{$fld}=1;
+           }
+         }
+      }
+   }
    if ($#{$applid}!=-1){
       my $appl=getModuleObject($self->Config,"TS::appl");
       my $CRvalue=$appl->getField("criticality")->{value};
