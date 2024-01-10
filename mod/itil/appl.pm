@@ -31,7 +31,7 @@ use finance::costcenter;
 use kernel::Scene;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink kernel::CIStatusTools
-        kernel::MandatorDataACL);
+        kernel::MandatorDataACL itil::lib::Listedit);
 
 sub new
 {
