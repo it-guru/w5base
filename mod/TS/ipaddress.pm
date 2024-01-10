@@ -48,11 +48,13 @@ sub Analyse
    return(
       $self->simpleRESTCallHandler(
          {
-            ipaddr=>{
+            query=>{
                typ=>'STRING',
-               mandatory=>1,
                path=>0,
                init=>'10.105.204.109'
+            },
+            ipaddr=>{
+               typ=>'STRING',
             },
             networkid=>{
                typ=>'STRING'
@@ -82,11 +84,17 @@ sub doAnalyse
    my %networks;
    my $r={};
 
+   if (exists($param->{query}) && $param->{query} ne ""){
+      if (!exists($param->{ipaddr}) || $param->{ipaddr} eq ""){
+         $param->{ipaddr}=$param->{query};
+      }
+      if (exists($param->{ipaddr}) && $param->{ipaddr} ne $param->{query}){
+         $param->{ipaddr}="-1";
+      }
+   }
 
    $ipflt->{name}=[$param->{ipaddr}];
    $ipflt->{cistatusid}=\'4';
-
-
 
 
    if (exists($param->{networkid}) && $param->{networkid} ne ""){
@@ -197,7 +205,8 @@ sub doAnalyse
 
 
    if (!keys(%applid) && 
-       $#cadmin==-1 && $#tadmin==-1){  # Query NOAH - if IP is not in Darwin
+       $#cadmin==-1 && $#tadmin==-1 &&
+       $param->{ipaddr} ne "-1"){  # Query NOAH - if IP is not in Darwin
       #msg(INFO,"start handling unknown ip adresses");
       my $newcomments="";
       my $ipflt=$param->{ipaddr};
@@ -265,9 +274,11 @@ sub doAnalyse
 
    my @criticality;
    my @ictono;
+   my %opmode;
 
    $self->finalizeAnalysedContacts(
       [keys(%applid)],
+      [keys(%systemid)],
       \%userid,
       \@indication,
       \@cadmin,
@@ -275,6 +286,7 @@ sub doAnalyse
       \@criticality,
       \@ictono,
       \@refurl,
+      \%opmode
    );
 
 
@@ -297,7 +309,9 @@ sub doAnalyse
    if ($#criticality!=-1){
       $r->{criticality}=$criticality[0];
    }
-
+   if (keys(%opmode)){
+      $r->{opmode}=\%opmode;
+   }
 
    if (keys(%networks)){
       $r->{networks}=[values(%networks)];
