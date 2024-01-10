@@ -1187,6 +1187,171 @@ sub genericSystemImport
 
 
 
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   my @l=$self->SUPER::getValidWebFunctions(@_);
+   push(@l,"Analyse");
+   return(@l);
+}
+
+
+sub Analyse
+{
+   my $self=shift;
+
+   return(
+      $self->simpleRESTCallHandler(
+         {
+            query=>{
+               typ=>'STRING',
+               path=>0,
+               init=>'qde8hv'
+            },
+            systemid=>{
+               typ=>'STRING',
+            },
+            name=>{
+               typ=>'STRING',
+            }
+         },undef,\&doAnalyse,@_)
+   );
+}
+
+sub doAnalyse
+{
+   my $self=shift;
+   my $q=shift;
+
+   my @indication;
+   my $ipflt={};
+   my %userid;
+   my $userid;
+   my @cadmin;
+   my @tadmin;
+   my %cadmin;
+   my %tadmin;
+   my @refurl;
+   my @applcadminfields=qw(applmgrid);
+   my @appltadminfields=qw(tsmid tsm2id opmid opm2id);
+   my $notes;
+   my %networks;
+   my $r={};
+
+   #print STDERR Dumper($q);
+   my @cflt;
+   if (exists($q->{query}) && $q->{query} ne ""){
+      my $f1={cistatusid=>[3,4],systemid=>[$q->{query}]};
+      my $f2={cistatusid=>[3,4],name=>[$q->{query}]};
+      push(@cflt,$f1,$f2);
+   }
+   else{
+      if ((exists($q->{name}) && $q->{name} ne "") ||
+          (exists($q->{systemid}) && $q->{systemid} ne "")){
+         my $f1={cistatusid=>[3,4]};
+         push(@cflt,$f1);
+      }
+      else{
+         my $f1={id=>[-1]};
+         push(@cflt,$f1);
+      }
+   }
+   foreach my $flt (@cflt){
+      if (exists($q->{name}) && $q->{name} ne ""){
+         $flt->{name}=[$q->{name}]
+      }
+      if (exists($q->{systemid}) && $q->{systemid} ne ""){
+         $flt->{systemid}=[$q->{systemid}]
+      }
+   }
+
+   $self->ResetFilter();
+   $self->SetFilter(\@cflt);
+
+
+   my @l=$self->getHashList(qw(
+      id systemid name applications urlofcurrentrec
+   )); 
+
+   my %applid;
+   my %systemid;
+   foreach my $rec (@l){
+      if (!in_array(\@refurl,$rec->{urlofcurrentrec})){
+         unshift(@refurl,$rec->{urlofcurrentrec});
+      }
+      if (ref($r->{systems}) ne "ARRAY"){
+         $r->{systems}=[];
+      }
+      push(@{$r->{systems}},{
+         name=>$rec->{name},
+         systemid=>$rec->{systemid}
+      });
+      push(@indication,"system: ".$rec->{name});
+      if ($rec->{id} ne ""){
+         $systemid{$rec->{id}}++;
+      }
+      foreach my $applrec (@{$rec->{applications}}){
+         push(@indication,"application: ".$applrec->{appl});
+         $applid{$applrec->{applid}}++;
+      }
+   }
+
+   my @criticality;
+   my @ictono;
+   my %opmode;
+
+   $self->finalizeAnalysedContacts(
+      [keys(%applid)],
+      [keys(%systemid)],
+      \%userid,
+      \@indication,
+      \@cadmin,
+      \@tadmin,
+      \@criticality,
+      \@ictono,
+      \@refurl,
+      \%opmode
+   );
+
+   if ($#indication!=-1){
+      $r->{indication}=\@indication;
+   }
+   if ($#cadmin!=-1){
+      $r->{'Admin-C'}=\@cadmin;
+   }
+   if ($#tadmin!=-1){
+      $r->{'Tech-C'}=\@tadmin;
+   }
+   if ($#refurl!=-1){
+      $r->{refurl}=\@refurl;
+   }
+   if ($#ictono!=-1){
+      $r->{ictono}=\@ictono;
+   }
+   if ($#criticality!=-1){
+      $r->{criticality}=$criticality[0];
+   }
+   if (keys(%opmode)){
+      $r->{opmode}=\%opmode;
+   }
+   if (keys(%applid)){
+      $r->{related}=[
+        map({{dataobj=>'itil::appl',dataobjid=>$_}} keys(%applid))
+      ];
+   }
+   if ($notes ne ""){
+      $r->{notes}=$notes;
+   }
+   
+   return({
+      result=>$r,
+      exitcode=>0,
+      exitmsg=>'OK'
+   });
+}
+
+
 
 
 

@@ -29,7 +29,7 @@ use itil::lib::Listedit;
 use itil::appl;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::DB 
         kernel::App::Web::InterviewLink
-        kernel::CIStatusTools);
+        kernel::CIStatusTools itil::lib::Listedit);
 
 sub new
 {
