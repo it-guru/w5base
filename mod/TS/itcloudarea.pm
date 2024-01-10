@@ -82,11 +82,16 @@ sub Analyse
    return(
       $self->simpleRESTCallHandler(
          {
-            cloudareasrcid=>{
+            query=>{
                typ=>'STRING',
-               mandatory=>1,
                path=>0,
                init=>'280962857063'
+            },
+            cloudareaname=>{
+               typ=>'STRING',
+            },
+            cloudareasrcid=>{
+               typ=>'STRING',
             },
             cloudshortname=>{
                typ=>'STRING'
@@ -98,7 +103,7 @@ sub Analyse
 sub doAnalyse
 {
    my $self=shift;
-   my $param=shift;
+   my $q=shift;
 
    my @indication;
    my $ipflt={};
@@ -115,299 +120,77 @@ sub doAnalyse
    my %networks;
    my $r={};
 
-   print STDERR Dumper($param);
-
-   my $cflt={};
-
-   $cflt->{cistatusid}=\'4';
-   $cflt->{srcid}=[$param->{cloudareasrcid}];
-   if (exists($param->{cloudshortname}) && $param->{cloudshortname} ne ""){
-      $cflt->{itcloudshortname}=[$param->{cloudshortname}];
+   #print STDERR Dumper($q);
+   my @cflt;
+   if (exists($q->{query}) && $q->{query} ne ""){
+      my $f1={cistatusid=>[3,4],srcid=>[$q->{query}]};
+      my $f2={cistatusid=>[3,4],name=>[$q->{query}]};
+      push(@cflt,$f1,$f2);
+   }
+   else{
+      if ((exists($q->{cloudareaname}) && $q->{cloudareaname} ne "") ||
+          (exists($q->{cloudareasrcid}) && $q->{cloudareasrcid} ne "") ||
+          (exists($q->{cloudshortname}) && $q->{cloudshortname} ne "")){
+         my $f1={cistatusid=>[3,4]};
+         push(@cflt,$f1);
+      }
+      else{
+         my $f1={id=>[-1]};
+         push(@cflt,$f1);
+      }
+      my $f2={cistatusid=>[3,4],name=>$q->{cloudareaq}};
+   }
+   foreach my $flt (@cflt){
+      if (exists($q->{cloudareaname}) && $q->{cloudareaname} ne ""){
+         $flt->{name}=[$q->{cloudareaname}]
+      }
+      if (exists($q->{cloudareasrcid}) && $q->{cloudareasrcid} ne ""){
+         $flt->{srcid}=[$q->{cloudareasrcid}]
+      }
+      if (exists($q->{cloudshortname}) && $q->{cloudshortname} ne ""){
+         $flt->{itcloudshortname}=[$q->{cloudshortname}]
+      }
    }
 
    $self->ResetFilter();
-   $self->SetFilter($cflt);
+   $self->SetFilter(\@cflt);
 
 
-   my @l=$self->getHashList(qw(id respappl respapplid fullname 
-                               itcloudshortname)); 
-
-   print STDERR Dumper(\@l);
-   
-   return({
-      result=>$r,
-      exitcode=>0,
-      exitmsg=>'OK'
-   });
-
+   my @l=$self->getHashList(qw(
+      id respappl respapplid fullname cloud name
+      itcloudshortname srcid
+   )); 
 
    my %applid;
-
-   my %systemid;
-
-   foreach my $iprec (@l){
-      $networks{$iprec->{networkid}}={
-         network=>$iprec->{network},
-         networkid=>$iprec->{networkid}
-      };
-      if (ref($iprec->{applications}) eq "ARRAY"){
-         foreach my $applrec (@{$iprec->{applications}}){
-            if ($applrec->{applid} ne ""){
-               $applid{$applrec->{applid}}++;
-            }
-         }
+   foreach my $rec (@l){
+      if (ref($r->{itcloudareas}) ne "ARRAY"){
+         $r->{itcloudareas}=[];
       }
-      if ($iprec->{system} ne ""){
-         if (!in_array(\@indication,"system: ".$iprec->{system})){
-            push(@indication,"system: ".$iprec->{system});
-            $systemid{$iprec->{systemid}}++;
-         }
-      }
-      if ($iprec->{itclustsvc} ne ""){
-         if (!in_array(\@indication,"clusterservice: ".$iprec->{itclustsvc})){
-            push(@indication,"clusterservice: ".$iprec->{itclustsvc});
-         }
-      }
-   }
-   if ((!keys(%applid)) && 
-       keys(%systemid)){ # logical system without any applications
-      my $sys=getModuleObject($self->Config,"itil::system");
-      $sys->SetFilter({id=>[keys(%systemid)]});
-      my @l=$sys->getHashList(qw(id databossid admid adm2id));
-      foreach my $r (@l){
-         if ($r->{databossid} ne ""){
-            my $userid=$r->{databossid};
-            $userid{$userid}++;
-            if (!exists($cadmin{$userid})){
-               $cadmin{$userid}++;
-               push(@cadmin,$userid);
-            }
-         }
-         if ($r->{admid} ne ""){
-            my $userid=$r->{admid};
-            $userid{$userid}++;
-            if (!exists($tadmin{$userid}) &&
-                !exists($cadmin{$userid})){
-               $tadmin{$userid}++;
-               push(@tadmin,$userid);
-            }
-         }
-     #    if ($r->{adm2id} ne ""){
-     #       my $userid=$r->{adm2id};
-     #       $userid{$userid}++;
-     #       if (!exists($tadmin{$userid})){
-     #          $tadmin{$userid}++;
-     #          push(@tadmin,$userid);
-     #       }
-     #    }
-      }
-   }
-
-   if (!keys(%applid)){ 
-      my $urlip=getModuleObject($self->Config,"itil::lnkapplurl");
-      my $ipflt={};
-      $ipflt->{lastipaddresses}=[$param->{ipaddr}];
-      if (exists($param->{networkid}) && $param->{networkid} ne ""){
-         $ipflt->{networkid}=[$param->{networkid}];
-      }
-#      if (exists($param->{network})){
-#         $ipflt->{network}=$param->{network};
-#      }
-      $urlip->ResetFilter();
-      $urlip->SetFilter($ipflt);
-      my @l=$urlip->getHashList(qw(id name network networkid 
-                                   applid urlofcurrentrec));
-      foreach my $r (@l){
-         $networks{$r->{networkid}}={
-            network=>$r->{network},
-            networkid=>$r->{networkid}
-         };
-         if (!in_array(@refurl,$r->{urlofcurrentrec})){
-            push(@refurl,$r->{urlofcurrentrec});
-         }
-         if (!in_array(\@indication,"url: ".$r->{name})){
-            push(@indication,"url: ".$r->{name});
-         }
-         $applid{$r->{applid}}++;
-      }
-   }
-
-
-
-
-   if (!keys(%applid) && 
-       !keys(%cadmin) && !keys(%tadmin)){  # Query NOAH - if IP is not in Darwin
-      #msg(INFO,"start handling unknown ip adresses");
-      my $newcomments="";
-      my $ipflt=$param->{ipaddr};
-      $ipflt=~s/\*//g;
-      $ipflt=~s/\?//g;
-      #msg(INFO,"try to query NOAH on ip $ipflt");
-      if ($ipflt ne ""){
-         $r->{query}->{ipaddr}=$ipflt;
-
-         my $neo=getModuleObject($self->Config,"neo::ipaddressAnalyse");
-
-         if (!defined($neo) || !$neo->Ping()){
-            return({
-               exitcode=>1,
-               exitmsg=>'error while connect to NEO'
-            });
-         }
-         $neo->SetFilter({cidr=>$ipflt,customer=>'CN-DTAG'});
-
-         my @l=$neo->getHashList(qw(ALL));
-         my @email;
-         if ($#l!=-1){
-            $newcomments.="NEO IP-Informations:\n".join("\n\n",map({
-               my $str=$_->{component_dns}."\n".
-               $_->{urlofcurrentrec}."\n".
-               "VLAN Domain:".$_->{vlan_domain}."\n".
-               "Network comment:".$_->{network_comment}."\n".
-               $_->{component_servicenumb};
-              foreach my $contactv (qw(network_contact
-                                       network_contact2
-                                       subnet_contact 
-                                       subnet_contact2)){
-                 if ($_->{$contactv} ne ""){
-                    if (!in_array(\@email,$_->{$contactv})){
-                       push(@email,$_->{$contactv});
-                    }
-                 }
-              }
-              $str;
-            } @l));
-         }
-
-         if ($#email!=-1){
-            foreach my $email (@email){
-               my $flt={emails=>$email};
-               $flt->{cistatusid}=[3,4,5];
-               my $user=getModuleObject($self->Config,"base::user");
-               $user->ResetFilter();
-               $user->SetFilter($flt);
-               my ($urec)=$user->getOnlyFirst(qw(userid));
-               if (defined($urec)){
-                  $userid=$urec->{userid};
-                  $userid{$userid}++;
-                  if (!exists($cadmin{$userid})){
-                     $cadmin{$userid}++;
-                     push(@cadmin,$userid);
-                  }
-               }
-            }
-         }
-      }
-      if ( trim($newcomments) ne ""){
-         $notes.=$newcomments;
-      }
-   }
-
-   # now all applications are detected
-   my @applrec;
-
-   if (keys(%applid)){
-      my $appl=getModuleObject($self->Config,"itil::appl");
-      $appl->ResetFilter();
-      $appl->SetFilter({
-         cistatusid=>"<6", 
-         id=>[keys(%applid)]
+      push(@{$r->{itcloudareas}},{
+         fullname=>$rec->{fullname},
+         cloudareaname=>$rec->{name},
+         cloudareasrcid=>$rec->{srcid},
+         cloud=>$rec->{cloud},
+         cloudshortname=>$rec->{itcloudshortname}
       });
-      my @appls=$appl->getHashList(qw(+cdate name urlofcurrentrec),
-                                @applcadminfields,@appltadminfields);
-      foreach my $a (@appls){
-         push(@applrec,{
-            name=>$a->{name},
-            urlofcurrentrec=>$a->{urlofcurrentrec},
-            tsmid=>$a->{tsmid},
-            opmid=>$a->{opmid},
-            tsm2id=>$a->{tsm2id},
-            opm2id=>$a->{opm2id},
-            applmgrid=>$a->{applmgrid}
-         });
-         foreach my $fld (@applcadminfields,@appltadminfields){
-            $userid{$a->{$fld}}++;
-         }
-      }
-   }
-   if (keys(%userid)){
-      my @userid=grep(!/^\s*$/,keys(%userid));
-      my $flt={};
-      $flt->{cistatusid}=[3,4,5];
-      $flt->{userid}=\@userid;
-      my $user=getModuleObject($self->Config,"base::user");
-      $user->ResetFilter();
-      $user->SetFilter($flt);
-      $user->SetCurrentView(qw(fullname posix dsid email userid));
-      $userid=$user->getHashIndexed(qw(userid));
-   }
-   # create prio list of cadmin tadmin
-   if ($#applrec!=-1){
-      foreach my $arec (@applrec){
-         my $cadminset=0;
-         foreach my $fld (@applcadminfields){
-            if (exists($userid->{userid}->{$arec->{$fld}}) &&
-                !exists($cadmin{$arec->{$fld}})){
-               $cadmin{$arec->{$fld}}++;
-               push(@cadmin,$userid->{userid}->{$arec->{$fld}});
-               $cadminset++;
-            }
-         }
-         foreach my $fld (@appltadminfields){
-            if (exists($userid->{userid}->{$arec->{$fld}}) &&
-                !exists($tadmin{$arec->{$fld}})){
-               $tadmin{$arec->{$fld}}++;
-               push(@tadmin,$userid->{userid}->{$arec->{$fld}});
-            }
-         }
-         if ($cadminset){
-            if (!in_array(\@indication,"application: ".$arec->{name})){
-               unshift(@indication,"application: ".$arec->{name});
-            }
-            if (!in_array(@refurl,$arec->{urlofcurrentrec})){
-               unshift(@refurl,$arec->{urlofcurrentrec});
-            }
-         }
-         else{
-            if (!in_array(@refurl,$arec->{urlofcurrentrec})){
-               push(@refurl,$arec->{urlofcurrentrec});
-            }
-         }
+      if ($rec->{respapplid} ne ""){
+         $applid{$rec->{respapplid}}++;
       }
    }
 
-   {
-      my @cadminuser;
-      foreach my $admrec (@cadmin){
-         if (ref($admrec)){
-            push(@cadminuser,$admrec);
-         }
-         else{
-            if (exists($userid->{userid}->{$admrec})){
-               push(@cadminuser,$userid->{userid}->{$admrec});
-            }
-         }
-      }
-      @cadmin=@cadminuser;
-   }
+   my @criticality;
+   my @ictono;
 
-   {
-      my @tadminuser;
-      foreach my $admrec (@tadmin){
-         if (ref($admrec)){
-            push(@tadminuser,$admrec);
-         }
-         else{
-            if (exists($userid->{userid}->{$admrec})){
-               push(@tadminuser,$userid->{userid}->{$admrec});
-            }
-         }
-      }
-      @tadmin=@tadminuser;
-   }
-
-
-
+   $self->finalizeAnalysedContacts(
+      [keys(%applid)],
+      \%userid,
+      \@indication,
+      \@cadmin,
+      \@tadmin,
+      \@criticality,
+      \@ictono,
+      \@refurl,
+   );
 
    if ($#indication!=-1){
       $r->{indication}=\@indication;
@@ -421,20 +204,20 @@ sub doAnalyse
    if ($#refurl!=-1){
       $r->{refurl}=\@refurl;
    }
-   if (keys(%networks)){
-      $r->{networks}=[values(%networks)];
+   if ($#ictono!=-1){
+      $r->{ictono}=\@ictono;
+   }
+   if ($#criticality!=-1){
+      $r->{criticality}=$criticality[0];
    }
    if (keys(%applid)){
       $r->{related}=[
         map({{dataobj=>'itil::appl',dataobjid=>$_}} keys(%applid))
       ];
    }
-
    if ($notes ne ""){
       $r->{notes}=$notes;
    }
-
-
    
    return({
       result=>$r,
@@ -442,10 +225,5 @@ sub doAnalyse
       exitmsg=>'OK'
    });
 }
-
-
-
-
-
 
 1;
