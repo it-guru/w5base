@@ -449,7 +449,7 @@ sub SecureSetFilter
    my @flt=@_;
 
    if (!$self->isDirectFilter(@flt) &&
-       !$self->IsMemberOf([qw(admin w5base.itil.read)],
+       !$self->IsMemberOf([qw(admin w5base.itil.itcloudarea.read)],
                           "RMember")){
       my @mandators=$self->getMandatorsOf($ENV{REMOTE_USER},"read");
       push(@flt,[
