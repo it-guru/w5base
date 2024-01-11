@@ -240,7 +240,7 @@ sub getOracleDBIConnectionHandle
 #
 # find system commandos sort, comm and diff
 #
-my @SYSCMD=qw(sort comm diff cat sftp uniq dd sed);
+my @SYSCMD=qw(sort comm diff cat sftp uniq dd tr sed);
 my %SYSCMD;
 foreach my $dir (split(":",$ENV{PATH})){
    $dir.="/" if (!($dir=~m/\/$/));
@@ -415,10 +415,20 @@ sub prepairTempfile
          MSG(ERROR,"fail to open source csv '$sourcefile'");
          exit(1);
       }
-      my $cmd="$SYSCMD{cat} '$TMP/base.csv'|".
-              "$SYSCMD{sort}|".
-              "$SYSCMD{uniq}".
-              ">'$TMP/source.csv'";
+
+      my $usortsequence="$SYSCMD{sort}|$SYSCMD{uniq}";
+      if ($opt_k>0){
+         $usortsequence="$SYSCMD{sort} -u -k $opt_k,$opt_k -t\\;|$SYSCMD{sort}";
+      }
+      if ($#opt_e!=-1){
+         my $sedcmd="$SYSCMD{sed} ".join(" ",map({"-e '".$_."'"} @opt_e));
+         $usortsequence=$sedcmd."|".$usortsequence;
+      }
+      my $cmd="$SYSCMD{cat}  '$TMP/base.csv'|".
+              "$SYSCMD{tr} -d '\15\32'|".  # remove cr + ctrl+z if it is DOS
+              "$usortsequence".
+              ">>'$TMP/source.csv'";
+
       msg(DEBUG,"source create cmd: $cmd");
       system($cmd);
       unlink("$TMP/base.csv");
@@ -581,19 +591,11 @@ sub ProcessTempfile
       }
       close(F);
    }
+   my $cmd="$SYSCMD{cat} '$TMP/sqlcurrent.csv'|".
+           "$SYSCMD{sort}|".
+           "$SYSCMD{uniq}".
+           ">'$TMP/current.csv'";
 
-   my $usortsequence="$SYSCMD{sort}|$SYSCMD{uniq}";
-   if ($opt_k>0){
-      $usortsequence="$SYSCMD{sort} -u -k $opt_k,$opt_k -t\\;|$SYSCMD{sort}";
-   }
-   if ($#opt_e!=-1){
-      my $sedcmd="$SYSCMD{sed} ".join(" ",map({"-e '".$_."'"} @opt_e));
-      $usortsequence=$sedcmd."|".$usortsequence;
-   }
-   my $cmd="$SYSCMD{cat}  '$TMP/base.csv'|".
-           "$SYSCMD{tr} -d '\15\32'|".  # remove cr + ctrl+z if it is DOS
-           "$usortsequence".
-           ">>'$TMP/source.csv'";
    system($cmd);
    unlink("$TMP/sqlcurrent.csv");
 
@@ -605,8 +607,6 @@ sub ProcessTempfile
    my @compcmd=($SYSCMD{comm},"-3","$TMP/current.csv","$TMP/source.csv");
 
    msg(DEBUG,"compare cmd = @compcmd");
-
-   #exit(1);
 
    my $diffpid=open($diffstream,"-|",@compcmd);
    if (!$diffpid){
