@@ -240,7 +240,7 @@ sub getOracleDBIConnectionHandle
 #
 # find system commandos sort, comm and diff
 #
-my @SYSCMD=qw(sort comm diff cat sftp uniq dd);
+my @SYSCMD=qw(sort comm diff cat sftp uniq dd sed);
 my %SYSCMD;
 foreach my $dir (split(":",$ENV{PATH})){
    $dir.="/" if (!($dir=~m/\/$/));
