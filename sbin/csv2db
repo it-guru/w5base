@@ -33,6 +33,7 @@ use vars qw($opt_v $opt_h $opt_c
             $opt_k 
             $opt_archivemode
             $opt_A
+            @opt_e
             $opt_q 
             $opt_w 
             $opt_fieldsize 
@@ -58,10 +59,13 @@ exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'post=s'=>\$opt_p,
                         'storeChronolog'=>\$opt_chronolog,
                         'transactsz=i'=>\$opt_tsize,
+                        'expressionPreProcessor=s@'=>\@opt_e,
                         'debug'=>\$opt_v,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
 my @ObjectFilter=@ARGV;
+
+
 
 if ($opt_q){
    open STDOUT, '>>/dev/null' or die "Can't write to /dev/null: $!";
@@ -250,7 +254,7 @@ sub getOracleDBIConnectionHandle
 #
 # find system commandos sort, comm and diff
 #
-my @SYSCMD=qw(sort comm diff cat sftp uniq dd tr head tail);
+my @SYSCMD=qw(sort comm diff cat sftp uniq dd tr head tail sed);
 my %SYSCMD;
 foreach my $dir (split(":",$ENV{PATH})){
    $dir.="/" if (!($dir=~m/\/$/));
@@ -438,7 +442,10 @@ sub prepairTempfile
       if ($opt_k>0){
          $usortsequence="$SYSCMD{sort} -u -k $opt_k,$opt_k -t\\;|$SYSCMD{sort}";
       }
-
+      if ($#opt_e!=-1){
+         my $sedcmd="$SYSCMD{sed} ".join(" ",map({"-e '".$_."'"} @opt_e));
+         $usortsequence=$sedcmd."|".$usortsequence;
+      }
       my $cmd="$SYSCMD{cat}  '$TMP/base.csv'|".
               "$SYSCMD{tr} -d '\15\32'|".  # remove cr + ctrl+z if it is DOS
               "$usortsequence".
@@ -977,6 +984,10 @@ sub Help
    printf($form,"             target table.","");
    printf($form,"","");
    printf($form,"--purgearch  cleanup archive after specified days", "[90]");
+   printf($form,"","");
+   printf($form,"--expressionPreProcessor", "");
+   printf($form,"             allows to add multiple sed expressions, to","");
+   printf($form,"             pre modifiy the csv bevore syncing it to DB","");
    printf($form,"","");
    printf($form,"--transactsz Specify, how many rows get a db transcaction.",
           "[50]");
