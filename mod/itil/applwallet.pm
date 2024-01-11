@@ -171,6 +171,16 @@ sub new
                 readonly      =>1,
                 dataobjattr   =>'wallet.serialno'),
 
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                readonly      =>1,
+                vjoinbase     =>[{'parentobj'=>\'itil::appl'}],
+                vjoinon       =>['applid'=>'refid'],
+                allowcleanup  =>0,
+                uivisible     =>0,
+                group         =>'contacts'),
+
       new kernel::Field::CDate(
                 name          =>'cdate',
                 group         =>'source',
