@@ -427,6 +427,16 @@ sub new
                 group         =>'applinfo',
                 dataobjattr   =>'appl.applid'),
 
+      new kernel::Field::ContactLnk(
+                name          =>'contacts',
+                label         =>'Contacts',
+                readonly      =>1,
+                vjoinbase     =>[{'parentobj'=>\'itil::appl'}],
+                vjoinon       =>['applid'=>'refid'],
+                allowcleanup  =>0,
+                uivisible     =>0,
+                group         =>'contacts'),
+
       new kernel::Field::TextDrop(
                 name          =>'customer',
                 label         =>'Customer',
