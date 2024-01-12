@@ -74,7 +74,7 @@ sub doById
    msg(INFO,"try to find inm location for $val");
 
    my $sm=$self->getPersistentModuleObject("sm9","tssm::inm");
-   my $sn=$self->getPersistentModuleObject("snow","tssnow::inm");
+  # my $sn=$self->getPersistentModuleObject("snow","tssnow::inm");
 
    my @flt;
    if ($val=~m/^IM/){
@@ -92,12 +92,12 @@ sub doById
       }
    }
    if ($val=~m/^INC/){
-      $sn->SetFilter({incidentnumber=>\$val});
-      my ($chkrec,$msg)=$sn->getOnlyFirst(qw(urlofcurrentrec));
-      if (defined($chkrec) && $chkrec->{urlofcurrentrec} ne ""){
-         $self->HtmlGoto($chkrec->{urlofcurrentrec});
+     # $sn->SetFilter({incidentnumber=>\$val});
+     # my ($chkrec,$msg)=$sn->getOnlyFirst(qw(urlofcurrentrec));
+     # if (defined($chkrec) && $chkrec->{urlofcurrentrec} ne ""){
+     #    $self->HtmlGoto($chkrec->{urlofcurrentrec});
          return(-1);
-      }
+     # }
    }
    printf("Status: 404 Forbidden - ".
           "account needs to be activated with web browser\n");
