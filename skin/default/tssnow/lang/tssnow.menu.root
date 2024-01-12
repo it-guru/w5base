@@ -1,4 +1,0 @@
-'itu.proc.snow'=>{de=>'TS-ServiceNow',en=>'TS-ServiceNow'},
-'itu.proc.snow.krn'=>{de=>'Stammdaten',en=>'Kerneldata'},
-'itu.proc.snow.incident'=>{de=>'Incident',en=>'Incident'},
-'itu.proc.snow.krn.dev'=>{de=>'Device',en=>'Device'},
