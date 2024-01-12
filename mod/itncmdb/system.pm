@@ -93,6 +93,12 @@ sub new
             dataobjattr       =>'vserverRemark',
             label             =>'vserverRemark'),
 
+      new kernel::Field::Text(     
+            name              =>'applw5baseid',
+            searchable        =>0,
+            dataobjattr       =>'vserverW5baseid',
+            label             =>'Application W5BaseID'),
+
       new kernel::Field::CDate(
             name              =>'cdate',
             group             =>'source',
@@ -110,7 +116,7 @@ sub new
 
    );
  #  $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(id name datacenter));
+   $self->setDefaultView(qw(id name datacenter applw5baseid));
    return($self);
 }
 
@@ -177,6 +183,7 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
+print STDERR Dumper($data);
 
          if (ref($data) eq "HASH" &&
              exists($data->{returnData}) &&
