@@ -65,18 +65,13 @@ sub new
                $tpcDerivation=~s/::.*$//;
 
                my $cistatusid="1";
-               if ($tpcDerivation eq "TPC1"){
-                  $cistatusid="4"; # in TPC1 every project is automatic active
-               }
-               else{
-                  if (ref($tags) eq "ARRAY"){
-                     foreach my $tag (@$tags){
-                        if (ref($tag) eq "HASH" &&
-                            $tag->{key} eq "projectname" &&
-                            $tag->{value} ne "" &&
-                            $tag->{value} eq $current->{name}){
-                           $cistatusid="4";
-                        }
+               if (ref($tags) eq "ARRAY"){
+                  foreach my $tag (@$tags){
+                     if (ref($tag) eq "HASH" &&
+                         $tag->{key} eq "projectname" &&
+                         $tag->{value} ne "" &&
+                         $tag->{value} eq $current->{name}){
+                        $cistatusid="4";
                      }
                   }
                }
