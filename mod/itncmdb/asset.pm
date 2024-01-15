@@ -157,6 +157,7 @@ sub new
             label             =>'original source record')
 
    );
+   $self->{ASSETKWORDS}=['ITENOS-RZ','virtuelles Asset ITENOS-RZ Frankfurt'];
    $self->setDefaultView(qw(id name));
    return($self);
 }
@@ -554,6 +555,27 @@ sub getRecordImageUrl
    my $self=shift;
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/system.jpg?".$cgi->query_string());
+}
+
+
+sub getPrimaryAssetW5BaseID
+{
+   my $self=shift;
+
+   my $o=$self->getPersistentModuleObject("ass","itil::asset");
+
+   $o->SetFilter({cistatusid=>[4],kwords=>$self->{ASSETKWORDS}});
+   my ($arec)=$o->getOnlyFirst(qw(ALL));
+   if (defined($arec)){
+      if (wantarray()){
+         return($arec->{id},$arec);
+      }
+      else{
+         return($arec->{id});
+      }
+   }
+
+   return(undef);
 }
 
 
