@@ -47,11 +47,18 @@ sub new
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Text(     
+            name              =>'systemname',
+            searchable        =>1,
+            dataobjattr       =>'systemname',
+            htmlwidth         =>'200px',
+            label             =>'Systemname'),
+
+      new kernel::Field::Text(     
             name              =>'name',
             searchable        =>1,
             dataobjattr       =>'vserverHostname',
             htmlwidth         =>'200px',
-            label             =>'Systemname'),
+            label             =>'vserverHostname'),
 
       new kernel::Field::Text(     
             name              =>'datacenter',
@@ -116,6 +123,7 @@ sub new
 
    );
  #  $self->{'data'}=\&DataCollector;
+   $self->{SRCSYS}="ITENOS";
    $self->setDefaultView(qw(id name datacenter applw5baseid));
    return($self);
 }
@@ -183,7 +191,6 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-print STDERR Dumper($data);
 
          if (ref($data) eq "HASH" &&
              exists($data->{returnData}) &&
@@ -201,6 +208,8 @@ print STDERR Dumper($data);
                if (in_array(\@curView,[qw(ALL cdate)])){
                   $rec->{cdate}=$rec->{vserverCreationDate};
                }
+               $rec->{systemname}=lc($rec->{vserverHostname});
+               $rec->{systemname}=~s/\..*$//;
                push(@l,$rec);
             }
             return(\@l);

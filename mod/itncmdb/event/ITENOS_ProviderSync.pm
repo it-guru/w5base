@@ -30,7 +30,7 @@ sub ITENOS_ProviderSync
    my $queryparam=shift;
 
    my @O=qw(
-      itil::asset itil::system 
+      itil::asset TS::system TS::appl
       itncmdb::asset itncmdb::system
    );
    my $O={};
@@ -53,15 +53,107 @@ sub ITENOS_ProviderSync
       }
       $O->{$objname}=$o;
    }
+   my $SRCSYS=$O->{'itncmdb::system'}->{SRCSYS};
+
+   my $AssetW5BaseID=$O->{'itncmdb::asset'}->getPrimaryAssetW5BaseID();
+
+
+   if (!defined($AssetW5BaseID)){
+      return({
+         exitcode=>1,
+         exitmsg=>'ITENOS AssetID can not be detected'
+      });
+   }
 
 
 
 
    $O->{'itncmdb::system'}->ResetFilter();
    $O->{'itncmdb::system'}->SetFilter({});
-   my @remoteSys=$O->{'itncmdb::system'}->getHashList(qw(id applw5baseid));
-   print Dumper(\@remoteSys);
+   $O->{'itncmdb::system'}->SetCurrentView(qw(id systemname name applw5baseid));
+  
+   my $remoteSys=$O->{'itncmdb::system'}->getHashIndexed(qw(id));
 
+   my @curIDs=keys(%{$remoteSys->{id}});
+
+   $O->{'TS::system'}->ResetFilter();
+   $O->{'TS::system'}->SetFilter({srcid=>\@curIDs,srcsys=>\$SRCSYS});
+   $O->{'TS::system'}->SetCurrentView(qw(id name cistatusid srcsys srcid));
+   my $cur=$O->{'TS::system'}->getHashIndexed(qw(id srcid));
+
+   foreach my $itncmdbid (@curIDs){
+      my $ApplW5BaseID=$remoteSys->{id}->{$itncmdbid}->{applw5baseid};
+      my $systemname=$remoteSys->{id}->{$itncmdbid}->{systemname};
+      msg(INFO,"start handling of $systemname for ApplW5BaseID: $ApplW5BaseID");
+      if (!exists($cur->{srcid}->{$itncmdbid})){
+         msg(INFO,"try to insert $itncmdbid");
+         $O->{'TS::appl'}->ResetFilter();
+         $O->{'TS::appl'}->SetFilter({id=>$ApplW5BaseID,cistatusid=>[3,4,5]});
+         my ($ApplW5BaseRec)=$O->{'TS::appl'}->getOnlyFirst(qw(ALL));
+         if (!defined($ApplW5BaseRec)){
+            msg(ERROR,"invalid ApplW5BaseID specified in $systemname - ".
+                      "import rejected");
+            next;
+         }
+         my $w5baseid;
+         $O->{'TS::system'}->ResetFilter();
+         $O->{'TS::system'}->SetFilter({
+            name=>\$systemname
+         });
+         my ($chkrec)=$O->{'TS::system'}->getOnlyFirst(qw(ALL));
+         my $isImported=0;
+         if (defined($chkrec)){
+            my $applMatch=0;
+            foreach my $applrec (@{$chkrec->{applications}}){
+               if ($applrec->{applid} eq $ApplW5BaseID){
+                  $applMatch++;
+                  last;
+               }
+            }
+            if ($applMatch){
+               $O->{'TS::system'}->ValidatedUpdateRecord($chkrec,
+                   {cistatusid=>'4',srcsys=>$SRCSYS,srcid=>$itncmdbid},
+                   {id=>\$chkrec->{id}}
+               );
+               $isImported=1;
+            }
+            else{
+               msg(ERROR,"W5Base system $systemname not matches ".
+                         "application in itncmdb - import rejected");
+            }
+         }
+
+         if (!$isImported){
+            msg(INFO,"start ValidatedInsertRecord $systemname");
+            my $nSys={
+               name=>$systemname,
+               cistatusid=>'4',
+               mandatorid=>$ApplW5BaseRec->{mandatorid},
+               databossid=>$ApplW5BaseRec->{databossid},
+               assetid=>$AssetW5BaseID,
+               systemtype=>'standard',
+               osrelease=>"other",
+               srcid=>$itncmdbid,
+               srcsys=>$SRCSYS
+            };
+            if (my $W5id=$O->{'TS::system'}->ValidatedInsertRecord($nSys)){
+               $O->{'TS::system'}->addDefContactsFromAppl(
+                  $W5id,
+                  $ApplW5BaseRec
+               );
+            }
+         }
+      }
+      else{
+         if ($cur->{srcid}->{$itncmdbid}->{cistatusid} ne "4"){
+            $O->{'TS::system'}->ValidatedUpdateRecord(
+                $cur->{srcid}->{$itncmdbid},
+                {cistatusid=>'4'},
+                {id=>\$cur->{srcid}->{$itncmdbid}->{id}}
+            );
+         }
+      }
+   }
 
 
 
