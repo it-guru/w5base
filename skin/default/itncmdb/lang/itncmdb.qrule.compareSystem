@@ -1,0 +1,5 @@
+'itncmdb::qrule::compareSystem'=>{de=>'ITENOS Abgleich log. System',en=>'ITENOS compare of log. system'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'set system CI-Status to disposed of waste store due missing on ITENOS'=>{de=>'Setze CI-Status auf veraltet/gelöscht wegen Fehlen auf der ITENOS'},
+'systemname is not unique - please change the systemname in ITENOS'=>{de=>'Systemname ist nicht eindeutig - bitte ändern Sie den Systemnamen in der ITENOS'},
+'using alternate systemname with unique sufix'=>{de=>'verwende alternativen Systemnamen mit eindeutigem Sufix'},

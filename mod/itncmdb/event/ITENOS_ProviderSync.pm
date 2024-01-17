@@ -31,6 +31,7 @@ sub ITENOS_ProviderSync
 
    my @O=qw(
       itil::asset TS::system TS::appl
+      itil::lnkapplsystem
       itncmdb::asset itncmdb::system
    );
    my $O={};
@@ -84,6 +85,7 @@ sub ITENOS_ProviderSync
    foreach my $itncmdbid (@curIDs){
       my $ApplW5BaseID=$remoteSys->{id}->{$itncmdbid}->{applw5baseid};
       my $systemname=$remoteSys->{id}->{$itncmdbid}->{systemname};
+      my $identifyby;
       msg(INFO,"start handling of $systemname for ApplW5BaseID: $ApplW5BaseID");
       if (!exists($cur->{srcid}->{$itncmdbid})){
          msg(INFO,"try to insert $itncmdbid");
@@ -132,25 +134,51 @@ sub ITENOS_ProviderSync
                databossid=>$ApplW5BaseRec->{databossid},
                assetid=>$AssetW5BaseID,
                systemtype=>'standard',
-               osrelease=>"other",
+               allowifupdate=>1,
                srcid=>$itncmdbid,
                srcsys=>$SRCSYS
             };
+            if ($ApplW5BaseRec->{conumber} ne ""){
+               $nSys->{conumber}=$ApplW5BaseRec->{conumber};
+            }
             if (my $W5id=$O->{'TS::system'}->ValidatedInsertRecord($nSys)){
                $O->{'TS::system'}->addDefContactsFromAppl(
                   $W5id,
                   $ApplW5BaseRec
                );
+               $O->{'itil::lnkapplsystem'}->ValidatedInsertRecord({
+                  applid=>$ApplW5BaseRec->{id},
+                  cistatusid=>4,
+                  systemid=>$W5id
+               });
+               $identifyby=$W5id;
             }
          }
       }
       else{
          if ($cur->{srcid}->{$itncmdbid}->{cistatusid} ne "4"){
-            $O->{'TS::system'}->ValidatedUpdateRecord(
-                $cur->{srcid}->{$itncmdbid},
-                {cistatusid=>'4'},
-                {id=>\$cur->{srcid}->{$itncmdbid}->{id}}
-            );
+            if ($O->{'TS::system'}->ValidatedUpdateRecord(
+                    $cur->{srcid}->{$itncmdbid},
+                    {cistatusid=>'4'},
+                    {id=>\$cur->{srcid}->{$itncmdbid}->{id}})){
+               $identifyby=$cur->{srcid}->{$itncmdbid}->{id};
+            }
+         }
+      }
+      if (defined($identifyby) && $identifyby!=0){
+         if ($self->LastMsg()==0){  # do qulity checks only if all is ok
+            $O->{'TS::system'}->ResetFilter();
+            $O->{'TS::system'}->SetFilter({'id'=>\$identifyby});
+            my ($rec,$msg)=$O->{'TS::system'}->getOnlyFirst(qw(ALL));
+            if (defined($rec)){
+               my %checksession;
+               my $qc=getModuleObject($self->Config,"base::qrule");
+               $qc->setParent($O->{'TS::system'});
+               $checksession{autocorrect}=$rec->{allowifupdate};
+               $qc->nativQualityCheck(
+                   $O->{'TS::system'}->getQualityCheckCompat($rec),$rec,
+                   \%checksession);
+            }
          }
       }
    }
