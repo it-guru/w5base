@@ -58,7 +58,7 @@ sub CRaSexpireCheck
          }
          else{
             my $d=CalcDateDuration($rec->{ssslenddate},NowStamp("en"));
-            if ($d->{days}>6){
+            if ($d->{days}>-6){
                if ($rec->{sslexpnotify2} eq "" && 
                    $rec->{sslparsedw5baseref} eq ""){
                   if ($obj->doNotify($rec->{id},"CERTEXPIRE2")){
