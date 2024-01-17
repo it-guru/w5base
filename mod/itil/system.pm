@@ -3103,14 +3103,15 @@ sub QRuleSyncCloudSystem
    }
    if (exists($parrec->{availabilityZone})){
       my $ass=getModuleObject($self->Config(),"itil::asset");
-      my $awslabel=$srcsystag.": Availability Zone";
-      my $k="$awslabel ".$parrec->{availabilityZone};
+      my $avZoneLabel=$srcsystag.": Availability Zone";
+      my $k="$avZoneLabel ".$parrec->{availabilityZone};
       msg(INFO,"checking assetid for '$k'");
-      $ass->SetFilter({
+      my $assFilter={
          kwords=>\$k,
          cistatusid=>[4],
          srcsys=>\'w5base'
-      }); 
+      };
+      $ass->SetFilter($assFilter);
       my @l=$ass->getHashList(qw(id name fullname));
       if ($#l==-1){
          my $msg='can not identify availability zone asset from '.
@@ -3123,7 +3124,7 @@ sub QRuleSyncCloudSystem
          # try to notify
          $ass->ResetFilter();
          $ass->SetFilter({
-            kwords=>"\"$awslabel *\"",
+            kwords=>"\"$avZoneLabel *\"",
             cistatusid=>[4],
             srcsys=>\'w5base'
          }); 
@@ -3175,6 +3176,40 @@ sub QRuleSyncCloudSystem
                           $qmsg,$dataissue,$errorlevel,
                           mode=>'leftouterlink');
          }
+      }
+   }
+   elsif (exists($parrec->{AssetKeyWords})){
+      my $ass=getModuleObject($self->Config(),"itil::asset");
+      msg(INFO,"checking assetid for kWords".
+               join(",",@{$parrec->{AssetKeyWords}}));
+      my $assFilter={
+         kwords=>$parrec->{AssetKeyWords},
+         cistatusid=>[4],
+         srcsys=>\'w5base'
+      };
+      $ass->SetFilter($assFilter);
+      my @l=$ass->getHashList(qw(id name fullname));
+      if ($#l==0){
+         if ($rec->{systemtype} ne "standard"){
+            $qrule->IfComp($self,
+                          $rec,"systemtype",
+                          {systemtype=>"standard"},"systemtype",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          $qmsg,$dataissue,$errorlevel,
+                          mode=>'string');
+         }
+         else{
+            $qrule->IfComp($self,
+                          $rec,"asset",
+                          {assetassetid=>$l[0]->{name}},"assetassetid",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          $qmsg,$dataissue,$errorlevel,
+                          mode=>'leftouterlink');
+         }
+
+      }
+      else{
+         msg(ERROR,"can not identify asset by AssetKeyWords");
       }
    }
    else{
