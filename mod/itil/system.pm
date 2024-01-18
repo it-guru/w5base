@@ -2907,7 +2907,8 @@ sub QRuleSyncCloudSystem
                     $parrec,"osrelease",
                     $autocorrect,$forcedupd,$wfrequest,
                     $qmsg,$dataissue,$errorlevel,
-                    mode=>'leftouterlinkmissok',
+                   # mode=>'leftouterlinkmissok',
+                    mode=>'leftouterlinkbaselogged',
                     iomapped=>$par);
 
       my $itcloudareaid=$parrec->{itcloudareaid};
