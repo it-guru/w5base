@@ -258,6 +258,7 @@ foreach my $apid (@apid){
                         });
                      }
                      my %param=(adminbcc=>1,
+                                emailcategory=>['QueryAbort','ProcessAbort'],
                                 emailfrom=>'"W5Base Process-Controller" <>');
                      if (defined($urec)){
                         $param{emailto}=$urec->{email};
