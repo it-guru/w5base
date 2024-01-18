@@ -21,6 +21,7 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Event;
 use kernel::QRule;
+use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::Event);
 
 
@@ -97,6 +98,15 @@ sub ITENOS_ProviderSync
                       "import rejected");
             next;
          }
+         my $isITENOSapp=0;
+         {
+            my $kwords=$ApplW5BaseRec->{kwords};
+            my @kwords=split(/[\s;,]+/,$kwords);
+            if (in_array(\@kwords,"ITENOS")){
+               $isITENOSapp=1;
+            }
+         }
+
          my $w5baseid;
          $O->{'TS::system'}->ResetFilter();
          $O->{'TS::system'}->SetFilter({
@@ -126,32 +136,64 @@ sub ITENOS_ProviderSync
          }
 
          if (!$isImported){
-            msg(INFO,"start ValidatedInsertRecord $systemname");
-            my $nSys={
-               name=>$systemname,
-               cistatusid=>'4',
-               mandatorid=>$ApplW5BaseRec->{mandatorid},
-               databossid=>$ApplW5BaseRec->{databossid},
-               assetid=>$AssetW5BaseID,
-               systemtype=>'standard',
-               allowifupdate=>1,
-               srcid=>$itncmdbid,
-               srcsys=>$SRCSYS
-            };
-            if ($ApplW5BaseRec->{conumber} ne ""){
-               $nSys->{conumber}=$ApplW5BaseRec->{conumber};
+            if ($isITENOSapp){
+               msg(INFO,"start ValidatedInsertRecord $systemname");
+               my $nSys={
+                  name=>$systemname,
+                  cistatusid=>'4',
+                  mandatorid=>$ApplW5BaseRec->{mandatorid},
+                  databossid=>$ApplW5BaseRec->{databossid},
+                  assetid=>$AssetW5BaseID,
+                  systemtype=>'standard',
+                  allowifupdate=>1,
+                  srcid=>$itncmdbid,
+                  srcsys=>$SRCSYS
+               };
+               if ($ApplW5BaseRec->{conumber} ne ""){
+                  $nSys->{conumber}=$ApplW5BaseRec->{conumber};
+               }
+               if (my $W5id=$O->{'TS::system'}->ValidatedInsertRecord($nSys)){
+                  $O->{'TS::system'}->addDefContactsFromAppl(
+                     $W5id,
+                     $ApplW5BaseRec
+                  );
+                  $O->{'itil::lnkapplsystem'}->ValidatedInsertRecord({
+                     applid=>$ApplW5BaseRec->{id},
+                     cistatusid=>4,
+                     systemid=>$W5id
+                  });
+                  $identifyby=$W5id;
+               }
             }
-            if (my $W5id=$O->{'TS::system'}->ValidatedInsertRecord($nSys)){
-               $O->{'TS::system'}->addDefContactsFromAppl(
-                  $W5id,
-                  $ApplW5BaseRec
+            else{
+               msg(INFO,"ApplicationW5BaseID for $systemname not allowed as ".
+                        "ITENOS Application");
+               my $infoHash=md5_base64("ITENOS Import reject $systemname --");
+               my %notifyparam=(
+                  infoHash=>$infoHash,
+                  emailcategory=>'ITENOSimportReject',
+                  adminbcc=>1
                );
-               $O->{'itil::lnkapplsystem'}->ValidatedInsertRecord({
-                  applid=>$ApplW5BaseRec->{id},
-                  cistatusid=>4,
-                  systemid=>$W5id
-               });
-               $identifyby=$W5id;
+               $O->{'itil::asset'}->ResetFilter();
+               $O->{'itil::asset'}->SetFilter({id=>\$AssetW5BaseID});
+               my ($ar,$msg)=$O->{'itil::asset'}->getOnlyFirst(qw(databossid));
+               if (defined($ar) && $ar->{databossid} ne ""){
+                  $notifyparam{emailcc}=[$ar->{databossid}];
+               }
+               my %notifycontrol=(mode=>'ERROR');
+               $O->{'TS::appl'}->NotifyWriteAuthorizedContacts(
+                  $ApplW5BaseRec,undef,\%notifyparam,\%notifycontrol,sub{
+                     my $self=shift;
+                     my $subject="ITENOS Import reject for ".$systemname;
+                     my $text=$self->T("Please add keyword ITENOS to ".
+                                       "application below linked application ".
+                                       "to allow ITENOS imports ".
+                                       "or clarify ITENOS documentation with ".
+                                       "ITENOS support");
+                     return($subject,$text);
+                  }
+               );
+    
             }
          }
       }
