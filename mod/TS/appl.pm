@@ -139,6 +139,13 @@ sub new
                 dataobjattr   =>'appl.ictoid'),
 
       new kernel::Field::Text(
+                name          =>'orgdomid',
+                label         =>'Organisation Domain',
+                vjointo       =>'TS::lnkorgdomappl',
+                vjoinon       =>['id'=>'applid'],
+                vjoindisp     =>'orgdomorgdomid'),
+
+      new kernel::Field::Text(
                 name          =>'ciamapplid',
                 group         =>'misc',
                 label         =>'CIAM ApplicationID',
