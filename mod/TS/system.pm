@@ -934,27 +934,10 @@ sub genericSystemImport
           ($w5sysrec->{isapprovtest}==0) &&
           ($w5sysrec->{isreference}==0) &&
           ($w5sysrec->{iscbreakdown}==0)) { # alter Datensatz - aber kein opmode
-         if ($w5applrec->{opmode} eq "prod"){   # dann nehmen wir halt die
-            $newrec{isprod}=1;                  # Anwendungsdaten
-         }
-         elsif ($w5applrec->{opmode} eq "test"){
-            $newrec{istest}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "devel"){
-            $newrec{isdevel}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "education"){
-            $newrec{iseducation}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "approvtest"){
-            $newrec{isapprovtest}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "reference"){
-            $newrec{isreference}=1;
-         }
-         elsif ($w5applrec->{opmode} eq "cbreakdown"){
-            $newrec{iscbreakdown}=1;
-         }
+         $self->mapApplicationOpModeToSystemOpModeFlags(
+            $w5applrec,
+            \%newrec
+         );
      }
       if (defined($w5applrec) && $w5applrec->{conumber} ne "" &&
           $w5applrec->{conumber} ne $sysrec->{conumber}){
