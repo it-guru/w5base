@@ -46,4 +46,5 @@
 'Cloud-Usage'=>{de=>'Cloud-Verwendung'},
 'CLOUDUSAGE.NONE'=>{de=>'keine',en=>'none'},
 'CLOUDUSAGE.FULL'=>{de=>'vollständig',en=>'full'},
-'CLOUDUSAGE.HYBRID'=>{de=>'hybrid',en=>'hybrid'}
+'CLOUDUSAGE.HYBRID'=>{de=>'hybrid',en=>'hybrid'},
+'Organisation Domain'=>{de=>'Organisations-Domain'},
