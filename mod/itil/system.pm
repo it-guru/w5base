@@ -3326,6 +3326,41 @@ sub  updateCostCenterByApplId
 }
 
 
+#
+# create a default opmode mapping from default opmode in application
+# for the opmode flags on logical systems
+#
+sub mapApplicationOpModeToSystemOpModeFlags
+{
+   my $self=shift;   
+   my $applrec=shift;
+   my $sysrec=shift; # needs to be a hash pointer
+   my $applopmode=$applrec->{opmode};
+
+   if ($applopmode eq "prod"){ 
+      $sysrec->{isprod}=1;    
+   }
+   elsif ($applopmode eq "test"){
+      $sysrec->{istest}=1;
+   }
+   elsif ($applopmode eq "devel"){
+      $sysrec->{isdevel}=1;
+   }
+   elsif ($applopmode eq "education"){
+      $sysrec->{iseducation}=1;
+   }
+   elsif ($applopmode eq "approvtest"){
+      $sysrec->{isapprovtest}=1;
+   }
+   elsif ($applopmode eq "reference"){
+      $sysrec->{isreference}=1;
+   }
+   elsif ($applopmode eq "cbreakdown"){
+      $sysrec->{iscbreakdown}=1;
+   }
+}
+
+
 
 
 

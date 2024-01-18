@@ -149,6 +149,12 @@ sub ITENOS_ProviderSync
                   srcid=>$itncmdbid,
                   srcsys=>$SRCSYS
                };
+               $O->{'TS::system'}->mapApplicationOpModeToSystemOpModeFlags(
+                  $ApplW5BaseRec,
+                  $nSys
+               );
+
+
                if ($ApplW5BaseRec->{conumber} ne ""){
                   $nSys->{conumber}=$ApplW5BaseRec->{conumber};
                }
