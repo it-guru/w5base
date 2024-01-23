@@ -74,6 +74,10 @@ sub Init
                       "W5Warehouse::UserGroupRelation",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itu.W5Warehouse.Rep.ApplExtOperationUser",
+                      "W5Warehouse::ApplExtOperationUser",
+                      defaultacl=>['admin','support']);
+
    $self->RegisterObj("itu.W5Warehouse.Rep.MViewMonitor",
                       "W5Warehouse::MViewMonitor",
                       defaultacl=>['admin']);

@@ -136,6 +136,13 @@ sub getFieldList
    return($self->SUPER::getFieldList(@_));
 }
 
+sub ModuleObjectInfo
+{
+   my $self=shift;
+   $self->AddAllFieldsFromWorktable();
+   return($self->SUPER::ModuleObjectInfo(@_));
+}
+
 sub SetFilter
 {
    my $self=shift;
@@ -164,21 +171,6 @@ sub Welcome
    }
    print $self->HtmlBottom(body=>1,form=>1);
 }
-
-sub ModuleObjectInfo
-{
-   my $self=shift;
-
-   print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css',
-                                   'kernel.App.Web.ModuleObjectInfo.css'],
-                           js=>['toolbox.js'],
-                           title=>$self->T('Module Object Information'),
-                           form=>1);
-   print $self->HtmlBottom(form=>1);
-}
-
-
 
 
 
@@ -234,8 +226,6 @@ sub preProcessDBmsg
 {
    my $self=shift;
    my $msg=shift;
-
-      printf STDERR ("fifi msg=$msg\n");
 
    if ($msg=~m/ORA-01031:/){
       $msg=~s/ \(//g;
