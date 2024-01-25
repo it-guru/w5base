@@ -268,11 +268,11 @@ sub LoadIntoCurrentConfig
          return(0);
       }
    }
-   while(<$F>){
+   while(my $line=<$F>){
       chomp;
       my ($myvar,$mykey,$myval)=();
-      if ( ! /^\s*\#.*$/ ){
-         if (my ($incl)=/^INCLUDE\s+(.*)$/){
+      if ( ! ($line=~m/^\s*\#.*$/) ){
+         if (my ($incl)=$line=~m/^\s*INCLUDE\s+(.*)$/){
             my $bk;
             $bk=$self->LoadIntoCurrentConfig($currentconfig,$incl);
             if (!$bk){
@@ -281,26 +281,87 @@ sub LoadIntoCurrentConfig
                return($bk);
             }
          }
-         if (defined($_)){
-            if (($myvar,$mykey,$myval)=
-                 m/^(.+?)\[([0-9]+?)\]\s*=\s*[\",'](.*)[\",'].*$/){
-               $myvar=~tr/[a-z]/[A-Z]/;
-               if (!defined($currentconfig->{$myvar})){
-                  $currentconfig->{$myvar}=[];
+         if (defined($line)){
+            # Syntax:
+            #   SCALAR:
+            #
+            #   AbCdEf="xxxxxx"
+            #   abcdef='xxxxxx'
+            #   ABCDEF='xxxxxx'
+            #
+            #   ARRAY:
+            #
+            #   AbCdEf[0]="xxxxxx"
+            #   abcdef[5]='xxxxxx'
+            #   ABCDEF[23]='xxxxxx'
+            #
+            #   HASH:
+            #
+            #   AbCdEf[hello]="xxxxxx"
+            #   abcdef[World]='xxxxxx'
+            #   ABCDEF[ThisIsATest]='xxxxxx'
+            #
+            #   MultiLine:
+            #   AbCdEf="
+            #   BalBla1
+            #   BalBla2
+            #   BalBla3
+            #   "
+            if (my ($varstr,$datastr)=$line=~m/^\s*([^=]+)\s*=\s*(.*)\s*$/){
+
+               my $datatarget=undef;
+               if (($myvar,$mykey)=$varstr=~m/^(.+?)\[([0-9]+?)\]\s*$/){
+                  $myvar=~tr/[a-z]/[A-Z]/;
+                  if (!defined($currentconfig->{$myvar})){
+                     $currentconfig->{$myvar}=[];
+                  }
+                  if (ref(${$currentconfig->{$myvar}}) eq "ARRAY"){
+                     $datatarget=\$currentconfig->{$myvar}->[$mykey];
+                  }
                }
-               ${$currentconfig->{$myvar}}[$mykey]="$myval";
-            }
-            elsif (($myvar,$mykey,$myval)=
-                    m/^(.+?)\[(.+?)\]\s*=\s*[\",'](.*)[\",'].*$/){
-               $myvar=~tr/[a-z]/[A-Z]/;
-               if (!defined($currentconfig->{$myvar})){
-                  $currentconfig->{$myvar}={};
+               elsif (($myvar,$mykey)=$varstr=~m/^(.+?)\[(.+?)\]\s*$/){
+                  $myvar=~tr/[a-z]/[A-Z]/;
+                  if (!defined($currentconfig->{$myvar})){
+                     $currentconfig->{$myvar}={};
+                  }
+                  if (ref($currentconfig->{$myvar}) eq "HASH"){
+                     $datatarget=\$currentconfig->{$myvar}->{$mykey};
+                  }
                }
-               $currentconfig->{$myvar}->{$mykey}="$myval";
-            }
-            elsif (($myvar,$myval)=m/^(.+?)\s*=\s*[\",'](.*)[\",'].*$/){
-               $myvar=~tr/[a-z]/[A-Z]/;
-               $currentconfig->{$myvar}="$myval";
+               elsif (($myvar,$myval)=$line=~
+                       m/^(.+?)\s*=\s*[\",'](.*)[\",'].*$/){
+                  $myvar=~tr/[a-z]/[A-Z]/;
+                  $datatarget=\$currentconfig->{$myvar};
+               }
+               if (defined($datatarget)){
+                  my $quote;
+                  if ($datastr=~m/^"/){
+                     $quote='"';
+                     $datastr=~s/^"(.*)"$/$1/;
+                  }
+                  elsif ($datastr=~m/^'/){
+                     $quote="'";
+                     $datastr=~s/^'(.*)'$/$1/;
+                  }
+                  if ($datastr=~m/^\s*$quote\s*$/s){  # MulitLine handling
+                     $datastr="";
+                     while(my $line=<$F>){
+                        if ($line=~m/^\s*$quote\s*$/s){
+                           last;
+                        }
+                        $datastr.=$line;
+                     }
+                     $$datatarget=$datastr;
+                  }
+                  else{
+                     $datastr=~s/^"(.*)"\s*(#.*)?$/$1/;
+                     $datastr=~s/^'(.*)'\s*(#.*)?$/$1/;
+                     $$datatarget=$datastr;
+                  }
+               }
+
+
+
             }
          }
       }
@@ -346,9 +407,13 @@ sub Param($)
       $varset=$self->{currrentconfig};
    }
 
-   if (wantarray() && 
-       (ref($varset->{$name}) eq "ARRAY" || ref($varset->{$name}) eq "HASH") ){
-      return(@{$varset->{$name}});
+   if (wantarray()){
+      if (ref($varset->{$name}) eq "ARRAY"){
+         return(@{$varset->{$name}});
+      }
+      if (ref($varset->{$name}) eq "HASH"){
+         return(%{$varset->{$name}});
+      }
    }
    else{
       return($self->ExpandConfigVariables($varset->{$name}));
