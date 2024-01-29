@@ -95,12 +95,12 @@ sub ProcessExcelImport
             }
          }
          else{
-            #if ($sheetName eq "Appl"){
-            #   $self->ProcessRowAppl($oExcel,$oBook,$oWkS,$sheetName,
-            #                         $Hcellname,$Acellname,$iSheet,$row
-            #   );
-            #}
-            if ($sheetName eq "System"){
+            if (1 && $sheetName eq "Appl"){
+               $self->ProcessRowAppl($oExcel,$oBook,$oWkS,$sheetName,
+                                     $Hcellname,$Acellname,$iSheet,$row
+               );
+            }
+            if (1 && $sheetName eq "System"){
                $self->ProcessRowSystem($oExcel,$oBook,$oWkS,$sheetName,
                                      $Hcellname,$Acellname,$iSheet,$row
                );
@@ -155,7 +155,6 @@ sub ProcessRowAppl
      #    $appl->ValidatedUpdateRecord($arec,{
      #        acinmassingmentgroup=>$iagsoll
      #    },{id=>\$arec->{id}});
-     #    #print STDERR Dumper(\%data);
      # }
 
       my $cagsoll=$data{'Change-Approver Gruppen neu'};
@@ -171,33 +170,44 @@ sub ProcessRowAppl
                 'responsibility' => $l[1]
             }; 
          } @cagsoll);
-
-
-
-print STDERR "IST:".Dumper($arec->{chmapprgroups});
-print STDERR "SOLL:".Dumper(\@cag);
-         #       name          =>'chmapprgroups',
-         #       label         =>'Change approver groups',
-         #       htmlwidth     =>'200px',
-         #       group         =>'chm',
-         #       allowcleanup  =>1,
-         #       subeditmsk    =>'subedit.approver',
-         #       vjointo       =>'TS::lnkapplchmapprgrp',
-         #       vjoinbase     =>[{parentobj=>\'TS::appl'}],
-         #       vjoinon       =>['id'=>'refid'],
-         #       vjoindisp     =>['group','responsibility']),
-#c=SAP.AO.DE.SN.DTAG.FINANCE.CA;Kunde
-#SAP.AO.DE.SN.DTAG.FINANCE.CA;fachlich
-#SAP.AO.DE.SN.DTAG.FINANCE.CA;technisch
-
-
+         my %map;
+         map({
+            push(@{$map{i}->{$_->{responsibility}}},$_->{group});
+         } @{$arec->{chmapprgroups}});
+         map({
+            push(@{$map{s}->{$_->{responsibility}}},$_->{group});
+         } @cag);
+         #printf STDERR ("map:%s",Dumper(\%map));
+         foreach my $responsibility (qw(technical)){
+            my $cag=$self->getPersistentModuleObject("TS::lnkapplchmapprgrp");
+            if (exists($map{s}->{$responsibility})){
+               if (!exists($map{i}->{$responsibility})){
+                  $map{i}->{$responsibility}=[];
+               } 
+               if (join(",",sort(@{$map{s}->{$responsibility}})) ne 
+                   join(",",sort(@{$map{i}->{$responsibility}}))){
+                  msg(INFO,"modify $responsibility");
+                  $cag->BulkDeleteRecord({ 
+                     refid=>\$arec->{id},
+                     responsibility=>\$responsibility,
+                     parentobj=>\'TS::appl'
+                  });
+                  foreach my $group (@{$map{s}->{$responsibility}}){
+                     $cag->ValidatedInsertRecord({ 
+                        refid=>$arec->{id},
+                        responsibility=>$responsibility,
+                        parentobj=>'TS::appl',
+                        group=>$group
+                     });
+                  }
+               }
+            } 
+         }
       }
-      
-
 
    }
    else{
-      msg(ERROR,"unable to process line $row in Sheet '$sheetName'");
+      msg(ERROR,"unable to process line ".($row+1)." in Sheet '$sheetName'");
    }
 }
 
@@ -239,21 +249,25 @@ sub ProcessRowSystem
    my ($srec,$msg)=$sys->getOnlyFirst(qw(ALL));
    if (defined($srec)){
       my $niag=$data{'Incident Assignmentgroup neu ab 01.02.2024'};
-      if ($niag ne ""){
+      if ($niag ne "" && 
+          lc($niag) ne "to clarify" &&
+          !($niag=~m/wird von/i) &&
+          !($niag=~m/wird vom/i) &&
+          !($niag=~m/wird in/i)){
          if ($srec->{srcsys} ne "AssetManager"){
-            msg(INFO,"process system '$srec->{name}'");
             if ($srec->{acinmassingmentgroup} ne $niag){
-               msg(INFO,"change to $niag");
+               msg(INFO,"process system '$srec->{name}'");
+               msg(INFO,"change to '$niag'");
                $sys->ValidatedUpdateRecord($srec,{
                    acinmassingmentgroup=>$niag
-               },{id=>\$sys->{id}});
+               },{id=>\$srec->{id}});
             }
          }
       }
       
    }
    else{
-      msg(ERROR,"unable to process line $row in Sheet '$sheetName'");
+      msg(ERROR,"unable to process line ".($row+1)." in Sheet '$sheetName'");
    }
 }
 
