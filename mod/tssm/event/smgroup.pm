@@ -483,7 +483,7 @@ sub handleSRec
    my $lastseen=365;
    my %lastseen;
    {
-      foreach my $f (qw(smdate amdate)){
+      foreach my $f (qw(smdate amdate mdate)){
          my $d=effVal($oldrec,$newrec,$f);
          if ($d ne ""){
             my $nowstamp=NowStamp("en");
