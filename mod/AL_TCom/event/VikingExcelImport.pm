@@ -150,12 +150,12 @@ sub ProcessRowAppl
       msg(INFO,"process application '$arec->{name}'");
       msg(INFO,"acinmassingmentgroup=$arec->{acinmassingmentgroup}");
       my $iagsoll=$data{'Incident Assignmentgroup neu'};
-     # if ($iagsoll ne "" && $arec->{acinmassingmentgroup} ne $iagsoll){
-     #    msg(INFO,"change to $iagsoll");
-     #    $appl->ValidatedUpdateRecord($arec,{
-     #        acinmassingmentgroup=>$iagsoll
-     #    },{id=>\$arec->{id}});
-     # }
+      if ($iagsoll ne "" && $arec->{acinmassingmentgroup} ne $iagsoll){
+         msg(INFO,"change to $iagsoll");
+         $appl->ValidatedUpdateRecord($arec,{
+             acinmassingmentgroup=>$iagsoll
+         },{id=>\$arec->{id}});
+      }
 
       my $cagsoll=$data{'Change-Approver Gruppen neu'};
       if ($cagsoll ne ""){
@@ -178,7 +178,7 @@ sub ProcessRowAppl
             push(@{$map{s}->{$_->{responsibility}}},$_->{group});
          } @cag);
          #printf STDERR ("map:%s",Dumper(\%map));
-         foreach my $responsibility (qw(technical)){
+         foreach my $responsibility (qw(technical customer functional)){
             my $cag=$self->getPersistentModuleObject("TS::lnkapplchmapprgrp");
             if (exists($map{s}->{$responsibility})){
                if (!exists($map{i}->{$responsibility})){
