@@ -134,7 +134,7 @@ sub ProcessRowAppl
    }
    my $appl=$self->getPersistentModuleObject("TS::appl");
 
-   my %flt=(cistatusid=>"3 4 5");
+   my %flt=(cistatusid=>"2 3 4 5");
    if (exists($data{'W5BaseID'})){
       $flt{id}=\$data{'W5BaseID'};
    }
@@ -162,6 +162,7 @@ sub ProcessRowAppl
          my @cagsoll=grep(!/^\s*$/, map({trim($_)} split(/(\r|\n)/,$cagsoll)));
          my @cag=map({
             my @l=map({trim($_)} split(/;/,$_));
+            $l[0]=~s/^MIS\.SIS\.DE\.SN\.CSO\.AIX\.CA$/MIS.SIS.DE.CSO.AIX.CA/;
             $l[1]=~s/Kunde/customer/i;
             $l[1]=~s/Technisch/technical/i;
             $l[1]=~s/fachlich/functional/i;
@@ -260,6 +261,23 @@ sub ProcessRowSystem
                msg(INFO,"change to '$niag'");
                $sys->ValidatedUpdateRecord($srec,{
                    acinmassingmentgroup=>$niag
+               },{id=>\$srec->{id}});
+            }
+         }
+      }
+      my $chag=$data{'Change Approvergroup ab 01.02.2024'};
+      $chag=~s/\s*;\s*tec.*\s*$//;
+      if ($chag ne "" && 
+          lc($chag) ne "to clarify" &&
+          !($chag=~m/wird von/i) &&
+          !($chag=~m/wird vom/i) &&
+          !($chag=~m/wird in/i)){
+         if ($srec->{srcsys} ne "AssetManager"){
+            if ($srec->{scapprgroup} ne $chag){
+               msg(INFO,"process system '$srec->{name}'");
+               msg(INFO,"change to '$chag'");
+               $sys->ValidatedUpdateRecord($srec,{
+                   scapprgroup=>$chag
                },{id=>\$srec->{id}});
             }
          }
