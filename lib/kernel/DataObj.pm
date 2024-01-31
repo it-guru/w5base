@@ -5317,6 +5317,11 @@ sub GetRESTCredentials
          $p{$v}=$p{$v}->{$dbname};
       }
    }
+   foreach my $v (keys(%p)){
+      if (ref($p{$v})){
+         delete($p{$v});
+      }
+   }
    return($p{dbconnect},$p{dbpass},$p{dbuser},$p{dbbase});
 }
 
