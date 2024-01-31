@@ -1,0 +1,6 @@
+'GCP::project'=>{
+   de=>'GCP: Projekt',
+   en=>'GCP: Project'
+},
+'fieldgroup.labels'=>{de=>'Labels',en=>'Labels'},
+'State'=>{de=>'Status'},
