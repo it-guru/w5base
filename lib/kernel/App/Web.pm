@@ -584,13 +584,24 @@ sub ValidateCaches
    return(0) if (!$self->ValidateMandatorCache($res->{Mandator}));
 
    my $UserCache=$self->Cache->{User}->{Cache};
+
+
+   my $UserQueryAbbortLimit=$self->Config->Param("UserQueryAbbortCountLimit");
+
+   if ($UserQueryAbbortLimit<10){
+      $UserQueryAbbortLimit="10";
+   }
+   if ($UserQueryAbbortLimit>100){
+      $UserQueryAbbortLimit="100";
+   }
+
    if ($ENV{REMOTE_USER} ne "anonymous" && #locked account check
        defined($UserCache->{$ENV{REMOTE_USER}}) &&
        defined($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid})){ 
       if ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{cistatusid}!=4 ||
           ($UserCache->{$ENV{REMOTE_USER}}->{rec}->{userquerybreakcount} ne "" 
-           &&
-           $UserCache->{$ENV{REMOTE_USER}}->{rec}->{userquerybreakcount}>10) ||
+           && $UserCache->{$ENV{REMOTE_USER}}->{rec}->{userquerybreakcount}>
+           $UserQueryAbbortLimit) ||
           $UserCache->{$ENV{REMOTE_USER}}->{rec}->{gtcack} eq ""){
          if (Query->Param("MOD") eq "base::interface"){
             printf("Status: 403 Forbidden - ".

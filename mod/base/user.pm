@@ -48,7 +48,16 @@ sub new
          'local'
       ]
    };
-   
+
+   my $UserQueryAbbortFocus=$self->Config->Param("UserQueryAbbortCountFocus");
+
+   if ($UserQueryAbbortFocus<4){
+      $UserQueryAbbortFocus="4";
+   }
+   if ($UserQueryAbbortFocus>24){
+      $UserQueryAbbortFocus="24";
+   }
+
    $self->AddFields(
       new kernel::Field::Linenumber(
                 name          =>'linenumber',
@@ -899,6 +908,61 @@ sub new
                 group         =>'picture',
                 dataobjattr   =>'contact.picture'),
 
+      new kernel::Field::Date(
+                name          =>'lastlogon',
+                readonly      =>1,
+                group         =>'userro',
+                searchable    =>0,
+                depend        =>["accounts"],
+                onRawValue    =>\&getLastLogon,
+                label         =>'Last-Logon'),
+
+      new kernel::Field::Number(
+                name          =>'userquerybreakcount',
+                group         =>'userro',
+                readonly      =>1,
+                label         =>'relevant user query abort count',
+                dataobjattr   =>"(select count(*) from userquerybreak where ".
+                                "userquerybreak.userid=contact.userid and ".
+                                "userquerybreak.createdate>".
+                                   "DATE_SUB(NOW(), ".
+                                   "INTERVAL $UserQueryAbbortFocus HOUR))"),
+
+      new kernel::Field::Text(
+                name          =>'lastlang',
+                readonly      =>1,
+                group         =>'userro',
+                depend        =>["accounts"],
+                onRawValue    =>\&getLastLogon,
+                searchable    =>0,
+                label         =>'Last-Lang'),
+
+      new kernel::Field::Text(
+                name          =>'talklang', 
+                readonly      =>1,
+                htmldetail    =>0,
+                group         =>'userro',
+                depend        =>["accounts","lang"],
+                onRawValue    =>\&getLastLogon,
+                searchable    =>0,
+                label         =>'Talk-Lang'),
+
+      new kernel::Field::Date(
+                name          =>'lastexternalseen',
+                readonly      =>1,
+                group         =>'userro',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                dayonly       =>1,
+                htmldetail    =>'NotEmpty',
+                label         =>'Last-External-Seen',
+                dataobjattr   =>'contact.lastexternalseen'),
+
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'userro',
@@ -960,22 +1024,6 @@ sub new
                 dataobjattr   =>"lpad(contact.userid,35,'0')"),
 
       new kernel::Field::Date(
-                name          =>'lastexternalseen',
-                readonly      =>1,
-                group         =>'userro',
-                searchable    =>sub{
-                   my $self=shift;
-                   my $app=$self->getParent;
-                   return(1) if ($app->IsMemberOf("admin"));
-                   return(0);
-                },
-                dayonly       =>1,
-                htmldetail    =>'NotEmpty',
-                label         =>'Last-External-Seen',
-                dataobjattr   =>'contact.lastexternalseen'),
-
-
-      new kernel::Field::Date(
                 name          =>'planneddismissaldate',
                 readonly      =>1,
                 group         =>'userro',
@@ -1005,44 +1053,6 @@ sub new
                 label         =>'notified dismissal date',
                 dataobjattr   =>'contact.notifieddismissaldate'),
 
-
-      new kernel::Field::Date(
-                name          =>'lastlogon',
-                readonly      =>1,
-                group         =>'userro',
-                searchable    =>0,
-                depend        =>["accounts"],
-                onRawValue    =>\&getLastLogon,
-                label         =>'Last-Logon'),
-
-      new kernel::Field::Number(
-                name          =>'userquerybreakcount',
-                group         =>'userro',
-                readonly      =>1,
-                label         =>'user query 24h abort count',
-                dataobjattr   =>"(select count(*) from userquerybreak where ".
-                                "userquerybreak.userid=contact.userid and ".
-                                "userquerybreak.createdate>".
-                                   "DATE_SUB(NOW(), INTERVAL 24 HOUR))"),
-
-      new kernel::Field::Text(
-                name          =>'lastlang',
-                readonly      =>1,
-                group         =>'userro',
-                depend        =>["accounts"],
-                onRawValue    =>\&getLastLogon,
-                searchable    =>0,
-                label         =>'Last-Lang'),
-
-      new kernel::Field::Text(
-                name          =>'talklang', 
-                readonly      =>1,
-                htmldetail    =>0,
-                group         =>'userro',
-                depend        =>["accounts","lang"],
-                onRawValue    =>\&getLastLogon,
-                searchable    =>0,
-                label         =>'Talk-Lang'),
 
       new kernel::Field::Link(
                 name          =>'lastknownbossid',
