@@ -2,5 +2,7 @@
    de=>'GCP: Projekt',
    en=>'GCP: Project'
 },
+'Systems'=>{de=>'Systeme'},
+'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
 'fieldgroup.labels'=>{de=>'Labels',en=>'Labels'},
 'State'=>{de=>'Status'},

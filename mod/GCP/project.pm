@@ -65,9 +65,19 @@ sub new
             dataobjattr       =>'lifecycleState',
             label             =>'State'),
 
+      new kernel::Field::SubList(
+            name              =>'systems',
+            label             =>'Systems',
+            searchable        =>0,
+            group             =>'systems',
+            vjointo           =>'GCP::system',
+            vjoinon           =>['id'=>'projectId'],
+            vjoindisp         =>['name','status']),
+
       new kernel::Field::Container(     
             name              =>'labels',
             dataobjattr       =>'labels',
+            group             =>'labels',
             uivisible         =>1,
             label             =>'Labels'),
 
@@ -193,18 +203,18 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default tags source));
+   return(qw(header default systems labels source));
 }
 
 
 
 
-sub getRecordImageUrl
-{
-   my $self=shift;
-   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
-}
+#sub getRecordImageUrl
+#{
+#   my $self=shift;
+#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
+#   return("../../../public/itil/load/system.jpg?".$cgi->query_string());
+#}
 
 
 1;

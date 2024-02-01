@@ -42,6 +42,10 @@ sub Init
                       "GCP::project",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.cloud.gcp.system",
+                      "GCP::system",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

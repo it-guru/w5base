@@ -75,7 +75,13 @@ sub ExternInternTimestampReformat
    foreach my $name (@$nameList){
       if (exists($rec->{$name})){
          if (my ($Y,$M,$D,$h,$m,$s)=$rec->{$name}=~
-                 m/^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\..*Z){0,1}$/){
+                 m/^(\d+)-(\d+)-(\d+)T(\d+):([0-9]+):([0-9]+)(\..*Z){0,1}$/){
+            $rec->{$name}=sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+                                  $Y,$M,$D,$h,$m,$s);
+         }
+         # Achtung: Zeitzone wird noch nicht korret bereuecksichtig!
+         if (my ($Y,$M,$D,$h,$m,$s)=$rec->{$name}=~
+                 m/^(\d+)-(\d+)-(\d+)T([0-9]+):([0-9]+):([0-9]+)\..*$/){ # TZ miss!
             $rec->{$name}=sprintf("%04d-%02d-%02d %02d:%02d:%02d",
                                   $Y,$M,$D,$h,$m,$s);
          }
