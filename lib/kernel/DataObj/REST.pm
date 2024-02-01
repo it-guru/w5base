@@ -97,6 +97,20 @@ sub Filter2RestPath
                                                 \%qparam,$constParam,$filter);
             }
          }
+         if (ref($fld->{RestFilterType}) eq "ARRAY"){  # idpath default handling
+            my $RestFilterPathSep=$fld->{RestFilterPathSep};
+            if ($RestFilterPathSep eq ""){
+               $RestFilterPathSep='@';
+            }
+            if ($const){
+               my @pathVar=split($RestFilterPathSep,$filter->{$fn});
+               for(my $c=0;$c<=$#{$fld->{RestFilterType}};$c++){
+                  my $pvar=$fld->{RestFilterType}->[$c];
+                   $filter->{$pvar}=$pathVar[$c];
+               }
+               delete($filter->{$fn});
+            }
+         }
       }
    }
    foreach my $fn (keys(%{$filter})){
