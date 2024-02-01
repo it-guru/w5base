@@ -6,10 +6,27 @@ E-Mail, falls in Artikel diese Kategorien aktualisiert oder neu
 eintestellt werden. Die Inhalte der Artikel werden nicht geprüft, d.h.
 es obliegt Ihnen die Vertrauenswürdigkeit der Informationen zu bewerten.<br>
 <b>Datenschutzhinweis:</b><br>
-In allen Bereichen der Wissendatenbank werden Ersteller-Kontaktdaten von FAQ-Artikeln und Forumsbeiträgen langfristig gespeichert. Durch das Hinzufügen von FAQ-Arikeln und Formumsbeiträgen stimmen Sie dieser Speicherung ihrer Kontaktdaten zu!
+In allen Bereichen der Wissendatenbank werden Ersteller-Kontaktdaten von FAQ-Artikeln und Forumsbeiträgen langfristig gespeichert. Durch das Hinzufügen von FAQ-Arikeln und Formumsbeiträgen stimmen Sie dieser Speicherung ihrer Kontaktdaten zu!<br>
+<b>Hinweis zur Barrierefreiheit:</b><br>
+Beim Erstellen von Beiträgen zum Wissensmanagement sollte darauf geachtet werden, das die Erläuterung von Abläufen und Funktionalitäten so formuliert werden, dass alle Nutzer diese auch ohne Bildbeispiele nachvollziehen können.<br>
+Alle Inhalte der Screenshots sollten auch in der textuellen Umsetzung zu finden sein.
 EOF
 en=><<EOF},
-This Knowledge Base is avalilable for all users.
+This knowledge database is accessible to all users. Anyone can
+post articles. If you are interested in certain topics
+you can subscribe to individual categories, i.e. you will then 
+automatically receive an 
+e-mail when articles in these categories are updated or newly
+are added. The contents of the articles are not checked, i.e.
+It is up to you to judge the trustworthiness of the information.<br>
+<br>
+<b>Note on data protection:</b><br>
+In all areas of the knowledge base, the contact details of the creators of FAQ articles and forum posts are stored long-term. By posting FAQ articles and forum contributions, you agree to this storage of your contact details!<br>
+<b>Note on accessibility:</b><br>
+When creating knowledge management articles, care should be taken to ensure that the explanations of processes and functionalities are formulated in such a way that they can be understood by all users even without image examples.<br>
+All contents of the screenshots should also be reflected in the text.
+
+
 EOF
 'Knowledge Base - Quickfind'=>{de=>'Wissensdatenbank - Quickfind'},
 'Keywords'=>{de=>'Schlüsselworte'},
