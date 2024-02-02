@@ -78,6 +78,10 @@ sub Init
                       "W5Warehouse::ApplExtOperationUser",
                       defaultacl=>['admin','support']);
 
+   $self->RegisterObj("itu.W5Warehouse.Rep.W5USULICMGMT_system",
+                      "W5Warehouse::W5USULICMGMT_SYSTEM",
+                      defaultacl=>['admin','support']);
+
    $self->RegisterObj("itu.W5Warehouse.Rep.MViewMonitor",
                       "W5Warehouse::MViewMonitor",
                       defaultacl=>['admin']);
