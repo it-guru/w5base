@@ -134,24 +134,37 @@ sub new
                 name          =>'lorgdomainseg',
                 label         =>'Lead OrgDomain Segment',
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>"trim(substring(Org_Domain,0,".
-                                "charindex('/',Org_Domain)))"),
+                dataobjattr   =>"CASE ".
+                                "WHEN charindex('/',Org_Domain)>0 THEN ".
+                                "trim(substring(Org_Domain,0,".
+                                "charindex('/',Org_Domain))) ".
+                                "ELSE '' ".
+                                "END"),
 
       new kernel::Field::Text(
                 name          =>'orgdomainid',
                 label         =>'OrgDomainID',
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>"trim(substring(Org_Domain,".
+                dataobjattr   =>"CASE ".
+                                "WHEN charindex('/',Org_Domain)>0 AND ".
+                                "     charindex('-',Org_Domain)>0 THEN ".
+                                "trim(substring(Org_Domain,".
                                 "charindex('/',Org_Domain)+1,".
                                 "charindex('-',Org_Domain)-".
-                                "charindex('/',Org_Domain)-2))"),
+                                "charindex('/',Org_Domain)-2))".
+                                "ELSE ''".
+                                "END"),
 
       new kernel::Field::Text(
                 name          =>'orgdomainname',
                 label         =>'OrgDomainName',
                 htmldetail    =>'NotEmpty',
-                dataobjattr   =>"trim(right(Org_Domain,len(Org_Domain)-".
-                                "charindex('-',Org_Domain)))"),
+                dataobjattr   =>"CASE ".
+                                "WHEN charindex('/',Org_Domain)>0 THEN ".
+                                "trim(right(Org_Domain,len(Org_Domain)-".
+                                "charindex('-',Org_Domain))) ".
+                                "ELSE '' ".
+                                "END"),
 
       new kernel::Field::Contact(
                 name          =>'applmgr',
