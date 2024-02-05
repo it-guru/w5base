@@ -406,8 +406,6 @@ sub Param($)
    if (exists($self->{currrentconfig}->{$name})){
       $varset=$self->{currrentconfig};
    }
-use Data::Dumper;
-
 
    if (wantarray()){
       if (ref($varset->{$name}) eq "ARRAY"){
