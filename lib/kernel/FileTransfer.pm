@@ -98,6 +98,14 @@ sub Connect
       $self->{mode}="ftp";
    }
 
+   $self->{initdir}=undef;
+   if ($self->{serv}=~m/\//){
+      $self->{initdir}=$self->{serv};
+      $self->{initdir}=~s/^[^\/]+//;
+      $self->{serv}=~s/\/.*$//;
+   }
+   
+
    if ($self->{mode} eq "sftp"){
       my $comObj;
       my %param=(host=>$self->{serv});
@@ -118,6 +126,9 @@ sub Connect
          return(undef);
       }
       $self->{$self->{mode}}=$comObj;
+      if (defined($self->{initdir})){
+         $self->Cd($self->{initdir});
+      }
       return(1);
 
    }
@@ -148,8 +159,13 @@ sub Connect
             }
          }
       }
+      if (defined($self->{initdir})){
+         $self->Cd($self->{initdir});
+      }
       return(1) if (defined($self->{$self->{mode}}));
    }
+
+
    return(undef);
 }
 
