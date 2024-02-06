@@ -1,5 +1,3 @@
-# -*-cperl-*-
-#
 # Crypt::GPG - An Object Oriented Interface to GnuPG.
 # Copyright (c) 2000-2007 Ashish Gulhati <crypt-gpg at neomailbox.com>
 #
@@ -236,7 +234,7 @@ sub msginfo {
   my ($tmpfh, $tmpnam) = 
     tempfile( $self->tmpfiles, DIR => $self->tmpdir, 
  	      SUFFIX => $self->tmpsuffix, UNLINK => 1);
-  warn join '',@{$_[0]};
+  printf STDERR ("WARN: %s\n",join '',@{$_[0]});
   print $tmpfh join '',@{$_[0]}; close $tmpfh;
   
   my @opts = (split (/\s+/, "$self->{FORCEDOPTS} $self->{GPGOPTS}"));
@@ -288,6 +286,12 @@ sub encrypt {
   my ($in, $out, $err, $in_q, $out_q, $err_q);
   my $h = start ([$self->gpgbin, @opts, '--no-tty', '--status-fd', '1', '--command-fd', 0,
                   '-o', $tmpnam2, @rcpts, '--encrypt', $tmpnam], \$in, \$out, \$err, timeout( 30 ));
+
+  my $cmd=join(" ",map({"'".$_."'"} $self->gpgbin, @opts, '--no-tty', '--status-fd', '1', '--command-fd', 0, '-o', $tmpnam2, @rcpts, '--encrypt', $tmpnam));
+
+  #printf STDERR ("fif cmd=%s\n",$cmd);
+  #system($cmd);
+
   local $SIG{CHLD} = 'IGNORE'; local $SIG{PIPE} = 'IGNORE';
   my $pos;
   eval {
@@ -352,6 +356,7 @@ sub addkey {
 
   $key = join ('', @$key) if ref($key) eq 'ARRAY'; 
   return if grep { $_ !~ /^[a-f0-9]+$/i } @keyids;
+
 
   my $tmpdir = tempdir( $self->tmpdirs, 
 		     DIR => $self->tmpdir, CLEANUP => 1);
@@ -587,7 +592,7 @@ sub parsekeys {
       }
     }
   }
-  $^W = 1;
+  #$^W = 1;
   return map {bless $_, 'Crypt::GPG::Key'} @keys;
 }
 
