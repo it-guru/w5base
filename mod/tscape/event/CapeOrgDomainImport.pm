@@ -70,7 +70,7 @@ sub CapeOrgDomainImport
    my $v=$vou->getHashIndexed(qw(shortname));
 
 
-   $orgdomo->SetFilter({cistatusid=>"<6"});
+   $orgdomo->SetFilter({cistatusid=>"4"});
    $orgdomo->SetCurrentView(qw( id orgdomid name cistatusid ));
    my $orgdom=$orgdomo->getHashIndexed(qw(orgdomid));
 
@@ -100,7 +100,7 @@ sub CapeOrgDomainImport
             $norgdom->{$irec->{orgdomainid}}->{orgareaid}->{$irec->{orgareaid}}++;
          }
       }
-    
+
       my @opList;
       my $res=OpAnalyse(
             sub{  # comperator
@@ -158,7 +158,7 @@ sub CapeOrgDomainImport
    }
 
    $orgdomo->ResetFilter();
-   $orgdomo->SetFilter({});
+   $orgdomo->SetFilter({cistatusid=>'4'});
    $orgdomo->SetCurrentView(qw(id orgdomid name cistatusid ));
    my $orgdom=$orgdomo->getHashIndexed(qw(orgdomid));
 
