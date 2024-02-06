@@ -141,6 +141,8 @@ sub new
       new kernel::Field::Text(
                 name          =>'orgdomid',
                 label         =>'Organisation Domain',
+                htmldetail    =>0,
+                group         =>'functional',
                 vjointo       =>'TS::lnkorgdomappl',
                 vjoinon       =>['id'=>'applid'],
                 vjoindisp     =>'orgdomorgdomid'),
