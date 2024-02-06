@@ -131,7 +131,7 @@ create table orgdom (
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
-  primary key(id),unique(orgdomid,name),
+  primary key(id),unique(orgdomid,cistatus),
   UNIQUE KEY `srcsys` (srcsys,srcid),
   key(lastqcheck)
 ) ENGINE=INNODB;
