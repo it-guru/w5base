@@ -70,6 +70,9 @@ sub Filter2RestPath
    my $filterSet=shift;
 
    my $restFinalAddr=$pathTmpl;
+   if (ref($restFinalAddr) ne "ARRAY"){
+      $restFinalAddr=[$pathTmpl];
+   }
    my $constParam={};
    my $requesttoken=undef;
    my %qparam;
@@ -122,13 +125,15 @@ sub Filter2RestPath
          }
          if ($const){
             $constParam->{$fn}=$filter->{$fn};
-            if ($fld->{RestFilterType} eq "CONST2PATH"){
-               $restFinalAddr.="/" if (!($restFinalAddr=~m/\/$/));
-               $restFinalAddr.=$filter->{$fn};
-            }
-            if ($restFinalAddr=~m/\{$fn\}/){
-               my $constVal=$filter->{$fn};
-               $restFinalAddr=~s/\{$fn\}/$constVal/g;
+            foreach my $subRestFinalAddr (@{$restFinalAddr}){
+               if ($fld->{RestFilterType} eq "CONST2PATH"){
+                  $subRestFinalAddr.="/" if (!($subRestFinalAddr=~m/\/$/));
+                  $subRestFinalAddr.=$filter->{$fn};
+               }
+               if ($subRestFinalAddr=~m/\{$fn\}/){
+                  my $constVal=$filter->{$fn};
+                  $subRestFinalAddr=~s/\{$fn\}/$constVal/g;
+               }
             }
             delete($filter->{$fn});
          }
@@ -257,31 +262,38 @@ sub Filter2RestPath
          $qparam{'$top'}=99999;
       }
    }
-   if ($restFinalAddr=~m/\{[^{}]+\}/){
-
-      my @varlist;
-      while ($restFinalAddr =~ /\{([^{}]+)\}/g) {
-          my $fn=$1;
-          my $fld=$self->getField($fn);
-          if (defined($fld)){
-             $fn=$fld->Label();
-          }
-          push(@varlist,$fn);
-        #  pos($restFinalAddr);
-       #   print STDERR "Word is $1, ends at position ", pos $restFinalAddr, "\n";
+   if (grep(/\{[^{}]+\}/,@$restFinalAddr)){
+      my $c=0;
+      for($c=0;$c<=$#{$restFinalAddr};$c++){
+         my $subRestFinalAddr=$restFinalAddr->[$c];
+         my @varlist;
+         while ($subRestFinalAddr =~ /\{([^{}]+)\}/g) {
+             my $fn=$1;
+             my $fld=$self->getField($fn);
+             if (defined($fld)){
+                $fn=$fld->Label();
+             }
+             push(@varlist,$fn);
+         }
+         if (!($subRestFinalAddr =~ /\{([^{}]+)\}/)){
+            last;
+         }
+         if ($c==$#{$restFinalAddr}){
+            if ($#varlist>0){
+               $self->LastMsg(ERROR,"missing constant query '%s' parameters",
+                                    join(",",@varlist));
+            }
+            else{
+               $self->LastMsg(ERROR,"missing constant query '%s' parameter",
+                                    join(",",@varlist));
+            }
+            return(undef);
+         }
       }
-      if ($#varlist>0){
-         $self->LastMsg(ERROR,"missing constant query '%s' parameters",
-                              join(",",@varlist));
-      }
-      else{
-         $self->LastMsg(ERROR,"missing constant query '%s' parameter",
-                              join(",",@varlist));
-      }
-      return(undef);
+      return($restFinalAddr->[$c],$requesttoken,$constParam);
    }
 
-   return($restFinalAddr,$requesttoken,$constParam);
+   return($restFinalAddr->[0],$requesttoken,$constParam);
 }
 
 
