@@ -1,4 +1,4 @@
-package GCP::system;
+package GCP::ipaddress;
 #  W5Base Framework
 #  Copyright (C) 2024  Hartmut Vogler (it@guru.de)
 #
@@ -33,16 +33,12 @@ sub new
 
    $self->AddFields(
 
-      new kernel::Field::Id(
+      new kernel::Field::Text(
             name              =>'idpath',
-            searchable        =>0,
             group             =>'source',
             align             =>'left',
-            RestFilterType    =>[qw(id name projectId zonename)],
+            RestFilterType    =>[qw(id sysname projectId zonename)],
             label             =>'GCP Id-Path'),
-
-      new kernel::Field::RecordUrl(),
-
 
       new kernel::Field::Text(     
             name              =>'id',
@@ -60,59 +56,29 @@ sub new
             dataobjattr       =>'projectId',
             label             =>'Project ID'),
 
-      new kernel::Field::RecordUrl(),
+      new kernel::Field::Text(
+            name              =>'sysname',
+            searchable        =>1,
+            dataobjattr       =>'sysname',
+            htmlwidth         =>'200px',
+            label             =>'Name'),
 
-      new kernel::Field::Text(      # https://www.ietf.org/rfc/rfc1035.txt
+      new kernel::Field::Text(
             name              =>'name',
             searchable        =>1,
             htmlwidth         =>'200px',
             label             =>'Name'),
 
-
-      new kernel::Field::Text(     
-            name              =>'status',
-            dataobjattr       =>'status',
-            label             =>'Online-State'),
-
-      new kernel::Field::Text(     
-            name              =>'cputype',
-            dataobjattr       =>'cpuPlatform',
-            label             =>'CPU Platform'),
-
-      new kernel::Field::SubList(
-            name              =>'ipaddresses',
-            label             =>'IP-Adresses',
+      new kernel::Field::Text(
+            name              =>'ifname',
             searchable        =>0,
-            vjointo           =>'GCP::ipaddress',
-            vjoinon           =>['idpath'=>'idpath'],
-            vjoindisp         =>['name','netareatag','ifname','mac']),
-
-
-      new kernel::Field::Container(     
-            name              =>'tags',
-            dataobjattr       =>'tags',
-            uivisible         =>1,
-            label             =>'Tags'),
+            htmlwidth         =>'200px',
+            label             =>'System Interface'),
 
       new kernel::Field::Text(
-            name              =>'zonename',
-            group             =>'source',
-            searchable        =>0,
-            dataobjattr       =>'zonename',
-            label             =>'Zone-Name'),
-
-      new kernel::Field::Date(
-            name              =>'laststart',
-            group             =>'source',
-            searchable        =>0,
-            dataobjattr       =>'lastStartTimestamp',
-            label             =>'Last-Start-Date'),
-
-      new kernel::Field::CDate(
-            name              =>'cdate',
-            group             =>'source',
-            searchable        =>0,
-            label             =>'Creation-Date'),
+            name              =>'netareatag',
+            htmlwidth         =>'200px',
+            label             =>'System Interface'),
 
    );
    $self->setDefaultView(qw(name id projectId status cdate));
@@ -145,12 +111,12 @@ sub DataCollector
 
 
    my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
-      [ "/compute/v1/projects/{projectId}/zones/{zonename}/instances/{name}",
-        "/compute/v1/projects/{projectId}/aggregated/instances"],  
+      "/compute/v1/projects/{projectId}/aggregated/instances",  
       $filterset,
       {
       }
    );
+printf STDERR ("flt=%s\n",Dumper($flt));
 
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
@@ -199,42 +165,30 @@ sub DataCollector
                      $self->Config->Param("W5BaseOperationMode") eq "dev"){
                     print STDERR Dumper($rec);
                  }
+printf STDERR ("fifi zonename=$zonename\n");
+                 if (ref($rec->{networkInterfaces}) eq "ARRAY"){
+                    foreach my $irec (@{$rec->{networkInterfaces}}){
+                       # network und subnetwork u.U. noch auswerten
+                       $irec->{id}=$rec->{id};
+                       $irec->{sysname}=$rec->{name};
+                       $irec->{ifname}=$irec->{name};
+                       $irec->{name}=$irec->{networkIP};
+                       $irec->{projectId}=$constParam->{projectId};
+                       $irec->{zonename}=$zonename;
+                       $irec->{netareatag}="CNDTAG";
+                       $irec->{zonename}=~s/^.*\///;  
+                       $irec->{idpath}=$rec->{id}.'@'.
+                                       $rec->{name}.'@'.
+                                       $constParam->{projectId}.'@'.
+                                       $irec->{zonename};
 
-                 # if (in_array(\@curView,[qw(ALL srcrec)])){
-                 #    my $jsonfmt=new JSON();
-                 #    $jsonfmt->property(latin1 => 1);
-                 #    $jsonfmt->property(utf8 => 0);
-                 #    $jsonfmt->pretty(1);
-                 #    my $d=$jsonfmt->encode($rec);
-                 #    $rec->{srcrec}=$d;
-                 # }
-                 # if (in_array(\@curView,[qw(ALL cdate)])){
-                 #    $rec->{cdate}=$rec->{vserverCreationDate};
-                 # }
-                  $rec->{projectId}=$constParam->{projectId};
-                  $rec->{zonename}=$zonename;
-                  $rec->{zonename}=~s/^.*\///;  
-                  $rec->{idpath}=$rec->{id}.'@'.
-                                 $rec->{name}.'@'.
-                                 $constParam->{projectId}.'@'.
-                                 $rec->{zonename};
-                  if (exists($constParam->{projectId})){
-                     $rec->{projectId}=$constParam->{projectId};
-                  }
-                  $self->GCP::lib::Listedit::ExternInternTimestampReformat(
-                     $rec,['creationTimestamp','lastStartTimestamp']
-                  );
-                  if (exists($rec->{creationTimestamp}) && 
-                      $rec->{creationTimestamp} ne ""){
-                     $rec->{cdate}=$rec->{creationTimestamp};
-                  }
-                  else{
-                     $rec->{cdate}=undef;
-                  }
-                  push(@l,$rec);
+                       push(@l,$irec);
+                    }
+                 }
                }
             }
          }
+print STDERR Dumper(\@l);
          return(\@l);
       }
    );
