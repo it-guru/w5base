@@ -202,7 +202,7 @@ sub qcheckRecord
                name=>\@sysname,
                cpucount=>$parrec->{cpucount},
                memory=>$parrec->{memory},
-               osrelease=>$parrec->{image_name},
+            #   osrelease=>$parrec->{image_name},
                sysiface=>\@sysiface,
                ipaddresses=>\@ipaddresses
             );
