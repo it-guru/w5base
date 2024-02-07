@@ -88,7 +88,13 @@ sub Transfer_W5USULICMGMT_SYSTEM
       my $filename=$tempdir."/".$file;
       my $csvfile=$output->WriteToScalar(HttpHeader=>0);
       $gpg->armor(0);
-      my $encrypted = $gpg->encrypt ($csvfile,"support\@aspera.com");
+      my $target=$k[0]->{ID};
+      my $encrypted = $gpg->encrypt ($csvfile,$target);
+      if ($encrypted eq ""){
+         my $msg="fail to encrypt data for $target";
+         #msg(ERROR,$msg);
+         return({exitcode=>1,exitmsg=>$msg});
+      }
       if (open(F,'>'.$filename)){
          print F ($encrypted);
          close(F);
