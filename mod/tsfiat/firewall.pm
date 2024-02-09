@@ -132,6 +132,18 @@ sub new
 }
 
 
+sub getValidWebFunctions
+{
+   my $self=shift;
+
+   my @l=$self->SUPER::getValidWebFunctions(@_);
+   push(@l,"QueryByServerIP");
+   return(@l);
+}
+
+
+
+
 sub isWriteValid
 {
    my $self=shift;
@@ -311,6 +323,60 @@ sub getFirewallTable
 
    return($d);
 }
+
+
+sub QueryByServerIP
+{
+   my $self=shift;
+
+   return(
+      $self->simpleRESTCallHandler(
+         {
+            query=>{
+               typ=>'STRING',
+               path=>0,
+               init=>'10.105.204.109'
+            },
+            ipaddr=>{
+               typ=>'STRING',
+            }
+         },undef,\&doQueryByServerIP,@_)
+   );
+}
+
+sub doQueryByServerIP
+{
+   my $self=shift;
+   my $param=shift;
+
+   if (exists($param->{query}) && $param->{query} ne ""){
+      if (!exists($param->{ipaddr}) || $param->{ipaddr} eq ""){
+         $param->{ipaddr}=$param->{query};
+      }
+      if (exists($param->{ipaddr}) && $param->{ipaddr} ne $param->{query}){
+         $param->{ipaddr}="-1";
+      }
+   }
+   my $d=$self->getFirewallByIp($param->{ipaddr});
+
+   if (ref($d) eq "ARRAY"){
+      foreach my $fwrec (@$d){
+         if ($fwrec->{id} ne ""){
+            $self->ResetFilter();
+            $self->SetFilter({id=>\$fwrec->{id}});
+            my @l=$self->getHashList(qw(ALL));
+            if ($#l!=-1){
+               $fwrec->{firewall}=\@l;
+            }
+         }
+      }
+   }
+
+   return($d);
+}
+
+
+
 
 sub getFirewallByIp
 {
