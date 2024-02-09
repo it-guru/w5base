@@ -26,7 +26,7 @@ sub new
 {
    my $type=shift;
    my $self=bless({@_},$type);
-   $self->{OTC_ScanNewSystems_timeout}=600;
+   $self->{OTC_ScanNewSystems_timeout}=1800;
    return($self);
 }
 
