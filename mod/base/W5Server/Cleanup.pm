@@ -149,11 +149,11 @@ sub CleanupWasted
    foreach my $obj (@objlist){
       my $o;
       eval('$o=getModuleObject($self->getParent->Config,$obj);');
-      msg(DEBUG,"check for CleanupWasted $obj");
-      if (!defined($o)){
-         die("ERROR: can not create object $obj");
-      }
-      if ($o->can("prepareToWasted")){
+      msg(DEBUG,"check for CleanupWasted $obj as '$o' instance");
+      #if (!defined($o)){
+      #   die("ERROR: can not create object $obj");
+      #}
+      if (defined($o) && $o->can("prepareToWasted")){
          my $idobj=$o->IdField();
          my $mdatefld=$o->getField("mdate");
          my $cistatusfld=$o->getField("cistatusid");
