@@ -210,6 +210,9 @@ sub mkAcFtpRecSystem
    my $inmassign=$rec->{acinmassingmentgroup};
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
+   if ($self->{DebugMode}){
+      msg(INFO,"mkAcFtpRecSystem: $CurrentEventId");
+   }
 
    my $nsys=1;
    if ($rec->{itcloudareaid} eq ""){  # For clouds the SystemPartOfAsset calc
@@ -260,6 +263,7 @@ sub mkAcFtpRecSystem
    # Wenn das Asset nicht Darwin "gehört", dann will die MU selbst den
    # SystemPartOfAsset Wert definieren - ist zwar unlogisch - ist aber so (HV).
    #
+
    if (defined($arec) && $arec->{srcsys} eq "W5Base"){
       $acrec->{LogSys}->{pSystemPartOfAsset}=$TXTpSystemPartOfAsset;
    }
@@ -276,6 +280,11 @@ sub mkAcFtpRecSystem
       # TS-TSIG_DE_FRANKFURT-AM-MAIN_HAHNSTR.-43
    }
    else{
+      if ($self->{DebugMode}){
+         msg(ERROR,"unable to detect SC_Location_ID ".
+                   "for mandator $rec->{mandator}");
+         msg(ERROR,"ignore system $rec->{name} in XML upload");
+      }
       return();
    }
    if (defined($arec)){  # alles gut - Asset Datensatz ist sichtbar
@@ -356,9 +365,15 @@ sub SendXmlToAM_system
          my $t0=Time::HiRes::time();
          msg(INFO,"Start of Record");
          if ($rec->{asset} ne "" && $rec->{acinmassingmentgroup} ne ""){
+            if ($self->{DebugMode}){
+               msg(INFO,"check assetid '$rec->{asset}'");
+            }
             $acasset->ResetFilter();
             $acasset->SetFilter({assetid=>\$rec->{asset}});
             my ($acassetrec,$msg)=$acasset->getOnlyFirst(qw(assetid srcsys));
+            if (defined($acassetrec) && $self->{DebugMode}){
+               msg(INFO," assetid '$rec->{asset}' OK");
+            }
             foreach my $acftprec ($self->mkAcFtpRecSystem($acassetrec,$rec)){
                if (defined($acftprec)){
                   my $fh=$fh{system};
