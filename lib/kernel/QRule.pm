@@ -384,8 +384,21 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                   if (!defined($origrec->{$origfieldname}) ||
                       lc($chkrec->{$lnkfield->{vjoindisp}}) ne 
                       lc($origrec->{$origfieldname})){
+
                      $remotecompval=$chkrec->{$lnkfield->{vjoindisp}};
-                     $takeremote++;
+                     if ($param{allowLocalHigherPrecision}){
+                        if (($origrec->{$origfieldname}=~m/\d/) &&
+                            !($remotecompval=~m/\d/)){
+                           # local has a higher precsion level (version) 
+                           # as remote
+                        }
+                        else{
+                           $takeremote++;      
+                        }
+                     }
+                     else{
+                        $takeremote++;
+                     }
                   }
                   else{
                      # takeremote not needed, because value is equal after
