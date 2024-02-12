@@ -154,6 +154,17 @@ foreach my $apid (@apid){
 #print STDERR Dumper(\%stat);
 
 
+my $UserQueryAbbortFocus=$curconfig->Param("UserQueryAbbortCountFocus");
+
+if ($UserQueryAbbortFocus<4){
+   $UserQueryAbbortFocus="4";
+}
+if ($UserQueryAbbortFocus>24){
+   $UserQueryAbbortFocus="24";
+}
+
+
+
 foreach my $apid (@apid){
    if ($opt_autokill){
       my $consolemsg="";
@@ -267,6 +278,7 @@ foreach my $apid (@apid){
                      my $d=$act->getParsedTemplate(
                            "tmpl/w5top.killmessage",{
                               static=>{
+                                 UserQueryAbbortFocus=>$UserQueryAbbortFocus,
                                  sitename=>$sitename,
                                  modlong=>$modlong,
                                  killtimeout=>$killtimeout,
@@ -325,7 +337,7 @@ if (!$opt_autokill){
 
 sub help
 {
-   printf STDERR ("Usage: W5Top -c {config} [-v] [--autokill]\n");
+   printf STDERR ("Usage: W5Top -c {config} [-v] [--autokill] [--fastkill]\n");
 }
 
 
