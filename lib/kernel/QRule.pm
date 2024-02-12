@@ -346,10 +346,18 @@ sub IfComp  # new version of IfaceCompare  - only this should be used from now!
                    if (defined($idfield) && $origrec->{$idfield->Name()} ne ""){
                       $ref.="(".$origrec->{$idfield->Name()}.")";
                    }
+                   my $parentref=$callerpackage;
+                   if (defined($param{iomapped}) && ref($param{iomapped})){
+                      $parentref=$param{iomapped}->Self();
+                   }
+                   my $atref="";
+                   if (defined($chkobj) && ref($chkobj)){
+                      $atref="at '".$chkobj->Self()."'";
+                   }
                    $obj->Log(ERROR,"basedata",
                         "Missing key '$comprec->{$compfieldname}' while ".
                         "try to import '$compfieldname' in '".
-                        $ref."' with module '$callerpackage'".
+                        $ref."' ${atref} queried from '$parentref'".
                         "\n-");
                }
                elsif ($param{mode} eq "leftouterlinkmissok"){
