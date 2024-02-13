@@ -31,6 +31,13 @@ sub new
    $param{vjoinon}='databossid'  if (!defined($param{vjoinon}));
    $param{AllowEmpty}='0'        if (!defined($param{AllowEmpty}));
    $param{SoftValidate}='1'      if (!defined($param{SoftValidate}));
+   if (!defined($param{vjoineditbase})){
+      $param{vjoineditbase}={
+         'cistatusid'=>[3,4,5],
+         'usertyp'=>['user','service']
+      };
+   }
+
 
    my $self=bless($type->SUPER::new(%param),$type);
    return($self);
