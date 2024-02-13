@@ -36,7 +36,10 @@ sub getMandatoryModules
    my $self=shift;
 
 
-   return qw(Text::Wrap);
+   return qw(Text::Wrap
+     Digest::MD5
+     MIME::Base64
+   );
 }
 
 

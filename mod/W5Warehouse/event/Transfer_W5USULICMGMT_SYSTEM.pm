@@ -23,10 +23,8 @@ use kernel;
 use kernel::Event;
 use kernel::QRule;
 use kernel::FileTransfer;
-use Crypt::OpenSSL::RSA;
 use Crypt::GPG;
 use File::Temp qw(tempdir);
-use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 @ISA=qw(kernel::Event);
 
 
