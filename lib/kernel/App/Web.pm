@@ -71,6 +71,21 @@ sub RunWebApp
                printf("Content-type: text/xml\n\n".
                       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             }
+            elsif ($ENV{HTTP_ACCEPT}=~m#application/json#){
+               printf("Content-type: application/json\n\n");
+               my $JSON;
+               eval("use JSON;\$JSON=new JSON;");
+               if ($@ eq ""){
+                  $JSON->utf8(1);
+                  $JSON->allow_blessed(1);
+                  $JSON->convert_blessed(1);
+                  print $JSON->pretty->encode({
+                     'http-code'=>'400',
+                     'http-message'=>"Forbidden - $msg",
+                     'exitcode'=>1
+                  });
+               }
+            }
             else{
                printf("Content-type: text/plain\n\n".
                       "ERROR: $msg\n");
