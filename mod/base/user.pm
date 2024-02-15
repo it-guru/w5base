@@ -1580,7 +1580,7 @@ sub Validate
       }
    }
    if (effChangedVal($oldrec,$newrec,"usertyp") &&
-       $oldrec->{usertyp} eq "function"){
+       (defined($oldrec) && $oldrec->{usertyp} eq "function")){
       if ($#{$oldrec->{contacts}}!=-1){
          $self->LastMsg(ERROR,
                         "usertyp change not allowed with existing contacts");
