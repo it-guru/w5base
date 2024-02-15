@@ -139,6 +139,7 @@ sub getAuthorizationToken
 {
    my $self=shift;
    my $credentialName=shift;
+   my $noImpersonate=shift;
 
    $W5V2::Cache->{GLOBAL}={} if (!exists($W5V2::Cache->{GLOBAL}));
    my $gc=$W5V2::Cache->{GLOBAL};
@@ -225,6 +226,9 @@ sub getAuthorizationToken
          return(undef);
       }
       my $access_token=$pred->{access_token};
+      if ($noImpersonate){
+         return("Bearer ".$access_token);
+      }
       my $generateAccessTokenURL="https://iamcredentials.googleapis.com/".
                                  "v1/projects/-/serviceAccounts/".
                                  $GCPimpersonateEMail.
