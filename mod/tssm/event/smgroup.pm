@@ -557,10 +557,27 @@ sub handleSRec
          $dataobj->{mgrp}->ValidatedInsertRecord($newrec);
       }
       else{
+         #print STDERR "OLD:".Dumper($oldrec);
          #print STDERR "UPD:".Dumper($newrec);
-         $dataobj->{mgrp}->ValidatedUpdateRecord($oldrec,$newrec,{
-            id=>$oldrec->{id}
-         });
+         if ($oldrec->{cistatusid}>5 && $newrec->{cistatusid}<6){
+            msg(INFO,"check reactivation of metassigment group");
+            $dataobj->{mgrp}->SetFilter({fullname=>\$newrec->{fullname}});
+            my @l=$dataobj->{mgrp}->getHashList(qw(ALL));
+            if ($#l!=-1 && $l[0]->{id} ne $oldrec->{id}){
+               msg(INFO,"no reactivation, ".
+                        "because record with same name already exists");
+               $newrec=undef;
+            }
+         }
+         if ($oldrec->{cistatusid}>4 && $newrec->{cistatusid}>4){
+            msg(INFO,"no updates on old records");
+            $newrec=undef;
+         }
+         if (defined($newrec)){
+            $dataobj->{mgrp}->ValidatedUpdateRecord($oldrec,$newrec,{
+               id=>$oldrec->{id}
+            });
+         }
       }
    }
 }
