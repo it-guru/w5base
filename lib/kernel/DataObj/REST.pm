@@ -297,6 +297,35 @@ sub Filter2RestPath
 }
 
 
+sub Ping
+{
+   my $self=shift;
+
+   if ($self->can("getCredentialName") && $self->can("getAuthorizationToken")){
+      my $credentialN=$self->getCredentialName();
+      my $Authorization;
+      my $errors;
+      open local(*STDERR), '>', \$errors;
+      eval('$Authorization=$self->getAuthorizationToken($credentialN);');
+      if ($Authorization ne ""){
+         return(1);
+      }
+      if (!$self->LastMsg()){
+         if ($errors){
+            foreach my $emsg (split(/[\n\r]+/,$errors)){
+               $self->SilentLastMsg(ERROR,$emsg);
+            }
+         }
+         else{
+            $self->SilentLastMsg(ERROR,"unknown Auth problem in $self");
+         }
+      }
+      return(0);
+   }
+   return($self->SUPER::Ping());
+}
+
+
 
 
 

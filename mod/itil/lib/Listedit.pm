@@ -1510,6 +1510,7 @@ sub NotifyInterfaceContacts
    my $notifycnt=0;
 
    my $o;
+   msg(INFO,"try to start NotifyInterfaceContacts for $W5DATAOBJ");
    if ($self->SelfAsParentObject() eq "itil::lnkapplappl"){
       $o=$self;
    }
@@ -1588,6 +1589,8 @@ sub NotifyInterfaceContacts
          }
       }
       my @notify_to=keys(%notify_to);
+      msg(INFO,"NotifyInterfaceContacts contacts for $W5DATAOBJ = ".
+                join(";",@notify_to));
       my @notify_cc;
       foreach my $uid (keys(%notify_cc)){
          if (!in_array(\@notify_to,$uid)){

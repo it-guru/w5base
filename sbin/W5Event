@@ -144,7 +144,8 @@ else{
       if ($self->Config->Param("W5BaseOperationMode") ne "prod" &&
           $self->Config->Param("W5BaseOperationMode") ne "online" &&
           $exitmsg ne ""){
-         msg(INFO,"exitcode $exitcode: $exitmsg");
+         printf STDERR ("\nW5Event: exitcode $exitcode\n");
+         printf STDERR ("$exitmsg\n") if ($exitmsg ne "");
       }
    }
    exit(0);

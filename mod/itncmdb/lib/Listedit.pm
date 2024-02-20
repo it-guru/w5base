@@ -36,6 +36,11 @@ sub new
    return($self);
 }
 
+sub getAuthorizationToken
+{
+   my $self=shift;
+   return($self->getITENOSAuthorizationToken(@_));
+}
 
 
 sub getITENOSAuthorizationToken
@@ -103,8 +108,13 @@ sub getITENOSAuthorizationToken
             my $reqtrace=shift;
 
             msg(ERROR,$reqtrace);
-            $self->LastMsg(ERROR,"unexpected data ITENOS auth response ".
-                                 "- code $code");
+            my $msg="unexpected ITNCMDB auth response code HTTP $code";
+            $msg.=" ($statusline)";
+            my $gc=globalContext();
+            $gc->{LastMsg}=[] if (!exists($gc->{LastMsg}));
+            push(@{$gc->{LastMsg}},"ERROR: $msg");
+
+            #$self->LastMsg(ERROR,$msg);
             return(undef);
          }
       );

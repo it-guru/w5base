@@ -25,6 +25,7 @@ use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::Event);
 
 
+
 sub ITENOS_ProviderSync
 {
    my $self=shift;
@@ -33,32 +34,18 @@ sub ITENOS_ProviderSync
    my @O=qw(
       itil::asset TS::system TS::appl
       itil::lnkapplsystem
-      itncmdb::asset itncmdb::system
+      itncmdb::system itncmdb::asset
    );
    my $O={};
 
-   foreach my $objname (@O){
-      msg(INFO,"load object $objname");
-      my $o=getModuleObject($self->Config,$objname);
-      if ($o->isSuspended()){ 
-         return({exitcode=>0,exitmsg=>'ok'});
-      }
-      if (!$o->Ping()){
-         my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
-         if ($infoObj->NotifyInterfaceContacts($o)){
-            return({exitcode=>0,exitmsg=>'Interface notified'});
-         }
-         return({
-            exitcode=>1,
-            exitmsg=>'not all dataobjects available - miss $objname'
-         });
-      }
-      $O->{$objname}=$o;
-   }
+   my $staleRetry;
+   my $ast="2h";    # allowed stale time
+   my $ast=undef;   # no allowed stale time
+   my $initBk=$self->robustEventObjectInitialize(\$staleRetry,$ast,$O,@O);
+   return($initBk) if ($initBk);
+
    my $SRCSYS=$O->{'itncmdb::system'}->{SRCSYS};
-
    my $AssetW5BaseID=$O->{'itncmdb::asset'}->getPrimaryAssetW5BaseID();
-
 
    if (!defined($AssetW5BaseID)){
       return({

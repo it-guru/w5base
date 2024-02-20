@@ -2,11 +2,13 @@
 <tr>
 <td align=center valign=center>
 <!----------------------------------------------------------------!>
-<table>
-<tr><td><img src="../../base/load/queryerror.jpg"></td></tr>
-</table>
+<table border=0>
+<tr><td align=center><img src="../../base/load/queryerror.jpg"></td></tr>
+<tr><td align=center>
 <b>%extinfo%</b>
 %LASTMSG%
+</td></tr>
+</table>
 <!----------------------------------------------------------------!>
 </td>
 </tr>

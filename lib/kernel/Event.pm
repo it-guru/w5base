@@ -171,6 +171,79 @@ sub CreateIntervalEvent($$$)
 
 
 
+sub robustEventObjectInitialize
+{
+   my $self=shift;
+   my $pStaleRetry=shift;  # stale retry is given, if within $ast all calls
+   my $ast=shift;          # have an exitcode !=0
+   my $O=shift;
+   my @O;
+   if (ref($_[0]) eq "ARRAY"){
+      @O=@{$_[0]};
+   }
+   else{
+      @O=@_;
+   }
+   
+   my $staleRetry=1;
+
+   my $eventNameInJobLog=(caller(1))[3];
+   if ($ast ne ""){
+      my $joblog=getModuleObject($self->Config,"base::joblog");
+      $joblog->SetFilter({name=>[$eventNameInJobLog],
+                          exitcode=>'!0',
+                          cdate=>'>now-'.$ast});
+      $joblog->SetCurrentOrder('cdate');
+      my @jobList=$joblog->getHashList(qw(id exitcode cdate));
+      if ($#jobList!=-1){
+         $staleRetry=$#jobList+1;
+         foreach my $jrec (@jobList){                 # moeglicherweise sollten
+            $staleRetry-- if ($jrec->{exitcode}!=0);  # hier nur negative exits
+         }                                            # als stale indicator sein
+         $staleRetry=1 if (!$staleRetry); # only if all are not 0 - 
+      }                                   # stale is given
+   }
+   $$pStaleRetry=$staleRetry;
+   msg(INFO,"stale $eventNameInJobLog = $staleRetry");
+
+   #######################################################################
+   # Optimal Init-Structure for Events with instable Backends (REST f.e.)
+   #
+   foreach my $objname (@O){
+      msg(INFO,"load object $objname");
+      my $o=getModuleObject($self->Config,$objname);
+      if ($o->isSuspended()){ 
+         return({exitcode=>0,exitmsg=>'ok - dataobj is suspended'});
+      }
+      if (!$o->Ping()){
+         my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+         if ($staleRetry){
+            if ($infoObj->NotifyInterfaceContacts($o)){
+               return({exitcode=>0,
+                       exitmsg=>"missing ".$objname." - ".
+                                'NotifyInterfaceContacts notified'});
+            }
+            my @msg=$self->LastMsg();
+            foreach my $msg (@msg){
+               printf STDERR ("%s\n",$msg);
+            }
+         }
+         return({
+            exitcode=>1,
+            exitmsg=>'missing necessary dataobj '.$objname.
+                     ' NotifyInterfaceContacts not posible'
+         });
+      }
+      $O->{$objname}=$o;
+   }
+   #######################################################################
+   return();
+}
+
+
+
+
+
 
 1;
 

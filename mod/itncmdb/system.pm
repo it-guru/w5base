@@ -152,6 +152,12 @@ sub DataCollector
    my $credentialName=$self->getCredentialName();
    my $Authorization=$self->getITENOSAuthorizationToken($credentialName);
 
+   if ($Authorization eq ""){
+      if (!$self->LastMsg()){
+         $self->LastMsg(ERROR,"unable to create Authorization token");
+      }
+      return(undef);
+   }
 
    my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
       "/cmdb/vServer",  # Path-Templ with var

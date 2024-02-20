@@ -1,12 +1,12 @@
 <center>
 <table style="margin-top:20px" cellspacing=20 border=0>
 <tr>
-<td>
+<td align=center>
 <img src="../../base/load/DataObjOffline.png">
 </td>
 </tr>
 <tr>
-<td>
+<td align=center>
 %LASTMSG%
 </td>
 </tr>
