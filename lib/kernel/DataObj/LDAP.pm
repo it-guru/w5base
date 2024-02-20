@@ -584,9 +584,16 @@ sub getFirst
      
       my $ldapfilter=$self->getLdapFilter();
       my $base=$self->getBase;
+      my $control=[];
+
+      if (defined($self->{LdapQueryPageSize})){
+         my $p=new Net::LDAP::Control::Paged(size=>$self->{LdapQueryPageSize});
+         push($control,$p);
+      }
 
       ($sth,$mesg)=$self->{LDAP}->execute(filter=>latin1($ldapfilter)->utf8,
                                           base=>$base,
+                                          control=>$control,
                                           attrs=>\@attr);
       if (!defined($sth) &&
           ($mesg=~m/ldap-search:Can't contact LDAP server/)){
@@ -663,6 +670,22 @@ sub setBase
    delete($self->{WorkDIR});
    $self->{WorkDIR}=$_[1] if (defined($self->{WorkDIR}));
    return($self->{Base},$self->{WorkDIR});
+}
+
+sub setLdapQueryPageSize
+{
+   my $self=shift;
+   my $sz=shift;
+
+   if (defined($sz)){
+      if ($sz ne ""){
+         $self->{LdapQueryPageSize}=$sz;
+      }
+      else{
+         $self->{LdapQueryPageSize}=undef;
+      }
+   }
+   return($self->{LdapQueryPageSize});
 }
 
 sub getBase

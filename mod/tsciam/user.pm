@@ -33,6 +33,7 @@ sub new
 
    
    $self->setBase("ou=Person,o=DTAG");
+   $self->setLdapQueryPageSize(3499);
    $self->AddFields(
       new kernel::Field::Linenumber(name     =>'linenumber',
                                     label    =>'No.'),
@@ -286,6 +287,15 @@ sub isQualityCheckValid
 }
 
 
+#sub SetFilter
+#{
+#   my $self=shift;
+#
+#   my @bk=$self->SUPER::SetFilter(@_);
+#   $self->Limit(1000,0,1);     # keine gute Idee - das wuerde vermutlich
+#                               # das Paging durcheinander bringen
+#   return(@bk);
+#}
 
 
 
