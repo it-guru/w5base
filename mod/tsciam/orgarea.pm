@@ -33,6 +33,7 @@ sub new
    
 
    $self->setBase("ou=Organisation,o=DTAG");
+   $self->setLdapQueryPageSize(3499);
    $self->AddFields(
       new kernel::Field::Id(       name       =>'toucid',
                                    label      =>'tOuCID',
@@ -112,6 +113,7 @@ sub new
                                    vjoinon    =>['toucid'=>'toucid'],
                                    vjoinbase  =>{primary=>'true',
                                                  active=>'true'},
+                                   htmllimit  =>50,
                                    vjoindisp  =>['fullname']),
 
       new kernel::Field::SubList(  name       =>'subunits',

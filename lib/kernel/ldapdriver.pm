@@ -23,6 +23,7 @@ use kernel;
 use kernel::Universal;
 use Net::LDAP;
 use Net::LDAP::Control::Sort;
+use Net::LDAP::Control::Paged;
 use Net::LDAP::Constant qw(LDAP_CONTROL_SORTRESULT);
 use Time::HiRes;
 
