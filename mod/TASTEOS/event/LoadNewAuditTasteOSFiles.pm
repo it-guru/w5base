@@ -31,6 +31,16 @@ sub LoadNewAuditTasteOSFiles
    my %param=@_;
 
 
+   my $tsossys=getModuleObject($self->Config,"TASTEOS::tsossystem");
+   my $tsosmac=getModuleObject($self->Config,"TASTEOS::tsosmachine");
+
+   if ($tsossys->isSuspended() || $tsosmac->isSuspended()){
+      return({exitcode=>0,exitmsg=>'TasteOS blacklisted'});
+   }
+
+   if (!$tsosmac->Ping()){   # ping on one object is sufficient
+      return({exitcode=>0,exitmsg=>'TasteOS not pingable'});
+   }
 
    my $firstDayRange=35;
    my $firstDayRange=45;
