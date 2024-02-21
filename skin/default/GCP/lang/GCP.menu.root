@@ -6,4 +6,8 @@
  de=>'Projekt',
  en=>'Project'
 },
+'itu.cloud.gcp.system'=>{
+ de=>'System',
+ en=>'System'
+},
 

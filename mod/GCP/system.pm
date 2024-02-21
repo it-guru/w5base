@@ -85,7 +85,7 @@ sub new
             searchable        =>0,
             vjointo           =>'GCP::ipaddress',
             vjoinon           =>['idpath'=>'idpath'],
-            vjoindisp         =>['name','netareatag','ifname','mac']),
+            vjoindisp         =>['name','netareatag','ifname']),
 
 
       new kernel::Field::Container(     
@@ -181,11 +181,16 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-
-         my $srcRecords=[];
-         if (ref($data) eq "HASH" &&
-             exists($data->{items})){
-            $srcRecords=$data->{items};
+         my $srcRecords={};
+         if (ref($data) eq "HASH"){
+            if (exists($data->{items})){
+               $srcRecords=$data->{items};
+            }
+            if (exists($data->{zone})){ # war offensichtlich ein direct request
+               my $zonename=$data->{zone};
+               $zonename=~s#^.*/([^/]+/[^/]+)$#$1#;
+               $srcRecords->{$zonename}->{instances}=[$data];
+            }
          }
 
          my @l;
@@ -197,7 +202,7 @@ sub DataCollector
                  $n++;
                  if ($n==1 &&
                      $self->Config->Param("W5BaseOperationMode") eq "dev"){
-                    print STDERR Dumper($rec);
+                  #  print STDERR Dumper($rec);
                  }
 
                  # if (in_array(\@curView,[qw(ALL srcrec)])){

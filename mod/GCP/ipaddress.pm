@@ -80,6 +80,12 @@ sub new
             htmlwidth         =>'200px',
             label             =>'System Interface'),
 
+      new kernel::Field::Text(
+            name              =>'zonename',
+            group             =>'source',
+            searchable        =>0,
+            dataobjattr       =>'zonename',
+            label             =>'Zone-Name'),
    );
    $self->setDefaultView(qw(name id projectId status cdate));
    return($self);
@@ -111,12 +117,12 @@ sub DataCollector
 
 
    my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
-      "/compute/v1/projects/{projectId}/aggregated/instances",  
+      [ "/compute/v1/projects/{projectId}/zones/{zonename}/instances/{sysname}",
+        "/compute/v1/projects/{projectId}/aggregated/instances"],
       $filterset,
       {
       }
    );
-printf STDERR ("flt=%s\n",Dumper($flt));
 
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
@@ -148,10 +154,16 @@ printf STDERR ("flt=%s\n",Dumper($flt));
          my $self=shift;
          my $data=shift;
 
-         my $srcRecords=[];
-         if (ref($data) eq "HASH" &&
-             exists($data->{items})){
-            $srcRecords=$data->{items};
+         my $srcRecords={};
+         if (ref($data) eq "HASH"){
+            if (exists($data->{items})){
+               $srcRecords=$data->{items};
+            }
+            if (exists($data->{zone})){
+               my $zonename=$data->{zone};
+               $zonename=~s#^.*/([^/]+/[^/]+)$#$1#;
+               $srcRecords->{$zonename}->{instances}=[$data];
+            }
          }
 
          my @l;
@@ -163,9 +175,8 @@ printf STDERR ("flt=%s\n",Dumper($flt));
                  $n++;
                  if ($n==1 &&
                      $self->Config->Param("W5BaseOperationMode") eq "dev"){
-                    print STDERR Dumper($rec);
+         #           print STDERR Dumper($rec);
                  }
-printf STDERR ("fifi zonename=$zonename\n");
                  if (ref($rec->{networkInterfaces}) eq "ARRAY"){
                     foreach my $irec (@{$rec->{networkInterfaces}}){
                        # network und subnetwork u.U. noch auswerten
