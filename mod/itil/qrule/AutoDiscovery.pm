@@ -92,8 +92,32 @@ sub qcheckRecord
 
    my $ade=getModuleObject($dataobj->Config,"itil::autodiscengine");
    if (defined($ade)){ # itil:: seems to be installed
+      my %missObj;
+      $ade->SetFilter({localdataobj=>\$dataobjname,
+                   #    addataobj=>\'HPSA::system',
+                       cistatusid=>\'4'});
+
+      foreach my $engine ($ade->getHashList(qw(ALL))){
+         my $ado;
+         eval('$ado=getModuleObject($dataobj->Config,$engine->{addataobj});');
+         if (defined($ado)){
+            if ($ado->isSuspended()){
+               $missObj{$engine->{addataobj}}++;
+            }
+         }
+         else{
+            $missObj{$engine->{addataobj}}++;
+         }
+      }
+      if (keys(%missObj)){
+         return(undef,{
+            qmsg=>'missing AutoDiscObjects '.join(",",sort(keys(%missObj)))
+         });
+      }
+
       my @AdPreData=();
       my %engines;
+      $ade->ResetFilter();
       $ade->SetFilter({localdataobj=>\$dataobjname,
                    #    addataobj=>\'HPSA::system',
                        cistatusid=>\'4'});
