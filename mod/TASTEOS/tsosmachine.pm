@@ -206,10 +206,12 @@ sub getRecordImageUrl
 
 
 
+sub getCredentialName
+{
+   my $self=shift;
 
-
-
-
+   return("TASTEOS");
+}
 
 
 
@@ -274,7 +276,7 @@ sub DataCollector
 
 
    return($self->CollectREST(
-      dbname=>'TASTEOS',
+      dbname=>$self->getCredentialName(),
       requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;

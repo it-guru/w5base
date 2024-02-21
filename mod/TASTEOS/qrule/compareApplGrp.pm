@@ -137,6 +137,24 @@ sub qcheckRecord
       return(undef,{qmsg=>'no sync on w5base testenv allowed'});
    }
 
+   my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
+   my $tsossysacl=getModuleObject($dataobj->Config,"TASTEOS::tsossystemacl");
+   my $tsosmac=getModuleObject($dataobj->Config,"TASTEOS::tsosmachine");
+
+   if ($tsossys->isSuspended() || $tsossysacl->isSuspended() ||
+       $tsosmac->isSuspended()){
+      return(undef,{
+         qmsg=>'TasteOS is blacklisted/suspended/maintained'
+      });
+   }
+
+   if (!$tsossys->Ping()){   # ping on one object is sufficient 
+      return(undef,{
+         qmsg=>'TasteOS not available'
+      });
+   }
+
+
    my $appl=getModuleObject($dataobj->Config,"itil::appl");
    $appl->SetFilter({
       applgrpid=>\$rec->{id},
@@ -234,9 +252,6 @@ sub qcheckRecord
 
   # printf STDERR ("addl=%s\n",Dumper($ladd));
 
-   my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
-   my $tsossysacl=getModuleObject($dataobj->Config,"TASTEOS::tsossystemacl");
-   my $tsosmac=getModuleObject($dataobj->Config,"TASTEOS::tsosmachine");
    my $w5sys=getModuleObject($dataobj->Config,"itil::system");
    #printf STDERR ("rec=%s\n",Dumper($rec));
 

@@ -66,6 +66,14 @@ sub new
    return($self);
 }
 
+sub getCredentialName
+{
+   my $self=shift;
+
+   return("TASTEOS");
+}
+
+
 sub DataCollector
 {
    my $self=shift;
@@ -84,7 +92,7 @@ sub DataCollector
    }
 
    my $d=$self->CollectREST(
-      dbname=>'TASTEOS',
+      dbname=>$self->getCredentialName(),
       requesttoken=>$requesttoken,
       url=>sub{
          my $self=shift;

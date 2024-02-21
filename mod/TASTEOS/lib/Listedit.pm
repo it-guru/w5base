@@ -20,27 +20,82 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
-use kernel::DataObj::Static;
+use kernel::DataObj::REST;
 use kernel::Field;
 use kernel::Field::TextURL;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::Static);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::REST);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+   
    return($self);
 }
 
-#sub Initialize
-#{
-#   my $self=shift;
-#
-#   my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
-#   return(@result) if (defined($result[0]) eq "InitERROR");
-#   return(1);
-#}
+
+
+# Dummy for Ping
+sub getAuthorizationToken
+{
+   my $self=shift;
+   my $name=shift;
+
+   my @c=caller(2);
+   my $token;
+   my $pass=$self->Config->Param('DATAOBJPASS');
+
+   if (ref($pass) eq "HASH"){
+      $token=$pass->{$name};
+   }
+
+   if ($c[3] eq "kernel::DataObj::REST::Ping"){
+      # if caller is Ping, we need to do a simple test request
+      my $d=$self->CollectREST(
+         dbname=>$name,
+         requesttoken=>'Ping'.time(),
+         url=>sub{
+            my $self=shift;
+            my $baseurl=shift;
+            $baseurl.="/"  if (!($baseurl=~m/\/$/));
+            my $dataobjurl=$baseurl."systems";
+            return($dataobjurl);
+         },
+         headers=>sub{
+            my $self=shift;
+            my $baseurl=shift;
+            my $apikey=shift;
+       
+            my $h=[
+               'access-token'=>$apikey,
+               'Content-Type','application/json',
+            ];
+            return($h);
+         },
+         onfail=>sub{
+            my $self=shift;
+            my $code=shift;
+            my $statusline=shift;
+            my $content=shift;
+            my $reqtrace=shift;
+
+            my $msg="Invalid Ping Respone from TasteOS - HTTP($code)";
+            if ($statusline ne ""){
+               $msg.=" - ";
+               $msg.=$statusline;
+            }
+            $self->SilentLastMsg(ERROR,$msg);
+            return([],"200");
+         },
+      );
+      if (ref($d) ne "ARRAY" || $#{$d}==-1){
+         return(undef);
+      }
+   }
+   return($token);
+}
+
 
 
 
@@ -126,6 +181,9 @@ sub decodeFilter2Query4TASTEOS
    }
    return($query);
 }
+
+
+
 
 
 
