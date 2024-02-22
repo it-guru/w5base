@@ -39,7 +39,7 @@ foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
                        Spreadsheet::WriteExcel::Big
                        Spreadsheet::ParseExcel
                        Spreadsheet::ParseExcel::SaveParser
-                       Net::Server XML::Smart IPC::Smart Data::Dumper RPC::Smart)){
+                       Net::Server XML::Smart Data::Dumper RPC::Smart)){
    printf("INFO:  check module %-33s        ... ","'$module'");
    eval("use $module;"); 
    ysleep if ($module ne "Time::HiRes"); 
