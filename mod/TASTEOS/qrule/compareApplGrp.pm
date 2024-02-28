@@ -187,33 +187,37 @@ sub qcheckRecord
 
    my $lobj=getModuleObject($dataobj->Config,"itil::lnkapplsystem");
 
-   $lobj->SetFilter({
-      applgrpid=>\$rec->{id},
-      systemcistatusid=>[4],
-      applcistatusid=>[4]
-   });
-
+   $lobj->SetFilter(
+      {
+         applgrpid=>\$rec->{id},
+         systemcistatusid=>[4],
+         applcistatusid=>[4]
+      }
+   );
 
    my @l=$lobj->getHashList(qw(systemid applgrpid applid id reltyp
-                               systemsystemid systemsrcsys systemsrcid));
+                               systemsystemid systemsrcsys systemsrcid
+                               isembedded isnetswitch));
+
+   @l=grep({
+      ($_->{isembedded} eq "0" && $_->{isnetswitch} eq "0")
+   } @l);
+
    my %ul;
    foreach my $lrec (@l){
       $ul{$lrec->{applgrpid}."-".$lrec->{systemid}}=$lrec;
    }
    @l=values(%ul);
 
-
-
    my @systemid;
    map({push(@systemid,$_->{systemid});} @l);
 
-   #printf STDERR ("l=%s\n",Dumper(\@l));
+   printf STDERR ("l=%s\n",Dumper(\@l));
    #printf STDERR ("n=%d\n",$#l+1);
    #printf STDERR ("systemid=%s\n",join(",",@systemid));
 
    my $laddobj=getModuleObject($dataobj->Config,"itil::addlnkapplgrpsystem");
    $laddobj->SetFilter({ applgrpid=>\$rec->{id} });
-     # systemid=>\@systemid
    my $opladdobj=$laddobj->Clone();
    $laddobj->SetCurrentView(qw(systemid system applgrpid applgrp 
                                additional id));
@@ -223,7 +227,8 @@ sub qcheckRecord
        my $TSOSmachineid;
        if (in_array(\@systemid,$systemid)){
           if (exists($ladd->{systemid}->{$systemid})){
-             $TSOSmachineid=$ladd->{systemid}->{$systemid}->{additional}->{TasteOS_MachineID}->[0];
+             my $laddent=$ladd->{systemid}->{$systemid};
+             $TSOSmachineid=$laddent->{additional}->{TasteOS_MachineID}->[0];
           }
           if ($TSOSmachineid ne ""){
              $ladd->{TasteOS_MachineID}->{$TSOSmachineid}=
@@ -246,21 +251,16 @@ sub qcheckRecord
           delete($ladd->{systemid}->{$systemid});
        }
    }
-
-
-
-
-  # printf STDERR ("addl=%s\n",Dumper($ladd));
+   # printf STDERR ("addl=%s\n",Dumper($ladd));
 
    my $w5sys=getModuleObject($dataobj->Config,"itil::system");
    #printf STDERR ("rec=%s\n",Dumper($rec));
-
 
    $tsossys->ResetFilter();
    $tsossys->SetFilter({ictoNumber=>$rec->{applgrpid}});
    $tsossys->SetCurrentView(qw(id ictoNumber machines));
    my $curSys=$tsossys->getHashIndexed(qw(ictoNumber id));
-   #printf STDERR ("curSys getHashIndexed=%s\n",Dumper($curSys));
+   # printf STDERR ("curSys getHashIndexed=%s\n",Dumper($curSys));
 
    if ($rec->{cistatusid}>5){
       if (keys(%{$curSys->{id}})){
@@ -278,7 +278,6 @@ sub qcheckRecord
    }
 
    my $dd=Dumper($rec->{additional});
-
 
    my $TSOSsystemid=$rec->{additional}->{TasteOS_SystemID}->[0];
 
@@ -319,8 +318,6 @@ sub qcheckRecord
       }
    }
 
-
-
    my $tsossysrec={
       name=>$rec->{fullname},
       ictoNumber=>$rec->{applgrpid},
@@ -351,8 +348,6 @@ sub qcheckRecord
             $tsosmac->ValidatedDeleteRecord({id=>$machineid});
          }
       }
-
-
    }
    #printf STDERR ("fifi upd TSOSsystemid=$TSOSsystemid\n");
    #printf STDERR ("l=%s\n",Dumper(\@l));
@@ -363,7 +358,8 @@ sub qcheckRecord
       foreach my $lrec (@l){
          my $TSOSmachineid;
          if (exists($ladd->{systemid}->{$lrec->{systemid}})){
-            $TSOSmachineid=$ladd->{systemid}->{$lrec->{systemid}}->{additional}->{TasteOS_MachineID}->[0];
+            my $laddent=$ladd->{systemid}->{$lrec->{systemid}};
+            $TSOSmachineid=$laddent->{additional}->{TasteOS_MachineID}->[0];
          }
          my $tsosmacrec={
             name=>$lrec->{system},
@@ -431,7 +427,6 @@ sub qcheckRecord
       }
    }
 
-
    $tsossys->ResetFilter();
    $tsossys->SetFilter({name=>'!"Default System"',ictoNumber=>\""});
    my @l=$tsossys->getHashList(qw(ALL));
@@ -451,10 +446,6 @@ sub qcheckRecord
          }
       }
    }
-
-
-
-
 
    my @result=$self->HandleQRuleResults("TasteOS",
                  $dataobj,$rec,$checksession,

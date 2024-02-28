@@ -627,6 +627,20 @@ sub new
                 dataobjattr   =>'system.is_webserver'),
 
       new kernel::Field::Boolean(
+                name          =>'isnetswitch',
+                group         =>'systemclass',
+                htmlhalfwidth =>1,
+                label         =>'Switch/Networkswitch',
+                dataobjattr   =>'system.is_netswitch'),
+
+      new kernel::Field::Boolean(
+                name          =>'isembedded',
+                readonly      =>1,
+                group         =>'systeminfo',
+                label         =>'Embedded System',
+                dataobjattr   =>'system.is_embedded'),
+
+      new kernel::Field::Boolean(
                 name          =>'systemissox',
                 readonly      =>1,
                 uivisible     =>0,
