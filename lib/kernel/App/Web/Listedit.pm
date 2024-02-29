@@ -3865,7 +3865,7 @@ sub UploadFrame
 function DownloadTemplate(format)
 {
    parent.document.forms[0].elements['CurrentView'].value="($fnames)";
-   var bk=DirectDownload(format,"uploadresult");
+   var bk=DirectDownload(this,format,"uploadresult");
    parent.document.forms[0].elements['CurrentView'].value="";
    return(bk);
 }
