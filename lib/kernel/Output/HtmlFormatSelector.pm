@@ -184,7 +184,7 @@ sub ProcessLine
             $rec{function}="DirectDownload";
          }
          else{
-            $rec{function}="DirectView";
+            $rec{function}="doDirectView";
          }
          $rec{name}=$f;
          $rec{icon}=$o->getRecordImageUrl();
@@ -214,8 +214,12 @@ sub ProcessLine
       my $lend="";
 
       if ($frec->{directlink}){
-         $lstart="<a href=JavaScript:$frec->{function}(\"$frec->{name}\") ".
+         $lstart="<a href=JavaScript:".
+                 "$frec->{function}(this,\"$frec->{name}\") ".
                  "title=\"$t1\">";
+         $lstart="<a onclick='".
+                 "$frec->{function}(this,\"$frec->{name}\")' ".
+                 "title=\"$t1\"  style='cursor:pointer'>";
          $lend="</a>";
       }
       $d.=<<EOF;
@@ -249,7 +253,7 @@ EOF
               $frec->{label};
        my $t2=$app->T("download the selected data as offline file").': '.
               $frec->{label};
-       my $directDownload="<a onclick='DirectDownload(\"$frec->{name}\",".
+       my $directDownload="<a onclick='DirectDownload(this,\"$frec->{name}\",".
                   "\"DirectView\")' style='cursor:pointer' ".
                   "title=\"$t2\">".
                   "<img border=0 alt=\"download\" ".
