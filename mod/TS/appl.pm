@@ -599,12 +599,12 @@ sub calcBaseApplicationExpertGroup
                 label=>$self->getParent->T("Business Owner IT",'TS::appl'),
                 sublabel=>$self->getParent->T("(operational)",'TS::appl')
             },
-            'SPOCITStabi'=>{
+            'StabilityOwner'=>{
                 userid=>[],
                 email=>[],
                 sindex=>$index++,
                 phonename=>[],
-                label=>$self->getParent->T("SPOC IT Stability",'TS::vou'),
+                label=>$self->getParent->T("Stability Owner",'TS::vou'),
                 sublabel=>$self->getParent->T("(operational)",'TS::appl')
             },
             'leadprmmgr'=>{
@@ -682,17 +682,17 @@ sub calcBaseApplicationExpertGroup
       my ($vourec,$msg)=$vou->getOnlyFirst(qw(
                    leaderitid
                    leaderid
-                   spocitstabiid
+                   stabiownerid
       ));
       if (defined($vourec)){
 
-         my $spocitstabiid=$vourec->{spocitstabiid};
-         if (ref($spocitstabiid) ne "ARRAY"){
-            $spocitstabiid=[$spocitstabiid];
+         my $stabiownerid=$vourec->{stabiownerid};
+         if (ref($stabiownerid) ne "ARRAY"){
+            $stabiownerid=[$stabiownerid];
          }
-         foreach my $uid (@{$spocitstabiid}){
+         foreach my $uid (@{$stabiownerid}){
             if ($uid ne ""){
-               push(@{$a{SPOCITStabi}->{userid}},$uid);
+               push(@{$a{StabilityOwner}->{userid}},$uid);
             }
          }
 

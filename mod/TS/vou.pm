@@ -151,34 +151,34 @@ sub new
                 dataobjattr   =>'vou.leaderit'),
 
       new kernel::Field::Contact(
-                name          =>'spocitstabi',
-                label         =>'SPOC IT Stability',
+                name          =>'stabiowner',
+                label         =>'Stability Owner',
                 readonly      =>1,
                 searchable    =>0,
                 htmldetail    =>'NotEmpty',
-                vjoinon       =>'spocitstabiid'),
+                vjoinon       =>'stabiownerid'),
 
       new kernel::Field::Link(
-                name          =>'spocitstabiid',
+                name          =>'stabiownerid',
                 depend        =>['contacts'],
                 onRawValue    =>sub {
                     my $self   =shift;
                     my $current=shift;
                     my $appl=$self->getParent();
-                    my $spocitstabiid=undef;
+                    my $stabiownerid=undef;
                     if (defined($current)){
                        my $contacts=
                             $appl->getField("contacts")->RawValue($current);
                        foreach my $crec (@$contacts){
                           my $roles=$crec->{roles};
                           $roles=[$roles] if (ref($roles) ne "ARRAY");
-                          if (in_array($roles,"ITstabillity") &&
+                          if (in_array($roles,"StabiOwner") &&
                               $crec->{target} eq "base::user"){
-                             $spocitstabiid=$crec->{targetid};
+                             $stabiownerid=$crec->{targetid};
                           }
                        }
                     }
-                    return($spocitstabiid);
+                    return($stabiownerid);
                 }),
 
       new kernel::Field::Textarea(

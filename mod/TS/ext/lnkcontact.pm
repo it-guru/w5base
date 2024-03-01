@@ -53,7 +53,7 @@ sub getPosibleRoles
                                                $self->Self),
              "spc"       =>$self->getParent->T("SPC (SAFe Programm Consultant)",
                                                $self->Self),
-             "ITstabillity"    =>$self->getParent->T("SPOC Stability",
+             "StabiOwner"=>$self->getParent->T("Stability Owner",
                                                $self->Self),
              "pm"        =>$self->getParent->T("PM (Product Manager)",
                                                $self->Self),
@@ -80,17 +80,17 @@ sub Validate
    if (defined($newrec->{roles}) && $parentobj=~m/::vou$/){
       my $roles=$newrec->{roles};
       $roles=[$roles] if (ref($roles) ne "ARRAY");
-      if (grep(/^ITstabillity$/,@$roles)){
+      if (grep(/^StabiOwner$/,@$roles)){
          if ($app->isRoleMultiUsed({
-               ITstabillity =>$self->getParent->T("SPOC Stability")
+               StabiOwner =>$self->getParent->T("Stability Owner")
                },$roles,$oldrec,$newrec,$parentobj,$refid)){
             return(0);
          }
       }
-      if (in_array("ITstabillity",$roles)){
+      if (in_array("StabiOwner",$roles)){
          if (effVal($oldrec,$newrec,"target") eq "base::grp"){
             $app->LastMsg(ERROR,
-                "role SPOC Stability cannot be assigned to groups");
+                "role Stability Owner cannot be assigned to groups");
             return(0);
          }
       }
