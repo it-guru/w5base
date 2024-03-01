@@ -90,17 +90,6 @@ sub GCP_KeyRefresh
        (! -r $keyfile)){
       return({exitcode=>1,exitmsg=>"invalid keyfile '$keyfile'"});
    }
-
-
-
-
-
-
-
-
-
-
-
    
    my $priv_key;
    my $pub_key;
@@ -114,8 +103,6 @@ sub GCP_KeyRefresh
    }
 
    #   printf STDERR ("priv_key:%s\n",$priv_key);
-  
-
    my $o=getModuleObject($self->Config,"GCP::project");
    my $credentialName=$o->getCredentialName();
    my $Authorization=$o->getAuthorizationToken($credentialName,1);
@@ -145,7 +132,12 @@ sub GCP_KeyRefresh
       url=>sub{
          my $self=shift;
          my $baseurl="https://iam.googleapis.com/";
-         my $dataobjurl=$baseurl."v1/projects/de0360-prd-w5base-darwin/serviceAccounts/w5base-darwin-access\@de0360-prd-w5base-darwin.iam.gserviceaccount.com/keys:upload";
+         my $dataobjurl=$baseurl.
+                        "v1/projects/de0360-prd-w5base-darwin/".
+                        "serviceAccounts/".
+                        "w5base-darwin-access\@".
+                        "de0360-prd-w5base-darwin.iam.gserviceaccount.com/".
+                        "keys:upload";
          return($dataobjurl);
       },
       data=>$data,
@@ -164,6 +156,23 @@ sub GCP_KeyRefresh
          my $statusline=shift;
          my $content=shift;
          my $reqtrace=shift;
+
+         if ($code eq "400"){
+            my $msg=$statusline;
+
+            my $j;
+            if ($content=~m/^{/){
+               eval('use JSON;my $J=new JSON;$j=$J->decode($content)');
+            }
+            if (defined($j)){
+               if (exists($j->{error}->{message})){
+                  $msg=$j->{error}->{message};
+               }
+            }
+
+            $self->SilentLastMsg(ERROR,$msg." - while new key upload");
+            return("200");
+         }
 
          msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,"unexpected data GCP response");
@@ -230,11 +239,12 @@ sub GCP_KeyRefresh
             exitmsg=>"error opening '$tempkeyfile' for writing : $!"
          });
       }
-
-
    }
-
-   return({exitcode=>999,exitmsg=>'unknown problem'});
+   my $msg=join("\n",$self->LastMsg());
+   if ($msg eq ""){
+      $msg="unkown problem";
+   }
+   return({exitcode=>1,exitmsg=>$msg});
 }
 
 1;
