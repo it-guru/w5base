@@ -50,7 +50,7 @@ sub new
                 label         =>'full qualified CloudArea',
                 readonly      =>1,
                 htmldetail    =>'NotEmpty',
-                htmlwidth     =>'280px',
+                htmlwidth     =>'360px',
                 dataobjattr   =>"concat(itcloud.fullname,'.',".
                                 "qitcloudarea.name)"),
 

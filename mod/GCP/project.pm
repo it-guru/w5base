@@ -81,6 +81,21 @@ sub new
             uivisible         =>1,
             label             =>'Labels'),
 
+
+      new kernel::Field::TextDrop(
+            name              =>'appl',
+            searchable        =>0,
+            vjointo           =>'itil::appl',
+            vjoinon           =>['w5baseid'=>'id'],
+            searchable        =>0,
+            vjoindisp         =>'name',
+            label             =>'W5Base Application'),
+
+      new kernel::Field::Interface(
+            name              =>'w5baseid',
+            container         =>'labels',
+            label             =>'Application W5BaseID'),
+
       new kernel::Field::CDate(
             name              =>'cdate',
             group             =>'source',
