@@ -98,6 +98,7 @@ sub qcheckRecord
    my $tpcprojectid=$rec->{srcid};  
    { 
       my $chk=getModuleObject($self->getParent->Config(),$tpccode."::project");
+      return(undef,undef) if (!$chk->Ping());
       $chk->SetFilter({id=>$tpcprojectid,cistatusid=>"4"});
       my @acc=$chk->getHashList(qw(id));
       if ($#acc==-1){
@@ -110,6 +111,7 @@ sub qcheckRecord
 
    if ($#qmsg==-1){
       my $par=getModuleObject($self->getParent->Config(),$tpccode."::machine");
+      return(undef,undef) if (!$par->Ping());
 
       $par->SetFilter({projectId=>$tpcprojectid});
 
