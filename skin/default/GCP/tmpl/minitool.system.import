@@ -1,0 +1,24 @@
+<table width="100%" height="100%"><tr><td align=center valign=center>
+<!------------------------------------------------------>
+<div class=dialog style="width:400px">
+<table width="100%" cellpadding=4 cellspacing=4>
+<tr><td colspan=2><b>TPC- Machine Import to logical system</b></td></tr>
+<tr>
+<td colspan=2>With this tool, it is posible to import systems
+from GCP into the W5base 'IT-Invantar'.
+You have to specify the Systemname of the system, you
+want to import.
+</td></tr>
+<tr><td width=1% nowrap>GCP ID-Path:</td>
+<td><input type=text class=finput name=importname value="%importname%"></td></tr>
+<tr>
+<td colspan=2 align=center><input name=DOIT type=submit value=" import "></td>
+</tr>
+</table>
+</div>
+<div style="text-align:left;width:400px;height:200px;overflow:auto">
+%LASTMSG(RAW)%
+</div>
+<!------------------------------------------------------>
+</td></tr></table>
+

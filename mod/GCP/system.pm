@@ -129,6 +129,13 @@ sub getCredentialName
 }
 
 
+sub getValidWebFunctions
+{
+   my ($self)=@_;
+   return($self->SUPER::getValidWebFunctions(),
+          qw(ImportSystem));
+}
+
 
 sub DataCollector
 {
@@ -265,6 +272,202 @@ sub getRecordImageUrl
    my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
    return("../../../public/itil/load/system.jpg?".$cgi->query_string());
 }
+
+
+
+sub ImportSystem
+{
+   my $self=shift;
+   my $importname=trim(Query->Param("importname"));
+   if (Query->Param("DOIT")){
+      if ($self->Import({importname=>$importname})){
+         Query->Delete("importname");
+         $self->LastMsg(OK,"system has been successfuly imported");
+      }
+      Query->Delete("DOIT");
+   }
+
+
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css',
+                                   'kernel.App.Web.css'],
+                           static=>{importname=>$importname},
+                           body=>1,form=>1,
+                           title=>"GCP System Import");
+   print $self->getParsedTemplate("tmpl/minitool.system.import",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+}
+
+
+sub Import
+{
+   my $self=shift;
+   my $param=shift;
+
+   my $flt;
+   my $importname;
+   my $sysrec;
+
+   my $credentialName=$self->getCredentialName();
+
+   if ($param->{importname} ne ""){
+      my $sysuuid;
+      $importname=$param->{importname};
+      msg(INFO,"start Import in GCP::system with importname $importname");
+      if (($sysuuid)=$importname
+              =~m/^(\S+)$/){
+         $flt={
+            idpath=>$sysuuid
+         };
+      }
+      else{
+         $self->LastMsg(ERROR,"GCP sieht schlecht aus");
+         return(undef);
+      }
+      $self->ResetFilter();
+      $self->SetFilter($flt);
+      my @l=$self->getHashList(qw(id name projectId status ipaddresses));
+      if ($#l==-1){
+         if ($self->isDataInputFromUserFrontend()){
+            if ($#{$self->LastMsg()}==-1){
+               $self->LastMsg(ERROR,"GCP machine not found");
+            }
+         }
+         msg(ERROR,"requested importname $importname can not be resolved");
+         return(undef);
+      }
+    
+      if ($#l>0){
+         if ($self->isDataInputFromUserFrontend()){
+            $self->LastMsg(ERROR,"Systemname '%s' not unique in GCP",
+                                 $param->{importname});
+         }
+         return(undef);
+      }
+      $sysrec=$l[0];
+   }
+   elsif (ref($param->{importrec}) eq "HASH"){
+      $sysrec=$param->{importrec};
+   }
+   else{
+      msg(ERROR,"no importname specified while ".$self->Self." Import call");
+      return(undef);
+   }
+   my $appl=getModuleObject($self->Config,"TS::appl");
+   my $cloudarea=getModuleObject($self->Config,"itil::itcloudarea");
+   my $itcloud=getModuleObject($self->Config,"itil::itcloud");
+
+   my $cloudrec;
+   my $w5carec;
+   {
+      $itcloud->ResetFilter();
+      $itcloud->SetFilter({shortname=>\$credentialName ,cistatusid=>'4'});
+      my ($crec,$msg)=$itcloud->getOnlyFirst(qw(id name fullname cistatusid));
+      if (defined($crec)){
+         $cloudrec=$crec;
+      }
+      else{
+         $self->LastMsg(ERROR,"no active GCP Cloud in inventory");
+         return(undef);
+      }
+   }
+
+   if ($sysrec->{projectId} ne ""){
+      msg(INFO,"try to add CloudArea to system ".$sysrec->{name});
+      $cloudarea->SetFilter({cloudid=>$cloudrec->{id},
+                             srcid=>\$sysrec->{projectId}
+      });
+      my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+      if (defined($w5cloudarearec)){
+         $w5carec=$w5cloudarearec;
+      }
+   }
+
+   my $syssrcid=$sysrec->{id};
+   my $system=getModuleObject($self->Config,"TS::system");
+
+   if (!defined($w5carec)){
+      my $msg;
+      if (exists($param->{importname})){
+         $msg=$param->{importname};
+      }
+      else{
+         $msg=$param->{importrec}->{id};
+      }
+      if ($self->isDataInputFromUserFrontend()){
+         # if import is from Job (W5Server f.e.) no error on missing
+         # ca rec is needed - ca's are guranted by other processes
+         $self->LastMsg(ERROR,"missing CloudArea for TPC import of '%s'",$msg);
+      }
+      return(undef);
+   }
+
+   my %ipaddresses;
+   foreach my $iprec (@{$sysrec->{ipaddresses}}){
+      $ipaddresses{$iprec->{name}}={
+         name=>$iprec->{name},
+         netareatag=>$iprec->{netareatag}
+      };
+   }
+
+   my $sysimporttempl={
+      name=>[$sysrec->{name},"gcp".$sysrec->{id}],
+      initialname=>"gcp".$sysrec->{id},
+      id=>$sysrec->{id},
+      srcid=>$sysrec->{idpath},
+      ipaddresses=>[values(%ipaddresses)]
+   };
+
+   #if ($sysrec->{address} ne ""){
+   #   $sysimporttempl->{ipaddresses}=[{
+   #       name=>$sysrec->{address},
+   #       netareatag=>'CNDTAG'
+   #   }];
+   #}
+
+   if ($sysrec->{projectId} ne ""){
+      msg(INFO,"try to add CloudArea to system ".$sysrec->{name});
+      $cloudarea->SetFilter({cloudid=>$cloudrec->{id},
+                             srcid=>\$sysrec->{projectId}
+      });
+      my ($w5cloudarearec,$msg)=$cloudarea->getOnlyFirst(qw(ALL));
+      if (defined($w5cloudarearec)){
+         $w5carec=$w5cloudarearec;
+      }
+   }
+
+
+   my $ImportRec={
+      cloudrec=>$cloudrec,
+      cloudarearec=>$w5carec,
+      imprec=>$sysimporttempl,
+      srcsys=>$credentialName,
+      checkForSystemExistsFilter=>sub{  # Nachfrage ob Reuse System-Candidat not
+         my $osys=shift;                # exists in srcobj
+         my $srcid=$osys->{srcid};
+         return({id=>\$srcid});
+      }
+   };
+
+   my $ImportObjects={   # Objects are in seperated Structur for better Dumping
+      itcloud=>$itcloud,
+      itcloudarea=>$cloudarea,
+      appl=>$appl,
+      system=>$system,
+      srcobj=>$self
+   };
+
+   printf STDERR ("ImportRec(imprec):%s\n",Dumper($ImportRec->{imprec}));
+   my $ImportResult=$system->genericSystemImport($ImportObjects,$ImportRec);
+   #printf STDERR ("ImportResult:%s\n",Dumper($ImportResult));
+   if ($ImportResult){
+      return($ImportResult->{IdentifedBy});
+   }
+   return();
+}
+
+
+
 
 
 1;

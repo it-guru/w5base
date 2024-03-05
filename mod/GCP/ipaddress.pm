@@ -199,7 +199,7 @@ sub DataCollector
                }
             }
          }
-print STDERR Dumper(\@l);
+         #print STDERR Dumper(\@l);
          return(\@l);
       }
    );

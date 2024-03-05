@@ -1216,6 +1216,7 @@ sub validateCloudAreaImportState
          });
       }
       if ($self->isDataInputFromUserFrontend()){
+         $self->LastMsg(ERROR,"CloudArea:'".$cloudarearec->{fullname}."'");
          $self->LastMsg(ERROR,"invalid CloudArea cistatus");
       }
       return(undef);

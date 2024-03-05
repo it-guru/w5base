@@ -667,9 +667,9 @@ sub genericSystemImport
          }
       }
    }
-
    if ((!$cloudAreaOk)){
       if ($self->LastMsg()==-1){
+         $self->LastMsg(ERROR,"CloudArea:'".$cloudarearec->{fullname}."'");
          $self->LastMsg(ERROR,"invalid CloudArea State");
       }
       return(undef);
@@ -970,13 +970,18 @@ sub genericSystemImport
    else{
       msg(INFO,"try to import new with databoss $curdataboss ...");
       my $newrec={name=>$sysrec->{id},
-                  srcid=>$sysrec->{srcid},
-                  autoscalinggroup=>$sysrec->{autoscalinggroup},
-                  autoscalingsubgroup=>$sysrec->{autoscalingsubgroup},
-                  srcsys=>$srcsys,
-                  osrelease=>'other',
-                  allowifupdate=>1,
+                  srcid=>$sysrec->{srcid}, srcsys=>$srcsys,
+                  osrelease=>'other', allowifupdate=>1,
                   cistatusid=>4};
+      if (exists($sysrec->{autoscalinggroup})){
+         $newrec->{autoscalinggroup}=$sysrec->{autoscalinggroup};
+      }
+      if (exists($sysrec->{autoscalingsubgroup})){
+         $newrec->{autoscalingsubgroup}=$sysrec->{autoscalingsubgroup};
+      }
+      if (exists($sysrec->{initialname}) && $sysrec->{initialname} ne ""){
+         $newrec->{name}=$sysrec->{initialname};
+      }
       if (defined($cloudarearec)){
          $newrec->{itcloudareaid}=$cloudarearec->{id};
       }
