@@ -212,7 +212,7 @@ sub qcheckRecord
    my @systemid;
    map({push(@systemid,$_->{systemid});} @l);
 
-   printf STDERR ("l=%s\n",Dumper(\@l));
+   #printf STDERR ("l=%s\n",Dumper(\@l));
    #printf STDERR ("n=%d\n",$#l+1);
    #printf STDERR ("systemid=%s\n",join(",",@systemid));
 
