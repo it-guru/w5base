@@ -1324,7 +1324,7 @@ sub doNotify
          }
          if ($mode eq "CERTEXPIRE2"){
             foreach my $uid (@csteam){
-               $touid{$uid}++;
+               $ccuid{$uid}++;
             }
          }
       }
