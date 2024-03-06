@@ -55,7 +55,7 @@ sub genKeyPair
 
    my @cmd=("openssl","req",
                       "-x509","-nodes","-newkey","rsa:4096",
-                      "-days","90",
+                      "-days","7",
                       "-keyout",$priv_keyfile, "-out",$pub_keyfile,
                       "-subj","/CN=unused"
    );
@@ -123,7 +123,102 @@ sub GCP_KeyRefresh
    eval('use JSON; $data=JSON->new->utf8->encode($qRec);');
    return(undef) if ($data eq "");
 
+   my $ServiceProject="de0360-prd-w5base-darwin";
+   my $ServiceAccount="w5base-darwin-access\@".
+                      "de0360-prd-w5base-darwin.iam.gserviceaccount.com";
 
+
+   my $d=$o->CollectREST(
+      dbname=>$credentialName,
+      useproxy=>1,
+      method=>'GET',
+      url=>sub{
+         my $self=shift;
+         my $baseurl="https://iam.googleapis.com/";
+         my $dataobjurl=$baseurl."v1/projects/".$ServiceProject."/".
+                                 "serviceAccounts/".$ServiceAccount.
+                                 "/keys";
+         return($dataobjurl);
+      },
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $headers=['Authorization'=>$Authorization,
+                      'Content-Type'=>'application/json'];
+ 
+         return($headers);
+      },
+#      onfail=>sub{
+#         my $self=shift;
+#         my $code=shift;
+#         my $statusline=shift;
+#         my $content=shift;
+#         my $reqtrace=shift;
+#
+#         if ($code eq "400"){
+#            return("200");
+#         }
+#
+#         msg(ERROR,$reqtrace);
+#         $self->LastMsg(ERROR,"unexpected data GCP response");
+#         return(undef);
+#      }
+#
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+
+         return($data->{keys});
+      }
+   );
+   if (ref($d) eq "ARRAY"){
+      my @k;
+      my @keyList=@$d;
+      foreach my $CheckKey (@keyList){
+         my $vTo=$CheckKey->{validBeforeTime};
+         my $validtill;
+         if ($vTo ne ""){
+            $validtill=$o->ExpandTimeExpression($vTo,"en","GMT","GMT");
+            next if ($validtill eq "");
+         }
+         my $d=CalcDateDuration(NowStamp("en"),$validtill);
+         push(@k,{
+            name=>$CheckKey->{name},
+            days=>$d->{totaldays}
+         });
+         #printf STDERR ("t=%s\n",$validtill);
+         #printf STDERR ("d=%s\n",Dumper($d));
+      }
+      @k=sort({$b->{days}<=>$a->{days}} @k);
+
+      for(my $c=8;$c<=$#k;$c++){
+         my $drop=$k[$c];
+         msg(INFO,"drop $drop->{name}");
+
+         my $d=$o->CollectREST(
+            dbname=>$credentialName,
+            useproxy=>1,
+            method=>'DELETE',
+            url=>sub{
+               my $self=shift;
+               my $baseurl="https://iam.googleapis.com/";
+               my $dataobjurl=$baseurl."v1/".$drop->{name};
+               return($dataobjurl);
+            },
+            headers=>sub{
+               my $self=shift;
+               my $baseurl=shift;
+               my $apikey=shift;
+               my $headers=['Authorization'=>$Authorization,
+                            'Content-Type'=>'application/json'];
+        
+               return($headers);
+            }
+         );
+         #print STDERR Dumper($drop);
+      }
+   }
 
    my $d=$o->CollectREST(
       dbname=>$credentialName,
@@ -133,11 +228,9 @@ sub GCP_KeyRefresh
          my $self=shift;
          my $baseurl="https://iam.googleapis.com/";
          my $dataobjurl=$baseurl.
-                        "v1/projects/de0360-prd-w5base-darwin/".
-                        "serviceAccounts/".
-                        "w5base-darwin-access\@".
-                        "de0360-prd-w5base-darwin.iam.gserviceaccount.com/".
-                        "keys:upload";
+                        "v1/projects/".$ServiceProject."/".
+                        "serviceAccounts/".$ServiceAccount.
+                        "/keys:upload";
          return($dataobjurl);
       },
       data=>$data,
