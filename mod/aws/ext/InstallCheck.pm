@@ -36,7 +36,13 @@ sub getMandatoryModules
    my $self=shift;
 
 
-   return qw(Data::Printer);
+   return(qw(Data::Printer
+             Paws
+             Paws::Credential
+             Paws::Credential::Explicit
+             Paws::Credential::AssumeRole
+             Paws::Net::LWPCaller
+   ));
 }
 
 
