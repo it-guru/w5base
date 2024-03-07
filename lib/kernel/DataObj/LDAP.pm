@@ -588,7 +588,7 @@ sub getFirst
 
       if (defined($self->{LdapQueryPageSize})){
          my $p=new Net::LDAP::Control::Paged(size=>$self->{LdapQueryPageSize});
-         push($control,$p);
+         push(@$control,$p);
       }
 
       ($sth,$mesg)=$self->{LDAP}->execute(filter=>latin1($ldapfilter)->utf8,
