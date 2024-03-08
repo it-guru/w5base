@@ -130,7 +130,8 @@ sub Validate
          }
          return({$self->{vjoinon}->[0]=>undef});
       }
-      $self->getParent->LastMsg(ERROR,"'%s' value '%s' not found",$self->Label,
+      $self->getParent->LastMsg(ERROR,"'%s' value '%s' ".
+                                      "not found or not allowed",$self->Label,
                                       $newval);
       return(undef);
    }

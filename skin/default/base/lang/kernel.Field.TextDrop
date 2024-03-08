@@ -1,2 +1,2 @@
-'\'%s\' value \'%s\' not found'         => {de=>'\'%s\' Eingabe \'%s\' nicht gefunden'},
+'\'%s\' value \'%s\' not found or not allowed'         => {de=>'\'%s\' Eingabe \'%s\' nicht gefunden/nicht erlaubt'},
 '\'%s\' value \'%s\' is not unique'     => {de=>'\'%s\' Eingabe \'%s\' nicht eindeutig'},
