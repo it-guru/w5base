@@ -175,7 +175,10 @@ sub GCP_KeyRefresh
    if (ref($d) eq "ARRAY"){
       my @k;
       my @keyList=@$d;
+      my $c=0;
       foreach my $CheckKey (@keyList){
+         #printf STDERR ("CheckKey=%s\n",Dumper($CheckKey));
+         next if ($CheckKey->{keyType} ne "USER_MANAGED");
          my $vTo=$CheckKey->{validBeforeTime};
          my $validtill;
          if ($vTo ne ""){
@@ -183,13 +186,15 @@ sub GCP_KeyRefresh
             next if ($validtill eq "");
          }
          my $d=CalcDateDuration(NowStamp("en"),$validtill);
+         $c++;
          push(@k,{
+            count=>$c,
             name=>$CheckKey->{name},
             days=>$d->{totaldays}
          });
          #printf STDERR ("t=%s\n",$validtill);
-         #printf STDERR ("d=%s\n",Dumper($d));
       }
+      #printf STDERR ("k=%s\n",Dumper(\@k));
       @k=sort({$b->{days}<=>$a->{days}} @k);
 
       for(my $c=8;$c<=$#k;$c++){
