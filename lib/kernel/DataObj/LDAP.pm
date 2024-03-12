@@ -391,6 +391,7 @@ sub getFinalLdapFilter
       push(@l1where,"(|".$where.join("",@l0where).")") if ($#l0where!=-1);
    } 
    $where="(&".join("",@l1where).")";
+   $where="objectClass=*" if ($where eq "(&)");  # handle empty filters
    #printf STDERR ("DUMP:$where\n");
    return($where);
 }
