@@ -306,10 +306,9 @@ sub new
                 dataobjattr   =>'grp.ext_refid2'),
 
       new kernel::Field::Text(
-                name          =>'SISnumber',
+                name          =>'sisnumber',
                 group         =>'source',
-                htmldetail    =>0,
-                uploadable    =>0,
+                #htmldetail    =>0,
                 label         =>'SIS Number',
                 dataobjattr   =>'grp.sisnumber'),
 
