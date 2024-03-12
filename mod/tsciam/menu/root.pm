@@ -58,6 +58,10 @@ sub Init
                       "tsciam::orgarea",
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("itu.ds.ciam.org",
+                      "tsciam::organisation",
+                      defaultacl=>['admin']);
+
 
    $self->RegisterObj("itu.ciam.location",
                       ">itu.ds.ciam.location");

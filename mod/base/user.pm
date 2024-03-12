@@ -546,7 +546,7 @@ sub new
                 dataobjattr   =>'contact.office_accarea'),
 
       new kernel::Field::Text(
-                name          =>'office_SISnumber',
+                name          =>'office_sisnumber',
                 group         =>'officeacc',
                 htmldetail    =>0,
                 uploadable    =>0,

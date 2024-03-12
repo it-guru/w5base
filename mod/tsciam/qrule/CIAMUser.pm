@@ -542,6 +542,7 @@ sub qcheckRecord
       my @fieldlist=qw(office_phone office_street office_zipcode 
                        office_location office_mobile office_costcenter
                        office_accarea office_organisation country
+                       office_sisnumber
                        office_facsimile office_room);
       if ($rec->{usertyp} ne "function" &&
           $rec->{usertyp} ne "service"){

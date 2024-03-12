@@ -105,14 +105,38 @@ sub qcheckRecord
       }
    }
    elsif ($rec->{srcsys} eq "CIAM"){
+printf STDERR ("fifi 01\n");
       # CIAM Org-Structure Updates
       my ($ciamrec,$msg);
       my $o=getModuleObject($self->getParent->Config(),"tsciam::orgarea");
       $o->SetFilter({toucid=>\$rec->{srcid}});
-      ($ciamrec,$msg)=$o->getOnlyFirst(qw(name shortname sapid
+      ($ciamrec,$msg)=$o->getOnlyFirst(qw(name shortname sapid toumgr
                                           urlofcurrentrec));
       my $ext_refid1;
       if (defined($ciamrec)){
+         # search for SISNumber
+         if ($ciamrec->{toumgr} ne ""){
+            my $p=getModuleObject($self->getParent->Config(),"tsciam::user");
+            $p->SetFilter({tcid=>$ciamrec->{toumgr}});
+            my ($mgrrec,$msg)=$p->getOnlyFirst(qw(ALL));
+            if (defined($mgrrec)){
+               if ($mgrrec->{office_sisnumber} ne ""){
+                  if ($rec->{sisnumber} ne $mgrrec->{office_sisnumber}){
+                     $forcedupd->{sisnumber}=$mgrrec->{office_sisnumber};
+                  }
+               }
+               else{
+                  if ($rec->{sisnumber} ne ""){
+                     $forcedupd->{sisnumber}="";
+                  }
+               }
+            }
+            else{
+               if ($rec->{sisnumber} ne ""){
+                  $forcedupd->{sisnumber}="";
+               }
+            }
+         }
 
          if (!($rec->{is_orggrp})){  # keine Org-Gruppe gesetzt - dann default
             if (($ciamrec->{name}=~m/\sGmbH$/i) ||

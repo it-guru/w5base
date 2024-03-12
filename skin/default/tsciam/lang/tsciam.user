@@ -7,6 +7,7 @@
 'CostCenter'=>{de=>'Kostenstelle'},
 'Fullname'=>{de=>'vollständiger Name'},
 'Accounting Area'=>{de=>'Buchungskreis'},
+'SIS Number'=>{de=>'Gesellschaftsnummer'},
 'Room'=>{de=>'Zimmer'},
 'ZIP-Code'=>{de=>'Postleitzahl'},
 'Mobile-Phonenumber'=>{de=>'Handy'},

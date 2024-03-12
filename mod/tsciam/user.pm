@@ -180,6 +180,11 @@ sub new
                                    label      =>'Accounting Area',
                                    dataobjattr=>'tCostCenterAccountingArea'),
 
+      new kernel::Field::Text(     name       =>'office_sisnumber',
+                                   group      =>'office',
+                                   label      =>'SIS Number',
+                                   dataobjattr=>'tTSISnumber'),
+
       new kernel::Field::Phonenumber(name     =>'office_phone',
                                    group      =>'office',
                                    label      =>'Phonenumber',
