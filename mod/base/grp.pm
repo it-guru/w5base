@@ -295,6 +295,46 @@ sub new
                 label         =>'External RefID2',
                 dataobjattr   =>'grp.ext_refid2'),
 
+      new kernel::Field::Text(
+                name          =>'SISnumber',
+                group         =>'source',
+                htmldetail    =>0,
+                uploadable    =>0,
+                label         =>'SIS Number',
+                dataobjattr   =>'grp.sisnumber'),
+
+      new kernel::Field::Text(
+                name          =>'accarea',
+                group         =>'source',
+                htmldetail    =>0,
+                uploadable    =>0,
+                label         =>'Account-Area',
+                dataobjattr   =>'grp.accarea'),
+
+      new kernel::Field::Text(
+                name          =>'comregnum',
+                group         =>'source',
+                htmldetail    =>0,
+                uploadable    =>0,
+                label         =>'Commercial Registry Number',
+                dataobjattr   =>'grp.comregnum'),
+
+      new kernel::Field::Text(
+                name          =>'nsin',
+                group         =>'source',
+                htmldetail    =>0,
+                uploadable    =>0,
+                label         =>'Nat. Securities Ident. Number',
+                dataobjattr   =>'grp.nsin'),
+
+      new kernel::Field::Text(
+                name          =>'isin',
+                group         =>'source',
+                htmldetail    =>0,
+                uploadable    =>0,
+                label         =>'Int. Securities Ident. Number',
+                dataobjattr   =>'grp.isin'),
+
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',

@@ -543,6 +543,14 @@ sub new
                 label         =>'Accounting Area',
                 dataobjattr   =>'contact.office_accarea'),
 
+      new kernel::Field::Text(
+                name          =>'office_SISnumber',
+                group         =>'officeacc',
+                htmldetail    =>0,
+                uploadable    =>0,
+                label         =>'SIS Number',
+                dataobjattr   =>'contact.office_sisnumber'),
+
       new kernel::Field::Link(
                 name          =>'costcenterid',
                 group         =>'officeacc',
