@@ -40,6 +40,8 @@
 '%d from %d orgareas successful imported'=>{
           de=>'%d von %d Organisationseinheiten erfolgreich importiert'},
 'add members'=>{de=>'Mitglieder hinzufügen'},
+'Subunits'=>{de=>'Untereinheiten'},
+'Users'=>{de=>'Kontakte/Users'},
 'Projectgroup'=>{de=>'Projektgruppe'},
 'Account-Area'=>{de=>'Buchungskreis'},
 'SIS Number'=>{de=>'Gesellschaftsnummer'},

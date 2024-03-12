@@ -495,6 +495,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'office_room',
                 group         =>'office',
+                htmldetail    =>'NotEmpty',
                 label         =>'Room number',
                 dataobjattr   =>'contact.office_room'),
 
@@ -502,6 +503,7 @@ sub new
                 name          =>'office_facsimile',
                 group         =>['office','nativcontact'],
                 label         =>'FAX-Number',
+                htmldetail    =>'NotEmpty',
                 dataobjattr   =>'contact.office_facsimile'),
 
       new kernel::Field::Text(
