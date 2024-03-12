@@ -58,6 +58,7 @@ sub new
                 explore       =>100,
                 htmlwidth     =>'300px',
                 size          =>'40',
+                history       =>0,
                 dataobjattr   =>'grp.fullname'),
 
       new kernel::Field::Text(
@@ -254,14 +255,23 @@ sub new
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-System',
                 dataobjattr   =>'grp.srcsys'),
 
       new kernel::Field::Text(
                 name          =>'srcid',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Source-Id',
                 dataobjattr   =>'grp.srcid'),
+
+      new kernel::Field::Text(
+                name          =>'srcurl',
+                group         =>'source',
+                htmldetail    =>'NotEmpty',
+                label         =>'Source-URL',
+                dataobjattr   =>'grp.srcurl'),
 
       new kernel::Field::Text(
                 name          =>'ext_refid1',
@@ -428,6 +438,12 @@ sub new
                          activator=>["admin","w5base.base.grp"],
                          uniquesize=>255};
 
+   $self->{history}={
+      update=>[
+         'local'
+      ]
+   };
+
    $self->setWorktable("grp");
    $self->setDefaultView(qw(fullname cistatus editor description grpid));
    $self->{locktables}="grp write,contact write,".
@@ -508,7 +524,7 @@ sub Validate
       trim(\$newrec->{name});
       $newrec->{name}=~s/[\.\s\*]/_/g;
       my $chkname=$newrec->{name};
-      if ($cistatus==6 || (defined($oldrec) && $oldrec->{cistatusid}==6)){
+      if ($cistatus>=6 || (defined($oldrec) && $oldrec->{cistatusid}>=6)){
          $chkname=~s/\[.*?\]$//g;
       }
       if ($chkname eq "" || !($chkname=~m/^[\(\)a-zA-Z0-9_-]+$/) ||
@@ -773,10 +789,13 @@ sub isViewValid
    my $self=shift;
    my $rec=shift;
 
-   return(qw(header default)) if (defined($rec) && $rec->{cistatusid}==7);
+   if (defined($rec) && $rec->{cistatusid}==7){
+      return(qw(header default history));
+   }
 
-   return(qw(header default source)) if (!defined($rec) || 
-                                  (defined($rec->{grpid}) && $rec->{grpid}<=0));
+   if (!defined($rec) || (defined($rec->{grpid}) && $rec->{grpid}<=0)){
+      return(qw(header default source));
+   }
    return("ALL");
 }
 

@@ -35,6 +35,7 @@
 'CI-StateID'             =>{de=>'CI-StatusID',     en=>'CI-StateID'         },
 'Source-System'          =>{de=>'Quellsystem' },
 'Source-Id'              =>{de=>'ID im Quellsystem' },
+'Source-URL'             =>{de=>'Quell-URL' },
 'Quality Check State'    =>{de=>'Quality Check Status' },
 'Quality Response Area'  =>{de=>'Quality verantwortlicher Bereich' },
 'Source-Load'            =>{de=>'letzter Quellsystem load' },
