@@ -152,7 +152,7 @@ sub qcheckRecord
                $is_org=1;
                my $refid2;
                if ($orgrec->{tocid} ne ""){
-                  $refid2="toCID: ".$orgrec->{tocid};
+                  $refid2="toCID:".$orgrec->{tocid};
                }
                if ($orgrec->{sisnumber} ne ""){
                   $sisnumber=$orgrec->{sisnumber};
@@ -183,6 +183,22 @@ sub qcheckRecord
                if (defined($mgrrec)){
                   if ($mgrrec->{office_sisnumber} ne ""){
                      $sisnumber=$mgrrec->{office_sisnumber};
+
+                     my $po=getModuleObject($self->getParent->Config(),
+                           "tsciam::organisation");
+                     $po->SetFilter({
+                         sisnumber=>\$sisnumber
+                     });
+                     my ($orgrec,$msg)=$po->getOnlyFirst(qw(ALL));
+                     if (defined($orgrec)){
+                        my $refid2;
+                        if ($orgrec->{tocid} ne ""){
+                           $refid2="toCID:".$orgrec->{tocid};
+                        }
+                        if ($rec->{ext_refid2} ne $refid2){
+                           $forcedupd->{ext_refid2}=$refid2;
+                        }
+                     }
                   }
                }
             }
