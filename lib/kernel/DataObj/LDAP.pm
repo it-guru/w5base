@@ -226,6 +226,8 @@ sub initSqlWhere
          my @orlist=();
          my @norlist=();
          foreach my $val (@list){
+            $val=~s/\(/\\28/g;
+            $val=~s/\)/\\29/g;
             if ($val=~m/^!/){
                $val=~s/^!//;
                push(@norlist,$val);
@@ -269,6 +271,10 @@ sub initSqlWhere
          my $fname=$fieldobject->Name();
          foreach my $q (@list){
             $q=$q;
+            $q=~s/\\/\\5c/g;
+            $q=~s/\(/\\28/g;
+            $q=~s/\)/\\29/g;
+            $q=~s/\*/\\2a/g;
             my $notempty=0;
             $notempty=1 if ($$where ne "");
             $$where="(& ".$$where if ($notempty);  # damit Arrays geodert werden
