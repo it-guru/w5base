@@ -63,6 +63,11 @@ sub new
                                    label      =>'inaktiv (tOuDisabled)',
                                    dataobjattr=>'tOuDisabled'),
 
+      new kernel::Field::Text(     name       =>'oulevel',     #eigentlich Mist
+                                   label      =>'OrgUnit Level'. #da es nicht
+                                                '(tOuLevel)',#das level inerhalb
+                                   dataobjattr=>'tOuLevel'), #einer Organi. ist
+
       new kernel::Field::TextDrop( name       =>'bossfullname',
                                    label      =>'Boss',
                                    vjointo    =>'tsciam::user',

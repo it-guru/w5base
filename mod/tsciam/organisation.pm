@@ -45,15 +45,17 @@ sub new
 
       new kernel::Field::Text(     name       =>'name',
                                    label      =>'Organisation-Name (toLD)',
-                                   size       =>'10',
                                    dataobjattr=>'toLD'),
 
       new kernel::Field::Text(     name       =>'shortname',
-                                   label      =>'Orgarea-ShortName (toSD)',
-                                   size       =>'10',
+                                   label      =>'Organisation-ShortName (toSD)',
                                    dataobjattr=>'toSD'),
 
-      new kernel::Field::Text(     name       =>'SISnumber',
+      new kernel::Field::Text(     name       =>'abbreviation',
+                                   label      =>'Abbreviation (toAbbreviation)',
+                                   dataobjattr=>'toAbbreviation'),
+
+      new kernel::Field::Text(     name       =>'sisnumber',
                                    label      =>'SIS Number',
                                    dataobjattr=>'tTSISnumber'),
 
@@ -64,7 +66,7 @@ sub new
                                    dataobjattr=>'o'),
 
    );
-   $self->setDefaultView(qw(name shortname tocid SISnumber));
+   $self->setDefaultView(qw(name abbreviation tocid SISnumber));
    return($self);
 }
 
