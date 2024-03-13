@@ -64,6 +64,18 @@ sub qcheckRecord
 
    my $forcedupd={};
    $errorlevel=0;
+   my $sisnumber;
+
+   # per default the parent sisnumber is inherit
+   if ($rec->{parentid} ne ""){
+      my $po=$dataobj->Clone();
+      $po->SetFilter({grpid=>\$rec->{parentid},cistatusid=>\'4'});
+      my ($prec,$msg)=$po->getOnlyFirst(qw(name sisnumber));
+      if (defined($prec)){
+         $sisnumber=$prec->{sisnumber};
+      }
+   }
+
    if ($rec->{srcsys} eq "WhoIsWho" && $rec->{cistatusid} eq "4"){
       # do an orgstructure transfer from WhoIsWho to CIAM
       if ($rec->{ext_refid1} ne "" && 
@@ -105,7 +117,6 @@ sub qcheckRecord
       }
    }
    elsif ($rec->{srcsys} eq "CIAM"){
-printf STDERR ("fifi 01\n");
       # CIAM Org-Structure Updates
       my ($ciamrec,$msg);
       my $o=getModuleObject($self->getParent->Config(),"tsciam::orgarea");
@@ -114,40 +125,86 @@ printf STDERR ("fifi 01\n");
                                           urlofcurrentrec));
       my $ext_refid1;
       if (defined($ciamrec)){
-         # search for SISNumber
-         if ($ciamrec->{toumgr} ne ""){
-            my $p=getModuleObject($self->getParent->Config(),"tsciam::user");
-            $p->SetFilter({tcid=>$ciamrec->{toumgr}});
-            my ($mgrrec,$msg)=$p->getOnlyFirst(qw(ALL));
-            if (defined($mgrrec)){
-               if ($mgrrec->{office_sisnumber} ne ""){
-                  if ($rec->{sisnumber} ne $mgrrec->{office_sisnumber}){
-                     $forcedupd->{sisnumber}=$mgrrec->{office_sisnumber};
-                  }
+         my $is_org=0;
+         my $hasOrgRecord=0;    # Fuer INT Einheiten exisitert nicht immer
+                                # ein tsciam::organisation Eintrag bzw. 
+                                # ist einfach die toLD nicht die gleiche, wie
+                                # die tOuLD - da muss dann der Leiter für die
+                                # Berechnung herhalten.
+         if ($ciamrec->{name} ne "" && $ciamrec->{shortname} ne ""){
+            my $p=getModuleObject($self->getParent->Config(),
+                  "tsciam::organisation");
+
+            # Das wäre eigentlich der korrekte Filter ...
+            #$p->SetFilter({
+            #    abbreviation=>\$ciamrec->{shortname},
+            #    name=>\$ciamrec->{name}
+            #});
+            # ... aber bei MSS Drehsten passt die Abkürzung in den OrgUnits
+            # nicht zur Abkürzung in der Organisation
+            $p->SetFilter({
+                name=>\$ciamrec->{name}
+            });
+
+            my ($orgrec,$msg)=$p->getOnlyFirst(qw(ALL));
+            if (defined($orgrec)){
+               $hasOrgRecord=1;
+               $is_org=1;
+               my $refid2;
+               if ($orgrec->{tocid} ne ""){
+                  $refid2="toCID: ".$orgrec->{tocid};
                }
-               else{
-                  if ($rec->{sisnumber} ne ""){
-                     $forcedupd->{sisnumber}="";
-                  }
+               if ($orgrec->{sisnumber} ne ""){
+                  $sisnumber=$orgrec->{sisnumber};
+               }
+               if ($rec->{ext_refid2} ne $refid2){
+                  $forcedupd->{ext_refid2}=$refid2;
                }
             }
-            else{
-               if ($rec->{sisnumber} ne ""){
-                  $forcedupd->{sisnumber}="";
+         }
+         if (($ciamrec->{name}=~m/\sGmbH$/i) ||   # name of ciam record
+             ($ciamrec->{name}=~m/\sAG$/)){       # indicates an organisation
+            $is_org=1;
+         }
+         # Problem: Rentnerservice TD GmbH ist namentlich eine eigene
+         #          Firma. Laut tsciam::organisation aber nicht. Sie befindet
+         #          sich im Org-Baum unterhalb von DTIT - der Leiter hat
+         #          aber eine Gesselschaftsnummer der "Deutsche Telekom AG"
+         #          -> alles sehr verworren
+
+         if (!$hasOrgRecord){
+                   # Konzept funktioniert nicht, wenn der Leiter etwas 
+                   # komisarisch leitet - also aus einer Firma kommt, bei der
+                   # er nicht direkt arbeitet.
+            if ($ciamrec->{toumgr} ne ""){
+               my $p=getModuleObject($self->getParent->Config(),"tsciam::user");
+               $p->SetFilter({tcid=>$ciamrec->{toumgr}});
+               my ($mgrrec,$msg)=$p->getOnlyFirst(qw(ALL));
+               if (defined($mgrrec)){
+                  if ($mgrrec->{office_sisnumber} ne ""){
+                     $sisnumber=$mgrrec->{office_sisnumber};
+                  }
                }
             }
          }
 
-         if (!($rec->{is_orggrp})){  # keine Org-Gruppe gesetzt - dann default
-            if (($ciamrec->{name}=~m/\sGmbH$/i) ||
-                ($ciamrec->{name}=~m/\sAG$/)){
+ 
+         if ($is_org){
+            if (!$rec->{is_org}){
                $forcedupd->{is_org}=1;
             }
-            else{
-               $forcedupd->{is_orggroup}="1";  # "organisatorische Untergruppe
-            }                                  # setzen
-         }            
- 
+            if ($rec->{is_orggroup}){
+               $forcedupd->{is_orggroup}=0;
+            }
+         }
+         else{
+            if ($rec->{is_org}){
+               $forcedupd->{is_org}=0;
+            }
+            if (!$rec->{is_orggroup}){
+               $forcedupd->{is_orggroup}=1;
+            }
+         }
 
          if ($ciamrec->{name} ne $rec->{description}){
             $forcedupd->{description}=$ciamrec->{name};
@@ -309,6 +366,12 @@ printf STDERR ("fifi 01\n");
       $forcedupd->{srcsys}="CIAM";     
       $forcedupd->{srcid}="15131753";
    }
+
+
+   if ($sisnumber ne $rec->{sisnumber}){
+      $forcedupd->{sisnumber}=$sisnumber;
+   }
+
    if (keys(%$forcedupd)){
       if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
                                           {grpid=>\$rec->{grpid}})){
