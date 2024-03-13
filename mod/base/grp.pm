@@ -276,31 +276,13 @@ sub new
       new kernel::Field::Text(
                 name          =>'ext_refid1',
                 group         =>'source',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   if (defined($param{current})){
-                      my $d=$param{current}->{$self->{name}};
-                      return(1) if ($d ne "");
-                   }
-                   return(0);
-                },
+                htmldetail    =>'NotEmpty',
                 label         =>'External RefID1',
                 dataobjattr   =>'grp.ext_refid1'),
 
       new kernel::Field::Text(
                 name          =>'ext_refid2',
-                htmldetail    =>sub{
-                   my $self=shift;
-                   my $mode=shift;
-                   my %param=@_;
-                   if (defined($param{current})){
-                      my $d=$param{current}->{$self->{name}};
-                      return(1) if ($d ne "");
-                   }
-                   return(0);
-                },
+                htmldetail    =>'NotEmpty',
                 group         =>'source',
                 label         =>'External RefID2',
                 dataobjattr   =>'grp.ext_refid2'),
@@ -308,7 +290,7 @@ sub new
       new kernel::Field::Text(
                 name          =>'sisnumber',
                 group         =>'source',
-                #htmldetail    =>0,
+                htmldetail    =>0,
                 label         =>'SIS Number',
                 dataobjattr   =>'grp.sisnumber'),
 
@@ -347,6 +329,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'srcload',
                 group         =>'source',
+                htmldetail    =>'NotEmpty',
                 label         =>'Last-Load',
                 dataobjattr   =>'grp.srcload'),
 
