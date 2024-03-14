@@ -47,13 +47,9 @@ sub Init
                       "caiman::orgarea",
                       defaultacl=>['admin','support']);
 
-   $self->RegisterObj("itu.ds.caiman.org",
-                      "caiman::organisation",
-                      defaultacl=>['admin','support']);
-
-   $self->RegisterObj("itu.ds.caiman.location",
-                      "caiman::location",
-                      defaultacl=>['admin','support']);
+#   $self->RegisterObj("itu.ds.caiman.org",
+#                      "caiman::organisation",
+#                      defaultacl=>['admin','support']);
 
 #   $self->RegisterObj("sysadm.grp.ciampfix",
 #                      "tsciam::orgarea",

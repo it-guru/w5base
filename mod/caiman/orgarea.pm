@@ -57,6 +57,10 @@ sub new
                                                 '(tOuSapID)',
                                    dataobjattr=>'tOuSapID'),
 
+      new kernel::Field::Text(     name       =>'sisnumber',
+                                   label      =>'SIS Number',
+                                   dataobjattr=>'tTSISnumber'),
+
       new kernel::Field::Text(     name       =>'kindoforg',
                                    label      =>'tkindOfOrg',
                                    dataobjattr=>'tkindOfOrg'),
@@ -151,7 +155,7 @@ sub new
       new kernel::Field::QualityState(),
       new kernel::Field::QualityOk(),
    );
-   $self->setDefaultView(qw(torgoid name shortname));
+   $self->setDefaultView(qw(torgoid name shortname sapid sisnumber));
    return($self);
 }
 

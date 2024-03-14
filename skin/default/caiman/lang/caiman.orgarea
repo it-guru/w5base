@@ -5,3 +5,4 @@
 'Subunits'=>{ de=>'Untereinheiten'},
 'Boss (tOuMgr)'=>{ de=>'Leiter (tOuMgr)'},
 'Boss'=>{ de=>'Leiter'},
+'SIS Number'=>{ de=>'Gesellschaftsnummer'},
