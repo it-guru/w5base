@@ -218,6 +218,11 @@ sub new
                                    label      =>'tOrgOID',
                                    dataobjattr=>'tOrgOID'),
 
+      new kernel::Field::Text(     name       =>'tccoid',
+                                   group      =>'office',
+                                   label      =>'tCcOID',
+                                   dataobjattr=>'tCcOID'),
+
       # war auch in CIAM nicht freigegeben
       #
       #new kernel::Field::Boolean(  name       =>'isVSNFD',
