@@ -69,6 +69,7 @@ sub Run
                                  js=>['toolbox.js','jquery.js','jquery.ui.js'],
                                  body=>1,form=>1);
          print("<script language='JavaScript'>");
+         print("window.focus();\n");
          print("addEvent(document,'keydown',function(e){");
          print("e=e || window.event;");
          print("if (e.keyCode==27){");

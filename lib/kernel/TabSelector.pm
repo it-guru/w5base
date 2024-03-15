@@ -19,7 +19,6 @@ package kernel::TabSelector;
 use strict;
 use vars qw(@EXPORT @ISA);
 use kernel;
-use Data::Dumper;
 use Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(&TabSelectorTool 
@@ -73,9 +72,12 @@ EOF
             $keyFuncs{"${lower1st}"}=$f;
             $flabel=~s#${c1st}#<u>${c1st}</u>#;
          }
-         my $flink="<span class=${name}$state ".
+         my $flink="<span ".
+                   " class=${name}$state ".
                    "onclick=${name}Set(\"$f\")>".
-                   "${flabel}&nbsp;&nbsp;&nbsp;</span>";
+                   "${flabel}".
+                   "<span aria-hidden=\"true\">&nbsp;&nbsp;&nbsp;".
+                   "</span></span>";
          my $width=" width=1% nowrap";
          if (defined($param{tabwidth})){
             $width=" width=$param{tabwidth}";
@@ -84,12 +86,17 @@ EOF
          if ($state ne "Activ" ||$c>1){
             $tabClass.=" hideOnMobile";
          }
-         push(@ml,"<td class=\"$tabClass\"$width>$flink</td>");
+         push(@ml,"<td class=\"$tabClass\"$width>$flink ".
+                  "<span class=aria-only>".
+                  "shortcut:<br>Alt plus $c1st<br></span></td>");
       }
    }
-   my $ml="<td class=${name}Sep>&nbsp;</td>".
-          join("<td class=${name}Sep>&nbsp;</td>",@ml);
-   $ml.="<td class=${name}Fillup>&nbsp;</td>";
+   my $ml="<td class=${name}Sep>".
+          "<span aria-hidden=\"true\">&nbsp;</span></td>".
+          join("<td class=${name}Sep>".
+               "<span aria-hidden=\"true\">&nbsp;</span></td>",@ml);
+   $ml.="<td class=${name}Fillup>".
+        "<span aria-hidden=\"true\">&nbsp;</span></td>";
    $ml="<table id=$name class=${name} cellspacing=0 cellpadding=0 border=0>".
        "<tr>$ml</tr></table>";
    my $ht="<table id=$name width=\"100%\" border=0 ".

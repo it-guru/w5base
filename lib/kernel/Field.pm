@@ -1388,9 +1388,9 @@ sub FormatedSearch
    }
    $curval=~s/"/&quot;/g;
    my $d="<table style=\"table-layout:fixed;width:100%\" ".
-         "border=0 cellspacing=0 cellpadding=0>\n";
+         "border=0 cellspacing=0 cellpadding=0 aria-hidden=\"true\"  >\n";
    $d.="<tr><td>". # for min width, add an empty image with 50px width
-       "<img width=50 border=0 height=1 alt=\"spacer\" ".
+       "<img width=50 border=0 height=1 alt=\"\" aria-hidden=\"true\" ".
        "src=\"../../../public/base/load/empty.gif\">";
    if (exists($self->{selectsearch})){
       my $options=$self->{selectsearch};
@@ -1414,7 +1414,9 @@ sub FormatedSearch
       $d.="</select>";
    }
    else{
+      my $searchfieldprefix=$self->getParent->T("Search field");
       $d.="<input type=text  name=\"search_$name\" ".
+          "aria-label=\"$searchfieldprefix : $label - help shortcut F1\" ".
           "class=finput style=\"min-width:50px\" value=\"$curval\">";
    }
    $d.="</td>";

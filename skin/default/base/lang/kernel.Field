@@ -1,3 +1,4 @@
 'field search help'=>{de=>'Feld Such Hilfe'},
 'search for NONE only posible on sublists'=>{de=>'suche nach NONE nur in Unterlisten Feldern möglich'},
 'filter on "%s" not selective enough'=>{de=>'Filter auf Feld "%s" ist nicht ausreichend selektiv'},
+'Search field'=>{de=>'Suchfeld'},
