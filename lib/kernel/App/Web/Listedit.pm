@@ -120,7 +120,9 @@ sub ModuleObjectInfo
       $jfld->{type}=$fo->Type();
       $label=~s/\// \/ /g;
       $label=~s/-/ - /g;
-      $label="&nbsp; &nbsp;" if ($label=~m/^\s*$/);
+      if ($label=~m/^\s*$/){
+         $label="<span aria-hidden=\"true\">&nbsp; &nbsp;</span>";
+      }
       if ($format eq "HtmlV01"){
          printf("<td valign=top>%s</td>",$label);
          printf("<td valign=top class=foname>%s</td>",$fo->Name());
@@ -2898,7 +2900,7 @@ if (window.addEventListener)
 else if (window.attachEvent)
    window.attachEvent('onload', createJSPluginLoader);
 else window.onload = createJSPluginLoader;
-</script><div id=IssueState>&nbsp;</div>"
+</script><div id=IssueState aria-hidden=true>&nbsp;</div>"
                 );
 
 
@@ -3996,7 +3998,7 @@ EOF
 
    printf("<table border=0 width=100%>");
    print("<tr>");
-   print("<td width=25% align=center>&nbsp;</td>");
+   print("<td width=25% align=center aria-hidden=true>&nbsp;</td>");
 
 
    print("<td align=center>");

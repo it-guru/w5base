@@ -1,3 +1,6 @@
+<span class="aria-only">
+<br>Erklärungen für die möglichen Ausdrücke im Suchfeld:<br>
+</span>
 Das Suchfeld '<b>%label%</b>' ist ein "Standard-Suchfeld".
 In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
 <br>
@@ -5,22 +8,35 @@ In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
 
 <tr>
 <td nowrap valign=top><b>*</b></td>
-<td>... steht für eine beliebige Anzahl von Zeichen</td>
+<td>... steht für eine beliebige Anzahl von Zeichen<br></td>
 </tr>
 
 <tr>
-<td nowrap valign=top><b>?</b></td>
-<td>... steht für exakt ein beliebiges Zeichen</td>
+<td nowrap valign=top><b>
+<span class="aria-only">Fragezeichen<br></span>
+<span aria-hidden="true">?</span>
+</b></td>
+<td>... steht für exakt ein beliebiges Zeichen<br>
+</td>
 </tr>
 
 <tr>
-<td nowrap valign=top><b>!</b></td>
-<td>... negiert den Ausruck. Falls Sie also !Hans eingeben, so erhalten
-    Sie alle Datensätze, bei denen "Hans" nicht in '%label%' eingetragen ist.</td>
+<td nowrap valign=top><b>
+<span class="aria-only">Ausrufezeichen<br></span>
+<span aria-hidden="true">!</span>
+</b></td>
+<td>... negiert den Ausruck. Falls Sie also <span aria-hidden=true>!</span><span class=aria-only>Ausrufezeichen</span>Hans eingeben, so erhalten
+    Sie alle Datensätze, bei denen "Hans" nicht in '%label%' eingetragen ist.
+<br></td>
 </tr>
 
 <tr>
-<td nowrap valign=top><b>"Hallo Welt"</b></td>
+<td nowrap valign=top><b>
+<span class="aria-only">Der Ausdruck Anführungszeichen Hallo Welt Anführungszeichen<br></span>
+<span aria-hidden="true">
+"Hallo Welt"
+</span>
+</b></td>
 <td>... wenn Sie mehrere Ausdrücke Leerzeichen seperiert hintereinander
     schreiben, so entspricht dies einer ODER Suche. Sollten Sie dies
     verhindern wollen, so können Sie die Worte in Anführungszeichen 
