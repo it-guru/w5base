@@ -312,6 +312,8 @@ sub ProcessLine
       my $data="undefined";
       my $fclick=$lineonclick;
       my $weblinkname=$app->Self();
+      my $weblinktitle="";
+      my $p=$self->getParent->getParent;
       if (defined($field)){
          $data=$app->findtemplvar({
                                    viewgroups=>$viewgroups,
@@ -319,10 +321,30 @@ sub ProcessLine
                                    current=>$rec
                                   },$fieldname,
                                      "formated");
-        # my $data=$field->FormatedResult("html");
          if (ref($field->{onClick}) eq "CODE"){
-            my $fc=&{$field->{onClick}}($self,$app);
+            my $fc=&{$field->{onClick}}($field,$self,$app,$rec);
             $fclick=$fc if ($fc ne "");
+            if ($fc ne ""){
+               my $weblinkto=$field->{weblinkto};
+               if (ref($weblinkto) ne "SCALAR"){
+                  my $p=$self->getParent;
+                  $p=$p->getParent if (defined($p));
+                  if (defined($p) && $p->can("findNearestTargetDataObj")){
+                     $weblinkto=$p->findNearestTargetDataObj(
+                                $weblinkto,"sublist:".$self->getParent->Self);
+                  }
+               }
+               if (ref($weblinkto) eq "SCALAR"){
+                  $weblinkto=$$weblinkto; # dereferenzieren von weblinkto
+               }
+               $weblinkto=$$weblinkto if (ref($weblinkto) eq "SCALAR");
+               if (!ref($weblinkto)){
+                  $weblinkname=$field->Label();
+                  $weblinktitle=sprintf($p->T('click to activate &lt;%s&gt;'),
+                                 $p->T($weblinkname,$weblinkname));
+               }
+
+            }
          }
          elsif (defined($field->{weblinkto}) && $field->{weblinkto} ne "none"){
             my $weblinkon=$field->{weblinkon};
@@ -396,17 +418,13 @@ sub ProcessLine
                }
             }
          }
+         if ($weblinktitle eq ""){
+            $weblinktitle=sprintf($p->T('click to view &lt;%s&gt;'),
+                         $p->T($weblinkname,$weblinkname));
+         }
          $fclick=undef if ($field->Type() eq "SubList");
          $fclick=undef if ($field->Type() eq "DynWebIcon");
          $fclick=undef if ($self->{nodetaillink});
-         my $p=$self->getParent->getParent;
-         if (defined($fclick)){
-            $weblinkname=sprintf($p->T('klick to view &lt;%s&gt;'),
-                         $p->T($weblinkname,$weblinkname));
-         }
-         else{
-            $weblinkname="";
-         }
       
          if ($self->{SubListEdit}==1){
             if ($id ne ""){
@@ -446,7 +464,7 @@ sub ProcessLine
       $d.=" onClick=$fclick" if ($fclick ne "");
       $data="&nbsp;" if ($data=~m/^\s*$/);
       $d.=" style=\"$style\"";
-      $d.=" title=\"$weblinkname\"";
+      $d.=" title=\"$weblinktitle\"";
       $d.="$nowrap>".$data;
       if (ref($param) eq "HASH" && 
           (($param->{ParentMode}=~m/^Html/) && 
