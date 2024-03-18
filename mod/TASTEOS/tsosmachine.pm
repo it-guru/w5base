@@ -352,8 +352,44 @@ sub InsertRecord
    my $newrec=shift;  # hash ref
 
    my $dbclass="machines";
-
    my %new;
+
+
+   my $tsossys=getModuleObject($self->Config,"TASTEOS::tsossystem");
+
+   my $uarec=$tsossys->getUnassignedMachinesRec();
+
+   return(undef) if (!defined($uarec));
+
+   #
+   # check, if machineNumber is already in 'Unassigned Machines' System
+   #
+   my $foundMachineIdInUnassinged;
+
+   foreach my $uaMachineRec (@{$uarec->{machines}}){
+      msg(INFO,"check ".$uaMachineRec->{machineNumber});
+      if ($uaMachineRec->{machineNumber} eq $newrec->{machineNumber}){
+         if (!$foundMachineIdInUnassinged){
+            if (($uaMachineRec->{name} ne $newrec->{name}) ||
+                ($uaMachineRec->{systemid} ne $newrec->{systemid}) ){
+               if ($self->ValidatedUpdateRecord($uaMachineRec,$newrec,{
+                      id=>$uaMachineRec->{id}
+                   })){
+                  $foundMachineIdInUnassinged=$uaMachineRec->{id};
+               }
+            }
+         }
+         else{
+           msg(INFO,"drop doublicate $uaMachineRec->{machineNumber} ".
+                    "id=$uaMachineRec->{id}");
+           $self->ValidatedDeleteRecord({id=>$uaMachineRec->{id}});
+         }
+      }
+   }
+   if ($foundMachineIdInUnassinged){
+      return($foundMachineIdInUnassinged);
+   }
+
    foreach my $k (keys(%$newrec)){
       my $dk=$k;
       $dk="systemId" if ($k eq "systemid");

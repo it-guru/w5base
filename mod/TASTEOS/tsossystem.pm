@@ -59,7 +59,7 @@ sub new
                 searchable    =>0,
                 vjointo       =>'TASTEOS::tsosmachine',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name','id']),
+                vjoindisp     =>['name','id','machineNumber','systemid']),
    );
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name ictoNumber description));
@@ -371,6 +371,29 @@ sub DeleteRecord
       return(1);
    }
    return(undef);
+}
+
+
+sub getUnassignedMachinesRec
+{
+   my $self=shift;
+
+   if ($self->isSuspended() || !($self->Ping())){
+      return(undef);
+   }
+   $self->SetFilter({name=>['Unassigned Machines']});
+   my @l=$self->getHashList(qw(ALL));
+   if ($#l==-1){
+      my $bk=$self->ValidatedInsertRecord({name=>'Unassigned Machines'});
+      $self->SetFilter({id=>\$bk});
+      @l=$self->getHashList(qw(ALL));
+   }
+   if ($#l>0){
+      for(my $c=1;$c<=$#l;$c++){
+         $self->DeleteRecord($l[$c]);
+      }
+   }
+   return($l[0]);
 }
 
 
