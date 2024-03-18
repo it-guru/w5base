@@ -394,6 +394,7 @@ sub qcheckRecord
             $tsosmacrec->{salt}.=$tsosmacrec->{systemid};
             my $newid=insNewTSOSmac($dataobj, $tsosmac,$opladdobj,
                                     $rec,$tsosmacrec,$lrec,$ladd->{systemid});
+            return(undef,undef) if ($newid eq ""); 
          }
          else{
             if ($mrec->{systemid} ne $tsosmacrec->{systemid} ||
@@ -431,6 +432,7 @@ sub qcheckRecord
    $tsossys->SetFilter({name=>'!"Default System"',ictoNumber=>\""});
    my @l=$tsossys->getHashList(qw(ALL));
    foreach my $delsys (@l){
+       next if ($delsys->{name} eq "Unassigned Machines");
        $tsossys->ResetFilter();
        $tsossys->ValidatedDeleteRecord({id=>$delsys->{id}});
    }
