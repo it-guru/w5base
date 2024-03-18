@@ -54,6 +54,12 @@ sub new
             label             =>'Name'),
 
       new kernel::Field::Text(     
+            name              =>'ictono',
+            dataobjattr       =>'icto',
+            htmldetail        =>'NotEmpty',
+            label             =>'ICTO-ID'),
+
+      new kernel::Field::Text(     
             name              =>'team',
             label             =>'Team'),
 
@@ -66,27 +72,27 @@ sub new
             label             =>'Zone'),
 
       new kernel::Field::SubList(
-                name          =>'subscriptions',
-                label         =>'Subscriptions',
-                searchable    =>0,
-                htmldetail    =>'NotEmpty',
-                group         =>'subscriptions',
-                vjointo       =>'tardis::apisubscription',
-                vjoinon       =>['id'=>'applicationId'],
-                vjoindisp     =>['name','approvalstatus']),
+            name              =>'subscriptions',
+            label             =>'Subscriptions',
+            searchable        =>0,
+            htmldetail        =>'NotEmpty',
+            group             =>'subscriptions',
+            vjointo           =>'tardis::apisubscription',
+            vjoinon           =>['id'=>'applicationId'],
+            vjoindisp         =>['name','approvalstatus']),
 
       new kernel::Field::SubList(
-                name          =>'exposures',
-                label         =>'Exposures',
-                searchable    =>0,
-                htmldetail    =>'NotEmpty',
-                group         =>'exposures',
-                vjointo       =>'tardis::apiexposure',
-                vjoinon       =>['id'=>'applicationId'],
-                vjoindisp     =>['name','statusstate'])
+            name              =>'exposures',
+            label             =>'Exposures',
+            searchable        =>0,
+            htmldetail        =>'NotEmpty',
+            group             =>'exposures',
+            vjointo           =>'tardis::apiexposure',
+            vjoinon           =>['id'=>'applicationId'],
+            vjoindisp         =>['name','statusstate'])
 
    );
-   $self->setDefaultView(qw(id name hub team zone));
+   $self->setDefaultView(qw(id name ictono hub team zone));
    return($self);
 }
 
@@ -157,6 +163,12 @@ sub DataCollector
          elsif(ref($data) eq "HASH"){
             $data=[$data];
          }
+         map({
+            $_=FlattenHash($_);
+            if ($_->{icto} ne ""){
+               $_->{icto}=uc($_->{icto});
+            }
+         } @$data);
          return($data);
       }
    );
