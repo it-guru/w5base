@@ -745,6 +745,8 @@ sub new
                 name          =>'dialermode',
                 uploadable    =>0,
                 label         =>'PC Phone Dialer Mode',
+                jsonchanged   =>\&getDialerChangeScript,
+                jsoninit      =>\&getDialerChangeScript,
                 htmleditwidth =>'50%',
                 group         =>'userparam',
                 value         =>[
@@ -1236,6 +1238,30 @@ sub getOnChangedScript
 if (mode=="onchange"){
    document.forms[0].submit();
 }
+EOF
+   return($d);
+}
+
+
+sub getDialerChangeScript
+{
+   my $self=shift;
+   my $app=$self->getParent();
+
+   my $d=<<EOF;
+var dialermode=document.forms[0].elements['Formated_dialermode'];
+var dialerurl=document.forms[0].elements['Formated_dialerurl'];
+if (dialermode){
+   var v=dialermode.options[dialermode.selectedIndex].value;
+   if (v.match(/Cisco/)){
+      dialerurl.disabled=false;
+   }
+   else{
+      dialerurl.disabled=true;
+   }
+}
+
+
 EOF
    return($d);
 }
