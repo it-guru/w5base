@@ -285,7 +285,7 @@ alter table grp  add is_resort   int(1) default '0';
 alter table grp  add is_team     int(1) default '0';
 alter table grp  add is_orggroup int(1) default '0';
 alter table contact add formdata    longtext    default NULL;
-alter table contact add dialermode  varchar(20);
+alter table contact add dialermode  varchar(20) default 'HTML-Dial-Tag';
 alter table contact add dialerurl   varchar(128);
 alter table contact add dialeripref varchar(5);
 alter table mandator add key(grpid);
