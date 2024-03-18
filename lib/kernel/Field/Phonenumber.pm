@@ -19,7 +19,6 @@ package kernel::Field::Phonenumber;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use Data::Dumper;
 @ISA    = qw(kernel::Field::Text);
 
 
@@ -28,6 +27,26 @@ sub new
    my $type=shift;
    my $self=bless($type->SUPER::new(@_),$type);
    $self->{nowrap}=1;
+   if (!exists($self->{onClick})){
+      $self->{onClick}=sub{
+         my $self=shift;
+         my $output=shift;
+         my $app=shift;
+         my $rec=shift;
+
+         my $d=$rec->{$self->{name}};
+
+         my $UserCache=$app->Cache->{User}->{Cache}->{$ENV{REMOTE_USER}};
+         my $jsdialcall;
+         if (ref($UserCache) eq "HASH"){
+            $jsdialcall=FormatJsDialCall($UserCache->{rec}->{dialermode},
+                             $UserCache->{rec}->{dialeripref},
+                             $UserCache->{rec}->{dialerurl},
+                             $d);
+         }
+         return($jsdialcall);
+      };
+   }
    return($self);
 }
 

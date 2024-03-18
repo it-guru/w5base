@@ -130,7 +130,7 @@ sub ProcessLine
                                      "formated");
         # my $data=$field->FormatedResult("html");
          if (ref($field->{onClick}) eq "CODE"){
-            my $fc=&{$field->{onClick}}($self,$app);
+            my $fc=&{$field->{onClick}}($field,$self,$app,$rec);
             $fclick=$fc if ($fc ne "");
          }
          elsif (defined($field->{weblinkto}) && $field->{weblinkto} ne "none"){
