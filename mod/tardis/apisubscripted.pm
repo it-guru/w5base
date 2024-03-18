@@ -65,10 +65,15 @@ sub new
             label             =>'parentApplicationId'),
 
       new kernel::Field::Text(     
+            name              =>'subscriberApplicationId',
+            label             =>'subscriberApplicationId'),
+
+      new kernel::Field::Text(     
             name              =>'application',
-            dataobjattr       =>'application',
+            dataobjattr       =>'application', 
+            htmlwidth         =>'200px',
             weblinkto         =>'tardis::application',
-            weblinkon         =>['application'=>'name'],
+            weblinkon         =>['subscriberApplicationId'=>'id'],
             label             =>'Application'),
 
       new kernel::Field::Text(     
@@ -162,6 +167,7 @@ sub DataCollector
             $data=[$data];
          }
          map({
+            $_=FlattenHash($_);
             foreach my $k (keys(%$constParam)){
                if (!exists($_->{$k})){
                   $_->{$k}=$constParam->{$k};
@@ -170,6 +176,13 @@ sub DataCollector
 #                  $_->{approvalstatus}=$_->{approval}->{status};
 #               }
             }
+            #print STDERR Dumper($_);
+            $_->{subscriberApplicationId}=join("--",
+                $_->{'team.hub'},
+                $_->{'team.name'},
+                $_->{'application'}
+            );
+                
             $_->{idpath}=join('@',$_->{apiExposureName},
                                   $_->{parentApplicationId});
          } @$data);

@@ -89,7 +89,7 @@ sub new
                 group         =>'subscripteds',
                 vjointo       =>'tardis::apisubscripted',
                 vjoinon       =>['idpath'=>'idpath'],
-                vjoindisp     =>['application']),
+                vjoindisp     =>['application','subscriberApplicationId']),
 
       new kernel::Field::Text(     
             name              =>'upstream',
