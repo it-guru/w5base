@@ -32,7 +32,7 @@ sub new
    
 
    $self->setBase("ou=Organisation,o=dtag");
-   $self->setLdapQueryPageSize(99);
+   $self->setLdapQueryPageSize(3499);
    $self->AddFields(
       new kernel::Field::Id(       name       =>'torgoid',
                                    label      =>'tOrgOID',
