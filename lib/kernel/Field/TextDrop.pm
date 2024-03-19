@@ -231,7 +231,12 @@ sub FormatedDetail
          return($self->FieldCache->{LastDrop});
       }
       $d=quoteHtml($d);
-      return("<input class=finput type=text name=Formated_$name value=\"$d\">");
+
+      my $arialable=$self->Label();
+      $arialable=~s/"//g;
+
+      return("<input class=finput aria-label=\"$arialable\" ".
+             "type=text name=Formated_$name value=\"$d\">");
    }
    if (ref($d) eq "ARRAY"){
       my $vjoinconcat=$self->{vjoinconcat};
