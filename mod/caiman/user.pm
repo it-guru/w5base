@@ -33,7 +33,7 @@ sub new
 
    
    $self->setBase("ou=Employment,o=dtag");
-   $self->setLdapQueryPageSize(99);
+   $self->setLdapQueryPageSize(3499);
    $self->AddFields(
       new kernel::Field::Linenumber(name     =>'linenumber',
                                     label    =>'No.'),
@@ -166,25 +166,25 @@ sub new
                                    label      =>'SIS Number',
                                    dataobjattr=>'tTSISnumber'),
 
-      #new kernel::Field::Phonenumber(name     =>'office_phone',
-      #                             group      =>'office',
-      #                             label      =>'Phonenumber',
-      #                             dataobjattr=>'telephoneNumber'),
+      new kernel::Field::Phonenumber(name     =>'office_phone',
+                                   group      =>'office',
+                                   label      =>'Phonenumber',
+                                   dataobjattr=>'telephoneNumber'),
 
-      #new kernel::Field::Phonenumber(name     =>'office_mobile',
-      #                             group      =>'office',
-      #                             label      =>'Mobile-Phonenumber',
-      #                             dataobjattr=>'mobile'),
+      new kernel::Field::Phonenumber(name     =>'office_mobile',
+                                   group      =>'office',
+                                   label      =>'Mobile-Phonenumber',
+                                   dataobjattr=>'mobile'),
 
-      #new kernel::Field::Phonenumber(name     =>'office_facsimile',
-      #                             group      =>'office',
-      #                             label      =>'FAX-Number',
-      #                             dataobjattr=>'facsimileTelephoneNumber'),
+      new kernel::Field::Phonenumber(name     =>'office_facsimile',
+                                   group      =>'office',
+                                   label      =>'FAX-Number',
+                                   dataobjattr=>'facsimileTelephoneNumber'),
 
-      #new kernel::Field::Text(     name       =>'office_room',
-      #                             group      =>'office',
-      #                             label      =>'Room',
-      #                             dataobjattr=>'roomNumber'),
+      new kernel::Field::Text(     name       =>'office_room',
+                                   group      =>'office',
+                                   label      =>'Room',
+                                   dataobjattr=>'roomNumber'),
 
       new kernel::Field::Text(     name       =>'office_organisation',
                                    group      =>'office',
@@ -247,17 +247,17 @@ sub new
                                    label      =>'date of employment',
                                    dataobjattr=>'tDateOfEmployment'),
 
-      #new kernel::Field::Date(     name       =>'ddismissal',
-      #                             group      =>'status',
-      #                             dayonly    =>1,
-      #                             searchable =>0,
-      #                             label      =>'date of dismissal',
-      #                             dataobjattr=>'tDateOfDismissal'),
+      new kernel::Field::Date(     name       =>'ddismissal',
+                                   group      =>'status',
+                                   dayonly    =>1,
+                                   searchable =>0,
+                                   label      =>'date of dismissal',
+                                   dataobjattr=>'tDateOfDismissal'),
 
-      #new kernel::Field::Text(     name       =>'lang',
-      #                             group      =>'status',
-      #                             label      =>'preferrredLanguage',
-      #                             dataobjattr=>'preferredLanguage'),
+      new kernel::Field::Text(     name       =>'lang',
+                                   group      =>'status',
+                                   label      =>'preferrredLanguage',
+                                   dataobjattr=>'preferredLanguage'),
 
    );
    $self->setDefaultView(qw(id wrid uid surname givenname email));
