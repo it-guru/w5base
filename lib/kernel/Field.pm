@@ -330,8 +330,13 @@ sub getSimpleInputField
    if ($maxlength ne ""  && ($maxlength=~m/^[0-9]+$/)){
       $maxlengthcode="maxlength=\"$maxlength\"";
    }
+   my $arialable=$self->Label();
+   $arialable=~s/"//g;
+
    my $inputfield="<input type=\"text\" id=\"$name\" value=\"$value\" ".
-                  "name=\"Formated_$name\" $maxlengthcode class=\"finput\">";
+                  "name=\"Formated_$name\" $maxlengthcode ".
+                  "aria-label=\"$arialable\" ".
+                  "class=\"finput\">";
    if (ref($self->{getHtmlImputCode}) eq "CODE"){
       $inputfield=&{$self->{getHtmlImputCode}}($self,$value,$readonly);
    }
@@ -339,14 +344,14 @@ sub getSimpleInputField
       my $width="100%";
       $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth}));
       $d=<<EOF;
-<table style="table-layout:fixed;width:$width" cellspacing=0 cellpadding=0>
+<table aria-hidden=\"true\" style="table-layout:fixed;width:$width" cellspacing=0 cellpadding=0>
 <tr><td>$inputfield</td>$unit</tr></table>
 EOF
    }
    else{
       $unit="" if ($value eq "");
       $d=<<EOF;
-<table style="table-layout:fixed;width:100%" cellspacing=0 cellpadding=0>
+<table aria-hidden=\"true\" style="table-layout:fixed;width:100%" cellspacing=0 cellpadding=0>
 <tr><td><span class="readonlyinput">$value</span></td>$unit</tr></table>
 EOF
    }

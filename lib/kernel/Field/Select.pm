@@ -215,8 +215,11 @@ sub FormatedDetail
       $width=$self->{htmleditwidth} if (defined($self->{htmleditwidth}));
       my $disabled="";
 
+      my $arialable=$self->Label();
+      $arialable=~s/"//g;
 
-      my $s="<select id=\"$name\" name=\"Formated_$name\"";
+      my $s="<select aria-label=\"$arialable\" id=\"$name\" ".
+            "name=\"Formated_$name\"";
       if ($self->{multisize}>0){
          $s.=" multiple";
          $s.=" size=\"$self->{multisize}\"";

@@ -91,8 +91,12 @@ sub EditArea    # for module defined edit areas (f.e. javascript areas)
          $style2.=";height:".($self->{htmlheight}-4)."px";
       }
    }
+
+   my $arialable=$self->Label();
+   $arialable=~s/"//g;
+
    $d="<div class=multilinetext$style1>".
-      "<textarea id=$name style='$style2' ".
+      "<textarea aria-label=\"$arialable\" id=$name style='$style2' ".
       "onkeydown=\"if (window.textareaKeyHandler){".
       "textareaKeyHandler(this,event);}\" ".
       "cols=$self->{cols} name=Formated_$name ".
