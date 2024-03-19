@@ -154,6 +154,16 @@ sub qcheckRecord
       });
    }
 
+   my $uarec=$tsossys->getUnassignedMachinesRec();
+   if (!defined($uarec)){
+      return(undef,{
+         qmsg=>'TasteOS UnassignedMachines record can not be loaded'
+      });
+   }
+   my %uaMachines;  # needed for check, if there is a "late Agent installation"
+   foreach my $uamrec (@{$uarec->{machines}}){
+      $uaMachines{$uamrec->{machineNumber}}=$uamrec;
+   }
 
    my $appl=getModuleObject($dataobj->Config,"itil::appl");
    $appl->SetFilter({
@@ -340,6 +350,18 @@ sub qcheckRecord
          foreach my $mrec (@{$srec->{machines}}){
             if (!exists($ladd->{TasteOS_MachineID}->{$mrec->{id}})){
                push(@delList,$mrec->{id});
+            }
+            else{
+               my $machineNumber=$mrec->{machineNumber};
+               if ($machineNumber ne "" && 
+                   exists($uaMachines{$machineNumber})){
+                  $tsosmac->ValidatedDeleteRecord({id=>$mrec->{id}});
+                  msg(INFO,"need to drop MachineID=$mrec->{id} ".
+                           "because new Agent in UnassignedMachines");
+                  # in follow processes, the machine will be new
+                  # inserted - and as followup, moved from 
+                  # UnassignedMachines to the current TasteOS-System
+               }
             }
          }
          #printf STDERR "delList=".Dumper(\@delList);
