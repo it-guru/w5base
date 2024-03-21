@@ -245,6 +245,39 @@ sub new
                 label         =>'Modification-Date',
                 dataobjattr   =>'lnkmgmtitemgroup.modifydate'),
                                                    
+      new kernel::Field::Date(
+                name          =>'cimdate',
+                group         =>'source',
+                selectfix     =>1,
+                label         =>'linked CI Modification-Date',
+                dataobjattr   =>"if (location.id is not null,".
+                                     "location.modifydate,".
+                                "if (appl.id is not null,".
+                                     "appl.modifydate,".
+                                "if (businessservice.id is not null,".
+                                     "businessservice.modifydate,NULL)))"),
+
+      new kernel::Field::Select(
+                name          =>'cicistatus',
+                htmleditwidth =>'40%',
+                group         =>'source',
+                label         =>'linked CI-State',
+                vjoineditbase =>{id=>">0 AND <7"},
+                vjointo       =>'base::cistatus',
+                vjoinon       =>['cicistatusid'=>'id'],
+                vjoindisp     =>'name'),
+
+      new kernel::Field::Interface(
+                name          =>'cicistatusid',
+                label         =>'linked CI-StateID',
+                group         =>'source',
+                dataobjattr   =>"if (location.id is not null,".
+                                     "location.cistatus,".
+                                "if (appl.id is not null,".
+                                     "appl.cistatus,".
+                                "if (businessservice.id is not null,".
+                                     "businessservice.cistatus,NULL)))"),
+                                                   
       new kernel::Field::Editor(
                 name          =>'editor',
                 group         =>'source',
@@ -294,7 +327,13 @@ sub getSqlFrom
 {
    my $self=shift;
    my $from="lnkmgmtitemgroup left outer join ".
-            "mgmtitemgroup on lnkmgmtitemgroup.mgmtitemgroup=mgmtitemgroup.id";
+            "mgmtitemgroup on lnkmgmtitemgroup.mgmtitemgroup=mgmtitemgroup.id ".
+            "left outer join appl ".
+               "on lnkmgmtitemgroup.appl=appl.id ".
+            "left outer join businessservice ".
+               "on lnkmgmtitemgroup.businessservice=businessservice.id ".
+            "left outer join location ".
+               "on lnkmgmtitemgroup.location=location.id";
    return($from);
 }
 
