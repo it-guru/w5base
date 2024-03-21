@@ -41,9 +41,25 @@ sub new
       new kernel::Field::Id(
                 name          =>'id',
                 label         =>'LinkID',
-                searchable    =>0,
+                group         =>'source',
                 dataobjattr   =>'lnkmgmtitemgroup.id'),
-                                                 
+
+      new kernel::Field::RecordUrl(),
+
+      new kernel::Field::Text(
+                name          =>'fullname',
+                label         =>'RelationName',
+                group         =>'source',
+                searchable    =>'0',
+                htmldetail    =>'0',
+                dataobjattr   =>"concat(mgmtitemgroup.name,' -> ',".
+                                "if (location.id is not null,".
+                                     "location.name,".
+                                "if (appl.id is not null,".
+                                     "appl.name,".
+                                "if (businessservice.id is not null,".
+                                     "businessservice.name,NULL))))"),
+
       new kernel::Field::TextDrop(
                 name          =>'mgmtitemgroup',
                 htmlwidth     =>'250px',
@@ -101,6 +117,7 @@ sub new
                  name          =>'appl',
                  htmlwidth     =>'150px',
                  label         =>'Application',
+                 htmldetail    =>'NotEmpty',
                  vjointo       =>'itil::appl',
                  vjoineditbase =>{'cistatusid'=>"4"},
                  SoftValidate  =>1,
@@ -115,6 +132,7 @@ sub new
       new kernel::Field::TextDrop(
                  name          =>'location',
                  htmlwidth     =>'150px',
+                 htmldetail    =>'NotEmpty',
                  label         =>'Location',
                  vjointo       =>'base::location',
                  vjoineditbase =>{'cistatusid'=>"4"},
@@ -130,6 +148,7 @@ sub new
       new kernel::Field::TextDrop(
                  name          =>'businessservice',
                  htmlwidth     =>'150px',
+                 htmldetail    =>'NotEmpty',
                  label         =>'Businessservice',
                  vjointo       =>'itil::businessservice',
                  vjoineditbase =>{'cistatusid'=>"<=5"},
@@ -290,6 +309,20 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'lnkmgmtitemgroup.realeditor')
    );
+
+   $self->{history}={
+      insert=>[
+         'local'
+      ],
+      update=>[
+         'local'
+      ],
+      delete=>[
+         {dataobj=>'itil::mgmtitemgroup', id=>'mgmtitemgroupid',
+          field=>'fullname',as=>'relation'}
+      ]
+   };
+
    $self->setDefaultView(qw(mgmtitemgroup from to appl businessservice 
                             businessprocess location cdate));
    $self->setWorktable("lnkmgmtitemgroup");
@@ -480,6 +513,44 @@ sub isParentWriteable
       }
    }
    return(0);
+
+}
+
+
+sub DailyProcess
+{
+   my $self=shift;
+
+   msg(INFO,"running Daily Process in itil::lnkmgmtitemgroup");
+
+   $self->ResetFilter();
+   $self->SetFilter({
+      cicistatusid=>'>5',
+      cimdate=>"<now-28d",
+      lnkto=>'[EMPTY]'
+   });
+   foreach my $rec ($self->getHashList(qw(ALL))){
+      my $op=$self->Clone();
+      my $newlnkto=$self->ExpandTimeExpression("now+90d");
+      $op->ValidatedUpdateRecord($rec,{
+         lnkto=>$newlnkto,
+         mdate=>NowStamp("en")
+      },{id=>\$rec->{id}}); 
+   }
+
+   $self->ResetFilter();
+
+   $self->SetFilter({
+      cicistatusid=>'>5',
+      lnkto=>'<now-90d'
+   });
+   foreach my $rec ($self->getHashList(qw(ALL))){
+      my $op=$self->Clone();
+      $op->ValidatedDeleteRecord($rec);
+   }
+
+
+   return(1);
 
 }
 
