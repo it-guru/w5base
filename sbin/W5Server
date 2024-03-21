@@ -1002,11 +1002,17 @@ sub StartW5ServerProcess
       sub process{
           \$srv->process();
       }
+      sub reload{
+          \$self->NotifyAdmin("$server USR2 - reload  received ".
+                              "pid=\$orgpid:\$\$ \$0","USR2");
+          \$srv->reload();
+      }
       sub hup{
           if (\$W5V2::Debug){
              exit();
           }
-          \$self->NotifyAdmin("$server hup erhalten pid=\$orgpid:\$\$ \$0","hup");
+          \$self->NotifyAdmin("$server hup received ".
+                              "pid=\$orgpid:\$\$ \$0","HUP");
           \$srv->reload();
       }
       sub shutdown{
@@ -1017,9 +1023,9 @@ sub StartW5ServerProcess
       }
       foreach my \$sig (keys(\%SIG)){
           if (\$sig eq "HUP"){
-             if (\$W5V2::Debug){
-                \$SIG{\$sig}=\\&shutdown;
-             }
+             if (\$W5V2::Debug){          # in debug mode, the terminal creates
+                \$SIG{\$sig}=\\&shutdown; # a HUP signal on close of term, soo
+             }                            # it needs to be handle as shutdown
              else{
                 \$SIG{\$sig}=\\&hup;
              }
@@ -1033,7 +1039,11 @@ sub StartW5ServerProcess
              \$SIG{INT}=\\&shutdown;
              next;
           }
-          if (\$sig eq "USR2" || \$sig eq "WINCH"){
+          if (\$sig eq "USR2"){   # USR2 works always for reload - even in
+             \$SIG{\$sig}=\\&reload; # debug mode
+             next;
+          }
+          if (\$sig eq "WINCH"){
              \$SIG{\$sig}='IGNORE';
              next;
           }
