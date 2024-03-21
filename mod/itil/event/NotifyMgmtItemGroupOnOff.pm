@@ -193,11 +193,13 @@ sub getNotifyParam
    my @notifyparam;
 
    my $l=$lnkobj->getHashList(qw(id applid locationid businessserviceid
-                                 lnkfrom lnkto mgmtitemgroup grouptype));
+                                 lnkfrom lnkto mgmtitemgroup grouptype
+                                 cicistatusid));
    foreach my $lnk (@$l) {
       my $mailtoid;
       my @mailccids;
       my %mylnkrec=();
+      next if ($lnk->{cicistatusid}>5);
 
       $mylnkrec{mgmtitemgroup}=$lnk->{mgmtitemgroup};
       $mylnkrec{id}=$lnk->{id};
