@@ -1,6 +1,7 @@
 'itil::lnkmgmtitemgroup'=>{de=>'CI Gruppen Zuordnung',
                            en=>'CI group relation'},
 'fieldgroup.notifications'=>{de=>'Benachrichtigungen',en=>'Notifications'},
+'fieldgroup.relations'=>{de=>'Zuordnungen',en=>'Relations'},
 'managed item group'=>{de=>'geführte CI Gruppe'},
 'managed group CI-State'=>{de=>'CI-Status der Gruppe'},
 'relation from'=>{de=>'Zuordnung von'},
@@ -18,3 +19,4 @@
 'linked CI Modification-Date'=>{de=>'verknüpftes CI Bearbeitungszeitpunkt'},
 'linked CI-State'=>{de=>'verknüpftes CI-Status'},
 'linked CI-StateID'=>{de=>'verknüpftes CI-StatusID'},
+'relations'=>{de=>'Zuordnungen',en=>'Relations'},

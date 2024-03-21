@@ -125,6 +125,14 @@ sub new
                 vjoinon       =>['id'=>'mgmtitemgroupid'],
                 vjoindisp     =>['businessservice','lnkfrom','lnkto']),
 
+      new kernel::Field::SubList(
+                name          =>'relations',
+                label         =>'relations',
+                group         =>'relations',
+                readonly      =>1,
+                vjointo       =>'itil::lnkmgmtitemgroup',
+                vjoinon       =>['id'=>'mgmtitemgroupid'],
+                vjoindisp     =>['fullname','lnkfrom','lnkto']),
 
       new kernel::Field::ContactLnk(
                 name          =>'contacts',
@@ -469,7 +477,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
 
-   my @l=qw(header default comments contacts source history);
+   my @l=qw(header default comments contacts source history relations);
    if ($rec->{grouptype} eq "CFGROUP"){
       push(@l,"applications");
    }
