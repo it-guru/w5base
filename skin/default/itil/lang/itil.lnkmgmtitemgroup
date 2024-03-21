@@ -15,3 +15,6 @@
 'to must be at least 0 days in the future'=>{de=>'"Zuordnung bis" muss in der Zukunft liegen'},
 'from must be at least 0 days in the future'=>{de=>'"Zuordnung von" muss in der Zukunft liegen'},
 'to must be behind from'=>{de=>'"Zuordnung von" muss vor "Zuordnung bis" liegen'},
+'linked CI Modification-Date'=>{de=>'verknüpftes CI Bearbeitungszeitpunkt'},
+'linked CI-State'=>{de=>'verknüpftes CI-Status'},
+'linked CI-StateID'=>{de=>'verknüpftes CI-StatusID'},
