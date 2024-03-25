@@ -282,9 +282,9 @@ sub setClearingDestinations
       return(0) if (!defined($mandator));
 
       # now search a Config-Manager
-      my @confmgr=$self->getMembersOf($mandator,["RCFManager"]);
+      my @confmgr=$self->getMembersOf($mandator,["RCFManager"],"direct");
       {  # add posible deputies
-         my @confmgr2=$self->getMembersOf($mandator,["RCFManager2"]);
+         my @confmgr2=$self->getMembersOf($mandator,["RCFManager2"],"direct");
          foreach my $uid (@confmgr2){
             if (!in_array(\@confmgr,$uid)){
                push(@confmgr,$uid);
