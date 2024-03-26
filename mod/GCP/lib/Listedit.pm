@@ -388,5 +388,53 @@ sub Ping
 
 }
 
+sub genericReadRequest
+{
+   my $self=shift;
+   my $db=shift;
+   my $auth=shift;
+   my $url=shift;
+
+   my $d=$self->CollectREST(
+      dbname=>$db,
+      useproxy=>1,
+      url=>$url,
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $headers=['Authorization'=>$auth,
+                      'Content-Type'=>'application/json'];
+ 
+         return($headers);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            return([],"200");
+         }
+         #if ($code eq "400"){
+         #   my $json=eval('decode_json($content);');
+         #   if ($@ eq "" && ref($json) eq "HASH" &&
+         #       $json->{error}->{message} ne ""){
+         #      $self->LastMsg(ERROR,$json->{error}->{message});
+         #      return(undef);
+         #   }
+         #}
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data $db response ".
+                              "in genericReadRequest");
+         return(undef);
+      }
+   );
+   return($d);
+}
+
+
 
 1;

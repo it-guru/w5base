@@ -79,6 +79,16 @@ sub new
             dataobjattr       =>'cpuPlatform',
             label             =>'CPU Platform'),
 
+      new kernel::Field::Text(
+            name              =>'cpucount',
+            searchable        =>0,
+            label             =>'CPU-Count'),
+
+      new kernel::Field::Text(
+            name              =>'memory',
+            searchable        =>0,
+            label             =>'Memory'),
+
       new kernel::Field::SubList(
             name              =>'ipaddresses',
             label             =>'IP-Adresses',
@@ -141,6 +151,8 @@ sub DataCollector
 {
    my $self=shift;
    my $filterset=shift;
+
+   my @view=$self->GetCurrentView();
 
    my ($flt,$requestToken)=$self->simplifyFilterSet($filterset);
    return(undef) if (!defined($flt));
@@ -209,7 +221,20 @@ sub DataCollector
                  $n++;
                  if ($n==1 &&
                      $self->Config->Param("W5BaseOperationMode") eq "dev"){
-                  #  print STDERR Dumper($rec);
+                    #print STDERR Dumper($rec);
+                 }
+                 if (in_array(\@view,[qw(ALL cpucount memory)])){
+                    my $machineType=$rec->{machineType};
+                    $rec->{cpucount}=1;
+                    $rec->{memory}=1;
+                    my $mtRec=$self->genericReadRequest(
+                       $credentialName,$Authorization,$machineType
+                    );
+                    if (defined($mtRec) && ref($mtRec) eq "HASH"){
+                       $rec->{cpucount}=$mtRec->{guestCpus};
+                       $rec->{memory}=$mtRec->{memoryMb};
+                    }
+                  
                  }
 
                  # if (in_array(\@curView,[qw(ALL srcrec)])){
