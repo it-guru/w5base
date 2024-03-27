@@ -373,6 +373,10 @@ sub qcheckRecord
                   }
                }
 
+               if (uc($parrec->{modelvendor}) eq "DELL"){
+                  $parrec->{eohs}=$parrec->{maintend};
+               }
+
 
                if ($parrec->{eohs} ne ""){
                   $self->IfComp($dataobj,  
