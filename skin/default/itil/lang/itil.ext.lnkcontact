@@ -14,6 +14,7 @@
 'Order acceptation deputy'=>{de=>'Auftragsannahme Vertretung'},
 'Technical Contact'=>{de=>'technischer-Ansprechpartner'},
 'Technical Approver'=>{de=>'technischer-Genehmiger'},
+'Technically privileged'=>{de=>'Technisch Priveligierter'},
 'Information contact'=>{de=>'Informationspartner'},
 'Event information contact'=>{de=>'Ereignis-Informationspartner'},
 'Projectmanager'=>{de=>'Projektmanager'},

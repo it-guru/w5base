@@ -65,6 +65,8 @@ sub getPosibleRoles
                                                  $self->Self),
          "techapprove"     =>$self->getParent->T("Technical Approver",
                                                  $self->Self),
+         "techpriv"        =>$self->getParent->T("Technically privileged",
+                                                 $self->Self),
          "vendor"          =>$self->getParent->T("Vendor Contact",
                                                  $self->Self),
          "infocontact"     =>$self->getParent->T("Information contact",
