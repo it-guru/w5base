@@ -40,7 +40,7 @@ sub CapeICTOimport
 
    my $appl=getModuleObject($self->Config,"TS::appl");
    return({}) if ($appl->isSuspended());
-   $appl->SetFilter({cistatusid=>\'4'});
+   $appl->SetFilter({cistatusid=>['3','4']});
    my $oldictono;
    my %icto=();
    my $start=NowStamp("en");
