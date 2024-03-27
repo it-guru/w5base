@@ -189,7 +189,7 @@ sub smgroup
       }
       $mgrp->SetCurrentOrder("chkdate");
       $mgrp->SetCurrentView(qw(ALL));
-      $mgrp->Limit(20,1);
+      $mgrp->Limit(200,1);
       my ($mgrprec,$msg)=$mgrp->getFirst();
       if (defined($mgrprec)){
          do{
@@ -569,10 +569,10 @@ sub handleSRec
                $newrec=undef;
             }
          }
-         if ($oldrec->{cistatusid}>4 && $newrec->{cistatusid}>4){
-            msg(INFO,"no updates on old records");
-            $newrec=undef;
-         }
+         #if ($oldrec->{cistatusid}>4 && $newrec->{cistatusid}>4){
+         #   msg(INFO,"no updates on old records");
+         #   $newrec=undef;
+         #}
          if (defined($newrec)){
             $dataobj->{mgrp}->ValidatedUpdateRecord($oldrec,$newrec,{
                id=>$oldrec->{id}
