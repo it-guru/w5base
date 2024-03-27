@@ -206,7 +206,15 @@ sub new
                 weblinkon     =>['lmodelid'=>'lmodelid'],
                 prefix        =>'model',
                 group         =>'hwparam',
-                fields        =>['name']),
+                fields        =>['name','vendor']),
+
+      new kernel::Field::Date(
+                name          =>'maintend',
+                htmldetail    =>'NotEmpty',
+                label         =>'Maintenance End',
+                group         =>'hwparam',
+                dayonly       =>1,
+                dataobjattr   =>'"maintend"'),
 
       new kernel::Field::Float(
                 name          =>'memory',
