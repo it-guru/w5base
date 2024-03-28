@@ -373,10 +373,11 @@ sub qcheckRecord
                   }
                }
 
-               if (uc($parrec->{modelvendor}) eq "DELL"){
+               if (uc($parrec->{modelvendor}) eq "DELL" &&
+                   $parrec->{maintend} ne "" && 
+                   $parrec->{maintend} ne "2199-12-31 00:00:00"){
                   $parrec->{eohs}=$parrec->{maintend};
                }
-
 
                if ($parrec->{eohs} ne ""){
                   $self->IfComp($dataobj,  
