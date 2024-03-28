@@ -305,6 +305,12 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
+   if (exists($newrec->{fullname}) && $newrec->{fullname} eq ""){
+      msg(WARN,"write request with invalid fullname $self: ".
+               Dumper($newrec));
+      delete($newrec->{fullname});  # ensure remove wrong write requests
+   }
+
    my $fullname=effVal($oldrec,$newrec,"fullname");
    my $name=$fullname;
    $name=~s/^.*\.//;
@@ -318,6 +324,7 @@ sub Validate
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,
                                                     "fullname"));
+
    return(1);
 }
 
