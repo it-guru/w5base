@@ -309,7 +309,7 @@ sub Validate
    my $name=$fullname;
    $name=~s/^.*\.//;
    $name=~s/\[.*$//;
-   if (effVal($oldrec,$newrec,"name") ne $name){
+   if (effVal($oldrec,$newrec,"name") ne $name && $name ne ""){
       $newrec->{name}=$name;
    }
    if (effVal($oldrec,$newrec,"chkdate") eq ""){
