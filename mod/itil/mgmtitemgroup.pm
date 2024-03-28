@@ -129,6 +129,7 @@ sub new
                 name          =>'relations',
                 label         =>'relations',
                 group         =>'relations',
+                htmldetail    =>0,
                 readonly      =>1,
                 vjointo       =>'itil::lnkmgmtitemgroup',
                 vjoinon       =>['id'=>'mgmtitemgroupid'],

@@ -5,6 +5,8 @@
 'Databoss'=>{de=>'Datenverantwortlicher'},
 'Group-type'=>{de=>'Gruppen-Typ'},
 'fieldgroup.applications'=>{de=>'zugeordnete Anwendungen',en=>'related applications'},
+'fieldgroup.relations'=>{de=>'Zuordnungen',en=>'Relations'},
+'relations'=>{de=>'Zuordnungen',en=>'Relations'},
 'fieldgroup.businessservices'=>{de=>'zugeordnete Businessservices',en=>'related Businessservices'},
 'fieldgroup.locations'=>{de=>'zugeordnete Standorte',en=>'related locations'},
 'invalid name specified'=>{de=>'unzulässiger Name angegeben'},
