@@ -189,7 +189,7 @@ sub smgroup
       }
       $mgrp->SetCurrentOrder("chkdate");
       $mgrp->SetCurrentView(qw(ALL));
-      $mgrp->Limit(200,1);
+      $mgrp->Limit(250,1);
       my ($mgrprec,$msg)=$mgrp->getFirst();
       if (defined($mgrprec)){
          do{
@@ -557,15 +557,21 @@ sub handleSRec
          $dataobj->{mgrp}->ValidatedInsertRecord($newrec);
       }
       else{
-         #print STDERR "OLD:".Dumper($oldrec);
-         #print STDERR "UPD:".Dumper($newrec);
          if ($oldrec->{cistatusid}>5 && $newrec->{cistatusid}<6){
             msg(INFO,"check reactivation of metassigment group");
-            $dataobj->{mgrp}->SetFilter({fullname=>\$newrec->{fullname}});
-            my @l=$dataobj->{mgrp}->getHashList(qw(ALL));
-            if ($#l!=-1 && $l[0]->{id} ne $oldrec->{id}){
-               msg(INFO,"no reactivation, ".
-                        "because record with same name already exists");
+            my $chkname=effVal($oldrec,$newrec,"fullname");
+            $chkname=~s/\[[0-9]+\]$//;
+            if ($chkname ne ""){
+               $dataobj->{mgrp}->SetFilter({fullname=>\$chkname});
+               my @l=$dataobj->{mgrp}->getHashList(qw(ALL));
+               if ($#l!=-1 && $l[0]->{id} ne $oldrec->{id}){
+                  msg(INFO,"no reactivation, ".
+                           "because record with same name already exists");
+                  $newrec=undef;
+               }
+            }
+            else{
+               msg(INFO,"no reactivation, because new name can not be created");
                $newrec=undef;
             }
          }
