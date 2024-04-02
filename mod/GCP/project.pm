@@ -78,7 +78,11 @@ sub new
             name              =>'labels',
             dataobjattr       =>'labels',
             group             =>'labels',
-            uivisible         =>1,
+            uivisible         =>sub{
+               my $self=shift;
+               return(1) if ($self->getParent->IsMemberOf("admin"));
+               return(0);
+            },
             label             =>'Labels'),
 
 

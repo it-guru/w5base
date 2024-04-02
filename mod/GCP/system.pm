@@ -101,7 +101,11 @@ sub new
       new kernel::Field::Container(     
             name              =>'tags',
             dataobjattr       =>'tags',
-            uivisible         =>1,
+            uivisible         =>sub{
+               my $self=shift;
+               return(1) if ($self->getParent->IsMemberOf("admin"));
+               return(0);
+            },
             label             =>'Tags'),
 
       new kernel::Field::Text(
