@@ -801,6 +801,7 @@ sub new
                 name          =>'itnormodelid',
                 group         =>'sec',
                 label         =>'NORmodelID',
+                uploadable    =>0,
                 dataobjattr   =>'system.itnormodel'),
 
       new kernel::Field::Select(
