@@ -2042,7 +2042,7 @@ sub findtemplvar
                if ($mode eq "html"){
                   $d.="&bull;&nbsp;";
                   $d.=$label." <a  class=supportinfo ".
-                      "href=\"callto:$urec->{office_phone}\">".
+                      "href=\"tel:$urec->{office_phone}\">".
                       "$urec->{office_phone}</a>";
                }
                if ($mode eq "text"){
