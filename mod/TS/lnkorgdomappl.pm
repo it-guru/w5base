@@ -160,7 +160,7 @@ sub initSqlWhere
    return(undef) if ($mode eq "delete");
    return(undef) if ($mode eq "insert");
    return(undef) if ($mode eq "update");
-   my $where="appl.cistatus=4";
+   my $where="appl.cistatus in (3,4)";
    return($where);
 }
 
