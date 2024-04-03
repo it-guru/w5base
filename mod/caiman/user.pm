@@ -126,11 +126,15 @@ sub new
                                   
       new kernel::Field::TextDrop( name       =>'office',
                                    label      =>'Office',
+                                   weblinkto  =>\'caiman::orgarea',
+                                   weblinkon  =>['torgoid'=>'torgoid'],
                                    group      =>'office',
                                    dataobjattr=>'tOuLD'),
 
       new kernel::Field::Text(     name       =>'shortname',
                                    label      =>'tOuSD',
+                                   weblinkto  =>\'caiman::orgarea',
+                                   weblinkon  =>['torgoid'=>'torgoid'],
                                    htmldetail =>'NotEmpty',
                                    group      =>'office',
                                    dataobjattr=>'tOuSD'),
@@ -164,6 +168,9 @@ sub new
       new kernel::Field::Text(     name       =>'office_sisnumber',
                                    group      =>'office',
                                    label      =>'SIS Number',
+                                   weblinkto  =>\'caiman::organisation',
+                                   weblinkon  =>['office_sisnumber'=>
+                                                 'sisnumber'],
                                    dataobjattr=>'tTSISnumber'),
 
       new kernel::Field::Phonenumber(name     =>'office_phone',
@@ -215,6 +222,8 @@ sub new
 
       new kernel::Field::Text(     name       =>'torgoid',
                                    group      =>'office',
+                                   weblinkto  =>\'caiman::orgarea',
+                                   weblinkon  =>['torgoid'=>'torgoid'],
                                    label      =>'tOrgOID',
                                    dataobjattr=>'tOrgOID'),
 

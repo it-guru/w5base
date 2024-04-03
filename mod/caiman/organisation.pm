@@ -1,4 +1,4 @@
-package caiman::menu::root;
+package caiman::organisation;
 #  W5Base Framework
 #  Copyright (C) 2024  Hartmut Vogler (it@guru.de)
 #
@@ -19,44 +19,30 @@ package caiman::menu::root;
 use strict;
 use vars qw(@ISA);
 use kernel;
-use kernel::MenuRegistry;
-@ISA=qw(kernel::MenuRegistry);
+use caiman::orgarea;
+@ISA=qw(caiman::orgarea);
 
 sub new
 {
    my $type=shift;
    my %param=@_;
    my $self=bless($type->SUPER::new(%param),$type);
+   my $fld=$self->getField("kindoforg");
+   $fld->{uivisible}="0";
    return($self);
 }
 
-sub Init
+sub SetFilter
 {
    my $self=shift;
+   my @flt=@_;
 
-   $self->RegisterObj("itu.ds.caiman",
-                      "tmpl/welcome",
-                      defaultacl=>['admin','support']);
-
-
-   $self->RegisterObj("itu.ds.caiman.user",
-                      "caiman::user",
-                      defaultacl=>['admin','support']);
-
-   $self->RegisterObj("itu.ds.caiman.orgarea",
-                      "caiman::orgarea",
-                      defaultacl=>['admin','support']);
-
-   $self->RegisterObj("itu.ds.caiman.org",
-                      "caiman::organisation",
-                      defaultacl=>['admin','support']);
-
-#   $self->RegisterObj("sysadm.grp.ciampfix",
-#                      "tsciam::orgarea",
-#                      func=>'ParentGroupFix',
-#                      defaultacl=>['admin']);
-
-   return(1);
+   foreach my $subflt (@flt){
+      if (ref($subflt) eq "HASH"){
+         $subflt->{kindoforg}=['Company'];
+      }
+   }
+   return($self->SUPER::SetFilter(@flt));
 }
 
 
