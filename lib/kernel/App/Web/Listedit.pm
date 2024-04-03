@@ -2834,9 +2834,54 @@ addEvent(document,'keydown',function(e){
 });
 
 function globalKeyHandling(doc,e){
+   if (e.key=="F1" && !e.ctrlKey && !e.altKey){
+      var dFrame=document.getElementById("HtmlDetailPage");
+      if (dFrame){
+         var dWin=dFrame.contentWindow;
+         var dDoc=dFrame.contentDocument;
+         if (dDoc && dWin){
+            var allSpecs=dDoc.getElementsByClassName("detailfieldspec");
+            var specs=new Array();
+            for(var c=0;c<allSpecs.length;c++){
+               if (allSpecs[c].tagName.toLowerCase()=="div"){
+                  specs.push(allSpecs[c]);
+               }
+            }
+            
+            var visiPoint=-1;
+            for(var c=0;c<specs.length;c++){
+               if (specs[c].style.display=="block"){
+                  visiPoint=c;
+                  specs[c].style.visibility="hidden";
+                  specs[c].style.display="none";
+                  break;
+               }
+            }
+            if (visiPoint==-1){ // nothin visible
+               if (specs.length>0){
+                  specs[0].style.visibility="visible";
+                  specs[0].style.display="block";
+                  specs[0].scrollIntoView();
+                  dWin.scrollBy(0,-20);
+               }
+            }
+            else{
+               visiPoint++;
+               if (visiPoint<specs.length){
+                  specs[visiPoint].style.visibility="visible";
+                  specs[visiPoint].style.display="block";
+                  specs[visiPoint].scrollIntoView();
+                  dWin.scrollBy(0,-20);
+               }
+            }
+         }
+      }
+      e.preventDefault();
+   }
    if (e.altKey){
       if (directTabKeyHandling){
          directTabKeyHandling(doc,e);
+         e.preventDefault();
       }
    }
 }
