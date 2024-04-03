@@ -59,6 +59,8 @@ sub new
 
       new kernel::Field::Text(     name       =>'sisnumber',
                                    label      =>'SIS Number',
+                                   weblinkto  =>\'caiman::organisation',
+                                   weblinkon  =>['sisnumber'=>'sisnumber'],
                                    dataobjattr=>'tTSISnumber'),
 
       new kernel::Field::Text(     name       =>'kindoforg',
