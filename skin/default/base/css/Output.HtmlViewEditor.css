@@ -32,5 +32,11 @@ display: inline-block;
 input[type="button"].fieldadd:focus {
 outline: 2px solid #30579f;
 }
+input[type="image"].fieldadd{
+background-color: transparent;
+}
+input[type="image"].fieldadd:focus {
+outline: 2px solid #30579f;
+}
 
 
