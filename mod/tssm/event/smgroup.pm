@@ -105,6 +105,9 @@ sub smgroup
       }
    );
 
+   # for refresh-debugging clear incloader
+   my @incloader=();
+
    foreach my $incloader (@incloader){
       my $dataobj=$incloader->{dataobj};
       # find restart point
@@ -189,7 +192,9 @@ sub smgroup
       }
       $mgrp->SetCurrentOrder("chkdate");
       $mgrp->SetCurrentView(qw(ALL));
-      $mgrp->Limit(2500,1);
+      #$mgrp->Limit(25000,1);
+      $mgrp->Limit(250,1);
+      #$mgrp->Limit(20,1);
       my ($mgrprec,$msg)=$mgrp->getFirst();
       if (defined($mgrprec)){
          do{
@@ -254,13 +259,22 @@ sub handleSRec
       $oldrec=$r;
    }
    if (!defined($sgrprec)){        # refresh records
-      if (defined($oldrec) && $oldrec->{smid} ne ""){
-         my $smid=$oldrec->{smid};
-         $dataobj->{sgrp}->SetFilter({id=>\$smid});
-        
-         $dataobj->{sgrp}->SetCurrentOrder("NONE");
-         my ($r,$msg)=$dataobj->{sgrp}->getOnlyFirst(@SMVIEW);
-         $sgrprec=$r;
+      if (defined($oldrec)){
+         my $smcheck;
+         if ($oldrec->{smid} ne ""){
+            $smcheck=$oldrec->{smid};
+         }
+         else{
+            my $chksmid=$oldrec->{fullname};
+            $chksmid=~s/\[\d+\]$//;
+            $smcheck=$chksmid;
+         }
+         if ($smcheck ne ""){
+            $dataobj->{sgrp}->SetFilter({id=>\$smcheck});
+            $dataobj->{sgrp}->SetCurrentOrder("NONE");
+            my ($r,$msg)=$dataobj->{sgrp}->getOnlyFirst(@SMVIEW);
+            $sgrprec=$r;
+         }
       }
    }
    if (!defined($agrprec)){        # read additional AssetManager Data
@@ -413,8 +427,8 @@ sub handleSRec
       if (defined($oldrec)){   # rename check (detect on AM rename)
          if ($oldrec->{fullname} ne 
              uc(exttrim($agrprec->{fullname}))){ # rename op
-            #msg(WARN,"rename request detected on metagroup id $oldrec->{id} ".
-            #         "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
+            msg(WARN,"rename request detected on metagroup id $oldrec->{id} ".
+                     "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
             my $newfullname=exttrim($agrprec->{fullname});
 
             my $smchecked=0;
