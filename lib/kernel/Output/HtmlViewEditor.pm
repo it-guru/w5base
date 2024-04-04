@@ -340,12 +340,16 @@ EOF
        "<input title=\"".$app->T("filter fields in menu tree",$self->Self()).
        "\" size=8 onKeyup=\"ShSearch();\" ".
        "id=shortsearch value=''/>&nbsp;&nbsp;&nbsp;&nbsp;".
-       "<img src=\"../../base/load/expandall.gif\" style=\"cursor:pointer\"".
+       "<input type=\"image\" class=fieldadd ".
+       "onclick=\"expandTree('tree_route');return(false);\" ".
+       "src=\"../../base/load/expandall.gif\" style=\"cursor:pointer\"".
        "title=\"".$app->T("Expand All Fields",$self->Self())."\" name=exall ".
-       "OnClick=\"expandTree('tree_route');\">&nbsp;".
-       "<img src=\"../../base/load/collapseall.gif\" style=\"cursor:pointer\"".
+       ">".
+       "&nbsp;".
+       "<input type=\"image\" class=fieldadd ".
+       " src=\"../../base/load/collapseall.gif\" style=\"cursor:pointer\"".
        "title=\"".$app->T("Collapse All Fields",$self->Self())."\" name=coall ".
-       "OnClick=\"collapseTree('tree_route');\">".
+       "OnClick=\"collapseTree('tree_route');return(false);\">".
        "</td></tr></table>";
    $d.="<td width=1%></td>";
    $d.="<td width=50%>".$app->T("MSG005",$self->Self())."</td>";
