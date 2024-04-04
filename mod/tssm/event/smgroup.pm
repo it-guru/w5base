@@ -189,7 +189,7 @@ sub smgroup
       }
       $mgrp->SetCurrentOrder("chkdate");
       $mgrp->SetCurrentView(qw(ALL));
-      $mgrp->Limit(250,1);
+      $mgrp->Limit(2500,1);
       my ($mgrprec,$msg)=$mgrp->getFirst();
       if (defined($mgrprec)){
          do{
@@ -240,6 +240,7 @@ sub handleSRec
          }
          elsif (defined($agrprec)){
             my $fullname=exttrim($agrprec->{fullname});
+            $fullname=~s/\[[0-9]+\]$//;
             $dataobj->{mgrp}->SetFilter({fullname=>\$fullname});
          }
          else{
@@ -440,6 +441,7 @@ sub handleSRec
             if ($smchecked){
                $dataobj->{mgrp}->ResetFilter();
                my $chknewfullname=uc($newfullname);
+               $chknewfullname=~s/\[[0-9]+\]$//;
                $dataobj->{mgrp}->SetFilter({fullname=>\$chknewfullname});
                my ($chkrec,$msg)=$dataobj->{mgrp}->getOnlyFirst(qw(ALL));
                if (defined($chkrec) &&
