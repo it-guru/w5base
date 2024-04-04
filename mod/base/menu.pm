@@ -1018,6 +1018,11 @@ function scrollToActive(){
    window.setTimeout("userCountTimer()", 100);
    var e=document.getElementById('activeMenuTree');
    if (e){
+      var linkEntry=e.getElementsByClassName("activeMenuTreeEntry");
+      if (linkEntry && linkEntry[0]){
+         linkEntry[0].focus();
+      }
+      console.log("linkEntry=",linkEntry);
       var rect = e.getBoundingClientRect();
       if (rect){
          var newscrollpos=rect.top-80;

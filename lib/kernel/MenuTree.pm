@@ -111,8 +111,17 @@ sub _TreeLine
       $d.="</td><td valign=center>";
       my $hrefclass;
       if (defined($control->{hrefclass})){
-         $hrefclass="class=$control->{hrefclass}";
+         $hrefclass="$control->{hrefclass}";
       }
+      if ($ment->{active}){
+         $hrefclass.=" " if ($hrefclass ne "");
+         $hrefclass.="activeMenuTreeEntry";
+      }
+      if ($hrefclass ne ""){
+         $hrefclass=" class=\"$hrefclass\" ";
+      }
+
+
       $d.=$ment->{labelprefix}  if (defined($ment->{labelprefix}));
       my $usehref="href=\"$href\"";
       $usehref="href=$href" if ($href=~m/^javascript:/i);
@@ -214,7 +223,8 @@ sub _ProcessTreeLayer
       }
       $modid=6 if ($m->{active} && $modid==3);
       $modid=5 if ($m->{active} && $modid==2);
-      $d.=_TreeLine($control,$layer,$modid,$m);
+      my $mLine=_TreeLine($control,$layer,$modid,$m);
+      $d.=$mLine;
       if (defined($m->{tree}) && $#{$m->{tree}}!=-1){
          $d.=_ProcessTreeLayer($control,[@$layer,$#{$m->{tree}}+1],
                                $m->{tree});
