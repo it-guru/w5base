@@ -61,6 +61,7 @@ sub FormatForHtmlPublicDetail
    my $d="";
 
    if (exists($rec->{$k}) && ref($rec->{$k}) eq "ARRAY"){
+      my $vjoinobj=$self->vjoinobj();
       foreach my $prec (@{$rec->{$k}}){
          if ((!defined($ntypes) || grep(/^$prec->{name}$/,@$ntypes))
              && $prec->{showpublic}){
@@ -73,7 +74,11 @@ sub FormatForHtmlPublicDetail
                   $phonelabel=$tr{$phonelabel};
                }
             }
-            my $number=$prec->{phonenumber};
+            my $number=$vjoinobj->findtemplvar({
+                  current=>$prec,
+                  mode=>"HtmlDetail"
+               },"phonenumber","formated"
+            );
             if ($prec->{shortedcomments} ne ""){
                $number.="<div style=\"color:gray\">";
                $number.="<i>";
