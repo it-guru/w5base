@@ -542,7 +542,9 @@ sub handleSRec
          }
       }
       if ($istelit){
-         if (exttrim($fullname)=~m/[^a-z0-9_.-]/i){
+         my $chkfullname=$fullname;
+         $chkfullname=~s/\[\d+\]$//;
+         if (exttrim($chkfullname)=~m/[^a-z0-9_.-]/i){
             push(@comments,"invalid character in assignmentgroup ".
                            "based on TelIT rules");
          }
