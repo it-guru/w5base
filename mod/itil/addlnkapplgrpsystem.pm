@@ -250,7 +250,8 @@ sub getSqlFrom
 
    my $from="$worktable ".
             "join applgrp on $worktable.applgrp=applgrp.id ".
-            "join system on $worktable.system=system.id";
+            "join system on ($worktable.system=system.id and ".
+                            "system.cistatus<7)";
    return($from);
 }
 
