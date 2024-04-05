@@ -198,8 +198,26 @@ sub smgroup
       my ($mgrprec,$msg)=$mgrp->getFirst();
       if (defined($mgrprec)){
          do{
-            msg(INFO,"process refresh $mgrprec->{fullname} $mgrprec->{mdate}");
-            $self->handleSRec(\%dataobj,undef,$mgrprec);
+            my $skipRefresh=0;
+            if ($mgrprec->{cistatusid}>4){
+               my $nativeFullname=$mgrprec->{fullname};
+               $nativeFullname=~s/\[\d+\]$//;
+               my $chkObj=$mgrp->Clone();
+               $chkObj->SetFilter({fullname=>$nativeFullname,cistatusid=>\'4'});
+               my ($chkrec,$msg)=$chkObj->getOnlyFirst(qw(id));
+               if (defined($chkrec)){
+                  $skipRefresh++;
+                  msg(INFO,"skip refresh while already new record ".
+                           "for $mgrprec->{fullname}");
+               }
+            }
+            
+
+            if (!$skipRefresh){
+               msg(INFO,"process refresh ".
+                        "$mgrprec->{fullname} $mgrprec->{mdate}");
+               $self->handleSRec(\%dataobj,undef,$mgrprec);
+            }
             ($mgrprec,$msg)=$mgrp->getNext();
          }until(!defined($mgrprec));
       }

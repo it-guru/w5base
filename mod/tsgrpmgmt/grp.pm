@@ -321,6 +321,12 @@ sub Validate
    if (effVal($oldrec,$newrec,"chkdate") eq ""){
       $newrec->{chkdate}="2000-01-01 00:00:00";
    }
+   if (effVal($oldrec,$newrec,"name") eq ""){
+      $self->LastMsg(ERROR,"invalid MetaAssigment name");
+      printf STDERR ("write request: oldrec=%s\n newrec=%s\n",
+                     Dumper($oldrec),Dumper($newrec));
+      return(0);
+   }
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,
                                                     "fullname"));
