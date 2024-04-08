@@ -851,6 +851,13 @@ sub new
                 dataobjattr   =>'system.conumber'),
 
       new kernel::Field::Text(
+                name          =>'sisnumber',
+                group         =>'source',
+                htmldetail    =>0,
+                label         =>'SIS Number',
+                dataobjattr   =>'mandatorgrp.sisnumber'),
+
+      new kernel::Field::Text(
                 name          =>'dsid',
                 group         =>'misc',
                 label         =>'Directory-Identifier',
@@ -2289,7 +2296,9 @@ sub getSqlFrom
           "on secsystemlnkcontact.parentobj='itil::system' ".
           "and system.id=secsystemlnkcontact.refid ".
           "left outer join costcenter secsystemcostcenter ".
-          "on secsystemappl.conumber=secsystemcostcenter.name ";
+          "on secsystemappl.conumber=secsystemcostcenter.name ".
+          "left outer join grp mandatorgrp ".
+          "on system.mandator=mandatorgrp.grpid ";
 
 
    return($from);

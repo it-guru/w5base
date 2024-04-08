@@ -139,3 +139,4 @@
  de=>'ICS / SOX konformer Betrieb implementiert'
 },
 'all ItemTags'=>{de=>'alle ItemTags'},
+'SIS Number'=>{de=>'Gesellschaftsnummer'},
