@@ -149,8 +149,14 @@ sub CapeICTOimport
             srcsys=>$iname,
             srcload=>$start
       };
+
       if ($cistatusid>5){
-         delete($newrec->{name}); # update of name makes no sense, if rec is del
+         $agrp->ResetFilter();
+         $agrp->SetFilter({srcsys=>\$iname,srcid=>\$irec->{archapplid}});
+         my ($chkrec)=$agrp->getOnlyFirst(qw(id));
+         if (defined($chkrec)){  # record exists - and we will only do an update
+            delete($newrec->{name}); # update of name makes no sense, if rec is del
+         }
       }
 
       my @idl=$agrp->ValidatedInsertOrUpdateRecord($newrec,
@@ -169,6 +175,10 @@ sub CapeICTOimport
                {srcsys=>\$iname,applid=>\$applid}
             );
          }
+      }
+      else{
+         printf STDERR ("update problem: %s\n",Dumper($newrec));
+         exit(1);
       }
    }
    if ($c<10){
