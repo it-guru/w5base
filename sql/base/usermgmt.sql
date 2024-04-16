@@ -119,7 +119,7 @@ CREATE TABLE contact (
   KEY private_location (private_location)
 )  ENGINE=INNODB;
 CREATE TABLE useraccount (
-  account varchar(40) NOT NULL default '',
+  account varchar(128) NOT NULL default '',
   userid bigint(20),password varchar(128),
   requestemail char(128),posturi text,requestcode varchar(20),
   requestemailwf bigint(20),apitoken varchar(128),ipacl longtext,
@@ -128,7 +128,7 @@ CREATE TABLE useraccount (
   KEY userid (userid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE userlogon (
-  account varchar(40) NOT NULL default '',
+  account varchar(128) NOT NULL default '',
   loghour varchar(10) NOT NULL default '',
   logondate datetime default NULL,
   logonbrowser varchar(128) default NULL,
