@@ -1,31 +1,15 @@
+<script language="JavaScript">
+
+</script>
 <table border=0 height=100% width=100%>
 <tr>
 <td valign=top align=center>
 <br>
 <br>
+Bitte wählen Sie Ihre Login Variante:
 <hr width=80%>
-<p>
-<div style="padding:10px;width:400px;border-style:solid;border-color:darkgreen;border-width:4px;text-align:left">
-Sie sind derzeit nicht angemeldet! Diverse Funktionen in dieser WEB-Anwendung
-sind nur möglich, wenn Sie sich Authentifiziert/Angemeldet haben.<br>
-Die Anmeldung ins W5Base Framework erfolgt mit Ihrem "normalen" WindowsNT 
-Domain Account. Wenn Sie z.B. Ihren Account 
-Mueller.Hans in der SUED3 Domain haben geben Sie <b>sued3/</b>mueller.hans als Anmeldename ein. <br>
-Achten Sie darauf, dass der Anmeldename (Account) kleingeschrieben werden muss.<br>
-Bitte beachten Sie, dass Sonderzeichen (äöüß) und Leerzeichen im Passwort zu Problemen führen können.
-</div>
-<hr width=80%>
-Um fortzufahren klicken Sie bitte auf Login.<br>
-<p><b>
-<script language="JavaScript">
-function dologin()
-{
-   parent.parent.parent.document.location.href="../../../auth/base/menu/root";
-}
-</script>
-<br>
-<input type=button style="font-size:18px;padding:5px;width:200px" value=" Login " onclick="dologin();">
-<br>
+%LOGINHANDLER%
+<hr width=80%><
 </td>
 </tr>
 </table>

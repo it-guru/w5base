@@ -63,6 +63,43 @@ sub Main
    my $tmpl="tmpl/login";
    $tmpl="tmpl/login.successfuly" if ($self->IsMemberOf("valid_user"));
    my $title=Query->Param("TITLE");
+
+   if (Query->Param("oidc_callback") ne ""){
+      my $callback=Query->Param("oidc_callback");
+      my $target_link_uri=Query->Param("target_link_uri");
+      my $iss;
+      ($iss)=$target_link_uri=~m/\?(https:\/\/.*)$/;
+      $target_link_uri=~s/\?.*$//;
+      Query->Param("target_link_uri"=>$target_link_uri);
+      Query->Delete("oidc_iss");
+      Query->Delete("oidc_callback");
+      Query->Delete("MOD");
+      Query->Delete("FUNC");
+      Query->Param("iss"=>$iss);
+      my $qs=Query->QueryString();
+      $qs=~s/;/&/g;
+      
+
+      if ($iss eq ""){
+         print $self->HttpHeader("text/html");
+         my $loginopenidc=$self->Config->Param("LOGINOPENIDC");
+         my @OIDCMetadataDir;
+         foreach my $k (keys(%$loginopenidc)){
+            if (-d $loginopenidc->{$k}){
+               push(@OIDCMetadataDir,$loginopenidc->{$k});
+            }
+         }
+         printf ("<a href=\"../menu/root\">Back</a><br>");
+         printf ("OpenID Browser not yet implemenated<br>");
+         printf ("found OIDCMetadataDir=%s<br>\n",join(";",@OIDCMetadataDir));
+         return(0);
+      }
+      $self->HtmlGoto($callback,get=>{Query->MultiVars()});
+
+      return(0);
+   }
+
+print STDERR Query->Dumper();
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css'],
                            title=>$title,
@@ -82,6 +119,40 @@ sub findtemplvar
    my $var=$_[1];
 
    my $chkobj=$self;
+   if ($var eq "LOGINHANDLER"){
+      my $d="There is no LoginHandler configured.";
+      my $loginname=$self->Config->Param("LOGINNAME");
+      my $loginicon=$self->Config->Param("LOGINICON");
+      my $loginhandler=$self->Config->Param("LOGINHANDLER");
+      if (ref($loginname) eq "HASH"){
+         $d="<div id=LOGINHANDLER ".
+            "style=\"width:30%\" ".
+            "class=\"LoginHandlerMainFrame\">";
+         foreach my $k (sort(keys(%$loginname))){
+            my $opt="<div id=\"loginframe$k\" class=LoginFrame ".
+                    "style=\"margin:15px;\" ".
+                    ">\n";
+            my $name=$loginname->{$k};
+            my $handler=$loginhandler->{$k};
+            $opt.="<button type=\"submit\" class=LoginButton ".
+                  "style=\"width:100%;cursor:pointer;text-align:left;line-height: 35px;vertical-align: middle;margin-right:40px;white-space:nowrap\" ".
+                  "value=\"$k\" name=handler onclick=\"parent.parent.parent.document.location.href='$handler';return(false);\">\n";
+
+            $opt.="<img style=\"vertical-align: middle;cursor:pointer;\" src=\"https://w5base-devnull-ng.telekom.de/darwin/public/base/load/miniglobe.gif\">\n";
+            $opt.="<label style=\"vertical-align: middle;cursor:pointer;white-space:nowrap;padding-right:20px\">\n";
+            $opt.="$name\n";
+            $opt.="</label>\n";
+            $opt.="</button>\n";
+            $opt.="</div>\n";
+            $d.=$opt;
+         }
+         $d.="</div>";
+      }
+
+printf STDERR ("fifi loginname=%s\n",Dumper($loginname));
+
+      return($d);
+   }
    if ($var eq "FORUMCHECK" && defined($_[2]) && $ENV{REMOTE_USER} ne "anonymous"){
       my $bo=getModuleObject($self->Config,"faq::forumboard");
       if (defined($bo)){
