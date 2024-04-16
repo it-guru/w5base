@@ -1082,6 +1082,8 @@ sub getConfigObject($$$)
    }
    #msg(INFO,"(re)read config for base '$basemod' from package '$package'");
    my $config=new kernel::config();
+   $configname=~s/^.*\///;  # remove all bevor the last / to handel 
+                            # installations deeper then 1st layer
    if (!$config->readconfig($instdir,$configname,$basemod)){
       if ($ENV{SERVER_SOFTWARE} ne ""){
          print("Content-type:text/plain\n\n");
