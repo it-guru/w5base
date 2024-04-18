@@ -342,11 +342,11 @@ sub qcheckRecord
    #
    # Prüfen des Anwendungsalters
    #
-   if ($appdaysage<$maxagedays*0.5){
-      msg(INFO,"$rec->{name}: application to ".
-                             "new appdaysage<maxagedays*0.5");
-      return(0);
-   }
+   #if ($appdaysage<$maxagedays*0.5){
+   #   msg(INFO,"$rec->{name}: application to ".
+   #                          "new appdaysage<maxagedays*0.5");
+   #   return(0);
+   #}
    #######################################################################
 
    #######################################################################
