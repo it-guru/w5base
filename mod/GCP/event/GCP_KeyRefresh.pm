@@ -55,7 +55,7 @@ sub genKeyPair
 
    my @cmd=("openssl","req",
                       "-x509","-nodes","-newkey","rsa:4096",
-                      "-days","7",
+                      "-days","90",
                       "-keyout",$priv_keyfile, "-out",$pub_keyfile,
                       "-subj","/CN=unused"
    );
@@ -190,14 +190,15 @@ sub GCP_KeyRefresh
          push(@k,{
             count=>$c,
             name=>$CheckKey->{name},
-            days=>$d->{totaldays}
+            days=>$d->{totaldays},
+            validtill=>$validtill
          });
          #printf STDERR ("t=%s\n",$validtill);
       }
-      #printf STDERR ("k=%s\n",Dumper(\@k));
       @k=sort({$b->{days}<=>$a->{days}} @k);
+      printf STDERR ("k=%s\n",Dumper(\@k));
 
-      for(my $c=8;$c<=$#k;$c++){
+      for(my $c=6;$c<=$#k;$c++){
          my $drop=$k[$c];
          msg(INFO,"drop $drop->{name}");
 
