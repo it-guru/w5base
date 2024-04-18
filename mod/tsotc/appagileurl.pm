@@ -89,6 +89,12 @@ sub new
                 dataobjattr   =>"appagile_routes_on_otc4darwin_vw.".
                                 "is_http80"),
 
+      new kernel::Field::Text(
+                name          =>'urltype',
+                label         =>'URL Type',
+                dataobjattr   =>"appagile_routes_on_otc4darwin_vw.".
+                                "url_type"),
+
      # new kernel::Field::Text(
      #           name          =>'fullname',
      #           htmldetail    =>0,
@@ -104,7 +110,7 @@ sub new
                                 "last_monitor_date"),
 
    );
-   $self->setDefaultView(qw(name ishttps ishttp lastmondate));
+   $self->setDefaultView(qw(name ishttps ishttp urltype lastmondate));
    $self->setWorktable("appagile_routes_on_otc4darwin_vw");
    return($self);
 }
