@@ -430,7 +430,7 @@ sub qcheckRecord
 
          if ($#qmsg==-1 && $lday ne ""){
             my $duration=CalcDateDuration(NowStamp("en"),$lday);
-            if (defined($duration) && $duration->{days}>90){
+            if (defined($duration) && $duration->{days}>0){
                my $msg="Disaster-Recovery last test is to far in the future";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
