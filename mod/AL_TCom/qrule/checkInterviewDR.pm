@@ -389,7 +389,7 @@ sub qcheckRecord
    # Prüfen des des Plan-Datums für den nächsten DR Test
    #
    if ($planday eq ""){
-      if ($appdaysage>($maxagedays*0.5)){
+      if (1 || $appdaysage>($maxagedays*0.5)){
          my $msg="missing valid next DR-Test change planning";
          push(@qmsg,$msg);
          if (!$drRiskAcceptance){
