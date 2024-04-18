@@ -105,6 +105,7 @@ sub qcheckRecord
       if ($urlrec->{ishttp}){
          if ($urlrec->{name} ne ""){
             push(@suburl,{
+               urltype=>$urlrec->{urltype},
                name=>"http://".$urlrec->{name},
                port=>80
             });
@@ -113,21 +114,31 @@ sub qcheckRecord
       if ($urlrec->{ishttps}){
          if ($urlrec->{name} ne ""){
             push(@suburl,{
+               urltype=>$urlrec->{urltype},
                name=>"https://".$urlrec->{name},
                port=>443
             });
          }
       }
       foreach my $suburl (@suburl){
-         $url{$suburl->{name}}={
-            name=>$suburl->{name},
-            applid=>$rec->{applid},
-            srcid=>$urlrec->{id}.":".$suburl->{port},  # TODO! 
-            srcsys=>$srcsys                            # Problem, wenn eine
-         };                                            # Anwendung mehrere
-      }                                                # Areas hat!
+         my $tag=$suburl->{urltype};
+         $tag="CNDTAG";
+         if ($suburl->{urltype} eq "INTERNET_URL"){
+            $tag="INTERNET";
+         }
+         if (exists($netarea->{$tag})){
+            $url{$suburl->{name}.";".$tag}={
+               name=>$suburl->{name},
+               networkid=>$netarea->{$tag},
+               applid=>$rec->{applid},
+               srcid=>$urlrec->{id}.":".$suburl->{port},  # TODO! 
+               srcsys=>$srcsys                            # Problem, wenn eine
+            };                                            # Anwendung mehrere
+         }                                                # Areas hat!
+      }
    }
    my @url=sort({$a->{name} cmp $b->{name}} values(%url));
+
 
    if ($#url!=-1){
       if (!$dataobj->validateCloudAreaImportState(
@@ -144,12 +155,12 @@ sub qcheckRecord
          {
              name=>join(" ",map({'"'.$_->{name}.'"'} @url)),
              applid=>[$rec->{applid}],
-             networkid =>$netarea->{CNDTAG}
+             networkid =>[$netarea->{CNDTAG},$netarea->{INTERNET}]
          },
          {
              name=>join(" ",map({'"'.$_->{name}.'/*"'} @url)),
              applid=>[$rec->{applid}],
-             networkid =>$netarea->{CNDTAG}
+             networkid =>[$netarea->{CNDTAG},$netarea->{INTERNET}]
          },
          {
              itcloudareaid=>$rec->{id},
@@ -172,6 +183,7 @@ sub qcheckRecord
                        $eq=0;
                        if ($a->{srcid} eq $b->{srcid} &&
                            $a->{srcsys} eq $b->{srcsys} &&
+                           $a->{networkid} eq $b->{networkid} &&
                            lc($b->{name}) eq lc(substr($a->{name},0,$blen))){
                           $eq=1;
                        }
@@ -186,7 +198,7 @@ sub qcheckRecord
                           MSG=>"$mode url $newrec->{name} ",
                           DATAOBJ=>'itil::lnkapplurl',
                           DATA=>{
-                             networkid     =>$netarea->{CNDTAG},
+                             networkid     =>$newrec->{networkid},
                              itcloudareaid =>$rec->{id},
                              applid        =>$newrec->{applid},
                              srcid         =>$newrec->{srcid},
