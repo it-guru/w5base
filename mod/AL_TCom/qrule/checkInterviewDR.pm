@@ -410,7 +410,7 @@ sub qcheckRecord
 
          if ($lday ne "" && $pday ne ""){
             my $duration=CalcDateDuration($lday,$pday);
-            if (defined($duration) && $duration->{days}<-56){
+            if (defined($duration) && $duration->{days}<(($maxagedays/2)*-1)){
                my $msg="Disaster-Recovery Test plan date is bevor last test";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
