@@ -99,7 +99,6 @@ sub Main
       return(0);
    }
 
-print STDERR Query->Dumper();
    print $self->HttpHeader("text/html");
    print $self->HtmlHeader(style=>['default.css','mainwork.css'],
                            title=>$title,

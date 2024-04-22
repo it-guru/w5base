@@ -1,28 +1,13 @@
-<table border=0 height=80% width=100%>
+<table border=0 height=100% width=100%>
 <tr>
 <td valign=top align=center>
 <br>
 <br>
+Please select your Login variant:
 <hr width=80%>
-<p>
-<div style="padding:10px;width:400px;border-style:solid;border-color:darkgreen;border-width:4px;text-align:left">
-You are not logged in at the moment! Many functions in these application are
-only posible, if you are authenticated
-The login at the W5Base Framework is possible takes place with your "normal" WindowsNT Domain Account. If you got f.e. the Account 
-Mueller.Hans in the SUED3 Domain, you have to use sued3/mueller.hans
-as your loginname at this application. 
-</div>
+%LOGINHANDLER%
 <hr width=80%>
-To continue please klick at login.<br>
-<script language="JavaScript">
-function dologin()
-{
-   parent.parent.parent.document.location.href="../../../auth/base/menu/root";
-}
-</script>
-<br>
-<input type=button style="font-size:18px;padding:5px;width:200px" value=" Login " onclick="dologin();">
-<br>
 </td>
 </tr>
 </table>
+
