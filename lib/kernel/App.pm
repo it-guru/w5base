@@ -852,15 +852,20 @@ sub getTemplate
    my $self=shift;
    my $name=shift;
    my $skinbase=shift;
+   my $addskin=shift;
    my $mask;
    my $maskfound=0;
    my $filename;
 
+   my %opt;
+   if ($addskin ne ""){
+      $opt{addskin}=$addskin;
+   }
    if (!($name=~m/\.js$/) || ($name=~m/tmpl\/.*\.js$/)){
       if (!defined($skinbase)){
          $skinbase=$self->SkinBase();
          my $skinfilename=$skinbase."/".$name;
-         $filename=$self->getSkinFile($skinfilename);
+         $filename=$self->getSkinFile($skinfilename,%opt);
          if (!defined($filename)){
             my $sp;
             if ($self->can("SelfAsParentObject")){
@@ -869,7 +874,7 @@ sub getTemplate
             if ($sp ne $self->Self()){
                my ($altskinbase)=$sp=~m/^([^:]+)::/;
                my $skinfilename=$altskinbase."/".$name;
-               my $f=$self->getSkinFile($skinfilename);
+               my $f=$self->getSkinFile($skinfilename,%opt);
                if (defined($f)){
                   $filename=$f;
                }
@@ -878,7 +883,7 @@ sub getTemplate
       }
       else{
          $name=$skinbase."/".$name;
-         $filename=$self->getSkinFile($name);
+         $filename=$self->getSkinFile($name,%opt);
       }
    }
    else{
