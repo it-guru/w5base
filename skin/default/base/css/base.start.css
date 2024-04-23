@@ -1,0 +1,32 @@
+.LoginHandlerMainFrame{
+   width:48%;
+   border-style:solid;
+   border-width:1px;
+   float:left;
+}
+.LoginHelpMainFrame{
+   width:48%;
+   float:right;
+}
+.LoginButton{
+   font-weight: bold;
+   width:100%;
+   cursor:pointer;
+   text-align:left;
+   line-height: 35px;
+   vertical-align:middle;
+   margin-right:40px;
+   white-space:nowrap
+}
+
+
+
+.hideHelp{
+   display:none;
+   text-align:left;
+   margin:15px;
+}
+.HelpFrameVisible{
+   display:block;
+}
+

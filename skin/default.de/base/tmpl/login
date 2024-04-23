@@ -1,15 +1,9 @@
-<script language="JavaScript">
-
-</script>
 <table border=0 height=100% width=100%>
 <tr>
 <td valign=top align=center>
 <br>
 <br>
-Bitte wählen Sie Ihre Login Variante:
-<hr width=80%>
 %LOGINHANDLER%
-<hr width=80%><
 </td>
 </tr>
 </table>

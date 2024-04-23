@@ -100,12 +100,34 @@ sub Main
    }
 
    print $self->HttpHeader("text/html");
-   print $self->HtmlHeader(style=>['default.css','mainwork.css'],
+   print $self->HtmlHeader(style=>['default.css',
+                                   'mainwork.css',
+                                   'base.start.css'],
                            title=>$title,
                            js=>['toolbox.js'],
                            body=>1,form=>1);
    print "<script language=\"JavaScript\" ".
          "src=\"../../base/load/toolbox.js\"></script>";
+   print <<EOF;
+<script language="JavaScript">
+   function onMouseOver(e){
+      var id=e.id;
+      var helpid=id+"Help";
+      var e=document.getElementById(helpid);
+      if (e){
+         e.classList.add("HelpFrameVisible");
+      }
+   }
+   function onMouseOut(e){
+      var id=e.id;
+      var helpid=id+"Help";
+      var e=document.getElementById(helpid);
+      if (e){
+         e.classList.remove("HelpFrameVisible");
+      }
+   }
+</script>
+EOF
    print $self->getParsedTemplate($tmpl,{});
    print $self->HtmlBottom(body=>1,form=>1);
    return(0);
@@ -123,22 +145,29 @@ sub findtemplvar
       my $loginname=$self->Config->Param("LOGINNAME");
       my $loginicon=$self->Config->Param("LOGINICON");
       my $loginhandler=$self->Config->Param("LOGINHANDLER");
+      my $loginhelp=$self->Config->Param("LOGINHELP");
       if (ref($loginname) eq "HASH"){
-         $d="<div id=LOGINHANDLER ".
-            "style=\"width:30%\" ".
-            "class=\"LoginHandlerMainFrame\">";
+         $d="";
+         $d.="<div id=LOGINTOP style=\"width:60%;\">";
+         $d.="<div id=LOGINHANDLER ".
+            "class=\"LoginHandlerMainFrame\">\n";
          foreach my $k (sort(keys(%$loginname))){
             my $opt="<div id=\"loginframe$k\" class=LoginFrame ".
-                    "style=\"margin:15px;\" ".
-                    ">\n";
+                    "style=\"margin:15px;\">\n";
             my $name=$loginname->{$k};
             my $handler=$loginhandler->{$k};
+            my $iconpath=$loginicon->{$k};
             $opt.="<button type=\"submit\" class=LoginButton ".
-                  "style=\"width:100%;cursor:pointer;text-align:left;line-height: 35px;vertical-align: middle;margin-right:40px;white-space:nowrap\" ".
-                  "value=\"$k\" name=handler onclick=\"parent.parent.parent.document.location.href='$handler';return(false);\">\n";
+                  "id=\"Login${k}Button\" value=\"$k\" ".
+                  "onmouseover=\"onMouseOver(this);\" ".
+                  "onmouseout=\"onMouseOut(this);\" ".
+                  "onclick=\"parent.parent.parent.document.location.href=".
+                  "'$handler';return(false);\">\n";
 
-            $opt.="<img style=\"vertical-align: middle;cursor:pointer;\" src=\"https://w5base-devnull-ng.telekom.de/darwin/public/base/load/miniglobe.gif\">\n";
-            $opt.="<label style=\"vertical-align: middle;cursor:pointer;white-space:nowrap;padding-right:20px\">\n";
+            $opt.="<img style=\"vertical-align: middle;cursor:pointer;\" ".
+                  "src=\"$iconpath\">\n";
+            $opt.="<label style=\"vertical-align:middle;cursor:pointer;".
+                  "white-space:nowrap;padding-right:20px\">\n";
             $opt.="$name\n";
             $opt.="</label>\n";
             $opt.="</button>\n";
@@ -146,9 +175,30 @@ sub findtemplvar
             $d.=$opt;
          }
          $d.="</div>";
+         $d.="<div id=LOGINHELP ".
+            "class=\"LoginHelpMainFrame\">";
+         foreach my $k (sort(keys(%$loginname))){
+            if (ref($loginhelp) eq "HASH" && exists($loginhelp->{$k})){
+               my @l=$loginhelp->{$k}=~m#^(([^/]+)/)?(.*)$#;
+               my (undef,$skin,$templ)=$loginhelp->{$k}=~m#^(([^/]+)/)?(.*)$#;
+               $skin="default" if ($skin eq "");
+               my $lang=$self->Lang();
+               if ($lang ne "en"){
+                  $skin.=".".$lang;
+               }
+               my $templtext=$self->getTemplate("tmpl/".$templ,"base",$skin);
+               if ($templtext ne ""){
+                  $d.="\n\n<div  ".
+                      "id=\"Login${k}ButtonHelp\" ".
+                      "class=\"hideHelp\">".
+                      $templtext.
+                      "</div>";
+               }
+            }
+         }
+         $d.="</div>";
+         $d.="</div>";
       }
-
-printf STDERR ("fifi loginname=%s\n",Dumper($loginname));
 
       return($d);
    }

@@ -3,10 +3,7 @@
 <td valign=top align=center>
 <br>
 <br>
-Please select your Login variant:
-<hr width=80%>
-%LOGINHANDLER%
-<hr width=80%>
+   %LOGINHANDLER%
 </td>
 </tr>
 </table>

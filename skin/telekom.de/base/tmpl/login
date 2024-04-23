@@ -4,6 +4,19 @@
 <br>
 <br>
 <hr width=80%>
+%LOGINHANDLER%
+<hr width=80%>
+</td>
+</tr>
+</table>
+<!--
+
+<table border=0 height=100% width=100%>
+<tr>
+<td valign=top align=center>
+<br>
+<br>
+<hr width=80%>
 <p>
 <div style="padding:10px;width:80%;border-style:solid;border-color:#E20074;border-width:4px;text-align:left;overflow:hidden">
 <table width=100% border=0 cellspacing=0 cellpadding=0>
@@ -91,3 +104,5 @@ function doadlogin()
 </td>
 </tr>
 </table>
+
+-->
