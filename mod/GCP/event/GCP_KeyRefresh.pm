@@ -196,7 +196,7 @@ sub GCP_KeyRefresh
          #printf STDERR ("t=%s\n",$validtill);
       }
       @k=sort({$b->{days}<=>$a->{days}} @k);
-      printf STDERR ("k=%s\n",Dumper(\@k));
+      #printf STDERR ("k=%s\n",Dumper(\@k));
 
       for(my $c=6;$c<=$#k;$c++){
          my $drop=$k[$c];
