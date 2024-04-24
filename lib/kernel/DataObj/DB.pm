@@ -435,7 +435,12 @@ sub getSqlSelect
    my $dropLimitStart=0;
    foreach my $from (@from){
       my $cmd="select "; 
-      $cmd.=$distinct.join(",",@fields);
+      if ($#fields!=-1){
+         $cmd.=$distinct.join(",",@fields);
+      }
+      else{
+         $cmd.=$distinct." '1' ";
+      }
       if ($from ne ""){
          $cmd.=" from $from";
       }
