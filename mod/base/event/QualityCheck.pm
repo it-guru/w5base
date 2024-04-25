@@ -93,7 +93,7 @@ sub QualityCheck
             my $taskcnt=int($cnt/50000);
 
             $taskcnt=1 if ($dataobj eq "base::workflow" || $taskcnt<1);
-            $taskcnt=4 if ($taskcnt>4);
+            $taskcnt=8 if ($taskcnt>8);
 
             if ($taskcnt==1){
                my $bk=$self->W5ServerCall("rpcCallEvent",
