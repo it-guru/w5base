@@ -1,0 +1,24 @@
+<center>
+<table width=30%>
+<tr><td nowrap>
+SWInstanceExtOperationUser:
+
+<xmp>
+ACCESSLEVEL Mapping:
+====================
+Appl              (all from ApplExtOperationUser)
+RESLNK: Appl      (all from ApplExtOperationUser but accesslevel>50 set to 50)
+SWInstance adm               90
+SWInstnace adm2              85
+
+           SWInstance InstanceTeam
+RBoss                39    
+RBoss2               38    
+REmployee            37    
+RFreelancer          12    
+RApprentice           2    
+</xmp>
+</td></tr>
+</table>
+
+
