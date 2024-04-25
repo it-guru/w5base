@@ -78,7 +78,7 @@ sub AddAllFieldsFromWorktable
          elsif ($fld->{fieldtype} eq "NUMBER"){
             push(@l,new kernel::Field::Number(
                           name          =>$name,
-                          searchable    =>0,
+                          searchable    =>1,
                           label         =>$label,
                           dataobjattr   =>"\"$fld->{fieldname}\""));
          }
@@ -164,10 +164,17 @@ sub Welcome
 
    my $module=$self->Module();
    my $appname=$self->App();
-   my $tmpl="tmpl/legend";
+   my $tmpl="tmpl/$appname.welcome";
    my @detaillist=$self->getSkinFile("$module/".$tmpl);
    if ($#detaillist!=-1){
       print $self->getParsedTemplate($tmpl,{});
+   }
+   else{
+      my $tmpl="tmpl/legend";
+      my @detaillist=$self->getSkinFile("$module/".$tmpl);
+      if ($#detaillist!=-1){
+         print $self->getParsedTemplate($tmpl,{});
+      }
    }
    print $self->HtmlBottom(body=>1,form=>1);
 }
