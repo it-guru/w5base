@@ -364,7 +364,25 @@ sub qcheckRecord
                                    mode=>'day');
                   }
                }
+               if (uc($parrec->{modelvendor}) eq "DELL"){
+                  if ($parrec->{maintend} ne ""){
+                     my $d=CalcDateDuration(NowStamp("en"),$parrec->{maintend});
+                     if ($d->{totaldays}>3650){
+                        $parrec->{maintend}=undef;
+                     }
+                  }
+                  if ($parrec->{maintend} eq "" && $parrec->{install} ne ""){
+                     my $end=$dataobj->ExpandTimeExpression(
+                          "$parrec->{install}+7Y","en","GMT","GMT"
+                     );
+                     if ($end ne ""){
+                        $parrec->{maintend}=$end;
+                     }
+                     msg(INFO,"result of self calc $parrec->{install}+7Y=$end");
+                  }
 
+                  $parrec->{eohs}=$parrec->{maintend};
+               }
                if ($parrec->{eohs} ne ""){
                   my $d=CalcDateDuration(NowStamp("en"),$parrec->{eohs});
                   if ($d->{days}>3660 ||
@@ -373,11 +391,6 @@ sub qcheckRecord
                   }
                }
 
-               if (uc($parrec->{modelvendor}) eq "DELL" &&
-                   $parrec->{maintend} ne "" && 
-                   $parrec->{maintend} ne "2199-12-31 00:00:00"){
-                  $parrec->{eohs}=$parrec->{maintend};
-               }
 
                if ($parrec->{eohs} ne ""){
                   $self->IfComp($dataobj,  
