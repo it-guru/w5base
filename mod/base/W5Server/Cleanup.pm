@@ -169,7 +169,7 @@ sub CleanupWasted
             $o->SetFilter({cistatusid=>\'6',mdate=>$uCleanupWasted});
             $o->SetCurrentView(qw(ALL));
             $o->SetCurrentOrder(qw(NONE));
-            $o->Limit(1000);
+            $o->Limit(10000);
             my ($rec,$msg)=$o->getFirst(unbuffered=>1);
             if (defined($rec)){
                my $op=$o->Clone();
