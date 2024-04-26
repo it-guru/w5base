@@ -104,12 +104,36 @@ sub Main
                                    'mainwork.css',
                                    'base.start.css'],
                            title=>$title,
+                           onload=>'onLoad();',
                            js=>['toolbox.js'],
                            body=>1,form=>1);
    print "<script language=\"JavaScript\" ".
          "src=\"../../base/load/toolbox.js\"></script>";
    print <<EOF;
 <script language="JavaScript">
+
+function onLoad(){
+   var focusable=document.querySelectorAll(
+     'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+   );
+   if (focusable && focusable[0]){
+      focusable[0].focus();
+   }
+}
+
+   function onFocus(e){
+      var div=document.querySelectorAll('.hideHelp');
+      for(var c=0;c<div.length;c++){
+         div[c].classList.remove("HelpFrameVisible");
+      }
+
+      var id=e.id;
+      var helpid=id+"Help";
+      var e=document.getElementById(helpid);
+      if (e){
+         e.classList.add("HelpFrameVisible");
+      }
+   }
    function onMouseOver(e){
       var id=e.id;
       var helpid=id+"Help";
@@ -151,16 +175,25 @@ sub findtemplvar
          $d.="<div id=LOGINTOP style=\"width:60%;\">";
          $d.="<div id=LOGINHANDLER ".
             "class=\"LoginHandlerMainFrame\">\n";
+         my $n=0;
          foreach my $k (sort(keys(%$loginname))){
             my $opt="<div id=\"loginframe$k\" class=LoginFrame ".
                     "style=\"margin:15px;\">\n";
             my $name=$loginname->{$k};
             my $handler=$loginhandler->{$k};
             my $iconpath=$loginicon->{$k};
+            if ($n==0){
+               $opt.="<button type=\"submit\" ".
+                     "style=\"width:0px;height:0px;margin:0;padding:0;".
+                     "border: none;".
+                     "background: transparent;\">";
+            }
             $opt.="<button type=\"submit\" class=LoginButton ".
                   "id=\"Login${k}Button\" value=\"$k\" ".
+                  "onfocus=\"onFocus(this);\" ".
                   "onmouseover=\"onMouseOver(this);\" ".
                   "onmouseout=\"onMouseOut(this);\" ".
+                  "aria-labelledby=\"Login${k}ButtonHelp\" ".
                   "onclick=\"parent.parent.parent.document.location.href=".
                   "'$handler';return(false);\">\n";
 
@@ -173,6 +206,7 @@ sub findtemplvar
             $opt.="</button>\n";
             $opt.="</div>\n";
             $d.=$opt;
+            $n++;
          }
          $d.="</div>";
          $d.="<div id=LOGINHELP ".
@@ -190,6 +224,7 @@ sub findtemplvar
                if ($templtext ne ""){
                   $d.="\n\n<div  ".
                       "id=\"Login${k}ButtonHelp\" ".
+                      "aria-hidden=\"true\" ".
                       "class=\"hideHelp\">".
                       $templtext.
                       "</div>";

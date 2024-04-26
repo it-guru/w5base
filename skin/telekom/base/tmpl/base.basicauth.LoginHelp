@@ -1,0 +1,23 @@
+<b>W5Base-Standard-Login:</b><br>
+To log in to W5Base/Darwin you can use your ...
+<ul>
+<li>... EMEA account, or</li>
+<li>... CIAM account, or</li>
+</ul>
+Please use your password from the corresponding authentication system.
+<br>
+
+If you are not already a registered user, please log in with your new credentials.<br>
+The entry of a Pn-Dup email address is not allowed! Accounts with this email address will be denied. Please use your corporate email address!<br>
+After your first login, you will receive a registration email with confirmation instructions. Your account will be activated after the confirmation.  <br>
+<hr>
+<b>Example account:</b><br>
+Account Mueller.Hans, Domäne: EMEA1<br>
+
+EMEA1 Account: emea1/a???????<br>
+CIAM Account: ciam/hans.mueller@telekom.de<br>
+<hr>
+
+Some functionalities and data areas in W5Base/Darwin are also accessible without logging in. Please use only lower case letters for account name when logging on and please don't use space characters in your password.
+<br>
+At <a href="http://find.telekom.de" target=_blank>http://find.telekom.de</a> you can use a simpler frontend with reduced barriers.
