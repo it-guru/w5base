@@ -213,9 +213,11 @@ sub w5statsend
             $w5stat->ResetFilter();
             $w5stat->SetFilter([{dstrange=>\$month,
                                  nameid=>\$rec->{grpid},
+                                 statstream=>\'default',
                                  sgroup=>\'Group'},
                                 {dstrange=>\$month,
                                  fullname=>\$rec->{fullname},
+                                 statstream=>\'default',
                                  sgroup=>\'Group'}]);
             my ($chkrec,$msg)=$w5stat->getOnlyFirst(qw(id));
             if (defined($chkrec)){
