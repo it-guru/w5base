@@ -291,23 +291,38 @@ sub getMandatorsOf
    if (defined($UserCache->{userid})){
       $userid=$UserCache->{userid};
    }
-   my %groups=$self->getGroupsOf($AccountOrUserID,[orgRoles(),
-                               qw(RCFManager RCFManager2)],
+   my %groups;
+   my %ugroups=$self->getGroupsOf($AccountOrUserID,[orgRoles()],
+                               'both');
+   my %cgroups=$self->getGroupsOf($AccountOrUserID,[qw(RCFManager RCFManager2)],
                                'both');
    my %dgroups=$self->getGroupsOf($AccountOrUserID,[qw(RCFManager RCFManager2)],
                                   'direct');
+   map({
+      if ($ugroups{$_}->{grpcistatusid}==4){
+         $groups{$_}++;
+      }
+   } keys(%ugroups));
+   map({$groups{$_}++} keys(%cgroups));
    my @grps=keys(%groups);
    my %m=();
   # my %m=map({($_=>1);}@grps);
    my $MandatorCache=$self->Cache->{Mandator}->{Cache};
    if (!defined($MandatorCache)){
-      $self->ValidateMandatorCache(0);  # load Cache, if call is from Event (not in Web-Context)
+      $self->ValidateMandatorCache(0);  # load Cache, if call is 
+                                        # from Event (not in Web-Context)
       $MandatorCache=$self->Cache->{Mandator}->{Cache};
    }
    my $isadmin=$self->IsMemberOf("admin");
    CHK: foreach my $mid (keys(%{$MandatorCache->{id}})){
       my $mc=$MandatorCache->{id}->{$mid};
       my $grpid=$mc->{grpid};
+      if (in_array(\@roles,"read")){  
+         if ($mc->{cistatusid} ne "4"){
+            next CHK if (!$isadmin &&            # Admins and direct Config-Mgr
+                     !exists($dgroups{$grpid})); # of Mandators can read alle
+         }                                       # mandators - no matter what st
+      }
       if (in_array(\@roles,"write")){  # write only on active mandators allowed
          next CHK if ($mc->{cistatusid} ne "4" &&
                       $mc->{cistatusid} ne "3");
@@ -501,11 +516,13 @@ sub LoadGroups
           ($allgrp->{$grp}->{direction} eq "up" || # if a group has been loaded
            $direction eq "both")){ # in up mode and a additional "both" mode
          my $fullname=$GroupCache->{grpid}->{$grp}->{fullname};
+         my $grpcistatusid=$GroupCache->{grpid}->{$grp}->{cistatusid};
          if (!exists($allgrp->{$grp}) ||      # distance 0 records have 
              $allgrp->{$grp}->{distance}!=0){ # priority !
             $allgrp->{$grp}={         # is requested - a force load is needed!
                   fullname=>$fullname,
                   grpid=>$grp,
+                  grpcistatusid=>$grpcistatusid,
                   distance=>$distance,
                   direction=>$direction
             };
@@ -821,7 +838,7 @@ sub ValidateGroupCache
    if (!defined($self->Cache->{Group}->{Cache})){
       my $grp=$self->ModuleObject("base::grp");
       $grp->SetFilter({grpid=>'>-999999999'}); # prefend slow query entry
-      $grp->SetCurrentView(qw(grpid fullname parentid subid));
+      $grp->SetCurrentView(qw(grpid fullname parentid subid cistatusid));
       $grp->SetCurrentOrder("NONE");
       $self->Cache->{Group}->{Cache}=$grp->getHashIndexed(qw(grpid fullname));
       foreach my $grp (values(%{$self->Cache->{Group}->{Cache}->{grpid}})){
