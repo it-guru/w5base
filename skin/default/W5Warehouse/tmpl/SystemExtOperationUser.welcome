@@ -6,7 +6,11 @@ SystemExtOperationUser:
 <xmp>
 ACCESSLEVEL Mapping:
 ====================
-Appl              (all from ApplExtOperationUser)
+
+runable SWInstance  (all from SWInstanceExtOperationUser but 
+                     accesslevel>50 set to 50)
+
+Appl                (all from ApplExtOperationUser)
 System adm               90
 System adm2              85
 System admteam           80

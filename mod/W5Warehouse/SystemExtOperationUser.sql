@@ -4,7 +4,34 @@ create materialized view "mview_W5I_SystemExtOperationUser"
    next sysdate+(1/24)*2
    as
 with 
-system as (
+swinstancerunnodes as (
+   select "itil::swinstance".id swinstanceid,
+          "itil::system".id systemid, 
+          "itil::system".name systemname
+   from  "itil::swinstance" 
+     join "itil::lnkitclustsvc" 
+        on "itil::swinstance".itclustsid="itil::lnkitclustsvc".id
+     join "itil::itclust" 
+        on "itil::lnkitclustsvc".clustid="itil::itclust".id
+     join "itil::system" 
+        on "itil::itclust".id="itil::system".itclustid
+     left outer join "itil::lnkitclustsvcsyspolicy"
+        on "itil::lnkitclustsvc".id="itil::lnkitclustsvcsyspolicy".itclustsvcid
+        and "itil::system".id="itil::lnkitclustsvcsyspolicy".syssystemid
+   where "itil::itclust".cistatusid=4
+     and "itil::system".cistatusid<6
+     and nvl2("itil::lnkitclustsvcsyspolicy".runpolicy,
+               regexp_substr("itil::lnkitclustsvcsyspolicy".runpolicy,
+               '[a-z]+'),"itil::itclust".defrunpolicy)='allow'
+union
+   select "itil::swinstance".id swinstanceid, 
+     "itil::system".id systemid,
+     "itil::system".name systemname
+   from "itil::swinstance"
+     join "itil::system" 
+        on "itil::swinstance".systemid="itil::system".id
+  where "itil::system".cistatusid<6
+), system as (
    select id            w5baseid,
           systemid      systemid,
           name          name,
@@ -95,6 +122,18 @@ select W5BASEID ID,SYSTEMID,NAME,USERID,EMAIL,DSID,POSIX,
           regexp_like(roles,'(^|; )(RApprentice)(;|$)')
        join u urole on
           lnkgrp.userid=urole.userid
+  union
+    select  system.id w5baseid,system.systemid,system.name,
+            SWInstanceAcl.userid,SWInstanceAcl.email,
+            SWInstanceAcl.dsid,SWInstanceAcl.posix,
+            CASE when SWInstanceAcl.accesslevel>50 then 50
+                 else SWInstanceAcl.accesslevel
+            END accesslevel
+    from "itil::system" system
+       join swinstancerunnodes
+          on system.id=swinstancerunnodes.systemid
+       join "mview_W5I_SWInstanceExtOperationUser" SWInstanceAcl
+            on SWInstanceAcl.id=swinstancerunnodes.swinstanceid
 ) BASELIST group by W5BASEID,SYSTEMID,NAME,USERID,EMAIL,DSID,POSIX;
 
 CREATE INDEX "mview_W5I_SystemExtOperationUser_i1" 
