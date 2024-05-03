@@ -172,21 +172,18 @@ sub findtemplvar
       my $loginhelp=$self->Config->Param("LOGINHELP");
       if (ref($loginname) eq "HASH"){
          $d="";
-         $d.="<div id=LOGINTOP style=\"width:60%;\">";
-         $d.="<div id=LOGINHANDLER ".
-            "class=\"LoginHandlerMainFrame\">\n";
+         $d.="<div id=\"LOGINTOP\">";
+         $d.="<div id=\"LOGINHANDLER\" class=\"LoginHandlerMainFrame\">\n";
          my $n=0;
          foreach my $k (sort(keys(%$loginname))){
-            my $opt="<div id=\"loginframe$k\" class=LoginFrame ".
-                    "style=\"margin:15px;\">\n";
+            my $opt="<div id=\"loginframe$k\" class=\"LoginFrame\">";
             my $name=$loginname->{$k};
             my $handler=$loginhandler->{$k};
             my $iconpath=$loginicon->{$k};
             if ($n==0){
                $opt.="<button type=\"submit\" ".
-                     "style=\"width:0px;height:0px;margin:0;padding:0;".
-                     "border: none;".
-                     "background: transparent;\">";
+                     "aria-labelledby=\"StdHiddenLoginHelp\" ".
+                     "class=\"StdHiddenLoginButton\">";
             }
             $opt.="<button type=\"submit\" class=LoginButton ".
                   "id=\"Login${k}Button\" value=\"$k\" ".
@@ -211,6 +208,21 @@ sub findtemplvar
          $d.="</div>";
          $d.="<div id=LOGINHELP ".
             "class=\"LoginHelpMainFrame\">";
+         if (ref($loginhelp) eq "HASH" && exists($loginhelp->{"BASE"})){
+            my $k="BASE";
+            my @l=$loginhelp->{$k}=~m#^(([^/]+)/)?(.*)$#;
+            my (undef,$skin,$templ)=$loginhelp->{$k}=~m#^(([^/]+)/)?(.*)$#;
+            $skin="default" if ($skin eq "");
+            my $lang=$self->Lang();
+            if ($lang ne "en"){
+               $skin.=".".$lang;
+            }
+            my $templtext=$self->getTemplate("tmpl/".$templ,"base",$skin);
+            if ($templtext ne ""){
+               $d.="\n\n<div id=\"StdHiddenLoginHelp\" ".
+                   "class=\"baseHelp\">".$templtext."</div>";
+            }
+         }
          foreach my $k (sort(keys(%$loginname))){
             if (ref($loginhelp) eq "HASH" && exists($loginhelp->{$k})){
                my @l=$loginhelp->{$k}=~m#^(([^/]+)/)?(.*)$#;
