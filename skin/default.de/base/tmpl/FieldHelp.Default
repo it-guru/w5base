@@ -55,18 +55,18 @@ In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
 </tr>
 
 <tr>
-<td nowrap valign=top><b>[LEER]</b></td>
+<td nowrap valign=top><b><span aria-hidden="true">[LEER]</span><span class="aria-only">Der Ausdruck eckige Klammer auf LEER eckige Klammer zu</span></b></td>
 <td>... bei bestimmten Datenbank einträgen gibt es einen Unterschied
-    zwischen "" und leer. Mit der Eingabe von [LEER] können Sie alle
+    zwischen "" und leer. Mit der Eingabe von <span aria-hidden="true">[LEER]</span><span class="aria-only">eckige Klammer auf LEER eckige Klammer zu</span> können Sie alle
     Datensätze suchen, die im jeweiligen Feld "" oder NULL (leer) enthalten.
     Bei verweisenden Felder (z.B. Unterlisten oder Listen) wird bei der Suche
     nach [LEER] nicht danach gesucht, ob kleine Verweise in dem Feld vorhanden
-    sind, sondern es werden die Datensätze gesucht, die auf ein [LEER] Feld
+    sind, sondern es werden die Datensätze gesucht, die auf ein <span aria-hidden="true">[LEER]</span><span class="aria-only">eckige Klammer auf LEER eckige Klammer zu</span> Feld
     verweisen. (was i.d.R. selten der Fall sein dürfte)</td>
 </tr>
 
 <tr>
-<td nowrap valign=top><b>[ICH]</b></td>
+<td nowrap valign=top><b><span aria-hidden="true">[ICH]</span><span class="aria-only">Der Ausdruck eckige Klammer auf ICH eckige Klammer zu</span></b></td>
 <td>... dieser Ausdruck wird durch den eigenen, vollständigen 
     Kontaktnamen ersetzt.
     </td>
