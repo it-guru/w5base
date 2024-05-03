@@ -1436,6 +1436,7 @@ sub FormatedSearch
           "border=0>";
       $d.="</td>";
       my $q=kernel::cgi::Hash2QueryString(
+            focus=>"1",
             field=>"search_$name",
             TITLE=>$self->getParent->T("field search help"),
             label=>$label);
