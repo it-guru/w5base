@@ -391,10 +391,43 @@ sub do_SSLCERT
       $sslcert->{ssl_cert_end}="".
           DateTime->from_epoch(epoch=>str2time($expireDate));
     
+      my $pkey=Net::SSLeay::X509_get_pubkey($cert);
+      my $bits = Net::SSLeay::EVP_PKEY_bits($pkey);
+      $sslcert->{ssl_cert_bits}=$bits;
+
       my $certserial;
       eval('$certserial=Net::SSLeay::X509_get_serialNumber($cert);');
+
       $sslcert->{ssl_cert_serialno}=
          Net::SSLeay::P_ASN1_INTEGER_get_hex($certserial) if ($@ eq "");
+
+      my $certificate_type;
+      my @certificate_type;
+      eval('$certificate_type = Net::SSLeay::X509_certificate_type($cert);');
+
+      foreach my $bitname (qw(EVP_PKS_DSA EVP_PKS_EC EVP_PKS_RSA
+                              EVP_PKT_ENC EVP_PKT_EXCH EVP_PKT_EXP 
+                              EVP_PKT_SIGN EVP_PK_DH EVP_PK_DSA 
+                              EVP_PK_EC EVP_PK_RSA)){
+          my $chk;
+          eval("\$chk=\$certificate_type & &Net::SSLeay::$bitname");
+          if ($chk){
+             push(@certificate_type,$bitname);
+          }
+      }
+      $sslcert->{ssl_cert_type}=\@certificate_type;
+      if (grep(/PK_RSA/,@certificate_type)){
+         $sslcert->{ssl_cert_pk_type}="RSA".$sslcert->{ssl_cert_bits};
+      }
+      if (grep(/PK_DSA/,@certificate_type)){
+         $sslcert->{ssl_cert_pk_type}="DSA".$sslcert->{ssl_cert_bits};
+      }
+      if (grep(/PK_DH/,@certificate_type)){
+         $sslcert->{ssl_cert_pk_type}="DH".$sslcert->{ssl_cert_bits};
+      }
+      if (grep(/PK_EC/,@certificate_type)){
+         $sslcert->{ssl_cert_pk_type}="EC".$sslcert->{ssl_cert_bits};
+      }
 
       my $issuerdn;
       eval('$issuerdn=Net::SSLeay::X509_NAME_print_ex('.
