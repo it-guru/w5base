@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use strict;
-use CGI qw/:standard/;
+use CGI qw/:standard -oldstyle_urls/;
 use Data::Dumper;
 use JSON;
 use URI;
@@ -161,6 +161,10 @@ else{
    if ($q->param("url") eq ""){
       $q->param("url"=>$ENV{SCRIPT_URI});
    }
+   if ($q->param("operation") eq ""){
+      $q->param(-name=>"operation",
+                -value=>['DNSRESOLV']);
+   }
    ShowForm();
 }
 exit(0);
@@ -186,6 +190,21 @@ sub outputResults
    }
    my $t2=Time::HiRes::time();
    $r->{startunixtime}=$t1;
+
+   my $uri=$ENV{SCRIPT_URI};
+   $uri=~s/\?.*$//;
+   if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+      $uri=~s/^http:/https:/;
+   }
+
+   my $requesturl=new CGI({});
+   $requesturl->param(-name=>'submit',-value=>'1');
+   $requesturl->param(-name=>'url',-value=>$q->param("url"));
+   my @operation=$q->param("operation");
+   $requesturl->param(-name=>'operation',-value=>\@operation);
+
+   $r->{requesturl}=$uri.'?'.$requesturl->query_string();
+
    $r->{endunixtime}=$t2;
    $r->{duration}=$t2-$t1;
 
@@ -847,8 +866,21 @@ sub ShowForm()
    my $e=Dumper(\%ENV);
    $e=~s/^\$VAR1/ENV/;
    $e="";
+   my %formparam=(
+      -method=>'POST',
+      -target=>'OUT'
+   );
+
+   my %htmlparam=(
+      -title => 'W5ProbeIP'
+   );
+
+   if ($q->param("submit") ne ""){
+      $htmlparam{'-onLoad'}='document.forms[0].submit();';
+   }
+
    print $q->header().
-   $q->start_html('W5ProbeIP').
+   $q->start_html(%htmlparam).
 
    "<div style='width:100%'>".
    h1({
@@ -858,15 +890,13 @@ sub ShowForm()
       -style=>'Color: black;'
    },'ClientIP:'.$ENV{REMOTE_ADDR}).
 
-   $q->start_form(
-      -method=>'POST',
-      -target=>'OUT'
-   ).
+
+   $q->start_form(%formparam).
 
    $q->textfield(-name=>'url',
       -value=>'',
       -size=>50,
-      -maxlength=>80
+      -maxlength=>256
    ).
 
    $q->checkbox_group(
@@ -884,7 +914,6 @@ sub ShowForm()
    '</div>'.
    "<div style='height:200px;overflow:scroll'>"."<xmp>".$e."</xmp>"."</div>".
    
-
    $q->end_html();
 }
 
