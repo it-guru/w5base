@@ -255,10 +255,13 @@ sub LoadIntoCurrentConfig
          print $F $res->decoded_content();
       }
       else{
-         printf STDERR ("ERROR: can not fetch %s\n",$self->{conffile});
-         printf STDERR ("ERROR: result: %s\n",$res->status_line);
-         return(0);
-      }
+         my $msg="WARN: can not fetch '".$self->{conffile}."'";
+         if (defined($res)){
+            $msg.=" - ".$res->status_line;
+         }
+         print STDERR  $msg."\n";
+         return(1); # Maybe a process for mandatory includes needs to be
+      }             # defined. At now a missing include only produces a WARN
       seek($F,0,0);
    }
    else{
