@@ -731,6 +731,11 @@ sub Init
                       "AL_TCom::inmbusinessarea",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("AL_TCom.proc.costobjectmap",
+                      "TS::costobjectmap",
+                      func=>'MainWithNew',
+                      defaultacl=>['admin']);
+
    $self->RegisterObj('AL_TCom::workflow::businesreq$',
                       "base::workflow",
                       func=>'New',

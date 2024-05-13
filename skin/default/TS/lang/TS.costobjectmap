@@ -1,0 +1,8 @@
+'TS::costobjectmap'=>{
+ de=>'TSI/AssetManager Kontierungs-Mapping',
+ en=>'TSI/AssetManager cost object mapping',
+},
+'cost object number'=>{
+  de=>'Kontierungsobjekt'
+}
+
