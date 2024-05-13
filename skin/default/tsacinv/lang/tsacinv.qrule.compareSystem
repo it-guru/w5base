@@ -25,3 +25,5 @@
 'TSI has migrated the system to INVOICE_ONLY, therefore it needs to be removed from Darwin -> IT-Inventory'=>{de=>'TSI hat das System auf INVOICE_ONLY migriert, daher muss es aus Darwin->IT-Inventar entfernt werden'},
 'IP-Adresses not in sync'=>{de=>'IP-Adressen sind nicht syncronisiert'},
 'ignoring multiple console ip'=>{de=>'ignoriere mehrfache IP-Console'},
+'using costobject from TelIT-cost object mapping'=>{de=>'verwende Kontierungsobject aus der TelIT Mapping Tabelle'},
+'can not assign network area to'=>{de=>'Netzwerkbereich kann nicht zugewiesen werden'},
