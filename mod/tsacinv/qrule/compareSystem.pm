@@ -633,6 +633,18 @@ sub qcheckRecord
                              mode=>'boolean');
 
 
+               if (defined($parrec) && $parrec->{systemid} ne ""){
+                  my $tmap=getModuleObject($self->getParent->Config,
+                                            "TS::costobjectmap");
+                  $tmap->SetFilter({systemid=>\$parrec->{systemid}});
+                  my ($maprec,$msg)=$tmap->getOnlyFirst(qw(ALL));
+                  if (defined($maprec) && $maprec->{conumber} ne ""){
+                     push(@qmsg,
+                       'using costobject from TelIT-cost object mapping');
+                     $parrec->{conumber}=$maprec->{conumber}; 
+                  }
+               }
+
                #
                # Filter for conumbers, which are allowed to use in darwin
                #
