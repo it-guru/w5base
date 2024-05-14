@@ -445,8 +445,8 @@ sub handleSRec
       if (defined($oldrec)){   # rename check (detect on AM rename)
          if ($oldrec->{fullname} ne 
              uc(exttrim($agrprec->{fullname}))){ # rename op
-            msg(WARN,"rename request detected on metagroup id $oldrec->{id} ".
-                     "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
+            #msg(WARN,"rename request detected on metagroup id $oldrec->{id} ".
+            #         "from '$oldrec->{fullname}' to '$agrprec->{fullname}'");
             my $newfullname=exttrim($agrprec->{fullname});
 
             my $smchecked=0;
