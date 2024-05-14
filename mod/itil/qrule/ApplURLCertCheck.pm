@@ -113,6 +113,17 @@ sub qcheckRecord
                                  "in $url\n%s\n",Dumper($res));
                }
                else{
+                  if (ref($res->{sslcert}->{ssl_cert_type}) eq "ARRAY" &&
+                      in_array($res->{sslcert}->{ssl_cert_type},"EVP_PK_RSA")){
+                     msg(INFO,"found RSA private key");
+                     my $bits=$res->{sslcert}->{ssl_cert_bits};
+                     if ($bits<3000){
+                        my $msg=$dataobj->T("WARN: ".
+                                "RSA private keys with less then 3000 bit ".
+                                "are considered insecure");
+                        push(@qmsg,$msg);
+                     }
+                  }
                   $forcedupd->{sslbegin}=$self->getParent->ExpandTimeExpression(
                      $res->{sslcert}->{ssl_cert_begin},'en','GMT');
                   $forcedupd->{sslend}=$self->getParent->ExpandTimeExpression(
