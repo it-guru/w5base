@@ -473,9 +473,46 @@ sub new
                 name          =>'sslparsedw5baseref',
                 label         =>'SSL Cert W5Ref',
                 htmldetail    =>'NotEmpty',
+                readonly      =>1,
                 group         =>'detail',
                 depend        =>["ssslissuerdn","ssslserialno"],
                 onRawValue    =>\&sslparsew5baseref),
+
+      new kernel::Field::Text(
+                name          =>'sslparsedAlgorithm',
+                label         =>'SSL Cert parsed algorithm',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'detail',
+                depend        =>["sslcert"],
+                onRawValue    =>sub {
+                    my $self=shift;
+                    my $current=shift;
+                    my $app=$self->getParent();
+                    return(undef) if ($current->{sslcert} eq "");
+                    my $crec=$app->unpackCertSignRequest(0,$current->{sslcert});
+                    return(undef) if (!defined($crec));
+
+                    return($crec->{algorithm});
+                }),
+
+      new kernel::Field::Text(
+                name          =>'sslparsedKeylen',
+                label         =>'SSL Cert parsed keylen',
+                readonly      =>1,
+                htmldetail    =>'NotEmpty',
+                group         =>'detail',
+                depend        =>["sslcert"],
+                onRawValue    =>sub {
+                    my $self=shift;
+                    my $current=shift;
+                    my $app=$self->getParent();
+                    return(undef) if ($current->{sslcert} eq "");
+                    my $crec=$app->unpackCertSignRequest(0,$current->{sslcert});
+                    return(undef) if (!defined($crec));
+
+                    return($crec->{keyparams}->{keylen});
+                }),
 
 
       new kernel::Field::Text(
@@ -919,6 +956,15 @@ sub Validate
       if (!defined($crec)){
          return(0);      
       }
+      msg(INFO,"Validate: algorithm: ".$carec->{algorithm});
+      if ($crec->{algorithm} eq "rsaEncryption"){
+         msg(INFO,"Validate: detect RSA");
+         if ($crec->{keyparams}->{keylen}<3000){
+            $self->LastMsg(ERROR,
+                  "RSA keylen with less then 3000 bit is insecure");
+            return(0);
+         }
+      }
       if ($self->verifyCSRtoCA(0,$carec,$crec)){
          $newrec->{name}=$crec->{name};
          $newrec->{sslcertorg}=$crec->{o} if ($crec->{o} ne "");
@@ -964,6 +1010,12 @@ sub Validate
       if (!defined($crec)){
          $self->LastMsg(ERROR,
                         "can not decode CSR detail informations for renewal");
+         return(0);
+      }
+      if ($crec->{algorithm} eq "rsaEncryption" &&
+          $crec->{keyparams}->{keylen}<3000){
+         $self->LastMsg(ERROR,
+                     "CSR with RSA keylen less then 3000 bit can not renewal");
          return(0);
       }
       if (!$self->verifyCSRtoCA(0,$carec,$crec)){
@@ -1022,20 +1074,32 @@ sub unpackCertSignRequest
    my $silent=shift;
    my $sslcertfile=shift;
 
-   Crypt::PKCS10->setAPIversion(0);
+   Crypt::PKCS10->setAPIversion(1);
    my $pkcs;
    # try multiple file formats
-   eval('$pkcs=Crypt::PKCS10->new($sslcertfile);');
+   eval('$pkcs=Crypt::PKCS10->new($sslcertfile,
+            verifySignature=>0
+   );');
    if ($@ ne "") {
+      printf STDERR ("Crypt::PKCS10 result: %s\n",$@);
       if (!$silent){
          $self->LastMsg(ERROR,"Unknown file format - PKCS10 required");
       }
       return(undef);      
    }
    my $crec={};
-   
-   $crec->{subject}=$pkcs->subject();
 
+   
+   if ($pkcs->can('subject')){
+      $crec->{subject}=$pkcs->subject();
+   }
+
+   if ($pkcs->can('pkAlgorithm')){
+      $crec->{algorithm}=$pkcs->pkAlgorithm();
+   }
+   if ($pkcs->can('subjectPublicKeyParams')){
+      $crec->{keyparams}=$pkcs->subjectPublicKeyParams();
+   }
    if ($pkcs->can('commonName')){
       $crec->{name}=$pkcs->commonName();
       $crec->{cn}=$pkcs->commonName();
