@@ -22,7 +22,7 @@ use Encode ();
 use MIME::Base64;
 use Scalar::Util ();
 
-our $VERSION = '2.002';
+our $VERSION = '2.005';
 
 my $apiVersion = undef;  # 0 for compatibility.  1 for prefered
 my $error;
@@ -45,9 +45,11 @@ my %oids = (
     '1.2.840.113549.1.9.1'          => 'emailAddress',
     '1.2.840.113549.1.9.2'          => 'unstructuredName',
     '1.2.840.113549.1.9.7'          => 'challengePassword',
+    '1.2.840.113549.1.9.8'          => 'unstructuredAddress',
     '1.2.840.113549.1.1.1'          => [ 'rsaEncryption', 'RSA encryption' ],
     '1.2.840.113549.1.1.5'          => [ 'sha1WithRSAEncryption', 'SHA1 with RSA encryption' ],
     '1.2.840.113549.1.1.4'          => [ 'md5WithRSAEncryption', 'MD5 with RSA encryption' ],
+    '1.2.840.113549.1.1.10'         => 'rsassaPss',
     '1.2.840.113549.1.9.14'         => 'extensionRequest',
     '1.3.6.1.4.1.311.13.2.3'        => 'OS_Version',                   # Microsoft
     '1.3.6.1.4.1.311.13.2.2'        => 'EnrollmentCSP',                # Microsoft
@@ -120,6 +122,7 @@ my %oids = (
     '1.2.840.113549.1.1.6'          => 'rsaOAEPEncryptionSET',
     '1.2.840.113549.1.1.7'          => 'RSAES-OAEP',
     '1.2.840.113549.1.9.15'         => [ 'smimeCapabilities', 'SMIMECapabilities' ],
+    '1.3.14.3.2.26'                 => 'sha1',
     '1.3.14.3.2.29'                 => [ 'sha1WithRSAEncryption', 'SHA1 with RSA signature' ],
     '1.3.6.1.4.1.311.13.1'          => 'RENEWAL_CERTIFICATE',          # Microsoft
     '1.3.6.1.4.1.311.13.2.1'        => 'ENROLLMENT_NAME_VALUE_PAIR',   # Microsoft
@@ -175,56 +178,252 @@ foreach (keys %oids) {
 }
 
 my %oid2extkeyusage = (
-                '1.3.6.1.5.5.7.3.1'        => 'serverAuth',
-                '1.3.6.1.5.5.7.3.2'        => 'clientAuth',
-                '1.3.6.1.5.5.7.3.3'        => 'codeSigning',
-                '1.3.6.1.5.5.7.3.4'        => 'emailProtection',
-                '1.3.6.1.5.5.7.3.8'        => 'timeStamping',
-                '1.3.6.1.5.5.7.3.9'        => 'OCSPSigning',
+    '1.3.6.1.5.5.7.3.1'        => 'serverAuth',
+    '1.3.6.1.5.5.7.3.2'        => 'clientAuth',
+    '1.3.6.1.5.5.7.3.3'        => 'codeSigning',
+    '1.3.6.1.5.5.7.3.4'        => 'emailProtection',
+    '1.3.6.1.5.5.7.3.8'        => 'timeStamping',
+    '1.3.6.1.5.5.7.3.9'        => 'OCSPSigning',
 
-		'1.3.6.1.5.5.7.3.21'       => 'sshClient',
-		'1.3.6.1.5.5.7.3.22'       => 'sshServer',
+    '1.3.6.1.5.5.7.3.21'       => 'sshClient',
+    '1.3.6.1.5.5.7.3.22'       => 'sshServer',
 
-		# Microsoft usages
+    # Microsoft usages
+    '1.3.6.1.4.1.311.10.3.1'   => 'msCTLSign',
+    '1.3.6.1.4.1.311.10.3.2'   => 'msTimeStamping',
+    '1.3.6.1.4.1.311.10.3.3'   => 'msSGC',
+    '1.3.6.1.4.1.311.10.3.4'   => 'msEFS',
+    '1.3.6.1.4.1.311.10.3.4.1' => 'msEFSRecovery',
+    '1.3.6.1.4.1.311.10.3.5'   => 'msWHQLCrypto',
+    '1.3.6.1.4.1.311.10.3.6'   => 'msNT5Crypto',
+    '1.3.6.1.4.1.311.10.3.7'   => 'msOEMWHQLCrypto',
+    '1.3.6.1.4.1.311.10.3.8'   => 'msEmbeddedNTCrypto',
+    '1.3.6.1.4.1.311.10.3.9'   => 'msRootListSigner',
+    '1.3.6.1.4.1.311.10.3.10'  => 'msQualifiedSubordination',
+    '1.3.6.1.4.1.311.10.3.11'  => 'msKeyRecovery',
+    '1.3.6.1.4.1.311.10.3.12'  => 'msDocumentSigning',
+    '1.3.6.1.4.1.311.10.3.13'  => 'msLifetimeSigning',
+    '1.3.6.1.4.1.311.10.3.14'  => 'msMobileDeviceSoftware',
 
-                '1.3.6.1.4.1.311.10.3.1'   => 'msCTLSign',
-                '1.3.6.1.4.1.311.10.3.2'   => 'msTimeStamping',
-                '1.3.6.1.4.1.311.10.3.3'   => 'msSGC',
-                '1.3.6.1.4.1.311.10.3.4'   => 'msEFS',
-                '1.3.6.1.4.1.311.10.3.4.1' => 'msEFSRecovery',
-                '1.3.6.1.4.1.311.10.3.5'   => 'msWHQLCrypto',
-                '1.3.6.1.4.1.311.10.3.6'   => 'msNT5Crypto',
-                '1.3.6.1.4.1.311.10.3.7'   => 'msOEMWHQLCrypto',
-                '1.3.6.1.4.1.311.10.3.8'   => 'msEmbeddedNTCrypto',
-                '1.3.6.1.4.1.311.10.3.9'   => 'msRootListSigner',
-                '1.3.6.1.4.1.311.10.3.10'  => 'msQualifiedSubordination',
-                '1.3.6.1.4.1.311.10.3.11'  => 'msKeyRecovery',
-                '1.3.6.1.4.1.311.10.3.12'  => 'msDocumentSigning',
-                '1.3.6.1.4.1.311.10.3.13'  => 'msLifetimeSigning',
-                '1.3.6.1.4.1.311.10.3.14'  => 'msMobileDeviceSoftware',
-
-                '1.3.6.1.4.1.311.2.1.21'   => 'msCodeInd',
-                '1.3.6.1.4.1.311.2.1.22'   => 'msCodeCom',
-                '1.3.6.1.4.1.311.20.2.2'   => 'msSmartCardLogon',
+    '1.3.6.1.4.1.311.2.1.21'   => 'msCodeInd',
+    '1.3.6.1.4.1.311.2.1.22'   => 'msCodeCom',
+    '1.3.6.1.4.1.311.20.2.2'   => 'msSmartCardLogon',
 
 
-	        # Netscape
-                '2.16.840.1.113730.4.1'    => 'nsSGC',
+    # Netscape
+    '2.16.840.1.113730.4.1'    => 'nsSGC',
 );
 
 my %shortnames = (
-		  countryName            => 'C',
-		  stateOrProvinceName    => 'ST',
-		  organizationName       => 'O',
-		  organizationalUnitName => 'OU',
-		  commonName             => 'CN',
+    countryName            => 'C',
+    stateOrProvinceName    => 'ST',
+    organizationName       => 'O',
+    organizationalUnitName => 'OU',
+    commonName             => 'CN',
 #		  emailAddress           => 'E', # Deprecated & not recognized by some software
-		  domainComponent        => 'DC',
-		  localityName           => 'L',
-		  userID                 => 'UID',
-		  surname                => 'SN',
-		  givenName              => 'GN',
+    domainComponent        => 'DC',
+    localityName           => 'L',
+    userID                 => 'UID',
+    surname                => 'SN',
+    givenName              => 'GN',
 );
+
+our $schema = <<ASN1
+    DirectoryString ::= CHOICE {
+      teletexString   TeletexString,
+      printableString PrintableString,
+      bmpString       BMPString,
+      universalString UniversalString,
+      utf8String      UTF8String,
+      ia5String       IA5String,
+      integer         INTEGER}
+
+    Algorithms ::= ANY
+
+    Name ::= SEQUENCE OF RelativeDistinguishedName
+    RelativeDistinguishedName ::= SET OF AttributeTypeAndValue
+    AttributeTypeAndValue ::= SEQUENCE {
+      type  OBJECT IDENTIFIER,
+      value DirectoryString}
+
+    Attributes ::= SET OF Attribute
+    Attribute ::= SEQUENCE {
+      type   OBJECT IDENTIFIER,
+      values SET OF ANY}
+
+
+    AlgorithmIdentifier ::= SEQUENCE {
+      algorithm  OBJECT IDENTIFIER,
+      parameters Algorithms OPTIONAL}
+
+    SubjectPublicKeyInfo ::= SEQUENCE {
+      algorithm        AlgorithmIdentifier,
+      subjectPublicKey BIT STRING}
+
+    --- Certificate Request ---
+
+    CertificationRequest ::= SEQUENCE {
+      certificationRequestInfo  CertificationRequestInfo,
+      signatureAlgorithm        AlgorithmIdentifier,
+      signature                 BIT STRING},
+
+    CertificationRequestInfo ::= SEQUENCE {
+      version       INTEGER ,
+      subject       Name OPTIONAL,
+      subjectPKInfo SubjectPublicKeyInfo,
+      attributes    [0] Attributes OPTIONAL}
+
+    --- Extensions ---
+
+    BasicConstraints ::= SEQUENCE {
+        cA                  BOOLEAN OPTIONAL, -- DEFAULT FALSE,
+        pathLenConstraint   INTEGER OPTIONAL}
+
+    OS_Version ::= IA5String
+    emailAddress ::= IA5String
+
+    EnrollmentCSP ::= SEQUENCE {
+        KeySpec     INTEGER,
+        Name        BMPString,
+        Signature   BIT STRING}
+
+    ENROLLMENT_CSP_PROVIDER ::= SEQUENCE { -- MSDN
+        keySpec     INTEGER,
+        cspName     BMPString,
+        signature   BIT STRING}
+
+    ENROLLMENT_NAME_VALUE_PAIR ::= EnrollmentNameValuePair -- MSDN: SEQUENCE OF
+
+    EnrollmentNameValuePair ::= SEQUENCE { -- MSDN
+         name       BMPString,
+         value      BMPString}
+
+    ClientInformation ::= SEQUENCE { -- MSDN
+        clientId       INTEGER,
+        MachineName    UTF8String,
+        UserName       UTF8String,
+        ProcessName    UTF8String}
+
+    extensionRequest ::= SEQUENCE OF Extension
+    Extension ::= SEQUENCE {
+      extnID    OBJECT IDENTIFIER,
+      critical  BOOLEAN OPTIONAL,
+      extnValue OCTET STRING}
+
+    SubjectKeyIdentifier ::= OCTET STRING
+
+    certificateTemplate ::= SEQUENCE {
+       templateID              OBJECT IDENTIFIER,
+       templateMajorVersion    INTEGER OPTIONAL, -- (0..4294967295)
+       templateMinorVersion    INTEGER OPTIONAL} -- (0..4294967295)
+
+    EnhancedKeyUsage ::= SEQUENCE OF OBJECT IDENTIFIER
+    KeyUsage ::= BIT STRING
+    netscapeCertType ::= BIT STRING
+
+    ApplicationCertPolicies ::= SEQUENCE OF PolicyInformation -- Microsoft
+
+    PolicyInformation ::= SEQUENCE {
+        policyIdentifier   OBJECT IDENTIFIER,
+        policyQualifiers   SEQUENCE OF PolicyQualifierInfo OPTIONAL}
+
+    PolicyQualifierInfo ::= SEQUENCE {
+       policyQualifierId    OBJECT IDENTIFIER,
+       qualifier            ANY}
+
+    certificatePolicies ::= SEQUENCE OF certPolicyInformation -- RFC 3280
+
+    certPolicyInformation ::= SEQUENCE {
+        policyIdentifier    CertPolicyId,
+        policyQualifier     SEQUENCE OF certPolicyQualifierInfo OPTIONAL}
+
+    CertPolicyId ::= OBJECT IDENTIFIER
+
+    certPolicyQualifierInfo ::= SEQUENCE {
+        policyQualifierId CertPolicyQualifierId,
+        qualifier         ANY DEFINED BY policyQualifierId}
+
+    CertPolicyQualifierId ::= OBJECT IDENTIFIER
+
+    CertPolicyQualifier ::= CHOICE {
+        cPSuri     CPSuri,
+        userNotice UserNotice }
+
+    CPSuri ::= IA5String
+
+    UserNotice ::= SEQUENCE {
+        noticeRef     NoticeReference OPTIONAL,
+        explicitText  DisplayText OPTIONAL}
+
+    NoticeReference ::= SEQUENCE {
+        organization     DisplayText,
+        noticeNumbers    SEQUENCE OF INTEGER }
+
+    DisplayText ::= CHOICE {
+        ia5String        IA5String,
+        visibleString    VisibleString,
+        bmpString        BMPString,
+        utf8String       UTF8String }
+
+    unstructuredName ::= CHOICE {
+        Ia5String       IA5String,
+        directoryString DirectoryString}
+
+    unstructuredAddress ::= CHOICE {
+        Ia5String       IA5String,
+        directoryString DirectoryString}
+
+    challengePassword ::= DirectoryString
+
+    subjectAltName ::= SEQUENCE OF GeneralName
+
+    GeneralName ::= CHOICE {
+         otherName                       [0]     AnotherName,
+         rfc822Name                      [1]     IA5String,
+         dNSName                         [2]     IA5String,
+         x400Address                     [3]     ANY, --ORAddress,
+         directoryName                   [4]     Name,
+         ediPartyName                    [5]     EDIPartyName,
+         uniformResourceIdentifier       [6]     IA5String,
+         iPAddress                       [7]     OCTET STRING,
+         registeredID                    [8]     OBJECT IDENTIFIER}
+
+    AnotherName ::= SEQUENCE {
+         type           OBJECT IDENTIFIER,
+         value      [0] EXPLICIT ANY }
+
+    EDIPartyName ::= SEQUENCE {
+         nameAssigner            [0]     DirectoryString OPTIONAL,
+         partyName               [1]     DirectoryString }
+
+    certificateTemplateName ::= CHOICE {
+        octets          OCTET STRING,
+        directoryString DirectoryString}
+
+    rsaKey ::= SEQUENCE {
+        modulus         INTEGER,
+        publicExponent  INTEGER}
+
+    dsaKey  ::= INTEGER
+
+    dsaPars ::= SEQUENCE {
+        P               INTEGER,
+        Q               INTEGER,
+        G               INTEGER}
+
+    eccName ::= OBJECT IDENTIFIER
+
+    ecdsaSigValue ::= SEQUENCE {
+        r               INTEGER,
+        s               INTEGER}
+
+    rsassaPssParam ::= SEQUENCE {
+        digestAlgorithm     [0] EXPLICIT AlgorithmIdentifier OPTIONAL,
+        maskGenAlgorithm    [1] EXPLICIT AlgorithmIdentifier OPTIONAL,
+        saltLength          [2] EXPLICIT INTEGER OPTIONAL,
+        trailerField        [3] EXPLICIT INTEGER OPTIONAL}
+ASN1
+;
 
 my %name2oid;
 
@@ -547,192 +746,7 @@ sub _new {
 
     my $asn = Convert::ASN1->new;
     $self->{_asn} = $asn;
-    $asn->prepare(<<ASN1) or die( "Internal error in " . __PACKAGE__ . ": " . $asn->error );
-
-    DirectoryString ::= CHOICE {
-      teletexString   TeletexString,
-      printableString PrintableString,
-      bmpString       BMPString,
-      universalString UniversalString,
-      utf8String      UTF8String,
-      ia5String       IA5String,
-      integer         INTEGER}
-
-    Algorithms ::= ANY
-
-    Name ::= SEQUENCE OF RelativeDistinguishedName
-    RelativeDistinguishedName ::= SET OF AttributeTypeAndValue
-    AttributeTypeAndValue ::= SEQUENCE {
-      type  OBJECT IDENTIFIER,
-      value DirectoryString}
-
-    Attributes ::= SET OF Attribute
-    Attribute ::= SEQUENCE {
-      type   OBJECT IDENTIFIER,
-      values SET OF ANY}
-
-
-    AlgorithmIdentifier ::= SEQUENCE {
-      algorithm  OBJECT IDENTIFIER,
-      parameters Algorithms OPTIONAL}
-
-    SubjectPublicKeyInfo ::= SEQUENCE {
-      algorithm        AlgorithmIdentifier,
-      subjectPublicKey BIT STRING}
-
-    --- Certificate Request ---
-
-    CertificationRequest ::= SEQUENCE {
-      certificationRequestInfo  CertificationRequestInfo,
-      signatureAlgorithm        AlgorithmIdentifier,
-      signature                 BIT STRING},
-
-    CertificationRequestInfo ::= SEQUENCE {
-      version       INTEGER ,
-      subject       Name OPTIONAL,
-      subjectPKInfo SubjectPublicKeyInfo,
-      attributes    [0] Attributes OPTIONAL}
-
-    --- Extensions ---
-
-    BasicConstraints ::= SEQUENCE {
-        cA                  BOOLEAN OPTIONAL, -- DEFAULT FALSE,
-        pathLenConstraint   INTEGER OPTIONAL}
-
-    OS_Version ::= IA5String
-    emailAddress ::= IA5String
-
-    EnrollmentCSP ::= SEQUENCE {
-        KeySpec     INTEGER,
-        Name        BMPString,
-        Signature   BIT STRING}
-
-    ENROLLMENT_CSP_PROVIDER ::= SEQUENCE { -- MSDN
-        keySpec     INTEGER,
-        cspName     BMPString,
-        signature   BIT STRING}
-
-    ENROLLMENT_NAME_VALUE_PAIR ::= EnrollmentNameValuePair -- MSDN: SEQUENCE OF
-
-    EnrollmentNameValuePair ::= SEQUENCE { -- MSDN
-         name       BMPString,
-         value      BMPString}
-
-    ClientInformation ::= SEQUENCE { -- MSDN
-        clientId       INTEGER,
-        MachineName    UTF8String,
-        UserName       UTF8String,
-        ProcessName    UTF8String}
-
-    extensionRequest ::= SEQUENCE OF Extension
-    Extension ::= SEQUENCE {
-      extnID    OBJECT IDENTIFIER,
-      critical  BOOLEAN OPTIONAL,
-      extnValue OCTET STRING}
-
-    SubjectKeyIdentifier ::= OCTET STRING
-
-    certificateTemplate ::= SEQUENCE {
-       templateID              OBJECT IDENTIFIER,
-       templateMajorVersion    INTEGER OPTIONAL, -- (0..4294967295)
-       templateMinorVersion    INTEGER OPTIONAL} -- (0..4294967295)
-
-    EnhancedKeyUsage ::= SEQUENCE OF OBJECT IDENTIFIER
-    KeyUsage ::= BIT STRING
-    netscapeCertType ::= BIT STRING
-
-    ApplicationCertPolicies ::= SEQUENCE OF PolicyInformation -- Microsoft
-
-    PolicyInformation ::= SEQUENCE {
-        policyIdentifier   OBJECT IDENTIFIER,
-        policyQualifiers   SEQUENCE OF PolicyQualifierInfo OPTIONAL}
-
-    PolicyQualifierInfo ::= SEQUENCE {
-       policyQualifierId    OBJECT IDENTIFIER,
-       qualifier            ANY}
-
-    certificatePolicies ::= SEQUENCE OF certPolicyInformation -- RFC 3280
-
-    certPolicyInformation ::= SEQUENCE {
-        policyIdentifier    CertPolicyId,
-        policyQualifier     SEQUENCE OF certPolicyQualifierInfo OPTIONAL}
-
-    CertPolicyId ::= OBJECT IDENTIFIER
-
-    certPolicyQualifierInfo ::= SEQUENCE {
-        policyQualifierId CertPolicyQualifierId,
-        qualifier         ANY DEFINED BY policyQualifierId}
-
-    CertPolicyQualifierId ::= OBJECT IDENTIFIER
-
-    CertPolicyQualifier ::= CHOICE {
-        cPSuri     CPSuri,
-        userNotice UserNotice }
-
-    CPSuri ::= IA5String
-
-    UserNotice ::= SEQUENCE {
-        noticeRef     NoticeReference OPTIONAL,
-        explicitText  DisplayText OPTIONAL}
-
-    NoticeReference ::= SEQUENCE {
-        organization     DisplayText,
-        noticeNumbers    SEQUENCE OF INTEGER }
-
-    DisplayText ::= CHOICE {
-        ia5String        IA5String,
-        visibleString    VisibleString,
-        bmpString        BMPString,
-        utf8String       UTF8String }
-
-    unstructuredName ::= CHOICE {
-        Ia5String       IA5String,
-        directoryString DirectoryString}
-
-    challengePassword ::= DirectoryString
-
-    subjectAltName ::= SEQUENCE OF GeneralName
-
-    GeneralName ::= CHOICE {
-         otherName                       [0]     AnotherName,
-         rfc822Name                      [1]     IA5String,
-         dNSName                         [2]     IA5String,
-         x400Address                     [3]     ANY, --ORAddress,
-         directoryName                   [4]     Name,
-         ediPartyName                    [5]     EDIPartyName,
-         uniformResourceIdentifier       [6]     IA5String,
-         iPAddress                       [7]     OCTET STRING,
-         registeredID                    [8]     OBJECT IDENTIFIER}
-
-    AnotherName ::= SEQUENCE {
-         type           OBJECT IDENTIFIER,
-         value      [0] EXPLICIT ANY }
-
-    EDIPartyName ::= SEQUENCE {
-         nameAssigner            [0]     DirectoryString OPTIONAL,
-         partyName               [1]     DirectoryString }
-
-    certificateTemplateName ::= CHOICE {
-        octets          OCTET STRING,
-        directoryString DirectoryString}
-
-    rsaKey ::= SEQUENCE {
-        modulus         INTEGER,
-        publicExponent  INTEGER}
-
-    dsaKey  ::= INTEGER
-
-    dsaPars ::= SEQUENCE {
-        P               INTEGER,
-        Q               INTEGER,
-        G               INTEGER}
-
-    eccName ::= OBJECT IDENTIFIER
-
-    ecdsaSigValue ::= SEQUENCE {
-        r               INTEGER,
-        s               INTEGER}
-ASN1
+    $asn->prepare($schema) or die( "Internal error in " . __PACKAGE__ . ": " . $asn->error );
 
     $asn->registertype( 'qualifier', '1.3.6.1.5.5.7.2.1', $self->_init('CPSuri') );
     $asn->registertype( 'qualifier', '1.3.6.1.5.5.7.2.2', $self->_init('UserNotice') );
@@ -768,6 +782,24 @@ ASN1
 
     $self->{signatureAlgorithm}
         = $self->_convert_signatureAlgorithm( $top->{signatureAlgorithm} );
+
+    # parse parameters for RSA PSS
+    if ($self->{signatureAlgorithm}{algorithm} eq 'rsassaPss') {
+        my $params = $self->_init('rsassaPssParam')
+            ->decode($self->{signatureAlgorithm}{parameters});
+
+        my $sigInfo = {
+            'saltLength' => ($params->{saltLength} || 20),
+            'digestAlgorithm' => 'sha1',
+        };
+        $sigInfo->{digestAlgorithm} = $self->_oid2name($params->{digestAlgorithm}{algorithm})
+            if($params->{digestAlgorithm}{algorithm});
+
+        $sigInfo->{maskGenAlgorithm} = $self->_oid2name($params->{maskGenAlgorithm}{algorithm})
+            if($params->{maskGenAlgorithm}{algorithm});
+
+        $self->{signatureAlgorithm}{parameters} = $sigInfo;
+    }
 
     # Extract bundle of bits that is signed
     # The DER is SEQUENCE -- CertificationRequest
@@ -932,14 +964,6 @@ my %special;
      $value->{templateID} = $self->_oid2name( $value->{templateID} ) if( $self->{_apiVersion} > 0 );
      return $value;
  },
- ENROLLMENT_NAME_VALUE_PAIR => sub {
-     my $self = shift;
-     my( $value, $id ) = @_;
-
-     $self->_bmpstring( @{$value}{qw/name value/} );
-
-     return $value;
- },
  EnrollmentCSP => sub {
      my $self = shift;
      my( $value, $id ) = @_;
@@ -1011,6 +1035,12 @@ my %special;
 
      return $self->_hash2string( $value );
  },
+ unstructuredAddress => sub {
+     my $self = shift;
+     my( $value, $id ) = @_;
+
+     return $self->_hash2string( $value );
+ },
  challengePassword => sub {
      my $self = shift;
      my( $value, $id ) = @_;
@@ -1024,30 +1054,42 @@ sub _convert_attributes {
     my( $typeandvalues ) = @_;
 
     foreach my $entry ( @{$typeandvalues} ) {
-	my $oid = $entry->{type};
-	my $name = $oids{$oid};
-	$name = $variantNames{$name} if( defined $name && exists $variantNames{$name} );
+    my $oid = $entry->{type};
+    my $name = $oids{$oid};
+    $name = $variantNames{$name} if( defined $name && exists $variantNames{$name} );
 
-	next unless( defined $name );
+    next unless( defined $name );
 
-	$entry->{type} = $name;
+    $entry->{type} = $name;
 
-	if ($name eq 'extensionRequest') {
-	    $entry->{values} = $self->_convert_extensionRequest($entry->{values}[0]);
-	} else {
-	    my $parser = $self->_init( $name, 1 ) or next; # Skip unknown attributes
+    if ($name eq 'extensionRequest') {
+        $entry->{values} = $self->_convert_extensionRequest($entry->{values}[0]);
 
-	    if($entry->{values}[1]) {
-		confess( "Incomplete parsing of attribute type: $name" );
-	    }
-	    my $value = $entry->{values} = $parser->decode( $entry->{values}[0] ) or
-	      confess( "Looks like damaged input parsing attribute $name" );
+    } elsif ($name eq 'ENROLLMENT_NAME_VALUE_PAIR') {
+        my $parser = $self->_init( $name );
+        my @values;
+        foreach my $der (@{$entry->{values}}) {
+            my $pair = $parser->decode( $der ) or
+                confess( "Looks like damaged input parsing attribute $name" );
+                $self->_bmpstring( $pair->{name}, $pair->{value} );
+            push @values, $pair;
+        };
+        $entry->{values} = \@values;
 
-	    if( exists $special{$name} ) {
-		my $action = $special{$name};
-		$entry->{values} = $action->( $self, $value, $name, $entry );
-	    }
-	}
+    } else {
+        my $parser = $self->_init( $name, 1 ) or next; # Skip unknown attributes
+
+        if($entry->{values}[1]) {
+            confess( "Incomplete parsing of attribute type: $name" );
+        }
+        my $value = $entry->{values} = $parser->decode( $entry->{values}[0] ) or
+        confess( "Looks like damaged input parsing attribute $name" );
+
+        if( exists $special{$name} ) {
+        my $action = $special{$name};
+        $entry->{values} = $action->( $self, $value, $name, $entry );
+        }
+    }
     }
     return $typeandvalues;
 }
@@ -1198,6 +1240,12 @@ sub subjectRaw {
 
 }
 
+sub subjectSequence {
+
+    my $self = shift;
+    return $self->{certificationRequestInfo}{subject_raw};
+
+}
 
 sub subjectAltName {
     my $self = shift;
@@ -1260,6 +1308,13 @@ sub subjectPublicKeyParams {
     my $at = $self->pkAlgorithm;
     $at = 'undef' unless( defined $at );
 
+
+    # this is wrong but unfortunately seen in the wild
+    if( $at eq 'rsassaPss') {
+        $at = 'rsaEncryption';
+        warn 'Got rsassaPss as pkAlgorithm - converting to RSA';
+    }
+
     if( $at eq 'rsaEncryption' ) {
         $rv->{keytype} = 'RSA';
         my $par = $self->_init( 'rsaKey' );
@@ -1319,11 +1374,16 @@ sub signatureAlgorithm {
 sub signatureParams {
     my $self = shift;
 
-    if( exists $self->{signatureAlgorithm}{parameters} ) {
-        my( $tlen, undef, $tag ) = asn_decode_tag2( $self->{signatureAlgorithm}{parameters} );
-        if( $tlen != 0 && $tag != ASN_NULL ) {
-            return $self->{signatureAlgorithm}{parameters}
-        }
+    return unless ( exists $self->{signatureAlgorithm}{parameters} );
+
+    # For RSA PSS the parameters have been parsed to a hash already
+    if (ref $self->{signatureAlgorithm}{parameters} eq 'HASH') {
+        return $self->{signatureAlgorithm}{parameters};
+    }
+
+    my( $tlen, undef, $tag ) = asn_decode_tag2( $self->{signatureAlgorithm}{parameters} );
+    if( $tlen != 0 && $tag != ASN_NULL ) {
+        return $self->{signatureAlgorithm}{parameters}
     }
     # Known algorithm's parameters MAY return a hash of decoded fields.
     # For now, leaving that to the caller...
@@ -1567,16 +1627,22 @@ sub checkSignature {
 
         # Determine the signature hash type from the algorithm name
 
-        my( $hash, $hashmod, $hashfcn ); # hashnnn, Digest::mod, Digest::mod::fcn
+        my @params = ( $sig, $self->certificationRequest );
         if( $alg =~ /sha-?(\d+)/i ) {
-            $hash = "sha$1";
-            $hashmod = 'Digest::SHA';
-            $hashfcn = "Digest::SHA::$hash";
+            push @params, "SHA$1";
+
         } elsif( $alg =~ /md-?(\d)/i ) {
-            $hash = "md$1";
-            $hashmod = "Digest::MD$1";
-            $hashfcn = "Digest::MD$1::$hash";
+            push @params, "MD$1";
+
+        } elsif ( $alg eq 'rsassaPss' ) {
+
+            my $sigParam = $self->signatureParams;
+            push @params, uc($sigParam->{digestAlgorithm});
+            push @params, 'pss';
+            push @params, $sigParam->{saltLength};
+
         } else {
+
             die( "Unknown hash in signature algorithm $alg\n" );
         }
 
@@ -1591,8 +1657,17 @@ sub checkSignature {
             eval { require Crypt::PK::RSA; };
             die( "Unable to load Crypt::PK::RSA\n" ) if( $@ );
 
-            $key = Crypt::PK::RSA->new( \$key );
-            return $key->verify_message( $sig, $self->certificationRequest, uc($hash),  "v1.5" );
+            # We have seen requests in the wild that accidentially
+            # have the rsaPSS OID set for the key type which is wrong
+            # and therefore not supported by Crypt::PK::RSA. We therefore
+            # build the key directly from the components extracted earlier
+            $key = Crypt::PK::RSA->new( {
+                e => $keyp->{publicExponent},
+                N => $keyp->{modulus},
+            } );
+            # if we have NOT pss padding we need to add v1.5 padding
+            push @params, 'v1.5' if ( $alg ne 'rsassaPss' );
+            return $key->verify_message( @params );
 
         }
 
@@ -1602,7 +1677,7 @@ sub checkSignature {
             die( "Unable to load Crypt::PK::DSA\n" ) if( $@ );
 
             $key = Crypt::PK::DSA->new( \$key );
-            return $key->verify_message( $sig, $self->certificationRequest, uc($hash) );
+            return $key->verify_message( @params );
         }
 
         if( $keyp->{keytype} eq 'ECC' ) {
@@ -1610,7 +1685,7 @@ sub checkSignature {
             die( "Unable to load Crypt::PK::ECC\n" ) if( $@ );
 
             $key = Crypt::PK::ECC->new( \$key );
-            return $key->verify_message( $sig, $self->certificationRequest, uc($hash) );
+            return $key->verify_message( @params );
         }
 
         die( "Unknown key type $keyp->{keytype}\n" );
@@ -2128,6 +2203,45 @@ second level, too:
         ]
     ];
 
+=head3 subjectSequence
+
+Returns the subject as returned from the ASN1 parser.
+
+Similar to subjectRaw this is a list with the RDNs but each item is
+always a list itself, in case of a single valued RND holding only
+a single item. Each item is a hash with the keys type and value where
+the value part is a hash with the format as key and the item value as
+value:
+
+    [
+        [
+            {
+                'value' => { 'ia5String' => 'Org' },
+                'type' => '0.9.2342.19200300.100.1.25'
+            }
+        ],
+        [
+            {
+                'value' => { 'utf8String' => 'ACME' },
+                'type' => '2.5.4.10'
+            },
+        ],
+        [
+            {
+
+                'type' => '2.5.4.3',
+                'value' => { 'utf8String' => 'Foobar' }
+            },
+            {
+                'type' => '0.9.2342.19200300.100.1.1',
+                'value' => { 'utf8String' => 'foobar' }
+            }
+        ]
+    ];
+
+This structure can be used directly to assemble ASN1 structures with
+the OpenXPKI::Crypt::* objects.
+
 =head3 commonName
 
 Returns the common name(s) from the subject.
@@ -2457,6 +2571,7 @@ B<registerOID>.
  1.2.840.113549.1.1.5       sha1WithRSAEncryption      (SHA1 with RSA encryption)
  1.2.840.113549.1.1.6       rsaOAEPEncryptionSET
  1.2.840.113549.1.1.7       RSAES-OAEP
+ 1.2.840.113549.1.1.10      rsassaPss
  1.2.840.113549.1.1.11      sha256WithRSAEncryption    (SHA-256 with RSA encryption)
  1.2.840.113549.1.1.12      sha384WithRSAEncryption
  1.2.840.113549.1.1.13      sha512WithRSAEncryption    (SHA-512 with RSA encryption)
@@ -2464,6 +2579,7 @@ B<registerOID>.
  1.2.840.113549.1.9.1       emailAddress
  1.2.840.113549.1.9.2       unstructuredName
  1.2.840.113549.1.9.7       challengePassword
+ 1.2.840.113549.1.9.8       unstructuredAddress
  1.2.840.113549.1.9.14      extensionRequest
  1.2.840.113549.1.9.15      smimeCapabilities          (SMIMECapabilities)
  1.3.6.1.4.1.311.2.1.14     CERT_EXTENSIONS
