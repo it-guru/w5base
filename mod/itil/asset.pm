@@ -511,15 +511,21 @@ sub new
                    my $mode=shift;
                    my %param=@_;
 
+                   my $ShowPlanedDeCons=0;
+
                    if (exists($param{current}) &&
                        $param{current}->{'eohs'} ne ""){
                       my $deohs=CalcDateDuration(NowStamp("en"),
                                             $param{current}->{'eohs'});
                       if ($deohs->{totaldays}<366){
-                         return(1);
+                         $ShowPlanedDeCons=1;
                       }
                    }
-                   return(0);
+                   if (exists($param{current}) &&
+                       $param{current}->{'plandecons'} ne ""){
+                      $ShowPlanedDeCons=1;
+                   }
+                   return($ShowPlanedDeCons);
                 },
                 label         =>'planned deconstruction date',
                 dataobjattr   =>'asset.plandecons'),
@@ -527,22 +533,37 @@ sub new
      new kernel::Field::Textarea(
                 name          =>'eohscomments',
                 group         =>'financeco',
-                depend        =>['eohs'],
+                depend        =>['eohs','plandecons'],
                 htmlheight    =>'50px',
                 htmldetail    =>sub{
                    my $self=shift;
                    my $mode=shift;
                    my %param=@_;
 
+                   my $ShowComments=0;
+
                    if (exists($param{current}) &&
                        $param{current}->{'eohs'} ne ""){
                       my $deohs=CalcDateDuration(NowStamp("en"),
                                             $param{current}->{'eohs'});
                       if ($deohs->{totaldays}<366){
-                         return(1);
+                         $ShowComments=1;
                       }
                    }
-                   return(0);
+                   if (exists($param{current}) &&
+                       $param{current}->{'plandecons'} ne ""){
+                      my $dplandecons=CalcDateDuration(NowStamp("en"),
+                                            $param{current}->{'plandecons'});
+                      if ($dplandecons->{totaldays}<366){
+                         $ShowComments=1;
+                      }
+                   }
+                   if (exists($param{current}) &&
+                       $param{current}->{'eohscomments'} ne ""){
+                      $ShowComments=1;
+                   }
+
+                   return($ShowComments);
                 },
                 label         =>'justification when exceeding '.
                                 '"end of hardware support"',
