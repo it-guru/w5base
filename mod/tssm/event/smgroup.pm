@@ -64,7 +64,6 @@ sub smgroup
    my $self=shift;
    my $queryparam=shift;
 
-   
 
    my $joblog=getModuleObject($self->Config,"base::joblog");
    my $sgrp=getModuleObject($self->Config,"tssm::group");
@@ -94,19 +93,26 @@ sub smgroup
       {
          dataobj=>$sgrp,
          recpos=>0,
+         cnt=>0,
          initflt=>{active=>1},
          view=>\@SMVIEW
       },
       {
          dataobj=>$agrp,
          recpos=>1,
+         cnt=>0,
          initflt=>{deleted=>\'0'},
          view=>\@AMVIEW
       }
    );
 
    # for refresh-debugging clear incloader
-   my @incloader=();
+   #@incloader=();
+
+   my $looplimit=100;
+   if ($queryparam eq "reset"){
+      $looplimit=1000000;
+   } 
 
    foreach my $incloader (@incloader){
       my $dataobj=$incloader->{dataobj};
@@ -139,16 +145,17 @@ sub smgroup
       if ($queryparam ne "" && $queryparam ne "reset"){
             $flt->{fullname}=$queryparam;
       }
-      #printf STDERR ("fifi flt=%s\n",Dumper($flt));
-      $dataobj->SetCurrentView(@{$incloader->{view}});
-      $dataobj->SetCurrentOrder("mdate");
+      $dataobj->ResetFilter();
       $dataobj->SetFilter($flt);
+      $dataobj->SetCurrentView(@{$incloader->{view}});
+      $dataobj->SetCurrentOrder("+mdate");
       my ($grprec,$msg)=$dataobj->getFirst();
       my $laststamp;
       if (defined($grprec)){
          my $c=0;
          do{
-            msg(INFO,"process $grprec->{fullname} $grprec->{mdate}");
+            $incloader->{cnt}++;
+            msg(INFO,"process ".$incloader->{dataobj}->Self()."($incloader->{cnt}): $grprec->{fullname} '$grprec->{mdate}'");
             $laststamp=$grprec->{mdate};
             if ($start eq $grprec->{mdate}){
                $c--;
@@ -163,7 +170,7 @@ sub smgroup
                msg(ERROR,"db record problem: %s",$msg);
                return({exitcode=>1,msg=>$msg});
             }
-         }until(!defined($grprec) || $c++>100);
+         }until(!defined($grprec) || $c++>$looplimit);
       }
       if (($queryparam eq "" ||
            $queryparam eq "reset") &&
@@ -531,7 +538,7 @@ sub handleSRec
          }
       }
    }
-   msg(INFO,"lastseen = $lastseen");
+   #msg(INFO,"lastseen = $lastseen");
 
    my $istelit=0;
    my $fullname=effVal($oldrec,$newrec,"fullname");
