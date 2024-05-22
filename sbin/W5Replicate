@@ -1096,6 +1096,20 @@ sub objectReplicationPhase3
            "  \"_$ctrl->{name}\".w5replfailcnt>8)) and ROWNUM<1000)";
    msg(INFO,"oracmd=$cmd");
    $dbi->doCmd($cmd);
+   if (exists($ctrl->{col}->{cistatusid})){  # special handling for W5Base
+                                             # cistatusid=7 records - delete
+                                             # them after 7 days
+      my $ccmd="delete from \"$ctrl->{name}\" ".
+               "where \"$ctrl->{name}\".$ctrl->{idname} in ".
+               "(select \"_$ctrl->{name}\".refid ".
+               "from \"_$ctrl->{name}\" ".
+               "join \"$ctrl->{name}\" ".
+               "on \"_$ctrl->{name}\".refid=\"$ctrl->{name}\".$ctrl->{idname} ".
+               "where \"_$ctrl->{name}\".w5repllastsucc<current_date-3 ".
+               "and \"$ctrl->{name}\".cistatusid='7')";
+      msg(INFO,"del cistatus7 cmd=$ccmd");
+      $dbi->doCmd($ccmd);
+   }
    msg(INFO,"end:   phase 3 replication for $ctrl->{name}");
    storeReplicateObjectStat($Config,$dbi,$ctrl,$rorec,3);
    my $rstatid=$rstatobj->ValidatedUpdateRecord({},{
