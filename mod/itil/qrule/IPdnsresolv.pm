@@ -100,7 +100,33 @@ sub qcheckRecord
          }
       }
    }
-   if (keys(%$forcedupd)){
+   if ($rec->{dnsname} ne ""){
+      if ($rec->{system} ne ""){
+         my $dnshostpart=$rec->{dnsname};
+         $dnshostpart=~s/\..*$//;
+         if (lc($dnshostpart) eq lc($rec->{system})){
+            if ($rec->{addresstyp} ne "0"){ # should be prim - but we check 
+                                            # if there others already primary
+               my $sys=getModuleObject($dataobj->Config,"itil::system");
+               $sys->SetFilter({id=>\$rec->{systemid}});
+               my ($sysrec,$msg)=$sys->getOnlyFirst(qw(ipaddresses)); 
+               my $foundprim=0;
+               if (defined($sysrec) && exists($sysrec->{ipaddresses})){
+                  foreach my $iprec (@{$sysrec->{ipaddresses}}){
+                    if ($iprec->{addresstyp} eq "0"){
+                       $foundprim=1;
+                       last;
+                    }
+                  }
+                  if (!$foundprim){
+                     $forcedupd->{addresstyp}="0";
+                  }
+               }
+            }
+         }
+      }
+   }
+   if (keys(%$forcedupd) && exists($forcedupd->{dnsname})){
       $forcedupd->{mdate}=$rec->{mdate};
       $forcedupd->{editor}=$rec->{editor};
       $forcedupd->{owner}=$rec->{owner};
