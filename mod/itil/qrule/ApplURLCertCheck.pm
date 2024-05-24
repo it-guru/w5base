@@ -119,7 +119,7 @@ sub qcheckRecord
                      my $bits=$res->{sslcert}->{ssl_cert_bits};
                      if ($bits<3000){
                         my $msg=$dataobj->T("WARN: ".
-                                "RSA private keys with less then 3000 bit ".
+                                "RSA private keys with less than 3000 bit ".
                                 "are considered insecure");
                         push(@qmsg,$msg);
                      }

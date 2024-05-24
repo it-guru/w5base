@@ -1,6 +1,6 @@
 'itil::qrule::ApplURLCertCheck'=>{de=>'KommunikationsURL Zertifikats-Check',en=>'CommunicationURL Cert-Check'},
 'Certificate expires in a few days'=>{de=>'Zertifikat verfällt in wenigen Tagen'},
 'Certificate has expired'=>{de=>'Zertifikat ist abgelaufen'},
-'WARN: RSA private keys with less then 3000 bit are considered insecure'=>{
+'WARN: RSA private keys with less than 3000 bit are considered insecure'=>{
 de=>'WARN: RSA PrivateKeys mit weniger als 3000 Bit gelten als unsicher'
 }

@@ -482,6 +482,7 @@ sub new
                 name          =>'sslparsedAlgorithm',
                 label         =>'SSL Cert parsed algorithm',
                 readonly      =>1,
+                searchable    =>1,
                 htmldetail    =>'NotEmpty',
                 group         =>'detail',
                 depend        =>["sslcert"],
@@ -500,6 +501,7 @@ sub new
                 name          =>'sslparsedKeylen',
                 label         =>'SSL Cert parsed keylen',
                 readonly      =>1,
+                searchable    =>1,
                 htmldetail    =>'NotEmpty',
                 group         =>'detail',
                 depend        =>["sslcert"],
@@ -961,7 +963,7 @@ sub Validate
          msg(INFO,"Validate: detect RSA");
          if ($crec->{keyparams}->{keylen}<3000){
             $self->LastMsg(ERROR,
-                  "RSA keylen with less then 3000 bit is insecure");
+                  "RSA keylen with less than 3000 bit is insecure");
             return(0);
          }
       }
@@ -1015,7 +1017,7 @@ sub Validate
       if ($crec->{algorithm} eq "rsaEncryption" &&
           $crec->{keyparams}->{keylen}<3000){
          $self->LastMsg(ERROR,
-                     "CSR with RSA keylen less then 3000 bit can not renewal");
+                     "CSR with RSA keylen less than 3000 bit can not renewal");
          return(0);
       }
       if (!$self->verifyCSRtoCA(0,$carec,$crec)){

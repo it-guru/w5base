@@ -63,10 +63,10 @@
 'SSL Cert W5Ref'=>{de=>'SSL-Zertifikat W5Ref'},
 "altname '%s' not allowed for requested CA"=>{de=>"Alternativer CN/Subject (%s) ist für die geforderte CA nicht zulässig"},
 "existing CSRs with the same CN - please ensure cleanup (maybe through service team)"=>{de=>'Bestehende CSRs mit demselben CN - bitte für Bereinigung sorgen (eventuell Serviceteam einschalten)'},
-'RSA keylen with less then 3000 bit is insecure'=>{
+'RSA keylen with less than 3000 bit is insecure'=>{
 de=>'RSA Schlüssellänge von weniger als 3000 Bits ist unsicher'
 },
-'CSR with RSA keylen less then 3000 bit can not renewal'=>{
+'CSR with RSA keylen less than 3000 bit can not renewal'=>{
 de=>'CSR mit RSA Schlüssellänge von weniger als 3000 Bit kann nicht erneuert werden'
 }
 
