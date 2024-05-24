@@ -169,6 +169,26 @@ sub getSqlFrom
 }
 
 
+sub prepUploadRecord
+{
+   my $self=shift;
+   my $newrec=shift;
+
+   if (!exists($newrec->{id}) || $newrec->{id} eq ""){
+      if (exists($newrec->{systemid}) && $newrec->{systemid} ne ""){
+         my $o=$self->Clone();
+         $o->SetFilter({systemid=>\$newrec->{systemid}});
+         my ($rec,$msg)=$o->getOnlyFirst(qw(id));
+         if (defined($rec)){
+            $newrec->{id}=$rec->{id};
+         }
+      }
+   }
+   return(1);
+}
+
+
+
 
 sub isQualityCheckValid
 {
