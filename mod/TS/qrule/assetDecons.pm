@@ -146,7 +146,7 @@ sub qcheckRecord
          if ($rec->{plandecons} ne ""){
             my $dplandecons=CalcDateDuration(NowStamp("en"),$rec->{plandecons});
             if ($dplandecons->{totaldays}<0){
-               my $msg="overwriten planned deconstruction date";
+               my $msg="Exceeding planned deconstruction date";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
                $errorlevel=3 if ($errorlevel<3);
@@ -155,7 +155,7 @@ sub qcheckRecord
                my $chk=CalcDateDuration($rec->{plandecons},$rec->{eohs});
                if ($chk->{totaldays}<0){
                   if (!isDetailed(undef,$rec,"eohscomments",20,5)){
-                     my $msg="justification for overwriten planned ".
+                     my $msg="Justification for exceeding planned ".
                              "deconstruction date not detailed enough";
                      push(@qmsg,$msg);
                      push(@dataissue,$msg);
@@ -172,7 +172,7 @@ sub qcheckRecord
          }
          if (!$plandeconsok){
             if ($deohs->{totaldays}<90){
-               my $msg="overwriten end of hardware support ".
+               my $msg="Exceeding \"End of Hardware Support\" ".
                        "without valid deconstruction planning";
                push(@qmsg,$msg);
                push(@dataissue,$msg);
