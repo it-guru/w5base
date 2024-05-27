@@ -195,14 +195,17 @@ sub preFixShortname
    $newname =~ s/Ü/Ue/g;
    $newname =~ s/ß/sz/g;
    $newname=~s/[^a-z0-9_-]/_/gi;
+printf STDERR ("fifi01 : newname=$newname\n");
    if (length($newname)>15){
       $newname=substr($newname,0,15);
    }
+printf STDERR ("fifi02 : newname=$newname\n");
    if ($newname eq ""){
       $newname="OID_$tOuID";
       $newname=~s/-//g;
       $newname=substr($newname,0,15);
    }
+printf STDERR ("fifi03 : newname=$newname\n");
    return($newname);
 }
 

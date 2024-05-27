@@ -91,7 +91,26 @@ sub qcheckRecord
           (my ($sapid)=$rec->{ext_refid1}=~m/^SAP:(\d+)$/)){
          # transfer is posible
          my $o=getModuleObject($self->getParent->Config(),"caiman::orgarea");
-         $o->SetFilter({sapid=>"*$sapid"});
+         if ($rec->{srcid} eq "1134822"){  # DTAG
+            $o->SetFilter({torgoid=>"5cb92e56-c099-4dec-bafc-8191515a3faf"});
+         }
+         elsif ($rec->{srcid} eq "9744971"){  # Congstar
+            $o->SetFilter({torgoid=>"fcb9f15c-5026-4e66-b7c0-4e570783b831"});
+         }
+         elsif ($rec->{is_org} eq "1" && 
+                $rec->{sisnumber} ne ""){  # funktioniert, wenn eine sisnumber
+            $o->SetFilter({                # ermittelt werden konnte.
+               sapid=>\$rec->{sisnumber},
+               sisnumber=>\$rec->{sisnumber},
+               kindoforg=>'Company'              # das koeente u.U. nicht gut
+            })                                   # sein. u.U. auf Company verz?
+         }
+         elsif ($rec->{srcid} eq "72599877"){ # DTIT
+            $o->SetFilter({torgoid=>"e08160db-631b-4dd0-a731-329e2cc2bbd6"});
+         }
+         else{
+            $o->SetFilter({sapid=>"*$sapid"});
+         }
          my @l=$o->getHashList(qw(torgoid sapid));
          if ($#l>0 && $rec->{srcid} ne ""){
             # try to add tOuSD to find a unique caiman tOuCID
@@ -142,87 +161,28 @@ sub qcheckRecord
       my $o=getModuleObject($self->getParent->Config(),"caiman::orgarea");
       $o->SetFilter({torgoid=>\$rec->{srcid}});
       ($caimanrec,$msg)=$o->getOnlyFirst(qw(name shortname sapid toumgr
-                                          urlofcurrentrec));
+                                          urlofcurrentrec sisnumber));
       my $ext_refid1;
+      my $refid2;
       if (defined($caimanrec)){
          my $is_org=0;
-         my $hasOrgRecord=0;    # Fuer INT Einheiten exisitert nicht immer
-                                # ein caiman::organisation Eintrag bzw. 
-                                # ist einfach die toLD nicht die gleiche, wie
-                                # die tOuLD - da muss dann der Leiter für die
-                                # Berechnung herhalten.
-         if ($caimanrec->{name} ne "" && $caimanrec->{shortname} ne ""){
-            my $p=getModuleObject($self->getParent->Config(),
-                  "caiman::organisation");
-
-            # Das wäre eigentlich der korrekte Filter ...
-            #$p->SetFilter({
-            #    abbreviation=>\$caimanrec->{shortname},
-            #    name=>\$caimanrec->{name}
-            #});
-            # ... aber bei MSS Drehsten passt die Abkürzung in den OrgUnits
-            # nicht zur Abkürzung in der Organisation
-            $p->SetFilter({
-                name=>\$caimanrec->{name}
-            });
-
-            my ($orgrec,$msg)=$p->getOnlyFirst(qw(ALL));
-            if (defined($orgrec)){
-               $hasOrgRecord=1;
-               $is_org=1;
-               my $refid2;
-               if ($orgrec->{torgoid} ne ""){
-                  $refid2="tOrgOID:".$orgrec->{torgoid};
-               }
-               if ($rec->{sisnumber} ne $orgrec->{sisnumber}){
-                  $forcedupd->{sisnumber}=$orgrec->{sisnumber};
-               }
-               if ($rec->{ext_refid2} ne $refid2){
-                  $forcedupd->{ext_refid2}=$refid2;
-               }
-            }
+         if ($caimanrec->{torgoid} ne ""){
+            $refid2="tOrgOID:".$caimanrec->{torgoid};
          }
-         if (($caimanrec->{name}=~m/\sGmbH$/i) ||   # name of caiman record
+         if ($rec->{sisnumber} ne $caimanrec->{sisnumber}){
+            $forcedupd->{sisnumber}=$caimanrec->{sisnumber};
+         }
+         if ($rec->{ext_refid2} ne $refid2){
+            $forcedupd->{ext_refid2}=$refid2;
+         }
+         if ($caimanrec->{kindoforg} eq 'Company'){
+            $is_org=1;
+         }
+         elsif (($caimanrec->{name}=~m/\sGmbH$/i) ||# name of caiman record
              ($caimanrec->{name}=~m/\sAG$/)){       # indicates an organisation
             $is_org=1;
          }
-         # Problem: Rentnerservice TD GmbH ist namentlich eine eigene
-         #          Firma. Laut caiman::organisation aber nicht. Sie befindet
-         #          sich im Org-Baum unterhalb von DTIT - der Leiter hat
-         #          aber eine Gesselschaftsnummer der "Deutsche Telekom AG"
-         #          -> alles sehr verworren
 
-         if (!$hasOrgRecord){
-                   # Konzept funktioniert nicht, wenn der Leiter etwas 
-                   # komisarisch leitet - also aus einer Firma kommt, bei der
-                   # er nicht direkt arbeitet.
-            if ($caimanrec->{toumgr} ne ""){
-               my $p=getModuleObject($self->getParent->Config(),"caiman::user");
-               $p->SetFilter({tcid=>$caimanrec->{toumgr}});
-               my ($mgrrec,$msg)=$p->getOnlyFirst(qw(ALL));
-               if (defined($mgrrec)){
-                  if ($mgrrec->{office_sisnumber} ne ""){
-                     $sisnumber=$mgrrec->{office_sisnumber};
-
-                     my $po=getModuleObject($self->getParent->Config(),
-                           "caiman::organisation");
-                     $po->SetFilter({
-                         sisnumber=>\$sisnumber
-                     });
-                     my ($orgrec,$msg)=$po->getOnlyFirst(qw(ALL));
-                     if (defined($orgrec)){
-                        my $refid2;
-                        if ($orgrec->{tocid} ne ""){
-                           $refid2="tOrgOID:".$orgrec->{torgoid};
-                        }
-                        if ($rec->{ext_refid2} ne $refid2){
-                           $forcedupd->{ext_refid2}=$refid2;
-                        }
-                     }
-                  }
-               }
-            }
-         }
 
          if ($is_org){
             if (!$rec->{is_org}){
@@ -256,8 +216,8 @@ sub qcheckRecord
          if (exists($rec->{additional}->{tOuSD}) &&
              ref($rec->{additional}->{tOuSD}) eq "ARRAY"){
             $rawoldtousd=$rec->{additional}->{tOuSD}->[0];
-  #          $oldtousd=caiman::ext::orgareaImport::preFixShortname(
-  #                       $caimanrec->{toucid},$rawoldtousd);
+            $oldtousd=caiman::ext::orgareaImport::preFixShortname(
+                         $caimanrec->{torgoid},$rawoldtousd);
          }
          $curtousd=caiman::ext::orgareaImport::preFixShortname(
             $caimanrec->{torgoid},
@@ -271,16 +231,17 @@ sub qcheckRecord
              $rec->{name} ne ""){         # invalid local name
             $localrenamed=1;
          }
-         #printf STDERR ("DEBUG: localname=$rec->{name}\n");
-         #printf STDERR ("DEBUG: localrenamed=$localrenamed\n");
-         #printf STDERR ("DEBUG: curtousd=$curtousd\n");
-         #printf STDERR ("DEBUG: oldtousd=$oldtousd\n");
+         printf STDERR ("DEBUG: localname=$rec->{name}\n");
+         printf STDERR ("DEBUG: localrenamed=$localrenamed\n");
+         printf STDERR ("DEBUG: curtousd=$curtousd\n");
+         printf STDERR ("DEBUG: oldtousd=$oldtousd\n");
 
          if (!$localrenamed && $curtousd ne $rec->{name}){
             my $oldname=$rec->{fullname};
             my $basemsg="Try rename of Org '$oldname' needed - ".
                         "based on CAIMAN new tOuSD '$curtousd'";
             $dataobj->Log(WARN,"basedata",$basemsg);
+return(undef,undef);
 
             ##################################################################
             # the new name for current group can be already be in use on 
