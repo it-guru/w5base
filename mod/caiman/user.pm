@@ -20,9 +20,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
-use kernel::DataObj::LDAP;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::LDAP);
+use caiman::lib::Listedit;
+@ISA=qw(caiman::lib::Listedit);
 
 sub new
 {

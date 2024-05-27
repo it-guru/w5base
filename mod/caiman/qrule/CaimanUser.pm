@@ -35,7 +35,7 @@ Um das Dataissue zu bereinigen müssen korrekte Daten die in CAIMAN enthalten sin
 =cut
 
 #  W5Base Framework
-#  Copyright (C) 2007  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2024  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

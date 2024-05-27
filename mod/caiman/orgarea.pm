@@ -20,9 +20,9 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::App::Web;
-use kernel::DataObj::LDAP;
 use kernel::Field;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::LDAP);
+use caiman::lib::Listedit;
+@ISA=qw(caiman::lib::Listedit);
 
 sub new
 {
@@ -161,27 +161,6 @@ sub new
    return($self);
 }
 
-sub Initialize
-{
-   my $self=shift;
-
-   my @result=$self->AddDirectory(LDAP=>new kernel::ldapdriver($self,"caiman"));
-   return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
-
-   return(1) if (defined($self->{tsciam}));
-   return(0);
-}
-
-
-sub isQualityCheckValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(0);
-}
-
-
-
 
 
 sub SetFilterForQualityCheck
@@ -201,19 +180,6 @@ sub getRecordImageUrl
 }
          
 
-sub isViewValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return("ALL");
-}
-
-sub isWriteValid
-{
-   my $self=shift;
-   my $rec=shift;
-   return(undef);
-}
 
 sub getValidWebFunctions
 {

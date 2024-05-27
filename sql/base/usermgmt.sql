@@ -8,7 +8,7 @@ CREATE TABLE grp (
   email varchar(128) NOT NULL default '',
   supervisor bigint(20) NOT NULL default '0',
   srcsys varchar(40) default NULL,
-  srcid varchar(20) default NULL,
+  srcid varchar(128) default NULL,
   srcload datetime default NULL,
   comments blob,additional longtext    default NULL,
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
