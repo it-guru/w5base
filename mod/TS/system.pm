@@ -196,6 +196,23 @@ sub new
                 searchable    =>0,
                 readonly      =>1,
                 onRawValue    =>\&doIPanalyse),
+
+      new kernel::Field::SubList(
+                name          =>'w5w_systemref',
+                label         =>'W5Warhouse itil::system reference',
+                group         =>'source',
+                searchable    =>0,
+                readonly      =>1,
+                uivisible     =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent();
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                vjointo       =>\'W5Warehouse::itil__system',
+                vjoinon       =>['id'=>'id'],
+                vjoindisp     =>['name','d_w5repllastsucc','d_w5repllasttry']),
+
    );
 
    return($self);
