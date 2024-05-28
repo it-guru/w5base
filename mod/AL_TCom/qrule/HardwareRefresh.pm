@@ -38,6 +38,10 @@ A DataIssue is generated when RefreshDate + 30 days has been exceeded.
 If the system is provided by a serverfarm, this QRule is
 deactivated.
 
+A valid "Upgrade/Refresh reject valid to" may not be more 
+than 36 months in the future (i.e. if it is further in the 
+future, the exclusion justification will be ignored).
+
 Further information or contacts can be found at ...
 https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001
 
@@ -61,6 +65,10 @@ Ein DataIssue wird erzeugt, wenn RefreshDate + 30 Tage überschritten wird.
 
 Handelt es sich um ein System, das über eine Serverfarm bereitgestellt
 wird, deaktivert sich diese QRule.
+
+Ein gültiges "Ausschlußbegründung gültig bis" darf max. 36 Monate
+in der Zukunft liegen (d.h. liegt es weiter in der Zukunft, wird
+die Ausschlußbegründung ignoriert).
 
 Weitere Infos bzw. Ansprechpartner finden Sie unter ...
 https://darwin.telekom.de/darwin/auth/faq/article/ById/14007521580001

@@ -10,6 +10,11 @@ Checking the age of hardware/asset items. This quality rules controles
 the refresh of hardware items. The handling is aligned to a maximum
 age of 60 months.
 
+A valid "Upgrade/Refresh reject valid to" may not be more
+than 36 months in the future (i.e. if it is further in the
+future, the exclusion justification will be ignored).
+
+
 =head3 IMPORTS
 
 NONE
@@ -31,6 +36,9 @@ Somit gilt:
 
 Ein DataIssue wird erzeugt, wenn RefreshData+30Tage überschritten wird.
 
+Ein gültiges "Ausschlußbegründung gültig bis" darf max. 36 Monate
+in der Zukunft liegen (d.h. liegt es weiter in der Zukunft, wird
+die Ausschlußbegründung ignoriert).
 
 
 =cut
