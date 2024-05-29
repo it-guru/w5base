@@ -1,0 +1,8 @@
+#!/bin/bash
+for file in "$@"; do
+   CDATE=$(git log --follow --format='%ai' \
+                   --date default "$file" 2>/dev/null | tail -n1)
+   if [ ! -z "$CDATE" ]; then
+      echo "$CDATE;$file"
+   fi
+done
