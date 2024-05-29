@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "are you shure?  (CTRL+C to break)"
+read a
+git reset --hard origin/$(git branch --show-current)
