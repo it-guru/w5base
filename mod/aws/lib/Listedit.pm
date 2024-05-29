@@ -227,6 +227,10 @@ sub GetCred4AWS
          access_key=>$awsuser,
          secret_key=>$awspass
    );
+   if ($AWSAccount eq ""){  # no STS
+      msg(INFO,"return AWS basecred");
+      return($baseCred);
+   }
 
    my $stscred=Paws::Credential::AssumeRole->new(
      sts=>Paws->service('STS', credentials=>$baseCred,region=>$AWSRegion),
