@@ -155,8 +155,9 @@ sub qcheckRecord
                my $chk=CalcDateDuration($rec->{plandecons},$rec->{eohs});
                if ($chk->{totaldays}<0){
                   if (!isDetailed(undef,$rec,"eohscomments",20,5)){
-                     my $msg="Justification for exceeding planned ".
-                             "deconstruction date not detailed enough";
+                     my $msg='Justification for exceeding '.
+                             '"End of Hardware Support"'.
+                             ' date not detailed enough';
                      push(@qmsg,$msg);
                      push(@dataissue,$msg);
                      $errorlevel=3 if ($errorlevel<3);

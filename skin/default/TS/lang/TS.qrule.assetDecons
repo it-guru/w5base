@@ -8,5 +8,5 @@ en=>'Monitor planed hardware deconstruction'
 'request for deconstruction date'=>{de=>'Anforderung Rückbauzeitpunkt'},
 'Exceeding "End of Hardware Support" without valid deconstruction planning'=>{de=>'Überschreitung des "Ende des Hardware-Supports" ohne gültige Rückbauplanung'},
 'Exceeding planned deconstruction date'=>{de=>'Überschreitung des geplanten Rückbauzeitpunktes'},
-'Justification for exceeding planned deconstruction date not detailed enough'=>{de=>'Begründung für Überschreitung des "Ende des Hardware-Supports" nicht ausführlich genug'},
+'Justification for exceeding "End of Hardware Support" date not detailed enough'=>{de=>'Begründung für Überschreitung des "Ende des Hardware-Supports" nicht ausführlich genug'},
 'excluded hardware model'=>{de=>'ausgeschlossenes Hardware-Model'},
