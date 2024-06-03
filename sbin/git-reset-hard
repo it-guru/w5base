@@ -1,0 +1,6 @@
+#!/bin/bash
+BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+echo "are you shure to reset branch '$BRANCH' ?  (CTRL+C to break)"
+read a
+
+git reset --hard origin/$BRANCH
