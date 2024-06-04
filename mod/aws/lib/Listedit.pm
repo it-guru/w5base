@@ -228,7 +228,7 @@ sub GetCred4AWS
          secret_key=>$awspass
    );
    if ($AWSAccount eq ""){  # no STS
-      msg(INFO,"return AWS basecred");
+      #msg(INFO,"return AWS basecred");
       return($baseCred);
    }
 

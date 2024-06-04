@@ -47,116 +47,126 @@ sub AWS_KeyRefresh
    my $o=getModuleObject($self->Config,"aws::account");
    my ($cred,$ua)=$o->GetCred4AWS();
 
-printf STDERR ("fifi cred=%s\n",$cred);
-
-   my $obj=Paws->service('IAM',
-               credentials=>$cred
-   );
-
-printf STDERR ("fifi obj=%s\n",$obj);
+   my $obj=Paws->service('IAM', credentials=>$cred);
 
    my $ListAccessKeysResponse=$obj->ListAccessKeys();
+   my $AccessKeyMeta=$ListAccessKeysResponse->AccessKeyMetadata;
 
-printf STDERR ("fifi ListAccessKeysResponse=%s\n",$ListAccessKeysResponse);
+   my $UserName;
+   my $ActiveCount=0;
+   my $KeyCount=0;
+   my $newestActive;
+   my $newCreatedAccessKey;
 
-   my $AccessKeyMetadata = $ListAccessKeysResponse->AccessKeyMetadata;
+   my @curKeys=sort({$a->{CreateDate} cmp $b->{CreateDate}} @{$AccessKeyMeta});
 
-printf STDERR ("fifi AccessKeyMetadata=%s\n",Dumper($AccessKeyMetadata));
-
-   my $AccessKey;
-   eval('
-     my $AccessKeyResp=$obj->CreateAccessKey(UserName=>"darwin_read_metadata");
-     $AccessKey=$obj->AccessKey();
-   ');
-   if ($@){
-      my @msg=grep(!/^\s*$/,split(/[\r\n]+/,$@));
-      my $msg=shift(@msg);
-      printf STDERR ("msg=%s\n",$msg);
+   foreach my $curKeyRec (@curKeys){
+      $UserName=$curKeyRec->{UserName};
+      $ActiveCount++ if ($curKeyRec->{Status} eq "Active");
+      $KeyCount++;
+      if ($curKeyRec->{Status} eq "Active" && !defined($newestActive)){
+         $newestActive=$curKeyRec;
+      }
    }
-
-
-   exit(1) if (!defined($AccessKey));
-   
-
-#   if ($priv_key eq "" || $pub_key eq ""){
-#      return({
-#         exitcode=>12,
-#         exitmsg=>"fail to create key pair with openssl"
-#      });
-#   }
+   msg(INFO,"AccessKeys=".Dumper(\@curKeys));
+   if ($KeyCount<=1){
+      eval('
+        my $AccessKeyResp=$obj->CreateAccessKey(UserName=>$UserName);
+        $newCreatedAccessKey=$AccessKeyResp->AccessKey();
+      ');
+      if ($@){
+         my @msg=grep(!/^\s*$/,split(/[\r\n]+/,$@));
+         my $msg=shift(@msg);
+         printf STDERR ("msg=%s\n",$msg);
+      }
+      if (defined($newCreatedAccessKey)){
+         msg(INFO,"new created AccessKey=".Dumper($newCreatedAccessKey));
+      }
+      else{
+         return({exitcode=>1,
+                 exitmsg=>'ERROR - fail to create new AccessKeyId'});
+      }
+   }
 
    my $credentialName="aws";
 
-   my $d;
+   my $tempkeyfile=$keyfile;
+   my $ts=NowStamp();
+   if ($tempkeyfile=~m/\.[^\/]+$/){
+      $tempkeyfile=~s/(\.[^\/]+)$/.$ts$1/x;
+   }
+   else{
+      $tempkeyfile.=".".$ts;
+   }
+   msg(INFO,"keyfile=$keyfile");
+   msg(INFO,"tempkeyfile=$tempkeyfile");
 
+   my $keyFileChanged=0;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   if (ref($d) eq "HASH" && 
-       exists($d->{name}) && $d->{name} ne ""){
-      msg(INFO,"new key stored in AWS as $d->{name}");
-
-      my $tempkeyfile=$keyfile;
-      my $ts=NowStamp();
-      if ($tempkeyfile=~m/\.[^\/]+$/){
-         $tempkeyfile=~s/(\.[^\/]+)$/.$ts$1/x;
+   if (open(my $keyfileFH,'<',$keyfile)){
+      my @curVal=<$keyfileFH>;
+      my @orgcurVal=@curVal;
+      close($keyfileFH);
+      @curVal=grep(/^(DATAOBJ)/,@curVal);
+      my $storedDATAOBJUSER;
+      foreach my $line (@curVal){
+         if (my ($v)=$line=~m/^DATAOBJUSER\[$credentialName\]="([^"]*)"\s*$/){
+            $storedDATAOBJUSER=$v;
+         }
+      }
+      if (defined($newCreatedAccessKey)){
+         msg(INFO,"build new curVal for ".$newCreatedAccessKey->{AccessKeyId});
+         @curVal=grep(!/^DATAOBJUSER\[$credentialName\]/,@curVal);
+         push(@curVal,"DATAOBJUSER[$credentialName]=\"".
+                       $newCreatedAccessKey->{AccessKeyId}.
+                      "\"\n");
+         @curVal=grep(!/^DATAOBJPASS\[$credentialName\]/,@curVal);
+         push(@curVal,"DATAOBJPASS[$credentialName]=\"".
+                       $newCreatedAccessKey->{SecretAccessKey}.
+                      "\"\n");
+         unshift(@curVal,"#NEW Generated: ".$ts."\n");
+         unshift(@curVal,"#AWS AccessKeyId: ".
+                         $newCreatedAccessKey->{AccessKeyId}."\n");
+         push(@curVal,"\n");
+         $keyFileChanged++;
       }
       else{
-         $tempkeyfile.=".".$ts;
+         msg(INFO,"newest=".$newestActive->{AccessKeyId});
+         msg(INFO,"curused=".$storedDATAOBJUSER);
+         if (defined($newestActive) && 
+             $newestActive->{AccessKeyId} ne $storedDATAOBJUSER){
+            msg(INFO,"do DeleteAccessKey unused key ".
+                     $newestActive->{AccessKeyId});
+            my $bk=$obj->DeleteAccessKey(
+               'AccessKeyId'=>$newestActive->{AccessKeyId},
+               'UserName'=>$newestActive->{UserName}
+            );  
+            msg(INFO,"DeleteAccessKey bk=$bk");
+            return({exitcode=>0,exitmsg=>'ok - drop unused key '.
+                                         $newestActive->{AccessKeyId}.
+                                         ' done'});
+         }
       }
-      #msg(INFO,"tempkeyfile=$tempkeyfile");
-     
-      if (open(my $tempkeyfileFH,">", $tempkeyfile )){
-         if (open(my $keyfileFH,'<',$keyfile)){
-            my @curVal=<$keyfileFH>;
-            print $tempkeyfileFH (join("",@curVal));
-            close($keyfileFH);
+      if ($keyFileChanged){
+         msg(INFO,"waiting 60sec to ensure key is working");
+         sleep(60);
+         msg(INFO,"try to store orgcurVal in $tempkeyfile");
+         if (open(my $tempkeyfileFH,">", $tempkeyfile )){
+            print $tempkeyfileFH (join("",@orgcurVal));
+            close($tempkeyfileFH);
+            msg(INFO,"try to store new curVal in $keyfile");
             if (open(my $keyfileFH,'>',$keyfile)){
-               printf $keyfileFH ("#NEW Generated: %s\n",$ts);
-               printf $keyfileFH ("#AWS name : %s\n",$d->{name});
-               @curVal=grep(/^(DATAOBJCONNECT|DATAOBJUSER)/,@curVal);
-               push(@curVal,'DATAOBJPASS['.$credentialName.']="'."\n");
-      #         push(@curVal,map({$_."\n"} split("\n",$priv_key)));
-               push(@curVal,'"'."\n");
-     
                print $keyfileFH (join("",@curVal));
                close($keyfileFH);
-               return({exitcode=>0,exitmsg=>'ok - key '.$d->{name}.' stored'});
+               return({exitcode=>0,exitmsg=>'ok - new key stored'});
             }
             else{
-               unlink($tempkeyfile);
-               return({
-                  exitcode=>12,
-                  exitmsg=>"error opening '$keyfile' for writing : $!"
-               });
+               $self->LastMsg(ERROR,"fail to re overwrite $keyfile");
             }
          }
-         else{
-            return({
-               exitcode=>11,
-               exitmsg=>"error opening '$keyfile' for reading : $!"
-            });
-         }
-         close($tempkeyfileFH);
       }
       else{
-         return({
-            exitcode=>10,
-            exitmsg=>"error opening '$tempkeyfile' for writing : $!"
-         });
+         return({exitcode=>0,exitmsg=>'ok - nothing to do'});
       }
    }
    my $msg=join("\n",$self->LastMsg());
