@@ -59,12 +59,23 @@ sub getAzureAuthorizationToken
 {
    my $self=shift;
    my $param=shift;
+
+
    my $resource="https://management.core.windows.net/";
+   my $scope;
+   my $tenant="1";
    if (ref($param) eq "HASH"){
       if (exists($param->{resource})){
          $resource=$param->{resource};
       }
+      if (exists($param->{scope})){
+         $scope=$param->{scope};
+      }
+      if (exists($param->{tenant})){
+         $tenant=$param->{tenant};
+      }
    }
+
 
    $W5V2::Cache->{GLOBAL}={} if (!exists($W5V2::Cache->{GLOBAL}));
    my $gc=$W5V2::Cache->{GLOBAL};
@@ -95,11 +106,23 @@ sub getAzureAuthorizationToken
             my %qparam=(
                grant_type    => 'client_credentials',
                client_id     => $apiuser,
-               client_secret => $apikey,
-               resource      => $resource,
-               tenant        => $base
+               client_secret => $apikey
             );
+            if ($tenant eq "1"){ # use "default" tenant from base
+               $tenant=$base;
+            }
+
+            if (defined($resource)){
+               $qparam{resource}=$resource;
+            }
+            if (defined($scope)){
+               $qparam{scope}=$scope;
+            }
+            if (defined($tenant)){
+               $qparam{tenant}=$tenant;
+            }
             my $qstr=kernel::cgi::Hash2QueryString(%qparam);
+            printf STDERR ("qstr: %s\n",$qstr);
             return($qstr);
          },
          headers=>sub{
