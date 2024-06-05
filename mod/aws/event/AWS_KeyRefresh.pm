@@ -148,8 +148,8 @@ sub AWS_KeyRefresh
          }
       }
       if ($keyFileChanged){
-         msg(INFO,"waiting 60sec to ensure key is working");
-         sleep(60);
+         msg(INFO,"waiting 10sec to ensure key is working");
+         sleep(10);
          msg(INFO,"try to store orgcurVal in $tempkeyfile");
          if (open(my $tempkeyfileFH,">", $tempkeyfile )){
             print $tempkeyfileFH (join("",@orgcurVal));
