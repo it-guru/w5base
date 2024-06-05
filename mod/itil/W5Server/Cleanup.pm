@@ -87,12 +87,16 @@ sub CleanupIPEntries
 
    my $ip=getModuleObject($self->Config,"itil::ipaddress");
    my $sys=getModuleObject($self->Config,"itil::system");
+   my $itcl=getModuleObject($self->Config,"itil::itcloudarea");
+   my $itclustsvc=getModuleObject($self->Config,"itil::lnkitclustsvc");
 
    $ip->SetFilter({ciactive=>\'0',cistatusid=>"<6"});
    my @ipl=$ip->getHashList(qw(ALL));
+   msg(DEBUG,"start CleanupIPEntries");
 
    foreach my $iprec (@ipl){
       $ip->ResetFilter();
+      msg(DEBUG,"cleanup ip $iprec->{name}");
       if ($iprec->{systemid} ne ""){ # validate system
          $sys->ResetFilter();
          $sys->SetFilter({id=>\$iprec->{systemid}});
@@ -103,6 +107,42 @@ sub CleanupIPEntries
          }
          else{
             my $d=CalcDateDuration($sysrec->{mdate},NowStamp("en")); 
+            msg(DEBUG,"set ip $iprec->{name} to disposted of waste");
+            if ($d->{totaldays}>6){
+               $ip->ValidatedUpdateRecord($iprec,{cistatusid=>6},
+                                          {id=>\$iprec->{id}});
+            }
+         }
+      }
+      elsif ($iprec->{itclustsvcid} ne ""){ # validate ClusterService
+         $itclustsvc->ResetFilter();
+         $itclustsvc->SetFilter({id=>\$iprec->{itclustsvcid}});
+         my ($itclrec,$msg)=$itclustsvc->getOnlyFirst(qw(id itclustcistatusid 
+                                                         mdate));
+         if (!defined($itclrec)){  # cleanup invalid ip records
+            msg(DEBUG,"delete $iprec->{name} with id $iprec->{id}");
+            $ip->BulkDeleteRecord({id=>\$iprec->{id}});
+         }
+         else{
+            #my $d=CalcDateDuration($itclrec->{mdate},NowStamp("en")); 
+            #msg(DEBUG,"set ip $iprec->{name} to disposted of waste");
+            #if ($d->{totaldays}>6){
+            #  mdate check geht da nicht, da nicht in itclustsvc verfuegbar
+               $ip->ValidatedUpdateRecord($iprec,{cistatusid=>6},
+                                          {id=>\$iprec->{id}});
+            #}
+         }
+      }
+      elsif ($iprec->{itcloudareaid} ne ""){ # validate CloudArea
+         $itcl->ResetFilter();
+         $itcl->SetFilter({id=>\$iprec->{itcloudareaid}});
+         my ($itclrec,$msg)=$itcl->getOnlyFirst(qw(id cistatusid mdate));
+         if (!defined($itclrec)){  # cleanup invalid ip records
+            msg(DEBUG,"delete $iprec->{name} with id $iprec->{id}");
+            $ip->BulkDeleteRecord({id=>\$iprec->{id}});
+         }
+         else{
+            my $d=CalcDateDuration($itclrec->{mdate},NowStamp("en")); 
             msg(DEBUG,"set ip $iprec->{name} to disposted of waste");
             if ($d->{totaldays}>6){
                $ip->ValidatedUpdateRecord($iprec,{cistatusid=>6},
