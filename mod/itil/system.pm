@@ -2989,7 +2989,8 @@ sub QRuleSyncCloudSystem
                           systemid     =>$p{refid}
                          }
                        };
-                       if (exists($newrec->{dnsname})){
+                       if (exists($newrec->{dnsname}) &&
+                           $newrec->{dnsname} ne ""){
                           $oprec->{DATA}->{dnsname}=$newrec->{dnsname};
                        }
                        if (exists($newrec->{ifname})){
@@ -2997,6 +2998,9 @@ sub QRuleSyncCloudSystem
                        }
                        if ($mode eq "insert"){
                           $oprec->{DATA}->{networkid}=$networkid;
+                       }
+                       if ($mode eq "update"){ # on update, do not change type
+                          delete($oprec->{DATA}->{type});
                        }
                        return($oprec);
                     }
