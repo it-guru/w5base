@@ -246,7 +246,7 @@ sub doNotify
       $appl->SetFilter({ictono=>\$itscanobjectid,cistatusid=>"<6"});
    }
 
-   my @l=$appl->getHashList(qw(name id applmgr tsmid contacts));
+   my @l=$appl->getHashList(qw(name id applmgr tsmid tsm2id contacts));
 
    my %uid;
 
@@ -255,6 +255,7 @@ sub doNotify
    foreach my $arec (@l){
       push(@itscanobjectname,$arec->{name});
       $uid{cc}->{$arec->{tsmid}}++;
+      $uid{cc}->{$arec->{tsm2id}}++;
       $uid{to}->{$arec->{applmgrid}}++;
       foreach my $crec (@{$arec->{contacts}}){
          my $roles=$crec->{roles};
