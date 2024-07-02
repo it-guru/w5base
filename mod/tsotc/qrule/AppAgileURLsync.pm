@@ -245,6 +245,15 @@ sub qcheckRecord
       #
       foreach my $oprec (@opList){
          if ($oprec->{OP} eq "insert"){
+            if (!($oprec->{DATA}->{name}=~m/\./)){
+               my $msg="invalid hostname part in url - missing FQDN";
+               push(@qmsg,"URL: ".$oprec->{DATA}->{name});
+               push(@qmsg,$msg);
+               $errorlevel=2 if ($errorlevel<2);
+               $oprec->{OP}="invalid";
+            }
+         }
+         if ($oprec->{OP} eq "insert"){
             $itilurl->ResetFilter();
             my $url=$oprec->{DATA}->{name};
             my $networkid=$oprec->{DATA}->{networkid};
