@@ -6,3 +6,4 @@
   de=>'diese URL ist bereits by einer anderen Anwendung registriert'
 },
 'invalid CloudArea or application state for import'=>{de=>'ungültiger CloudArea oder Anwendungs CI-Status für AutoImport'},
+'invalid hostname part in url - missing FQDN'=>{de=>'ungültiger Hostname-Anteil in URL - fehlender FullQualifiedDomainName'},
