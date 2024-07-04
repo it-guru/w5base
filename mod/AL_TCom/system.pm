@@ -45,14 +45,13 @@ sub new
                    selectlabel=>\'AL_TCom::system::exposurelevel',
                    cistatusid=>\'4'
                 },
-                default       =>'CNDTAG',
                 vjoinon       =>['rawexposurelevel'=>'name'],
                 vjoindisp     =>'displaylabel',
                 htmleditwidth =>'200px'),
 
       new kernel::Field::Interface(
                 name          =>'rawexposurelevel',
-                group         =>'classi',
+                group         =>'sec',
                 label         =>'raw ExposureLevel',
                 uploadable    =>0,
                 container     =>'additional'),

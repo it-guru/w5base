@@ -1,2 +1,6 @@
 'acsas70relevant'=>{de=>'Wenn ja, wird das System ICS- und SOX- konform betrieben. Dies bezieht sich auf das Betriebssystem und Infrastruktur.',en=>'If yes, the system is operated ICS- and SOX-compliant. This refers to the operating system and infrastructure.'},
+'exposurelevel'=>{
+de=>'Netzwerk-Zone, aus der das System erreichbar ist. Wenn ein System aus mehreren Zonen erreichbar ist, ist die öffentlichste bzw. sicherheitstechnisch kritischste Zone (Reihenfolge: Internet  CNDTAG  Backend) auszuwählen.',
+en=>'The network zone from which the system can be reached. If a system can be reached from multiple zones pick the most public or critical one in terms of security (Order: internet  CNDTAG  backend).'
+},
 
