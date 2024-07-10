@@ -489,6 +489,9 @@ sub fetchrow
    }
    $self->{'current'}=$self->{'sth'}->fetchrow_hashref();
    if ($DBI::err){
+      if ($DBI::errstr ne ""){
+         msg(ERROR,"DB Error - fetchrow_hashref err='$DBI::errstr'");
+      }
       return(undef,1);
    }
    return($self->{'current'});
