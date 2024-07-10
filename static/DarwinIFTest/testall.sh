@@ -39,7 +39,7 @@ echo "$CHKLIST" |egrep -v '^#' | ( while read l; do
    SVALUE=$3
    if [ ! -z "$DATAOBJ" ]; then
       printf "Checking %-25s ..." "$DATAOBJ"
-      $W5EVENT $W5EVPARAM -t 5 W5ServerMONI $DATAOBJ $SFIELD $SVALUE >/dev/null 2>&1
+      $W5EVENT $W5EVPARAM -t 10 W5ServerMONI $DATAOBJ $SFIELD $SVALUE >/dev/null 2>&1
       BK=$?
       if [ $BK == 0 ]; then
          echo -e  "\b\b\b            OK done";
