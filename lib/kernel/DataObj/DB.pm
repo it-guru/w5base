@@ -961,6 +961,11 @@ sub tieRec
    my $self=shift;
    my $rec=shift;
 
+   if (ref($rec) ne "HASH"){
+      msg(ERROR,"tieRec on none HASH ref is invalid");
+      Stacktrace();
+   }
+
    $self->preProcessReadedRecord($rec);
 
    my %rec;
@@ -1109,7 +1114,8 @@ sub getNext
       $self->Context->{CurrentLimit}--;
       if ($self->Context->{CurrentLimit}<=0){
          if (lc($self->{DB}->{db}->{Driver}->{Name}) ne "mysql"){
-            while(my $temprec=$self->{DB}->fetchrow()){  # on oracle DBD
+            while(my ($temprec,$dberr)=$self->{DB}->fetchrow()){ 
+               last if (!defined($temprec));      # on oracle DBD
             }                                     # we must read to the end
          }                                        # of request to count rows
          $self->{DB}->finish();
@@ -1117,7 +1123,7 @@ sub getNext
       }
    }
    if (defined($self->{DB})){
-      my $temprec=$self->{DB}->fetchrow();
+      my ($temprec,$dberr)=$self->{DB}->fetchrow();
       if (defined($temprec)){
          $temprec=$self->tieRec($temprec);
          return($temprec);
@@ -1250,6 +1256,12 @@ sub FETCH
    my $key=shift;
    my $mode=shift;
 
+   if (exists($self->{Rec}) && defined($self->{Rec}) &&
+       ref($self->{Rec}) ne "HASH"){
+      msg(ERROR,"invalid internal data structure in self->Rec");
+      Stacktrace(1);
+      return("- internal FETCH error -");
+   }
    return($self->{Rec}->{$key}) if (exists($self->{Rec}->{$key}));
    my $p=$self->getParent();
    if (defined($p)){
