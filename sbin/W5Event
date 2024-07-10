@@ -10,10 +10,11 @@ use kernel::config;
 use kernel::EventController;
 use Getopt::Long;
 use kernel::cgi;
-use vars qw($opt_v $opt_d $opt_h $opt_c $opt_s $configname);
+use vars qw($opt_v $opt_d $opt_h $opt_c $opt_s $opt_t $configname);
 $0="W5Event ".join(" ",@ARGV);
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_d,
+                        'timeout=i'=>\$opt_t,
                         'serverless'=>\$opt_s,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
@@ -22,6 +23,25 @@ if ($opt_h ne ""){
    help();
    exit(1);
 }
+
+if (!$opt_v && !$opt_d){
+   close(STDOUT);
+}
+
+if ($opt_t){
+   if ($opt_t<1 || $opt_t>9999){
+      msg(ERROR,"option --timeout out of range (1-9999)");
+      exit(1);
+   }
+   else{
+      $SIG{ALRM}=sub{
+         msg(ERROR,"W5Event hard termination by --timeout");
+         POSIX::_exit(128);
+      };
+      alarm($opt_t);
+   }
+}
+
 
 if ($opt_d){
    $W5V2::Debug=1;
@@ -162,7 +182,8 @@ sub help
    printf STDERR ("\n");
    printf STDERR ("\n");
    printf STDERR (" -c sets the name of the config (default:w5server.conf)\n");
-   printf STDERR (" -v activates verbose mode\n");
+   printf STDERR (" -t sets timeout (ALRM handling)\n");
+   printf STDERR (" -v activates verbose mode (and do NOT close STDOUT)\n");
    printf STDERR (" -s serverless (running W5Server is not needed)\n");
    printf STDERR (" -d starts the W5Server in debug mode (not as background!)\n");
    printf STDERR ("\n");
