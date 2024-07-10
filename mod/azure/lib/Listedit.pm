@@ -122,7 +122,7 @@ sub getAzureAuthorizationToken
                $qparam{tenant}=$tenant;
             }
             my $qstr=kernel::cgi::Hash2QueryString(%qparam);
-            printf STDERR ("qstr: %s\n",$qstr);
+            #printf STDERR ("qstr: %s\n",$qstr);
             return($qstr);
          },
          headers=>sub{
