@@ -44,8 +44,10 @@ sub ipcStore
    my $self=shift;
    my $p=$self->getParent();
 
-   if ($p->can("ipcStore")){
-      return($p->ipcStore(@_));
+   if (defined($p)){
+      if ($p->can("ipcStore")){
+         return($p->ipcStore(@_));
+      }
    }
    return(undef);
 }

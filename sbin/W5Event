@@ -145,6 +145,7 @@ if ($#bk==-1){
 else{
    msg(DEBUG,"Event '%s' processed at %d Handlers",$event,$#bk);
    msg(DEBUG,"result=%s",Dumper(\@bk));
+   my $fineexit=0;
    foreach my $bkrec (@bk){
       my $exitcode;
       if (!ref($bkrec)){
@@ -155,6 +156,9 @@ else{
       }
       else{
          $exitcode=$bkrec->{exitcode};
+         if ($fineexit==0){
+            $fineexit=$exitcode;
+         }
       }
       $exitcode="(undef)" if (!defined($exitcode));
       my $exitmsg=$bkrec->{exitmsg};
@@ -167,7 +171,7 @@ else{
          printf("$exitmsg\n") if ($exitmsg ne "");
       }
    }
-   exit(0);
+   exit($fineexit);
 }
 
 
