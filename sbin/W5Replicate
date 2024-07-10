@@ -30,7 +30,7 @@ use List::Util 'shuffle';
 use Time::HiRes qw(usleep sleep);
 use DBI;
 use POSIX;
-use vars qw($opt_v $opt_h $opt_c $opt_t $opt_p $opt_f
+use vars qw($opt_v $opt_h $opt_m $opt_c $opt_t $opt_p $opt_f
             $opt_q $opt_l $configname);
 $|=1;
 my $startProcessPPID=getppid(); # there is need to check ppid at at start 
@@ -40,6 +40,7 @@ my $startProcessPPID=getppid(); # there is need to check ppid at at start
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'tasks=i'=>\$opt_t,
                         'phase=s'=>\$opt_p,
+                        'module=s'=>\$opt_m,
                         'quietmode'=>\$opt_q,
                         'force'=>\$opt_f,          # process if other sessions
                         'limittime=i'=>\$opt_l,
@@ -525,7 +526,6 @@ sub getRequestedReplicationObjects
          }
       }
    }
-
    #
    # the fields in the tables with :: are automaticly the view to 
    # w5base. If the fieldname begins with w5, it will be ignored in view.
@@ -552,6 +552,13 @@ sub getRequestedReplicationObjects
          if (!(lc($col->{'column_name'})=~m/^w5/)){
             push(@{$ctrl->{'view'}},lc($col->{'column_name'}));
          }
+      }
+      $ctrl->{'online'}=0;
+      my ($module)=$ctrl->{'name'}=~m/^(.*?)::/;
+      my @opt_m=split(/,/,$opt_m);
+      if ($opt_m ne "" && !in_array(\@opt_m,$module)){
+         msg(INFO,"skip $ctrl->{'name'} due opt_m filter to ".join("|",@opt_m));
+         next;
       }
 
       #
@@ -666,7 +673,10 @@ sub getRequestedReplicationObjects
    $dbi->commit();
    $dbi->disconnect();
 
-
+   if ($opt_m ne ""){
+      msg(INFO,"opt_m used - try to find exit segmentation bug");
+      exit(1234);
+   }
 
    return(@replicationOjects);
 }
@@ -1235,17 +1245,8 @@ foreach my $replControl (@ReplicationObjects){
 }
 @joblist=shuffle(@joblist);
 #print STDERR Dumper(\@joblist);sleep(1);
-
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
-
-   #if ($opt_v){ 
-   #   next if ($nextjob->{replControl}->{name} ne "base::grp");
-   #   printf STDERR ("fifi 01\n");
-   #   printf STDERR ("fifi rec=%s\n",Dumper($nextjob));
-   #}
-
-
    if (exists($nextjob->{depend}) && $nextjob->{depend}->{state} ne "done"){
       msg(INFO,"dependence wait for $nextjob on ".
                "$nextjob->{depend}($nextjob->{depend}->{state})");
