@@ -74,9 +74,10 @@ sub W5ServerMONI
    my $stdout=$output->WriteToScalar(HttpHeader=>0);
    $stdout=trim($stdout);
    if ($stdout ne "OK"){
-      return({exitcode=>100,exitmsg=>"unexpected result '$stdout'"});
+      return({exitcode=>100,
+              exitmsg=>"unexpected result value in returned field "});
    }
-   return({exitcode=>0,msg=>'ok'});
+   return({exitcode=>0,exitmsg=>'ok'});
 }
 
 
