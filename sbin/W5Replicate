@@ -1138,6 +1138,7 @@ sub createSlot
 
    my $pid=fork();
    if ($pid==0){
+      $0="W5Replicate $tasklabel ".$ctrl->{'name'};
       $SIG{HUP}=sub{die("by HUP in $$")};
       $SIG{INT}=sub{die("by INT in $$")};
       $SIG{KILL}=sub{die("by KILL in $$")};
@@ -1151,7 +1152,10 @@ sub createSlot
          $W5V2::W5Server->Connect();
          $self->Cache->{W5Server}=$W5V2::W5Server;
       }
-      exit(&$function());
+      my $bk=&$function();
+      #printf STDERR ("fifi in CreateSlot finished - bk=$bk and exit\n");
+      POSIX::_exit($bk);
+      exit($bk);
    }
    $job->{state}="running";
    return({
@@ -1234,6 +1238,14 @@ foreach my $replControl (@ReplicationObjects){
 
 my $currentStartPhase;
 while(my $nextjob=shift(@joblist)){
+
+   #if ($opt_v){ 
+   #   next if ($nextjob->{replControl}->{name} ne "base::grp");
+   #   printf STDERR ("fifi 01\n");
+   #   printf STDERR ("fifi rec=%s\n",Dumper($nextjob));
+   #}
+
+
    if (exists($nextjob->{depend}) && $nextjob->{depend}->{state} ne "done"){
       msg(INFO,"dependence wait for $nextjob on ".
                "$nextjob->{depend}($nextjob->{depend}->{state})");
@@ -1251,6 +1263,9 @@ while(my $nextjob=shift(@joblist)){
       for(my $slotno=0;$slotno<$maxslots;$slotno++){
          # das muß noch besser werden - phaselimit calc!
          my $phaselimit=int($MaximumReplicationTime/($#joblist+2))*($maxslots/4);
+         if ($phaselimit<20){
+            $phaselimit=20;
+         } 
          if ($phaselimit>($MaximumReplicationTime/3*2)){
             $phaselimit=$MaximumReplicationTime/3*2;
          }
@@ -1364,7 +1379,7 @@ msg(INFO,"OK, done");
 #printf STDERR ("replication duration=%d max=%d\n",time()-$ReplicationStart,
 #               $MaximumReplicationTime);
                
-exit(0);
+POSIX::_exit(0);
 
 #==================================================================
 sub Help
