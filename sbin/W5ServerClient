@@ -93,6 +93,9 @@ if ($res->{exitcode}==0 && defined($res->{AsyncID})){
 }
 if (defined($res->{exitcode}) && $res->{exitcode}!=0){
    msg(ERROR,"can't call event '$method' exitcode=$res->{exitcode}");
+   if (exists($res->{result})){
+      msg(ERROR,"RPC::Smart::Client result='$res->{result}'");
+   }
    exit($res->{exitcode});
 }
 exit(0);
