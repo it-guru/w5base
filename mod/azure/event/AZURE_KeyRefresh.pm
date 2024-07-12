@@ -46,7 +46,6 @@ sub AZURE_KeyRefresh
 
    my $o=getModuleObject($self->Config,"azure::subscription");
    my $Authorization=$o->getAzureAuthorizationToken({
-     tenant=>undef,
      resource=>undef,
      scope=>"https://app-regeneratesptoken-telit.azurewebsites.net/.default",
    });

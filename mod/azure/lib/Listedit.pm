@@ -63,7 +63,7 @@ sub getAzureAuthorizationToken
 
    my $resource="https://management.core.windows.net/";
    my $scope;
-   my $tenant="1";
+   my $tenant;
    if (ref($param) eq "HASH"){
       if (exists($param->{resource})){
          $resource=$param->{resource};
@@ -93,7 +93,11 @@ sub getAzureAuthorizationToken
             my $apiuser=shift;
             my $base=shift;
             $baseurl.="/"  if (!($baseurl=~m/\/$/));
+            if (defined($tenant)){
+               $base=$tenant;
+            }
             my $dataobjurl=$baseurl.$base."/oauth2/token";
+            msg(INFO,"AzureAuth url: ".$dataobjurl);
             return($dataobjurl);
          },
          content=>sub{
@@ -108,7 +112,8 @@ sub getAzureAuthorizationToken
                client_id     => $apiuser,
                client_secret => $apikey
             );
-            if ($tenant eq "1"){ # use "default" tenant from base
+            
+            if (!defined($tenant) && $tenant ne "1"){
                $tenant=$base;
             }
 
@@ -118,11 +123,8 @@ sub getAzureAuthorizationToken
             if (defined($scope)){
                $qparam{scope}=$scope;
             }
-            if (defined($tenant)){
-               $qparam{tenant}=$tenant;
-            }
             my $qstr=kernel::cgi::Hash2QueryString(%qparam);
-            #printf STDERR ("qstr: %s\n",$qstr);
+            msg(INFO,"AzureAuth POST data: ".$qstr);
             return($qstr);
          },
          headers=>sub{
