@@ -96,7 +96,11 @@ sub getAzureAuthorizationToken
             if (defined($tenant)){
                $base=$tenant;
             }
-            my $dataobjurl=$baseurl.$base."/oauth2/token";
+            my $dataobjurl=$baseurl.$base."/oauth2/";
+            if (defined($scope)){
+               $dataobjurl.="v2.0/";
+            }
+            $dataobjurl.="token";
             msg(INFO,"AzureAuth url: ".$dataobjurl);
             return($dataobjurl);
          },
