@@ -135,7 +135,7 @@ sub new
                 label         =>'Lead OrgDomain Segment',
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"CASE ".
-                                "WHEN charindex('/',Org_Domain)>0 THEN ".
+                                "WHEN charindex('/D',Org_Domain)>0 THEN ".
                                 "trim(substring(Org_Domain,0,".
                                 "charindex('/',Org_Domain))) ".
                                 "ELSE '' ".
@@ -146,8 +146,8 @@ sub new
                 label         =>'OrgDomainID',
                 htmldetail    =>'NotEmpty',
                 dataobjattr   =>"CASE ".
-                                "WHEN charindex('/',Org_Domain)>0 AND ".
-                                "     charindex('-',Org_Domain)>0 THEN ".
+                                "WHEN charindex('/D',Org_Domain)>0 AND ".
+                                "     charindex('- ',Org_Domain)>0 THEN ".
                                 "trim(substring(Org_Domain,".
                                 "charindex('/',Org_Domain)+1,".
                                 "charindex('-',Org_Domain)-".
