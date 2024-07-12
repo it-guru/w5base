@@ -3,6 +3,7 @@ W5EVPARAM=$*
 W5EVENT=/opt/w5base/sbin/W5Event
 
 CHKLIST=$(cat <<EOF
+itncmdb::system       id         3K6T8G0QIHQ7G8
 aws::NetworkInterface idpath     eni-002fd55e210abaefc@163126355411@eu-central-1
 TPC1::project         id         238ae962-cbe5-46e2-9259-9bfd857fc583
 TPC2::project         id         0096b537-0f99-43fe-b932-eeb93a7445ee
