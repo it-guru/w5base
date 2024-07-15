@@ -1170,7 +1170,7 @@ sub createSlot
       }
       my $bk=&$function();
       #printf STDERR ("fifi in CreateSlot finished - bk=$bk and exit\n");
-      POSIX::_exit($bk);
+      #POSIX::_exit($bk);
       exit($bk);
    }
    $job->{state}="running";
@@ -1386,7 +1386,7 @@ msg(INFO,"OK, done");
 #printf STDERR ("replication duration=%d max=%d\n",time()-$ReplicationStart,
 #               $MaximumReplicationTime);
                
-POSIX::_exit(0);
+exit(0);
 
 #==================================================================
 sub Help
