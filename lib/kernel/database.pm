@@ -59,13 +59,34 @@ sub Connect
    $p{dbschema}=$self->getParent->Config->Param('DATAOBJBASE');
    local $SIG{INT}; # try fix signal INT problem DBD::Oracle
 
-   if (my $parent=$self->getParent()){
-      # check if DATAOBJCONNECT is "overwrited" defined for current object
-      # witch allows to make some speical objects writealbe on readonly envs
+   my $parent=$self->getParent();
+
+   my @PosibleDBname=($self->{dbname});
+
+   if (defined($parent)){
       my $s=$parent->Self;
-      if (ref($p{dbconnect}) eq "HASH" && exists($p{dbconnect}->{$s})){
-         $self->{dbname}=$s; # using parent object name as dbname
+      if ($s ne ""){
+         unshift(@PosibleDBname,$s);
+         if ($s=~m/::/){
+            $s=~s/^([^:]+)::.*$/$1::*/;
+            unshift(@PosibleDBname,$s);
+         }
       }
+   }
+   if ($#PosibleDBname>0){
+      DBCHKNAME: foreach my $chkName (@PosibleDBname){
+         if (ref($p{dbconnect}) eq "HASH" && 
+             exists($p{dbconnect}->{$chkName})){
+            $self->{dbname}=$chkName; #dbname after check prio handling
+            last DBCHKNAME;
+         }
+      }
+   }
+
+   if (defined($parent)){
+      # check if DATAOBJCONNECT is "overwrited" defined for current object
+      # witch allows to make some special objects writealbe on readonly envs
+      my $s=$parent->Self;
    }
    my $dbname=$self->{dbname};
    
