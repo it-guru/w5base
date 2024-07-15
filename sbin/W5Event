@@ -107,6 +107,13 @@ if (!$curconfig->readconfig("$FindBin::Bin/..",$configname)){
    msg(DEBUG,"W5ServerPort=%s",$port);
    $ClientParam{'PeerPort'}=$port;
 }
+{
+   my $ip=$curconfig->Param("W5SERVERHOST");
+   $ip="127.0.0.1" if ($ip eq "");
+   msg(DEBUG,"W5ServerHost=%s",$ip);
+   $ClientParam{'PeerAddr'}=$ip;
+}
+
 
 my $self=new kernel::App(Config=>$curconfig);
 if (!defined($W5V2::Translation{$self})){
