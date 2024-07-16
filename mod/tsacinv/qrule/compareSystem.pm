@@ -428,17 +428,20 @@ sub qcheckRecord
                      # system. Because posible wrong informations for ESX vm's,
                      # it is needed to query eCMDB (ADOP-T)
                      if ($parrec->{systemid} ne ""){
-                        my $vsys=$dataobj->getPersistentModuleObject(
-                                  'tsadopt::vsys');
+                        #my $vsys=$dataobj->getPersistentModuleObject(
+                        #          'tsadopt::vsys');
+                        # Lange Verbindungen machen anscheinend Probleme
+                        my $vsys=getModuleObject($self->getParent->Config,
+                                 'tsadopt::vsys');
                         $vsys->SetFilter({
                            systemid=>$parrec->{systemid}
                         });
                         my ($vsysrec,$msg)=$vsys->getOnlyFirst(qw(id name 
                                                                   assetid));
-                        #if (!$vsys->Ping()){
-                        #   return(undef,{qmsg=>"ADOP-T not available - ".
-                        #                "assetid is not detectable"});
-                        #}
+                        if (!$vsys->Ping()){
+                           return(undef,{qmsg=>"ADOP-T not available - ".
+                                        "assetid is not detectable"});
+                        }
                         if ($vsysrec->{assetid} ne ""){
                            my $msg=$self->T('substituted assetid for %s '.
                                           'from %s to %s based on ADOP-T');
