@@ -1898,6 +1898,15 @@ sub getFieldObjsByView
             }
          }
       }
+      if (defined($param{current}) && 
+          exists($param{current}->{targetitnormodel})){
+         if ($param{output} ne "kernel::Output::HtmlDetail"){
+            if (!$self->IsMemberOf("admin") &&
+                !$self->IsMemberOf("w5base.itil.system.securityread")){
+               @l=grep({$_->{name} ne "targetitnormodel"} @l);
+            }
+         }
+      }
    }
    return(@l);
 }
