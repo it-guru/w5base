@@ -371,14 +371,14 @@ sub qcheckRecord
                         $parrec->{maintend}=undef;
                      }
                   }
-                  if ($parrec->{maintend} eq "" && $parrec->{install} ne ""){
+                  if ($parrec->{maintend} eq "" && $parrec->{cdate} ne ""){
                      my $end=$dataobj->ExpandTimeExpression(
-                          "$parrec->{install}+7Y","en","GMT","GMT"
+                          "$parrec->{cdate}+7Y","en","GMT","GMT"
                      );
                      if ($end ne ""){
                         $parrec->{maintend}=$end;
                      }
-                     msg(INFO,"result of self calc $parrec->{install}+7Y=$end");
+                     msg(INFO,"result of self calc $parrec->{cdate}+7Y=$end");
                   }
 
                   $parrec->{eohs}=$parrec->{maintend};
