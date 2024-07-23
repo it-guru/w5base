@@ -58,7 +58,7 @@ sub AWS_KeyRefresh
    my $newestActive;
    my $newCreatedAccessKey;
 
-   my @curKeys=sort({$a->{CreateDate} cmp $b->{CreateDate}} @{$AccessKeyMeta});
+   my @curKeys=sort({$b->{CreateDate} cmp $a->{CreateDate}} @{$AccessKeyMeta});
 
    foreach my $curKeyRec (@curKeys){
       $UserName=$curKeyRec->{UserName};
@@ -69,6 +69,8 @@ sub AWS_KeyRefresh
       }
    }
    msg(INFO,"AccessKeys=".Dumper(\@curKeys));
+   msg(INFO,"newestActive=".Dumper($newestActive));
+
    if ($KeyCount<=1){
       eval('
         my $AccessKeyResp=$obj->CreateAccessKey(UserName=>$UserName);
@@ -85,6 +87,14 @@ sub AWS_KeyRefresh
       else{
          return({exitcode=>1,
                  exitmsg=>'ERROR - fail to create new AccessKeyId'});
+      }
+   }
+   else{  # we have already enough keys
+      if ($newestActive->{AccessKeyId} ne $storedDATAOBJUSER){ 
+         # someone have created on key in the AWS - but we haven't stored
+         # the key in our config. We treat them as new created
+         msg(INFO,"found manuelly created key - and use them as newCreated");
+         $newCreatedAccessKey=$newestActive;
       }
    }
 
