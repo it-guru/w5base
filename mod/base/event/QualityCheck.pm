@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
+use List::Util qw/shuffle/;
 @ISA=qw(kernel::Event);
 
 sub new
@@ -85,7 +86,7 @@ sub QualityCheck
       my $doSleep=($self->{qualitycheckduration}-600-30)/$n;
       $doSleep=20 if ($doSleep<20);
       $doSleep=120 if ($doSleep>120);
-      foreach my $dataobj (sort(keys(%dataobjtocheck))){
+      foreach my $dataobj (shuffle(keys(%dataobjtocheck))){
          msg(INFO,"calling QualityCheck for '$dataobj'");
          my $o=getModuleObject($self->Config,$dataobj);
          if (defined($o)){
