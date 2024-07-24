@@ -82,9 +82,9 @@ sub QualityCheck
    #msg(INFO,Dumper(\%dataobjtocheck));
    if ($dataobj eq ""){
       my $n=keys(%dataobjtocheck);
-      my $doSleep=($self->{qualitycheckduration}+600-30)/$n;
-      $doSleep=30 if ($doSleep<30);
-      $doSleep=300 if ($doSleep>300);
+      my $doSleep=($self->{qualitycheckduration}-600-30)/$n;
+      $doSleep=20 if ($doSleep<20);
+      $doSleep=120 if ($doSleep>120);
       foreach my $dataobj (sort(keys(%dataobjtocheck))){
          msg(INFO,"calling QualityCheck for '$dataobj'");
          my $o=getModuleObject($self->Config,$dataobj);
@@ -102,7 +102,6 @@ sub QualityCheck
                   msg(ERROR,"can't call QualityCheck for ".
                             "dataobj '$dataobj' Event");
                }
-               sleep($doSleep);
             }
             else{
                my @tasks;
@@ -118,8 +117,8 @@ sub QualityCheck
                                "dataobj '$dataobj' Event");
                   }
                }
-               sleep($doSleep);
             }
+            sleep($doSleep);
          }
       }
    }
