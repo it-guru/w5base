@@ -456,6 +456,26 @@ sub rpcResetEvents
 }
 
 
+sub rpcEventInfo
+{
+   my $self=shift;
+   my $eventname=shift;
+
+   my @methods=$self->{EventController}->getEventMethods($eventname);
+
+   if ($#methods!=-1){
+      my $timeout=$self->{EventController}->getMaxEventTimeout($eventname);
+      my $evrec={
+        name=>$eventname,
+        timeout=>$timeout,
+        methods=>\@methods,
+      };
+      return({event=>$evrec,exitcode=>0});
+   }
+   return({exitcode=>-1});
+}
+
+
 
 
 sub rpcGetUniqueId

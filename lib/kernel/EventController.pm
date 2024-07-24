@@ -64,7 +64,7 @@ sub getEventMethods
       }
       return(@l);
    }
-   return(undef);
+   return();
 }
 
 sub getMaxEventTimeout
