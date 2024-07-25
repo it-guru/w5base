@@ -1,4 +1,12 @@
 #!/bin/bash
+
+DEBUGOBJ=""
+
+if [[ "$1" =~ :: ]]; then
+   DEBUGOBJ=$1
+   shift
+fi
+
 W5EVPARAM=$*
 W5EVENT=/opt/w5base/sbin/W5Event
 
@@ -30,7 +38,6 @@ tsdina::system        name          qde8hv
 tssmartcube::tcc      systemname    QDE8HV
 EOF
 )
-
 echo ""
 
 echo "$CHKLIST" |egrep -v '^#' | ( while read l; do
@@ -39,8 +46,16 @@ echo "$CHKLIST" |egrep -v '^#' | ( while read l; do
    SFIELD=$2
    SVALUE=$3
    if [ ! -z "$DATAOBJ" ]; then
+      if [ ! -z "$DEBUGOBJ" -a "$DATAOBJ" != "$DEBUGOBJ" ]; then  
+         continue 
+      fi
       printf "Checking %-25s ..." "$DATAOBJ"
-      $W5EVENT $W5EVPARAM -t 10 W5ServerMONI $DATAOBJ $SFIELD $SVALUE >/dev/null 2>&1
+      if [ -z "$DEBUGOBJ" ]; then
+         $W5EVENT $W5EVPARAM -t 10 W5ServerMONI \
+                  $DATAOBJ $SFIELD $SVALUE >/dev/null 2>&1
+      else
+         $W5EVENT $W5EVPARAM -d -v -t 10 W5ServerMONI $DATAOBJ $SFIELD $SVALUE 
+      fi
       BK=$?
       if [ $BK == 0 ]; then
          echo -e  "\b\b\b            OK done";
