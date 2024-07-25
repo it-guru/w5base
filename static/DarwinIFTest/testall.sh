@@ -50,13 +50,15 @@ echo "$CHKLIST" |egrep -v '^#' | ( while read l; do
          continue 
       fi
       printf "Checking %-25s ..." "$DATAOBJ"
+      BK=0
       if [ -z "$DEBUGOBJ" ]; then
          $W5EVENT $W5EVPARAM -t 10 W5ServerMONI \
                   $DATAOBJ $SFIELD $SVALUE >/dev/null 2>&1
+         BK=$?
       else
          $W5EVENT $W5EVPARAM -d -v -t 10 W5ServerMONI $DATAOBJ $SFIELD $SVALUE 
+         BK=$?
       fi
-      BK=$?
       if [ $BK == 0 ]; then
          echo -e  "\b\b\b            OK done";
       else
