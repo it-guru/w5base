@@ -189,6 +189,8 @@ sub Sendmail
    if (defined($id)){
       msg(DEBUG,"Event($self):Sendmail wfheadid=$id");
       $wf->SetFilter({class=>'base::workflow::mailsend',state=>\'6',id=>\$id});
+      $wf->SetFilter({class=>'base::workflow::mailsend',id=>\$id});
+
       $wf->SetCurrentView(qw(ALL));
       $wf->Limit(1);
    }
@@ -340,12 +342,19 @@ sub Sendmail
          }
 
 
-         my @FullEmailto=@emailto;
-         my @FullEmailcc=@emailcc;
-         my @FullEmailbcc=@emailbcc;
+         my @FullEmailto=grep(!/^\s*$/,@emailto);
+         my @FullEmailcc=grep(!/^\s*$/,@emailcc);
+         my @FullEmailbcc=grep(!/^\s*$/,@emailbcc);
+
          my $splitnum=0;
          my $splitokcount=0;
+         if ($#FullEmailto==-1 && $#FullEmailcc==-1 && $#FullEmailbcc==-1){
+            $splitokcount=1;
+         }
          do{   # split large Mails
+            if ($#FullEmailto==-1 && $#FullEmailcc==-1 && $#FullEmailbcc==-1){
+               next;
+            }
             my $mail=$self->createSplitEmailHead(
                $wf, $rec, $from,
                \@FullEmailto, \@FullEmailcc, \@FullEmailbcc,
@@ -496,19 +505,19 @@ sub Sendmail
                      $prepemailpostfix="<font size=1>&nbsp;</font>";
                   }
                   $maildata=$app->getParsedTemplate($formname,{
-                                     static=>{
-                                        %useadditional,
-                                        emailtext   =>$emailtext,
-                                        emailhead   =>$rec->{emailhead}->[$blk],
-                                        emailbottom =>$emailbottom,
-                                        emailtstamp =>$rec->{emailtstamp}->[$blk],
-                                        emailprefix =>$rec->{emailprefix}->[$blk],
-                                        emailsubtitle =>$rec->{emailsubtitle}->[$blk],
-                                        emailpostfix=>$prepemailpostfix,
-                                        currentlang =>$currentlang,
-                                        langcontrol =>$langcontrol,
-                                                             }
-                                      });
+                             static=>{
+                                %useadditional,
+                                emailtext   =>$emailtext,
+                                emailhead   =>$rec->{emailhead}->[$blk],
+                                emailbottom =>$emailbottom,
+                                emailtstamp =>$rec->{emailtstamp}->[$blk],
+                                emailprefix =>$rec->{emailprefix}->[$blk],
+                                emailsubtitle =>$rec->{emailsubtitle}->[$blk],
+                                emailpostfix=>$prepemailpostfix,
+                                currentlang =>$currentlang,
+                                langcontrol =>$langcontrol,
+                                                     }
+                              });
                   $maildata=~s#^\.\s*$# .\n#mg;  # prevent . finish of mail
                   if ($rec->{emailsep}->[$blk] ne "" &&
                       $rec->{emailsep}->[$blk] ne "0"){
