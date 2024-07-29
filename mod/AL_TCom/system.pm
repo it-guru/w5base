@@ -47,6 +47,8 @@ sub new
                 },
                 vjoinon       =>['rawexposurelevel'=>'name'],
                 vjoindisp     =>'displaylabel',
+                depend        =>['additional'],
+                searchable    =>0,
                 htmleditwidth =>'200px'),
 
       new kernel::Field::Interface(
