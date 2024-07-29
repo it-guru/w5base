@@ -201,6 +201,20 @@ sub DataCollector
  
          return($headers);
       },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            return([],"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data GCP system response");
+         return(undef);
+      },
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
