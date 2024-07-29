@@ -107,6 +107,7 @@ sub qcheckRecord
    my $errorlevel=0;
 
    my ($parrec,$msg);
+   my $vsys=$dataobj->getPersistentModuleObject('TSADOPTvsys','tsadopt::vsys');
    my $par=getModuleObject($self->getParent->Config(),"tsacinv::system");
 
    # ATTENTION: AssetManager qrule needs to be run in every case of srcsys!
@@ -189,6 +190,8 @@ sub qcheckRecord
       }
    }
 
+   my $AdopTping=$vsys->Ping(); # ensure open Connection to ADOP-T
+   msg(INFO,$self->Self." ADOP-T Status=$AdopTping");
 
 
 
@@ -428,11 +431,6 @@ sub qcheckRecord
                      # system. Because posible wrong informations for ESX vm's,
                      # it is needed to query eCMDB (ADOP-T)
                      if ($parrec->{systemid} ne ""){
-                        #my $vsys=$dataobj->getPersistentModuleObject(
-                        #          'tsadopt::vsys');
-                        # Lange Verbindungen machen anscheinend Probleme
-                        my $vsys=getModuleObject($self->getParent->Config,
-                                 'tsadopt::vsys');
                         $vsys->SetFilter({
                            systemid=>$parrec->{systemid}
                         });
