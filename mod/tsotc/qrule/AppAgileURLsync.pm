@@ -150,6 +150,11 @@ sub qcheckRecord
    }
    if ($#qmsg==-1){
       my $itilurl=getModuleObject($dataobj->Config,"itil::lnkapplurl");
+
+      my %focusids=();
+      foreach my $urlrec (@url){
+         $focusids{$urlrec->{srcid}}++;
+      }
      
       my $fltset=[
          {
@@ -163,11 +168,62 @@ sub qcheckRecord
              networkid =>[$netarea->{CNDTAG},$netarea->{INTERNET}]
          },
          {
+             srcsys=>\$srcsys,
+             srcid=>[keys(%focusids)]
+         },
+         {
              itcloudareaid=>$rec->{id},
              applid=>[$rec->{applid}]
          }
       ];
+
+      { # update posible already synced records - because OTC have 
+        # changed thinking
+         $itilurl->ResetFilter();
+         $itilurl->SetFilter($fltset);
+         my @curl=$itilurl->getHashList(qw(ALL));
+         my @opList;
+         my $res=OpAnalyse(
+                    sub{  # comperator 
+                       my ($a,$b)=@_;
+                       my $eq;
+                       my $blen=length($b->{name});
+                       if ($a->{srcid} eq $b->{srcid} &&
+                           $a->{srcsys} eq $b->{srcsys}){
+                          $eq=0;
+                          if ($a->{srcid} eq $b->{srcid} &&
+                              $a->{srcsys} eq $b->{srcsys} &&
+                              $a->{applid} eq $b->{applid} &&
+                              $a->{networkid} eq $b->{networkid} &&
+                              lc($b->{name}) eq lc(substr($a->{name},0,$blen))){
+                             $eq=1;
+                          }
+                       }
+                       return($eq);
+                    },
+                    sub{  # oprec generator
+                       my ($mode,$oldrec,$newrec,%p)=@_;
+                       if ($mode eq "update"){
+                          my $oprec={
+                             OP=>"delete",
+                             MSG=>"remove url $oldrec->{id} ",
+                             DATAOBJ=>'itil::lnkapplurl',
+                          };
+                          $oprec->{IDENTIFYBY}=$oldrec->{id};
+                          return($oprec);
+                       }
+                    },
+                    \@curl,\@url,\@opList,
+                    refid=>$rec->{id});
+         if (!$res){
+            my $opres=ProcessOpList($self->getParent,\@opList);
+         }
+      }
      
+
+
+      # fine set
+      $itilurl->ResetFilter();
       $itilurl->SetFilter($fltset);
       my @curl=$itilurl->getHashList(qw(ALL));
      
@@ -177,9 +233,8 @@ sub qcheckRecord
                     my ($a,$b)=@_;
                     my $eq;
                     my $blen=length($b->{name});
-                    if ((lc($b->{name}) eq lc(substr($a->{name},0,$blen))) ||
-                        ($a->{srcid} eq $b->{srcid} &&
-                         $a->{srcsys} eq $b->{srcsys})){
+                    if ((lc($b->{name}) eq lc(substr($a->{name},0,$blen))) &&
+                        ($a->{networkid} eq $b->{networkid})){
                        $eq=0;
                        if ($a->{srcid} eq $b->{srcid} &&
                            $a->{srcsys} eq $b->{srcsys} &&
