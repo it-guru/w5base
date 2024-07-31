@@ -1496,20 +1496,11 @@ sub doSetSkin
    $cpath=~s#/(public|auth)/base/menu/setSkin#/#i;
    #msg(INFO,"setSkin '$newskin' user cookie operation on $cpath");
 
-   if ($newskin ne ""){
-      $cookie=Query->Cookie(
-                    -path=>$cpath,
-                    -name=>"W5SKIN",
-                    -value=>$newskin);
-   }
-   else{
-      $cookie=Query->Cookie(
-                    -path=>$cpath,
-                    -name=>"W5SKIN",
-                    -value=>$newskin);
-   }
-
-
+   $cookie=Query->Cookie(
+                 -path=>$cpath,
+                 -expires=>'+12M',
+                 -name=>"W5SKIN",
+                 -value=>$newskin);
 
    return($cookie,{
       exitcode=>0,
