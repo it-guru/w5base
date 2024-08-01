@@ -216,6 +216,7 @@ sub new
       new kernel::Field::Date(
                 name          =>'pcalcdate',
                 label         =>'Patch Calculation Date',
+                timezone      =>'CET', 
                 group         =>'source',
                 dataobjattr   =>'DARWIN_SYSTEM_STATUS.patch_calculation_dat'),
 
