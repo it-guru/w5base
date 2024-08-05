@@ -1006,7 +1006,8 @@ sub genericSystemImport
       $newrec->{name}=~s/\s/_/g;
 
       my $user=getModuleObject($self->Config,"base::user");
-      if ($self->isDataInputFromUserFrontend()){
+      if ($self->isDataInputFromUserFrontend() &&
+          !($impparam->{forceUnattended})){
          $newrec->{databossid}=$self->getCurrentUserId();
          $curdataboss=$newrec->{databossid};
       }
@@ -1022,7 +1023,8 @@ sub genericSystemImport
             $curdataboss=$newrec->{databossid};
          }
          else{
-            if ($self->isDataInputFromUserFrontend()){
+            if ($self->isDataInputFromUserFrontend() &&
+                !($impparam->{forceUnattended})){
                $self->LastMsg(ERROR,"can not find databoss contact record");
             }
             else{
@@ -1036,7 +1038,8 @@ sub genericSystemImport
                }
             }
             if (!defined($curdataboss)){
-               if ($self->isDataInputFromUserFrontend()){
+               if ($self->isDataInputFromUserFrontend() &&
+                   !($impparam->{forceUnattended})){
                   msg(ERROR,"unable to import system '$sysrec->{name}' ".
                             "without databoss");
                }
