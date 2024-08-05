@@ -496,6 +496,9 @@ sub Import
          return({idpath=>\$srcid});
       }
    };
+   if ($param->{forceUnattended}){
+      $ImportRec->{forceUnattended}=1;
+   }
    my $ImportObjects={   # Objects are in seperated Structur for better Dumping
       itcloud=>$itcloud,
       itcloudarea=>$cloudarea,

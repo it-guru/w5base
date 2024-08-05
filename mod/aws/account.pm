@@ -224,7 +224,7 @@ sub TriggerEndpoint
             if ($q->{InstanceID} ne ""){
                my $idpath=$q->{InstanceID}.'@'.$AccountID.'@'.$awsregion;
                my $o=getModuleObject($self->Config,"aws::system");
-               $o->Import({importname=>$idpath});
+               $o->Import({importname=>$idpath,forceUnattended=>1});
             }
          }
 
