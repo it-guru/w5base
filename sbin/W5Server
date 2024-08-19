@@ -1356,8 +1356,15 @@ if ($W5V2::Debug==0){
    {
       my $logfile="${statedir}W5Server.${configname}.log";
       $ServerParam{'log_file'}=$logfile;
-      msg(DEBUG,"W5ServerLogFile=%s",$logfile);
    }
+   my $logTarget=$curconfig->Param("LogTarget");
+   if ($logTarget ne ""){
+      if ($logTarget=~m/^\//){  # LogTarget on W5Server only useable for files
+         $logTarget=~s/\%f/NetW5Server/g;
+         $ServerParam{'log_file'}=$logTarget;
+      }
+   }
+   #printf STDERR ("W5ServerLogFile:%s\n",$ServerParam{'log_file'});
 }
 else{
    $ServerParam{'debug'}=1;
