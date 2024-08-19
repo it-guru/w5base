@@ -1246,16 +1246,27 @@ sub SendXmlToAM_appl
                         push(@chks,$lnk->{systemsystemid});
                      }
                   }
-                  if ($#chks!=-1){
+                  # printf STDERR ("DEBUG checks 01: %s\n",Dumper(\@chks));
+                  # at 1st, we are now see all as ProtectedNetworkDev
+                  map({
+                    if (!in_array(\@isProtectedNetworkDev,$_)){
+                       push(@isProtectedNetworkDev,$_);
+                    }
+                  } @chks);
+
+                  if ($#isProtectedNetworkDev!=-1){
                      $acsys->ResetFilter();
-                     $acsys->SetFilter({systemid=>\@chks});
+                     $acsys->SetFilter({systemid=>\@isProtectedNetworkDev});
                      foreach my $r ($acsys->getHashList(qw(systemid 
                                                            isprotnetdev))){
-                        if ($r->{isprotnetdev}){
-                           push(@isProtectedNetworkDev,$r->{systemid});
+                        if (!$r->{isprotnetdev}){
+                           @isProtectedNetworkDev=
+                              grep(!/^$r->{systemid}$/,@isProtectedNetworkDev);
                         }
                      }
                   }
+                  #printf STDERR ("DEBUG: isProtectedNetworkDev %s\n",
+                  #               Dumper(\@isProtectedNetworkDev));
                
                }
                foreach my $lnk (@l){
