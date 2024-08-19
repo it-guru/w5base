@@ -134,6 +134,12 @@ sub qcheckRecord
    # Level 2
    #
    if (defined($parrec)){
+      if ($dataobj->getField("acinmassignmentgroupid",$rec)){
+         if ($rec->{acinmassignmentgroupid} ne "" &&
+             lc($rec->{srcsys}) eq "assetmanager"){
+            $forcedupd->{acinmassignmentgroupid}=undef;
+         }
+      }
       if ($rec->{cistatusid}<6){
          if ($rec->{name} ne $parrec->{assetid}){
             $forcedupd->{name}=$parrec->{assetid};
