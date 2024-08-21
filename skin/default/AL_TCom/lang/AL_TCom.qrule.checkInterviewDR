@@ -20,8 +20,8 @@
 'temporary skip take of workflow end from change'=>{
  de=>'zeitweises übergehen der Workflow-Ende-Übernahme aus Change'
 },
-'missing valid next DR-Test change planning'=>{
- de=>'fehlende gültige "nächster DR-Test Change" Planung'
+'missing valid plan date for next DR test'=>{
+ de=>'fehlender gültiger Plantermin für nächsten DR Test'
 },
 'Calculation base for this mail'=>{
  de=>'Berechnungsbasis für diese Info-Mail'

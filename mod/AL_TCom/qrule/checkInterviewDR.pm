@@ -389,8 +389,22 @@ sub qcheckRecord
    # Prüfen des des Plan-Datums für den nächsten DR Test
    #
    if ($planday eq ""){
-      if (1 || $appdaysage>($maxagedays*0.5)){
-         my $msg="missing valid next DR-Test change planning";
+      my $ldayok=0;  # true, if lday is more then $maxagedays/2 in the past
+      if ($lastday ne "" &&
+          ($lastday=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)){
+         my $lday=$wf->ExpandTimeExpression($lastday,"en","GMT","GMT");
+         if ($lday ne ""){
+            my $duration=CalcDateDuration($lday,NowStamp("en"));
+            if (defined($duration)){
+               msg(INFO,"$rec->{name}: plancheck - lastday ".$duration->{days}." ago");
+               if ($duration->{days}>$maxagedays/2){
+                  $ldayok=1;
+               }
+            }
+         }
+      }
+      if ($ldayok){  # lday exists and is more then 0.5*$maxagedays in the past
+         my $msg="missing valid plan date for next DR test";
          push(@qmsg,$msg);
          if (!$drRiskAcceptance){
             push(@dataissue,$msg);
@@ -461,128 +475,6 @@ sub qcheckRecord
          }
       }  # endif mit plantermin
    }
-
-
-# 
-#    Der ganze Notification Rotz fliegt erstmal raus
-# 
-#      if ($lastday ne "" && $maxagedays>0){
-#         my $debuglog="";
-#         #printf STDERR ("ChangeEndDate=%s\n",$ChangeEndDate);
-#         my $ChangeEndDateOnly=$ChangeEndDate;
-#         $ChangeEndDateOnly=~s/ .*$//;
-#         if ($lastday eq ""){
-#            $lastday=NowStamp("en");
-#            $lastday=~s/\s.*$//;
-#         }
-#         $debuglog.="last date of DR-Tests: $lastday\n"; 
-#         $debuglog.="maximum days bettween DR-Tests: $maxagedays\n"; 
-#         my $deadline=$wf->ExpandTimeExpression(
-#                      $lastday."+${maxagedays}d",
-#                      "en","GMT","GMT");
-#
-#         $deadline=~s/\s.*$//;
-#         if ($planday ne ""){
-#            $deadline=$planday;
-#            $debuglog.="deadline replaced by interview answer: $deadline\n"; 
-#         }
-#         else{
-#            $debuglog.="deadline for DR-Test: $deadline\n"; 
-#         }
-#         $deadline=~s/\s.*$//;
-#
-#         my $plandeadline=$wf->ExpandTimeExpression(
-#                           $deadline."-42d",
-#                           "en","GMT","GMT");
-#         $debuglog.="plan of DR-Test deadline: $plandeadline\n"; 
-#         $debuglog.="last day from Change: $ChangeEndDate\n"; 
-#         
-#         my $d=CalcDateDuration(NowStamp("en"),$plandeadline);
-#         my $needToPlan=0;
-#         if (defined($d)){
-#            if ($d->{totaldays}<0){
-#               $needToPlan=1;
-#            }
-#         }
-#         else{
-#            msg(ERROR,"DR Test calc needToPlan failed: $plandeadline");
-#         }
-#         if ($needToPlan && $ChangeNumber eq ""){ # check if next plandate 
-#                                                  # within next 42 days
-#            msg(INFO,"needToPlanCheck: lastday: $lastday");
-#            msg(INFO,"needToPlanCheck: planday: $planday");
-#            if ($lastday eq $planday){
-#               my $msg="found change planning without ChangeNumber";
-#               push(@qmsg,$msg);
-#               $needToPlan=0;
-#            }
-#         }
-#
-#         msg(INFO,"$rec->{name}: next DR-Test planing deadline: ".
-#                  $plandeadline);
-#         msg(INFO,"$rec->{name}: days to next DR-Test planing deadline: ".
-#                  "$d->{totaldays}");
-#         msg(INFO,"$rec->{name}: next DR-Test planning needed: $needToPlan");
-#         if ($needToPlan){
-#            my $d;
-#            if ($ChangeEndDate ne ""){
-#               #printf STDERR ("ChangeEndDate=%s\n",$ChangeEndDate);
-#               $d=CalcDateDuration($deadline." 00:00:00",$ChangeEndDate);
-#               #printf STDERR ("plandeadline->ChangeEndDate:%s\n",Dumper($d));
-#            }
-#            if (!defined($d) || ($d->{totaldays}<-42 && $d->{totaldays}>7)){
-#               # Zieldatum des Changes nicht um den deadline Termin
-#               my $msg="missing valid next DR-Test change planning";
-#               push(@qmsg,$msg);
-#               if (!$drRiskAcceptance){
-#                  push(@dataissue,$msg);
-#                  $errorlevel=3 if ($errorlevel<3);
-#               }
-#               {
-#                  msg(INFO,"set DR-TestChange missing");
-#                  my $marker=$tag->getTag($rec->{id},
-#                              {name=>"DRTestNotify",mdate=>'>now-90d'});
-#                  if ($marker eq ""){
-#                     msg(INFO,"set DRTestNotify tag");
-#                     msg(INFO,"DR Test planning needed for ".$rec->{name}.
-#                              " - deadline for test is $deadline");
-#                     my $notifyparam={emailbcc=>11634953080001,
-#                                      emailcategory=>'DRTestPlanningNeeded'};
-#                     my $notifycontrol={};
-#                     $dataobj->NotifyWriteAuthorizedContacts($rec,{},
-#                                     $notifyparam,$notifycontrol,sub{
-#                        my $self=shift;
-#                        my $notifyparam=shift;
-#                        my $notifycontrol=shift;
-#                        my $subject;
-#                        my $text;
-#                        $subject=$self->T("request to plan next DR Test for").
-#                                 " ".$rec->{name};
-#                        my $tmpl=$self->getParsedTemplate(
-#                           "tmpl/AL_TCom.qrule.checkInterviewDR.testplan",{
-#                              static=>{
-#                                 APPNAME=>$rec->{name}
-#                              }
-#                        });
-#                        $text=$tmpl;
-#
-#                        $text.="\n\n";
-#                   
-#                        $text.=$self->T("Calculation base for this mail").":\n".
-#                               "---\n".
-#                               $debuglog;
-#                   
-#                   
-#                        return($subject,$text);
-#                     });
-#                     # mail verschicken
-#                     $tag->setTag($rec->{id},"DRTestNotify",NowStamp("en"));
-#                  }
-#                  # hier sollte die Notification versandt werden
-#               }
-#            }
-#         }
-#      }
 
 
    return($self->HandleQRuleResults("None",
