@@ -180,8 +180,8 @@ sub qcheckRecord
             my $d=CalcDateDuration($parrec->{mdate},NowStamp("en"));
             #msg(INFO,"age=".Dumper($d));
             if ($d->{totaldays}>8*7){
-               msg(WARN,"debug info - found long out of operation system ".
-                        "$rec->{systemid} in AssetManager and set cistatus=6");
+               #msg(WARN,"debug info - found long out of operation system ".
+               #         "$rec->{systemid} in AssetManager and set cistatus=6");
                $forcedupd->{cistatusid}="6";
             }
          }
