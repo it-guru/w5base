@@ -160,6 +160,30 @@ sub new
             label             =>'UCinstanceUUID'),
 
       new kernel::Field::Text(     
+            name              =>'cloudAccountId',
+            searchable        =>0,
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            label             =>'CloudAccountId'),
+
+      new kernel::Field::Text(     
+            name              =>'cloudAccountName',
+            vjointo           =>'tpc::cloudaccount',
+            vjoinon           =>['cloudAccountId'=>'id'],
+            vjoindisp         =>'name',
+            group             =>'source',
+            label             =>'CloudAccountName'),
+
+      new kernel::Field::Text(     
+            name              =>'cloudAccountHost',
+            vjointo           =>'tpc::cloudaccount',
+            vjoinon           =>['cloudAccountId'=>'id'],
+            vjoindisp         =>'cloudAccountControlHostName',
+            group             =>'source',
+            label             =>'CloudAccountHost'),
+
+
+      new kernel::Field::Text(     
             name              =>'vcUuid',
             searchable        =>0,
             group             =>'source',
@@ -274,6 +298,10 @@ sub DataCollector
              }
              else{
                 $_->{ismcos}=0;
+             }
+             $_->{cloudAccountId}=undef;
+             if (ref($_->{cloudAccountIds}) eq "ARRAY"){
+                $_->{cloudAccountId}=join(" ",@{$_->{cloudAccountIds}});
              }
              #printf STDERR ("RAW Record %s\n",Dumper($_));
          } @$data);
