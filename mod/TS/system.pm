@@ -767,7 +767,6 @@ sub genericSystemImport
       #   printf STDERR ("ERROR: redepl check rejected\n");
       #   @redepl=();
       #}
-print STDERR Dumper(\@redepl);
 
 
       msg(INFO,"invantar check for $srcsys-SystemID: $sysrec->{id}");
