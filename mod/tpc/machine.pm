@@ -27,6 +27,9 @@ use JSON;
 # API at https://code.vmware.com/apis/39/vrealize-automation
 # https://code.vmware.com/apis/978
 
+# alles neu, macht der Mai
+# https://developer.broadcom.com/xapis/vrealize-automation-cloud-infrastructure-as-a-service-iaas-api/latest/iaas/api/machines/get/
+
 sub new
 {
    my $type=shift;
