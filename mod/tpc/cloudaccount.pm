@@ -1,4 +1,4 @@
-package tpc::iaasAPI;
+package tpc::cloudaccount;
 #  W5Base Framework
 #  Copyright (C) 2024  Hartmut Vogler (it@guru.de)
 #
@@ -31,19 +31,42 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
    $self->AddFields(
+      new kernel::Field::Id(     
+            name              =>'id',
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            label             =>'CloudAccountID'),
+
+      new kernel::Field::RecordUrl(),
+
       new kernel::Field::Text(     
-            name              =>'latestApiVersion',
+            name              =>'name',
             ignorecase        =>1,
-            label             =>'latestApiVersion'),
-      new kernel::Field::Objects(     
-            name              =>'supportedApis',
-            searchable        =>0,
-            uivisible         =>1,
-            label             =>'supportedApis'),
+            label             =>'Name'),
+
+      new kernel::Field::Text(     
+            name              =>'cloudAccountControlHostName',
+            ignorecase        =>1,
+            label             =>'cloudAccountControlHostName'),
+
+      new kernel::Field::Text(     
+            name              =>'cloudAccountType',
+            ignorecase        =>1,
+            label             =>'cloudAccountType'),
+
+      new kernel::Field::Container(
+            name              =>'cloudAccountProperties',
+            label             =>'cloudAccountProperties',
+            uivisible         =>sub{
+               my $self=shift;
+               return(1) if ($self->getParent->IsMemberOf("admin"));
+               return(0);
+            },
+            searchable        =>0),
 
    );
    $self->{'data'}=\&DataCollector;
-   $self->setDefaultView(qw(latestApiVersion supportedApis));
+   $self->setDefaultView(qw(id name cloudAccountType cloudAccountControlHostName));
 
    return($self);
 }
@@ -73,7 +96,7 @@ sub DataCollector
    }
 
    my ($dbclass,$requesttoken)=$self->decodeFilter2Query4vRealize(
-      "api/about","id",
+      "cloud-accounts","id",
       $filterset
    );
    my $d=$self->CollectREST(
@@ -100,17 +123,20 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
+         if (ref($data) eq "HASH" && exists($data->{content})){
+            $data=$data->{content};
+         }
          if (ref($data) ne "ARRAY"){
             $data=[$data];
          }
-#         map({
-#            my $cistatusid="3";
-#            $cistatusid="4" if ($tpcDerivation eq "TPC1");
-#
-#
-#            $_->{cistatusid}=$cistatusid;
-#
-#         } @$data);
+         map({
+            $_->{cloudAccountControlHostName}=undef;
+            if (ref($_->{cloudAccountProperties}) eq "HASH"){
+               $_->{cloudAccountControlHostName}=
+                   $_->{cloudAccountProperties}->{hostName};
+            }
+
+         } @$data);
          return($data);
       },
       onfail=>sub{
@@ -124,7 +150,7 @@ sub DataCollector
             return([],"200");
          }
          msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data TPC response");
+         $self->LastMsg(ERROR,"unexpected data TPC cloudaccount response");
          return(undef);
       }
    );
@@ -175,5 +201,6 @@ sub getDetailBlockPriority
    my %param=@_;
    return(qw(header default));
 }
+
 
 1;
