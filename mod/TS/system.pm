@@ -767,6 +767,7 @@ sub genericSystemImport
       #   printf STDERR ("ERROR: redepl check rejected\n");
       #   @redepl=();
       #}
+print STDERR Dumper(\@redepl);
 
 
       msg(INFO,"invantar check for $srcsys-SystemID: $sysrec->{id}");
@@ -796,11 +797,21 @@ sub genericSystemImport
          }
          my $sysallowed=0;
          if ($osys->{srcsys} eq "w5base"){ #den Fall muss ich erstmal beobachten
-            printf STDERR ("genericSystemImport: try to transform w5base ".
-                           "system record to $srcsys on system %d\n",
-                           $osys->{id});
-            printf STDERR ("genericSystemImport: searchname was %s\n\n",
-                           Dumper($searchname));
+            #printf STDERR ("genericSystemImport: try to transform w5base ".
+            #               "system record to $srcsys on system %d\n",
+            #               $osys->{id});
+            #printf STDERR ("genericSystemImport: searchname was %s\n\n",
+            #               Dumper($searchname));
+            if ($osys->{cistatusid}==4){ # create manually in cistatus=4
+               $sysallowed++;           
+            }
+         }
+         if ($ageok && $applok && 
+             lc($osys->{srcsys}) eq "w5base" || $osys->{srcsys} eq ""){
+            if ($osys->{cistatusid}<=3){ # prepaied record for initail depl.
+               $sysallowed++;            # on system cistatus=avail on projekt
+            }
+
          }
          if ($ageok && $applok && 
              $osys->{srcsys} eq $srcsys &&   # OLDsys must be from the same 
