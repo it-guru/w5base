@@ -103,7 +103,7 @@ sub arrayhash2table
          my $dk=$d->{$k};
          if (ref($dk) eq "HASH"){
             $r.="<td class=containerfval valign=top>".
-                $self->hash2table($loopcount+1,$dk).
+                $self->arrayhash2table($loopcount+1,[$dk]).
                 "</td>"; 
          }
          else{
