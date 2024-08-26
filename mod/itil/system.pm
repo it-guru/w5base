@@ -3123,7 +3123,69 @@ sub QRuleSyncCloudSystem
             push(@$qmsg,map({"ToDo: ".$_->{MSG}} @opList));
          }
       }
-      
+
+      # checking databoss
+     
+      my $databossid=$rec->{databossid}; 
+      my $dbossvalid=1;
+      if ($databossid eq ""){
+         $dbossvalid=0;
+      }
+      if ($databossid){
+         my $u=getModuleObject($self->Config(),"base::user");
+         if (defined($u)){
+            $u->SetFilter({userid=>\$databossid});
+            my @ul=$u->getHashList(qw(cistatusid mdate userid usertyp ));
+            if ($#ul!=0){
+               $dbossvalid=0;
+            }
+            else{
+               if ($ul[0]->{usertyp} ne "user"){ # databosses in cloud-systems
+                  $dbossvalid=0;                 # are need to be always "users"
+                                                 # (no services or whatever)
+                  msg(WARN,"dataobss for $rec->{name}($rec->{id}) is not user!");
+               }
+            }
+         }
+      }
+      if (!$dbossvalid){
+         # resetting databoss to the default (derevided from the cloudarea appl)
+         my $applid;
+         my $itcloudareaid=$rec->{itcloudareaid};
+         if ($itcloudareaid ne ""){
+            my $ca=getModuleObject($self->Config(),"itil::itcloudarea");
+            $ca->SetFilter({id=>\$itcloudareaid});
+            my @carec=$ca->getHashList(qw(cistatusid applid));
+            if ($#carec==0){
+               if ($carec[0]->{cistatusid}==4){
+                  $applid=$carec[0]->{applid};
+               }
+            }
+         }
+         if ($applid ne ""){
+            my $appl=getModuleObject($self->Config(),"itil::appl");
+            $appl->SetFilter({id=>\$applid});
+            my @arec=$appl->getHashList(qw(databossid cistatusid applid));
+            if ($#arec==0 && $arec[0]->{cistatusid}==4){
+               my $newdatabossid=$arec[0]->{databossid};
+               my $u=getModuleObject($self->Config(),"base::user");
+               if (defined($u)){
+                  $u->SetFilter({userid=>\$newdatabossid});
+                  my @ul=$u->getHashList(qw(cistatusid mdate userid usertyp ));
+                  if ($#ul==0){
+                     if ($ul[0]->{usertyp} eq "user" &&
+                         $ul[0]->{cistatusid} eq "4" &&
+                         $ul[0]->{userid} ne $rec->{databossid}){
+                        msg(WARN,"replace databoss in ".
+                                 "$rec->{name}($rec->{id}) while ".
+                                 "old databoss is invalid or usertyp!=user");
+                        $forcedupd->{databossid}=$newdatabossid;
+                     }
+                  }
+               }
+            }
+         }
+      }
    }
    if (exists($parrec->{availabilityZone})){
       my $ass=getModuleObject($self->Config(),"itil::asset");
@@ -3246,6 +3308,16 @@ sub QRuleSyncCloudSystem
                        mode=>'string');
       }
    }
+
+
+
+
+
+
+
+
+
+
 }
 
 
