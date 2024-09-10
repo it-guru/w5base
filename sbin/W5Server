@@ -912,7 +912,7 @@ sub configure_hook
 {
    my $self=shift;
 
-   $self->max_async(256);
+   $self->max_async(320);
    $self->{'UniqueId'}={'counter'=>0,timer=>time()};
    $self->{'CacheState'}={};
    if ($W5V2::Debug==1){
