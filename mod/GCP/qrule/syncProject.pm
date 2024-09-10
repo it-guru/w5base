@@ -94,6 +94,14 @@ sub qcheckRecord
       }
    }
    my $gcpprojectid=$rec->{srcid};  
+
+   if ($gcpprojectid eq ""){
+      my $msg="no valid GCP ProjectID in CloudArea record $rec->{id}";
+      msg(ERROR,$msg);
+      push(@qmsg,$msg);
+      $errorlevel=3;
+   }
+   
    { 
       my $chk=getModuleObject($self->getParent->Config(),"GCP::project");
       return(undef,undef) if (!$chk->Ping());
@@ -107,7 +115,7 @@ sub qcheckRecord
       }
    }
 
-   if ($#qmsg==-1){
+   if ($#qmsg==-1 && $gcpprojectid ne ""){
       my $par=getModuleObject($self->getParent->Config(),"GCP::system");
       return(undef,undef) if (!$par->Ping());
 
@@ -172,8 +180,11 @@ sub qcheckRecord
          $sys->SetFilter({itcloudareaid=>$rec->{id},srcid=>\@updsys});
          my $op=$sys->Clone();
          foreach my $rec ($sys->getHashList(qw(ALL))){
+            my $tempname=$rec->{srcid};
+            $tempname=~s/\@.*$//;
+            $tempname="gcp".$tempname;
             $op->ValidatedUpdateRecord($rec,{
-               name=>$rec->{srcid},   # give a temp name for reactivation to
+               name=>$tempname,   # give a temp name for reactivation to
                cistatusid=>4          # ensure reactivation works
             },{id=>\$rec->{id}});
          }

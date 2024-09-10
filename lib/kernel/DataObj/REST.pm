@@ -280,11 +280,13 @@ sub Filter2RestPath
          }
          if ($c==$#{$restFinalAddr}){
             if ($#varlist>0){
-               $self->LastMsg(ERROR,"missing constant query '%s' parameters",
+               $self->LastMsg(ERROR,"missing constant query '%s' parameters ".
+                                    "at ".$self->Self(),
                                     join(",",@varlist));
             }
             else{
-               $self->LastMsg(ERROR,"missing constant query '%s' parameter",
+               $self->LastMsg(ERROR,"missing constant query '%s' parameter ".
+                                    "at ".$self->Self(),
                                     join(",",@varlist));
             }
             return(undef);
