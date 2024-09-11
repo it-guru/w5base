@@ -41,45 +41,43 @@ sub new
    $self->AddFields(
       new kernel::Field::Id(
             name          =>'sys_id',
+            RestFilterType=>'SYSPARMQUERY',
             label         =>'SysID'),
 
       new kernel::Field::Text(     
             name          =>'group_name',
-            RestFilterType=>'ServiceNow',
             label         =>'Group-Name'),
 
       new kernel::Field::Text(     
             name          =>'sm9_name',
-            RestFilterType=>'ServiceNow',
             label         =>'SM9Group'),
 
       new kernel::Field::Text(     
             name          =>'migstate',
+            RestFilterType=>'SYSPARMQUERY',
             dataobjattr   =>'migration_state',
-            RestFilterType=>'ServiceNow',
             label         =>'MigState'),
 
       new kernel::Field::Boolean(     
             name          =>'problem',
-            RestFilterType=>'ServiceNow',
+            RestFilterType=>'SYSPARMQUERY',
             label         =>'Problem'),
 
       new kernel::Field::Date(     
             name          =>'golive',
             dataobjattr   =>'go_live_inm',
-            RestFilterType=>'ServiceNow',
+            RestFilterType=>'SYSPARMQUERY',
             dayonly       =>1,
             label         =>'go life'),
 
       new kernel::Field::Number(     
             name          =>'sys_mod_count',
-            RestFilterType=>'ServiceNow',
+            RestFilterType=>'SYSPARMQUERY',
             label         =>'SysModCount'),
 
       new kernel::Field::MDate(     
             name          =>'sys_updated_on',
-            RestFilterType=>'ServiceNow',
-            searchable    =>0,
+            RestFilterType=>'SYSPARMQUERY',
             label         =>'Modification-Date')
 
    );
@@ -114,6 +112,7 @@ sub DataCollector
          P1=>'xx'
       }
    );
+   msg(INFO,"restFinalAddr=$restFinalAddr");
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
          $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
@@ -178,6 +177,7 @@ sub DataCollector
                }
             }
          } @$data);
+print STDERR Dumper($data);
          return($data);
       }
    );
