@@ -77,16 +77,62 @@ sub Filter2RestPath
    my $requesttoken=undef;
    my %qparam;
 
+
+   my $isODATA=0;
+   my @ODATAandLst;
+
+   my $isSIMPLE=0;
+
+   my $filterCnt=0;
+
+   
+   my $isSYSPARMQUERY=0;
+   my @SYSPARMQUERYandList;
+   
+
+   foreach my $fname (keys(%$filterSet)){
+      my $filterBlock=$filterSet->{$fname};
+      $filterBlock=[$filterBlock] if (ref($filterBlock) ne "ARRAY");
+      foreach my $filter (@$filterBlock){
+         $filterCnt++;
+         foreach my $fn (keys(%{$filter})){  # paas1 loop
+            my $fld=$self->getField($fn);
+            if (defined($fld)){
+               if ($fld->{RestFilterType} eq "ODATA"){
+                  $isODATA++;
+               }
+               if ($fld->{RestFilterType} eq "SYSPARMQUERY"){
+                  $isSYSPARMQUERY++;
+               }
+               if ($fld->{RestFilterType} eq "SIMPLE"){
+                  $isSIMPLE++;
+               }
+            }
+         }
+      }
+   }
+   if ($isSIMPLE && $isSYSPARMQUERY){
+      $self->LastMsg(ERROR,"RestFilterType SIMPLE and SYSPARMQUERY can not ".
+                           "be used together in the same call");
+      return(undef); 
+
+   }
+   if ($filterCnt>1){
+      $self->LastMsg(ERROR,"DATAOBJ::REST only support one dimension filters");
+      return(undef); 
+
+   }
+
+   
    # ToDo: check if ODATA filtering - if yes, allow in simplifyFilterSet
    #       flat SCALAR and ARRAY values
-
-
    my ($filter,$queryToken)=$self->simplifyFilterSet($filterSet);
-
    return(undef) if (!defined($filter));
 
-   my @ODATAandLst;
-   my $isODATA=0;
+
+
+
+
    foreach my $fn (keys(%{$filter})){  # paas1 loop
       my $fld=$self->getField($fn);
       if (defined($fld)){
@@ -124,20 +170,96 @@ sub Filter2RestPath
             $const=0;
          }
          if ($const){
+            my $constHandeled=0;
             $constParam->{$fn}=$filter->{$fn};
             foreach my $subRestFinalAddr (@{$restFinalAddr}){
                if ($fld->{RestFilterType} eq "CONST2PATH"){
                   $subRestFinalAddr.="/" if (!($subRestFinalAddr=~m/\/$/));
                   $subRestFinalAddr.=$filter->{$fn};
+                  $constHandeled++;
                }
                if ($subRestFinalAddr=~m/\{$fn\}/){
                   my $constVal=$filter->{$fn};
                   $subRestFinalAddr=~s/\{$fn\}/$constVal/g;
+                  $constHandeled++;
                }
             }
-            delete($filter->{$fn});
+            if ($constHandeled){
+               delete($filter->{$fn});
+            }
          }
-         if ($fld->{RestFilterType} eq "ODATA"){
+         if ($fld->{RestFilterType} eq "SYSPARMQUERY"){
+            my $fieldname=$fn;
+            $fieldname=$fld->{dataobjattr}  if (defined($fld->{dataobjattr}));
+            my @data;
+            my $fstr=$filter->{$fn};
+            if ($fstr=~m/^[^*?]+\*$/){
+               my $fstrmod=$fstr;
+               $fstrmod=~s/\*$//;
+               push(@SYSPARMQUERYandList,"$fieldname STARTSWITH $fstrmod");
+            }
+            elsif ($fstr=~m/^\*[^*?]+$/){
+               my $fstrmod=$fstr;
+               $fstrmod=~s/^\*//;
+               push(@SYSPARMQUERYandList,"$fieldname ENDSWITH $fstrmod");
+            }
+            elsif ($fstr=~m/^\*[^*?]+\*$/){
+               my $fstrmod=$fstr;
+               $fstrmod=~s/^\*//;
+               $fstrmod=~s/\*$//;
+               push(@SYSPARMQUERYandList,"$fieldname LIKE $fstrmod");
+            }
+            elsif ($fstr=~m/^>[^*?]+$/){
+               my $fstrmod=$fstr;
+               $fstrmod=~s/^>//;
+               if ($fld->Type()=~m/Date/){
+                  my $raw=$self->ExpandTimeExpression(
+                           $fstrmod,undef,$fld->timezone());
+                  if (defined($raw)){
+                     $raw=~s/ /','/;
+                  }
+                  $fstrmod="javascript:gs.dateGenerate('${raw}.000Z')";
+               } 
+               push(@SYSPARMQUERYandList,"$fieldname>$fstrmod");
+            }
+            elsif ($fstr=~m/^<[^*?]+$/){
+               my $fstrmod=$fstr;
+               $fstrmod=~s/^<//;
+               push(@SYSPARMQUERYandList,"$fieldname < $fstrmod");
+            }
+            elsif ($fstr=~m/[*?]/){
+               $self->LastMsg(ERROR,"selected wildcard filter can not be ".
+                                    "translated to sysparam_query");
+               return(undef);
+            }
+            else{
+               push(@SYSPARMQUERYandList,"$fieldname=$fstr");
+            }
+         }
+         elsif ($fld->{RestFilterType} eq "SIMPLE"){
+            my $fieldname=$fn;
+            $fieldname=$fld->{dataobjattr}  if (defined($fld->{dataobjattr}));
+            my @data;
+            my $fstr=$filter->{$fn};
+            if (ref($fstr) eq "SCALAR"){
+               my @l=($$fstr);
+               $fstr=\@l;
+            }
+            elsif (ref($fstr) eq "ARRAY"){
+               foreach my $word (@$fstr){
+                  my $exp="'".$word."'";
+                  my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
+                  push(@data,"$v eq $e");
+               }
+            }
+            else{
+               @data=($fstr);
+            }
+
+            $qparam{$fieldname}=join(" ",@data);
+
+         }
+         elsif ($fld->{RestFilterType} eq "ODATA"){
             $isODATA++;
             my @ODATAorLst;
             my $fieldname=$fn;
@@ -247,6 +369,14 @@ sub Filter2RestPath
          }
       }
    }
+   if ($isSYSPARMQUERY){
+      my $sysquery=join("^",@SYSPARMQUERYandList);
+      $qparam{'sysparm_query'}=$sysquery;
+printf STDERR ("sysparm_query=$sysquery\n");
+      $qparam{'sysparm_input_display_value'}="false"; # ensure working on UTC
+   }
+
+
    if ($isODATA){
       if ($#ODATAandLst!=-1){
          $qparam{'$filter'}=join(" and ",@ODATAandLst);
@@ -262,6 +392,10 @@ sub Filter2RestPath
          $qparam{'$top'}=99999;
       }
    }
+
+   my $qstr=kernel::cgi::Hash2QueryString(%qparam);
+
+   my $restFinalAddrString=$restFinalAddr->[0];
    if (grep(/\{[^{}]+\}/,@$restFinalAddr)){
       my $c=0;
       for($c=0;$c<=$#{$restFinalAddr};$c++){
@@ -292,10 +426,20 @@ sub Filter2RestPath
             return(undef);
          }
       }
-      return($restFinalAddr->[$c],$requesttoken,$constParam);
+      $restFinalAddrString=$restFinalAddr->[$c];
    }
 
-   return($restFinalAddr->[0],$requesttoken,$constParam);
+   if ($qstr ne ""){
+      if ($restFinalAddrString=~m/\?/){
+         $restFinalAddrString.="&".$qstr;
+      }
+      else{
+         $restFinalAddrString.="?".$qstr;
+      }
+   }
+   $requesttoken=$restFinalAddrString;
+
+   return($restFinalAddrString,$requesttoken,$constParam);
 }
 
 
