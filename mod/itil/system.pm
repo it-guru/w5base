@@ -3166,7 +3166,7 @@ sub QRuleSyncCloudSystem
             my $appl=getModuleObject($self->Config(),"itil::appl");
             $appl->SetFilter({id=>\$applid});
             my @arec=$appl->getHashList(qw(databossid cistatusid applid));
-            if ($#arec==0 && $arec[0]->{cistatusid}==4){
+            if ($#arec==0 && $arec[0]->{databossid} ne ""){
                my $newdatabossid=$arec[0]->{databossid};
                my $u=getModuleObject($self->Config(),"base::user");
                if (defined($u)){
