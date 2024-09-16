@@ -44,8 +44,10 @@ $Data::Dumper::Terse = 1;
 $Data::Dumper::Indent = 1;  
 my @prog=qw(mysql mysqldump gunzip);
 my($db,$prog,$err,$help,$exclude,$tasks,$convert,$file,$verbose,
-   $format,$mode,$targetdb,$dir,%inputinclude,%inputexclude,$mydefaultsfile);
+   $format,$mode,$slavectrl,
+   $targetdb,$dir,%inputinclude,%inputexclude,$mydefaultsfile);
 my $force=0;
+my $slavefound=0;
 
 # posible options
 my $optresult = GetOptions ("help"            => \$help,
@@ -57,6 +59,7 @@ my $optresult = GetOptions ("help"            => \$help,
                             "targetdb=s"      => \$targetdb,
                             "force"           => \$force,
                             "verbose"         => \$verbose,
+                            "slavectrl"       => \$slavectrl,
                             "format=s"        => \$format,
                             "convert=s"       => \$convert,
                             "defaults-file=s" => \$mydefaultsfile);
@@ -122,6 +125,9 @@ sub help
         --defaults-file configfile for mysql and mysqladmin
 
         --force         ignore warnings for example overwritting tables
+
+        --slavectrl     enables slave control, which locks all tables
+                        at begin of backup and dumps a 
 
         --verbose       write more output
 
@@ -336,6 +342,29 @@ sub load_tables{
    return(@tabl);
 }
 
+sub get_slave_status{
+   # load available tables in a array
+   my $stat=qx($prog->{mysql}  -Ee 'show slave status' $db);
+   if ($?){
+      die ("system command -mysql show slave status- failed:$?");
+   }
+   my @stat=grep(!/^\s*$/,split(/\n/,$stat));
+   shift(@stat);
+   return(@stat);
+}
+
+sub set_slave_mode{
+   my $mode=shift; # start or stop
+   # load available tables in a array
+   my $result="$prog->{mysql}  -e '$mode slave' $db";
+   if ($?){
+      die ("system command -mysql $mode slave status- failed:$?");
+   }
+   my @result=grep(!/^\s*$/,split(/\n/,$result));
+   shift(@result);
+   return(@result);
+}
+
 sub load_triggers{
    # load available tables in a array
    my $trg=qx($prog->{mysql} -e 'show triggers' $db) ;
@@ -496,6 +525,29 @@ sub process_engine
    my $dir=shift;
    my %processes;
 
+   if ($mode eq "export" && $slavectrl){
+      my @stat=get_slave_status(); 
+      if ($#stat!=-1){
+         foreach my $d (@$dir){
+            if (open(F,">$d/slave.pre.0.status")){
+               print F join("",@stat);
+               close(F);
+            }
+         }
+         $slavefound++;
+         set_slave_mode("stop");
+         my @stat=get_slave_status(); 
+         foreach my $d (@$dir){
+            if (open(F,">$d/slave.pre.1.status")){
+               print F join("",@stat);
+               close(F);
+            }
+         }
+      }
+      else{
+         msg("ERROR","slavectrl requested, but database not in slave mode");
+      }
+   }
    do{
       foreach my $k (keys(%processes)){
          delete($processes{$k})  if (!kill(0,$k));
@@ -871,6 +923,24 @@ sub process_engine
       }
       usleep(100);
    } until (keys(%processes) == 0 );
+
+   if ($slavefound){
+      $slavefound=0;
+      my @stat=get_slave_status(); 
+      foreach my $d (@$dir){
+         if (open(F,">$d/slave.post.1.status")){
+            print F join("",@stat);
+            close(F);
+         }
+      }
+      set_slave_mode("start");
+      foreach my $d (@$dir){
+         if (open(F,">$d/slave.post.2.status")){
+            print F join("",@stat);
+            close(F);
+         }
+      }
+   }
 }
 
 
@@ -890,6 +960,7 @@ if (lc($mode) eq "export"){
    include_tables();
    exclude_tables();
    my @tab=create_array_to_dump();
+   #@tab=grep(/^(user|grp|vou|usersubst|location|asset|osrelease|hwmodel)$/,@tab);
    # create dump folder
    if ($#dir >= $#dirformat){
       foreach my $dir (@dir){
