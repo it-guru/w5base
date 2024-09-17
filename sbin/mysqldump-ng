@@ -528,18 +528,22 @@ sub process_engine
    if ($mode eq "export" && $slavectrl){
       my @stat=get_slave_status(); 
       if ($#stat!=-1){
+         msg("INFO","found slave status");
          foreach my $d (@$dir){
+            msg("INFO","write slave status to pre.0 at $d");
             if (open(F,">$d/slave.pre.0.status")){
-               print F join("",@stat);
+               print F join("\n",@stat);
                close(F);
             }
          }
          $slavefound++;
+         msg("INFO","set stop slave");
          set_slave_mode("stop");
          my @stat=get_slave_status(); 
          foreach my $d (@$dir){
+            msg("INFO","write slave status to pre.0 at $d");
             if (open(F,">$d/slave.pre.1.status")){
-               print F join("",@stat);
+               print F join("\n",@stat);
                close(F);
             }
          }
@@ -925,18 +929,22 @@ sub process_engine
    } until (keys(%processes) == 0 );
 
    if ($slavefound){
+      msg("INFO","start finish sequence with slavectrl");
       $slavefound=0;
       my @stat=get_slave_status(); 
       foreach my $d (@$dir){
+         msg("INFO","write slave status to post.1 at $d");
          if (open(F,">$d/slave.post.1.status")){
-            print F join("",@stat);
+            print F join("\n",@stat);
             close(F);
          }
       }
+      msg("INFO","set start slave");
       set_slave_mode("start");
       foreach my $d (@$dir){
+         msg("INFO","write slave status to post.2 at $d");
          if (open(F,">$d/slave.post.2.status")){
-            print F join("",@stat);
+            print F join("\n",@stat);
             close(F);
          }
       }
