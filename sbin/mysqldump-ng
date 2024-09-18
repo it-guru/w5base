@@ -346,7 +346,7 @@ sub get_slave_status{
    # load available tables in a array
    my $stat=qx($prog->{mysql}  -Ee 'show slave status' $db);
    if ($?){
-      die ("system command -mysql show slave status- failed:$?");
+      printf STDERR ("system command -mysql show slave status- failed: $!\n");
    }
    my @stat=grep(!/^\s*$/,split(/\n/,$stat));
    shift(@stat);
@@ -356,9 +356,9 @@ sub get_slave_status{
 sub set_slave_mode{
    my $mode=shift; # start or stop
    # load available tables in a array
-   my $result="$prog->{mysql}  -e '$mode slave' $db";
+   my $result=qx($prog->{mysql}  -e '$mode slave' $db);
    if ($?){
-      die ("system command -mysql $mode slave status- failed:$?");
+      printf STDERR ("system command -mysql $mode slave status- failed: $!\n");
    }
    my @result=grep(!/^\s*$/,split(/\n/,$result));
    shift(@result);
@@ -539,6 +539,7 @@ sub process_engine
          $slavefound++;
          msg("INFO","set stop slave");
          set_slave_mode("stop");
+         sleep(2);
          my @stat=get_slave_status(); 
          foreach my $d (@$dir){
             msg("INFO","write slave status to pre.0 at $d");
@@ -929,21 +930,25 @@ sub process_engine
    } until (keys(%processes) == 0 );
 
    if ($slavefound){
+      $SIG{PIPE}='DEFAULT';
+      $SIG{CHLD}='DEFAULT'; 
       msg("INFO","start finish sequence with slavectrl");
       $slavefound=0;
       my @stat=get_slave_status(); 
       foreach my $d (@$dir){
-         msg("INFO","write slave status to post.1 at $d");
-         if (open(F,">$d/slave.post.1.status")){
+         msg("INFO","write slave status to post.0 at $d");
+         if (open(F,">$d/slave.post.0.status")){
             print F join("\n",@stat);
             close(F);
          }
       }
       msg("INFO","set start slave");
       set_slave_mode("start");
+      sleep(2);
+      my @stat=get_slave_status(); 
       foreach my $d (@$dir){
-         msg("INFO","write slave status to post.2 at $d");
-         if (open(F,">$d/slave.post.2.status")){
+         msg("INFO","write slave status to post.1 at $d");
+         if (open(F,">$d/slave.post.1.status")){
             print F join("\n",@stat);
             close(F);
          }
@@ -968,7 +973,7 @@ if (lc($mode) eq "export"){
    include_tables();
    exclude_tables();
    my @tab=create_array_to_dump();
-   #@tab=grep(/^(user|grp|vou|usersubst|location|asset|osrelease|hwmodel)$/,@tab);
+   #@tab=grep(/^(user|grp|vou|usersubst|location|asset|osrelease|hwmodel|itcloud|appl)$/,@tab);
    # create dump folder
    if ($#dir >= $#dirformat){
       foreach my $dir (@dir){
