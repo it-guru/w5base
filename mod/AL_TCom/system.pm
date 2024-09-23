@@ -30,34 +30,34 @@ sub new
    my $self=bless($type->SUPER::new(%param),$type);
 
 
-#   $self->AddFields(
-#      new kernel::Field::Select(
-#                name          =>'exposurelevel',
-#                group         =>'sec',
-#                label         =>'Exposure Level',
-#                allowempty    =>1,
-#                weblinkto     =>"none",
-#                vjointo       =>'base::itemizedlist',
-#                vjoinbase     =>{
-#                   selectlabel=>\'AL_TCom::system::exposurelevel',
-#                },
-#                vjoineditbase =>{
-#                   selectlabel=>\'AL_TCom::system::exposurelevel',
-#                   cistatusid=>\'4'
-#                },
-#                vjoinon       =>['rawexposurelevel'=>'name'],
-#                vjoindisp     =>'displaylabel',
-#                depend        =>['additional'],
-#                searchable    =>0,
-#                htmleditwidth =>'200px'),
-#
-#      new kernel::Field::Interface(
-#                name          =>'rawexposurelevel',
-#                group         =>'sec',
-#                label         =>'raw ExposureLevel',
-#                uploadable    =>0,
-#                container     =>'additional'),
-#   );
+   $self->AddFields(
+      new kernel::Field::Select(
+                name          =>'exposurelevel',
+                group         =>'sec',
+                label         =>'Exposure Level',
+                allowempty    =>1,
+                weblinkto     =>"none",
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'AL_TCom::system::exposurelevel',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'AL_TCom::system::exposurelevel',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['rawexposurelevel'=>'name'],
+                vjoindisp     =>'displaylabel',
+                depend        =>['additional'],
+                searchable    =>0,
+                htmleditwidth =>'200px'),
+
+      new kernel::Field::Interface(
+                name          =>'rawexposurelevel',
+                group         =>'sec',
+                label         =>'raw ExposureLevel',
+                uploadable    =>0,
+                container     =>'additional'),
+   );
 
 
    # BETA - diese Funktion ist noch im Aufbau!
