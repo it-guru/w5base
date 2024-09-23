@@ -1280,6 +1280,7 @@ sub doAnalyse
    my @criticality;
    my @ictono;
    my %opmode;
+   my @related;
 
    $self->finalizeAnalysedContacts(
       [keys(%applid)],
@@ -1291,7 +1292,8 @@ sub doAnalyse
       \@criticality,
       \@ictono,
       \@refurl,
-      \%opmode
+      \%opmode,
+      \@related
    );
 
    if ($#indication!=-1){
@@ -1315,10 +1317,8 @@ sub doAnalyse
    if (keys(%opmode)){
       $r->{opmode}=\%opmode;
    }
-   if (keys(%applid)){
-      $r->{related}=[
-        map({{dataobj=>'itil::appl',dataobjid=>$_}} keys(%applid))
-      ];
+   if ($#related!=-1){
+      $r->{related}=\@related;
    }
    if ($notes ne ""){
       $r->{notes}=$notes;

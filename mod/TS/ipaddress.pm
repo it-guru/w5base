@@ -110,11 +110,12 @@ sub doAnalyse
 
    my @l=$self->getHashList(qw(id applications network networkid
                                dnsname name system itclustsvc
-                               systemid itclustsvcid));
+                               systemid systemsystemid itclustsvcid));
 
    my %applid;
 
    my %systemid;
+   my @related;
 
    foreach my $iprec (@l){
       $networks{$iprec->{networkid}}={
@@ -133,6 +134,14 @@ sub doAnalyse
             push(@indication,"system: ".$iprec->{system});
             $systemid{$iprec->{systemid}}++;
          }
+         push(@related,{
+            dataobj=>'itil::system',
+            dataobjid=>$iprec->{systemid},
+            data=>{
+               name=>$iprec->{system},
+               systemid=>$iprec->{systemsystemid}
+            }
+         });
       }
       if ($iprec->{itclustsvc} ne ""){
          if (!in_array(\@indication,"clusterservice: ".$iprec->{itclustsvc})){
@@ -286,7 +295,8 @@ sub doAnalyse
       \@criticality,
       \@ictono,
       \@refurl,
-      \%opmode
+      \%opmode,
+      \@related
    );
 
 
@@ -316,10 +326,8 @@ sub doAnalyse
    if (keys(%networks)){
       $r->{networks}=[values(%networks)];
    }
-   if (keys(%applid)){
-      $r->{related}=[
-        map({{dataobj=>'itil::appl',dataobjid=>$_}} keys(%applid))
-      ];
+   if ($#related!=-1){
+      $r->{related}=\@related;
    }
 
    if ($notes ne ""){

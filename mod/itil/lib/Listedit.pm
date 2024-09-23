@@ -1979,6 +1979,7 @@ sub finalizeAnalysedContacts
    my $ictono=shift;       # ictos
    my $refurl=shift;       # refurl
    my $opmode=shift;
+   my $related=shift;
 
    my @applcadminfields=qw(applmgrid);
    my @appltadminfields=qw(tsmid tsm2id opmid opm2id);
@@ -2017,7 +2018,7 @@ sub finalizeAnalysedContacts
          $CRMap{$CRvalue->[$c]}=$c;
       }
       my @appls=$appl->getHashList(qw(+cdate name urlofcurrentrec 
-                                       criticality ictono),
+                                       criticality ictono applid),
                                 @applcadminfields,@appltadminfields);
 
       foreach my $a (@appls){
@@ -2034,6 +2035,16 @@ sub finalizeAnalysedContacts
          });
          foreach my $fld (@applcadminfields,@appltadminfields){
             $userid->{$a->{$fld}}++;
+         }
+         if (ref($related) eq "ARRAY"){
+            push(@$related,{
+               dataobj=>'itil::appl',
+               dataobjid=>$a->{id},
+               data=>{
+                  name=>$a->{name},
+                  applid=>$a->{applid}
+               }
+            });
          }
       }
    }
@@ -2082,18 +2093,11 @@ sub finalizeAnalysedContacts
                push(@$tadmin,$arec->{$fld});
             }
          }
-         if ($cadminset){
-            if (!in_array($indication,"application: ".$arec->{name})){
-               unshift(@$indication,"application: ".$arec->{name});
-            }
-            if (!in_array($refurl,$arec->{urlofcurrentrec})){
-               unshift(@$refurl,$arec->{urlofcurrentrec});
-            }
+         if (!in_array($indication,"application: ".$arec->{name})){
+            unshift(@$indication,"application: ".$arec->{name});
          }
-         else{
-            if (!in_array($refurl,$arec->{urlofcurrentrec})){
-               push(@$refurl,$arec->{urlofcurrentrec});
-            }
+         if (!in_array($refurl,$arec->{urlofcurrentrec})){
+            unshift(@$refurl,$arec->{urlofcurrentrec});
          }
       }
    }
