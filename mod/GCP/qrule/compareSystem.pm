@@ -118,8 +118,6 @@ sub qcheckRecord
          'set system CI-Status to disposed of waste due missing on GCP');
    }
 
-
-
    if (($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
         $rec->{cistatusid}==5 ||
         (exists($forcedupd->{cistatusid}) && $forcedupd->{cistatusid}==4)) &&
@@ -171,10 +169,11 @@ sub qcheckRecord
             my @ipaddresses;
             @ipaddresses=sort({$a->{name} cmp $b->{name}} values(%ipaddresses));
 
-
             my %syncData=(
                id=>$parrec->{id},
                name=>\@sysname,
+               cpucount=>$parrec->{cpucount},
+               memory=>$parrec->{memory},
                ipaddresses=>\@ipaddresses,
                availabilityZone=>$parrec->{zonename}
             );
