@@ -54,7 +54,6 @@ sub new
 
       new kernel::Field::Text(     
             name          =>'migstate',
-            RestFilterType=>'SYSPARMQUERY',
             dataobjattr   =>'migration_state',
             label         =>'MigState'),
 
@@ -63,10 +62,11 @@ sub new
             RestFilterType=>'SYSPARMQUERY',
             label         =>'Problem'),
 
-      new kernel::Field::Date(     
+      new kernel::Field::Text(     
             name          =>'golive',
             dataobjattr   =>'go_live_inm',
             RestFilterType=>'SYSPARMQUERY',
+            RestSoftFilter=>0,
             dayonly       =>1,
             label         =>'go life'),
 
@@ -78,6 +78,7 @@ sub new
       new kernel::Field::MDate(     
             name          =>'sys_updated_on',
             RestFilterType=>'SYSPARMQUERY',
+            RestSoftFilter=>0,
             label         =>'Modification-Date')
 
    );
@@ -166,18 +167,17 @@ sub DataCollector
          }
          map({
             $_=FlattenHash($_);
-            if (exists($_->{go_live_inm}) && $_->{go_live_inm} ne ""){
-               if ($_->{go_live_inm}=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/){
-                  $_->{go_live_inm}.=" 00:00:00";
-               }
-            }
+            #if (exists($_->{go_live_inm}) && $_->{go_live_inm} ne ""){
+            #   if ($_->{go_live_inm}=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/){
+            #      $_->{go_live_inm}.=" 00:00:00";
+            #   }
+            #}
             foreach my $k (keys(%$constParam)){
                if (!exists($_->{$k})){
                   $_->{$k}=$constParam->{$k};
                }
             }
          } @$data);
-print STDERR Dumper($data);
          return($data);
       }
    );

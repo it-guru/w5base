@@ -193,48 +193,76 @@ sub Filter2RestPath
             $fieldname=$fld->{dataobjattr}  if (defined($fld->{dataobjattr}));
             my @data;
             my $fstr=$filter->{$fn};
-            if ($fstr=~m/^[^*?]+\*$/){
-               my $fstrmod=$fstr;
-               $fstrmod=~s/\*$//;
-               push(@SYSPARMQUERYandList,"$fieldname STARTSWITH $fstrmod");
+            if ($fld->Type()=~m/Date/){
+               $fstr=$self->PreParseTimeExpression($fstr,$fld->timezone());
             }
-            elsif ($fstr=~m/^\*[^*?]+$/){
-               my $fstrmod=$fstr;
-               $fstrmod=~s/^\*//;
-               push(@SYSPARMQUERYandList,"$fieldname ENDSWITH $fstrmod");
-            }
-            elsif ($fstr=~m/^\*[^*?]+\*$/){
-               my $fstrmod=$fstr;
-               $fstrmod=~s/^\*//;
-               $fstrmod=~s/\*$//;
-               push(@SYSPARMQUERYandList,"$fieldname LIKE $fstrmod");
-            }
-            elsif ($fstr=~m/^>[^*?]+$/){
-               my $fstrmod=$fstr;
-               $fstrmod=~s/^>//;
+            my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
+            for(my $c=0;$c<=$#words;$c++){
+               my $sword=$words[$c];
+               next if ($sword eq "AND");
+               if ($sword eq "OR"){
+                  $self->LastMsg(ERROR,"OR is not supported in ".
+                                       "sysparam_query translation");
+                  return(undef);
+               }
+               my $cmpop="="; 
+               if ($sword=~m/^<=[^*?]+$/){
+                  $sword=~s/^<=//;
+                  $cmpop="<=";
+               }
+               elsif ($sword=~m/^>=[^*?]+$/){
+                  $sword=~s/^>=//;
+                  $cmpop=">=";
+               }
+               elsif ($sword=~m/^>[^*?]+$/){
+                  $sword=~s/^>//;
+                  $cmpop=">";
+               }
+               elsif ($sword=~m/^<[^*?]+$/){
+                  $sword=~s/^<//;
+                  $cmpop="<";
+               }
+               elsif ($sword=~m/^[^*?]+\*$/){
+                  my $fstrmod=$sword;
+                  $sword=~s/\*$//;
+                  $cmpop=" STARTSWITH ";
+               }
+               elsif ($sword=~m/^\*[^*?]+$/){
+                  my $fstrmod=$sword;
+                  $sword=~s/^\*//;
+                  $cmpop=" ENDSWITH ";
+               }
+               elsif ($sword=~m/^\*[^*?]+\*$/){
+                  my $fstrmod=$sword;
+                  $sword=~s/^\*//;
+                  $sword=~s/\*$//;
+                  $cmpop=" LIKE ";
+               }
+               elsif ($sword=~m/[*?]/){
+                  $self->LastMsg(ERROR,
+                                 "selected wildcard filter can not be ".
+                                 "translated to sysparam_query");
+                  return(undef);
+               }
+
+
                if ($fld->Type()=~m/Date/){
-                  my $raw=$self->ExpandTimeExpression(
-                           $fstrmod,undef,$fld->timezone());
+                  my $raw=$self->ExpandTimeExpression($sword);
+
                   if (defined($raw)){
                      $raw=~s/ /','/;
                   }
-                  $fstrmod="javascript:gs.dateGenerate('${raw}.000Z')";
-               } 
-               push(@SYSPARMQUERYandList,"$fieldname>$fstrmod");
-            }
-            elsif ($fstr=~m/^<[^*?]+$/){
-               my $fstrmod=$fstr;
-               $fstrmod=~s/^<//;
-               push(@SYSPARMQUERYandList,"$fieldname < $fstrmod");
-            }
-            elsif ($fstr=~m/[*?]/){
-               $self->LastMsg(ERROR,"selected wildcard filter can not be ".
+                  else{
+                     $self->LastMsg(ERROR,
+                                    "selected date expression can not be ".
                                     "translated to sysparam_query");
-               return(undef);
-            }
-            else{
-               push(@SYSPARMQUERYandList,"$fieldname=$fstr");
-            }
+                     return(undef);
+                  }
+                  $sword="javascript:gs.dateGenerate('${raw}.000Z')";
+               } 
+
+               push(@SYSPARMQUERYandList,"${fieldname}${cmpop}${sword}");
+            } 
          }
          elsif ($fld->{RestFilterType} eq "SIMPLE"){
             my $fieldname=$fn;
