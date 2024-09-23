@@ -219,6 +219,8 @@ sub CheckFilter
    my $okcount=0;
    CHK: foreach my $filter (@flt){
       foreach my $k (keys(%{$filter})){
+         my $fld=$self->getField($k);
+         next if (exists($fld->{RestSoftFilter}) && !$fld->{RestSoftFilter});
          if (exists($filter->{$k}) && !defined($filter->{$k})){ # compare on 
             if (!(!defined($rec->{$k}) && exists($rec->{$k}))){ # null entrys
                $failcount=1;
