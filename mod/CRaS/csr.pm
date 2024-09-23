@@ -1527,7 +1527,7 @@ sub doNotify
             if ($mode eq "CERTEXPIRE2"){
                $level="ERROR";
                $subject=$self->T(
-                  "CRaS expiration extrem near",
+                  "CRaS expiration extremly near",
                   $obj->Self).": ".$rec->{sslcertcommon};
             }
  
