@@ -179,6 +179,10 @@ sub DataCollector
          if ($code eq "404"){  # 404 bedeutet nicht gefunden
             return([],"200");
          }
+         if (exists($constParam->{id}) && $constParam->{id} ne "" &&
+             $code eq "403"){ # this means on GCP a rundown of project
+            return([],"200");
+         }
          msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,"unexpected data GCP project response");
          return(undef);
