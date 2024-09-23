@@ -46,7 +46,7 @@
 'CRaS new CSR to process'=>{de=>'CRaS neuer CSR zur Bearbeitung'},
 'CRaS certificate signed'=>{de=>'CRaS Zertifikat signiert'},
 'CRaS check for renew'=>{de=>'CRaS Prüfung der Erneuerung/Verlängerung'},
-'CRaS expiration extrem near'=>{de=>'CRaS Verfall extrem nahe'},
+'CRaS expiration extremly near'=>{de=>'CRaS Verfall extrem nahe'},
 'sigend state only allowed with singed cert file'=>{de=>'signiert Status nur zulässig mit signiertem Zertifikat'},
 'new record would be out of a serviceteam scope'=>{de=>'neuer Datensatz wäre nicht im Fokus eines ServiceTeams'},
 'sign request CA'=>{de=>'gewünschte CA'},
