@@ -207,7 +207,7 @@ sub qcheckRecord
 
    my @l=$lobj->getHashList(qw(systemid applgrpid applid id reltyp
                                systemsystemid systemsrcsys systemsrcid
-                               isembedded isnetswitch));
+                               isembedded isnetswitch shortdesc));
 
    @l=grep({
       ($_->{isembedded} eq "0" && $_->{isnetswitch} eq "0")
@@ -261,9 +261,17 @@ sub qcheckRecord
           delete($ladd->{systemid}->{$systemid});
        }
    }
-   # printf STDERR ("addl=%s\n",Dumper($ladd));
+   #printf STDERR ("addl=%s\n",Dumper($ladd));
 
-   my $w5sys=getModuleObject($dataobj->Config,"itil::system");
+   #my $w5sys=getModuleObject($dataobj->Config,"itil::system");
+   #my @systemids=keys(%{$ladd->{systemid}});
+   #if ($#systemids!=-1){
+   #   $w5sys->SetFilter({id=>\@systemids});
+   #   my @w5rec=$w5sys->getHashList(qw(id name shortdesc));
+   #   foreach my $rec (@w5rec){
+   #      $ladd->{systemid}->{$rec->{id}}->{shortdesc}=$rec->{shortdesc};
+   #   }
+   #}
    #printf STDERR ("rec=%s\n",Dumper($rec));
 
    $tsossys->ResetFilter();
@@ -385,7 +393,8 @@ sub qcheckRecord
          }
          my $tsosmacrec={
             name=>$lrec->{system},
-            systemid=>$TSOSsystemid
+            systemid=>$TSOSsystemid,
+            description=>$lrec->{shortdesc}
          };
          my $machineNumber;
 
@@ -405,7 +414,8 @@ sub qcheckRecord
 
          $tsosmac->ResetFilter();
          $tsosmac->SetFilter({id=>$TSOSmachineid});
-         my ($mrec,$msg)=$tsosmac->getOnlyFirst(qw(id name systemid));
+         my ($mrec,$msg)=$tsosmac->getOnlyFirst(qw(id name systemid 
+                                                   description));
          if (!defined($mrec)){
             $TSOSmachineid=undef;
          }
@@ -421,6 +431,7 @@ sub qcheckRecord
          else{
             if ($mrec->{systemid} ne $tsosmacrec->{systemid} ||
                 $mrec->{machineNumber}  ne $tsosmacrec->{machineNumber} ||
+                $mrec->{description}  ne $tsosmacrec->{description} ||
                 $mrec->{name}     ne $tsosmacrec->{name}){
                my $bk=$tsosmac->ValidatedUpdateRecord(
                   {},$tsosmacrec,
