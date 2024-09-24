@@ -1129,10 +1129,12 @@ sub unpackCertSignRequest
       if ($#names==0 && ref($names[0]) eq "ARRAY"){
          @names=@{$names[0]};
       }
-      
       foreach my $nrec (@names){
          if ($nrec->{dNSName} ne ""){
             push(@altnames,$nrec->{dNSName});
+         }
+         if ($nrec->{iPAddress} ne ""){
+            push(@altnames,$nrec->{iPAddress});
          }
       }
    }
