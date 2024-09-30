@@ -1,0 +1,236 @@
+package SMNow::event::SMNowGroupMig;
+#  W5Base Framework
+#  Copyright (C) 2024  Hartmut Vogler (it@guru.de)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+use strict;
+use vars qw(@ISA);
+use kernel;
+use kernel::Event;
+use kernel::QRule;
+@ISA=qw(kernel::Event);
+
+
+
+sub Init
+{
+   my $self=shift;
+
+
+   $self->RegisterEvent("SMNowGroupMig","SMNowGroupMig",timeout=>500);
+   return(1);
+}
+
+
+sub SMNowGroupMig
+{
+   my $self=shift;
+
+   my $sngrpmig=getModuleObject($self->Config,"SMNow::grpmig");
+   my $user=getModuleObject($self->Config,"base::user");
+
+   my $doNotify=1;
+   my $doChange=1;
+
+   if ($#_!=-1){   # if any is specified, not the default handling process
+      $doNotify=0; # is done
+      $doChange=0;
+   }
+   while(my $p=shift){
+      if ($p eq "NOTIFY"){
+         $doNotify=1;
+         if ($_[0]=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/){
+            $doNotify=shift;
+         }
+         elsif($_[0]="CHANGE"){
+            $doNotify="1";
+         }
+         else{
+            return({exitcode=>1,exitmsg=>'invalid parameter order after NOTIFY'});
+         }
+      }
+      elsif ($p eq "CHANGE"){
+         $doChange=1;
+         if ($_[0]=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/){
+            $doChange=shift;
+         }
+         elsif($_[0]="NOTIFY"){
+            $doChange="1";
+         }
+         else{
+            return({exitcode=>1,exitmsg=>'invalid parameter order after CHANGE'});
+         }
+      }
+      else{
+            return({exitcode=>1,exitmsg=>'invalid parameter '.$p});
+      }
+   }
+   if ($doNotify eq "1"){
+      my $dst=$sngrpmig->ExpandTimeExpression("now+29d","en");
+      $dst=~s/\s.*//;
+      $doNotify=$dst;
+   }
+   if ($doChange eq "1"){
+      my $dst=$sngrpmig->ExpandTimeExpression("now+1d","en");
+      $dst=~s/\s.*//;
+      $doChange=$dst;
+   }
+   if ($doNotify){
+      msg(INFO,"process doNotify for $doNotify");
+      my $bk=$self->handleTimeStamp("prewarning",$user,$sngrpmig,$doNotify);
+      return($bk) if ($bk);
+   }
+   if ($doChange){
+      msg(INFO,"process doChange for $doChange");
+      my $bk=$self->handleTimeStamp("postmodify",$user,$sngrpmig,$doChange);
+      return($bk) if ($bk);
+   }
+   return({exitcode=>0});
+}
+
+sub processRelevantCIs
+{
+   my $self=shift;
+   my $mode=shift;
+   my $migstate=shift;
+   my $iag=shift;
+
+   my %l;
+
+   foreach my $dataobjname (qw(TS::appl TS::system TS::asset TS::swinstance)){
+      my $o=getModuleObject($self->Config,$dataobjname);
+      $o->SetFilter({acinmassingmentgroup=>\$iag,cistatusid=>"<6"});
+      foreach my $rec ($o->getHashList(qw(ALL))){
+        my $name=$rec->{name};
+        if ($dataobjname=~m/::system$/){
+           if ($rec->{shortdesc} ne ""){
+              $name.=": ".$rec->{shortdesc};
+           }
+        }
+        my $lrec={
+           urlofcurrentrec=>$rec->{urlofcurrentrec},
+           name=>$name,
+           databossid=>$rec->{databossid}
+        };
+        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+      }
+   }
+   return(%l);
+}
+
+sub handleTimeStamp
+{
+   my $self=shift;
+   my $mode=shift;
+   my $user=shift;
+   my $o=shift;
+   my $ts=shift;
+
+   $o->SetFilter({golive=>\$ts});
+
+   my %effGrp;
+
+   my @d=$o->getHashList(qw(group_name sm9_name migstate sys_id));
+
+   foreach my $rec (@d){
+      next if ($rec->{migstate} eq "");
+      if (exists($effGrp{$rec->{sm9_name}})){
+         return({exitcode=>2,exitmsg=>'mulitple Notify records for '.
+                                      $rec->{sm9_name}});
+      }
+      $effGrp{$rec->{sm9_name}.':'.$rec->{migstate}}={
+         sys_id=>$rec->{sys_id},
+         sm9_name=>$rec->{sm9_name},
+         group_name=>$rec->{group_name},
+         migstate=>$rec->{migstate} 
+      };
+   }
+   #printf STDERR ("fifi mig=%s\n",Dumper(\%effGrp));
+   foreach my $ia (sort(keys(%effGrp))){
+      my $iag=$effGrp{$ia}->{sm9_name};
+      my $newgroup=$effGrp{$ia}->{group_name};
+      my $sys_id=$effGrp{$ia}->{sys_id};
+      my $migstate=lc($effGrp{$ia}->{migstate});
+      next if (!in_array($migstate,[qw(merge migrated omitted)]));
+      next if ($iag eq "");
+      my %l=$self->processRelevantCIs($mode,$migstate,$iag);
+      foreach my $databossid (sort(keys(%{$l{databossid}}))){
+         printf STDERR ("databossid: $databossid do $migstate  on iag=$iag on:\n");
+         my $is1st=1;
+         my $itemlist="";
+         foreach my $cirec (@{$l{databossid}->{$databossid}}){
+            $itemlist.=sprintf("\n") if (!$is1st);
+            $itemlist.=sprintf(" %s\n",$cirec->{name});
+            $itemlist.=sprintf(" - %s\n",$cirec->{urlofcurrentrec});
+            $is1st=0;
+         }
+         $user->ResetFilter();
+         $user->SetFilter({userid=>$databossid,cistatusid=>'4'});
+         my ($urec)=$user->getOnlyFirst(qw(email userid cistatusid talklang));
+         if (defined($urec)){
+            my $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
+            $ENV{HTTP_FORCE_LANGUAGE}=$urec->{talklang};
+            my $subject="???";
+            if ($mode eq "prewarning"){
+               $subject=$self->T("SM.Now planed changes for Incident-AG");
+            }
+            else{
+               $subject=$self->T("SM.Now done changes for Incident-AG");
+            }
+            $subject.=" ".$iag;
+            my $tmpl=$o->getParsedTemplate(
+                     "tmpl/SMNow.".$mode.".".$migstate,
+                     {static=>{
+                        migstate=>$migstate,
+                        ChangeDate=>$ts,
+                        oldgroup=>$iag,
+                        newgroup=>$newgroup,
+                        ITEMS=>$itemlist,
+                     }});
+            my $baseurl=$self->Config->Param("EventJobBaseUrl");
+            my $directlink=$baseurl."/auth/SMNow/grpmig/Detail?".
+                           "search_sys_id=$sys_id";
+            my %notiy;
+            my $fakeFrom="\"SM.Now - AG-Migration\" <>";
+            $notiy{emailfrom}=$fakeFrom;
+            $notiy{emailto}=$urec->{email};
+            $notiy{emailcc}=[qw(12898138600000)];
+            $notiy{emailbcc}=[qw(11634953080001)];
+            $notiy{emailcategory}='SMNowGroupMigration';
+            $notiy{name}=$subject;
+            my $sitename=$self->Config->Param("SITENAME");
+            if ($sitename ne ""){
+               $notiy{name}=$sitename.": ".$notiy{name};
+            }
+            $tmpl.="\n\nDirectLink:\n".$directlink;
+
+            my $wfa=getModuleObject($self->Config,"base::workflowaction");
+            $wfa->Notify("INFO",$subject,$tmpl,%notiy);
+
+            printf STDERR Dumper($urec);
+            $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;;
+         }
+      }
+      #printf STDERR ("fifi l for iag $iag=%s\n",Dumper(\%l));
+   }
+
+   
+   return(0);
+}
+
+
+1;

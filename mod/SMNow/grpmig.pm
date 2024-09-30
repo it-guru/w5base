@@ -65,9 +65,9 @@ sub new
       new kernel::Field::Text(     
             name          =>'golive',
             dataobjattr   =>'go_live_inm',
-            RestFilterType=>'SYSPARMQUERY',
-            RestSoftFilter=>0,
-            dayonly       =>1,
+#            RestFilterType=>'SYSPARMQUERY',   # funktioniert mit der SNow API
+#            RestSoftFilter=>0,                # nicht korrekt
+#            dayonly       =>1,
             label         =>'go life'),
 
       new kernel::Field::Number(     
