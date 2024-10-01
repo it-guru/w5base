@@ -219,6 +219,7 @@ sub DataCollector
                   };
                   if (length($tag{Name})>2){
                      $rec->{name}=$tag{Name};
+                     $rec->{name}=~s/\..*//;
                   }
                   if (in_array(\@view,"status")){
                      my $status="unknown";
