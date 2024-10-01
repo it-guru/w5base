@@ -2018,6 +2018,7 @@ sub finalizeAnalysedContacts
          $CRMap{$CRvalue->[$c]}=$c;
       }
       my @appls=$appl->getHashList(qw(+cdate name urlofcurrentrec 
+                                       description
                                        criticality ictono applid),
                                 @applcadminfields,@appltadminfields);
 
@@ -2042,7 +2043,8 @@ sub finalizeAnalysedContacts
                dataobjid=>$a->{id},
                data=>{
                   name=>$a->{name},
-                  applid=>$a->{applid}
+                  applid=>$a->{applid},
+                  description=>$a->{description}
                }
             });
          }
