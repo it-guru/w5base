@@ -285,6 +285,20 @@ sub DataCollector
              if ($_->{hostname} ne ""){
                 $_->{name}=$_->{hostname};
              }
+             else{  # hostname is not known at this time. try to extract from
+                my $bootconfig;  # bootConfig
+                if (ref($_->{bootConfig}) eq "HASH"){
+                   $bootconfig=$_->{bootConfig}->{content};
+                }
+                my @l=grep(/^\s*hostname\s*:/,split(/\n/,$bootconfig));
+                if ($#l==0){
+                   my ($tmpname)=$l[0]=~m/^\s*hostname\s*:\s*(.*)\s*$/;
+                   if (length($tmpname)>3){
+                      $_->{name}=$tmpname;
+                   }
+                }
+             }
+
              $_->{name}=~s/[\. ].*$//;
              if (ref($_->{tags}) eq "ARRAY"){
                 my %h;
