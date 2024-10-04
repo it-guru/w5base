@@ -1,8 +1,9 @@
 Hello databoss,
 
-the Incident-Assigmentgroup %oldgroup% in your 
+the Incident-Assigmentgroup/Change-Approvergroups
+<b>%oldgroup%</b> in your 
 configitems (see below) will be %migstate% 
-to %newgroup% at %ChangeDate% .
+to <b>%newgroup%</b> at <b>%ChangeDate%</b>.
 Please check whether this matches your expectations.
 
 Please direct any questions you may have to Markus Hammelmann.

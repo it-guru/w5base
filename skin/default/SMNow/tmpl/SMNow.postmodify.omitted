@@ -1,6 +1,7 @@
 Hello databoss,
 
-the Incident-Assigmentgroup %oldgroup% in your
+the Incident-Assigmentgroup/Change-Approvergroups
+<b>%oldgroup%</b> in your
 configitems (see below) has been changed to EMPTY.
 
 Please check whether this matches your expectations.

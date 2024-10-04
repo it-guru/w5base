@@ -1,8 +1,9 @@
 Hello databoss,
 
-the Incident-Assigmentgroup %oldgroup% in your 
+the Incident-Assigmentgroup/Change-Approvergroups
+<b>%oldgroup%</b> in your 
 configitems (see below) has been migrated to
-the new group %newgroup% .
+the new group <b>%newgroup%</b>.
 
 Please check whether this matches your expectations.
 

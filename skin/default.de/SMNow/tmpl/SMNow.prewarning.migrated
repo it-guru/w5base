@@ -1,12 +1,14 @@
-Hello databoss,
+Sehr geehrter Datenverantwortlicher,
 
-the Incident-Assigmentgroup/Change-Approvergroups
-<b>%oldgroup%</b> in your 
-configitems (see below) will be %migstate% 
-to <b>%newgroup%</b> at <b>%ChangeDate%</b>.
-Please check whether this matches your expectations.
+die Incident-Assigmentgroup/Change-Approvergroups
+<b>%oldgroup%</b> in Ihren
+ConfigItems (siehe unten) werden am <b>%ChangeDate%</b>
+auf die Gruppe <b>%newgroup%</b>
+migriert.
 
-Please direct any questions you may have to Markus Hammelmann.
+Bitte prüfen Sie, ob dies Ihren Erwartungen entspricht.
+
+Bei Rückfragen wenden Sie sich bitte direkt an Markus Hammelmann.
 
 <b>Items:</b>
 

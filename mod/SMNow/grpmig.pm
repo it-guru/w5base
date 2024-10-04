@@ -197,7 +197,7 @@ sub initSearchQuery
 {
    my $self=shift;
    if (!defined(Query->Param("search_migstate"))){
-     Query->Param("search_migstate"=>"MERGE");
+     Query->Param("search_migstate"=>"MERGE MIGRATED OMITTED");
    }
 }
 

@@ -41,6 +41,7 @@ sub SMNowGroupMig
 
    my $sngrpmig=getModuleObject($self->Config,"SMNow::grpmig");
    my $user=getModuleObject($self->Config,"base::user");
+   my $metagrp=getModuleObject($self->Config,"tsgrpmgmt::grp");
 
    my $doNotify=1;
    my $doChange=1;
@@ -90,12 +91,16 @@ sub SMNowGroupMig
    }
    if ($doNotify){
       msg(INFO,"process doNotify for $doNotify");
-      my $bk=$self->handleTimeStamp("prewarning",$user,$sngrpmig,$doNotify);
+      my $bk=$self->handleTimeStamp("prewarning",
+                                    $user,$metagrp,$sngrpmig,
+                                    $doNotify);
       return($bk) if ($bk);
    }
    if ($doChange){
       msg(INFO,"process doChange for $doChange");
-      my $bk=$self->handleTimeStamp("postmodify",$user,$sngrpmig,$doChange);
+      my $bk=$self->handleTimeStamp("postmodify",
+                                    $user,$metagrp,$sngrpmig,
+                                    $doChange);
       return($bk) if ($bk);
    }
    return({exitcode=>0});
@@ -104,29 +109,120 @@ sub SMNowGroupMig
 sub processRelevantCIs
 {
    my $self=shift;
+   my $metagrp=shift;
    my $mode=shift;
    my $migstate=shift;
-   my $iag=shift;
+   my $ag=shift;
+   my $newag=shift;
 
    my %l;
 
    foreach my $dataobjname (qw(TS::appl TS::system TS::asset TS::swinstance)){
-      my $o=getModuleObject($self->Config,$dataobjname);
-      $o->SetFilter({acinmassingmentgroup=>\$iag,cistatusid=>"<6"});
-      foreach my $rec ($o->getHashList(qw(ALL))){
-        my $name=$rec->{name};
-        if ($dataobjname=~m/::system$/){
-           if ($rec->{shortdesc} ne ""){
-              $name.=": ".$rec->{shortdesc};
-           }
-        }
-        my $lrec={
-           urlofcurrentrec=>$rec->{urlofcurrentrec},
-           name=>$name,
-           databossid=>$rec->{databossid}
-        };
-        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
-        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+      foreach my $prc (qw(INM CHM)){
+         if ($prc eq "CHM" && $dataobjname eq "TS::appl"){
+            $metagrp->ResetFilter();
+            $metagrp->SetFilter({fullname=>\$ag,
+                                 ischmapprov=>1,cistatusid=>4}); 
+            my @chk=$metagrp->getHashList(qw(id));
+            if ($#chk==0){
+               my $o=getModuleObject($self->Config,$dataobjname);
+               $o->SetFilter({chmapprgroups=>\$newag,cistatusid=>"<6"});
+               foreach my $rec ($o->getHashList(qw(ALL))){
+                 my $name=$rec->{name};
+                 my $lrec={
+                    urlofcurrentrec=>$rec->{urlofcurrentrec},
+                    name=>$name,
+                    databossid=>$rec->{databossid}
+                 };
+                 if ($mode eq "postmodify"){
+                    if ($migstate eq "migrated" || $migstate eq "merge"){
+                       my $op=getModuleObject($self->Config,
+                                              "TS::lnkapplchmapprgrp");
+                       foreach my $lnkrec (@{$rec->{chmapprgroups}}){
+                          if (lc($ag) eq lc($lnkrec->{group})){
+                             my $bk=$op->ValidatedUpdateRecord(
+                                 $lnkrec,
+                                 {group=>$newag},
+                                 {id=>\$lnkrec->{id}}
+                             );
+printf STDERR ("fifi bk=$bk - group=$newag\n");
+                          }
+                       }
+               #        printf STDERR ("migrated $ag to $newag bk=$bk\n");
+print STDERR Dumper($rec->{chmapprgroups});
+                       push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                       push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                    }
+                    if ($migstate eq "omitted"){
+                       my $op=$o->Clone();
+               #        my $bk=$op->ValidatedUpdateRecord(
+               #            $rec,
+               #            {acinmassingmentgroup=>undef},
+               #            {id=>\$rec->{id}}
+               #        );
+               #        printf STDERR ("omitted $ag bk=$bk\n");
+                       push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                       push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                    }
+                 }
+                 else{
+                    push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                    push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                 }
+               }
+            }
+         }
+         if ($prc eq "INM"){
+            $metagrp->ResetFilter();
+            $metagrp->SetFilter({fullname=>\$newag,
+                                 isinmassign=>1,cistatusid=>4}); 
+            my @chk=$metagrp->getHashList(qw(id));
+            if ($#chk==0){
+               my $o=getModuleObject($self->Config,$dataobjname);
+               $o->SetFilter({acinmassingmentgroup=>\$ag,cistatusid=>"<6"});
+               foreach my $rec ($o->getHashList(qw(ALL))){
+                 my $name=$rec->{name};
+                 if ($dataobjname=~m/::system$/){
+                    if ($rec->{shortdesc} ne ""){
+                       $name.=": ".$rec->{shortdesc};
+                    }
+                 }
+                 my $lrec={
+                    urlofcurrentrec=>$rec->{urlofcurrentrec},
+                    name=>$name,
+                    databossid=>$rec->{databossid}
+                 };
+                 if ($mode eq "postmodify"){
+                    if ($migstate eq "migrated" || $migstate eq "merge"){
+                       my $op=$o->Clone();
+                       my $bk=$op->ValidatedUpdateRecord(
+                           $rec,
+                           {acinmassingmentgroup=>$newag},
+                           {id=>\$rec->{id}}
+                       );
+                       printf STDERR ("migrated $ag to $newag bk=$bk\n");
+                       push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                       push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                    }
+                    if ($migstate eq "omitted"){
+                       my $op=$o->Clone();
+                       my $bk=$op->ValidatedUpdateRecord(
+                           $rec,
+                           {acinmassingmentgroup=>undef},
+                           {id=>\$rec->{id}}
+                       );
+                       printf STDERR ("omitted $ag bk=$bk\n");
+                       push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                       push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                    }
+                 }
+                 else{
+                    push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                    push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                 }
+               }
+            }
+         }
       }
    }
    return(%l);
@@ -137,6 +233,7 @@ sub handleTimeStamp
    my $self=shift;
    my $mode=shift;
    my $user=shift;
+   my $metagrp=shift;
    my $o=shift;
    my $ts=shift;
 
@@ -167,9 +264,9 @@ sub handleTimeStamp
       my $migstate=lc($effGrp{$ia}->{migstate});
       next if (!in_array($migstate,[qw(merge migrated omitted)]));
       next if ($iag eq "");
-      my %l=$self->processRelevantCIs($mode,$migstate,$iag);
+      my %l=$self->processRelevantCIs($metagrp,$mode,$migstate,$iag,$newgroup);
       foreach my $databossid (sort(keys(%{$l{databossid}}))){
-         printf STDERR ("databossid: $databossid do $migstate  on iag=$iag on:\n");
+         msg(INFO,"databossid: $databossid do $migstate  on iag=$iag on:");
          my $is1st=1;
          my $itemlist="";
          foreach my $cirec (@{$l{databossid}->{$databossid}}){
@@ -184,19 +281,24 @@ sub handleTimeStamp
          if (defined($urec)){
             my $lastlang=$ENV{HTTP_FORCE_LANGUAGE};
             $ENV{HTTP_FORCE_LANGUAGE}=$urec->{talklang};
+            my $fancyTS=$ts;
+            if (lc($urec->{talklang}) eq "de"){
+               my ($Y,$M,$D)=$ts=~m/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/;
+               $fancyTS=$D.".".$M.".".$Y;
+            }
             my $subject="???";
             if ($mode eq "prewarning"){
-               $subject=$self->T("SM.Now planed changes for Incident-AG");
+               $subject=$self->T("SM.Now planed changes for Assignmentgroup");
             }
             else{
-               $subject=$self->T("SM.Now done changes for Incident-AG");
+               $subject=$self->T("SM.Now done changes for Assignmentgroup");
             }
             $subject.=" ".$iag;
             my $tmpl=$o->getParsedTemplate(
                      "tmpl/SMNow.".$mode.".".$migstate,
                      {static=>{
                         migstate=>$migstate,
-                        ChangeDate=>$ts,
+                        ChangeDate=>$fancyTS,
                         oldgroup=>$iag,
                         newgroup=>$newgroup,
                         ITEMS=>$itemlist,
@@ -221,7 +323,6 @@ sub handleTimeStamp
             my $wfa=getModuleObject($self->Config,"base::workflowaction");
             $wfa->Notify("INFO",$subject,$tmpl,%notiy);
 
-            printf STDERR Dumper($urec);
             $ENV{HTTP_FORCE_LANGUAGE}=$lastlang;;
          }
       }

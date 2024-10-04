@@ -24,6 +24,9 @@ use tpc::lib::Listedit;
 use JSON;
 @ISA=qw(tpc::lib::Listedit);
 
+# Docu:
+# https://developer.broadcom.com/xapis/vrealize-automation-deployment-api/8.1.0/Deployments/index
+
 sub new
 {
    my $type=shift;
@@ -39,12 +42,14 @@ sub new
 
       new kernel::Field::Text(     
             name              =>'opname',
+            ODATA_filter      =>'1',
             dataobjattr       =>'name',
             ignorecase        =>1,
             label             =>'Operation label'),
 
       new kernel::Field::Text(     
             name              =>'status',
+            ODATA_filter      =>'1',
             ODATA_constFilter =>'1',
             uppersearch       =>1,
             label             =>'Status'),
