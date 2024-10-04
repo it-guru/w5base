@@ -5509,7 +5509,7 @@ sub DoRESTcall
          );
       }
       else{
-         msg(ERROR,$reqtrace);
+         msg(ERROR,$reqtrace."\nstatusline=".$statusline);
          $self->LastMsg(ERROR,"unexpected result from REST call: ".$statusline);
       }
    }
