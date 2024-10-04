@@ -127,6 +127,7 @@ sub new
                 vjointo       =>'TS::lnkapplchmapprgrp',
                 vjoinbase     =>[{parentobj=>\'TS::appl'}],
                 vjoinon       =>['id'=>'refid'],
+                vjoininhash   =>['group','responsibility','id','parentobj'],
                 vjoindisp     =>['group','responsibility']),
 
       new kernel::Field::Text(

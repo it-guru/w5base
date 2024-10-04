@@ -1,15 +1,15 @@
-Hello databoss,
+Sehr geehrter Datenverantwortlicher,
 
-the Incident-Assigmentgroup/Change-Approvergroups
-<b>%oldgroup%</b> in your
-configitems (see below) will be changed to EMPTY
-at <b>%ChangeDate%</b>.
-Please check whether this matches your expectations.
+die Incident-Assigmentgroup/Change-Approvergroups
+<b>%oldgroup%</b> in Ihren 
+ConfigItems (siehe unten) werden am <b>%ChangeDate%</b>
+entfernt.
 
-Please direct any questions you may have to Markus Hammelmann.
+Bitte prüfen Sie, ob dies Ihren Erwartungen entspricht.
+
+Bei Rückfragen wenden Sie sich bitte direkt an Markus Hammelmann.
 
 <b>Items:</b>
 
 %ITEMS%
-
 
