@@ -96,6 +96,89 @@ sub getCredentialName
    return("SMNOW");
 }
 
+sub getDummyRequest
+{
+   my $self=shift;
+
+   my $credentialName=$self->getCredentialName();
+   my $dummyAddr="now/table/x_dtitg_user_mange_group_migration?".
+                 "sysparm_fields=sys_id&".
+                 "sysparm_query=sys_id%3D000000000000000000000000000000000";
+
+   my $d=$self->CollectREST(
+      dbname=>$credentialName,
+      timeout=>5,
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apiuser=shift;
+         my $headers=[Authorization =>'Basic '.
+                                      encode_base64($apiuser.':'.$apikey)];
+
+         return($headers);
+      },
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apipass=shift;
+         my $dataobjurl=$baseurl.$dummyAddr;
+         #$dataobjurl=~s/smnow.telekom.de/smnow.telekom.de:444/g;
+         return($dataobjurl);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            return([],"200");
+         }
+         return(undef);
+      },
+   );
+
+   return($d);
+}
+
+
+sub Ping
+{
+   my $self=shift;
+
+   my $errors;
+   my $d;
+   # Ping is for checking backend connect, without any error displaying ...
+   {
+      open local(*STDERR), '>', \$errors;
+      eval('
+       $d=$self->getDummyRequest();
+      ');
+   }
+   if ((!defined($d) ||
+         ref($d) ne "HASH" ||
+        !exists($d->{result}) ||
+         ref($d->{result}) ne "ARRAY") && !$self->LastMsg()){
+      $self->LastMsg(ERROR,"fail to REST Ping to SMNow");
+      $d=undef;
+   }
+   if (!$self->LastMsg()){
+      if ($errors){
+         foreach my $emsg (grep(!/INFO:/,split(/[\n\r]+/,$errors))){
+            $self->SilentLastMsg(ERROR,$emsg);
+         }
+      }
+   }
+
+   return(0) if (!defined($d));
+   return(1);
+
+}
+
+
 
 
 
@@ -107,13 +190,13 @@ sub DataCollector
    my $credentialName=$self->getCredentialName();
 
    my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
-      "/now/table/x_dtitg_user_mange_group_migration",  # Path-Templ with var
+      "now/table/x_dtitg_user_mange_group_migration",  # Path-Templ with var
       $filterset,
       {   # translation parameters - for future use
          P1=>'xx'
       }
    );
-   msg(INFO,"restFinalAddr=$restFinalAddr");
+   #msg(INFO,"restFinalAddr=$restFinalAddr");
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
          $self->LastMsg(ERROR,"unknown error while create restFinalAddr");

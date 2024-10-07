@@ -43,6 +43,18 @@ sub SMNowGroupMig
    my $user=getModuleObject($self->Config,"base::user");
    my $metagrp=getModuleObject($self->Config,"tsgrpmgmt::grp");
 
+   return({}) if ($sngrpmig->isSuspended());
+   # if ping failed ...
+   if (!$sngrpmig->Ping()){
+      # check if there are lastmsgs
+      # if there, send a message to interface partners
+      my $infoObj=getModuleObject($self->Config,"itil::lnkapplappl");
+      return({}) if ($infoObj->NotifyInterfaceContacts($sngrpmig));
+      msg(ERROR,"no ping posible to ".$sngrpmig->Self());
+      return({});
+   }
+
+
    my $doNotify=1;
    my $doChange=1;
 
@@ -145,22 +157,20 @@ sub processRelevantCIs
                                  {group=>$newag},
                                  {id=>\$lnkrec->{id}}
                              );
-printf STDERR ("fifi bk=$bk - group=$newag\n");
                           }
                        }
-               #        printf STDERR ("migrated $ag to $newag bk=$bk\n");
-print STDERR Dumper($rec->{chmapprgroups});
                        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
                        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
                     }
                     if ($migstate eq "omitted"){
                        my $op=$o->Clone();
-               #        my $bk=$op->ValidatedUpdateRecord(
-               #            $rec,
-               #            {acinmassingmentgroup=>undef},
-               #            {id=>\$rec->{id}}
-               #        );
-               #        printf STDERR ("omitted $ag bk=$bk\n");
+                       my $op=getModuleObject($self->Config,
+                                              "TS::lnkapplchmapprgrp");
+                       foreach my $lnkrec (@{$rec->{chmapprgroups}}){
+                          if (lc($ag) eq lc($lnkrec->{group})){
+                             $op->ValidatedDeleteRecord($lnkrec);
+                          }
+                       }
                        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
                        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
                     }
