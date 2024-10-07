@@ -5378,6 +5378,12 @@ sub DoRESTcall
          $ua->proxy(['https'],$probeipproxy);
       }
    }
+   if (defined($p{timeout}) && $p{timeout}>0){
+      $ua->timeout($p{timeout});
+   }
+   else{
+      $ua->timeout(180); # default UserAgent timeout
+   }
    my $req;
    $reqtrace.="DoRESTcall: ".$p{method}." ".$p{url}."\n";
    if ($p{method} eq "GET"){
@@ -5588,6 +5594,7 @@ sub CollectREST
          data=>$p{data},
          BasicAuthUser=>undef, BasicAuthPass=>undef,
          format=>$p{format},
+         timeout=>$p{timeout},
          success=>$p{success},
          onfail=>$p{onfail},
          preprocess=>$p{preprocess}
