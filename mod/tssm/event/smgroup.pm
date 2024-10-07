@@ -537,6 +537,24 @@ sub handleSRec
             }
          }
       }
+      {  # reset last seen - if its longer then 4 weeks in the past
+         if (exists($lastseen{amdate}) && $lastseen{amdate}>28){
+            $newrec->{amdate}=undef;
+            $newrec->{amid}=undef;
+            $newrec->{iscfmassign}=undef;
+         }
+         if (exists($lastseen{smdate}) && $lastseen{smdate}>28){
+            $newrec->{smdate}=undef;
+            $newrec->{smid}=undef;
+            $newrec->{iscfmassign}=undef;
+            my %smfldmap=@smfldmap;
+            foreach my $fld (values(%smfldmap)){
+               $newrec->{$fld}=undef;
+            }
+         }
+      }
+      #printf STDERR Dumper(\%lastseen); 
+      #printf STDERR Dumper($newrec); 
    }
    #msg(INFO,"lastseen = $lastseen");
 
