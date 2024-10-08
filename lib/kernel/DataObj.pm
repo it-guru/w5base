@@ -5354,7 +5354,7 @@ sub DoRESTcall
    my $self=shift;
    my %p=@_;
 
-   my $reqtrace="---\n";
+   my $reqtrace="--- $self ---\n";
 
    my $ua;
    if (!exists($p{verify_hostname})){
