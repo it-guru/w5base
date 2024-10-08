@@ -56,17 +56,39 @@ sub AZURE_KeyRefresh
    msg(INFO,"Authorization: ".$Authorization);
 
    my $credentialName="AZURE";
+
+   my $curSecretId=$self->Config->Param("DATAOBJSECRETID");
+   if (ref($curSecretId) eq "HASH"){
+      $curSecretId=$curSecretId->{$credentialName};
+   }
+   msg(INFO,"curSecretId=".$curSecretId);
+
    my $KeyApiBaseURL="https://app-regeneratesptoken-telit.azurewebsites.net/".
                      "api/RegenerateSPToken";
 
-   my $cgi=new CGI({purgeOldKeys=>"False"});
+   my $cgi;
+
+   # hier kann irgendwann ein Key-Cleanup eingebaut werden, d.h. wenn
+   # curSecretId ne "", dann kann purgeOldKeys=true und ex muss dann
+   # die curSecretId in der Query uebergeben werden, damit diese NICHT
+   # gepurged wird. Das werd ich dann in ein paar Tagen mal aktivieren, wenns
+   # ohne den Purge stabil laeuft.
+
+   if ($curSecretId ne ""){
+      #$cgi=new CGI({purgeOldKeys=>"True",skipPurgeById=>$curSecretId});
+      $cgi=new CGI({purgeOldKeys=>"False"});
+   }
+   else{
+      $cgi=new CGI({purgeOldKeys=>"False"});
+   }
+
+   #######################################################################
+
    my $KeyApiQueryString=$cgi->query_string();
    my $KeyApiRequestUrl=$KeyApiBaseURL.'?'.$KeyApiQueryString;
 
    #msg(INFO,"QueryString=".$KeyApiQueryString);
    msg(INFO,"KeyApiRequestUrl=".$KeyApiRequestUrl);
-
-
 
    my $d=$o->CollectREST(
       dbname=>$credentialName,
@@ -83,30 +105,16 @@ sub AZURE_KeyRefresh
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-print STDERR Dumper($data);
-
          return($data);
       }
    );
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
    if (ref($d) eq "HASH" && 
-       exists($d->{name}) && $d->{name} ne ""){
-      msg(INFO,"new key stored in AZURE as $d->{name}");
+       exists($d->{secret}) && $d->{secret} ne "" &&
+       exists($d->{secretId}) && $d->{secretId} ne ""){
+      msg(INFO,"new key stored in AZURE as $d->{secretId}");
 
       my $tempkeyfile=$keyfile;
       my $ts=NowStamp();
@@ -125,15 +133,19 @@ print STDERR Dumper($data);
             close($keyfileFH);
             if (open(my $keyfileFH,'>',$keyfile)){
                printf $keyfileFH ("#NEW Generated: %s\n",$ts);
-               printf $keyfileFH ("#AZURE name : %s\n",$d->{name});
-               @curVal=grep(/^(DATAOBJCONNECT|DATAOBJUSER)/,@curVal);
-               push(@curVal,'DATAOBJPASS['.$credentialName.']="'."\n");
-      #         push(@curVal,map({$_."\n"} split("\n",$priv_key)));
-               push(@curVal,'"'."\n");
+               printf $keyfileFH ("#AZURE name : %s\n",$d->{secretId});
+               @curVal=grep(/^(DATAOBJCONNECT|DATAOBJBASE|DATAOBJUSER)/,
+                            @curVal);
+               push(@curVal,'DATAOBJPASS['.$credentialName.']="'.
+                                         $d->{secret}."\"\n");
+               push(@curVal,'DATAOBJSECRETID['.$credentialName.']="'.
+                                         $d->{secretId}."\"\n");
+               push(@curVal,"\n");
      
                print $keyfileFH (join("",@curVal));
                close($keyfileFH);
-               return({exitcode=>0,exitmsg=>'ok - key '.$d->{name}.' stored'});
+               return({exitcode=>0,exitmsg=>'ok - key '.$d->{secretId}.
+                                            ' stored'});
             }
             else{
                unlink($tempkeyfile);
