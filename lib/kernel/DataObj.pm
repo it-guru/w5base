@@ -5385,21 +5385,18 @@ sub DoRESTcall
       $ua->timeout(180); # default UserAgent timeout
    }
    my $req;
+   $reqtrace.="DoRESTcall: ".$p{method}." ".$p{url}."\n";
    if ($p{method} eq "GET"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers});
-      $reqtrace.=$p{method}." ".$p{url}."\n";
    }
    if ($p{method} eq "POST"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
-      $reqtrace.=$p{method}." ".$p{url}."\n";
    }
    if ($p{method} eq "PUT"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers});
-      $reqtrace.=$p{method}." ".$p{url}."\n";
    }
    if ($p{method} eq "DELETE"){
       $req=HTTP::Request->new($p{method},$p{url},$p{headers});
-      $reqtrace.=$p{method}." ".$p{url}."\n";
    }
    if (ref($p{headers}) eq "ARRAY"){
       my @p=@{$p{headers}};
@@ -5497,6 +5494,7 @@ sub DoRESTcall
          return($d);
       }
       else{
+         msg(ERROR,"unexpected data in REST response - d=$d");
          msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,
                         "unexpected data structure returend from REST call");
