@@ -668,6 +668,12 @@ sub new
                 label         =>'Console-IP[:Port]',
                 dataobjattr   =>'system.consoleip'),
 
+      new kernel::Field::Date(
+                name          =>'instdate',
+                group         =>'logsys',
+                label         =>'Installation date',
+                dataobjattr   =>'system.instdate'),
+
       new kernel::Field::TextDrop(
                 name          =>'servicesupport',
                 AllowEmpty    =>1,
@@ -2260,6 +2266,17 @@ sub Validate
    if (!$self->itil::lib::Listedit::updateDenyHandling($oldrec,$newrec)){
       return(0);
    }
+
+   if (effVal($oldrec,$newrec,"instdate") eq ""){
+      if (defined($oldrec)){
+         if (exists($oldrec->{cdate}) && $oldrec->{cdate} ne ""){
+            $newrec->{instdate}=$oldrec->{cdate};
+         }
+      }
+      else{
+         $newrec->{instdate}=NowStamp("en");
+      }
+   } 
 
 
    return(0) if (!$self->HandleCIStatusModification($oldrec,$newrec,"name"));

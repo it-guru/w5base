@@ -84,5 +84,15 @@ en=>'When the application reaches the ICS/SOX Focus, this is documented in the a
 de=>'Soll die Applikationsvorgabe für einzelne Server nicht übernommen werden, so ist hier ein Nein einzutragen.',
 en=>'If the application default for individual servers is not to be accepted, a No must be entered here.'
 },
+'instdate'=>{de=>'Zeitpunkt der letzten Neuinstallation. Dies kann
+u.U. nicht korrekt befüllt sein, wenn aus zuliefernden Systemen
+der Installationszeitpunkt nicht korrekt bereitgestellt wird. In
+diesen Fällen handelt es sich dann um den Erstellungszeitpunkt.
+',en=>'
+Timestamp of last installation. 
+This may not be filled correctly if the installation time is not 
+provided correctly from supplying config systems. 
+In these cases, this is the creation timestamp.
+'},
 
 
