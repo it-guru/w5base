@@ -300,7 +300,12 @@ sub qcheckRecord
                ipaddresses=>\@ipaddresses,
                availabilityZone=>'Any'
             );
-
+            if ($parrec->{osclass}=~m/linux/i){
+               $syncData{osclass}="LINUX";
+            }
+            elsif ($parrec->{osclass}=~m/win/i){
+               $syncData{osclass}="WIN";
+            }
             my $w5itcloudarea;
             if ($parrec->{projectId} ne ""){
                msg(INFO,"try to add CloudArea to system ".$rec->{name});
