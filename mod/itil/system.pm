@@ -2946,6 +2946,30 @@ sub QRuleSyncCloudSystem
                     mode=>'leftouterlinkbaselogged',
                     allowLocalHigherPrecision=>1,
                     iomapped=>$par);
+      if (exists($parrec->{isembedded})){
+         $qrule->IfComp($self,
+                       $rec,"isembedded",
+                       $parrec,"isembedded",
+                       $autocorrect,$forcedupd,$wfrequest,
+                       $qmsg,$dataissue,$errorlevel);
+      }
+
+      if (exists($parrec->{osclass}) && $rec->{osclass} ne $parrec->{osclass}){
+         if ($parrec->{osclass} eq "WIN"){
+            $qrule->IfComp($self,
+                          $rec,"osrelease",
+                          {osrelease=>'Windows'},"osrelease",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          $qmsg,$dataissue,$errorlevel);
+         }
+         if ($parrec->{osclass} eq "LINUX"){
+            $qrule->IfComp($self,
+                          $rec,"osrelease",
+                          {osrelease=>'Linux'},"osrelease",
+                          $autocorrect,$forcedupd,$wfrequest,
+                          $qmsg,$dataissue,$errorlevel);
+         }
+      }
 
       my $itcloudareaid=$parrec->{itcloudareaid};
 

@@ -113,7 +113,31 @@ sub new
                 label         =>'Instance type'),
 
       new kernel::Field::Text(
+                name          =>'imageid',
+                searchable    =>0,
+                label         =>'ImageID'),
+
+      new kernel::Field::Text(
+                name          =>'imagename',
+                searchable    =>0,
+                htmldetail    =>'NotEmpty',
+                label         =>'ImageName'),
+
+      new kernel::Field::Text(
+                name          =>'imageowner',
+                searchable    =>0,
+                htmldetail    =>'NotEmpty',
+                label         =>'ImageOwner'),
+
+      new kernel::Field::Text(
+                name          =>'platform',
+                searchable    =>0,
+                htmldetail    =>'NotEmpty',
+                label         =>'Platform'),
+
+      new kernel::Field::Text(
                 name          =>'autoscalinggroup',
+                htmldetail    =>'NotEmpty',
                 label         =>'AutoScalingGroup'),
 
       new kernel::Field::Text(
@@ -207,6 +231,8 @@ sub DataCollector
                   my $rec={
                       id=>$instance->{InstanceId},
                       type=>$instance->{InstanceType},
+                      imageid=>$instance->{ImageId},
+                      platform=>$instance->{platform},
                       accountid=>$AWSAccount,
                       region=>$AWSRegion,
                       name=>$instance->{InstanceId},
@@ -220,6 +246,21 @@ sub DataCollector
                   if (length($tag{Name})>2){
                      $rec->{name}=$tag{Name};
                      $rec->{name}=~s/\..*//;
+                  }
+
+                  if (in_array(\@view,[qw(all imagename imageowner platform)])){
+                     my $descImg =$ec2->DescribeImages(
+                        'ImageIds'=>[$instance->{ImageId}]
+                     );
+                     my $ImgDesc=$descImg->Images;
+                     if (ref($ImgDesc) eq "ARRAY" && $#{$ImgDesc}==0){
+                        $rec->{imagename}=$ImgDesc->[0]->{Name};
+                        $rec->{imageowner}=$ImgDesc->[0]->{OwnerId};
+                        if ($ImgDesc->[0]->{PlatformDetails} ne "" &&
+                            $rec->{platform} eq ""){
+                           $rec->{platform}=$ImgDesc->[0]->{PlatformDetails};
+                        }
+                     }
                   }
                   if (in_array(\@view,"status")){
                      my $status="unknown";

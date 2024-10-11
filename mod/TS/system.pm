@@ -861,14 +861,11 @@ sub genericSystemImport
             if (defined($oldrec)){
                my $updrec={
                   srcid=>$sysrec->{srcid},
-                  srcsys=>$srcsys
+                  srcsys=>$srcsys,
+                  instdate=>NowStamp("en")
                };
                if ($oldrec->{cistatusid} ne "4"){
                   $updrec->{cistatusid}="4";
-                  #if (lc($updrec->{srcsys}) eq "azure"){
-                  #   printf STDERR ("reactivation with %s\n",
-                  #                  Dumper($updrec));
-                  #}
                }
                if ($sys->ValidatedUpdateRecord($oldrec,$updrec,
                    {id=>\$oldrec->{id}})) {
