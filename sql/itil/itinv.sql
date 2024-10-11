@@ -1843,3 +1843,4 @@ alter table asset add notifyplandecons1 datetime default NULL,add notifyplandeco
 alter table asset add eohscomments longtext;
 alter table system add issoximpl int(2) default NULL;
 alter table system add reqitnormodel bigint(20);
+alter table system add instdate datetime default NULL,add key(instdate);

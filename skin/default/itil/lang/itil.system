@@ -140,3 +140,4 @@
 },
 'all ItemTags'=>{de=>'alle ItemTags'},
 'SIS Number'=>{de=>'Gesellschaftsnummer'},
+'Installation date'=>{de=>'Installationszeitpunkt'},
