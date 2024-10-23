@@ -94,5 +94,17 @@ This may not be filled correctly if the installation time is not
 provided correctly from supplying config systems. 
 In these cases, this is the creation timestamp.
 '},
+'isclosedosenv'=>{de=>
+'Geschlossenens System bzw. System-Image,
+bei dem die System-Betreuung oder Administration keine 
+oder nur sehr gerinige Anpassungsmöglichkeiten hat.
+Die Installation von zusätzlichen Agenten oder 
+Software-Produkten ist i.d.R. nicht möglich.
+',en=>'
+Closed system or system image in which the system 
+support/administration has no or only very limited 
+customization options. The installation of additional 
+agents or software products is generally not possible.
+'},
 
 

@@ -221,7 +221,7 @@ sub qcheckRecord
                memory=>$parrec->{memory},
                osrelease=>$parrec->{image_name},
                sysiface=>\@sysiface,
-               ipaddresses=>\@ipaddresses
+               ipaddresses=>\@ipaddresses,
             );
             if ($parrec->{platform}=~m/linux/i){
                $syncData{osclass}="LINUX";
@@ -229,10 +229,10 @@ sub qcheckRecord
             elsif ($parrec->{platform}=~m/win/i){
                $syncData{osclass}="WIN";
             }
-            #if (($parrec->{imagename}=~m/^DevSecOps-eks-node-/) &&
-            #    ($parrec->{imageowner} eq "784159863720")){
-            #   $syncData{isembedded}=1
-            #}
+            if (($parrec->{imagename}=~m/^DevSecOps-eks-node-/) &&
+                ($parrec->{imageowner} eq "784159863720")){
+               $syncData{isclosedosenv}=1
+            }
             if (exists($parrec->{tags})){
                if (exists($parrec->{tags}->{'eks:nodegroup-name'}) &&
                    $parrec->{tags}->{'eks:nodegroup-name'} ne ""){ 

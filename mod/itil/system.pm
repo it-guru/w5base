@@ -1341,9 +1341,18 @@ sub new
       new kernel::Field::Boolean(
                 name          =>'isembedded',
                 selectfix     =>1,
+                htmlhalfwidth =>1,
                 group         =>'systemclass',
                 label         =>'Embedded System',
                 dataobjattr   =>'system.is_embedded'),
+
+      new kernel::Field::Boolean(
+                name          =>'isclosedosenv',
+                selectfix     =>1,
+                group         =>'systemclass',
+                readonly      =>1,
+                label         =>'Closed system env',
+                dataobjattr   =>'system.is_closedosenv'),
 
       new kernel::Field::TextDrop(
                 name          =>'itclust',
@@ -2946,13 +2955,14 @@ sub QRuleSyncCloudSystem
                     mode=>'leftouterlinkbaselogged',
                     allowLocalHigherPrecision=>1,
                     iomapped=>$par);
-      if (exists($parrec->{isembedded})){
-         $qrule->IfComp($self,
-                       $rec,"isembedded",
-                       $parrec,"isembedded",
-                       $autocorrect,$forcedupd,$wfrequest,
-                       $qmsg,$dataissue,$errorlevel);
+      if (!exists($parrec->{isclosedosenv})){
+         $parrec->{isclosedosenv}=0;
       }
+      $qrule->IfComp($self,
+                    $rec,"isclosedosenv",
+                    $parrec,"isclosedosenv",
+                    $autocorrect,$forcedupd,$wfrequest,
+                    $qmsg,$dataissue,$errorlevel);
 
       if (exists($parrec->{osclass}) && $rec->{osclass} ne $parrec->{osclass}){
          if ($parrec->{osclass} eq "WIN"){
