@@ -5365,7 +5365,9 @@ sub DoRESTcall
       use LWP::UserAgent;
       $ua=new LWP::UserAgent(env_proxy=>0,ssl_opts =>{verify_hostname=>'.$p{verify_hostname}.'});
    ');
+   $reqtrace.="DoRESTcall: ua=$ua\n";
    if ($@ ne ""){
+      $reqtrace.="DoRESTcall: ua error=$@\n";
       $self->LastMsg(ERROR,"fail to create UserAgent for DoRESTcall");
       return(undef);
    }
@@ -5378,6 +5380,7 @@ sub DoRESTcall
          $ua->proxy(['https'],$probeipproxy);
       }
    }
+   $reqtrace.="DoRESTcall: ua timeout=$p{timeout}\n";
    if (defined($p{timeout}) && $p{timeout}>0){
       $ua->timeout($p{timeout});
    }
