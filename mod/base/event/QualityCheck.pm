@@ -82,6 +82,7 @@ sub QualityCheck
    my %dataobjtocheck=$lnkq->LoadQualityActivationLinks();
    #msg(INFO,Dumper(\%dataobjtocheck));
    if ($dataobj eq ""){
+      my $startt=time();
       my $n=keys(%dataobjtocheck);
       my $doSleep=($self->{qualitycheckduration}-600-30)/$n;
       $doSleep=20 if ($doSleep<20);
@@ -121,6 +122,9 @@ sub QualityCheck
             }
             sleep($doSleep);
          }
+      }
+      while((time()-$startt)<$self->{qualitycheckduration}){
+         sleep(1);
       }
    }
    else{
