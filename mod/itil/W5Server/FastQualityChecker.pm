@@ -41,42 +41,73 @@ sub process
          }
          if (time()-$spoolRefresh>300){
             $spoolRefresh=time();
-            msg(INFO,"FastQualityChecker: doSpoolRefresh");
             my $o=getModuleObject($self->Config,"itil::system");
+            ###################################################################
+            msg(INFO,"FastQualityChecker: doSpoolRefresh for shortly inst");
             $o->SetFilter({
                 cistatusid=>\'4',
-                instdate=>'<now-70m AND >now-90m',
+                instdate=>'<now-1h AND >now-2h',
                 itcloudareaid=>"![EMPTY]",
-                lastqcheck=>'<now-1h'
+                lastqcheck=>'<now-1h AND >now-2h'
             });
-            my @l=$o->getHashList(qw(id instdate lastqcheck mdate));
-            #print STDERR Dumper(\@l);
+            my @l=$o->getHashList(qw(instdate lastqcheck id  mdate));
             foreach my $rec (@l){
                if (!in_array($self->{'itil::system'}->{'SPOOL'},$rec->{id})){
                   push(@{$self->{'itil::system'}->{'SPOOL'}},$rec->{id});
                }
             }
+            ###################################################################
+            msg(INFO,"FastQualityChecker: doSpoolRefresh for last 25h inst");
+            $o->SetFilter({
+                cistatusid=>\'4',
+                instdate=>'<now-25h AND >now-26h',
+                itcloudareaid=>"![EMPTY]",
+                lastqcheck=>'<now-12h AND >now-26h'
+            });
+            my @l=$o->getHashList(qw(instdate lastqcheck id mdate));
+            foreach my $rec (@l){
+               if (!in_array($self->{'itil::system'}->{'SPOOL'},$rec->{id})){
+                  push(@{$self->{'itil::system'}->{'SPOOL'}},$rec->{id});
+               }
+            }
+            ###################################################################
+         }
+         my $nent=$#{$self->{'itil::system'}->{'SPOOL'}}+1;
+         msg(INFO,"FastQualityChecker: $nent in spool");
+         if ($#{$self->{'itil::system'}->{'SPOOL'}}!=-1){
+            sleep(2);
          }
          if ((!$insleep) &&
              ($#{$self->{'itil::system'}->{'SPOOL'}}!=-1)){
             my $o=getModuleObject($self->Config,"itil::system");
             my $st=time();
-            while(my $id=shift(@{$self->{'itil::system'}->{'SPOOL'}})){
+            PLOOP: while(my $id=shift(@{$self->{'itil::system'}->{'SPOOL'}})){
+               msg(INFO,"FastQualityChecker: start process id $id from spool");
                $o->SetFilter({
                   id=>\$id,
-                  lastqcheck=>'<now-1h',
+                  lastqcheck=>'<now-55m',
                   cistatusid=>\'4',
                   itcloudareaid=>"![EMPTY]"
                });
                my @l=$o->getHashList(qw(id lastqcheck 
                                         qcstate mdate cistatusid));
-              
-               #print STDERR Dumper(\@l);
+               if ($#l==-1){
+                  msg(INFO,"FastQualityChecker: id $id hast lost need ".
+                           "to qcheck since is in spool");
+                  
+               }
+               else{
+                  foreach my $rec (@l){
+                     msg(INFO,"FastQualityChecker: qcheck result for id $id : ".
+                              $rec->{qcstate});
+                  }
+               }
+               sleep(1);
                if ($st-time()>60){
-                  last;
+                  last PLOOP;
                }
             }
-            sleep(10);
+            sleep(1);
          }
       }
       sleep(5);

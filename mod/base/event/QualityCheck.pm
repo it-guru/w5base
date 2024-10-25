@@ -123,7 +123,8 @@ sub QualityCheck
             sleep($doSleep);
          }
       }
-      while((time()-$startt)<$self->{qualitycheckduration}){
+      my $laststart=time();
+      while((time()-$laststart)<$self->{qualitycheckduration}){
          sleep(1);
       }
    }
