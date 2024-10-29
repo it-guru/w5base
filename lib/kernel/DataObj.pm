@@ -5354,170 +5354,195 @@ sub DoRESTcall
    my $self=shift;
    my %p=@_;
 
-   my $reqtrace="--- $self ---\n";
+   my $retry_count=$p{retry_count};
+   my $retry_interval=$p{retry_interval};
+   $retry_count=0     if ($retry_count eq "");
+   $retry_interval=10 if ($retry_interval eq "");
 
-   my $ua;
-   if (!exists($p{verify_hostname})){
-      $p{verify_hostname}="1";
-   }
-   eval('
-      use JSON;
-      use LWP::UserAgent;
-      $ua=new LWP::UserAgent(env_proxy=>0,ssl_opts =>{verify_hostname=>'.$p{verify_hostname}.'});
-   ');
-   $reqtrace.="DoRESTcall: ua=$ua\n";
-   if ($@ ne ""){
-      $reqtrace.="DoRESTcall: ua error=$@\n";
-      $self->LastMsg(ERROR,"fail to create UserAgent for DoRESTcall");
-      return(undef);
-   }
 
-   $ua->protocols_allowed( ['https','http','connect'] );
-   if ($p{useproxy}){
-      my $probeipproxy=$self->Config->Param("http_proxy");
-      if ($probeipproxy ne ""){
-         $probeipproxy=~s/^http:/connect:/;
-         $ua->proxy(['https'],$probeipproxy);
+   RETRYLOOP: for(my $retry=0;$retry<=$retry_count;$retry++){
+      my $reqtrace="--- $self ---\n";
+
+      my $ua;
+      if (!exists($p{verify_hostname})){
+         $p{verify_hostname}="1";
       }
-   }
-   $reqtrace.="DoRESTcall: ua timeout=$p{timeout}\n";
-   if (defined($p{timeout}) && $p{timeout}>0){
-      $ua->timeout($p{timeout});
-   }
-   else{
-      $ua->timeout(180); # default UserAgent timeout
-   }
-   my $req;
-   $reqtrace.="DoRESTcall: ".$p{method}." ".$p{url}."\n";
-   if ($p{method} eq "GET"){
-      $req=HTTP::Request->new($p{method},$p{url},$p{headers});
-   }
-   if ($p{method} eq "POST"){
-      $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
-   }
-   if ($p{method} eq "PUT"){
-      $req=HTTP::Request->new($p{method},$p{url},$p{headers});
-   }
-   if ($p{method} eq "DELETE"){
-      $req=HTTP::Request->new($p{method},$p{url},$p{headers});
-   }
-   if (ref($p{headers}) eq "ARRAY"){
-      my @p=@{$p{headers}};
-      while(my $var=shift(@p)){
-         my $val=shift(@p);
-         if (($var=~m/token/i) || 
-             ($var=~m/auth/i) || 
-             ($var=~m/passw/i) || 
-             ($var=~m/access/i)){
-            if (length($val)>22){
-               $val=substr($val,0,8)."...".substr($val,-8);
+      eval('
+         use JSON;
+         use LWP::UserAgent;
+         $ua=new LWP::UserAgent(env_proxy=>0,
+                                ssl_opts =>{
+                                   verify_hostname=>'.$p{verify_hostname}.'
+                                });
+      ');
+      $reqtrace.="DoRESTcall: ua=$ua\n";
+      if ($@ ne ""){
+         $reqtrace.="DoRESTcall: ua error=$@\n";
+         $self->LastMsg(ERROR,"fail to create UserAgent for DoRESTcall");
+         return(undef);
+      }
+
+      $ua->protocols_allowed( ['https','http','connect'] );
+      if ($p{useproxy}){
+         my $probeipproxy=$self->Config->Param("http_proxy");
+         if ($probeipproxy ne ""){
+            $probeipproxy=~s/^http:/connect:/;
+            $ua->proxy(['https'],$probeipproxy);
+         }
+      }
+      $reqtrace.="DoRESTcall: ua timeout=$p{timeout}\n";
+      $reqtrace.="DoRESTcall: ua retry_count=$retry_count\n";
+      $reqtrace.="DoRESTcall: ua retry_interval=$retry_interval\n";
+      if (defined($p{timeout}) && $p{timeout}>0){
+         $ua->timeout($p{timeout});
+      }
+      else{
+         $ua->timeout(180); # default UserAgent timeout
+      }
+      my $req;
+      my $RESTcallURL=$p{method}." ".$p{url};
+      $reqtrace.="DoRESTcall: ".$RESTcallURL;
+      if ($p{method} eq "GET"){
+         $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+      }
+      if ($p{method} eq "POST"){
+         $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
+      }
+      if ($p{method} eq "PUT"){
+         $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+      }
+      if ($p{method} eq "DELETE"){
+         $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+      }
+      if (ref($p{headers}) eq "ARRAY"){
+         my @p=@{$p{headers}};
+         while(my $var=shift(@p)){
+            my $val=shift(@p);
+            if (($var=~m/token/i) || 
+                ($var=~m/auth/i) || 
+                ($var=~m/passw/i) || 
+                ($var=~m/access/i)){
+               if (length($val)>22){
+                  $val=substr($val,0,8)."...".substr($val,-8);
+               }
+               elsif (length($val)>18){
+                  $val=substr($val,0,6)."...".substr($val,-6);
+               }
+               elsif (length($val)>10){
+                  $val=substr($val,0,2)."...".substr($val,-2);
+               }
+               else{
+                  $val=~s/[a-z0-9]/?/ig;
+               }
             }
-            elsif (length($val)>18){
-               $val=substr($val,0,6)."...".substr($val,-6);
+            $reqtrace.=$var.": ".$val."\n";
+         }
+
+      }
+      if (defined($p{content})){
+         $req->content($p{content});
+         if (length($p{content})<1000){
+            $reqtrace.=$p{content};
+         }
+         else{
+            $reqtrace.="[CLOB more then 1000 char]\n";
+         }
+      }
+      
+      $self->Log(INFO,"restcall",$self->Self()." ".$p{method}." ".$p{url}.
+                      " REMOTE_USER=$ENV{REMOTE_USER}");
+
+
+      my $response=$ua->request($req);
+      my $code=$response->code();
+      my $message=$response->message();
+      if ($response->is_success) {
+         # printf STDERR ("Debug1: code=$code ".
+         #                "message=$message ".
+         #                "result=%s\n",$response->decoded_content);
+         my $respcontent=$response->decoded_content;
+         if ($p{preprocess}){
+            $respcontent=&{$p{preprocess}}($self,$respcontent,$code,$message,
+                                           $response);
+         }
+         my $ContentType=$response->header('content-type');
+         $ContentType="text/json" if ($ContentType eq "");
+
+         my $d;
+         if ($ContentType eq "application/xml"){
+            eval("use XML::Smart;");
+            return(undef) if ($@ ne "");
+            my $xmltree;
+            eval('$xmltree=new XML::Smart($respcontent);');
+            return(undef) if ($@ ne "");
+            $d=$xmltree;
+         }
+         else{
+            #eval('$d=decode_json($respcontent);');  # problems if coding is wron
+            eval('$d=from_json($respcontent,{utf8=>1});');
+            if ($@=~m/Wide character in subroutine entry/){    # if response is 
+               eval('$d=from_json($respcontent,{utf8=>0});');  # wrong coded
             }
-            elsif (length($val)>10){
-               $val=substr($val,0,2)."...".substr($val,-2);
+            if ($@ ne ""){
+               my $jsonParseError=$@;
+               if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+                  msg(ERROR,"JSON parse error: $jsonParseError");
+                  $respcontent=TextShorter($respcontent,80,["INDICATED"]);
+                  msg(ERROR,"can not parse JSON content:\n".$respcontent);
+               }
+               return(undef);
+            }
+         }
+         #print STDERR ("Debug2: result=%s\n",Dumper($d));
+         if (ref($d) eq "HASH" || ref($d) eq "ARRAY" || ref($d) eq "XML::Smart"){
+            if ($p{success}){
+               my $dd=&{$p{success}}($self,$d,$code,$message);
+               if (defined($dd)){
+                  if (wantarray()){
+                     return($dd,$code,$message);
+                  }
+                  return($dd);
+               }
+            }
+            if (wantarray()){
+               return($d,$code,$message);
+            }
+            return($d);
+         }
+         else{
+            msg(ERROR,"unexpected data in REST response - d=$d");
+            msg(ERROR,$reqtrace);
+            $self->LastMsg(ERROR,
+                           "unexpected data structure returend from REST call");
+         }
+      }
+      else{
+         my $statusline=$response->status_line;
+         if (($retry<$retry_count) && $code eq "500"){
+            msg(WARN,"start retry $RESTcallURL due $statusline at ".
+                     NowStamp("en"));
+            sleep($retry_interval);
+         }
+         else{
+            $reqtrace.=
+                 "Response (".NowStamp("en")." UTC):\n$code $statusline\n";
+            if ($response->decoded_content ne ""){
+               $reqtrace.=$response->decoded_content."\n";
+            }
+            if ($p{onfail}){
+               return(
+                  &{$p{onfail}}($self,$code,$statusline,
+                                $response->decoded_content,
+                                $reqtrace)
+               );
             }
             else{
-               $val=~s/[a-z0-9]/?/ig;
+               msg(ERROR,$reqtrace."\nstatusline=".$statusline);
+               $self->LastMsg(ERROR,"unexpected result from REST call: ".
+                                    $statusline);
             }
+            last RETRYLOOP;
          }
-         $reqtrace.=$var.": ".$val."\n";
-      }
-
-   }
-   if (defined($p{content})){
-      $req->content($p{content});
-      if (length($p{content})<1000){
-         $reqtrace.=$p{content};
-      }
-      else{
-         $reqtrace.="[CLOB more then 1000 char]\n";
-      }
-   }
-   
-   $self->Log(INFO,"restcall",$self->Self()." ".$p{method}." ".$p{url}.
-                   " REMOTE_USER=$ENV{REMOTE_USER}");
-
-
-   my $response=$ua->request($req);
-   my $code=$response->code();
-   my $message=$response->message();
-   if ($response->is_success) {
-      # printf STDERR ("Debug1: code=$code ".
-      #                "message=$message ".
-      #                "result=%s\n",$response->decoded_content);
-      my $respcontent=$response->decoded_content;
-      if ($p{preprocess}){
-         $respcontent=&{$p{preprocess}}($self,$respcontent,$code,$message,
-                                        $response);
-      }
-      my $ContentType=$response->header('content-type');
-      $ContentType="text/json" if ($ContentType eq "");
-
-      my $d;
-      if ($ContentType eq "application/xml"){
-         eval("use XML::Smart;");
-         return(undef) if ($@ ne "");
-         my $xmltree;
-         eval('$xmltree=new XML::Smart($respcontent);');
-         return(undef) if ($@ ne "");
-         $d=$xmltree;
-      }
-      else{
-         #eval('$d=decode_json($respcontent);');  # problems if coding is wron
-         eval('$d=from_json($respcontent,{utf8=>1});');
-         if ($@=~m/Wide character in subroutine entry/){    # if response is 
-            eval('$d=from_json($respcontent,{utf8=>0});');  # wrong coded
-         }
-         if ($@ ne ""){
-            my $jsonParseError=$@;
-            if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-               msg(ERROR,"JSON parse error: $jsonParseError");
-               $respcontent=TextShorter($respcontent,80,["INDICATED"]);
-               msg(ERROR,"can not parse JSON content:\n".$respcontent);
-            }
-            return(undef);
-         }
-      }
-      #print STDERR ("Debug2: result=%s\n",Dumper($d));
-      if (ref($d) eq "HASH" || ref($d) eq "ARRAY" || ref($d) eq "XML::Smart"){
-         if ($p{success}){
-            my $dd=&{$p{success}}($self,$d,$code,$message);
-            if (defined($dd)){
-               if (wantarray()){
-                  return($dd,$code,$message);
-               }
-               return($dd);
-            }
-         }
-         if (wantarray()){
-            return($d,$code,$message);
-         }
-         return($d);
-      }
-      else{
-         msg(ERROR,"unexpected data in REST response - d=$d");
-         msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,
-                        "unexpected data structure returend from REST call");
-      }
-   }
-   else{
-      my $statusline=$response->status_line;
-      $reqtrace.="Response (".NowStamp("en")." UTC):\n$code $statusline\n";
-      if ($response->decoded_content ne ""){
-         $reqtrace.=$response->decoded_content."\n";
-      }
-      if ($p{onfail}){
-         return(
-            &{$p{onfail}}($self,$code,$statusline,$response->decoded_content,
-                          $reqtrace)
-         );
-      }
-      else{
-         msg(ERROR,$reqtrace."\nstatusline=".$statusline);
-         $self->LastMsg(ERROR,"unexpected result from REST call: ".$statusline);
       }
    }
    return(undef);
@@ -5531,6 +5556,12 @@ sub CollectREST
 
    my $cachetime=$p{cachetime};
    $cachetime=30 if (!defined($cachetime));
+   if (!exists($p{retry_count})){ 
+      $p{retry_count}=0; 
+   }
+   if (!exists($p{retry_interval})){ 
+      $p{retry_interval}=10; 
+   }
 
    my $dbname=$p{dbname};
    my ($baseurl,$apikey,$apiuser,$base);
@@ -5593,6 +5624,8 @@ sub CollectREST
          method=>$p{method},    url=>$dataobjurl,
          content=>$Content,     headers=>$Headers,
          useproxy=>$p{useproxy},
+         retry_count=>$p{retry_count},
+         retry_interval=>$p{retry_interval},
          verify_hostname=>$p{verify_hostname},
          data=>$p{data},
          BasicAuthUser=>undef, BasicAuthPass=>undef,
