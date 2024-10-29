@@ -366,7 +366,7 @@ sub getMandatorsOf
    }
    if ($#roles==0 && $roles[0] eq "direct"){
       # order by distance
-      return(sort({$groups{$a}->{distance} <=> $groups{$b}->{distance}} keys(%m)));
+      return(sort({$ugroups{$a}->{distance} <=> $ugroups{$b}->{distance}} keys(%m)));
    }
    return(sort(keys(%m)));
 }
