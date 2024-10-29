@@ -320,6 +320,13 @@ sub doQualityCheck
                my @emsgs=grep(/error/i,@l);  # find out messages with error in
                if ($#emsgs!=-1){
                   @emsgs=grep(!/^ERROR:/,@emsgs); # remove messages, which are
+                  if ($#emsgs==-1 &&              # already printed (or Silent)
+                      $self->LastErrorMsgCount()>0){
+                     msg(ERROR,"debug LastErrorMsgCount seems to be wrong");
+                     my @allErrmsg=$self->LastMsg();
+                     msg(ERROR,"debug LastMsg=".Dumper(\@allErrmsg));
+                     msg(ERROR,"maybe WARN Messages silent?");
+                  }
                   if ($#emsgs!=-1 ||              # already printed (or Silent)
                       $self->LastErrorMsgCount()){
                      msg(ERROR,"error messages while check of ".
