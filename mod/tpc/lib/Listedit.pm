@@ -70,6 +70,8 @@ sub getVRealizeAuthorizationToken
          method=>'POST',
          dbname=>$credentialName,
          requesttoken=>'AuthLevel1',
+         retry_count=>3,
+         retry_interval=>10,
          url=>sub{
             my $self=shift;
             my $baseurl=shift;
@@ -147,6 +149,8 @@ sub getVRealizeAuthorizationToken
       if ($refresh_token ne ""){
          my $d=$self->CollectREST(
             method=>'POST',
+            retry_count=>3,
+            retry_interval=>10,
             dbname=>$credentialName,
             requesttoken=>'AuthLevel2',
             url=>sub{
