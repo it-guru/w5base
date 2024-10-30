@@ -43,7 +43,7 @@ sub Init
 
 
    $self->RegisterEvent("QualityCheck","QualityCheck",
-                        timeout=>$self->{qualitycheckduration}+600); 
+                        timeout=>$self->{qualitycheckduration}*2); 
    return(1);
 }
 
