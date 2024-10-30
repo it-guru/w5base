@@ -211,6 +211,7 @@ sub DataCollector
          if ($code eq "404"){  # 404 bedeutet nicht gefunden
             return([],"200");
          }
+         msg(ERROR,"HTTP code $code");
          msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,"unexpected data TPC project response");
          return(undef);
