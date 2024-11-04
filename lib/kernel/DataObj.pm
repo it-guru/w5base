@@ -19,6 +19,7 @@ package kernel::DataObj;
 use strict;
 use vars qw(@ISA);
 use Class::ISA;
+use Time::HiRes;
 use UUID::Tiny ':std';
 use kernel;
 use kernel::App;
@@ -5358,6 +5359,8 @@ sub DoRESTcall
    my $retry_interval=$p{retry_interval};
    $retry_count=0     if ($retry_count eq "");
    $retry_interval=10 if ($retry_interval eq "");
+   my $sseconds=Time::HiRes::time();
+
 
 
    RETRYLOOP: for(my $retry=0;$retry<=$retry_count;$retry++){
@@ -5397,7 +5400,12 @@ sub DoRESTcall
          $ua->timeout($p{timeout});
       }
       else{
-         $ua->timeout(180); # default UserAgent timeout
+         if ($retry_count>0){
+            $ua->timeout(30); # if retry is enabled, the timeout for one
+         }                    # request can be reduced to 30sec
+         else{
+            $ua->timeout(180); # default UserAgent timeout
+         }
       }
       my $req;
       my $RESTcallURL=$p{method}." ".$p{url};
@@ -5457,9 +5465,14 @@ sub DoRESTcall
       my $code=$response->code();
       my $message=$response->message();
       if ($response->is_success) {
+         my $eseconds=Time::HiRes::time();
          # printf STDERR ("Debug1: code=$code ".
          #                "message=$message ".
          #                "result=%s\n",$response->decoded_content);
+         my $sec=sprintf("%.2lf",$eseconds-$sseconds);
+         $self->Log(INFO,"restcall",$self->Self()." SUCCESS ${sec}sec ".
+                         $p{method}." ".$p{url}.
+                         " REMOTE_USER=$ENV{REMOTE_USER}");
          my $respcontent=$response->decoded_content;
          if ($p{preprocess}){
             $respcontent=&{$p{preprocess}}($self,$respcontent,$code,$message,
@@ -5518,9 +5531,11 @@ sub DoRESTcall
       }
       else{
          my $statusline=$response->status_line;
-         if (($retry<$retry_count) && $code eq "500"){
-            msg(WARN,"start retry $RESTcallURL due $statusline at ".
-                     NowStamp("en"));
+         if (($retry<$retry_count) && 
+             ($code eq "500" || $code eq "503" || $code eq "504")){
+            $self->Log(INFO,"restcall",$self->Self()." RETRY $code($retry) ".
+                            $p{method}." ".$p{url}.
+                            " REMOTE_USER=$ENV{REMOTE_USER}");
             sleep($retry_interval);
          }
          else{
