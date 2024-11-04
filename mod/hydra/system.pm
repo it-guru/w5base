@@ -135,6 +135,8 @@ sub doQueryHydra
    my $d=$p->CollectREST(
       dbname=>$credentialName,
       requesttoken=>$requesttoken,
+      retry_count=>3,
+      retry_interval=>30,
       method=>'POST',
       url=>sub{
          my $self=shift;
