@@ -75,8 +75,8 @@ sub AZURE_KeyRefresh
    # ohne den Purge stabil laeuft.
 
    if ($curSecretId ne ""){
-      #$cgi=new CGI({purgeOldKeys=>"True",skipPurgeById=>$curSecretId});
-      $cgi=new CGI({purgeOldKeys=>"False"});
+      $cgi=new CGI({purgeOldKeys=>"True",skipPurgeById=>$curSecretId});
+      #$cgi=new CGI({purgeOldKeys=>"False"});
    }
    else{
       $cgi=new CGI({purgeOldKeys=>"False"});
