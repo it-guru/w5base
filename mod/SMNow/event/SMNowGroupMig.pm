@@ -136,9 +136,10 @@ sub processRelevantCIs
             $metagrp->SetFilter({fullname=>\$ag,
                                  ischmapprov=>1,cistatusid=>4}); 
             my @chk=$metagrp->getHashList(qw(id));
+            #printf STDERR ("fifi chk=%s\n",Dumper(\@chk));
             if ($#chk==0){
                my $o=getModuleObject($self->Config,$dataobjname);
-               $o->SetFilter({chmapprgroups=>\$newag,cistatusid=>"<6"});
+               $o->SetFilter({chmapprgroups=>\$ag,cistatusid=>"<6"});
                foreach my $rec ($o->getHashList(qw(ALL))){
                  my $name=$rec->{name};
                  my $lrec={
