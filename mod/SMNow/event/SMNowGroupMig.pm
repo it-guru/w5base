@@ -318,7 +318,7 @@ sub handleTimeStamp
             my $directlink=$baseurl."/auth/SMNow/grpmig/Detail?".
                            "search_sys_id=$sys_id";
             my %notiy;
-            my $fakeFrom="\"SM.Now - AG-Migration\" <>";
+            my $fakeFrom="\"SM.Now - AG-Migration\" <smnow\@telekom.de>";
             $notiy{emailfrom}=$fakeFrom;
             $notiy{emailto}=$urec->{email};
             $notiy{emailcc}=[qw(12898138600000)];
