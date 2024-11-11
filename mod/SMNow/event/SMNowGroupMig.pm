@@ -92,7 +92,7 @@ sub SMNowGroupMig
       }
    }
    if ($doNotify eq "1"){
-      my $dst=$sngrpmig->ExpandTimeExpression("now+29d","en");
+      my $dst=$sngrpmig->ExpandTimeExpression("now+15d","en");
       $dst=~s/\s.*//;
       $doNotify=$dst;
    }
