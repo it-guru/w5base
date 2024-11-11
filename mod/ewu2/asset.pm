@@ -82,7 +82,7 @@ sub new
       new kernel::Field::Link(
                 name          =>'locationid',
                 label         =>"LocationID",
-                dataobjattr   =>"'11927275230009'"),
+                dataobjattr   =>"'14176132680002'"),
 
       new kernel::Field::Boolean(
                 name          =>'deleted',
