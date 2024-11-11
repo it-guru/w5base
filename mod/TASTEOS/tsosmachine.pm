@@ -487,7 +487,7 @@ sub UpdateRecord
    my ($d,$code,$message)=$self->CollectREST(
       dbname=>'TASTEOS',
       requesttoken=>"UPD.".$id.".".time(),
-      method=>'PUT',
+      method=>'PATCH',
       url=>sub{
          my $self=shift;
          my $baseurl=shift;
