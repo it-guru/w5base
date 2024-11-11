@@ -5419,6 +5419,9 @@ sub DoRESTcall
       if ($p{method} eq "PUT"){
          $req=HTTP::Request->new($p{method},$p{url},$p{headers});
       }
+      if ($p{method} eq "PATCH"){
+         $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+      }
       if ($p{method} eq "DELETE"){
          $req=HTTP::Request->new($p{method},$p{url},$p{headers});
       }
