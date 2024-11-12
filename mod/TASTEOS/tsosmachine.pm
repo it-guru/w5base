@@ -231,6 +231,13 @@ sub DataCollector
                            "itil::addlnkapplgrpsystem");
                   $o->SetFilter({systemid=>$id});
                   my @l=$o->getHashList(qw(applgrpid systemid additional));
+                  if ($#l==-1){
+                     # we have a search request to a w5systemid, witch is
+                     # not mapped in itil::addlnkapplgrpsystem to a TasteOS
+                     # machine id.
+                     # This needs to get an empty result.
+                     return([]);
+                  }
                   foreach my $srec (@l){
                      my $machineId;
                      if (ref($srec->{additional}) eq "HASH"){
@@ -247,6 +254,7 @@ sub DataCollector
                }
                if (!defined($flt->{id})){
                   $flt->{id}="-1";
+                  return([]);
                }
                delete($flt->{w5systemid});
             }
