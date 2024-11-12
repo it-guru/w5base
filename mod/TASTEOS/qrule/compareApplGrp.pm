@@ -154,6 +154,7 @@ sub qcheckRecord
       });
    }
 
+   msg(INFO,"start loading getUnassignedMachinesRec");
    my $uarec=$tsossys->getUnassignedMachinesRec();
    if (!defined($uarec)){
       return(undef,{
@@ -299,6 +300,7 @@ sub qcheckRecord
 
    my $TSOSsystemid=$rec->{additional}->{TasteOS_SystemID}->[0];
 
+   msg(INFO,"try to system record for TSOSsystemid=$TSOSsystemid");
    if ($TSOSsystemid ne ""){
       $tsossys->ResetFilter();
       $tsossys->SetFilter({id=>$TSOSsystemid}); # check if systemid still exists
