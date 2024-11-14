@@ -1,5 +1,0 @@
-'itu.secscan'=>{de=>'T-SecScan',en=>'T-SecScan'},
-'itu.secscan.finding'=>{de=>'Finding',en=>'Finding'},
-'itu.secscan.networknode'=>{de=>'NetworkNode',en=>'NetworkNode'},
-'itu.secscan.item'=>{de=>'SecItem',en=>'SecItem'},
-'itu.secscan.item.new'=>{de=>'Neueingabe',en=>'New'}
