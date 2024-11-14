@@ -274,6 +274,8 @@ sub DataCollector
 
    $systemid=~s/[\.\/]//g;
 
+   return([]) if ($systemid eq "");
+
    my $dbclass="systems/$systemid/machines";
    my $requesttoken=$systemid;
 
