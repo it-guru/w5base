@@ -211,7 +211,7 @@ sub Validate
       $self->LastMsg(ERROR,"Invalid dataobject '%s'",$parentobj);
       return(0);
    }
-   if ($refid eq '') {
+   if (!defined($oldrec) && $refid eq '') {
       $self->LastMsg(ERROR,"No RefID specified");
       return(0);
    }
@@ -226,12 +226,14 @@ sub Validate
    }
 
    my $parent_fldgrp=$self->getParentFieldGroup();
-   if (!$self->isWriteOnParentValid({parentobj=>$parentobj,
-                                     refid=>$refid},
-                                    $parent_fldgrp)) {
-     $self->LastMsg(ERROR,"You have no write access ".
-                          "on the given parent object");
-     return(0);
+   if ($self->isDataInputFromUserFrontend()){
+      if (!$self->isWriteOnParentValid({parentobj=>$parentobj,
+                                        refid=>$refid},
+                                       $parent_fldgrp)) {
+        $self->LastMsg(ERROR,"You have no write access ".
+                             "on the given parent object");
+        return(0);
+      }
    }
 
    return(1);

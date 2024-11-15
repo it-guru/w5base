@@ -260,11 +260,16 @@ sub handleTimeStamp
          return({exitcode=>2,exitmsg=>'mulitple Notify records for '.
                                       $rec->{sm9_name}});
       }
+      my $migstate=lc($rec->{migstate});
+      my $group_name=$rec->{group_name};
+      if ($migstate eq "merge"){
+         $group_name=$rec->{merge_group};
+      }
       $effGrp{$rec->{sm9_name}.':'.$rec->{migstate}}={
          sys_id=>$rec->{sys_id},
          sm9_name=>$rec->{sm9_name},
-         group_name=>$rec->{group_name},
-         migstate=>$rec->{migstate} 
+         group_name=>$group_name,
+         migstate=>$migstate 
       };
    }
    #printf STDERR ("fifi mig=%s\n",Dumper(\%effGrp));
@@ -272,7 +277,7 @@ sub handleTimeStamp
       my $iag=$effGrp{$ia}->{sm9_name};
       my $newgroup=$effGrp{$ia}->{group_name};
       my $sys_id=$effGrp{$ia}->{sys_id};
-      my $migstate=lc($effGrp{$ia}->{migstate});
+      my $migstate=$effGrp{$ia}->{migstate};
       next if (!in_array($migstate,[qw(merge migrated omitted)]));
       next if ($iag eq "");
       my %l=$self->processRelevantCIs($metagrp,$mode,$migstate,$iag,$newgroup);
