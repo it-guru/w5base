@@ -45,12 +45,16 @@ sub new
             label         =>'SysID'),
 
       new kernel::Field::Text(     
+            name          =>'sm9_name',
+            label         =>'SM9Group'),
+
+      new kernel::Field::Text(     
             name          =>'group_name',
             label         =>'Group-Name'),
 
       new kernel::Field::Text(     
-            name          =>'sm9_name',
-            label         =>'SM9Group'),
+            name          =>'migrate_group',
+            label         =>'Migrate-Group'),
 
       new kernel::Field::Text(     
             name          =>'migstate',
@@ -82,7 +86,7 @@ sub new
             label         =>'Modification-Date')
 
    );
-   $self->setDefaultView(qw(sm9_name group_name migstate
+   $self->setDefaultView(qw(sm9_name group_name migrate_group migstate
                             problem golive 
                             sys_updated_on));
    return($self);
