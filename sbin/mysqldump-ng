@@ -654,6 +654,10 @@ sub process_engine
                #$|=1;
                my $procname="mysql-restore-control";
                $0="$procname init";
+               my $promptname=$first;
+               $promptname=~s/^.*\///;
+               $promptname=~s/\..*$//;
+               $promptname=~s/\s/_/g;
                my $pStack=[
                   {
                      STDIN=>undef,
@@ -670,7 +674,7 @@ sub process_engine
                      STDIN=>new IO::Handle(),
                      STDOUT=>new IO::Handle(),
                      STDERR=>gensym,
-                     CMD=>"$prog->{mysql} -fNB $db",
+                     CMD=>"$prog->{mysql} --prompt=$promptname -fNB $db",
                      SELECT=>new IO::Select(),
                      OUTSELECT=>['STDERR'],
                      OUTMSG=>[], 
@@ -685,6 +689,11 @@ sub process_engine
                   
                   exit(1);
                };
+               $SIG{'ALRM'}=sub{
+                  msg("ERROR","Watchdog ALRM timeout - terminating myself");
+                  kill(SIGHUP,$$);
+               };
+               alarm(10);
 
 
                foreach my $prc (@$pStack){
@@ -780,6 +789,7 @@ sub process_engine
                                  " - initiating HUP on $0");
                      kill(SIGHUP,$$);
                   }
+                  alarm(1);
                   usleep(100);
                } while(pStackMon($pStack));
 
