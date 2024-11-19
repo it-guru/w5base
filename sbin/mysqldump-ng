@@ -196,7 +196,7 @@ sub msg
    if (!$verbose && $type ne "ERROR" && !$force){
       return("");
    }
-   my $d;
+   my $d="";
    foreach my $linemsg (split(/\n/,$msg)){
       $d.=sprintf("%-6s [pid $$] %s\n",$type.":",$linemsg);
    }
@@ -562,6 +562,12 @@ sub process_engine
       }
       if (keys(%processes) < $tasks and @$tables){
          $SIG{CHLD}='IGNORE';  # parent don't wait on child exit state 
+         $SIG{HUP}=sub{
+            msg("ERROR","Terminate mysqldump-ng - terminal lost");
+            exit(1);
+         };
+         my $originalPPID=$$;
+
          my $pid=fork();
          if (not defined $pid) {
             die ("pid is not defined\n\n");
@@ -644,7 +650,6 @@ sub process_engine
             } elsif ($mode eq "import"){  #  import database
                my $table;
                #$|=1;
-
                my $pStack=[
                   {
                      STDIN=>undef,
@@ -668,6 +673,15 @@ sub process_engine
                      EXITCODE=>undef, PID=>undef
                   }
                ];
+               $SIG{HUP}=sub{
+                  msg("ERROR","Terminate by HUP signal - terminal lost");
+                  foreach my $prc (@$pStack){
+                     kill(SIGINT,$prc->{PID}) if ($prc->{PID} ne "");
+                  }
+                  
+                  exit(1);
+               };
+
 
                foreach my $prc (@$pStack){
                   $prc->{PID}=open3(
@@ -753,6 +767,11 @@ sub process_engine
                            );
                         }
                      }
+                  }
+                  if (getppid()!=$originalPPID){
+                     msg("ERROR","parent process seems to be terminalted".
+                                 " - initiating HUP on $0");
+                     kill(SIGHUP,$$);
                   }
                   usleep(100);
                } while(pStackMon($pStack));
