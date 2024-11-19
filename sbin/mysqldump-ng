@@ -693,7 +693,7 @@ sub process_engine
                   msg("ERROR","Watchdog ALRM timeout - terminating myself");
                   kill(SIGHUP,$$);
                };
-               alarm(10);
+               alarm(60);
 
 
                foreach my $prc (@$pStack){
@@ -789,7 +789,7 @@ sub process_engine
                                  " - initiating HUP on $0");
                      kill(SIGHUP,$$);
                   }
-                  alarm(1);
+                  alarm(60);
                   usleep(100);
                } while(pStackMon($pStack));
 
