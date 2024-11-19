@@ -263,7 +263,7 @@ sub handleTimeStamp
       my $migstate=lc($rec->{migstate});
       my $group_name=$rec->{group_name};
       if ($migstate eq "merge"){
-         $group_name=$rec->{merge_group};
+         $group_name=$rec->{migrate_group};
       }
       $effGrp{$rec->{sm9_name}.':'.$rec->{migstate}}={
          sys_id=>$rec->{sys_id},
@@ -304,7 +304,7 @@ sub handleTimeStamp
             }
             my $subject="???";
             if ($mode eq "prewarning"){
-               $subject=$self->T("SM.Now planed changes for Assignmentgroup");
+               $subject=$self->T("SM.Now planned changes for Assignmentgroup");
             }
             else{
                $subject=$self->T("SM.Now done changes for Assignmentgroup");
@@ -326,8 +326,8 @@ sub handleTimeStamp
             my $fakeFrom="\"SM.Now - AG-Migration\" <smnow\@telekom.de>";
             $notiy{emailfrom}=$fakeFrom;
             $notiy{emailto}=$urec->{email};
-            $notiy{emailcc}=[qw(12898138600000)];
-            $notiy{emailbcc}=[qw(11634953080001)];
+            $notiy{emailcc}=[qw(12898138600000)];   # Hammel
+            $notiy{emailbcc}=[qw(11634953080001)];  # HV
             $notiy{emailcategory}='SMNowGroupMigration';
             $notiy{name}=$subject;
             my $sitename=$self->Config->Param("SITENAME");
