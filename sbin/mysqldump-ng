@@ -49,6 +49,8 @@ my($db,$prog,$err,$help,$exclude,$tasks,$convert,$file,$verbose,
 my $force=0;
 my $slavefound=0;
 
+$skipdataexp=""; # init to prevent uninitialized message
+
 # posible options
 my $optresult = GetOptions ("help"            => \$help,
                             "exclude=s"       => \$exclude,
@@ -650,6 +652,8 @@ sub process_engine
             } elsif ($mode eq "import"){  #  import database
                my $table;
                #$|=1;
+               my $procname="mysql-restore-control";
+               $0="$procname init";
                my $pStack=[
                   {
                      STDIN=>undef,
@@ -720,8 +724,8 @@ sub process_engine
                      if (!$table and $line=~m/^CREATE\s+TABLE.*\(/){
                         my @table=split('[ `]',$line);
                         $table=$table[3];
-                        my $procname="$table-mysql-restore-control";
-                        $0=$procname;
+                        $procname="$table-mysql-restore-control";
+                        $0="$procname create table";
                      }
                      my $mod=5000;
                      if ($linepos>10000){
@@ -731,6 +735,9 @@ sub process_engine
                         my $tnow=time();
                         my $npersec=sprintf("%.0lf",$linepos/($tnow-$tstart));
                         msg("INFO","line=$linepos $npersec/s at $first");
+                     }
+                     if (!($linepos % 10)){
+                        $0="$procname line=$linepos";
                      }
                   }
                   else{
