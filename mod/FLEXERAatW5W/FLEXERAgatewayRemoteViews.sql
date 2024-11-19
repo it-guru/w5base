@@ -9,7 +9,7 @@ select
    FlexSystem.FLEXERADEVICEID flexerasystemid,
    upper(FlexSystem.DEVICESTATUS) DEVICESTATUS,
    FlexSystem.UUID,
-   FlexSyste.TENANTID,
+   FlexSystem.TENANTID,
    FlexSystem.SYSTEMNAME,
    lower(FlexSystem.SYSTEMNAME) LW_SYSTEMNAME,
    FlexSystem.SYSTEMOS,
@@ -38,7 +38,7 @@ select
    lower(FlexSystem.REALCOMPUTERNAME) LW_REALCOMPUTERNAME,
    lower(FlexSystem.INSTANCECLOUDID) LW_INSTANCECLOUDID,
    cast(
-      regexp_replace(FlexSystem.W5BASEID,'[^0-9].*$','') 
+      regexp_replace(regexp_replace(FlexSystem.W5BASEID,'\..+$',''),'[^0-9].*$','') 
    as int) SYSTEMW5BASEID
 from dbo.customDarwinExportDevice@flexerap FlexSystem;
 
