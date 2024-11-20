@@ -413,12 +413,11 @@ sub addDesasterRecoveryClassFields
                                 'if (appl.disasterrecclass=18,25,'.
                                 'NULL))))))))))))'),
 
-      new kernel::Field::Text(
+      new kernel::Field::Interface(
                 name          =>'drc',
                 group         =>'sodrgroup',
                 label         =>'DR Class',
                 htmldetail    =>0,
-                uivisible     =>0,
                 dataobjattr   =>'appl.disasterrecclass'),
 
       new kernel::Field::Text(
