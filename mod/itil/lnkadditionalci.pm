@@ -178,6 +178,20 @@ sub new
                 group         =>'source',
                 label         =>'real Editor Account',
                 dataobjattr   =>'addci.realeditor'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"addci.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(addci.id,35,'0')"),
+
+
                                                    
    );
    $self->setDefaultView(qw(id name ciusage appl srcsys srcid));
