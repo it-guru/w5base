@@ -829,6 +829,7 @@ sub objectReplicationPhase1
                if (!$dbi->InsertOrUpdate($obj,$ctrl,$srcrec)){
                   msg(ERROR,"REPLICATION BREAK: fail to write in ".
                             "object '$ctrl->{'name'}'");
+                  msg(ERROR,"DBI ERROR = $DBI::errstr");
                   $dbi->rollback();
                   $dbi->disconnect();
                   return(8);
