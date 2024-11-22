@@ -149,8 +149,8 @@ sub CapeNORtargetImport
                  $uid=$user->GetW5BaseUserID($nrec->{cnfciam},"dsid");
               }
               if ($nrec->{cnfciam} eq "" || $uid eq ""){
-                 msg(ERROR,"can not import CIAM ID $nrec->{cnfciam} for ".
-                           "NOR Target $nrec->{appl}");
+                 # msg(ERROR,"can not import CIAM ID $nrec->{cnfciam} for ".
+                 #           "NOR Target $nrec->{appl}");
                  # Stacktrace();
               }
               my $nmodid=$itnormodel->{name}->{$nrec->{itnormodel}}->{id};
