@@ -7,16 +7,22 @@ use strict;
 use kernel;
 use kernel::config;
 use Getopt::Long;
-use vars qw($opt_v $opt_h $opt_s $opt_c $opt_n $configname);
+use vars qw($opt_v $opt_h $opt_s $opt_c $opt_n $opt_nwin $configname);
+
 
 $0="W5ServerClient ".join(" ",@ARGV);
 
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
                         'noconnecterror'=>\$opt_n,
+                        'allowerrorwin=s'=>\$opt_nwin,
                         'showconfig'=>\$opt_s,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
+
+if ($opt_nwin eq ""){
+   $opt_nwin="0-23";
+}
 
 if ($opt_v){
    $W5V2::Debug=1;
@@ -28,6 +34,41 @@ if (defined($opt_h)){
    help();
    exit(1);
 }
+
+my ($opt_nwin_from,$opt_nwin_to);
+
+if (!(($opt_nwin_from,$opt_nwin_to)=$opt_nwin=~m/^([0-9]+)-([0-9]+)$/)){
+   msg(ERROR,"can't interprete allowerrorwin '%s'",$opt_nwin);
+   exit(1);
+}
+
+if ($opt_nwin_from<0 || $opt_nwin_from>23){
+   msg(ERROR,"can't interprete allowerrorwin from '%s' out of range 0-23",
+       $opt_nwin_from);
+   exit(1);
+}
+
+if ($opt_nwin_to<0 || $opt_nwin_to>23){
+   msg(ERROR,"can't interprete allowerrorwin to '%s' out of range 0-23",
+       $opt_nwin_to);
+   exit(1);
+}
+
+if ($opt_nwin_from>$opt_nwin_to){
+   msg(ERROR,"can't interprete allowerrorwin '%s' not in serial",
+       $opt_nwin);
+   exit(1);
+}
+
+my (undef,undef,$utchour) = gmtime(time());
+
+if ($opt_n){
+   msg(DEBUG,"opt_nwin      = ".$opt_nwin);
+   msg(DEBUG,"opt_nwin_from = ".$opt_nwin_from);
+   msg(DEBUG,"opt_nwin_to   = ".$opt_nwin_to);
+   msg(DEBUG,"cur UTC hour  = ".$utchour);
+}
+
 
 if ($opt_c eq ""){
    $opt_c="w5server";
@@ -64,7 +105,10 @@ if (defined($opt_s)){
 my $MyClient=new RPC::Smart::Client(%ClientParam);
 
 if (! defined($MyClient->Connect())){
-   if (!($opt_n)){
+   if (!($opt_n) || ($opt_n && (
+        ($utchour<$opt_nwin_from)||($utchour>$opt_nwin_to)
+       ))
+      ){
       msg(ERROR,"can't connect from ".hostname()." to W5Server '".
                 $ClientParam{'PeerAddr'}."'");
    }
@@ -108,6 +152,7 @@ sub help
    printf STDERR (" -v activates verbose mode\n");
    printf STDERR (" -d starts client in debug mode\n");
    printf STDERR (" -noconnecterror -n no connect errors\n");
+   printf STDERR (" -allowerrorwin  -a allowed error window - def 0-23 UTC\n");
    printf STDERR (" -showconfig -s     shows current config variables (-c)\n");
    printf STDERR ("\n");
 }
