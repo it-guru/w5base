@@ -84,6 +84,16 @@ sub getPosibleTargets
          }
          else{
             my %add=%{$ladd->{$lrec->{systemid}}->{additional}};
+            my $oldTasteOS_MachineID=$add{TasteOS_MachineID};
+            if (ref($oldTasteOS_MachineID) eq "ARRAY"){
+               $oldTasteOS_MachineID=$oldTasteOS_MachineID->[0];
+            }
+            my $newTasteOS_MachineID=$newid;
+            if ($oldTasteOS_MachineID ne "" &&
+                $newTasteOS_MachineID ne $oldTasteOS_MachineID){
+               msg(WARN,"TasteOS stored MachineID='$oldTasteOS_MachineID' ".
+                        "changed to new '$newTasteOS_MachineID'");
+            }
             $add{TasteOS_MachineID}=$newid;
             $opladdobj->ValidatedUpdateRecord(
                $ladd->{$lrec->{systemid}},
@@ -133,8 +143,17 @@ sub qcheckRecord
 
    return(0,undef) if ($rec->{cistatusid}<3);
    return(undef)   if ($rec->{applgrpid} eq "");
-   if ($dataobj->Config->Param("W5BaseOperationMode") eq "test"){
+   
+
+   my $opmode=$dataobj->Config->Param("W5BaseOperationMode");
+   if ($opmode eq "test"){
       return(undef,{qmsg=>'no sync on w5base testenv allowed'});
+   }
+
+   if ($opmode ne "prod" && ( 1
+       && $rec->{id} ne "15954048670047"
+       )){
+      return(undef,{qmsg=>'on noneprod only individual selected id'});
    }
 
    my $tsossys=getModuleObject($dataobj->Config,"TASTEOS::tsossystem");
@@ -382,7 +401,7 @@ sub qcheckRecord
       }
    }
    #printf STDERR ("fifi upd TSOSsystemid=$TSOSsystemid\n");
-   #printf STDERR ("l=%s\n",Dumper(\@l));
+   #printf STDERR ("current SysList in ICTO=%s\n",Dumper(\@l));
 
 
    if ($TSOSsystemid ne ""){
@@ -413,12 +432,13 @@ sub qcheckRecord
          if ($machineNumber){
             $tsosmacrec->{machineNumber}=$machineNumber;
          }
-
+         msg(INFO,"check if known MachineID $TSOSmachineid still exists");
          $tsosmac->ResetFilter();
          $tsosmac->SetFilter({id=>$TSOSmachineid});
          my ($mrec,$msg)=$tsosmac->getOnlyFirst(qw(id name systemid 
                                                    description));
          if (!defined($mrec)){
+            msg(WARN,"MachineID $TSOSmachineid lost in TasteOS");
             $TSOSmachineid=undef;
          }
          if ($TSOSmachineid eq ""){
