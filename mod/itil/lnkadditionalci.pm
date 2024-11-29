@@ -208,39 +208,46 @@ sub getSqlFrom
    my @filter=@_;
 
    my $from="
-      (select id,
+      select id,
              appl,system,accessurl,swinstance,name,ciusage,comments,
              target,targetid,
              createdate,modifydate,createuser,modifyuser,editor,realeditor,
              srcsys,srcid,srcload
-       from lnkadditionalci
-       union
-       select null id,
-              appl.id appl,
-              null system,
-              null accessurl,
-              swinstance.id swinstance,
-              swinstance.fullname name,
-              swinstancerule.ruletype ciusage,
-              null comments,
-              'itil::swinstance' target,
-              swinstancerule.swinstance targetid,
-              swinstancerule.createdate createdate,
-              swinstancerule.modifydate modifydate,
-              swinstancerule.createuser createuser,
-              swinstancerule.modifyuser modifyuser,
-              swinstancerule.editor editor,
-              swinstancerule.realeditor realeditor,
-              'itil::swinstancerule' srcsys,
-              swinstancerule.id srcid,
-              now() srcload
-        from swinstancerule 
-           join appl 
-              on swinstancerule.refid=appl.id
-           join swinstance 
-              on swinstancerule.swinstance=swinstance.id
-        where parentobj='itil::appl' and swinstance.cistatus in (3,4,5)
-     ) addci";
+      from lnkadditionalci
+   ";
+   if ($W5V2::OperationContext eq "W5Replicate"){
+      $from="($from) addci";
+   }
+   else{
+      $from="($from
+              union
+              select null id,
+                     appl.id appl,
+                     null system,
+                     null accessurl,
+                     swinstance.id swinstance,
+                     swinstance.fullname name,
+                     swinstancerule.ruletype ciusage,
+                     null comments,
+                     'itil::swinstance' target,
+                     swinstancerule.swinstance targetid,
+                     swinstancerule.createdate createdate,
+                     swinstancerule.modifydate modifydate,
+                     swinstancerule.createuser createuser,
+                     swinstancerule.modifyuser modifyuser,
+                     swinstancerule.editor editor,
+                     swinstancerule.realeditor realeditor,
+                     'itil::swinstancerule' srcsys,
+                     swinstancerule.id srcid,
+                     now() srcload
+               from swinstancerule 
+                  join appl 
+                     on swinstancerule.refid=appl.id
+                  join swinstance 
+                     on swinstancerule.swinstance=swinstance.id
+               where parentobj='itil::appl' and swinstance.cistatus in (3,4,5)
+            ) addci";
+   }
    return($from);
 }
 
