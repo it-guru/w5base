@@ -274,7 +274,7 @@ sub DataCollector
 
    $systemid=~s/[\.\/]//g;
 
-   return([]) if ($systemid eq "");
+   return([]) if ($query->{id} eq "" && $systemid eq "");
 
    my $dbclass="systems/$systemid/machines";
    my $requesttoken=$systemid;
@@ -377,7 +377,7 @@ sub InsertRecord
    my $foundMachineIdInUnassinged;
 
    foreach my $uaMachineRec (@{$uarec->{machines}}){
-      msg(INFO,"check ".$uaMachineRec->{machineNumber});
+     # msg(INFO,"check ".$uaMachineRec->{machineNumber});
       if ($uaMachineRec->{machineNumber} eq $newrec->{machineNumber}){
          if (!$foundMachineIdInUnassinged){
             if (($uaMachineRec->{name} ne $newrec->{name}) ||
