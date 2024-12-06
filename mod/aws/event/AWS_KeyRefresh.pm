@@ -67,11 +67,23 @@ sub AWS_KeyRefresh
       if ($curKeyRec->{Status} eq "Active" && !defined($newestActive)){
          $newestActive=$curKeyRec;
       }
+      if ($curKeyRec->{Status} eq "Inactive"){
+         msg(INFO,"Cleanup needed for key ".$curKeyRec->{AccessKeyId});
+         msg(INFO,"inactive rec=".Dumper($curKeyRec));
+         my $bk=$obj->DeleteAccessKey(
+            'AccessKeyId'=>$curKeyRec->{AccessKeyId},
+            'UserName'=>$curKeyRec->{UserName}
+         );  
+         return({exitcode=>0,
+                 exitmsg=>'cleanup (bk='.$bk.') is enough for today'});
+      }
    }
+
    msg(INFO,"AccessKeys=".Dumper(\@curKeys));
    msg(INFO,"newestActive=".Dumper($newestActive));
 
    if ($KeyCount<=1){
+      msg(INFO,"try to add new Access key with pAWS CreateAccessKey=");
       eval('
         my $AccessKeyResp=$obj->CreateAccessKey(UserName=>$UserName);
         $newCreatedAccessKey=$AccessKeyResp->AccessKey();
@@ -174,6 +186,11 @@ sub AWS_KeyRefresh
             else{
                $self->LastMsg(ERROR,"fail to re overwrite $keyfile");
             }
+         }
+	      else{
+            return({exitcode=>1,
+                    exitmsg=>'fail to open tempkeyfile '.$tempkeyfile
+            });
          }
       }
       else{
