@@ -30,7 +30,7 @@ sub Init
    my $self=shift;
 
 
-   $self->RegisterEvent("SMNowGroupMig","SMNowGroupMig",timeout=>500);
+   $self->RegisterEvent("SMNowGroupMig","SMNowGroupMig",timeout=>7200);
    return(1);
 }
 
