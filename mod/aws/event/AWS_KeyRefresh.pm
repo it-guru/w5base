@@ -128,14 +128,14 @@ sub AWS_KeyRefresh
             $storedDATAOBJUSER=$v;
          }
       }
-      if (!defined($newCreatedAccessKey) && defined($newestActive)){
-         if ($newestActive->{AccessKeyId} ne $storedDATAOBJUSER){ 
-            # someone have created on key in the AWS - but we haven't stored
-            # the key in our config. We treat them as new created
-            msg(INFO,"found manuelly created key - and use them as newCreated");
-            $newCreatedAccessKey=$newestActive;
-         }
-      }
+      #if (!defined($newCreatedAccessKey) && defined($newestActive)){
+      #   if ($newestActive->{AccessKeyId} ne $storedDATAOBJUSER){ 
+      #      # someone have created on key in the AWS - but we haven't stored
+      #      # the key in our config. We treat them as new created
+      #      msg(INFO,"found manuelly created key - and use them as newCreated");
+      #      $newCreatedAccessKey=$newestActive;
+      #   }
+      #}
 
       if (defined($newCreatedAccessKey)){
          msg(INFO,"build new curVal for ".$newCreatedAccessKey->{AccessKeyId});
@@ -156,18 +156,24 @@ sub AWS_KeyRefresh
       else{
          msg(INFO,"newest=".$newestActive->{AccessKeyId});
          msg(INFO,"curused=".$storedDATAOBJUSER);
-         if (defined($newestActive) && 
-             $newestActive->{AccessKeyId} ne $storedDATAOBJUSER){
-            msg(INFO,"do DeleteAccessKey unused key ".
-                     $newestActive->{AccessKeyId});
-            my $bk=$obj->DeleteAccessKey(
-               'AccessKeyId'=>$newestActive->{AccessKeyId},
-               'UserName'=>$newestActive->{UserName}
-            );  
-            msg(INFO,"DeleteAccessKey bk=$bk");
-            return({exitcode=>0,exitmsg=>'ok - drop unused key '.
-                                         $newestActive->{AccessKeyId}.
-                                         ' done'});
+
+
+         if ($storedDATAOBJUSER ne ""){
+            foreach my $curKeyRec (@curKeys){
+               if (defined($curKeyRec) && 
+                   $curKeyRec->{AccessKeyId} ne $storedDATAOBJUSER){
+                  msg(INFO,"do DeleteAccessKey unused key ".
+                           $curKeyRec->{AccessKeyId});
+                  my $bk=$obj->DeleteAccessKey(
+                     'AccessKeyId'=>$curKeyRec->{AccessKeyId},
+                     'UserName'=>$curKeyRec->{UserName}
+                  );  
+                  msg(INFO,"DeleteAccessKey bk=$bk");
+                  return({exitcode=>0,exitmsg=>'ok - drop unused key '.
+                                               $curKeyRec->{AccessKeyId}.
+                                               ' done'});
+               }
+            }
          }
       }
       if ($keyFileChanged){
