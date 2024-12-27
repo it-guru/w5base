@@ -329,9 +329,11 @@ sub analyseRecord
                    my $reqtrace=shift;
              
                    if ($code eq "404"){  # 404 bedeutet nicht gefunden
-                      msg(ERROR,"$rec->{systemname}/$rec->{systemid} ".
-                                "machineID:$MachineID - ".
-                                "not found in TasteOS");
+                      if (!($rec->{systemname}=~m/^SEC/)){
+                         msg(ERROR,"$rec->{systemname}/$rec->{systemid} ".
+                                   "machineID:$MachineID - ".
+                                   "not found in TasteOS");
+                      }
                       return([],"200");
                    }
                    if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
