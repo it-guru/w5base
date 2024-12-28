@@ -86,6 +86,7 @@ sub CloudAreaSync
           lastmondate=>$appansrec->{lastmondate}
        );
        #next if ($fullname=~m/test/i);
+       next if ($appansrec->{appl} eq "");
        push(@a,\%carec);
    }
    if ($#a==-1){
@@ -122,6 +123,7 @@ sub CloudAreaSync
              appl=>$otcprorec->{appl},
              lastmondate=>$otcprorec->{lastmondate}
           );
+          next if ($otcprorec->{appl} eq "");
           push(@a,\%carec);
       }
       my @dupotcpname=grep({$otcpname{$_}>1} keys(%otcpname));
@@ -166,6 +168,8 @@ sub CloudAreaSync
    #print Dumper(\%itcloud);
    #print Dumper($itcloud);
    #print Dumper($itcloudarea);
+   #print Dumper(\@a);
+   #printf("n=%d\n",$#a+1);
    my $caref={};
 
    foreach my $a (@a){
@@ -263,7 +267,7 @@ sub CloudAreaSync
          my $updrec;
          my $d=CalcDateDuration($a->{lastmondate},NowStamp("en"));
          if (defined($d)){
-            if ($d->{days}>6){
+            if ($d->{days}>28){
                if ($currec->{cistatusid}!=6){
                   $updrec->{cistatusid}=6;   # auf veraltet settzen
                }
