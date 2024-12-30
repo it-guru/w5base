@@ -211,6 +211,9 @@ sub DataCollector
          if ($code eq "404"){  # 404 bedeutet nicht gefunden
             return([],"200");
          }
+         if ($code eq "403"){  # 403=forbitten means not found, because
+            return([],"200");  # project is disabled. (=GCP Rotz)
+         }
          msg(ERROR,$reqtrace);
          $self->LastMsg(ERROR,"unexpected data GCP system response");
          return(undef);
