@@ -386,6 +386,8 @@ sub getFirewallByIp
    my $d=$self->CollectREST(
       dbname=>'tsfiat',
       useproxy=>0,
+      retry_count=>6,
+      retry_interval=>10,
       verify_hostname=>0,
       url=>sub{
          my $self=shift;
