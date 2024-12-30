@@ -173,6 +173,8 @@ sub DataCollector
 
    my $d=$self->CollectREST(
       dbname=>$CredName,
+      retry_count=>6,
+      retry_interval=>30,
       requesttoken=>$requestToken,
       url=>sub{
          my $self=shift;
