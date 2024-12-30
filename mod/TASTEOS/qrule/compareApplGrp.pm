@@ -433,12 +433,14 @@ sub qcheckRecord
             $tsosmacrec->{machineNumber}=$machineNumber;
          }
          msg(INFO,"check if known MachineID $TSOSmachineid still exists");
+         my $SystemName=$lrec->{system};
          $tsosmac->ResetFilter();
          $tsosmac->SetFilter({id=>$TSOSmachineid});
          my ($mrec,$msg)=$tsosmac->getOnlyFirst(qw(id name systemid 
                                                    description));
          if (!defined($mrec)){
-            msg(WARN,"MachineID $TSOSmachineid lost in TasteOS");
+            msg(WARN,"MachineID $TSOSmachineid (SystemName=$SystemName) ".
+                     "lost in TasteOS");
             $TSOSmachineid=undef;
          }
          if ($TSOSmachineid eq ""){
