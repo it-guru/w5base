@@ -2,3 +2,4 @@
 'itu.cloud.tpc.TPC2.machine'=>{de=>'Maschine',en=>'Machine'},
 'itu.cloud.tpc.TPC2.kernel'=>{de=>'Kern',en=>'Kernel'},
 'itu.cloud.tpc.TPC2.kernel.depl'=>{de=>'Deployment',en=>'Deployment'},
+'itu.cloud.tpc.TPC2.kernel.res'=>{de=>'Resource',en=>'Resource'},

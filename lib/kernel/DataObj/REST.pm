@@ -131,6 +131,7 @@ sub Filter2RestPath
 
 
 
+printf STDERR ("fifi 00: %s\n",Dumper($filter));
 
 
    foreach my $fn (keys(%{$filter})){  # paas1 loop
@@ -162,6 +163,7 @@ sub Filter2RestPath
          }
       }
    }
+printf STDERR ("fifi 01: %s\n",Dumper($filter));
    foreach my $fn (keys(%{$filter})){
       my $fld=$self->getField($fn);
       if (defined($fld)){
@@ -263,6 +265,34 @@ sub Filter2RestPath
 
                push(@SYSPARMQUERYandList,"${fieldname}${cmpop}${sword}");
             } 
+         }
+         elsif ($fld->{RestFilterType} eq "SIMPLEQUERY"){
+            my $fieldname=$fn;
+            $fieldname=$fld->{dataobjattr}  if (defined($fld->{dataobjattr}));
+            if (defined($fld->{RestFilterField})){
+               $fieldname=$fld->{RestFilterField};
+            }
+
+            my @data;
+            my $fstr=$filter->{$fn};
+            if (ref($fstr) eq "SCALAR"){
+               my @l=($$fstr);
+               $fstr=\@l;
+            }
+            elsif (ref($fstr) eq "ARRAY"){
+               foreach my $word (@$fstr){
+                  my $exp=$word;
+                  my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
+                  push(@data," $e");
+               }
+            }
+            else{
+               $fstr=~s/\*//g;
+               @data=($fstr);
+            }
+
+            $qparam{$fieldname}=join(" ",@data);
+
          }
          elsif ($fld->{RestFilterType} eq "SIMPLE"){
             my $fieldname=$fn;
