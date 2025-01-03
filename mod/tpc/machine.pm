@@ -147,6 +147,12 @@ sub new
             group             =>'tags'),
 
       new kernel::Field::Text(     
+            name              =>'resourceId',
+            group             =>'source',
+            htmldetail        =>'NotEmpty',
+            label             =>'ResourceID'),
+
+      new kernel::Field::Text(     
             name              =>'instanceUUID',
             group             =>'source',
             htmldetail        =>'NotEmpty',
@@ -319,7 +325,7 @@ sub DataCollector
              if (ref($_->{cloudAccountIds}) eq "ARRAY"){
                 $_->{cloudAccountId}=join(" ",@{$_->{cloudAccountIds}});
              }
-             #printf STDERR ("RAW Record %s\n",Dumper($_));
+             printf STDERR ("RAW Record %s\n",Dumper($_));
          } @$data);
          return($data);
       },

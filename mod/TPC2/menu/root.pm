@@ -55,6 +55,10 @@ sub Init
                       "TPC2::deployment",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.cloud.tpc.TPC2.kernel.res",
+                      "TPC2::resource",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 

@@ -432,6 +432,9 @@ sub decodeFilter2Query4vRealize
    }
    else{
       $qparam{'$top'}=99999;
+ #     $qparam{'resourceTypes'}="Cloud.vSphere.Machine";
+ #     $qparam{'search'}="ede188-mcm370670-280508727773";
+ #     $qparam{'search'}="ede188*";
    }
    if ($dbclass=~m/\{[^{}]+\}/){
       $self->LastMsg(ERROR,"missing constant query parameter");
