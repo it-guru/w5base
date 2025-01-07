@@ -131,7 +131,6 @@ sub Filter2RestPath
 
 
 
-printf STDERR ("fifi 00: %s\n",Dumper($filter));
 
 
    foreach my $fn (keys(%{$filter})){  # paas1 loop
@@ -163,7 +162,6 @@ printf STDERR ("fifi 00: %s\n",Dumper($filter));
          }
       }
    }
-printf STDERR ("fifi 01: %s\n",Dumper($filter));
    foreach my $fn (keys(%{$filter})){
       my $fld=$self->getField($fn);
       if (defined($fld)){
