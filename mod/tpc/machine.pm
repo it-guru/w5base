@@ -325,7 +325,7 @@ sub DataCollector
              if (ref($_->{cloudAccountIds}) eq "ARRAY"){
                 $_->{cloudAccountId}=join(" ",@{$_->{cloudAccountIds}});
              }
-             printf STDERR ("RAW Record %s\n",Dumper($_));
+             #printf STDERR ("RAW Record %s\n",Dumper($_));
          } @$data);
          return($data);
       },
