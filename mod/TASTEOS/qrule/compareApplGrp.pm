@@ -150,7 +150,7 @@ sub qcheckRecord
       return(undef,{qmsg=>'no sync on w5base testenv allowed'});
    }
 
-   if ($opmode ne "prod" && ( 1
+   if (($opmode ne "prod" && $opmode ne "online") && ( 1
        && $rec->{id} ne "15954048670047"
        )){
       return(undef,{qmsg=>'on noneprod only individual selected id'});
