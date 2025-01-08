@@ -18,6 +18,7 @@ package SMNow::event::SMNowGroupMig;
 #
 use strict;
 use vars qw(@ISA);
+use Time::HiRes qw(usleep);
 use kernel;
 use kernel::Event;
 use kernel::QRule;
@@ -139,7 +140,11 @@ sub processRelevantCIs
             #printf STDERR ("fifi chk=%s\n",Dumper(\@chk));
             if ($#chk==0){
                my $o=getModuleObject($self->Config,$dataobjname);
-               $o->SetFilter({chmapprgroups=>\$ag,cistatusid=>"<7"});
+               $o->SetFilter([
+                     {chmapprgroups=>\$ag,cistatusid=>"<6"},
+                     {chmapprgroups=>\$ag,cistatusid=>"6",mdate=>'>now-90d'}
+                                                                   
+               ]);
                foreach my $rec ($o->getHashList(qw(ALL))){
                  my $name=$rec->{name};
                  my $lrec={
@@ -160,7 +165,7 @@ sub processRelevantCIs
                              );
                           }
                        }
-                       sleep(1);
+                       usleep(200); # prevent to many mods in one sec.
                        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
                        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
                     }
@@ -173,7 +178,7 @@ sub processRelevantCIs
                              $op->ValidatedDeleteRecord($lnkrec);
                           }
                        }
-                       sleep(1);
+                       usleep(200); # prevent to many mods in one sec.
                        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
                        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
                     }
@@ -192,7 +197,11 @@ sub processRelevantCIs
             my @chk=$metagrp->getHashList(qw(id));
             if ($#chk==0){
                my $o=getModuleObject($self->Config,$dataobjname);
-               $o->SetFilter({acinmassingmentgroup=>\$ag,cistatusid=>"<7"});
+               $o->SetFilter([
+                     {acinmassingmentgroup=>\$ag,cistatusid=>"<6"},
+                     {acinmassingmentgroup=>\$ag,cistatusid=>"6",
+                      mdate=>'>now-90d'}
+               ]);
                foreach my $rec ($o->getHashList(qw(ALL))){
                  my $name=$rec->{name};
                  if ($dataobjname=~m/::system$/){
@@ -213,8 +222,8 @@ sub processRelevantCIs
                            {acinmassingmentgroup=>$newag},
                            {id=>\$rec->{id}}
                        );
-                       sleep(1);
-                       printf STDERR ("migrated $ag to $newag bk=$bk\n");
+                       usleep(200); # prevent to many mods in one sec.
+                       #printf STDERR ("migrated $ag to $newag bk=$bk\n");
                        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
                        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
                     }
@@ -225,8 +234,8 @@ sub processRelevantCIs
                            {acinmassingmentgroup=>undef},
                            {id=>\$rec->{id}}
                        );
-                       sleep(1);
-                       printf STDERR ("omitted $ag bk=$bk\n");
+                       usleep(200);  # prevent to many mods in one sec.
+                       #printf STDERR ("omitted $ag bk=$bk\n");
                        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
                        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
                     }
