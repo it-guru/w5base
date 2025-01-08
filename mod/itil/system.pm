@@ -1087,8 +1087,8 @@ sub new
                 name          =>'itcloudshortname',
                 label         =>'cloud technical shortname',
                 readonly      =>1,
+                htmldetail    =>0,
                 group         =>'physys',
-                group         =>'cloudinfo',
                 dataobjattr   =>'itcloud.shortname'),
 
       new kernel::Field::TextDrop(

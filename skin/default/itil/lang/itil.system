@@ -141,4 +141,5 @@
 'all ItemTags'=>{de=>'alle ItemTags'},
 'SIS Number'=>{de=>'Gesellschaftsnummer'},
 'Installation date'=>{de=>'Installationszeitpunkt'},
-'Closed system env'=>{de=>'geschlossene System/OS-Umgebung'}
+'Closed system env'=>{de=>'geschlossene System/OS-Umgebung'},
+'cloud technical shortname'=>{de=>'Cloud technischer Kurzname'}
