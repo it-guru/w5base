@@ -306,6 +306,11 @@ sub qcheckRecord
             elsif ($parrec->{osclass}=~m/win/i){
                $syncData{osclass}="WIN";
             }
+
+            if ($parrec->{osrelease}=~m/other/i){ # Class=LINUX but OS Other
+               $syncData{osclass}="MISC";
+               $syncData{osrelease}="other";
+            }
             my $w5itcloudarea;
             if ($parrec->{projectId} ne ""){
                msg(INFO,"try to add CloudArea to system ".$rec->{name});
