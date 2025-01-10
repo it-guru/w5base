@@ -754,11 +754,14 @@ sub genericSystemImport
             }
          }
       }
+      #push(@flt,{
+      #  name=>"ede1*"
+      #});
 
       $sys->ResetFilter();
       $sys->SetFilter(\@flt);
       $sys->Limit(20);
-      my @redepl=$sys->getHashList(qw(mdate cistatusid name id
+      my @redepl=$sys->getHashList(qw(-mdate cistatusid name id
                                       srcid srcsys applications));
       #if ($#redepl>20){
       #   printf STDERR ("ERROR: genericSystemImport produces >20 rec\n");
@@ -768,11 +771,15 @@ sub genericSystemImport
       #   @redepl=();
       #}
 
+      #printf STDERR ("ERROR: redepl=%s\n",Dumper(\@redepl));
+      #printf STDERR ("ERROR: searchname=%s\n",Dumper($searchname));
+      #exit(1);
 
       msg(INFO,"invantar check for $srcsys-SystemID: $sysrec->{id}");
       foreach my $osys (@redepl){   # find best matching redepl candidate
          my $applok=0;
-         msg(INFO,"check $srcsys-SystemID: $osys->{srcid} from inventar");
+         my $applAlreadyAssigned=0;
+         msg(INFO,"ReDeplChk: $srcsys-SystemID: $osys->{srcid} from inventar");
          if ($osys->{srcid} eq $sysrec->{id}){
             msg(ERROR,"$srcsys-SystemID: $osys->{srcid} already in inventar");
             # dieser Punkt dürfte nie erreicht werden, da ja oben bereits
@@ -780,16 +787,23 @@ sub genericSystemImport
             last;
          }
          my $ageok=1;
+         my $days;
          if ($osys->{cistatusid} ne "4"){  # prüfen, ob das Teil nicht schon
                                            # ewig alt ist
             my $d=CalcDateDuration($osys->{mdate},NowStamp("en"));
+            $days=$d->{days};
             if (defined($d) && $d->{days}>28){
+               msg(INFO,"ReDeplChk:$osys->{name}($osys->{id}) ".
+                        "to old=$d->{days}");
                next; # das Teil ist schon zu alt, um es wieder zu aktivieren
             }
          }
+         msg(INFO,"ReDeplChk:$osys->{name}($osys->{id}) ageok=$ageok ".
+                  "(days=$days)\n");
          if ($cloudarearec->{cistatusid}==4){
             foreach my $appl (@{$osys->{applications}}){
                if ($appl->{applid} eq $w5applrec->{id}){
+                  $applAlreadyAssigned++;
                   $applok++;
                }
             }
@@ -804,7 +818,14 @@ sub genericSystemImport
             if ($osys->{cistatusid}==4){ # create manually in cistatus=4
                $sysallowed++;           
             }
+            if (!$applok && # if it is a initial process, then no appl=ok
+                $osys->{cistatusid}<=3){ 
+               if ($#{$osys->{applications}}==-1){ 
+                  $applok=1;
+               }
+            }
          }
+         msg(INFO,"ReDeplChk: $osys->{name}($osys->{id}) applok=$applok\n");
          if ($ageok && $applok && 
              lc($osys->{srcsys}) eq "w5base" || $osys->{srcsys} eq ""){
             if ($osys->{cistatusid}<=3){ # prepaied record for initail depl.
@@ -812,6 +833,8 @@ sub genericSystemImport
             }
 
          }
+         msg(INFO,"ReDeplChk: $osys->{name}($osys->{id}) ".
+                  "sysallowed=$sysallowed\n");
          if ($ageok && $applok && 
              $osys->{srcsys} eq $srcsys &&   # OLDsys must be from the same 
              $osys->{srcid} ne ""){          # srcsys and have a srcid
@@ -822,7 +845,8 @@ sub genericSystemImport
                msg(INFO,"check exist of $srcsys-SystemID: $osys->{srcid}");
                my ($chkrec,$msg)=$srcobj->getOnlyFirst(qw(ALL));
                if (!defined($chkrec)){
-                  msg(INFO,"$srcsys-System: ".
+                  msg(INFO,"ReDeplChk: $osys->{name}($osys->{id}) ".
+                           "$srcsys-System: ".
                            "$osys->{srcid} does not exists anymore");
                   $sysallowed++;
                }
@@ -867,6 +891,36 @@ sub genericSystemImport
                if ($oldrec->{cistatusid} ne "4"){
                   $updrec->{cistatusid}="4";
                }
+
+               ##############################################################
+               # further parameters which needs to be updated 
+               # in redeployment case
+
+
+               if (defined($cloudarearec) &&
+                   $oldrec->{itcloudareaid} ne $cloudarearec->{id}){
+                  $updrec->{itcloudareaid}=$cloudarearec->{id};
+               }
+               if (!$applAlreadyAssigned){
+                  $self->genericAddApplRelation(0,$oldrec->{id},
+                                             $oldrec->{databossid},$w5applrec); 
+               }
+               if (defined($w5applrec) &&
+                   ($oldrec->{isprod}==0) &&
+                   ($oldrec->{istest}==0) &&
+                   ($oldrec->{isdevel}==0) &&
+                   ($oldrec->{iseducation}==0) &&
+                   ($oldrec->{isapprovtest}==0) &&
+                   ($oldrec->{isreference}==0) &&
+                   ($oldrec->{iscbreakdown}==0)) { 
+                  $self->mapApplicationOpModeToSystemOpModeFlags(
+                     $w5applrec,
+                     $updrec
+                  );
+               }
+               $self->ValidateSystemClassFullfilment($oldrec,$updrec);
+
+               ##############################################################
                if ($sys->ValidatedUpdateRecord($oldrec,$updrec,
                    {id=>\$oldrec->{id}})) {
                   $sys->ResetFilter();
@@ -913,7 +967,6 @@ sub genericSystemImport
       }
    }
    my $curdataboss;
-   #print STDERR ("fifi w5sysrec=%s\n",Dumper($w5sysrec));
    if (defined($w5sysrec)){
       $curdataboss=$w5sysrec->{databossid};
       my %newrec=();
@@ -957,7 +1010,7 @@ sub genericSystemImport
           ($w5sysrec->{iseducation}==0) &&
           ($w5sysrec->{isapprovtest}==0) &&
           ($w5sysrec->{isreference}==0) &&
-          ($w5sysrec->{iscbreakdown}==0)) { # alter Datensatz - aber kein opmode
+          ($w5sysrec->{iscbreakdown}==0)) { 
          $self->mapApplicationOpModeToSystemOpModeFlags(
             $w5applrec,
             \%newrec
@@ -972,20 +1025,7 @@ sub genericSystemImport
          $newrec{acinmassignmentgroupid}=
              $w5applrec->{acinmassignmentgroupid};
       }
-
-      my $foundsystemclass=0;
-      foreach my $v (qw(isapplserver isworkstation isinfrastruct 
-                        isprinter isbackupsrv isdatabasesrv 
-                        iswebserver ismailserver isrouter 
-                        isnetswitch isterminalsrv isnas
-                        isclusternode)){
-         if ($w5sysrec->{$v}==1){
-            $foundsystemclass++;
-         }
-      }
-      if (!$foundsystemclass){
-         $newrec{isapplserver}="1"; 
-      }
+      $self->ValidateSystemClassFullfilment($w5sysrec,\%newrec);
       if ($sys->ValidatedUpdateRecord($w5sysrec,\%newrec,
                                       {id=>\$w5sysrec->{id}})) {
          $identifyby=$w5sysrec->{id};
