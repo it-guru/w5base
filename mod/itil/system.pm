@@ -3506,6 +3506,33 @@ sub mapApplicationOpModeToSystemOpModeFlags
    }
 }
 
+sub ValidateSystemClassFullfilment
+{
+   my $self=shift;   
+   my $oldrec=shift;
+   my $newrec=shift;
+
+   if (defined($oldrec)){
+      my $foundsystemclass=0;
+      foreach my $v (qw(isapplserver isworkstation isinfrastruct
+                        isprinter isbackupsrv isdatabasesrv
+                        iswebserver ismailserver isrouter
+                        isnetswitch isterminalsrv isnas
+                        isclusternode)){
+         if ($oldrec->{$v}==1){
+            $foundsystemclass++;
+         }
+      }
+      if (!$foundsystemclass){
+         $newrec->{isapplserver}="1";
+      }
+   }
+   else{
+      $newrec->{isapplserver}=1;
+   }
+
+}
+
 
 
 
