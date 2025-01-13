@@ -262,6 +262,8 @@ sub qcheckRecord
             }
             push(@sysname,$parrec->{id});
 
+            
+
             #my %sysiface;
             #my %ipaddresses;
             #if ($parrec->{address} ne ""){
@@ -311,6 +313,17 @@ sub qcheckRecord
                $syncData{osclass}="MISC";
                $syncData{osrelease}="other";
             }
+
+            ###################################################################
+            # check, if shortname comes from TPC (as tag)
+            if (ref($parrec->{tags}) eq "HASH" &&
+                defined($parrec->{tags}->{shortdescription}) &&
+                $parrec->{tags}->{shortdescription} ne "" &&
+                length($parrec->{tags}->{shortdescription})<80){
+               $syncData{shortdesc}=$parrec->{tags}->{shortdescription};
+            }
+            ###################################################################
+
             my $w5itcloudarea;
             if ($parrec->{projectId} ne ""){
                msg(INFO,"try to add CloudArea to system ".$rec->{name});
