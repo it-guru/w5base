@@ -432,36 +432,52 @@ sub qcheckRecord
          if ($machineNumber){
             $tsosmacrec->{machineNumber}=$machineNumber;
          }
-         msg(INFO,"check if known MachineID $TSOSmachineid still exists");
-         my $SystemName=$lrec->{system};
-         $tsosmac->ResetFilter();
-         $tsosmac->SetFilter({id=>$TSOSmachineid});
-         my ($mrec,$msg)=$tsosmac->getOnlyFirst(qw(id name systemid 
-                                                   description));
-         if (!defined($mrec)){
-            msg(WARN,"MachineID $TSOSmachineid (SystemName=$SystemName) ".
-                     "lost in TasteOS");
-            $TSOSmachineid=undef;
-         }
-         if ($TSOSmachineid eq ""){
-            $tsosmacrec->{salt}=$tsosmacrec->{machineNumber};
-            $tsosmacrec->{salt}.=":" if ($tsosmacrec->{salt} ne "" &&
-                                         $tsosmacrec->{systemid} ne "");
-            $tsosmacrec->{salt}.=$tsosmacrec->{systemid};
-            my $newid=insNewTSOSmac($dataobj, $tsosmac,$opladdobj,
-                                    $rec,$tsosmacrec,$lrec,$ladd->{systemid});
-            return(undef,undef) if ($newid eq ""); 
-         }
-         else{
-            if ($mrec->{systemid} ne $tsosmacrec->{systemid} ||
-                $mrec->{machineNumber}  ne $tsosmacrec->{machineNumber} ||
-                $mrec->{description}  ne $tsosmacrec->{description} ||
-                $mrec->{name}     ne $tsosmacrec->{name}){
-               my $bk=$tsosmac->ValidatedUpdateRecord(
-                  {},$tsosmacrec,
-                  {id=>$TSOSmachineid
-               });
+         {
+            my $SystemName=$lrec->{system};
+            my ($mrec,$msg);
+           
+            #################################################################
+            # Check if in w5base stored TSOSmachineid still exists in TasteOS
+            # (in some cases, records were deleted in TasteOS)
+            #
+            msg(INFO,"check if known MachineID '$TSOSmachineid' for ".
+                     "SystemName=$SystemName still exists");
+           
+            if ($TSOSmachineid ne ""){ 
+               $tsosmac->ResetFilter();
+               $tsosmac->SetFilter({id=>$TSOSmachineid});
+               ($mrec,$msg)=$tsosmac->getOnlyFirst(qw(id name systemid 
+                                                         description));
+               if (!defined($mrec)){
+                  msg(WARN,"MachineID '$TSOSmachineid' ".
+                           "(SystemName=$SystemName) ".
+                           "lost in TasteOS");
+                  $TSOSmachineid=undef;
+               }
             }
+            #################################################################
+            if ($TSOSmachineid eq ""){
+               $tsosmacrec->{salt}=$tsosmacrec->{machineNumber};
+               $tsosmacrec->{salt}.=":" if ($tsosmacrec->{salt} ne "" &&
+                                            $tsosmacrec->{systemid} ne "");
+               $tsosmacrec->{salt}.=$tsosmacrec->{systemid};
+               my $newid=insNewTSOSmac($dataobj, $tsosmac,$opladdobj,
+                                       $rec,$tsosmacrec,$lrec,
+                                       $ladd->{systemid});
+               return(undef,undef) if ($newid eq ""); 
+            }
+            else{
+               if ($mrec->{systemid} ne $tsosmacrec->{systemid} ||
+                   $mrec->{machineNumber}  ne $tsosmacrec->{machineNumber} ||
+                   $mrec->{description}  ne $tsosmacrec->{description} ||
+                   $mrec->{name}     ne $tsosmacrec->{name}){
+                  my $bk=$tsosmac->ValidatedUpdateRecord(
+                     {},$tsosmacrec,
+                     {id=>$TSOSmachineid
+                  });
+               }
+            }
+            #################################################################
          }
 
       }
