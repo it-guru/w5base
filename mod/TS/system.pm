@@ -1173,7 +1173,7 @@ sub genericSystemImport
             $newrec->{iscbreakdown}=1;
          }
       }
-      {
+      if (defined($sysrec->{altname}) && $sysrec->{altname} ne ""){
          my $newname=$newrec->{name};
          $sys->ResetFilter();
          $sys->SetFilter({name=>\$newname});
