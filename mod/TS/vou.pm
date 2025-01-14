@@ -395,6 +395,18 @@ sub new
                 label         =>'real Editor Account',
                 dataobjattr   =>'vou.realeditor'),
 
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"vou.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(vou.id,35,'0')"),
+
       new kernel::Field::QualityText(),
       new kernel::Field::IssueState(),
       new kernel::Field::QualityState(),
