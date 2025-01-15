@@ -951,6 +951,10 @@ sub genericSystemImport
                                \%checksession);
             return({IdentifiedBy=>$w5sysrec->{id}});
          }
+         # in QualityCheck, there is no need to print ERROR message
+         if ($W5V2::OperationContext eq "QualityCheck"){
+            return({IdentifiedBy=>$w5sysrec->{id}});
+         }
          $self->LastMsg(ERROR,$msg);
          return(undef);
       }
