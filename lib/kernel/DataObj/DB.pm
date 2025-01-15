@@ -857,11 +857,13 @@ sub InsertRecord
       while(($workdb->getErrorMsg())
             =~/^Deadlock found when trying to get lock/){
         $retrycnt++;
-        msg(ERROR,"found Deadlock - retry $retrycnt");
-        sleep(1);
+        if ($retrycnt>1){
+           msg(ERROR,"found Deadlock - retry $retrycnt");
+        }
+        sleep($retrycnt); # increase the sleep
         $bk=$workdb->do($cmd);
         last if ($bk);
-        if ($retrycnt>3){
+        if ($retrycnt>4){
            msg(ERROR,"Deadlock problem - giving up");
            last;
         }
