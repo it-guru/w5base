@@ -155,6 +155,7 @@ sub ListFiles
          $clone{href}="ViewProcessor/load/$self->{name}/".
                       "$refid/$clone{fid}/";
 
+
          my $cleanName=$clone{name};
          $cleanName=~s/\///g;
          $cleanName=~s/\.\.//g;
@@ -723,6 +724,14 @@ sub RawValue
          $clone{href}="ViewProcessor/load/$self->{name}/".
                       "$refid/$clone{fid}/$clone{name}";
          $clone{href}=~s/\s/_/g;
+         {
+            my $url=$self->getParent->Config->Param("EventJobBaseUrl");
+            my $pobj=$parentobj;
+            $pobj=~s/::/\//g;
+            $url.="/" if (!($url=~m/\/$/));
+            $url.="auth/$pobj/".$clone{href};
+            $clone{urlofcurrentrec}=$url;
+         }
          push(@filelist,\%clone);
       }
    }
