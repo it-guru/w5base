@@ -115,6 +115,7 @@ sub new
                 readonly      =>1,
                 vjointo       =>'TS::lnkorgdomappl',
                 vjoinon       =>['id'=>'orgdomid'],
+                vjoininhash   =>['appl','applid','vouid'],
                 vjoindisp     =>['appl']),
 
       new kernel::Field::Text(
@@ -176,6 +177,20 @@ sub new
                 group         =>'source',
                 label         =>'real Editor Account',
                 dataobjattr   =>'orgdom.realeditor'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"orgdom.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(orgdom.id,35,'0')"),
+
+
    );
    $self->{history}={
       insert=>[
