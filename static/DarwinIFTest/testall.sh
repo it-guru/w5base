@@ -27,14 +27,13 @@ base::grp             fullname      admin
 base::user            posix         hvogler
 tscape::archappl      archapplid    ICTO-4175
 tsAuditSrv::system    systemname    EDE15Q
-FLEXERAatW5W::system  systemname    ede15q
+FLEXERAatW5W::system  systemname    ede188
 tssm::dev             configitemid  S33162327
-tsacinv::system       systemname    EDE15Q
+tsacinv::system       systemname    EDE188
 tsadopt::vfarm        name          dcppt-fra01-s01-cl01
 tsciam::user          email         Peter.Testuser@external.telekom.de
 caiman::user          email         Peter.Testuser@external.telekom.de
 ewu2::system          systemname    dcplnx22483873
-tsdina::system        name          qde8hv
 tssmartcube::tcc      systemname    QDE8HV
 EOF
 )
