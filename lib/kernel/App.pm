@@ -825,8 +825,13 @@ sub ValidateGroupCache
          delete($self->Cache->{Group});
       }
       elsif ($self->Cache->{Group}->{state} ne $res->{state}){
+         my $age="undef";
+         if (($self->Cache->{Group}->{state}=~m/^[0-9]+$/) &&
+             ($res->{state}=~m/^[0-9]+$/)){
+            $age=$res->{state}-$self->Cache->{Group}->{state};
+         }
          msg(INFO,"cache for Group is invalid - ".
-                  "cleared state='%s' rpcstate='%s'",
+                  "cleared state='%s' rpcstate='%s' age=$age",
                   $self->Cache->{Group}->{state},
                   $res->{state});
          delete($self->Cache->{Group});
