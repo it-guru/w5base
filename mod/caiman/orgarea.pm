@@ -308,13 +308,13 @@ sub doParentFix
       return();
    }
    if ($grprec->{srcid} eq ""){
-      print("ERROR: no toucid in srcid of grp");
+      print("ERROR: no torgoid in srcid of grp");
       return();
    }
    #
    # load current parent from ciam
    #
-   $ciam->SecureSetFilter({toucid=>\$grprec->{srcid}});
+   $ciam->SecureSetFilter({torgoid=>\$grprec->{srcid}});
    my ($ciamrec)=$ciam->getOnlyFirst(qw(parentid));
 
    if ($ciamrec->{parentid} eq ""){
@@ -375,23 +375,23 @@ sub doParentFix
 sub getGrpIdOf
 {
     my $self=shift;
-    my $ciamrec=shift;
+    my $caimanrec=shift;
 
     my $grp=getModuleObject($self->Config,"base::grp");
 
-    $grp->SetFilter({srcid=>\$ciamrec->{toucid},srcsys=>'CIAM'});
+    $grp->SetFilter({srcid=>\$caimanrec->{torgoid},srcsys=>'CAIMAN'});
     $grp->SetCurrentView(qw(grpid srcid srcsys srcload));
     my ($rec,$msg)=$grp->getFirst();
     if (defined($rec)){
        return($rec->{grpid});
     }
     else{
-       my $orgareaImport=$self->ModuleObject('tsciam::ext::orgareaImport');
-       my $lastimportedgrpid=$orgareaImport->processImport($ciamrec->{toucid},
-                                                           'srcid',
-                                                           {quiet=>1});
+       my $orgareaImport=$self->ModuleObject('caiman::ext::orgareaImport');
+       my $lastimportedgrpid=$orgareaImport->processImport(
+           $caimanrec->{torgoid}, 'srcid', {quiet=>1}
+       );
        return($lastimportedgrpid);
-       #return($self->Import({importname=>$ciamrec->{toucid},silent=>1}));
+       #return($self->Import({importname=>$caimanrec->{torgoid},silent=>1}));
     }
 }
 
@@ -438,8 +438,8 @@ EOF
       my $parent=$rec->{parentid};
       while($parent ne ""){
          $self->ResetFilter();
-         $self->SecureSetFilter({toucid=>\$parent});
-         my ($rec,$msg)=$self->getOnlyFirst(qw(toucid name parentid shortname
+         $self->SecureSetFilter({torgoid=>\$parent});
+         my ($rec,$msg)=$self->getOnlyFirst(qw(torgoid name parentid shortname
                                                bosssurname bossgivenname));
          if (defined($rec)){
             unshift(@parents,$rec);
@@ -450,22 +450,22 @@ EOF
          }
       }
       $self->ResetFilter();
-      $self->SecureSetFilter({parentid=>\$rec->{toucid}});
-      @childs=$self->getHashList(qw(toucid name parentid shortname
+      $self->SecureSetFilter({parentid=>\$rec->{torgoid}});
+      @childs=$self->getHashList(qw(torgoid name parentid shortname
                                     bosssurname bossgivenname));
 
       #######################################################################
       my %hiddenchilds;
       my @hiddencheck;
       foreach my $crec (@childs){
-         if ($crec->{toucid} ne ""){
-            push(@hiddencheck,$crec->{toucid});
+         if ($crec->{torgoid} ne ""){
+            push(@hiddencheck,$crec->{torgoid});
          }
       }
       if ($#hiddencheck!=-1){
          $self->ResetFilter();
          $self->SecureSetFilter({parentid=>join(" ",@hiddencheck)});
-         my @chkchilds=$self->getHashList(qw(toucid parentid));
+         my @chkchilds=$self->getHashList(qw(torgoid parentid));
          foreach my $crec (@chkchilds){
             $hiddenchilds{$crec->{parentid}}++; 
          }
@@ -501,7 +501,7 @@ EOF
          $g->Line(@curpos,$curpos[0],$row-1);
          $g->Line($curpos[0],$row-1,$col,$row-1);
          $g->Line($col,$row-1,$col,$row);
-         if (exists($hiddenchilds{$childs[$c]->{toucid}})){
+         if (exists($hiddenchilds{$childs[$c]->{torgoid}})){
             $g->Line($col,$row,$col,$row+6);
             $self->displayFurtherLink($g,$col,$row+6);
          }
@@ -555,7 +555,7 @@ sub displayOrg
       my $lnk="<a target=_top class=SimpleLink ".
               "href=\"Detail?ModeSelectCurrentMode=TView&".
               "AllowClose=$ac&".
-              "search_toucid=".$prec->{toucid}."\">";
+              "search_torgoid=".$prec->{torgoid}."\">";
       $shortname=$lnk.$shortname."</a>";
    }
 

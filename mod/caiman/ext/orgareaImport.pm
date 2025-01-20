@@ -60,13 +60,16 @@ sub processImport
    my $useAs=shift;
    my $param=shift;
 
+printf STDERR ("fifi processImport name=$name\n");
    return(undef) if (!$name);
+
+printf STDERR ("fifi processImport\n");
 
    my $flt; 
    $useAs='srcid' if (!defined($useAs));
 
    if ($useAs eq "srcid"){
-      if (!($name=~m/^\S{3,10}$/)){
+      if (!($name=~m/^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/)){
          if (!$param->{quiet}) {
             $self->getParent->LastMsg(ERROR,"invalid tOrgOID specified");
          }
@@ -131,8 +134,27 @@ sub processImport
                              srcsys=>\'CAIMAN'});
          }
          else{
-            $grp->SetFilter({fullname=>\'DTAG'});
+            $grp->SetFilter({fullname=>\'EC',parentid=>\undef});
+            my ($grprec)=$grp->getOnlyFirst(qw(ALL));
+            if (!defined($grprec)){
+               if (my $back=$grp->ValidatedInsertRecord({
+                              name=>"EC",
+                              description=>'DTAG Employee Central',
+                              srcsys=>'CAIMAN',
+                              srcid=>'00000000-0000-0000-0000-000000000000',
+                              cistatusid=>4,
+                              srcload=>NowStamp(),
+                              comments=>'Root Record for CAIMAN OrgTree'
+                            })){
+                  msg(INFO,"EC Rec created");
+               }
+            }
+            $grp->ResetFilter();
+            $grp->SetFilter({fullname=>\'EC',parentid=>\undef});
          }
+
+
+
          my ($grprec)=$grp->getOnlyFirst(qw(ALL));
          if (defined($grprec)){
             my $newname=$self->findNewValidShortname(
@@ -182,8 +204,28 @@ sub processImport
 
 sub preFixShortname
 {
-   my $tOuID=shift;
+   my $ciamrec=shift;
    my $newname=shift;
+   my $tOuID=$ciamrec->{torgoid};
+
+   msg(INFO,"preFixShortname:".Dumper($ciamrec));
+
+   if (lc($newname) eq lc("Deutsche Telekom IT GmbH")){
+      $newname="DTIT";
+   }
+   if (lc($newname) eq lc("Deutsche Telekom AG")){
+      $newname="DTAG";
+   }
+   if (lc($newname) eq lc("T-Systems International GmbH")){
+      $newname="TSI";
+   }
+   if (lc($newname) eq lc("DT Security")){
+      $newname="DT-Sec";
+   }
+   $newname=~s/^DT IT&/DTIT_/i;
+   $newname=~s/^Telekom IT\s/TelIT /i;
+   $newname=~s/\sHungary/ HU/i;
+   $newname=~s/\sSlovakia/ SK/i;
 
    $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
    $newname=~s/&/_u_/g;
@@ -215,7 +257,7 @@ sub findNewValidShortname
    my $caimanrec=shift;
 
    my $newname=$caimanrec->{shortname};
-   $newname=preFixShortname($caimanrec->{torgoid},$newname);
+   $newname=preFixShortname($caimanrec,$newname);
    my $suffix="";
    my $grprec;
    my $loop=1;

@@ -75,87 +75,78 @@ sub qcheckRecord
       return(undef,undef);
    }
 
-   # per default the parent sisnumber is inherit
-   if ($rec->{parentid} ne ""){
-      my $po=$dataobj->Clone();
-      $po->SetFilter({grpid=>\$rec->{parentid},cistatusid=>\'4'});
-      my ($prec,$msg)=$po->getOnlyFirst(qw(name sisnumber));
-      if (defined($prec)){
-         $sisnumber=$prec->{sisnumber};
-      }
-   }
 
-   if ($rec->{srcsys} eq "CIAM" && $rec->{cistatusid} eq "4"){
-      # do an orgstructure transfer from WhoIsWho to CAIMAN
-      if ($rec->{ext_refid1} ne "" && 
-          (my ($sapid)=$rec->{ext_refid1}=~m/^SAP:(\d+)$/)){
-         # transfer is posible
-         my $o=getModuleObject($self->getParent->Config(),"caiman::orgarea");
-         if ($rec->{srcid} eq "1134822"){  # DTAG
-            $o->SetFilter({torgoid=>"5cb92e56-c099-4dec-bafc-8191515a3faf"});
-         }
-         elsif ($rec->{srcid} eq "9744971"){  # Congstar
-            $o->SetFilter({torgoid=>"fcb9f15c-5026-4e66-b7c0-4e570783b831"});
-         }
-         elsif ($rec->{is_org} eq "1" && 
-                $rec->{sisnumber} ne ""){  # funktioniert, wenn eine sisnumber
-            $o->SetFilter({                # ermittelt werden konnte.
-               sapid=>\$rec->{sisnumber},
-               sisnumber=>\$rec->{sisnumber},
-               kindoforg=>'Company'              # das koeente u.U. nicht gut
-            })                                   # sein. u.U. auf Company verz?
-         }
-         elsif ($rec->{srcid} eq "72599877"){ # DTIT
-            $o->SetFilter({torgoid=>"e08160db-631b-4dd0-a731-329e2cc2bbd6"});
-         }
-         else{
-            $o->SetFilter({sapid=>"*$sapid"});
-         }
-         my @l=$o->getHashList(qw(torgoid sapid));
-         if ($#l>0 && $rec->{srcid} ne ""){
-            # try to add tOuSD to find a unique caiman tOuCID
-            msg(INFO,"try to find unique caiman org by adding tOuSD/toumgr");
-            my $ciam=getModuleObject($self->getParent->Config(),
-                                    "tsciam::orgarea");
-            $ciam->SetFilter({toucid=>\$rec->{srcid}});
-            my ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(shortname toumgr));
-            if (defined($ciamrec) && $ciamrec->{toumgr} ne ""){
-               $o->ResetFilter();
-               $o->SetFilter({sapid=>"*$sapid",
-                              toumgr=>\$ciamrec->{toumgr}});
-               my @l2=$o->getHashList(qw(torgoid sapid));
-               if ($#l2==0){
-                  msg(INFO,"found unique caiman rec by add toumgr");
-                  @l=@l2;
-               }
-            }
-            if ($#l!=0 && defined($ciamrec) && $ciamrec->{shortname} ne ""){
-               $o->ResetFilter();
-               $o->SetFilter({sapid=>"*$sapid",
-                              shortname=>\$ciamrec->{shortname}});
-               my @l2=$o->getHashList(qw(torgoid sapid));
-               if ($#l2==0){
-                  msg(INFO,"found unique caiman rec by add shortname");
-                  @l=@l2;
-               }
-            }
-         }
-         if ($#l==0){
-            my $caimanrec=$l[0];
-            $forcedupd->{srcsys}='CAIMAN';
-            $forcedupd->{srcid}=$caimanrec->{torgoid};
-            $forcedupd->{ext_refid2}="CIAM:$rec->{srcid}";
-         }
-         elsif($#l>0){
-            msg(ERROR,"sapid '*$sapid' not unique in CAIMAN");
-         }
-         else{
-            msg(ERROR,"fail to find CAIMAN Org for $rec->{fullname} ".
-                      "based on sapid '*$sapid'");
-         }
-      }
-   }
-   elsif ($rec->{srcsys} eq "CAIMAN"){
+#   if ($rec->{srcsys} eq "CAIMAN" && $rec->{cistatusid} eq "4"){
+#      # do an orgstructure transfer from WhoIsWho to CAIMAN
+#      if ($rec->{ext_refid1} ne "" && 
+#          (my ($sapid)=$rec->{ext_refid1}=~m/^SAP:(\d+)$/)){
+#         # transfer is posible
+#         my $o=getModuleObject($self->getParent->Config(),"caiman::orgarea");
+#         if ($rec->{srcid} eq "1134822"){  # DTAG
+#            $o->SetFilter({torgoid=>"5cb92e56-c099-4dec-bafc-8191515a3faf"});
+#         }
+#         elsif ($rec->{srcid} eq "9744971"){  # Congstar
+#            $o->SetFilter({torgoid=>"fcb9f15c-5026-4e66-b7c0-4e570783b831"});
+#         }
+#         elsif ($rec->{is_org} eq "1" && 
+#                $rec->{sisnumber} ne ""){  # funktioniert, wenn eine sisnumber
+#            $o->SetFilter({                # ermittelt werden konnte.
+#               sapid=>\$rec->{sisnumber},
+#               sisnumber=>\$rec->{sisnumber},
+#               kindoforg=>'Company'              # das koeente u.U. nicht gut
+#            })                                   # sein. u.U. auf Company verz?
+#         }
+#         elsif ($rec->{srcid} eq "72599877"){ # DTIT
+#            $o->SetFilter({torgoid=>"e08160db-631b-4dd0-a731-329e2cc2bbd6"});
+#         }
+#         else{
+#            $o->SetFilter({sapid=>"*$sapid"});
+#         }
+#         my @l=$o->getHashList(qw(torgoid sapid));
+#         if ($#l>0 && $rec->{srcid} ne ""){
+#            # try to add tOuSD to find a unique caiman tOuCID
+#            msg(INFO,"try to find unique caiman org by adding tOuSD/toumgr");
+#            my $ciam=getModuleObject($self->getParent->Config(),
+#                                    "tsciam::orgarea");
+#            $ciam->SetFilter({toucid=>\$rec->{srcid}});
+#            my ($ciamrec,$msg)=$ciam->getOnlyFirst(qw(shortname toumgr));
+#            if (defined($ciamrec) && $ciamrec->{toumgr} ne ""){
+#               $o->ResetFilter();
+#               $o->SetFilter({sapid=>"*$sapid",
+#                              toumgr=>\$ciamrec->{toumgr}});
+#               my @l2=$o->getHashList(qw(torgoid sapid));
+#               if ($#l2==0){
+#                  msg(INFO,"found unique caiman rec by add toumgr");
+#                  @l=@l2;
+#               }
+#            }
+#            if ($#l!=0 && defined($ciamrec) && $ciamrec->{shortname} ne ""){
+#               $o->ResetFilter();
+#               $o->SetFilter({sapid=>"*$sapid",
+#                              shortname=>\$ciamrec->{shortname}});
+#               my @l2=$o->getHashList(qw(torgoid sapid));
+#               if ($#l2==0){
+#                  msg(INFO,"found unique caiman rec by add shortname");
+#                  @l=@l2;
+#               }
+#            }
+#         }
+#         if ($#l==0){
+#            my $caimanrec=$l[0];
+#            $forcedupd->{srcsys}='CAIMAN';
+#            $forcedupd->{srcid}=$caimanrec->{torgoid};
+#            $forcedupd->{ext_refid2}="CIAM:$rec->{srcid}";
+#         }
+#         elsif($#l>0){
+#            msg(ERROR,"sapid '*$sapid' not unique in CAIMAN");
+#         }
+#         else{
+#            msg(ERROR,"fail to find CAIMAN Org for $rec->{fullname} ".
+#                      "based on sapid '*$sapid'");
+#         }
+#      }
+#   }
+   if ($rec->{srcsys} eq "CAIMAN"){
       # CAIMAN Org-Structure Updates
       my ($caimanrec,$msg);
       my $o=getModuleObject($self->getParent->Config(),"caiman::orgarea");
@@ -217,10 +208,10 @@ sub qcheckRecord
              ref($rec->{additional}->{tOuSD}) eq "ARRAY"){
             $rawoldtousd=$rec->{additional}->{tOuSD}->[0];
             $oldtousd=caiman::ext::orgareaImport::preFixShortname(
-                         $caimanrec->{torgoid},$rawoldtousd);
+                         $caimanrec,$rawoldtousd);
          }
          $curtousd=caiman::ext::orgareaImport::preFixShortname(
-            $caimanrec->{torgoid},
+            $caimanrec,
             $caimanrec->{shortname}
          );
          my $curfinename=$curtousd;
@@ -241,7 +232,6 @@ sub qcheckRecord
             my $basemsg="Try rename of Org '$oldname' needed - ".
                         "based on CAIMAN new tOuSD '$curtousd'";
             $dataobj->Log(WARN,"basedata",$basemsg);
-return(undef,undef);
 
             ##################################################################
             # the new name for current group can be already be in use on 
@@ -354,6 +344,8 @@ return(undef,undef);
       #printf STDERR ("store last known tOuSD\n");
       #printf STDERR ("d=%s\n",Dumper($rec));
    }
+
+   msg(INFO,"forcedupd:".Dumper($forcedupd));
 
    my @result=$self->HandleQRuleResults("None",
                  $dataobj,$rec,$checksession,

@@ -139,10 +139,16 @@ sub new
                                    group      =>'office',
                                    dataobjattr=>'tOuSD'),
 
+#      new kernel::Field::Text(     name       =>'office_state',
+#                                   group      =>'office',
+#                                   label      =>'Status',
+#                                   dataobjattr=>'tWrHrState'),
+
       new kernel::Field::Text(     name       =>'office_state',
                                    group      =>'office',
                                    label      =>'Status',
-                                   dataobjattr=>'tWrHrState'),
+                                   dataobjattr=>'organizationalstatus'),
+
 
       new kernel::Field::Text(     name       =>'office_wrs',
                                    group      =>'office',
