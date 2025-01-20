@@ -384,8 +384,10 @@ sub qcheckRecord
    }
 
 
-   if ($sisnumber ne $rec->{sisnumber}){
-      $forcedupd->{sisnumber}=$sisnumber;
+   if ($rec->{srcsys} ne "CAIMAN"){
+      if ($sisnumber ne $rec->{sisnumber}){
+         $forcedupd->{sisnumber}=$sisnumber;
+      }
    }
 
    if (keys(%$forcedupd)){
