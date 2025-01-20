@@ -222,10 +222,38 @@ sub preFixShortname
    if (lc($newname) eq lc("DT Security")){
       $newname="DT-Sec";
    }
+   if (lc($newname) eq lc("Deutsche Telekom Technik GmbH")){
+      $newname="DTT";
+   }
+   if (lc($newname) eq lc("Deutsche Telekom Service GmbH")){
+      $newname="DTS";
+   }
+   if (lc($newname) eq lc("Deutsche Telekom Auﬂendienst GmbH")){
+      $newname="DTA";
+   }
+   if (lc($newname) eq lc("Deutsche Telekom MMS GmbH")){
+      $newname="MMS";
+   }
+   if (lc($newname) eq lc("DT Gesch‰ftskunden GmbH")){
+      $newname="DT-GKS";
+   }
+   if (lc($newname) eq lc("DT Individual Solutions & Products GmbH")){
+      $newname="DT-ISP";
+   }
+   if (lc($newname) eq lc("operational services GmbH & Co. KG")){
+      $newname="OS";
+   }
+   if (lc($newname) eq lc("T-Systems IFS GmbH")){
+      $newname="TSIFS";
+   }
+   if (lc($newname) eq lc("T-Systems Road User Services GmbH")){
+      $newname="TSRUS";
+   }
    $newname=~s/^DT IT&/DTIT_/i;
    $newname=~s/^Telekom IT\s/TelIT /i;
    $newname=~s/\sHungary/ HU/i;
    $newname=~s/\sSlovakia/ SK/i;
+   $newname=~s/\s+GmbH//i;
 
    $newname=~s/[\/\s]/_/g;    # rewriting for some shit names
    $newname=~s/&/_u_/g;
