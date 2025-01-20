@@ -280,7 +280,8 @@ sub new
                    return($flt);
                 },
                 vjoinon       =>['reprgrp'=>'responseorg'],
-                vjoindisp     =>['name','cistatus','businessteam']),
+                vjoindisp     =>['name','cistatus','businessteam'],
+                vjoininhash   =>['name','cistatusid','id','businessteamid']),
 
       new kernel::Field::SubList(
                 name          =>'applications',
@@ -314,7 +315,8 @@ sub new
                    }
                    return($flt);
                 },
-                vjoindisp     =>['name','cistatus','businessteam']),
+                vjoindisp     =>['name','cistatus','businessteam'],
+                vjoininhash   =>['name','cistatusid','id','businessteamid']),
 
 
 
