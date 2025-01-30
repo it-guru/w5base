@@ -661,7 +661,9 @@ sub Import
                            "missing PhysicalElement reference");
             return(undef);
          }
-         my ($hwrec,$msg)=$self->ImportAsset($sysrec->{physicalelementid});
+         my ($hwrec,$msg)=$self->ImportAsset($sysrec->{physicalelementid},
+                                             $newrec->{mandatorid},
+                                             $newrec->{databossid});
 
          if (!defined($hwrec)){
             $self->LastMsg(ERROR,"EWU2 incomplete: ".
