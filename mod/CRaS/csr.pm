@@ -2009,6 +2009,20 @@ sub CAresponseHandler
 }
 
 
+sub Welcome
+{
+   my $self=shift;
+   print $self->HttpHeader("text/html");
+   print $self->HtmlHeader(style=>['default.css','work.css'],
+                           body=>1,form=>1);
+   print $self->getParsedTemplate("tmpl/welcome.csr",{});
+   print $self->HtmlBottom(body=>1,form=>1);
+   return(1);
+}
+
+
+
+
 
 
 
