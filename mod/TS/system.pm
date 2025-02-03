@@ -619,6 +619,15 @@ sub genericSystemImport
    my $sysrec=$impparam->{imprec};
    my $srcsys=$impparam->{srcsys};
 
+   my $srcsyslist;  # list of posible srcsys's for redeployments
+   if (exists($impparam->{srcsyslist})){
+      $srcsyslist=$impparam->{srcsyslist};
+   }
+   else{
+      $srcsyslist=[$srcsys];
+   }
+   
+
    if (!exists($sysrec->{srcid})){
       $sysrec->{srcid}=$sysrec->{id};
    }
@@ -698,7 +707,6 @@ sub genericSystemImport
    $sys->SetFilter({srcsys=>\$srcsys,srcid=>\$sysrec->{srcid}});
    my ($w5sysrec,$msg)=$sys->getOnlyFirst(qw(ALL));
 
-
    if (!defined($w5sysrec)){   # srcid update kandidaten (schneller Redeploy)
       my @flt;
       my @oldiprecords;
@@ -726,11 +734,13 @@ sub genericSystemImport
          $searchname=[$searchname];
       }
 
-      push(@flt,{
-        name=>$searchname,
-        srcsys=>\$srcsys,
-        srcid=>'!'.$sysrec->{srcid}  # erzeugt SQL Fehler im Darwin Kern!!!
-      });
+      {
+         push(@flt,{
+           name=>$searchname,
+           srcsys=>$srcsyslist,
+           srcid=>'!'.$sysrec->{srcid}
+         });
+      }
 
       push(@flt,{          # if system is alread create by hand with systemname
         name=>$searchname,
@@ -774,6 +784,7 @@ sub genericSystemImport
       #printf STDERR ("ERROR: redepl=%s\n",Dumper(\@redepl));
       #printf STDERR ("ERROR: searchname=%s\n",Dumper($searchname));
       #exit(1);
+      msg(INFO,"candidats from redeployment: ".Dumper(\@redepl));
 
       msg(INFO,"invantar check for $srcsys-SystemID: $sysrec->{id}");
       foreach my $osys (@redepl){   # find best matching redepl candidate
@@ -836,7 +847,7 @@ sub genericSystemImport
          msg(INFO,"ReDeplChk: $osys->{name}($osys->{id}) ".
                   "sysallowed=$sysallowed\n");
          if ($ageok && $applok && 
-             $osys->{srcsys} eq $srcsys &&   # OLDsys must be from the same 
+             in_array($osys->{srcsys},$srcsyslist) &&  
              $osys->{srcid} ne ""){          # srcsys and have a srcid
             if (defined($impparam->{checkForSystemExistsFilter})){
                my $flt=&{$impparam->{checkForSystemExistsFilter}}($osys);

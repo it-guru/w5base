@@ -531,7 +531,7 @@ sub Import
    }
 
    my $sysimporttempl={
-      name=>[$sysrec->{name},$sysrec->{genname}],
+      name=>[lc($sysrec->{name}),lc($sysrec->{genname})],
       initialname=>$sysrec->{id},
       id=>$sysrec->{id},
       srcid=>$sysrec->{id},
@@ -562,6 +562,9 @@ sub Import
       cloudarearec=>$w5carec,
       imprec=>$sysimporttempl,
       srcsys=>$credentialName,
+      srcsyslist=>[$credentialName,
+                   'AssetManager', # for MCOS Systems
+                   'TPC1'],        # for cleanup/retiere of TPC1
       checkForSystemExistsFilter=>sub{  # Nachfrage ob Reuse System-Candidat not
          my $osys=shift;                # exists in srcobj
          my $srcid=$osys->{srcid};
