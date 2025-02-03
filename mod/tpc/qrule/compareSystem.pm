@@ -180,9 +180,7 @@ sub qcheckRecord
                'set system CI-Status to disposed of waste due missing on TPC');
          }
          else{
-printf STDERR ("fifi 01\n");
             if ($parrec->{ismcos}){
-printf STDERR ("fifi 02\n");
                # ok, this record should be transfered to srcsys=AssetManager
                # because for MCOS always AssetManager(TSI) is datamaster
                my $instanceUUID=uc($parrec->{instanceUUID});
@@ -195,7 +193,6 @@ printf STDERR ("fifi 02\n");
                      deleted=>\'0'
                   });
                   my @as=$acsys->getHashList(qw(systemid name srcsys srcid));
-printf STDERR ("fifi 00 %s\n",Dumper(\@as));
                   if ($#as==0){
                      my $amrec=$as[0];
                      #
