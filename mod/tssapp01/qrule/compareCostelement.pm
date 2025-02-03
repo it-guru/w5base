@@ -96,8 +96,9 @@ sub qcheckRecord
       return(undef,{qmsg=>'GHS costcenter detected'});
    }
    if ($rec->{name}=~m/^[0-9]{8}$/ &&
-       $rec->{costcentertype} eq 'costcenter'){
-      return(undef,{qmsg=>'costcenter of InternalIT SK detected'});
+       $rec->{costcentertype} eq 'costcenter' &&
+       $rec->{accarea} eq "0190"){
+      return(undef,{qmsg=>'costcenter of InternalIT HU detected'});
    }
 
 
