@@ -180,7 +180,9 @@ sub qcheckRecord
                'set system CI-Status to disposed of waste due missing on TPC');
          }
          else{
+printf STDERR ("fifi 01\n");
             if ($parrec->{ismcos}){
+printf STDERR ("fifi 02\n");
                # ok, this record should be transfered to srcsys=AssetManager
                # because for MCOS always AssetManager(TSI) is datamaster
                my $instanceUUID=uc($parrec->{instanceUUID});
@@ -193,6 +195,7 @@ sub qcheckRecord
                      deleted=>\'0'
                   });
                   my @as=$acsys->getHashList(qw(systemid name srcsys srcid));
+printf STDERR ("fifi 00 %s\n",Dumper(\@as));
                   if ($#as==0){
                      my $amrec=$as[0];
                      #
@@ -206,7 +209,39 @@ sub qcheckRecord
                         {systemid=>$systemid},
                         {name=>$name},
                      ]);
-                     my @chkl=$dataobj->getHashList(qw(id));
+                     my @chkl=$dataobj->getHashList(qw(id cistatusid));
+                     my $updates=0;
+                     #########################################################
+                     #
+                     # Add Support for "moving" SystemID from an inactiv
+                     # system to another system (IT-Inventar) which happens
+                     # if f.e. a logical system is moved directly from 
+                     # TPC1 (vSphere) to TPC8 (vSphere)
+                     #
+                     foreach my $chkrec (@chkl){
+                        if ($chkrec->{cistatusid}>4){
+                           my $op=$dataobj->Clone();
+                           $op->ValidatedUpdateRecord({
+                              systemid=>$chkrec->{systemid}
+                           },
+                           {
+                              systemid=>undef,
+                           },
+                           {id=>\$chkrec->{id}});
+                           $updates++;
+                        }
+                     }
+                     if ($updates){
+                        $dataobj->ResetFilter();
+                        $dataobj->SetFilter([
+                           {systemid=>$systemid},
+                           {name=>$name},
+                        ]);
+                        @chkl=$dataobj->getHashList(qw(id cistatusid));
+                     }
+                     #########################################################
+                     #
+
                      if ($#chkl!=-1){
                         my $msg="missconfigurued MCOS system detected";
                         push(@qmsg,$msg);
