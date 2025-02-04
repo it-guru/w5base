@@ -274,6 +274,23 @@ sub isWriteOnSystemValid
 }
 
 
+sub isWriteOnAssetValid
+{
+   my $self=shift;
+   my $assetid=shift;
+   my $group=shift;
+
+   my $asset=$self->getPersistentModuleObject("itil::asset");
+   $asset->SetFilter({id=>\$assetid});
+   my ($srec,$msg)=$asset->getOnlyFirst(qw(ALL));
+   my @g=$asset->isWriteValid($srec);
+   if (grep(/^ALL$/,@g) || grep(/^$group$/,@g)){
+      return(1);
+   }
+   return(0);
+}
+
+
 sub isWriteOnApplgrpValid
 {
    my $self=shift;

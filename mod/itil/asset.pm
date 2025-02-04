@@ -54,6 +54,16 @@ sub new
                 name          =>'class',
                 label         =>'Asset Class',
                 searchable    =>0,
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (!defined($param{current})){
+                      return(1);
+                   }
+                   return(0);
+                },
+
                 htmleditwidth =>'80px',
                 jsonchanged   =>\&getOnChangedClassScript,
                 jsoninit      =>\&getOnChangedClassScript,
@@ -349,6 +359,28 @@ sub new
                 unit          =>'MB',
                 wrdataobjattr =>"asset.memory",
                 dataobjattr   =>"if (asset.class='BUNDLE',1,asset.memory)"),
+
+      new kernel::Field::SubList(
+                name          =>'compassets',
+                label         =>'composing assets',
+                group         =>'compassets',
+                vjointo       =>'itil::lnkassetasset',
+                vjoinon       =>['id'=>'passetid'],
+                vjoininhash   =>['cassetid','casset','id',
+                                 'cassetlocation','cassetlocationid'],
+                vjoindisp     =>['casset','cassetcistatus','cassetlocation']),
+
+      new kernel::Field::SubList(
+                name          =>'passet',
+                label         =>'parent asset',
+                group         =>'passet',
+                readonly      =>1,
+                htmldetail    =>"notEmpty",
+                vjointo       =>'itil::lnkassetasset',
+                vjoinon       =>['id'=>'cassetid'],
+                vjoininhash   =>['passetid','passet','id'],
+                vjoindisp     =>['passet']),
+
 
       new kernel::Field::TextDrop(
                 name          =>'location',
@@ -807,6 +839,22 @@ sub new
                    return(1);
                 },
                 dataobjattr   =>'asset.additional'),
+
+      new kernel::Field::Text(
+                name          =>'rawclass',
+                label         =>'Asset Class',
+                group         =>'source',
+                htmldetail    =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if (!defined($param{current})){
+                      return(0);
+                   }
+                   return(1);
+                },
+                readonly     =>1,
+                dataobjattr   =>'asset.class'),
 
       new kernel::Field::Interface(
                 name          =>'replkeypri',
@@ -1473,11 +1521,11 @@ sub isViewValid
 
    if ($rec->{class} eq "NATIVE"){
       push(@all,qw(guardian physasset location sec financeco
-                   phonenumbers));
+                   phonenumbers passet));
 
    }
    if ($rec->{class} eq "BUNDLE"){
-      push(@all,qw(location));
+      push(@all,qw(location compassets));
 
    }
    if (($rec->{acqumode} eq "PURCHASE" && $rec->{deprstart} ne "") ||
@@ -1497,6 +1545,9 @@ sub isWriteValid
    my @databossedit=qw(default guardian physasset contacts control location 
                        phonenumbers misc attachments sec financeco
                        upd);
+   if (defined($rec) && $rec->{class} eq "BUNDLE"){
+      push(@databossedit,"compassets");
+   }
    if (!defined($rec)){
       return("default","control");
    }
@@ -1543,7 +1594,7 @@ sub isWriteValid
 sub getDetailBlockPriority
 {
    my $self=shift;
-   return(qw(header default guardian phonenumbers location 
+   return(qw(header default guardian phonenumbers location compassets passet
              physasset sec financeco upd contacts misc systems 
              applications attachments control source));
 }
