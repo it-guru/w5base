@@ -94,4 +94,7 @@
 'planned deconstruction date in unexpected range'=>{de=>'geplanter Rückbau Zeitpunkt in unerwartetem Bereich'},
 'planned deconstruction date'=>{de=>'geplanter Rückbau Zeitpunkt'},
 'justification when exceeding "end of hardware support"'=>{de=>'Begründung bei Überschreitung von "Ende des Hardware-Supports"'},
+'Asset Class'=>{de=>'Asset Klasse'},
+'fieldgroup.compassets'=>{en=>'compose assets',de=>'Teil-Assets'},
+'fieldgroup.passet'=>{en=>'parent asset',de=>'Übergeordnetes-Asset'},
 
