@@ -7,7 +7,8 @@ use strict;
 use kernel;
 use kernel::config;
 use Getopt::Long;
-use vars qw($opt_v $opt_h $opt_s $opt_c $opt_n $opt_nwin $configname);
+use vars qw($opt_v $opt_h $opt_s $opt_c $opt_n $opt_nwin $configname
+            $W5ServerHost $W5ServerPort);
 
 
 $0="W5ServerClient ".join(" ",@ARGV);
@@ -17,6 +18,8 @@ exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'noconnecterror'=>\$opt_n,
                         'allowerrorwin=s'=>\$opt_nwin,
                         'showconfig'=>\$opt_s,
+                        'W5ServerHost=s'=>\$W5ServerHost,
+                        'W5ServerPort=s'=>\$W5ServerPort,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
 
@@ -88,16 +91,24 @@ if (defined($opt_s)){
    exit(1);
 }
 
+my $port;
 {
-   my $port=$configcheck->Param("W5SERVERPORT");
+   $port=$configcheck->Param("W5SERVERPORT");
    $port=4711 if ($port eq "");
+   if (defined($W5ServerPort) && $W5ServerPort ne ""){ 
+      $port=$W5ServerPort;
+   }
    msg(DEBUG,"W5ServerPort=%s",$port);
    $ClientParam{'PeerPort'}=$port;
 }
 
+my $host;
 {
-   my $host=$configcheck->Param("W5SERVERHOST");
+   $host=$configcheck->Param("W5SERVERHOST");
    $host="localhost" if ($host eq "");
+   if (defined($W5ServerHost) && $W5ServerHost ne ""){ 
+      $host=$W5ServerHost;
+   }
    msg(DEBUG,"W5ServerHost=%s",$host);
    $ClientParam{'PeerAddr'}=$host;
 }
@@ -117,6 +128,10 @@ if (! defined($MyClient->Connect())){
 my $method=shift(@ARGV);
 msg(DEBUG,"call method %s(%s)",$method,join(",",@ARGV));
 my $res=$MyClient->Call($method,@ARGV);
+if (!defined($res)){
+   msg(ERROR,"comunication error to $host:$port - result was undefined");
+   exit(1);
+}
 printf("%s",Dumper($res)) if ($W5V2::Debug);
 if ($res->{exitcode}==0 && defined($res->{AsyncID})){
    my $sec=0;
@@ -151,6 +166,8 @@ sub help
    printf STDERR (" -c sets the name of the config (default:w5server.conf)\n");
    printf STDERR (" -v activates verbose mode\n");
    printf STDERR (" -d starts client in debug mode\n");
+   printf STDERR (" --W5ServerHost force a specific W5ServerHost\n");
+   printf STDERR (" --W5ServerPort force a specific W5ServerPort\n");
    printf STDERR (" -noconnecterror -n no connect errors\n");
    printf STDERR (" -allowerrorwin  -a allowed error window - def 0-23 UTC\n");
    printf STDERR (" -showconfig -s     shows current config variables (-c)\n");
