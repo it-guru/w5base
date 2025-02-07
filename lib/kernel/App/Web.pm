@@ -1519,7 +1519,7 @@ sub HttpHeader
    my $d="";
 
    if ($content eq ""){
-      $content="text/plain"; # ensure default a not proplematic mime type
+      $content="text/html"; # ensure default a not proplematic mime type
    }
 
    if ( !defined($param{'cache'}) || $param{'cache'} < 1){
