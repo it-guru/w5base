@@ -1518,6 +1518,10 @@ sub HttpHeader
    my ($self,$content,%param)=@_;
    my $d="";
 
+   if ($content eq ""){
+      $content="text/plain"; # ensure default a not proplematic mime type
+   }
+
    if ( !defined($param{'cache'}) || $param{'cache'} < 1){
       $d.=sprintf("Cache-Control: no-cache\n");
       $d.=sprintf("Cache-Control: no-store\n");
