@@ -5409,7 +5409,7 @@ sub DoRESTcall
       }
       my $req;
       my $RESTcallURL=$p{method}." ".$p{url};
-      $reqtrace.="DoRESTcall: ".$RESTcallURL;
+      $reqtrace.="DoRESTcall: ".$RESTcallURL."\n";
       if ($p{method} eq "GET"){
          $req=HTTP::Request->new($p{method},$p{url},$p{headers});
       }
@@ -5494,7 +5494,6 @@ sub DoRESTcall
             $d=$xmltree;
          }
          else{
-            #eval('$d=decode_json($respcontent);');  # problems if coding is wron
             eval('$d=from_json($respcontent,{utf8=>1});');
             if ($@=~m/Wide character in subroutine entry/){    # if response is 
                eval('$d=from_json($respcontent,{utf8=>0});');  # wrong coded

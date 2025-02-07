@@ -41,7 +41,7 @@ sub getHttpHeader
    my $self=shift;
    my $app=$self->getParent->getParent();
    my $d="";
-   $d.=$app->HttpHeader();
+   $d.=$app->HttpHeader("text/html");
    $d.=$app->HtmlHeader(style=>['default.css',
                                 'work.css',
                                 'Output.HtmlDetail.css',
