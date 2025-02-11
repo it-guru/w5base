@@ -990,10 +990,18 @@ sub pre_loop_hook
 sub RunScheduler
 {
    my $self=shift;
-   $self->LoadSubObjs("W5Server","W5Server");
-   foreach my $server (keys(%{$self->{W5Server}})){
-      #next if (!($server=~m/Reporter/));
-      $self->StartW5ServerProcess($server);
+
+   my $W5ServerMode=lc($self->{Config}->Param("W5SERVERMODE"));
+
+   if ($W5ServerMode eq "hotstandby"){
+      $self->{W5Server}={};
+   }
+   else{
+      $self->LoadSubObjs("W5Server","W5Server");
+      foreach my $server (keys(%{$self->{W5Server}})){
+         #next if (!($server=~m/Reporter/));
+         $self->StartW5ServerProcess($server);
+      }
    }
 
    #########################################################################
