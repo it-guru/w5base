@@ -149,7 +149,7 @@ sub userCount
 {
    my $self=shift;
 
-   print($self->HttpHeader("application/json"));
+   print($self->HttpHeader("text/javascript"));
 
    my $n="???";
 
