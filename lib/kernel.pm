@@ -364,7 +364,8 @@ sub haveSpecialChar
    my $str=shift;
    my %param=@_;
 
-   if ($str=~m/[\~§\s,ÖÜÄäöüß\\,;\*\?\r\n\t]/i){
+   if ($str=~m/[\~§\sÖÜÄäöüß\\,;\*\?\r\n\t]/){
+      msg(ERROR,"haveSpecialChar at '$-[0]'-'$+[0]' in '$str'\n");
       return(1);
    }
    return(0);
