@@ -132,6 +132,7 @@ sub qcheckRecord
       my $icto=$rec->{ictono};
       if ($icto ne "" && 
           ($rec->{opmode} eq "prod" || $rec->{opmode} eq "cbreakdown")){
+         my $m=getModuleObject($dataobj->Config,"base::mandator");
          my $grp;
          my $i=getModuleObject($dataobj->Config,"tscape::archappl");
          return(undef,undef) if ($i->isSuspended());
@@ -146,8 +147,18 @@ sub qcheckRecord
          if ($ictor->{orgarea}=~m/\.DTIT\.Hub\./i){ # seems a hub
             $grp="200"; # map all TelIT Hubs to Mandator TelekomIT group
          }
+
+         if ($ictor->{organisation}=~m/^TD-T .*$/i){ # seems to be DT Technik
+            $m->ResetFilter();
+            $m->SetFilter({name=>\"DT Technik",cistatusid=>['3','4','5']});
+            my ($mrec)=$m->getOnlyFirst(qw(name grpid));
+            if (defined($mrec)){
+               msg(INFO,"DT Technik Mandator: ".Dumper($mrec));
+               $grp=$mrec->{grpid};
+            }
+         }
          if ($grp ne ""){
-            my $m=getModuleObject($dataobj->Config,"base::mandator");
+            $m->ResetFilter();
             $m->SetFilter({grpid=>\$grp,cistatusid=>['3','4','5']});
             my ($mrec)=$m->getOnlyFirst(qw(name grpid));
             if (!defined($mrec)){ 
