@@ -138,7 +138,7 @@ sub processRelevantCIs
                                  ischmapprov=>1,cistatusid=>4}); 
             my @chk=$metagrp->getHashList(qw(id));
             #printf STDERR ("fifi chk=%s\n",Dumper(\@chk));
-            if ($#chk==0){
+            if ($#chk==0 || $migstate eq "omitted"){
                my $o=getModuleObject($self->Config,$dataobjname);
                $o->SetFilter([
                      {chmapprgroups=>\$ag,cistatusid=>"<6"},
@@ -195,7 +195,7 @@ sub processRelevantCIs
             $metagrp->SetFilter({fullname=>\$newag,
                                  isinmassign=>1,cistatusid=>4}); 
             my @chk=$metagrp->getHashList(qw(id));
-            if ($#chk==0){
+            if ($#chk==0 || $migstate eq "omitted"){
                my $o=getModuleObject($self->Config,$dataobjname);
                $o->SetFilter([
                      {acinmassingmentgroup=>\$ag,cistatusid=>"<6"},
