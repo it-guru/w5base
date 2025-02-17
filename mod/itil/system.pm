@@ -3006,6 +3006,29 @@ sub QRuleSyncCloudSystem
          $netarea=$net->getTaggedNetworkAreaId();
       }
 
+
+      foreach my $currec (@{$rec->{ipaddresses}}){
+         if ($currec->{srcsys} ne $srcsystag){
+            #printf STDERR ("ext rec=%s\n",Dumper($currec));
+            foreach my $piprec (@{$parrec->{ipaddresses}}){
+               if ($piprec->{name} eq $currec->{name}){
+                  # take over IP Rec to our srcsys
+                  my $op=getModuleObject($par->Config,'itil::ipaddress');
+                  msg(WARN,"try to take over $currec->{name} ".
+                           "to $srcsystag at $rec->{name}");
+                  my $bk=$op->ValidatedUpdateRecord(
+                     $currec,{srcsys=>$srcsystag},
+                     {id=>\$currec->{id}}
+                  );
+                  msg(WARN,"result on $rec->{name} takeover was $bk");
+                  $currec->{srcsys}=$srcsystag;
+               }
+            }
+         }
+      }
+
+      
+
       my @opList;
       my $res=kernel::QRule::OpAnalyse(
                  sub{  # comperator 
@@ -3079,7 +3102,8 @@ sub QRuleSyncCloudSystem
                     }
                     return(undef);
                  },
-                 $rec->{ipaddresses},$parrec->{ipaddresses},\@opList,
+                 [grep({$_->{srcsys} eq $srcsystag} @{$rec->{ipaddresses}})],
+                    $parrec->{ipaddresses},\@opList,
                  refid=>$rec->{id});
       if ($autocorrect){
          if (!$res){
