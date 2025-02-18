@@ -281,18 +281,35 @@ sub qcheckRecord
           delete($ladd->{systemid}->{$systemid});
        }
    }
-   #printf STDERR ("addl=%s\n",Dumper($ladd));
+  # printf STDERR ("addl=%s\n",Dumper($ladd));
 
-   #my $w5sys=getModuleObject($dataobj->Config,"itil::system");
-   #my @systemids=keys(%{$ladd->{systemid}});
-   #if ($#systemids!=-1){
-   #   $w5sys->SetFilter({id=>\@systemids});
-   #   my @w5rec=$w5sys->getHashList(qw(id name shortdesc));
-   #   foreach my $rec (@w5rec){
-   #      $ladd->{systemid}->{$rec->{id}}->{shortdesc}=$rec->{shortdesc};
-   #   }
-   #}
-   #printf STDERR ("rec=%s\n",Dumper($rec));
+   my $expLevelIdMap={
+      'CNDTAG'  =>10018,
+      'Backend' =>10019,
+      'Internet'=>10017,
+   };
+
+   my $w5sys=getModuleObject($dataobj->Config,"TS::system");
+   my @systemids=keys(%{$ladd->{systemid}});
+   if ($#systemids!=-1){
+      $w5sys->SetFilter({id=>\@systemids});
+      my @w5rec=$w5sys->getHashList(qw(id name 
+                                       effexposurelevel 
+                                       autoexposurelevel 
+                                       exposurelevel));
+      foreach my $rec (@w5rec){
+         foreach my $v (qw(effexposurelevel)){
+            
+            $ladd->{systemid}->{$rec->{id}}->{$v}=$rec->{$v};
+            if (exists($expLevelIdMap->{$rec->{$v}})){
+               $ladd->{systemid}->{$rec->{id}}->{riskCategoryId}=
+                   $expLevelIdMap->{$rec->{$v}};
+            }
+         }
+      }
+   }
+   printf STDERR ("addl=%s\n",Dumper($ladd));
+  # printf STDERR Dumper(\@l);
 
    $tsossys->ResetFilter();
    $tsossys->SetFilter({ictoNumber=>$rec->{applgrpid}});
@@ -363,6 +380,7 @@ sub qcheckRecord
       description=>NowStamp("en")
    };
 
+
    if ($TSOSsystemid eq ""){
       $TSOSsystemid=insNewTSOSsys($dataobj,$tsossys,$rec,$tsossysrec);
    }
@@ -408,7 +426,8 @@ sub qcheckRecord
        
       foreach my $lrec (@l){
          my $TSOSmachineid;
-         if (exists($ladd->{systemid}->{$lrec->{systemid}})){
+         if (exists($ladd->{systemid}->{$lrec->{systemid}}) &&
+             exists($ladd->{systemid}->{$lrec->{systemid}}->{additional})){
             my $laddent=$ladd->{systemid}->{$lrec->{systemid}};
             $TSOSmachineid=$laddent->{additional}->{TasteOS_MachineID}->[0];
          }
@@ -417,6 +436,13 @@ sub qcheckRecord
             systemid=>$TSOSsystemid,
             description=>$lrec->{shortdesc}
          };
+         if (exists($ladd->{systemid}->{$lrec->{systemid}}) &&
+             exists($ladd->{systemid}->{$lrec->{systemid}}->{riskCategoryId})){
+            my $laddent=$ladd->{systemid}->{$lrec->{systemid}};
+            $tsosmacrec->{riskCategoryId}=$laddent->{riskCategoryId};
+         }
+
+
          my $machineNumber;
 
          {
@@ -447,7 +473,8 @@ sub qcheckRecord
                $tsosmac->ResetFilter();
                $tsosmac->SetFilter({id=>$TSOSmachineid});
                ($mrec,$msg)=$tsosmac->getOnlyFirst(qw(id name systemid 
-                                                         description));
+                                                         description
+                                                         riskCategoryId));
                if (!defined($mrec)){
                   msg(WARN,"MachineID '$TSOSmachineid' ".
                            "(SystemName=$SystemName) ".
@@ -470,6 +497,7 @@ sub qcheckRecord
                if ($mrec->{systemid} ne $tsosmacrec->{systemid} ||
                    $mrec->{machineNumber}  ne $tsosmacrec->{machineNumber} ||
                    $mrec->{description}  ne $tsosmacrec->{description} ||
+                   $mrec->{riskCategoryId}  ne $tsosmacrec->{riskCategoryId} ||
                    $mrec->{name}     ne $tsosmacrec->{name}){
                   my $bk=$tsosmac->ValidatedUpdateRecord(
                      {},$tsosmacrec,

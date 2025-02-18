@@ -84,16 +84,24 @@ sub new
       new kernel::Field::Text(     
             name               =>'riskCategoryName',
             searchable         =>1,
+            readonly           =>1,
             label              =>'risk Category Name'),
+
+      new kernel::Field::Text(     
+            name               =>'riskCategoryId',
+            searchable         =>1,
+            label              =>'risk Category Id'),
 
       new kernel::Field::Text(     
             name               =>'riskCategoryFactor',
             searchable         =>1,
+            readonly           =>1,
             label              =>'risk Category Factor'),
 
       new kernel::Field::Date(
             name              =>'lastscan',
             searchable        =>1,
+            readonly           =>1,
             label             =>'LastScanDate'),
 
       new kernel::Field::Text(
@@ -417,6 +425,7 @@ sub InsertRecord
          $new{$dk}=$new{$dk}->[0] if (ref($new{$dk}) eq "ARRAY");
       }
    }
+printf STDERR ("new rec=%s\n",Dumper(\%new));
    my $d=$self->CollectREST(
       dbname=>'TASTEOS',
       requesttoken=>"INS.".$newrec->{name}.time(),
@@ -485,6 +494,8 @@ sub UpdateRecord
    my %upd=();
    foreach my $k (keys(%$newrec)){
       my $kk=$k;
+      next if ($k eq "lastscan");
+      next if ($k eq "riskCategoryName");
       $kk="systemId" if ($k eq "systemid");  # systemid->systemId map
       $upd{$kk}=$newrec->{$k};
    }

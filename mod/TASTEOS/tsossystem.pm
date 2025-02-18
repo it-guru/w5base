@@ -59,7 +59,9 @@ sub new
                 searchable    =>0,
                 vjointo       =>'TASTEOS::tsosmachine',
                 vjoinon       =>['id'=>'systemid'],
-                vjoindisp     =>['name','id','machineNumber','systemid']),
+                vjoindisp     =>[qw(name id machineNumber riskCategoryName)]),
+                vjoininhash   =>[qw(name id machineNumber systemid
+                                    riskCategoryName riskCategoryId)]
    );
    $self->{'data'}=\&DataCollector;
    $self->setDefaultView(qw(id name ictoNumber description));
