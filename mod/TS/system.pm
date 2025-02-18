@@ -197,6 +197,51 @@ sub new
                 readonly      =>1,
                 onRawValue    =>\&doIPanalyse),
 
+      new kernel::Field::Select(
+                name          =>'exposurelevel',
+                group         =>'sec',
+                label         =>'Exposure Level',
+                allowempty    =>1,
+                weblinkto     =>"none",
+                vjointo       =>'base::itemizedlist',
+                vjoinbase     =>{
+                   selectlabel=>\'AL_TCom::system::exposurelevel',
+                },
+                vjoineditbase =>{
+                   selectlabel=>\'AL_TCom::system::exposurelevel',
+                   cistatusid=>\'4'
+                },
+                vjoinon       =>['rawexposurelevel'=>'name'],
+                vjoindisp     =>'displaylabel',
+                depend        =>['additional'],
+                searchable    =>0,
+                htmleditwidth =>'200px'),
+
+      new kernel::Field::Text(
+                name          =>'autoexposurelevel',
+                group         =>'sec',
+                label         =>'auto Exposure Level',
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['ipaddresses','addcis'],
+                onRawValue    =>\&autoExposureLevelCalc),
+
+      new kernel::Field::Text(
+                name          =>'effexposurelevel',
+                group         =>'sec',
+                label         =>'effective Exposure Level',
+                readonly      =>1,
+                searchable    =>0,
+                depend        =>['autoexposurelevel','exposurelevel'],
+                onRawValue    =>\&effExposureLevelCalc),
+
+      new kernel::Field::Interface(
+                name          =>'rawexposurelevel',
+                group         =>'sec',
+                label         =>'raw ExposureLevel',
+                uploadable    =>0,
+                container     =>'additional'),
+
       new kernel::Field::SubList(
                 name          =>'w5w_systemref',
                 label         =>'W5Warhouse itil::system reference',
@@ -228,6 +273,54 @@ sub Validate
       $newrec->{systemid}=uc($newrec->{systemid}); # T-Systems Standard laut AM
    }
    return($self->SUPER::Validate($oldrec,$newrec));
+}
+
+
+sub autoExposureLevelCalc
+{
+   my $self=shift;
+   my $current=shift;
+   my $ipafld=$self->getParent->getField("ipaddresses");
+   my $ipadrs=$ipafld->RawValue($current);
+   my $addcisfld=$self->getParent->getField("addcis");
+   my $addcis=$addcisfld->RawValue($current);
+
+   my $autoExposureLevel="CNDTAG";
+   if (defined($addcis) && ref($addcis) eq "ARRAY"){
+      foreach my $addrec (@{$addcis}){
+         if (ref($addrec) eq "HASH" && $addrec->{ciusage} eq "FIREWALL"){
+            $autoExposureLevel="Backend";
+            last;
+         }
+      }
+   }
+   if (defined($ipadrs) && ref($ipadrs) eq "ARRAY"){
+      foreach my $iprec (@{$ipadrs}){
+         if (ref($iprec) eq "HASH" && uc($iprec->{networktag}) eq "INTERNET"){
+            $autoExposureLevel="Internet";
+            last;
+         }
+      }
+   }
+
+   
+
+   return($autoExposureLevel);
+}
+
+sub effExposureLevelCalc
+{
+   my $self=shift;
+   my $current=shift;
+   my $melfld=$self->getParent->getField("exposurelevel");
+   my $mel=$melfld->RawValue($current);
+
+   if ($mel eq ""){
+      my $aelfld=$self->getParent->getField("autoexposurelevel");
+      my $ael=$aelfld->RawValue($current);
+      return($ael);
+   }
+   return($mel);
 }
 
 sub doIPanalyse
