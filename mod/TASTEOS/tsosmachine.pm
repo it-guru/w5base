@@ -425,7 +425,6 @@ sub InsertRecord
          $new{$dk}=$new{$dk}->[0] if (ref($new{$dk}) eq "ARRAY");
       }
    }
-printf STDERR ("new rec=%s\n",Dumper(\%new));
    my $d=$self->CollectREST(
       dbname=>'TASTEOS',
       requesttoken=>"INS.".$newrec->{name}.time(),

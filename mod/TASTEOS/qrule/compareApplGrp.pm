@@ -150,8 +150,8 @@ sub qcheckRecord
       return(undef,{qmsg=>'no sync on w5base testenv allowed'});
    }
 
-   if (($opmode ne "prod" && $opmode ne "online") && ( 1
-       && $rec->{id} ne "15954048670047"
+   if (($opmode ne "prod" && $opmode ne "online") && ( 0
+       && !in_array($rec->{id},["15954048670047"])
        )){
       return(undef,{qmsg=>'on noneprod only individual selected id'});
    }
@@ -308,7 +308,7 @@ sub qcheckRecord
          }
       }
    }
-   printf STDERR ("addl=%s\n",Dumper($ladd));
+   #printf STDERR ("addl=%s\n",Dumper($ladd));
   # printf STDERR Dumper(\@l);
 
    $tsossys->ResetFilter();
@@ -403,8 +403,10 @@ sub qcheckRecord
                if ($machineNumber ne "" && 
                    exists($uaMachines{$machineNumber})){
                   $tsosmac->ValidatedDeleteRecord({id=>$mrec->{id}});
-                  msg(INFO,"need to drop MachineID=$mrec->{id} ".
-                           "because new Agent in UnassignedMachines");
+                  $tsosmac->Log(WARN,"basedata",
+                           "TasteOS: droped MachineID=$mrec->{id} ".
+                           "because new Agent in UnassignedMachines ".
+                           "for $machineNumber");
                   # in follow processes, the machine will be new
                   # inserted - and as followup, moved from 
                   # UnassignedMachines to the current TasteOS-System
@@ -415,6 +417,10 @@ sub qcheckRecord
          foreach my $machineid (@delList){
             $tsosmac->ResetFilter();
             $tsosmac->ValidatedDeleteRecord({id=>$machineid});
+            $tsosmac->Log(WARN,"basedata",
+                     "TasteOS: ".
+                     "normaly drop MachineID '$machineid' because it ".
+                     "does not exists in ICTO anymore");
          }
       }
    }
@@ -476,7 +482,9 @@ sub qcheckRecord
                                                          description
                                                          riskCategoryId));
                if (!defined($mrec)){
-                  msg(WARN,"MachineID '$TSOSmachineid' ".
+                  $tsosmac->Log(WARN,"basedata",
+                           "TasteOS: ".
+                           "MachineID '$TSOSmachineid' ".
                            "(SystemName=$SystemName) ".
                            "lost in TasteOS");
                   $TSOSmachineid=undef;
@@ -546,6 +554,10 @@ sub qcheckRecord
          foreach my $mrec (@{$defrec->{machines}}){
             $tsosmac->ResetFilter();
             $tsosmac->ValidatedDeleteRecord({id=>$mrec->{id}});
+            $tsosmac->Log(WARN,"basedata",
+                     "TasteOS: ".
+                     "cleanup MachineID '$mrec->{id}' from 'Default System' ".
+                     "(SystemName=$mrec->{name}) ");
          }
       }
    }
