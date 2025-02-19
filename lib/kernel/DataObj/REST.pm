@@ -225,18 +225,18 @@ sub Filter2RestPath
                elsif ($sword=~m/^[^*?]+\*$/){
                   my $fstrmod=$sword;
                   $sword=~s/\*$//;
-                  $cmpop=" STARTSWITH ";
+                  $cmpop=" STARTSWITH";
                }
                elsif ($sword=~m/^\*[^*?]+$/){
                   my $fstrmod=$sword;
                   $sword=~s/^\*//;
-                  $cmpop=" ENDSWITH ";
+                  $cmpop=" ENDSWITH";
                }
                elsif ($sword=~m/^\*[^*?]+\*$/){
                   my $fstrmod=$sword;
                   $sword=~s/^\*//;
                   $sword=~s/\*$//;
-                  $cmpop=" LIKE ";
+                  $cmpop=" LIKE";
                }
                elsif ($sword=~m/[*?]/){
                   $self->LastMsg(ERROR,
@@ -428,7 +428,7 @@ sub Filter2RestPath
    if ($isSYSPARMQUERY){
       my $sysquery=join("^",@SYSPARMQUERYandList);
       $qparam{'sysparm_query'}=$sysquery;
-printf STDERR ("sysparm_query=$sysquery\n");
+      msg(INFO,"sysparm_query=$sysquery in $self");
       $qparam{'sysparm_input_display_value'}="false"; # ensure working on UTC
    }
 
