@@ -68,6 +68,7 @@ sub Filter2RestPath
    my $self=shift;
    my $pathTmpl=shift;
    my $filterSet=shift;
+   my $param=shift;
 
    my $restFinalAddr=$pathTmpl;
    if (ref($restFinalAddr) ne "ARRAY"){
@@ -76,6 +77,10 @@ sub Filter2RestPath
    my $constParam={};
    my $requesttoken=undef;
    my %qparam;
+
+   if (ref($param) eq "HASH" && ref($param->{initQueryParam}) eq "HASH"){
+      %qparam=%{$param->{initQueryParam}};
+   }
 
 
    my $isODATA=0;
@@ -197,6 +202,7 @@ sub Filter2RestPath
                $fstr=$self->PreParseTimeExpression($fstr,$fld->timezone());
             }
             my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
+            my @fieldQuery;
             for(my $c=0;$c<=$#words;$c++){
                my $sword=$words[$c];
                next if ($sword eq "AND");
@@ -261,8 +267,12 @@ sub Filter2RestPath
                   $sword="javascript:gs.dateGenerate('${raw}.000Z')";
                } 
 
-               push(@SYSPARMQUERYandList,"${fieldname}${cmpop}${sword}");
+               push(@fieldQuery,"${fieldname}${cmpop}${sword}");
             } 
+            push(@SYSPARMQUERYandList,join("^OR",@fieldQuery));
+
+
+
          }
          elsif ($fld->{RestFilterType} eq "SIMPLEQUERY"){
             my $fieldname=$fn;
@@ -430,8 +440,9 @@ sub Filter2RestPath
       $qparam{'sysparm_query'}=$sysquery;
       msg(INFO,"sysparm_query=$sysquery in $self");
       $qparam{'sysparm_input_display_value'}="false"; # ensure working on UTC
+      $qparam{'sysparm_display_value'}="true"; # resolv links to values
+      $qparam{'sysparm_exclude_reference_link'}="true"; # link ids?
    }
-
 
    if ($isODATA){
       if ($#ODATAandLst!=-1){

@@ -50,8 +50,25 @@ sub new
             label         =>'group name'),
 
       new kernel::Field::Text(     
+            name          =>'manager',
+            dataobjattr   =>'manager',
+            RestSoftFilter=>0,       # because return matches not query string
+            searchable    =>0,
+            label         =>'manager'),
+
+      new kernel::Field::Text(     
+            name          =>'deputy',
+            dataobjattr   =>'u_deputy',
+            RestSoftFilter=>0,       # because return matches not query string
+            searchable    =>0,
+            label         =>'deputy'),
+
+      new kernel::Field::Text(     
             name          =>'type',
-            label         =>'type id'),
+            RestFilterType=>'SYSPARMQUERY',
+            RestSoftFilter=>0,       # because return matches not query string
+            dataobjattr   =>'type',
+            label         =>'type'),
 
       new kernel::Field::Text(     
             name          =>'email',
@@ -71,10 +88,15 @@ sub new
             name          =>'sys_updated_on',
             RestFilterType=>'SYSPARMQUERY',
             RestSoftFilter=>0,
-            label         =>'Modification-Date')
+            label         =>'Modification-Date'),
+
+      new kernel::Field::Text(
+                name          =>'srcsys',
+                label         =>'Source-System',
+                dataobjattr   =>'source'),
 
    );
-   $self->setDefaultView(qw(name sys_id type sys_updated_on));
+   $self->setDefaultView(qw(name sys_id type manager deputy sys_updated_on srcsys));
    return($self);
 }
 
@@ -180,13 +202,18 @@ sub DataCollector
    my $credentialName=$self->getCredentialName();
 
    my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
-      "now/table/sys_user_group",  # Path-Templ with var
+      "now/table/sys_user_group",  
       $filterset,
-      {   # translation parameters - for future use
-         P1=>'xx'
+      { 
+        initQueryParam=>{
+          'sysparm_input_display_value'=>"false",
+          'sysparm_display_value'=>"all",
+          'sysparm_exclude_reference_link'=>"true",
+          'sysparm_limit'=>"999999"
+        } 
       }
    );
-   #msg(INFO,"restFinalAddr=$restFinalAddr");
+   msg(INFO,"restFinalAddr=$restFinalAddr");
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
          $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
@@ -231,6 +258,7 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
+         print STDERR Dumper($data);
          if (ref($data) eq "HASH" && exists($data->{result}) &&
              ref($data->{result}) eq "ARRAY"){
             $data=$data->{result};
@@ -267,13 +295,21 @@ sub getDetailBlockPriority
    return(qw(header default source));
 }
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_migstate"))){
-#     Query->Param("search_migstate"=>"MERGE MIGRATED OMITTED");
-#   }
-#}
+sub initSearchQuery
+{
+   my $self=shift;
+   if (!defined(Query->Param("search_name"))){
+     Query->Param("search_name"=>"DT.HUB.DE.DAR*");
+   }
+   if (!defined(Query->Param("search_type"))){
+     Query->Param("search_type"=>"*52e03b172b703d10c0fb4cfbad01a081* ".
+                                 "*0551bb172b703d10c0fb4cfbad01a0b0* ".
+                                 "*d98b56fcfc8aded85dcff689977724aa* ".
+                                 "*654da04a2b61651053504cfbad01a094* ".
+                                 "*297a61de2b30fd90c0fb4cfbad01a086* ".
+                                 "*dcd035702b1c3150c0fb4cfbad01a05b*");
+   }
+}
 
 sub isViewValid
 {
