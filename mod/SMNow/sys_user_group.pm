@@ -115,7 +115,7 @@ sub getDummyRequest
    my $credentialName=$self->getCredentialName();
    my $dummyAddr="now/table/sys_user_group?".
                  "sysparm_fields=sys_id&".
-                 "sysparm_query=sys_id%3D000000000000000000000000000000000";
+                 "sysparm_query=name%3Dadmin";
 
    my $d=$self->CollectREST(
       dbname=>$credentialName,
@@ -258,7 +258,7 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         print STDERR Dumper($data);
+         #print STDERR Dumper($data);
          if (ref($data) eq "HASH" && exists($data->{result}) &&
              ref($data->{result}) eq "ARRAY"){
             $data=$data->{result};
@@ -269,17 +269,16 @@ sub DataCollector
          #print STDERR Dumper($data->[0]);
          map({
             $_=FlattenHash($_);
-            #if (exists($_->{go_live_inm}) && $_->{go_live_inm} ne ""){
-            #   if ($_->{go_live_inm}=~m/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/){
-            #      $_->{go_live_inm}.=" 00:00:00";
-            #   }
-            #}
+            if (exists($_->{type}) && $_->{type} ne ""){
+               $_->{type}=[split(/\s*,\s*/,$_->{type})];
+            }
             foreach my $k (keys(%$constParam)){
                if (!exists($_->{$k})){
                   $_->{$k}=$constParam->{$k};
                }
             }
          } @$data);
+         #print STDERR Dumper($data);
          return($data);
       }
    );
