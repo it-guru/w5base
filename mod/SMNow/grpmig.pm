@@ -196,8 +196,10 @@ sub DataCollector
    my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
       "now/table/x_dtitg_user_mange_group_migration",  # Path-Templ with var
       $filterset,
-      {   # translation parameters - for future use
-         P1=>'xx'
+      {  
+        initQueryParam=>{
+          'sysparm_input_display_value'=>"false"
+        }
       }
    );
    #msg(INFO,"restFinalAddr=$restFinalAddr");
