@@ -33,11 +33,27 @@ sub process
       if (!$ro){
          my $current=time();
          my ($year,$month,$day,$hour,$min,$sec)=Time_to_Date("GMT",$current);
-         if ($hour>=7 and $hour<=22){
+         if ($hour>=7 and $hour<=18){
             $insleep=0;
          }
          else{
-            $insleep=1;
+            # nightly check, if a QualityCheck process is running. If not,
+            # FastQualityChecks can also be done at night.
+            my $joblog=getModuleObject($self->Config,"base::joblog");
+            $joblog->SetFilter({
+               'name'=>'base::event::QualityCheck::QualityCheck',
+               'event'=>'QualityCheck',
+               'cdate'=>'>now-12h',
+               'exitcode'=>'[EMPTY]'
+            });
+            my @l=$joblog->getHashList(qw(id));
+            if ($#l==-1){
+               $insleep=0;    # no nightly QualityCheck is currently running
+            }
+            else{
+               $insleep=1;
+               sleep(300);   # if Job is running, we check it at first in
+            }                # 5 min again
          }
          if (time()-$spoolRefresh>300){
             $spoolRefresh=time();
@@ -107,7 +123,7 @@ sub process
                   last PLOOP;
                }
             }
-            sleep(1);
+            sleep(3);
          }
       }
       sleep(5);
