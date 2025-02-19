@@ -47,6 +47,10 @@ sub Init
                       "SMNow::grpmig",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.proc.SMNow.krn.grp",
+                      "SMNow::sys_user_group",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 
