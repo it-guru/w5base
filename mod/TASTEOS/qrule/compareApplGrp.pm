@@ -417,10 +417,10 @@ sub qcheckRecord
          foreach my $machineid (@delList){
             $tsosmac->ResetFilter();
             $tsosmac->ValidatedDeleteRecord({id=>$machineid});
-            $tsosmac->Log(WARN,"basedata",
-                     "TasteOS: ".
-                     "normaly drop MachineID '$machineid' because it ".
-                     "does not exists in ICTO anymore");
+            #$tsosmac->Log(WARN,"basedata",
+            #         "TasteOS: ".
+            #         "normaly drop MachineID '$machineid' because it ".
+            #         "does not exists in ICTO anymore");
          }
       }
    }
