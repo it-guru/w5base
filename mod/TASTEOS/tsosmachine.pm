@@ -388,12 +388,22 @@ sub InsertRecord
      # msg(INFO,"check ".$uaMachineRec->{machineNumber});
       if ($uaMachineRec->{machineNumber} eq $newrec->{machineNumber}){
          if (!$foundMachineIdInUnassinged){
+            $self->Log(WARN,"basedata",
+                     "TasteOS: ".
+                     "move MachineID '$uaMachineRec->{id}' from ".
+                     "UnassignedMachines to SystemID '$newrec->{systemid}'");
             if (($uaMachineRec->{name} ne $newrec->{name}) ||
+                ($uaMachineRec->{riskCategoryId} ne 
+                 $newrec->{riskCategoryId}) || 
                 ($uaMachineRec->{systemid} ne $newrec->{systemid}) ){
                if ($self->ValidatedUpdateRecord($uaMachineRec,$newrec,{
                       id=>$uaMachineRec->{id}
                    })){
                   $foundMachineIdInUnassinged=$uaMachineRec->{id};
+                  $self->Log(WARN,"basedata",
+                           "TasteOS: ".
+                           "set MachineID '$uaMachineRec->{id}' to ".
+                           "riskCategoryId='$newrec->{riskCategoryId}'");
                }
             }
          }
