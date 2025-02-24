@@ -44,6 +44,7 @@ sub CloudAreaSync
    my $queryparam=shift;
 
    my $inscnt=0;
+   my $minDaysOfMoni=14;
 
    my @a;
    my %itcloud;
@@ -100,7 +101,7 @@ sub CloudAreaSync
    {
       my %otcpname;
       my $itcloud="OTC";
-      $otcpro->SetFilter({lastmondate=>">now-28d"});
+      $otcpro->SetFilter({lastmondate=>">now-${minDaysOfMoni}d"});
       foreach my $otcprorec ($otcpro->getHashList(qw(
                               name cluster id applid appl supportid
                               domain fullname
@@ -267,7 +268,7 @@ sub CloudAreaSync
          my $updrec;
          my $d=CalcDateDuration($a->{lastmondate},NowStamp("en"));
          if (defined($d)){
-            if ($d->{days}>28){
+            if ($d->{days}>$minDaysOfMoni){
                if ($currec->{cistatusid}!=6){
                   $updrec->{cistatusid}=6;   # auf veraltet settzen
                }
