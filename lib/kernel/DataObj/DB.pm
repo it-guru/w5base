@@ -655,7 +655,36 @@ sub UpdateRecord
    }
    #msg(INFO,"fifi UpdateRecord data=%s\n",Dumper($newdata));
    my $t0=[gettimeofday()];
-   if (my $rows=$workdb->do($cmd)){
+   my $rows=$workdb->do($cmd);
+   if (!defined($rows)){
+      my $retrycnt=0;
+      while(my $retryErrorNo=_checkCommonRetryErrors($workdb->getErrorMsg())){
+        $retrycnt++;
+        if ($retrycnt>1){
+           if ($retryErrorNo==1){
+              msg(ERROR,"found Deadlock - retry $retrycnt");
+           }
+        }
+        sleep($retrycnt); # increase the sleep
+        $rows=$workdb->do($cmd);
+        last if ($rows);
+        if ($retryErrorNo==1 && $retrycnt>4){
+           msg(ERROR,"Deadlock problem - giving up");
+           last;
+        }
+        if ($retryErrorNo==2 && $retrycnt>4){
+           msg(ERROR,"readonly problem - giving up");
+           last;
+        }
+        {
+           msg(INFO,"do sleep for $retryErrorNo with $retrycnt*$retrycnt for:".
+                    $cmd);
+           sleep($retrycnt*$retrycnt); # 1 4 9 16 sleeps (in sum 30sec)
+        }
+      }
+   }
+
+   if ($rows){
       if ($rows eq "0E0" && $self->{UseSqlReplace}==1){
          my @flist=keys(%raw);
          $cmd="insert into $worktable (".
@@ -781,6 +810,22 @@ sub BulkDeleteRecord
    return(undef);
 }
 
+
+sub _checkCommonRetryErrors
+{
+   my $emsg=shift;
+
+   if ($emsg=~m/^Deadlock found when trying to get lock/){
+      return(1);
+   }
+   if ($emsg=~m/^The MariaDB server is running .*--read-only option/){
+      return(2);
+   }
+
+   return(0);
+}
+
+
 sub InsertRecord
 {
    my $self=shift;
@@ -854,18 +899,28 @@ sub InsertRecord
    my $bk=$workdb->do($cmd);
    if (!$bk){
       my $retrycnt=0;
-      while(($workdb->getErrorMsg())
-            =~/^Deadlock found when trying to get lock/){
+      while(my $retryErrorNo=_checkCommonRetryErrors($workdb->getErrorMsg())){
         $retrycnt++;
         if ($retrycnt>1){
-           msg(ERROR,"found Deadlock - retry $retrycnt");
+           if ($retryErrorNo==1){
+              msg(ERROR,"found Deadlock - retry $retrycnt");
+           }
         }
         sleep($retrycnt); # increase the sleep
         $bk=$workdb->do($cmd);
         last if ($bk);
-        if ($retrycnt>4){
+        if ($retryErrorNo==1 && $retrycnt>4){
            msg(ERROR,"Deadlock problem - giving up");
            last;
+        }
+        if ($retryErrorNo==2 && $retrycnt>4){
+           msg(ERROR,"readonly problem - giving up");
+           last;
+        }
+        {
+           msg(INFO,"do sleep for $retryErrorNo with $retrycnt*$retrycnt for:".
+                    $cmd);
+           sleep($retrycnt*$retrycnt); # 1 4 9 16 sleeps (in sum 30sec)
         }
       }
    }

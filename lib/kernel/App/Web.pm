@@ -1098,6 +1098,9 @@ sub HandleNewUser
                           requestcode
                           requestemailwf posturi));
    my ($uarec,$msg)=$ua->getFirst();
+   if (!$ua->Ping()){
+      die("problems while access to base::useraccount");
+   }
    if (!defined($uarec)){
       my $newacc={account=>$ENV{REMOTE_USER}};
       my $posturi=Query->Param("POSTURI");

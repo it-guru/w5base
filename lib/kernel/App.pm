@@ -551,41 +551,50 @@ sub _LoadUserInUserCache
 
    return(0) if ($AccountOrUserID eq "");
    return(0) if ($AccountOrUserID eq "anonymous");
+
    my $o=$self->Cache->{User}->{DataObj};
    if (!defined($o)){     # DataObj also filled in App/Web.pm !
       $o=$self->ModuleObject("base::user");
       $self->Cache->{User}={DataObj=>$o,Cache=>{}};
    }
    my $UserCache=$self->Cache->{User}->{Cache};
-   if ($o){
-         if ($AccountOrUserID=~m/^\d+$/){
-            $o->SetFilter({userid=>\$AccountOrUserID});
+   if (defined($o) && $o->Ping()){
+      if ($AccountOrUserID=~m/^\d+$/){
+         $o->SetFilter({userid=>\$AccountOrUserID});
+      }
+      else{
+         $o->SetFilter({'accounts'=>[$AccountOrUserID]});
+      }
+      my ($rec,$msg)=$o->getOnlyFirst(qw(surname 
+                            fullname country gtcack
+                            userid givenname posix groups tz lang
+                            cistatusid secstate ipacl pagelimit
+                            dialermode dialerurl dialeripref
+                            email usersubst usertyp winsize winhandling
+                            dateofvsnfd
+                            userquerybreakcount));
+      if (defined($rec)){
+         if ($rec->{ipacl} ne ""){
+            $rec->{ipacl}=[split(/[;,]\s*/,$rec->{ipacl})];
          }
-         else{
-            $o->SetFilter({'accounts'=>[$AccountOrUserID]});
+         $UserCache->{$AccountOrUserID}->{rec}=$rec;
+         if (defined($res)){   # only in Web-Context the state is stored
+            $UserCache->{$AccountOrUserID}->{state}=$res->{state};
          }
-         my ($rec,$msg)=$o->getOnlyFirst(qw(surname 
-                               fullname country gtcack
-                               userid givenname posix groups tz lang
-                               cistatusid secstate ipacl pagelimit
-                               dialermode dialerurl dialeripref
-                               email usersubst usertyp winsize winhandling
-                               dateofvsnfd
-                               userquerybreakcount));
-         if (defined($rec)){
-            if ($rec->{ipacl} ne ""){
-               $rec->{ipacl}=[split(/[;,]\s*/,$rec->{ipacl})];
-            }
-            $UserCache->{$AccountOrUserID}->{rec}=$rec;
-            if (defined($res)){   # only in Web-Context the state is stored
-               $UserCache->{$AccountOrUserID}->{state}=$res->{state};
-            }
-            $UserCache->{$AccountOrUserID}->{atime}=time();
-            if ($AccountOrUserID ne $rec->{userid}){
-               $UserCache->{$rec->{userid}}=$UserCache->{$ENV{REMOTE_USER}};
-            }
-            return(1);
+         $UserCache->{$AccountOrUserID}->{atime}=time();
+         if ($AccountOrUserID ne $rec->{userid}){
+            $UserCache->{$rec->{userid}}=$UserCache->{$ENV{REMOTE_USER}};
          }
+         return(1);
+      }
+      if (!defined($rec)){
+         if (!$o->Ping()){
+            die("nativ problem while access base::user");
+         }
+      }
+   }
+   else{
+      die("nativ problem while create base::user");
    }
    return(0);
 }
