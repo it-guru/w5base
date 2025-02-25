@@ -74,7 +74,8 @@ sub getPosibleTargets
 
       my $newid=$tsosmac->ValidatedInsertRecord($nrec);
       if ($newid ne ""){
-         if (!exists($ladd->{$lrec->{systemid}})){
+         if (!exists($ladd->{$lrec->{systemid}}) ||
+             !exists($ladd->{$lrec->{systemid}}->{additional})){
             my %add=(TasteOS_MachineID=>$newid);
             $opladdobj->ValidatedInsertRecord({
                systemid=>$lrec->{systemid},
@@ -266,22 +267,21 @@ sub qcheckRecord
           }
        }
        else{
-          #printf STDERR ("needs to delete $systemid\n");
-          my $oldrec=$ladd->{systemid}->{$systemid};
-          if (exists($oldrec->{additional}->{TasteOS_MachineID})){
-             my %add=%{$oldrec->{additional}};
-             delete($add{TasteOS_MachineID});
+          #
+          # drop addlnkapplgrpsystem record (no relation between applgrp
+          # and logical system
+          #
+          if (exists($ladd->{systemid}->{$systemid}) &&
+              $ladd->{systemid}->{$systemid} ne ""){
+             my $oldrec=$ladd->{systemid}->{$systemid};
              my $opladdobj=$laddobj->Clone();
-             $opladdobj->ValidatedUpdateRecord(
-                $oldrec,
-                {additional=>\%add},
+             $opladdobj->ValidatedDeleteRecord(
                 {id=>\$oldrec->{id}}
              );
           }
           delete($ladd->{systemid}->{$systemid});
        }
    }
-  # printf STDERR ("addl=%s\n",Dumper($ladd));
 
    my $expLevelIdMap={
       'CNDTAG'  =>10018,
@@ -290,9 +290,8 @@ sub qcheckRecord
    };
 
    my $w5sys=getModuleObject($dataobj->Config,"TS::system");
-   my @systemids=keys(%{$ladd->{systemid}});
-   if ($#systemids!=-1){
-      $w5sys->SetFilter({id=>\@systemids});
+   if ($#systemid!=-1){
+      $w5sys->SetFilter({id=>\@systemid});
       my @w5rec=$w5sys->getHashList(qw(id name 
                                        effexposurelevel 
                                        autoexposurelevel 
@@ -397,6 +396,8 @@ sub qcheckRecord
          foreach my $mrec (@{$srec->{machines}}){
             if (!exists($ladd->{TasteOS_MachineID}->{$mrec->{id}})){
                push(@delList,$mrec->{id});
+               push(@qmsg,"drop MachineID $mrec->{id} for ".
+                          "systemname $mrec->{name}");
             }
             else{
                my $machineNumber=$mrec->{machineNumber};
@@ -500,6 +501,8 @@ sub qcheckRecord
                                        $rec,$tsosmacrec,$lrec,
                                        $ladd->{systemid});
                return(undef,undef) if ($newid eq ""); 
+               push(@qmsg,"add MachineID $newid for ".
+                          "systemname $tsosmacrec->{name}");
             }
             else{
                if ($mrec->{systemid} ne $tsosmacrec->{systemid} ||
