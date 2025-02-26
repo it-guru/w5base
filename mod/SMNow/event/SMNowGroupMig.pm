@@ -134,7 +134,7 @@ sub processRelevantCIs
       foreach my $prc (qw(INM CHM)){
          if ($prc eq "CHM" && $dataobjname eq "TS::appl"){
             $metagrp->ResetFilter();
-            $metagrp->SetFilter({fullname=>\$ag,
+            $metagrp->SetFilter({fullname=>\$newag,
                                  ischmapprov=>1,cistatusid=>4}); 
             my @chk=$metagrp->getHashList(qw(id));
             #printf STDERR ("fifi chk=%s\n",Dumper(\@chk));
@@ -179,6 +179,59 @@ sub processRelevantCIs
                           }
                        }
                        usleep(200); # prevent to many mods in one sec.
+                       push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                       push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                    }
+                 }
+                 else{
+                    push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                    push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                 }
+               }
+            }
+         }
+         if ($prc eq "CHM" && $dataobjname eq "TS::swinstance"){
+            $metagrp->ResetFilter();
+            $metagrp->SetFilter({fullname=>\$newag,
+                                 ischmapprov=>1,cistatusid=>4}); 
+            my @chk=$metagrp->getHashList(qw(id));
+            #printf STDERR ("fifi chk=%s\n",Dumper(\@chk));
+            if ($#chk==0 || $migstate eq "omitted"){
+               my $o=getModuleObject($self->Config,$dataobjname);
+               $o->SetFilter([
+                     {scapprgroup=>\$ag,cistatusid=>"<6"},
+                     {scapprgroup=>\$ag,cistatusid=>"6",mdate=>'>now-90d'}
+                                                                   
+               ]);
+               foreach my $rec ($o->getHashList(qw(ALL))){
+                 my $name=$rec->{name};
+                 my $lrec={
+                    urlofcurrentrec=>$rec->{urlofcurrentrec},
+                    name=>$name,
+                    databossid=>$rec->{databossid}
+                 };
+                 if ($mode eq "postmodify"){
+                    if ($migstate eq "migrated" || $migstate eq "merge"){
+                       my $op=$o->Clone();
+                       my $bk=$op->ValidatedUpdateRecord(
+                           $rec,
+                           {scapprgroup=>$newag},
+                           {id=>\$rec->{id}}
+                       );
+                       usleep(200); # prevent to many mods in one sec.
+                       #printf STDERR ("migrated $ag to $newag bk=$bk\n");
+                       push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
+                       push(@{$l{dataobjname}->{$dataobjname}},$lrec);
+                    }
+                    if ($migstate eq "omitted"){
+                       my $op=$o->Clone();
+                       my $bk=$op->ValidatedUpdateRecord(
+                           $rec,
+                           {scapprgroup=>undef},
+                           {id=>\$rec->{id}}
+                       );
+                       usleep(200);  # prevent to many mods in one sec.
+                       #printf STDERR ("omitted $ag bk=$bk\n");
                        push(@{$l{databossid}->{$rec->{databossid}}},$lrec);
                        push(@{$l{dataobjname}->{$dataobjname}},$lrec);
                     }
