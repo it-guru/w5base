@@ -106,6 +106,21 @@ sub new
                 dataobjattr   =>'metagrpmgmt.smadmgrp'),
 
       new kernel::Field::Text(
+                name          =>'snid',
+                group         =>'ref',
+                weblinkto     =>'SMNow::sys_user_group',
+                weblinkon     =>['snid'=>'sys_id'],
+                label         =>'Group Sys_Id in SMNow',
+                dataobjattr   =>'metagrpmgmt.snid'),
+
+      new kernel::Field::Date(
+                name          =>'sndate',
+                group         =>'ref',
+                history       =>0,
+                label         =>'Group seen in SMNow',
+                dataobjattr   =>'metagrpmgmt.sndate'),
+
+      new kernel::Field::Text(
                 name          =>'amid',
                 group         =>'ref',
                 weblinkto     =>'tsacinv::group',

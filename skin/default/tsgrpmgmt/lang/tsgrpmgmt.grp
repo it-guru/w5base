@@ -18,4 +18,10 @@
 'is incident assinment group'=>{de=>'ist Incident-Assignmentgroup'},
 'is responsilbe for all'=>{de=>'ist verwendbar von allen'},
 'last check date'=>{de=>'Zeitpunkt der letzten Prüfung'},
+'Group Sys_Id in SMNow'=>{
+ de=>'Gruppen-Sys_Id in SMNow'
+},
+'Group seen in SMNow'=>{
+ de=>'Gruppe in SMNow gesehen am'
+},
 
