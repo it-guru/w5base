@@ -49,6 +49,12 @@ sub new
             RestFilterType=>'SYSPARMQUERY',
             label         =>'group name'),
 
+      new kernel::Field::Interface(     
+            name          =>'fullname',
+            RestFilterType=>'SYSPARMQUERY',
+            dataobjattr   =>'name',
+            label         =>'full group name'),
+
       new kernel::Field::Text(     
             name          =>'manager',
             dataobjattr   =>'manager',
@@ -62,6 +68,12 @@ sub new
             RestSoftFilter=>0,       # because return matches not query string
             searchable    =>0,
             label         =>'deputy'),
+
+      new kernel::Field::Boolean(     
+            name          =>'active',
+            searchable    =>'0',
+            dataobjattr   =>'active',
+            label         =>'active'),
 
       new kernel::Field::Text(     
             name          =>'type',
@@ -85,9 +97,10 @@ sub new
             label         =>'SysModCount'),
 
       new kernel::Field::MDate(     
-            name          =>'sys_updated_on',
+            name          =>'mdate',
             RestFilterType=>'SYSPARMQUERY',
             RestSoftFilter=>0,
+            dataobjattr   =>'sys_updated_on',
             label         =>'Modification-Date'),
 
       new kernel::Field::Text(
@@ -269,6 +282,14 @@ sub DataCollector
          #print STDERR Dumper($data->[0]);
          map({
             $_=FlattenHash($_);
+            if (exists($_->{active}) && $_->{active} ne ""){
+               if ($_->{active} eq "1" || lc($_->{active}) eq "true"){
+                  $_->{active}=1;
+               }
+               else{
+                  $_->{active}=0;
+               }
+            }
             if (exists($_->{type}) && $_->{type} ne ""){
                $_->{type}=[split(/\s*,\s*/,$_->{type})];
             }
