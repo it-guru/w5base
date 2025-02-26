@@ -62,3 +62,4 @@ CREATE TABLE lnkmetagrp (
   UNIQUE KEY grp (targetid,parentobj,refid,responsibility),
   FOREIGN KEY fk_metagrp (targetid) REFERENCES metagrpmgmt (id) ON DELETE CASCADE
 ) ENGINE=INNODB;
+alter table metagrpmgmt add snid varchar(40) default NULL,add key(snid),add sndate datetime default NULL;
