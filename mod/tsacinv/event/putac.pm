@@ -47,6 +47,12 @@ my %w52ac=(0 =>'OTHER',
            60=>'DEVELOPMENT',
            70=>'PRODUCTION');
 
+#
+# To reduce config items in AssetManager, a list of srcsystems
+# in W5Base are excluded from XML Export (starting from 28.02.2025).
+#
+my $exclude_srcsys_expr=qr/^(AWS|TPC\d+|AZURE|OTC|GCP)$/i;
+
 my %locmap;
 
 sub new
@@ -170,6 +176,7 @@ sub mkAcFtpRecIP
    my $arec=shift;
    my $rec=shift;
 
+   return(undef) if ($rec->{srcsys} =~ $exclude_srcsys_expr);
    if (ref($rec->{ipaddresses}) eq "ARRAY"){
       my @ip;
       foreach my $iprec (@{$rec->{ipaddresses}}){
@@ -210,6 +217,7 @@ sub mkAcFtpRecSystem
    my $inmassign=$rec->{acinmassingmentgroup};
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
+   return(undef) if ($rec->{srcsys} =~ $exclude_srcsys_expr);
    if ($self->{DebugMode}){
       msg(INFO,"mkAcFtpRecSystem: $CurrentEventId");
    }
@@ -346,25 +354,20 @@ sub SendXmlToAM_system
 
    $system->SetFilter(\%filter);
 
-   my @idList=$system->getHashList(qw(id));
-
-
-
-   $system->SetCurrentView(qw(ALL));
-
-   my ($rec,$msg)=$system->getFirst(unbuffered=>1);
-
+   my @idList=$system->getHashList(qw(id srcsys));
    my $acnew=0;
    my $acnewback=0;
 
    foreach my $idRec (@idList){
+      next if ($idRec->{srcsys} =~ $exclude_srcsys_expr);
       $system->ResetFilter();
       $system->SetFilter({id=>\$idRec->{id}});
       my ($rec,$msg)=$system->getOnlyFirst(qw(ALL));
       if (defined($rec)){
          my $t0=Time::HiRes::time();
-         msg(INFO,"Start of Record");
-         if ($rec->{asset} ne "" && $rec->{acinmassingmentgroup} ne ""){
+         msg(INFO,"Start of Record systemname=$rec->{name}");
+         if ($rec->{asset} ne "" && $rec->{acinmassingmentgroup} ne "" &&
+             (!($rec->{srcsys} =~ $exclude_srcsys_expr)) ){
             if ($self->{DebugMode}){
                msg(INFO,"check assetid '$rec->{asset}'");
             }
@@ -406,6 +409,7 @@ sub mkAcFtpRecAsset
    my %param=@_;
    my $app=$self->getParent;
 
+   return(undef) if ($rec->{srcsys} =~ $exclude_srcsys_expr);
    my $CurrentEventId="Process Asset '$rec->{name}'";
 
    my $inmassign=$rec->{acinmassingmentgroup};
@@ -747,8 +751,7 @@ sub SendXmlToAM_instance
             }
             ########################################################
             my $iassignment=$irec->{acinmassingmentgroup};
-            #  if ($irec->{swinstanceid} ne "" || $iassignment ne ""){
-            if (1){
+            if (!($irec->{srcsys} =~ $exclude_srcsys_expr)){
                if ($iassignment eq ""){
                   $iassignment="[NULL]";
                }
@@ -1210,7 +1213,8 @@ sub SendXmlToAM_appl
          if ((!($acapplrec->{assignmentgroup} eq "GQ.PS" ||   # NO GQPS Elements
                ($acapplrec->{assignmentgroup}=~m/^GQ\.PS\./))) &&
              ($rec->{acinmassingmentgroup} ne "" ||           # INM AG needed
-              $rec->{applid} ne "")){
+              $rec->{applid} ne "") &&
+             (!($rec->{srcsys} =~ $exclude_srcsys_expr))){
             my $CurrentEventId;
             my $CurrentAppl=$rec->{name};
             my $ApplU=0;
