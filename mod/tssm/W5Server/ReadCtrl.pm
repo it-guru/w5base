@@ -30,7 +30,9 @@ sub process
       $deepsleep++;
    }
 
-   if ($deepsleep){
+   #if ($deepsleep){
+   if (1){ # endless deepsleep
+      # https://darwin.telekom.de/darwin/auth/base/workflow/ById/17401306630001
       while(1){
          sleep(3600);
       }
