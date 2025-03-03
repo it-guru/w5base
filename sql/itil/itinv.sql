@@ -955,7 +955,7 @@ create table ipnet (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=0;
 alter table appl add FOREIGN KEY fk_appl_databoss (databoss)
-          REFERENCES contact (userid) ON DELETE RESTRICT;
+          REFERENCES contact (userid) ON DELETE SET NULL;
 set FOREIGN_KEY_CHECKS=1;
 set FOREIGN_KEY_CHECKS=0;
 alter table asset add FOREIGN KEY fk_asset_databoss (databoss)
