@@ -589,12 +589,16 @@ sub _LoadUserInUserCache
       }
       if (!defined($rec)){
          if (!$o->Ping()){
-            die("nativ problem while access base::user");
+            msg(ERROR,"_LoadUserInUserCache: ".
+                      "nativ problem while access base::user");
+            Stacktrace();
          }
       }
    }
    else{
-      die("nativ problem while create base::user");
+      msg(ERROR,"_LoadUserInUserCache: ".
+                "nativ problem while create base::user o=$o");
+      Stacktrace();
    }
    return(0);
 }
