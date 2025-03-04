@@ -450,9 +450,7 @@ sub new
                          };
    $self->{workflowlink}->{workflowtyp}=[qw(itil::workflow::devrequest
                                             AL_TCom::workflow::businesreq
-                                            THOMEZMD::workflow::businesreq
-                                            AL_TCom::workflow::change
-                                            AL_TCom::workflow::incident)];
+                                            THOMEZMD::workflow::businesreq)];
    $self->{history}={
       update=>[
          'local'
