@@ -317,12 +317,6 @@ sub new
                                             THOMEZMD::workflow::businesreq
                                             base::workflow::DataIssue
                                             base::workflow::mailsend
-                                            TS::workflow::change
-                                            TS::workflow::problem
-                                            TS::workflow::incident
-                                            AL_TCom::workflow::change
-                                            AL_TCom::workflow::problem
-                                            AL_TCom::workflow::incident
                                             )];
    $self->{workflowlink}->{workflowstart}=\&calcWorkflowStart;
 
