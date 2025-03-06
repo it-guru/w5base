@@ -131,11 +131,14 @@ sub Filter2RestPath
    
    # ToDo: check if ODATA filtering - if yes, allow in simplifyFilterSet
    #       flat SCALAR and ARRAY values
-   my ($filter,$queryToken)=$self->simplifyFilterSet($filterSet);
+
+   my $simplifyParam=[];
+   if ($isSYSPARMQUERY){  # in SYSPARMQUERY quoates ca be handled correct
+      push(@{$simplifyParam},"NOREMOVEQUOTES");
+   }
+
+   my ($filter,$queryToken)=$self->simplifyFilterSet($filterSet,$simplifyParam);
    return(undef) if (!defined($filter));
-
-
-
 
 
    foreach my $fn (keys(%{$filter})){  # paas1 loop
@@ -201,15 +204,24 @@ sub Filter2RestPath
             if ($fld->Type()=~m/Date/){
                $fstr=$self->PreParseTimeExpression($fstr,$fld->timezone());
             }
+            $fstr=~s/\\\*/[|*|]/g;   # \* handling maybe wrong (02/2025)
+            $fstr=~s/\\/\\\\/g;      # \  handling maybe wrong (02/2025)
             my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
+            if ($fstr ne "" && $#words==-1){
+               $self->LastMsg(ERROR,"parse error '$fstr'");
+               return(undef);
+            }
+
             my @fieldQuery;
             for(my $c=0;$c<=$#words;$c++){
                my $sword=$words[$c];
-               next if ($sword eq "AND");
-               if ($sword eq "OR"){
-                  $self->LastMsg(ERROR,"OR is not supported in ".
-                                       "sysparam_query translation");
-                  return(undef);
+               foreach my $cword (qw(AND OR)){
+                  if ($sword eq $cword && $c>0 && $c<$#words){
+                     $self->LastMsg(ERROR,"concatenation $cword is not ".
+                                          "supported in sysparam_query ".
+                                          "translation");
+                     return(undef);
+                  }
                }
                my $cmpop="="; 
                if ($sword=~m/^<=[^*?]+$/){
