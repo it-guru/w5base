@@ -268,9 +268,11 @@ sub simplifyFilterSet
       else{
          if (!in_array($mode,"NOREMOVEQUOTES")){
             my $v=$fltDup{$k};
-            $v=~s/^"//;
-            $v=~s/"$//;
-            $fltDup{$k}=$v;
+            if (($v=~m/^"/) && ($v=~m/"$/)){
+               $v=~s/^"//;
+               $v=~s/"$//;
+               $fltDup{$k}=$v;
+            }
          }
       }
       push(@qparam,$k,$fltDup{$k});
@@ -5035,6 +5037,10 @@ sub Data2SQLwhere
          $f=~s/\\\*/[|*|]/g;
          $f=~s/\\/\\\\/g;
          my @words=parse_line('[,;]{0,1}\s+',0,$f);
+         if ($f ne "" && $#words==-1){
+            $self->LastMsg(ERROR,"parse error '$f'");
+            return(undef);
+         }
          #my @words=parse_line('[,;]{0,1}\s+',"delimiters",$f);
          if (!($f=~m/^\s*$/) && $#words==-1){  # maybe an invalid " struct
             push(@newfilter,undef);
