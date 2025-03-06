@@ -496,10 +496,14 @@ EOF
                }
             }
 
+
+            # Attion: The spaces around the href prevent from rewriten
+            #         the address in T-SSO Logon Mode. This is not beautiful,
+            #         but it works.
             $ByIdLinkStart="<a tabindex=-1 ".
                            "id=toplineimage target=_blank title=\"".
             $self->getParent->getParent->T("use this link to reference this ".
-            "record (f.e. in mail)")."\" href=\"$targeturl\">";
+            "record (f.e. in mail)")."\" href=\" $targeturl \">";
             $ByIdLinkEnd="</a>";
             #if ($targeturl ne ""){
             #   $targeturl=~s#^.*//[^/]+/#/#;
