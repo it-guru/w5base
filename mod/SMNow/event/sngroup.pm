@@ -133,7 +133,8 @@ sub sngroup
          $start="$firstrec->{exitmsg}";
       }
 
-      
+      msg(INFO,"processing delta query starting from mdate>=$start"); 
+      sleep(1);
       my $flt=$incloader->{initflt};
       if ($queryparam eq ""){
          if (defined($start)){
