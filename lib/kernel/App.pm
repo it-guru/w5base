@@ -558,41 +558,48 @@ sub _LoadUserInUserCache
       $self->Cache->{User}={DataObj=>$o,Cache=>{}};
    }
    my $UserCache=$self->Cache->{User}->{Cache};
-   if (defined($o) && $o->Ping()){
-      if ($AccountOrUserID=~m/^\d+$/){
-         $o->SetFilter({userid=>\$AccountOrUserID});
+   if (defined($o)){
+      if ($o->Ping()){
+         if ($AccountOrUserID=~m/^\d+$/){
+            $o->SetFilter({userid=>\$AccountOrUserID});
+         }
+         else{
+            $o->SetFilter({'accounts'=>[$AccountOrUserID]});
+         }
+         my ($rec,$msg)=$o->getOnlyFirst(qw(surname 
+                               fullname country gtcack
+                               userid givenname posix groups tz lang
+                               cistatusid secstate ipacl pagelimit
+                               dialermode dialerurl dialeripref
+                               email usersubst usertyp winsize winhandling
+                               dateofvsnfd
+                               userquerybreakcount));
+         if (defined($rec)){
+            if ($rec->{ipacl} ne ""){
+               $rec->{ipacl}=[split(/[;,]\s*/,$rec->{ipacl})];
+            }
+            $UserCache->{$AccountOrUserID}->{rec}=$rec;
+            if (defined($res)){   # only in Web-Context the state is stored
+               $UserCache->{$AccountOrUserID}->{state}=$res->{state};
+            }
+            $UserCache->{$AccountOrUserID}->{atime}=time();
+            if ($AccountOrUserID ne $rec->{userid}){
+               $UserCache->{$rec->{userid}}=$UserCache->{$ENV{REMOTE_USER}};
+            }
+            return(1);
+         }
+         if (!defined($rec)){
+            if (!$o->Ping()){
+               msg(ERROR,"_LoadUserInUserCache: ".
+                         "nativ problem while access base::user");
+               Stacktrace();
+            }
+         }
       }
       else{
-         $o->SetFilter({'accounts'=>[$AccountOrUserID]});
-      }
-      my ($rec,$msg)=$o->getOnlyFirst(qw(surname 
-                            fullname country gtcack
-                            userid givenname posix groups tz lang
-                            cistatusid secstate ipacl pagelimit
-                            dialermode dialerurl dialeripref
-                            email usersubst usertyp winsize winhandling
-                            dateofvsnfd
-                            userquerybreakcount));
-      if (defined($rec)){
-         if ($rec->{ipacl} ne ""){
-            $rec->{ipacl}=[split(/[;,]\s*/,$rec->{ipacl})];
-         }
-         $UserCache->{$AccountOrUserID}->{rec}=$rec;
-         if (defined($res)){   # only in Web-Context the state is stored
-            $UserCache->{$AccountOrUserID}->{state}=$res->{state};
-         }
-         $UserCache->{$AccountOrUserID}->{atime}=time();
-         if ($AccountOrUserID ne $rec->{userid}){
-            $UserCache->{$rec->{userid}}=$UserCache->{$ENV{REMOTE_USER}};
-         }
-         return(1);
-      }
-      if (!defined($rec)){
-         if (!$o->Ping()){
-            msg(ERROR,"_LoadUserInUserCache: ".
-                      "nativ problem while access base::user");
-            Stacktrace();
-         }
+         msg(ERROR,"_LoadUserInUserCache: ".
+                   "fail to ping base::user");
+         Stacktrace();
       }
    }
    else{
