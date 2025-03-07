@@ -71,10 +71,22 @@ sub ITENOS_ProviderSync
    my $cur=$O->{'TS::system'}->getHashIndexed(qw(id srcid));
 
    foreach my $itncmdbid (@curIDs){
-      my $ApplW5BaseID=$remoteSys->{id}->{$itncmdbid}->{applw5baseid};
-      my $systemname=$remoteSys->{id}->{$itncmdbid}->{systemname};
+      
+      my $ApplW5BaseID;
+      my $systemname;
+      msg(INFO,"processing ITNCMDID: $itncmdbid");
+      if (ref($remoteSys->{id}->{$itncmdbid}) eq "ARRAY"){
+         msg(ERROR,"structure error while loading ITENOS ITNCMDBID $itncmdbid ".
+                  "- ID not unique");
+         next;
+      }
+      if (ref($remoteSys->{id}->{$itncmdbid}) eq "HASH"){
+         $ApplW5BaseID=$remoteSys->{id}->{$itncmdbid}->{applw5baseid};
+         $systemname=$remoteSys->{id}->{$itncmdbid}->{systemname};
+         msg(INFO,"start handling of $systemname for ApplW5BaseID: ".
+                  "$ApplW5BaseID");
+      }
       my $identifyby;
-      msg(INFO,"start handling of $systemname for ApplW5BaseID: $ApplW5BaseID");
       if (!exists($cur->{srcid}->{$itncmdbid})){
          msg(INFO,"try to insert $itncmdbid");
          $O->{'TS::appl'}->ResetFilter();
