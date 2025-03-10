@@ -168,10 +168,13 @@ sub HandleCIStatusModification
                      $self->ResetFilter();
                      $self->SetFilter({$primarykey=>$dropchkname});
                      $self->SetCurrentOrder("+mdate");
-                     my ($droprec,$msg)=$self->getOnlyFirst($idfield);
+                     my ($droprec,$msg)=$self->getOnlyFirst($idfield,
+                                                            $primarykey);
                      if (defined($droprec) && !defined($msg)){
-                        msg(WARN,"drop record $droprec->{$idfield} in ".
-                                 $self->Self()." to get free name [999]");
+                        msg(WARN,"drop record ".
+                            $droprec->{$idfield}($droprec->{$primarykey}) in ".
+                            $self->Self()." to get free ".
+                            "name($primarykey) [999]");
                         $self->BulkDeleteRecord({
                            $idfield=>\$droprec->{$idfield}
                         });
