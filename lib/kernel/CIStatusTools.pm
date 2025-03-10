@@ -172,7 +172,7 @@ sub HandleCIStatusModification
                                                             $primarykey);
                      if (defined($droprec) && !defined($msg)){
                         msg(WARN,"drop record ".
-                            $droprec->{$idfield}($droprec->{$primarykey}) in ".
+                            "$droprec->{$idfield}($droprec->{$primarykey}) in ".
                             $self->Self()." to get free ".
                             "name($primarykey) [999]");
                         $self->BulkDeleteRecord({
