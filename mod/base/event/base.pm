@@ -20,6 +20,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::Event;
+use Sys::Hostname;
 @ISA=qw(kernel::Event);
 
 sub new
@@ -35,6 +36,7 @@ sub Init
 {
    my $self=shift;
 
+   $self->RegisterEvent("HelloW5Server",\&HelloW5Server,timeout=>10);
    $self->RegisterEvent("UserVerified",\&UserVerified,timeout=>300);
    $self->RegisterEvent("TableVersionCheck",\&TableVersionCheck,timeout=>300);
    return(1);
@@ -51,6 +53,16 @@ sub TableVersionCheck
 
 
    return({msg=>'OK',exitcode=>0});
+}
+
+
+sub HelloW5Server
+{
+   my $self=shift;
+
+   my $hostname=hostname();
+
+   return({exitmsg=>"W5Server\@$hostname",exitcode=>0});
 }
 
 
