@@ -54,6 +54,16 @@ sub ITENOS_ProviderSync
       });
    }
 
+   $O->{'itncmdb::system'}->ResetFilter();
+   $O->{'itncmdb::system'}->SetFilter({id=>'73DC1B2U2R4M3U'});
+   my @l= $O->{'itncmdb::system'}->getHashList(qw(id));
+   if ($#l>0){
+      return({
+         exitcode=>1,
+         exitmsg=>'ITENOS logical system Access '.
+                  'to ID 73DC1B2U2R4M3U not unique'
+      });
+   }
 
 
 
