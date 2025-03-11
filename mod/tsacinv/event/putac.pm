@@ -888,7 +888,12 @@ sub SendXmlToAM_itclust
    my %grpnotfound;
    if (defined($rec)){
       do{
-         if ($rec->{acinmassingmentgroup} ne ""){
+         my $skip=0;
+         if (lc($rec->{srcsys}) eq lc("AssetManager")){
+            msg(INFO,"skip itclust=$rec->{name} - already comes from AssetManager");
+            $skip++;
+         }
+         if (!$skip && $rec->{acinmassingmentgroup} ne ""){
             my $jobname="W5Base.$self->{jobstart}.".NowStamp().
                         '.Campus_'.$rec->{id};
             msg(INFO,"process itclust=$rec->{name} jobname=$jobname");
