@@ -1458,15 +1458,18 @@ sub Stacktrace {
   my $traceonly=shift;
   my ( $path, $line, $subr );
   my $max_depth = 30;
-  my $i = 1;
+  my $i = 0;
 
   print STDERR ("--- Begin stack trace ---\n");
+  my $firstLine;
   while ( (my @call_details = (caller($i++))) && ($i<$max_depth) ) {
-    print STDERR ("$i $call_details[1]($call_details[2]) ".
-                  "in $call_details[3]\n");
+    my $line="$i $call_details[1]($call_details[2]) ".
+             "in $call_details[3]\n";
+    $firstLine=$line if (!defined($firstLine));
+    print STDERR ($line);
   }
   print STDERR ("--- End stack trace ---\n");
-  die() if (!$traceonly);
+  die("die with kernel::Stacktrace(0): ".$firstLine) if (!$traceonly);
 }
 
 
