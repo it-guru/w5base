@@ -3126,8 +3126,6 @@ sub QRuleSyncCloudSystem
                     $parrec->{ipaddresses},\@opList,
                  refid=>$rec->{id});
 
-printf STDERR ("fifi opList=%s\n",Dumper(\@opList));
-
 
 
       if ($autocorrect){
