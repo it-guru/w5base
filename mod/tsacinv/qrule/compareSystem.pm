@@ -162,9 +162,6 @@ sub qcheckRecord
          $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
          ($parrec)=$par->getOnlyFirst(qw(ALL));
       }
-      if (defined($parrec)){
-         $checksession->{EssentialsChangedCnt}++;
-      }
    }
 
 
@@ -209,6 +206,7 @@ sub qcheckRecord
       if ($parrec->{srcsys} eq "W5Base"){
          if ($rec->{srcsys} eq "AssetManager"){
             $forcedupd->{srcsys}="w5base";
+            $checksession->{EssentialsChangedCnt}++;
             if ($rec->{srcid} ne ""){
                $forcedupd->{srcid}=undef;
             }
@@ -227,6 +225,7 @@ sub qcheckRecord
       else{
          if ($rec->{srcsys} ne "AssetManager"){
             $forcedupd->{srcsys}="AssetManager";
+            $checksession->{EssentialsChangedCnt}++;
             $forcedupd->{allowifupdate}="1";  # Beim Switch auf AssetManager
          }                                    # AutoUpdate auf Ja
          if ($parrec->{srcsys} ne "MCOS_FCI"){  # on MCOS Systems the srcid
@@ -234,6 +233,7 @@ sub qcheckRecord
                                                 # vmid from vRA tpc::system
             if ($rec->{srcid} ne $parrec->{systemid}){
                $forcedupd->{srcid}=$parrec->{systemid};
+               $checksession->{EssentialsChangedCnt}++;
             }
          }
          $forcedupd->{srcload}=NowStamp("en");
