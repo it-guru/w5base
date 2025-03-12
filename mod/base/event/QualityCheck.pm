@@ -81,6 +81,13 @@ sub QualityCheck
 
    my %dataobjtocheck=$lnkq->LoadQualityActivationLinks();
    #msg(INFO,Dumper(\%dataobjtocheck));
+   my $LimitTasks=int($self->Config->Param("QualityCheckLimitParallelTasks"));
+   if ($LimitTasks<1){
+      $LimitTasks=1;
+   }
+   if ($LimitTasks>10){
+      $LimitTasks=10;
+   }
    if ($dataobj eq ""){
       my $startt=time();
       my $n=keys(%dataobjtocheck);
@@ -95,7 +102,7 @@ sub QualityCheck
             my $taskcnt=int($cnt/50000);
 
             $taskcnt=1 if ($dataobj eq "base::workflow" || $taskcnt<1);
-            $taskcnt=8 if ($taskcnt>8);
+            $taskcnt=$LimitTasks  if ($taskcnt>$LimitTasks);
 
             if ($taskcnt==1){
                my $bk=$self->W5ServerCall("rpcCallEvent",
