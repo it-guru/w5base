@@ -3029,6 +3029,7 @@ sub QRuleSyncCloudSystem
 
       
 
+      my $ip=getModuleObject($self->Config(),"itil::ipaddress");
       my @opList;
       my $res=kernel::QRule::OpAnalyse(
                  sub{  # comperator 
@@ -3053,9 +3054,28 @@ sub QRuleSyncCloudSystem
                     if ($mode eq "insert" || $mode eq "update"){
                        my $networkid=$netarea->{ISLAND};
                        my $identifyby=undef;
+                       if ($mode eq "insert"){
+                          $ip->ResetFilter();
+                          $ip->SetFilter({
+                              systemid=>\$rec->{id},
+                              name=>$newrec->{name}."[*]",
+                              cistatusid=>\'6',
+                              mdate=>'>now-30d'
+                          });
+                          $ip->Limit(1);
+                          my @l=$ip->getHashList(qw(mdate id name cistatusid
+                                                    addresstyp networkid
+                                                    itcloudareaid ifname
+                                                    srcsys networktag));
+                          if ($#l==0){
+                             $oldrec=$l[0];
+                             $mode="update";
+                          }
+                       }
                        if ($mode eq "update"){
                           $identifyby=$oldrec->{id};
                        }
+                       push(@$qmsg,"request IP $newrec->{name}");
                        my $type="1";   # secondary
                        my $oprec={
                          OP=>$mode,
@@ -3105,6 +3125,11 @@ sub QRuleSyncCloudSystem
                  [grep({$_->{srcsys} eq $srcsystag} @{$rec->{ipaddresses}})],
                     $parrec->{ipaddresses},\@opList,
                  refid=>$rec->{id});
+
+printf STDERR ("fifi opList=%s\n",Dumper(\@opList));
+
+
+
       if ($autocorrect){
          if (!$res){
             my $opres=kernel::QRule::ProcessOpList(
@@ -3128,7 +3153,6 @@ sub QRuleSyncCloudSystem
          $parip{$iprec->{name}}={networkid=>$netarea->{ISLAND}};
          $parip{$iprec->{name}}->{NetareaTag}=$iprec->{netareatag};
       }
-      my $ip=getModuleObject($self->Config(),"itil::ipaddress");
       $ip->switchSystemIpToNetarea(\%parip,$rec->{id},$netarea,$qmsg);
 
       @opList=();
