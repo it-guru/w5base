@@ -803,6 +803,7 @@ sub genericSystemImport
    if (!defined($w5sysrec)){   # srcid update kandidaten (schneller Redeploy)
       my @flt;
       my @oldiprecords;
+      #printf STDERR ("fifi sysrec=%s\n",Dumper($sysrec));
       if (ref($sysrec->{ipaddresses}) eq "ARRAY" &&
           $#{$sysrec->{ipaddresses}}!=-1){
          my $ip=getModuleObject($self->Config,"itil::ipaddress");
@@ -814,12 +815,16 @@ sub genericSystemImport
                srcsys=>\$srcsys
             });
             push(@ipflt,{
-               name=>$iprec->{name}."[*",
-               srcsys=>\$srcsys
+               name=>$iprec->{name}."[*]",
+               srcsys=>\$srcsys,
+               mdate=>">now-30d"
             });
          }
+         #printf STDERR ("fifi ipflt=%s\n",Dumper(\@ipflt));
          $ip->SetFilter(\@ipflt);
-         @oldiprecords=$ip->getHashList(qw(name systemid));
+         $ip->Limit(30);  # it is enougth to check 30 records
+         @oldiprecords=$ip->getHashList(qw(mdate cistatusid itcloudareaid
+                                           name systemid));
       }
       my $searchname=$sysrec->{name};
       if (!ref($sysrec->{name})){
@@ -846,11 +851,12 @@ sub genericSystemImport
       });
 
 
+      #printf STDERR ("fifi oldiprec=%s\n",Dumper(\@oldiprecords));
       if ($#oldiprecords!=-1){
          foreach my $oldiprec (@oldiprecords){
             if ($oldiprec->{systemid} ne ""){
                push(@flt,{
-                 id=>\$oldiprec->{systemid},
+                 id=>$oldiprec->{systemid},
                  srcsys=>\$srcsys,
                  srcid=>'!'.$sysrec->{srcid}
                });
@@ -860,6 +866,8 @@ sub genericSystemImport
       #push(@flt,{
       #  name=>"ede1*"
       #});
+
+      #printf STDERR ("fifi flt=%s\n",Dumper(\@flt));
 
       $sys->ResetFilter();
       $sys->SetFilter(\@flt);
