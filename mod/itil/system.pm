@@ -3099,7 +3099,11 @@ sub QRuleSyncCloudSystem
                        if (exists($newrec->{ifname})){
                           $oprec->{DATA}->{ifname}=$newrec->{ifname};
                        }
-                       if ($mode eq "insert"){
+                       if ($mode eq "insert" ||
+                           (defined($oldrec) && $oldrec->{cistatusid}==6)){
+                          # a new record - or an update (oldrec exists) need
+                          # to be forced moved to ISLAND to prevent doublicate
+                          # entries
                           $oprec->{DATA}->{networkid}=$networkid;
                        }
                        if ($mode eq "update"){ # on update, do not change type
