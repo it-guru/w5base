@@ -517,6 +517,7 @@ sub StringToFilter
 sub Initialize
 {
    my $self=shift;
+   $self->{dontSendRemoteEvent}=1 if (!exists($self->{dontSendRemoteEvent}));
    if ($self->can("AddDatabase")){
       my @result=$self->AddDatabase(DB=>new kernel::database($self,"w5base"));
       return(@result) if (defined($result[0]) && $result[0] eq "InitERROR");
@@ -3217,6 +3218,7 @@ sub SendRemoteEvent
          $source=$altsource;
       }
       $userid=0 if (!defined($userid));
+      Time::HiRes::sleep(0.2);
       $self->W5ServerCall("rpcSendRemoteEvent",
                           $userid,$self->Self,$mode,$id,$sub);
    }
