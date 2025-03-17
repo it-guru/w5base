@@ -46,7 +46,35 @@ sub Init
 
    $self->RegisterEvent("SMmigAppl","SMmigAppl");
    $self->RegisterEvent("SMmigSwi","SMmigSwi");
+   $self->RegisterEvent("SMcleanup","SMcleanup");
    return(1);
+}
+
+sub SMcleanup
+{
+   my $self=shift;
+
+   my $wf=getModuleObject($self->getParent->Config,"base::workflow");
+   my $wfop=getModuleObject($self->getParent->Config,"base::workflow");
+
+
+
+   $wf->SetFilter({class=>['itil::workflow::change','itil::workflow::incident'],
+                   mdate=>"<now-365d"});
+   $wf->SetCurrentView(qw(ALL));
+   $wf->SetCurrentOrder(qw(NONE));
+   $wf->Limit(10000);
+   my $c=0;
+
+   my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
+   if (defined($rec)){
+      do{
+         msg(INFO,"process $rec->{id} class=$rec->{class}");
+         $wfop->ValidatedDeleteRecord($rec);
+         ($rec,$msg)=$wf->getNext();
+      } until(!defined($rec));
+   }
+
 }
 
 
