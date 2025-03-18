@@ -133,6 +133,8 @@ sub getDummyRequest
    my $d=$self->CollectREST(
       dbname=>$credentialName,
       timeout=>5,
+      retry_count=>3,
+      retry_interval=>30,
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
@@ -187,7 +189,7 @@ sub Ping
          ref($d) ne "HASH" ||
         !exists($d->{result}) ||
          ref($d->{result}) ne "ARRAY") && !$self->LastMsg()){
-      $self->LastMsg(ERROR,"fail to REST Ping to SMNow");
+      #$self->LastMsg(ERROR,"fail to REST Ping to SMNow");
       $d=undef;
    }
    if (!$self->LastMsg()){
