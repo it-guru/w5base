@@ -70,7 +70,7 @@ sub SIMonNotify
    else{
       $datastream->SetFilter({
          cistatusid=>[3,4],
-         cdate=>"<now-14d",    # das muss in der Prod min. 14 Tage sein
+         cdate=>"<now-28d",    # das muss in der Prod min. 14 Tage sein
          reqtarget=>['RECO','MAND'],
          curinststate=>\'NOTFOUND',
          exceptreqtxt=>'',     # noch keine Ausnahme beantragt
