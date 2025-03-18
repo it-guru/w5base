@@ -27,7 +27,7 @@ sub process
          sleep(1);
       }
       my $current=time();
-      $nextrun=$current+400;
+      $nextrun=$current+200;
       my $sleep=$nextrun-$current;
       msg(DEBUG,"(%s) sleeping %d seconds",$self->Self,$sleep);
       $sleep=60 if ($sleep>60);
@@ -56,7 +56,7 @@ sub CleanupWorkflows
    });
    $wf->SetCurrentView(qw(ALL));
    $wf->SetCurrentOrder(qw(mdate));
-   $wf->Limit(100);
+   $wf->Limit(200);
    my $c=0;
 
    my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
