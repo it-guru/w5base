@@ -809,6 +809,15 @@ sub new
       new kernel::Field::Select(
                 name          =>'sms',
                 label         =>'SMS Notification',
+                uivisible   =>sub{
+                   my $self=shift;
+                   my $mode=shift;
+                   my %param=@_;
+                   if ($self->getParent->Config->Param("SMSInterfaceScript") 
+                       eq ""){
+                      return(0);
+                   }
+                },
                 group         =>'control',
                 transprefix   =>'SMS.',
                 htmldetail    =>sub{
