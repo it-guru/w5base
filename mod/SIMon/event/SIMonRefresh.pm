@@ -219,6 +219,7 @@ sub SIMonNotify
             if ($rec->{reqtarget} eq "MAND"){
                $mode="WARN";
             } 
+            $notifyparam{emailcategory}=['SIMon','InstallRequestHint'];
             $wfa->Notify($mode,$subject,$text,%notifyparam); 
            
            
