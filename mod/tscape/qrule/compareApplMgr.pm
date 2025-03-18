@@ -192,17 +192,6 @@ sub qcheckRecord
    return(@result);
 }
 
-sub qenrichRecord
-{
-   my $self=shift;
-   my $dataobj=shift;
-   my $rec=shift;
-   my $checksession=shift;
-
-
-
-}
-
 
 
 1;
