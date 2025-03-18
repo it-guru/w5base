@@ -69,17 +69,6 @@ sub getPosibleTargets
    return(['itil::system','itil::swinstance']);
 }
 
-sub qenrichRecord
-{
-   my $self=shift;
-   my $dataobj=shift;
-   my $rec=shift;
-   my $checksession=shift;
-
-   return($self->qcheckRecord($dataobj,$rec,$checksession));
-}
-
-
 sub qcheckRecord
 {
    my $self=shift;

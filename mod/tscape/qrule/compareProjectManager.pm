@@ -273,17 +273,6 @@ sub qcheckRecord
    return($errorlevel,{qmsg=>\@qmsg,dataissue=>\@dataissue});
 }
 
-sub qenrichRecord
-{
-   my $self=shift;
-   my $dataobj=shift;
-   my $rec=shift;
-   my $checksession=shift;
-
-
-
-}
-
 
 
 1;
