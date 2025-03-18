@@ -18,15 +18,6 @@ sub new
 sub process
 {
    my $self=shift;
-   my $CleanupTime=$self->getParent->Config->Param("CleanupTime");
-   my ($h,$m)=$CleanupTime=~m/^(\d+):(\d+)/;
-
-
-   $h=0  if ($h<0);
-   $h=23 if ($h>23);
-   $m=0  if ($m<0);
-   $m=59 if ($m>59);
-
    my $nextrun;
 
    while(1){
@@ -36,13 +27,7 @@ sub process
          sleep(1);
       }
       my $current=time();
-      my ($year,$month,$day,$hour,$min,$sec)=Time_to_Date("GMT",$current);
-      if (Date_to_Time("GMT",$year,$month,$day,$h,$m,0)<=time()){
-         ($year,$month,$day)=Add_Delta_YMD("GMT",$year,$month,$day,0,0,1);
-      }
-      $nextrun=Date_to_Time("GMT",$year,$month,$day,$h,$m,0);
-      msg(DEBUG,"(%s) next cleanup at %04d-%02d-%02d %02d:%02d:%02d",
-                 $self->Self,$year,$month,$day,$h,$m,0);
+      $nextrun=$current+400;
       my $sleep=$nextrun-$current;
       msg(DEBUG,"(%s) sleeping %d seconds",$self->Self,$sleep);
       $sleep=60 if ($sleep>60);
@@ -60,11 +45,18 @@ sub CleanupWorkflows
 
 
 
-   $wf->SetFilter({class=>['itil::workflow::change','itil::workflow::incident'],
-                   mdate=>"<now-365d"});
+   $wf->SetFilter({class=>[qw(
+      itil::workflow::change itil::workflow::incident   itil::workflow::problem
+      TS::workflow::change   TS::workflow::incident     TS::workflow::problem
+      AL_TCom::workflow::change 
+      AL_TCom::workflow::incident   
+      AL_TCom::workflow::problem
+      AL_TCom::workflow::P800   AL_TCom::workflow::P800special
+      AL_TCom::workflow::riskmgmt)]
+   });
    $wf->SetCurrentView(qw(ALL));
-   $wf->SetCurrentOrder(qw(NONE));
-   $wf->Limit(10000);
+   $wf->SetCurrentOrder(qw(mdate));
+   $wf->Limit(100);
    my $c=0;
 
    my ($rec,$msg)=$wf->getFirst(unbuffered=>1);

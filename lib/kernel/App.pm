@@ -551,6 +551,7 @@ sub _LoadUserInUserCache
 
    return(0) if ($AccountOrUserID eq "");
    return(0) if ($AccountOrUserID eq "anonymous");
+   return(0) if ($W5V2::OperationContext eq "W5Server");
 
    my $o=$self->Cache->{User}->{DataObj};
    if (!defined($o)){     # DataObj also filled in App/Web.pm !

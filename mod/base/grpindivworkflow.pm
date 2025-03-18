@@ -52,30 +52,37 @@ sub getSqlFrom
    my $mode=shift;
    my @filter=@_;
 
-
-   my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
-
-
-   my $ids=join(",",keys(%groups));
-   my $dids=join(",",map({$_->{grpid}} 
-                     grep({$_->{distance} eq "0"} 
-                     values(%groups))));
-
-   if ($ids eq ""){
-      $ids="-99";
+   my $from="wfhead ".
+         "join grpindivfld ".
+         "on grpindivfld.dataobject='base::workflow' ".
+         "left outer join grpindivwfhead ".
+         "on (wfhead.wfheadid=grpindivwfhead.dataobjid ".
+         " and grpindivwfhead.grpindivfld=grpindivfld.id)";
+   if ($W5V2::OperationContext ne "W5Server"){
+      my %groups=$self->getGroupsOf($ENV{REMOTE_USER},'RMember','up');
+     
+     
+      my $ids=join(",",keys(%groups));
+      my $dids=join(",",map({$_->{grpid}} 
+                        grep({$_->{distance} eq "0"} 
+                        values(%groups))));
+     
+      if ($ids eq ""){
+         $ids="-99";
+      }
+      if ($dids eq ""){
+         $dids="-99";
+      }
+     
+      $from="wfhead ".
+         "join grpindivfld ".
+         "on grpindivfld.dataobject='base::workflow' and ".
+         "((grpindivfld.grpview in ($ids) and grpindivfld.directonly='0') or ".
+         "(grpindivfld.grpview in ($dids) and grpindivfld.directonly='1')) ".
+         "left outer join grpindivwfhead ".
+         "on (wfhead.wfheadid=grpindivwfhead.dataobjid ".
+         " and grpindivwfhead.grpindivfld=grpindivfld.id)";
    }
-   if ($dids eq ""){
-      $dids="-99";
-   }
-
-   my $from.="wfhead ".
-          "join grpindivfld ".
-          "on grpindivfld.dataobject='base::workflow' and ".
-          "((grpindivfld.grpview in ($ids) and grpindivfld.directonly='0') or ".
-          "(grpindivfld.grpview in ($dids) and grpindivfld.directonly='1')) ".
-          "left outer join grpindivwfhead ".
-          "on (wfhead.wfheadid=grpindivwfhead.dataobjid ".
-          " and grpindivwfhead.grpindivfld=grpindivfld.id)";
 
    return($from);
 }
