@@ -406,6 +406,36 @@ sub handleSRec
       }
       map_sgrp_flags($oldrec,$newrec,$sgrprec);
       $newrec->{sndate}=NowStamp("en");
+      if (defined($oldrec) && $#comments==-1){  # only if no errors
+         if ($sgrprec->{fullname} ne $oldrec->{fullname}){
+            msg(WARN,"rename from ".$oldrec->{fullname}." to ".
+                     $sgrprec->{fullname}."on SM.Now detected");
+            my $newfullname=uc($sgrprec->{fullname});
+            $dataobj->{mgrp}->ResetFilter();
+            my $chknewfullname=uc($newfullname);
+            $dataobj->{mgrp}->SetFilter({fullname=>\$chknewfullname});
+            my ($chkrec,$msg)=$dataobj->{mgrp}->getOnlyFirst(qw(ALL));
+            if (defined($chkrec) &&
+                $chkrec->{id} ne $oldrec->{id}){
+               # group already created by f.e. SM9
+               msg(WARN,"Meta-group was already new created but it was ".
+                        "a rename on id ".
+                        "$chkrec->{id} - deaktivating this group now");
+               $dataobj->{mgrp}->ValidatedUpdateRecord($chkrec,{
+                     cistatusid=>'6',
+                     snid=>undef,
+                     sndate=>undef,
+                     amid=>undef,
+                     amdate=>undef,
+                     comments=>'data trash by rename operation - '.
+                               'SM.Now bevor AM rename',
+                     },{
+                     id=>$chkrec->{id}
+               });
+            }
+            $newrec->{fullname}=uc($newfullname);
+         }
+      }
    }
    else{
       my $resetsmflags=1;
