@@ -1,4 +1,0 @@
-'TCOM::custsystem'=>{de=>'T-Deutschland Kundensicht System',en=>'T-Deutschland Customerview System'},
-'OS-Release'=>{de=>'Betriebssystemversion'},
-'fieldgroup.applications'=>{de=>'Anwendungen',en=>'Applications'},
-'fieldgroup.software'=>{de=>'Software',en=>'Software'}
