@@ -5600,9 +5600,6 @@ sub CollectREST
    if (!exists($p{retry_interval})){ 
       $p{retry_interval}=10; 
    }
-   if (!exists($p{retry_interval})){ 
-      $p{retry_interval}=10; 
-   }
 
    my $dbname=$p{dbname};
    my ($baseurl,$apikey,$apiuser,$base);
