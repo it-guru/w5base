@@ -107,7 +107,8 @@ sub ExpandContacts
          return(1);
       }
       if ($#l<$#req){
-         $self->LastMsg(ERROR,"error in base data request");
+         $self->LastMsg(ERROR,
+                "requested contact count matches not found contact count");
          return(0);
       }
       $data->{sendBaseData}=join("; ",sort(@l));

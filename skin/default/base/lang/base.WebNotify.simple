@@ -10,5 +10,8 @@
 'SMS activate'=>{de=>'SMS aktivieren'},
 'error in base data request'=>{
   de=>'Fehler in der Basisdatenabfrage'
+},
+'requested contact count matches not found contact count'=>{
+  de=>'Angefrage Anzahl von Kontakte entspricht nicht gefundenen Kontakten'
 }
 
