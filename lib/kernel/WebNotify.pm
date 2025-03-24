@@ -192,8 +192,15 @@ sub getDefaultOptionLine
    $sl.="</select>";
 
    my $sms="<input type=checkbox name=messageSMS";
-   if ($data->{messageSMS} ne ""){
-      $sms.=" checked";
+   my $SMSIfScript=$self->getParent->Config->Param("SMSInterfaceScript");
+   msg(INFO,"SMSInterfaceScript=$SMSIfScript");
+   if ($SMSIfScript eq ""){
+      $sms.=" disabled=true";
+   }
+   else{
+      if ($data->{messageSMS} ne ""){
+         $sms.=" checked";
+      }
    }
    $sms.=">";
 
