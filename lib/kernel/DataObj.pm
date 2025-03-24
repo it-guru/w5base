@@ -5579,10 +5579,26 @@ sub CollectREST
    my $self=shift;
    my %p=@_;
 
-   my $cachetime=$p{cachetime};
-   $cachetime=30 if (!defined($cachetime));
+   my $cachetime;
+   if (!exists($p{cachetime})){
+      if ($W5V2::OperationContext eq "W5Server"){
+         $cachetime=0;
+      }
+      else{
+         $cachetime=30;
+      }
+   }
+   else{
+      $cachetime=int($p{cachetime});
+   }
+   $cachetime=0 if (!defined($cachetime));
+
+
    if (!exists($p{retry_count})){ 
       $p{retry_count}=0; 
+   }
+   if (!exists($p{retry_interval})){ 
+      $p{retry_interval}=10; 
    }
    if (!exists($p{retry_interval})){ 
       $p{retry_interval}=10; 
@@ -5629,7 +5645,7 @@ sub CollectREST
    
    #msg(INFO,"CollectREST: Cache address=$c - token='$token'");
 
-   if (!exists($c->{"RESTCallResult.$token"}) || 
+   if (($cachetime<2 || !exists($c->{"RESTCallResult.$token"})) || 
        $c->{"RESTCallResult.$token"}->{t}<time()-$cachetime ||
        $p{method} eq "POST"){  # no Caching for posts
 
@@ -5637,7 +5653,25 @@ sub CollectREST
       if ($p{headers}){
          $Headers=&{$p{headers}}($self,$baseurl,$apikey,$apiuser,$base);
       }
-
+      if ($cachetime<2){  # cachetime = 1 | 0 disables caching
+         my %h=@$Headers;
+         if (!exists($h{'Cache-Control'})){
+            push(@{$Headers},
+               "Cache-Control",
+               "no-cache, no-store, must-revalidate"
+            );
+         }
+         if (!exists($h{'Pragma'})){
+            push(@{$Headers},
+               "Pragma","no-cache"
+            );
+         }
+         if (!exists($h{'Expires'})){
+            push(@{$Headers},
+               "Expires","0"
+            );
+         }
+      }
       my $Content;
       if ($p{content}){
          $Content=&{$p{content}}($self,$baseurl,$apikey,$apiuser,$base)
@@ -5664,9 +5698,6 @@ sub CollectREST
          DATA=>\@data,
          t=>time()
       };
-   }
-   else{
-      #msg(INFO,"CollectREST: Cache access to token '$token'");
    }
    if (exists($c->{"RESTCallResult.$token"})){
       if (wantarray()){
