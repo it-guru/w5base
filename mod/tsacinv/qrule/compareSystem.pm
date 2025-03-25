@@ -120,10 +120,34 @@ sub qcheckRecord
    #          srcid (W5Base) die srcid aus AssetManager (also die MCOS vmid)
    #
    if ($rec->{systemid} ne ""){   # pruefen ob SYSTEMID von AssetManager
-      $par->SetFilter({systemid=>\$rec->{systemid},
-                       deleted=>\'0'});
+      $par->SetFilter({systemid=>\$rec->{systemid}});
       ($parrec,$msg)=$par->getOnlyFirst(qw(ALL));
       return(undef,undef) if (!$par->Ping());
+      my $resetSystemID=0;
+      if (!defined($parrec)){   
+         $resetSystemID++;
+      }
+      else{
+         msg(INFO,
+             sprintf("ACRec %s : bdelete=%s mdate=%s\n",$parrec->{systemid},
+                     $parrec->{deleted},$parrec->{mdate}));
+         if ($parrec->{deleted} && lc($parrec->{srcsys}) eq "w5base"){
+            $resetSystemID++;
+         }
+      }
+      if ($resetSystemID){
+         $dataobj->ValidatedUpdateRecord(
+            $rec,
+            {systemid=>undef},
+            {id=>\$rec->{id}}
+         );
+         return(undef,{
+                qmsg=>'lost SystemID in AssetManager - reset local SystemID'
+         }); 
+      }
+      if ($parrec->{deleted}){  # reset, if parrec is deleted
+         $parrec=undef;
+      }
    }
 
 
