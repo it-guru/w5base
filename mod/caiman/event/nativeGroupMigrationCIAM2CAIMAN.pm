@@ -315,6 +315,38 @@ sub nativeGroupMigrationCIAM2CAIMAN
    }
    #######################################################################
 
+
+   foreach my $migrec (@lev1mig){
+      msg(INFO,"migrate $migrec->{old} to $migrec->{new}");
+      $grp->ResetFilter();
+      $grp->SetFilter({fullname=>\$migrec->{old}});
+      my ($ogrprec,$msg)=$grp->getOnlyFirst(qw(ALL));
+      $grp->ResetFilter();
+      $grp->SetFilter({fullname=>\$migrec->{new}});
+      my ($ngrprec,$msg)=$grp->getOnlyFirst(qw(ALL));
+      if (defined($ogrprec) && defined($ngrprec)){
+         $mandator->ResetFilter();
+         $mandator->SetFilter({grpid=>\$ogrprec->{grpid}});
+         my @l=$mandator->getHashList(qw(ALL));
+         foreach my $rec (@l){
+            my $op=$mandator->Clone();
+            $op->ValidatedUpdateRecord(
+               $rec,
+               {grpid=>$ngrprec->{grpid}},
+               {id=>\$rec->{id}}
+            );
+         }
+
+      }
+   }
+
+
+
+
+
+   # Miration of base::iomap with query from records tscape::archappl for
+   # importing Mandator
+
     
 
    
