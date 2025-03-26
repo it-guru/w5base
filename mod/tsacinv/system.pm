@@ -227,6 +227,8 @@ sub new
                            cfmassignment.\"name\" like 'MIS.%') and
                           (inmassignment.\"name\"='TI' or 
                            inmassignment.\"name\" like 'TI.%' or
+                           inmassignment.\"name\"='DT' or 
+                           inmassignment.\"name\" like 'DT.%' or
                            inmassignment.\"name\"='TIT' or 
                            inmassignment.\"name\" like 'TIT.%') 
                           then n'INVOICE_ONLY'
@@ -239,6 +241,8 @@ sub new
                            cfmassignment.\"name\" like 'MIS.%') and
                           (inmassignment.\"name\"='TI' or 
                            inmassignment.\"name\" like 'TI.%' or
+                           inmassignment.\"name\"='DT' or 
+                           inmassignment.\"name\" like 'DT.%' or
                            inmassignment.\"name\"='TIT' or 
                            inmassignment.\"name\" like 'TIT.%') 
                           then n'INVOICE_ONLY?'
