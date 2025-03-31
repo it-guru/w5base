@@ -120,10 +120,18 @@ sub getFirst
    my @o=$self->GetCurrentOrder();
    if (!($#o==0 && uc($o[0]) eq "NONE")){
       if ($#o==-1 || ($#o==0 && $o[0] eq "")){
-         @o=$self->getCurrentView();
+         @o=$self->getCurrentView(1);
       }
    }
    @o=grep(!/^linenumber$/,@o);
+   map({$_=~s/^\+//; $_} @o);
+
+   if (grep(/^-/,@o)){
+      $self->LastMsg(WARN,"requested descending (desc) order not suppored ".
+                          "and will be ignored");
+      map({$_=~s/^\-//; $_} @o);
+   }
+
    my @orderbuf;
    for(my $c=0;$c<=$#{$self->{CurrentData}};$c++){
       push(@orderbuf,{

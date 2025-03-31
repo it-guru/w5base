@@ -82,7 +82,49 @@ sub sngroup
       return({});
    }
 
+   # precheck - to find missing AG problem with SM.Now
+   msg(INFO,"start query for precheck - check against missing groups");
+   
+   $sgrp->ResetFilter();
+   $sgrp->SetFilter({
+      active=>1,
+      type=>'*52e03b172b703d10c0fb4cfbad01a081* '.
+            '*0551bb172b703d10c0fb4cfbad01a0b0* '.
+            '*d98b56fcfc8aded85dcff689977724aa* '.
+            '*654da04a2b61651053504cfbad01a094* '.
+            '*297a61de2b30fd90c0fb4cfbad01a086* '.
+            '*dcd035702b1c3150c0fb4cfbad01a05b*',
+      mdate=>'<now-6h'   
+   });
+   my @l=$sgrp->getHashList(qw(fullname));
 
+   if ($#l<50){
+      msg(ERROR,"SM.Now result of fullquery groups seems not plausible n=".
+          ($#l+1));
+      return({exitcode=>'100',exitmsg=>'ERROR group count was '.($#l+1)});
+   }
+
+   foreach my $rec (@l){
+      msg(INFO,"found $rec->{fullname} in SM.Now");
+   }
+   my $mistakeDateStamp;
+   foreach my $rec (@l){
+      $mgrp->ResetFilter();
+      $mgrp->SetFilter({fullname=>\$rec->{fullname}});
+      my ($chkrec,$msg)=$mgrp->getOnlyFirst(qw(id));
+      if (!defined($chkrec)){
+         msg(WARN,"missing group $rec->{fullname} with mdate in SM.Now older ".
+                  "then 6h - mdate in SM.Now is ".$rec->{mdate});
+         if (!defined($mistakeDateStamp) ||
+             $mistakeDateStamp gt $rec->{mdate}){
+            $mistakeDateStamp=$rec->{mdate};
+         }
+      }
+   }
+   if (defined($mistakeDateStamp)){
+      msg(WARN,"start repair sync with mistakeDateStamp=$mistakeDateStamp");
+   }
+      
    my $srcsys=$self->Self;
 
    my @incloader=(
@@ -132,6 +174,14 @@ sub sngroup
       if (defined($firstrec)){
          $start="$firstrec->{exitmsg}";
       }
+      if (defined($mistakeDateStamp) && defined($start) &&
+          $start gt $mistakeDateStamp){
+         msg(WARN,"overwrite sync start for mdate ".$dataobj->Self." ".
+                  "from $start to $mistakeDateStamp");
+         $start=$mistakeDateStamp;
+         $looplimit=1000000;
+      }
+    
 
       msg(INFO,"processing delta query starting from mdate>=$start"); 
       sleep(1);
@@ -161,6 +211,10 @@ sub sngroup
             msg(INFO,"process ".$incloader->{dataobj}->Self().
                      "($incloader->{cnt}): $grprec->{fullname} ".
                      "'$grprec->{mdate}'");
+            if (defined($laststamp) && $laststamp gt $grprec->{mdate}){
+               msg(WARN,"data stream ".$dataobj->Self()." not in mdate order");
+               msg(WARN,"old=$laststamp new=$grprec->{mdate}");
+            }
             $laststamp=$grprec->{mdate};
             if ($start eq $grprec->{mdate}){
                $c--;
