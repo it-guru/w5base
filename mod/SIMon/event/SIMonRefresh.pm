@@ -70,7 +70,7 @@ sub SIMonNotify
    else{
       $datastream->SetFilter({
          cistatusid=>[3,4],
-         cdate=>"<now-28d",    # das muss in der Prod min. 14 Tage sein
+         systemidate=>"<now-28d",  # send mails at earliest after 4 weeks
          reqtarget=>['RECO','MAND'],
          curinststate=>\'NOTFOUND',
          exceptreqtxt=>'',     # noch keine Ausnahme beantragt
@@ -83,7 +83,7 @@ sub SIMonNotify
 
 
    $datastream->SetCurrentView("ALL");
-   $datastream->SetCurrentOrder("cdate");
+   $datastream->SetCurrentOrder("systemidate");
    my ($rec,$msg)=$datastream->getFirst();
    my $c=0;
    if (defined($rec)){
@@ -263,9 +263,25 @@ sub SIMonRefresh
    my $system=getModuleObject($self->Config,"itil::system");
    my $datastream=getModuleObject($self->Config,$StreamDataobj);
    my $opobj=$datastream->Clone();
+   my $notifyResetCount=0;
+
+
+   $datastream->ResetFilter();
+   $datastream->SetFilter({neednotifyreset=>\'1'});
+   my @l=$datastream->getHashList(qw(ALL));
+   msg(INFO,"need reset of ".($#l+1)." notification records");
+   foreach my $rec (@l){
+      my $bk=$opobj->ValidatedUpdateRecord($rec,{
+         notifydate=>undef,
+         mdate=>NowStamp("en")
+      },{id=>\$rec->{id}});
+      msg(INFO,"reset for $rec->{system} bk=$bk");
+      $notifyResetCount++;
+   }
 
    if (exists($param{debug}) &&
        $param{debug} ne ""){
+      $datastream->ResetFilter();
       $datastream->SetFilter([
         {id=>$param{debug}},
         {system=>$param{debug}}
@@ -273,9 +289,21 @@ sub SIMonRefresh
 
    }
    else{
+      $datastream->ResetFilter();
       $datastream->SetFilter([
-        {id=>\undef,systemcdate=>"<now-14d"},
-        {needrefresh=>\'1'}
+        {
+           systemcistatusid=>[3,4],
+           id=>\undef,
+           systemidate=>"<now-14d" # create mon rec after 2 weeks
+        },  
+        {
+           systemcistatusid=>[3,4],
+           needrefresh=>\'1'
+        },
+        {  # add an automatic recalculation for active systems once a month 
+           systemcistatusid=>[3,4],
+           mdate=>'<now-1M'
+        }
       ]);
    }
 
@@ -283,12 +311,12 @@ sub SIMonRefresh
    $datastream->SetCurrentView(@datastreamview);
    $datastream->SetCurrentOrder("systemid");
    my ($rec,$msg)=$datastream->getFirst();
-   my $c=0;
+   my $refreshCount=0;
    if (defined($rec)){
       READLOOP: do{
-         $c++;
+         $refreshCount++;
          if ($opmode eq "dev"){
-            msg(INFO,sprintf("%6d",$c)." processing ".$rec->{system}.
+            msg(INFO,sprintf("%6d",$refreshCount)." processing ".$rec->{system}.
                      " in pkg ".$rec->{monpkg});
          }
          my $newtarget=$rec->{monpkgrestrictarget};
@@ -328,14 +356,16 @@ sub SIMonRefresh
             msg(ERROR,"db record problem: %s",$msg);
             return({exitcode=>1,msg=>$msg});
          }
-      }until(!defined($rec) || $c>5000);
+      }until(!defined($rec)||$refreshCount>1999);
+           # max. 2000 recalculations per hour(run)
    }
 
-
-
-
-
-   return({exitcode=>0,exitmsg=>'ok'});
+   return({
+      exitcode=>0,
+      exitmsg=>"ok; ".
+               "notifyResetCount=$notifyResetCount; ".
+               "refreshCount=$refreshCount"
+   });
 }
 
 
