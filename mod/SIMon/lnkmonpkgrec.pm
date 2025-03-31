@@ -46,6 +46,7 @@ sub new
                 name          =>'id',
                 label         =>'LinkID',
                 searchable    =>0,
+                group         =>'source',
                 dataobjattr   =>'lnksimonpkgrec.id'),
 
       new kernel::Field::RecordUrl(),
@@ -133,7 +134,7 @@ sub new
 
       new kernel::Field::Link(
                 name          =>'needrefresh',
-                label         =>'kg Restriction',
+                label         =>'need recalc flag',
                 readonly      =>1,
                 dataobjattr   =>"if (lnksimonpkgrec.id is not null AND ".
                                 "lnksimonpkgrec.modifydate<".
@@ -142,6 +143,15 @@ sub new
                                 "lnksimonpkgrec.reqtarget='NEDL'". # of deleted
                                 ",0,1)".                           # systems
                                 ",0)"),               
+
+      new kernel::Field::Link(
+                name          =>'neednotifyreset',
+                label         =>'need reset of notify flag',
+                readonly      =>1,
+                dataobjattr   =>
+                   "if (lnksimonpkgrec.notifydate is not null AND (".
+                   "system.instdate>lnksimonpkgrec.notifydate OR ".
+                   "system.cistatus>5),1,0)"),
 
       new kernel::Field::Select(
                 name          =>'reqtarget',
@@ -461,6 +471,12 @@ sub new
                 dataobjattr   =>'system.createdate'),
 
       new kernel::Field::Date(
+                name          =>'systemidate',
+                group         =>'source',
+                label         =>'system installation-date',
+                dataobjattr   =>'system.instdate'),
+
+      new kernel::Field::Date(
                 name          =>'notifydate',
                 group         =>'exceptionreq',
                 readonly      =>1,
@@ -541,7 +557,7 @@ sub initSqlWhere
    my $mode=shift;
    my $where="";
    if ($mode eq "select"){
-      $where="((system.cistatus in (3,4) and simonpkg.cistatus=4) ".
+      $where="((system.id is not null and simonpkg.cistatus=4) ".
              "or lnksimonpkgrec.id is not null)";
    }
    return($where);
