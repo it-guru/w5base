@@ -280,7 +280,10 @@ sub mkAcFtpRecSystem
       $acrec->{LogSys}->{pSystemPartOfAsset}="0.00";
    }
 
-   if ($rec->{mandator}=~m/^TelekomIT.*/){
+   if ($rec->{mandator}=~m/^TelekomIT HU Internal_IT/){
+      $acrec->{LogSys}->{SC_Location_ID}="DWR0.0000.0000";
+   }
+   elsif ($rec->{mandator}=~m/^TelekomIT.*/){
       $acrec->{LogSys}->{SC_Location_ID}="4787.0000.0000";
    }
    elsif ($rec->{mandator}=~m/^T-Systems.*/){
