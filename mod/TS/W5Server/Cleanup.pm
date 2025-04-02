@@ -27,7 +27,7 @@ sub process
          sleep(1);
       }
       my $current=time();
-      $nextrun=$current+200;
+      $nextrun=$current+40;
       my $sleep=$nextrun-$current;
       msg(DEBUG,"(%s) sleeping %d seconds",$self->Self,$sleep);
       $sleep=60 if ($sleep>60);
@@ -45,6 +45,7 @@ sub CleanupWorkflows
 
 
 
+   msg(DEBUG,"(%s) start cleanup",$self->Self);
    $wf->SetFilter({class=>[qw(
       itil::workflow::change itil::workflow::incident   itil::workflow::problem
       TS::workflow::change   TS::workflow::incident     TS::workflow::problem
@@ -56,7 +57,7 @@ sub CleanupWorkflows
    });
    $wf->SetCurrentView(qw(ALL));
    $wf->SetCurrentOrder(qw(mdate));
-   $wf->Limit(200);
+   $wf->Limit(100);
    my $c=0;
 
    my ($rec,$msg)=$wf->getFirst(unbuffered=>1);
@@ -67,6 +68,7 @@ sub CleanupWorkflows
          ($rec,$msg)=$wf->getNext();
       } until(!defined($rec));
    }
+   msg(DEBUG,"(%s) end cleanup",$self->Self);
 }
 
 sub reload
