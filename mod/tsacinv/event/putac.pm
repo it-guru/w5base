@@ -217,7 +217,13 @@ sub mkAcFtpRecSystem
    my $inmassign=$rec->{acinmassingmentgroup};
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
-   return(undef) if ($rec->{srcsys} =~ $exclude_srcsys_expr);
+   return(undef) if ( !(
+                          ($inmassign=~m/^MIS\..*$/i) ||
+                          ($inmassign=~m/^SAP\..*$/i) ||
+                          ($inmassign=~m/^S\.SEO\.DE\..*$/i) ||
+                          ($inmassign=~m/^PCS\..*$/i) 
+                       ) &&
+                     ($rec->{srcsys} =~ $exclude_srcsys_expr));
    if ($self->{DebugMode}){
       msg(INFO,"mkAcFtpRecSystem: $CurrentEventId");
    }
