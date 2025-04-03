@@ -2839,6 +2839,18 @@ sub ValidateDelete
                           {objtype=>\'itil::appl',obj3id=>\$id}]);
       $lock++ if ($refobj->CountRecords()>0);
    }
+   my $refobj=getModuleObject($self->Config,"itil::businessservice");
+   if (defined($refobj)){
+      my $idname=$self->IdField->Name();
+      my $id=$rec->{$idname};
+      $refobj->SetFilter([{applid=>\$id,cistatusid=>"<6"}]);
+      if ($refobj->CountRecords()>0){
+         $self->LastMsg(ERROR,
+             "delete only posible, if there are existing generic ".
+             "businessservices which are not disposed of wasted");
+         return(0);
+      }
+   }
 
    if ($lock>0 ||
        $#{$rec->{systems}}!=-1 ||
