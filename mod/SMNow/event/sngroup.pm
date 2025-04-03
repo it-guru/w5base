@@ -113,7 +113,8 @@ sub sngroup
       $mgrp->SetFilter({fullname=>\$rec->{fullname}});
       my ($chkrec,$msg)=$mgrp->getOnlyFirst(qw(id));
       if (!defined($chkrec)){
-         msg(WARN,"missing group $rec->{fullname} with mdate in SM.Now older ".
+         $mgrp->Log(WARN,"basedata",
+                  "missing group $rec->{fullname} with mdate in SM.Now older ".
                   "then 6h - mdate in SM.Now is ".$rec->{mdate});
          if (!defined($mistakeDateStamp) ||
              $mistakeDateStamp gt $rec->{mdate}){
@@ -462,8 +463,9 @@ sub handleSRec
       $newrec->{sndate}=NowStamp("en");
       if (defined($oldrec) && $#comments==-1){  # only if no errors
          if ($sgrprec->{fullname} ne $oldrec->{fullname}){
-            msg(WARN,"rename from ".$oldrec->{fullname}." to ".
-                     $sgrprec->{fullname}."on SM.Now detected");
+            $dataobj->Log(WARN,"basedata",
+                     "SM.Now interface rename from ".$oldrec->{fullname}." to ".
+                     $sgrprec->{fullname}." detected");
             my $newfullname=uc($sgrprec->{fullname});
             $dataobj->{mgrp}->ResetFilter();
             my $chknewfullname=uc($newfullname);
@@ -472,7 +474,8 @@ sub handleSRec
             if (defined($chkrec) &&
                 $chkrec->{id} ne $oldrec->{id}){
                # group already created by f.e. SM9
-               msg(WARN,"Meta-group was already new created but it was ".
+               $dataobj->Log(WARN,"basedata",
+                        "Meta-group was already new created but it was ".
                         "a rename on id ".
                         "$chkrec->{id} - deaktivating this group now");
                $dataobj->{mgrp}->ValidatedUpdateRecord($chkrec,{
