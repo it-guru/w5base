@@ -1139,7 +1139,7 @@ create table businessservice (
   UNIQUE KEY name (appl,name),KEY(name),
   UNIQUE KEY `srcsys` (srcsys,srcid),
   FOREIGN KEY fk_appl (appl)
-              REFERENCES appl (id) ON DELETE CASCADE
+              REFERENCES appl (id) ON DELETE SET NUL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table appl add applmgr bigint(20) default NULL, add applowner bigint(20) default NULL;
 alter table lnkapplappl add monitor varchar(20) default NULL;
