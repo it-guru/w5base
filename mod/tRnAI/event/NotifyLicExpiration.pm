@@ -144,9 +144,9 @@ sub doNotify
       });
       $wfa->Notify( "WARN",$subject,$tmpl, 
          emailto=>\@emailto, 
-         emailbcc=>[
-            11634953080001,   # HV
-         ],
+#         emailbcc=>[
+#            11634953080001,   # HV
+#         ],
          emailcategory =>['RnAI',
                           'tRnAI::event::NotifyLicExpiration',
                           'LicExpiration']
