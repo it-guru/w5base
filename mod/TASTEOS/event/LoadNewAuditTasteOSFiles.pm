@@ -143,7 +143,7 @@ sub LoadNewAuditTasteOSFiles
             $datastream->SetFilter({id=>\$lastid,mdate=>"\"$laststamp CET\""});
             my ($lastrec,$msg)=$datastream->getOnlyFirst(qw(id));
             if (!defined($lastrec)){
-               msg(WARN,"record with id '$lastid' ".
+               $datastream->Log(WARN,"backlog","record with id '$lastid' ".
                         "has been deleted or changed - using date only");
                $lastid=undef;
             }
