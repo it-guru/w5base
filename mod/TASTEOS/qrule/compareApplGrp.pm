@@ -404,7 +404,7 @@ sub qcheckRecord
                if ($machineNumber ne "" && 
                    exists($uaMachines{$machineNumber})){
                   $tsosmac->ValidatedDeleteRecord({id=>$mrec->{id}});
-                  $tsosmac->Log(WARN,"basedata",
+                  $tsosmac->Log(WARN,"backlog",
                            "TasteOS: droped MachineID=$mrec->{id} ".
                            "because new Agent in UnassignedMachines ".
                            "for $machineNumber");
@@ -418,10 +418,10 @@ sub qcheckRecord
          foreach my $machineid (@delList){
             $tsosmac->ResetFilter();
             $tsosmac->ValidatedDeleteRecord({id=>$machineid});
-            #$tsosmac->Log(WARN,"basedata",
-            #         "TasteOS: ".
-            #         "normaly drop MachineID '$machineid' because it ".
-            #         "does not exists in ICTO anymore");
+            $tsosmac->Log(WARN,"backlog",
+                     "TasteOS: ".
+                     "normaly drop MachineID '$machineid' because it ".
+                     "does not exists in ICTO anymore");
          }
       }
    }
@@ -483,7 +483,7 @@ sub qcheckRecord
                                                          description
                                                          riskCategoryId));
                if (!defined($mrec)){
-                  $tsosmac->Log(WARN,"basedata",
+                  $tsosmac->Log(WARN,"backlog",
                            "TasteOS: ".
                            "MachineID '$TSOSmachineid' ".
                            "(SystemName=$SystemName) ".
@@ -557,7 +557,7 @@ sub qcheckRecord
          foreach my $mrec (@{$defrec->{machines}}){
             $tsosmac->ResetFilter();
             $tsosmac->ValidatedDeleteRecord({id=>$mrec->{id}});
-            $tsosmac->Log(WARN,"basedata",
+            $tsosmac->Log(WARN,"backlog",
                      "TasteOS: ".
                      "cleanup MachineID '$mrec->{id}' from 'Default System' ".
                      "(SystemName=$mrec->{name}) ");

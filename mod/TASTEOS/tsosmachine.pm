@@ -388,7 +388,7 @@ sub InsertRecord
      # msg(INFO,"check ".$uaMachineRec->{machineNumber});
       if ($uaMachineRec->{machineNumber} eq $newrec->{machineNumber}){
          if (!$foundMachineIdInUnassinged){
-            $self->Log(WARN,"basedata",
+            $self->Log(WARN,"backlog",
                      "TasteOS: ".
                      "move MachineID '$uaMachineRec->{id}' from ".
                      "UnassignedMachines to SystemID '$newrec->{systemid}'");
@@ -400,7 +400,7 @@ sub InsertRecord
                       id=>$uaMachineRec->{id}
                    })){
                   $foundMachineIdInUnassinged=$uaMachineRec->{id};
-                  $self->Log(WARN,"basedata",
+                  $self->Log(WARN,"backlog",
                            "TasteOS: ".
                            "set MachineID '$uaMachineRec->{id}' to ".
                            "riskCategoryId='$newrec->{riskCategoryId}'");
