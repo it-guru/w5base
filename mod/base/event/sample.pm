@@ -287,6 +287,8 @@ sub SampleEvent2
    $user->SetFilter({systemid=>[qw(S06705023 S19907575)]});
    my @l=$user->getHashList(qw(systemname applications customer));
 
+   $user->Log(WARN,'backlog',"SampleEvent2 just for fun and test");
+
    for my $rec (@l){
       print STDERR hash2xml({'struct'=>{'entry'=>$rec->{customer}}});
 
