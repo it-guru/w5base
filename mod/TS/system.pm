@@ -1003,6 +1003,9 @@ sub genericSystemImport
                if ($oldrec->{cistatusid} ne "4"){
                   $updrec->{cistatusid}="4";
                }
+               if ($oldrec->{systemid} ne ""){
+                  $updrec->{systemid}=undef;
+               }
 
                ##############################################################
                # further parameters which needs to be updated 
