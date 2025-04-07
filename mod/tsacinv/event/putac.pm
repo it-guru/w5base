@@ -215,8 +215,10 @@ sub mkAcFtpRecSystem
 
    my $CurrentEventId="Process System '$rec->{name}'";
    my $inmassign=$rec->{acinmassingmentgroup};
+
    my $cfmassign="TIT";
    return(undef) if ($inmassign eq "");
+
    return(undef) if ( !(
                           ($inmassign=~m/^MIS\..*$/i) ||
                           ($inmassign=~m/^SAP\..*$/i) ||
@@ -368,15 +370,13 @@ sub SendXmlToAM_system
    my $acnewback=0;
 
    foreach my $idRec (@idList){
-      next if ($idRec->{srcsys} =~ $exclude_srcsys_expr);
       $system->ResetFilter();
       $system->SetFilter({id=>\$idRec->{id}});
       my ($rec,$msg)=$system->getOnlyFirst(qw(ALL));
       if (defined($rec)){
          my $t0=Time::HiRes::time();
          msg(INFO,"Start of Record systemname=$rec->{name}");
-         if ($rec->{asset} ne "" && $rec->{acinmassingmentgroup} ne "" &&
-             (!($rec->{srcsys} =~ $exclude_srcsys_expr)) ){
+         if ($rec->{asset} ne "" && $rec->{acinmassingmentgroup} ne ""){
             if ($self->{DebugMode}){
                msg(INFO,"check assetid '$rec->{asset}'");
             }
