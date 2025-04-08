@@ -1,6 +1,6 @@
 package caiman::qrule::CaimanUserOrgstruct;
 #  W5Base Framework
-#  Copyright (C) 2010  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2025  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
