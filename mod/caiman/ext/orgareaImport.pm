@@ -60,10 +60,7 @@ sub processImport
    my $useAs=shift;
    my $param=shift;
 
-printf STDERR ("fifi processImport name=$name\n");
    return(undef) if (!$name);
-
-printf STDERR ("fifi processImport\n");
 
    my $flt; 
    $useAs='srcid' if (!defined($useAs));
