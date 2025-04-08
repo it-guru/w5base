@@ -1,0 +1,4 @@
+'caiman::qrule::CaimanUserOrgstruct'=>{
+   de=>'CAIMAN Aktualisierung der Org-Zuorndung',
+   en=>'CAIMAN Refresh of Org-Relations',
+},

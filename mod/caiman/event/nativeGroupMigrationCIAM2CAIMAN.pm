@@ -139,6 +139,22 @@ sub nativeGroupMigrationCIAM2CAIMAN
 {
    my $self=shift;
 
+
+
+   { # activate IO-Maps from state "reserved" 
+      my $iomap=getModuleObject($self->Config,"base::iomap");
+      my $op=$iomap->Clone();
+
+      $iomap->SetFilter({cistatusid=>\'1'});
+
+      foreach my $rec ($iomap->getHashList(qw(ALL))){
+         if ($op->ValidatedUpdateRecord(
+                  $rec,{cistatusid=>'4'},{id=>$rec->{id}})){
+            msg(INFO,"IOMap Rule $rec->{id} migrated");
+         }
+      }
+   }
+
    my $grp=getModuleObject($self->Config,"base::grp");
    my $mandator=getModuleObject($self->Config,"base::mandator");
 
