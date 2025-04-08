@@ -341,18 +341,41 @@ sub nativeGroupMigrationCIAM2CAIMAN
       $grp->SetFilter({fullname=>\$migrec->{new}});
       my ($ngrprec,$msg)=$grp->getOnlyFirst(qw(ALL));
       if (defined($ogrprec) && defined($ngrprec)){
-         $mandator->ResetFilter();
-         $mandator->SetFilter({grpid=>\$ogrprec->{grpid}});
-         my @l=$mandator->getHashList(qw(ALL));
-         foreach my $rec (@l){
-            my $op=$mandator->Clone();
-            $op->ValidatedUpdateRecord(
-               $rec,
-               {grpid=>$ngrprec->{grpid}},
-               {id=>\$rec->{id}}
-            );
+         my $oldgrpid=$ogrprec->{grpid};
+         my $newgrpid=$ngrprec->{grpid};
+         my $tmpgrpid="12345678912344";
+         my @cmds=(
+            "set autocommit=off;",
+            "START TRANSACTION;",
+            "update grp set grpid='$tmpgrpid'    where grpid='$oldgrpid';",
+            "update grp set parentid='$tmpgrpid' where parentid='$oldgrpid';",
+            "update grp set grpid='$oldgrpid'    where grpid='$newgrpid';",
+            "update grp set parentid='$oldgrpid' where parentid='$newgrpid';",
+            "update grp set grpid='$newgrpid'    where grpid='$tmpgrpid';",
+            "update grp set parentid='$newgrpid' where parentid='$tmpgrpid';",
+            "COMMIT;",
+            "set autocommit=on;"
+         );
+         foreach my $cmd (@cmds){
+            $grp->{DB}->do($cmd);
          }
 
+
+         #
+         # It is not a good Idea, to modify mandator grpid
+         #
+        # $mandator->ResetFilter();
+        # $mandator->SetFilter({grpid=>\$ogrprec->{grpid}});
+        # my @l=$mandator->getHashList(qw(ALL));
+        # foreach my $rec (@l){
+        #    my $oldgrpid=
+        #    my $op=$mandator->Clone();
+        #    $op->ValidatedUpdateRecord(
+        #       $rec,
+        #       {grpid=>$ngrprec->{grpid}},
+        #       {id=>\$rec->{id}}
+        #    );
+        # }
       }
    }
 
