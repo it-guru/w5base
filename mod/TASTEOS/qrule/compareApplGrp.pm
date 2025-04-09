@@ -92,7 +92,8 @@ sub getPosibleTargets
             my $newTasteOS_MachineID=$newid;
             if ($oldTasteOS_MachineID ne "" &&
                 $newTasteOS_MachineID ne $oldTasteOS_MachineID){
-               msg(WARN,"TasteOS stored MachineID='$oldTasteOS_MachineID' ".
+               $tsosmac->Log(WARN,"backlog",
+                        "TasteOS stored MachineID='$oldTasteOS_MachineID' ".
                         "changed to new '$newTasteOS_MachineID'");
             }
             $add{TasteOS_MachineID}=$newid;
@@ -341,7 +342,9 @@ sub qcheckRecord
       $tsossys->SetFilter({id=>$TSOSsystemid}); # check if systemid still exists
       my ($srec,$msg)=$tsossys->getOnlyFirst(qw(id name));
       if (!defined($srec)){
-         msg(WARN,"stored systemid $TSOSsystemid does not exists in TasteOS");
+         $tsossys->Log(WARN,"backlog",
+                            "stored systemid $TSOSsystemid does not ".
+                            "exists in TasteOS");
          $TSOSsystemid=undef;
       }
    }
@@ -368,7 +371,8 @@ sub qcheckRecord
    }
    foreach my $id (@delList){  # cleanup old system records (not stored local)
       if ($id ne ""){
-         msg(WARN,"drop systemid $id in TasteOS");
+         $tsossys->Log(WARN,"backlog",
+                            "drop systemid $id in TasteOS");
          $tsossys->ValidatedDeleteRecord({id=>$id});
       }
    }
