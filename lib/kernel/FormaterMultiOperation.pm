@@ -112,6 +112,24 @@ function MarkAll()
    }
    allon=!allon;
 }
+document.addEventListener("DOMContentLoaded", function () {
+   const forms = document.querySelectorAll("form");
+
+   forms.forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+         const submitButton = form.querySelectorAll(".button");
+         submitButton.forEach(function (button) {
+            if (button) {
+               button.onclick = function () {
+                  return false; 
+               };
+               button.value = "working ..."; 
+            }
+         });
+      });
+   });
+
+});
 </script>
 EOF
    $d.=$self->MultiOperationHeader($app);
@@ -319,6 +337,7 @@ sub MultiOperationActor
    $text="Start Operation" if ($text eq "");
 
    return("<center><input class=button name=DO type=submit ".
+          "style=\"cursor: pointer\" ".
           "value=\"$text\"></center>");
 }
 
