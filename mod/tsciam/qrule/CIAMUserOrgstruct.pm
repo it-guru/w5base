@@ -236,7 +236,7 @@ sub qcheckRecord
             return($errorlevel,undef) if (defined($bk));
          }
          if ($#bossgrpsrcid!=-1){
-            $ciamusr->Log(WARN,"basedata",
+            $ciamusr->Log(WARN,"backlog",
                          "removing RBoss from User '%s' on group toucid='%s'",
                          $urec->{email},join(",",@bossgrpsrcid)
             );
