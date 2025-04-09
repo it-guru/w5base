@@ -158,44 +158,44 @@ sub nativeGroupMigrationCIAM2CAIMAN
    my $grp=getModuleObject($self->Config,"base::grp");
    my $mandator=getModuleObject($self->Config,"base::mandator");
 
-   #######################################################################
-   # 1st Migrate Hub Groups
-   $grp->ResetFilter();
-   $grp->SetFilter({fullname=>'EC.DTIT',cistatusid=>4});
-   my ($telitorgrec,$msg)=$grp->getOnlyFirst(qw(ALL));
-
-   my $HubGroupMigration=0; 
-   if (defined($telitorgrec)){
-      $grp->ResetFilter();
-      $grp->SetFilter({fullname=>'DTAG.GHQ.VTI.DTIT.Hub',cistatusid=>4});
-      my @l=$grp->getHashList(qw(ALL));
-      if ($#l!=-1){  # Parent Migration is not done
-         my $oldtelitorgrecgrpid=$l[0]->{parentid};
-         my $op=$grp->Clone();
-         if ($op->ValidatedUpdateRecord(
-               $l[0], { parent=>$telitorgrec->{fullname} },
-               {grpid=>\$l[0]->{grpid}}
-            )){
-            $HubGroupMigration++;
-         }
-         if ($HubGroupMigration){
-            msg(INFO,"Starting Hub-Group Migration in TS::vou");
-            msg(INFO,"telitorgrec:".Dumper($telitorgrec));
-            my $vou=getModuleObject($self->Config,"TS::vou");
-            $vou->SetFilter({rorgid=>$oldtelitorgrecgrpid,cistatusid=>'<6'});
-            my @v=$vou->getHashList(qw(ALL));
-            my $op=$vou->Clone();
-            foreach my $vrec (@v){
-               $op->ValidatedUpdateRecord(
-                  $vrec,
-                  {rorgid=>$telitorgrec->{grpid}},
-                  {id=>\$vrec->{id}}
-               );
-            }
-            msg(INFO,"Finish Hub-Group Migration in TS::vou");
-         }
-      }
-   }
+#   #######################################################################
+#   # 1st Migrate Hub Groups
+#   $grp->ResetFilter();
+#   $grp->SetFilter({fullname=>'EC.DTIT',cistatusid=>4});
+#   my ($telitorgrec,$msg)=$grp->getOnlyFirst(qw(ALL));
+#
+#   my $HubGroupMigration=0; 
+#   if (defined($telitorgrec)){
+#      $grp->ResetFilter();
+#      $grp->SetFilter({fullname=>'DTAG.GHQ.VTI.DTIT.Hub',cistatusid=>4});
+#      my @l=$grp->getHashList(qw(ALL));
+#      if ($#l!=-1){  # Parent Migration is not done
+#         my $oldtelitorgrecgrpid=$l[0]->{parentid};
+#         my $op=$grp->Clone();
+#         if ($op->ValidatedUpdateRecord(
+#               $l[0], { parent=>$telitorgrec->{fullname} },
+#               {grpid=>\$l[0]->{grpid}}
+#            )){
+#            $HubGroupMigration++;
+#         }
+#         if ($HubGroupMigration){
+#            msg(INFO,"Starting Hub-Group Migration in TS::vou");
+#            msg(INFO,"telitorgrec:".Dumper($telitorgrec));
+#            my $vou=getModuleObject($self->Config,"TS::vou");
+#            $vou->SetFilter({rorgid=>$oldtelitorgrecgrpid,cistatusid=>'<6'});
+#            my @v=$vou->getHashList(qw(ALL));
+#            my $op=$vou->Clone();
+#            foreach my $vrec (@v){
+#               $op->ValidatedUpdateRecord(
+#                  $vrec,
+#                  {rorgid=>$telitorgrec->{grpid}},
+#                  {id=>\$vrec->{id}}
+#               );
+#            }
+#            msg(INFO,"Finish Hub-Group Migration in TS::vou");
+#         }
+#      }
+#   }
    
 
    #######################################################################
