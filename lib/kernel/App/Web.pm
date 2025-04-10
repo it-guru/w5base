@@ -344,9 +344,15 @@ sub InitRequest
          else{
             my $fldlst="account,loghour,logondate,logonbrowser,".
                        "logonip,lang,site";
+            my $HTTP_USER_AGENT=$ENV{HTTP_USER_AGENT};
+            $HTTP_USER_AGENT=~s/['"\\]//g;
+            my $ipaddr=getClientAddrIdString();
+            $ipaddr=~s/['"\\]//g;
+            $site=~s/['"\\]//g;
+            $lang=~s/['"\\]//g;
+
             my $vallst="'$user','$loghour','$now',".
-                       "'$ENV{HTTP_USER_AGENT}','".
-                       getClientAddrIdString()."','$lang',".
+                       "'$HTTP_USER_AGENT','$ipaddr','$lang',".
                        "'$site'"; 
             my $cmd="replace delayed into userlogon";
             $cmd.=" ($fldlst)";
