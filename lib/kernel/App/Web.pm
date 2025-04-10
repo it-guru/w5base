@@ -113,7 +113,9 @@ sub RunWebApp
       my $o=getModuleObject($instdir,$configname,$MOD);
       if (!defined($o)){
          print("Content-type:text/plain\n\n");
-         print(msg(ERROR,"can't create DataObject '$MOD'"));
+         my $msgMOD=$MOD;
+         $msgMOD=~s/[<>()\/]//g;
+         print(msg(ERROR,"can't create DataObject '$msgMOD'"));
          return(undef);
       }
       $W5V2::ObjCache{$objectkey}={Obj=>$o,Time=>time()};
