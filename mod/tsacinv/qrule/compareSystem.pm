@@ -183,7 +183,7 @@ sub qcheckRecord
       # try to find parrec by srcsys and srcid
       if ($rec->{srcsys} ne "AssetManager"){       # if we got an MCOS constellation
          $par->ResetFilter();
-         $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id}});
+         $par->SetFilter({srcsys=>\'W5Base',srcid=>\$rec->{id},deleted=>\'0'});
          ($parrec)=$par->getOnlyFirst(qw(ALL));
       }
    }
