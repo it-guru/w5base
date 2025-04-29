@@ -220,65 +220,65 @@ sub qcheckRecord
          }
 
 
-#         ######################################################################
-#         #
-#         # hinzufügen der Leiter rollen
-#         #
-#         if (!defined($caimanid) || $caimanid eq ""){
-#            msg(ERROR,"can't find ciamid of user '%s'",$urec->{email});
-#            return($errorlevel,undef);
-#         }
-#         $caimanorg->SetFilter({toumgr=>\$caimanid,disabled=>\'false'});
-#         foreach my $caimanrec ($caimanorg->getHashList(
-#                              qw(torgoid name parentid parent shortname))){
-#            if ($caimanrec->{torgoid} ne ""){
-#               @bossgrpsrcid=grep(!/^$caimanrec->{torgoid}$/,@bossgrpsrcid);
-#            }
-#            my $bk=$self->addGrpLinkToUser($grp,$caimanorg,$grpuser,
-#                                           $caimanrec,$urec,
-#                                           ['RBoss']);
-#            return($errorlevel,undef) if (defined($bk));
-#         }
-#         if ($#bossgrpsrcid!=-1){
-#            $caimanusr->Log(WARN,"basedata",
-#                         "removing RBoss from User '%s' on group torgoid='%s'",
-#                         $urec->{email},join(",",@bossgrpsrcid)
-#            );
-#            my $lnkgrpuser=getModuleObject($Config,"base::lnkgrpuser");
-#            my $lnkgrpuserop=$lnkgrpuser->Clone();
-#            $grp->SetFilter({srcid=>\@bossgrpsrcid,
-#                             srcsys=>\$self->{SRCSYS}});
-#            foreach my $rgrprec ($grp->getHashList("grpid")){
-#               $lnkgrpuser->ResetFilter();
-#               $lnkgrpuser->SetFilter({userid=>\$urec->{userid},
-#                                           grpid=>\$rgrprec->{grpid},
-#                                           roles=>'RBoss'});
-#               foreach my $lnkrec ($lnkgrpuser->getHashList("ALL")){
-#                  my $needkill=0;
-#                  if (ref($lnkrec->{roles}) eq "ARRAY"){
-#                     my @r=grep(!/^RBoss$/,@{$lnkrec->{roles}});
-#                     if ($#r!=-1){
-#                        msg(INFO,"patching relation $rec->{lnkgrpuserid}");
-#                        $lnkgrpuserop->ValidatedUpdateRecord($lnkrec,
-#                           {lnkgrpuserid=>$lnkrec->{lnkgrpuserid},
-#                            roles=>\@r},
-#                           {lnkgrpuserid=>\$lnkrec->{lnkgrpuserid}});
-#                     }
-#                     else{
-#                        $needkill++;
-#                     }
-#                  }
-#                  else{
-#                     $needkill++;
-#                  }
-#                  if ($needkill){
-#                     msg(INFO,"killing relation $rec->{lnkgrpuserid}");
-#                     $lnkgrpuserop->ValidatedDeleteRecord($lnkrec);
-#                  }
-#               }
-#            }
-#         }
-#         ######################################################################
+         ######################################################################
+         #
+         # hinzufügen der Leiter rollen
+         #
+         if (!defined($caimanid) || $caimanid eq ""){
+            msg(ERROR,"can't find ciamid of user '%s'",$urec->{email});
+            return($errorlevel,undef);
+         }
+         $caimanorg->SetFilter({toumgr=>\$caimanid});
+         foreach my $caimanrec ($caimanorg->getHashList(
+                              qw(torgoid name parentid parent shortname))){
+            if ($caimanrec->{torgoid} ne ""){
+               @bossgrpsrcid=grep(!/^$caimanrec->{torgoid}$/,@bossgrpsrcid);
+            }
+            my $bk=$self->addGrpLinkToUser($grp,$caimanorg,$grpuser,
+                                           $caimanrec,$urec,
+                                           ['RBoss']);
+            return($errorlevel,undef) if (defined($bk));
+         }
+         if ($#bossgrpsrcid!=-1){
+            $caimanusr->Log(WARN,"basedata",
+                         "removing RBoss from User '%s' on group torgoid='%s'",
+                         $urec->{email},join(",",@bossgrpsrcid)
+            );
+            my $lnkgrpuser=getModuleObject($Config,"base::lnkgrpuser");
+            my $lnkgrpuserop=$lnkgrpuser->Clone();
+            $grp->SetFilter({srcid=>\@bossgrpsrcid,
+                             srcsys=>\$self->{SRCSYS}});
+            foreach my $rgrprec ($grp->getHashList("grpid")){
+               $lnkgrpuser->ResetFilter();
+               $lnkgrpuser->SetFilter({userid=>\$urec->{userid},
+                                           grpid=>\$rgrprec->{grpid},
+                                           roles=>'RBoss'});
+               foreach my $lnkrec ($lnkgrpuser->getHashList("ALL")){
+                  my $needkill=0;
+                  if (ref($lnkrec->{roles}) eq "ARRAY"){
+                     my @r=grep(!/^RBoss$/,@{$lnkrec->{roles}});
+                     if ($#r!=-1){
+                        msg(INFO,"patching relation $rec->{lnkgrpuserid}");
+                        $lnkgrpuserop->ValidatedUpdateRecord($lnkrec,
+                           {lnkgrpuserid=>$lnkrec->{lnkgrpuserid},
+                            roles=>\@r},
+                           {lnkgrpuserid=>\$lnkrec->{lnkgrpuserid}});
+                     }
+                     else{
+                        $needkill++;
+                     }
+                  }
+                  else{
+                     $needkill++;
+                  }
+                  if ($needkill){
+                     msg(INFO,"killing relation $rec->{lnkgrpuserid}");
+                     $lnkgrpuserop->ValidatedDeleteRecord($lnkrec);
+                  }
+               }
+            }
+         }
+         ######################################################################
 
 
          ######################################################################
