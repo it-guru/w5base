@@ -248,8 +248,8 @@ sub nativeGroupMigrationCIAM2CAIMAN
 
    my %migConst=(
     'DTAG.GHQ.VTI.DTIT'     =>{fullname=>'EC.DTIT'},
-    'DTAG.TSY.INT.DTIT_SK'  =>{fullname=>'EC.DT_SK'},
-    'DTAG.TSY.INT.DTIT_HU'  =>{fullname=>'EC.DT_HU'},
+    'DTAG.TSY.INT.DTIT_SK'  =>{srcid=>'eae720f8-c543-4430-bdcb-fe68b4fd5174'},
+    'DTAG.TSY.INT.DTIT_HU'  =>{srcid=>'27d1cf81-fb12-4acc-9f92-5c8fa3ff6e8e'},
     'DTAG.TSY.INT.HU'       =>{srcid=>'e37ef74a-cf08-4aab-b925-1528a62b6aa9'},
     'DTAG.TSY.INT.UKD'      =>{},
     'DTAG.GHQ.VTS.TSI'      =>{fullname=>'EC.TSI'},
@@ -273,7 +273,9 @@ sub nativeGroupMigrationCIAM2CAIMAN
     'DTAG.GHQ.VD.TDG.T.DT_A_GmbH'                                           =>
        {srcid=>'6773beb0-0b1a-4cc7-b324-13d4ac5cf62e'},
     'DTAG.TSY.INT.DTIT_HU.E.E-IIT03'                                        =>
-       {srcid=>'dd8e068c-a255-429b-84ec-d83682112adb'},
+       {srcid=>'73c2a3ad-050e-43c1-aa7c-3f5d69b69745'},
+    'DTAG.TSY.INT.DTIT_SK.SK-IT.SK-IT-LA1.SK-IT-LA1-01'                     =>
+       {srcid=>'666fdded-9166-4db8-a280-28f7ffadaa48'},
     'DTAG.Deutsche_Telek-old01.DTCS_GR'                                     =>
        {},
     'DTAG.GHQ.VTS.TSI.T.T-CSI.T-CSICH.T-CSICH04.T-CSICH04_CB'               =>
