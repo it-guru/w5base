@@ -276,6 +276,8 @@ sub nativeGroupMigrationCIAM2CAIMAN
        {srcid=>'73c2a3ad-050e-43c1-aa7c-3f5d69b69745'},
     'DTAG.TSY.INT.DTIT_SK.SK-IT.SK-IT-LA1.SK-IT-LA1-01'                     =>
        {srcid=>'666fdded-9166-4db8-a280-28f7ffadaa48'},
+    'DTAG.GHQ.VTI.DTIT.IT.IT-SC4-1'                                         =>
+       {srcid=>'2f5c1552-f82c-4f29-9740-33ce288ce6b6'},
     'DTAG.Deutsche_Telek-old01.DTCS_GR'                                     =>
        {},
     'DTAG.GHQ.VTS.TSI.T.T-CSI.T-CSICH.T-CSICH04.T-CSICH04_CB'               =>
