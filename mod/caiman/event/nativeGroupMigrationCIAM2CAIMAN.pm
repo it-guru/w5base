@@ -158,46 +158,6 @@ sub nativeGroupMigrationCIAM2CAIMAN
    my $grp=getModuleObject($self->Config,"base::grp");
    my $mandator=getModuleObject($self->Config,"base::mandator");
 
-#   #######################################################################
-#   # 1st Migrate Hub Groups
-#   $grp->ResetFilter();
-#   $grp->SetFilter({fullname=>'EC.DTIT',cistatusid=>4});
-#   my ($telitorgrec,$msg)=$grp->getOnlyFirst(qw(ALL));
-#
-#   my $HubGroupMigration=0; 
-#   if (defined($telitorgrec)){
-#      $grp->ResetFilter();
-#      $grp->SetFilter({fullname=>'DTAG.GHQ.VTI.DTIT.Hub',cistatusid=>4});
-#      my @l=$grp->getHashList(qw(ALL));
-#      if ($#l!=-1){  # Parent Migration is not done
-#         my $oldtelitorgrecgrpid=$l[0]->{parentid};
-#         my $op=$grp->Clone();
-#         if ($op->ValidatedUpdateRecord(
-#               $l[0], { parent=>$telitorgrec->{fullname} },
-#               {grpid=>\$l[0]->{grpid}}
-#            )){
-#            $HubGroupMigration++;
-#         }
-#         if ($HubGroupMigration){
-#            msg(INFO,"Starting Hub-Group Migration in TS::vou");
-#            msg(INFO,"telitorgrec:".Dumper($telitorgrec));
-#            my $vou=getModuleObject($self->Config,"TS::vou");
-#            $vou->SetFilter({rorgid=>$oldtelitorgrecgrpid,cistatusid=>'<6'});
-#            my @v=$vou->getHashList(qw(ALL));
-#            my $op=$vou->Clone();
-#            foreach my $vrec (@v){
-#               $op->ValidatedUpdateRecord(
-#                  $vrec,
-#                  {rorgid=>$telitorgrec->{grpid}},
-#                  {id=>\$vrec->{id}}
-#               );
-#            }
-#            msg(INFO,"Finish Hub-Group Migration in TS::vou");
-#         }
-#      }
-#   }
-   
-
    #######################################################################
    $grp->ResetFilter();
    $grp->SetFilter([
@@ -386,29 +346,58 @@ sub nativeGroupMigrationCIAM2CAIMAN
 
 
 
+   #######################################################################
+   # 1st Migrate Hub Groups
+   $grp->ResetFilter();
+   $grp->SetFilter({fullname=>'EC.DTIT',cistatusid=>4});
+   my ($telitorgrec,$msg)=$grp->getOnlyFirst(qw(ALL));
 
-   # Miration of base::iomap with query from records tscape::archappl for
-   # importing Mandator
+   if (defined($telitorgrec)){
+      $grp->ResetFilter();
+      $grp->SetFilter({fullname=>'DTAG.*.Hub DTAG.*.ConfigMgmtClearing',cistatusid=>4});
+      my @l=$grp->getHashList(qw(ALL));
+      foreach my $mig (@l){
+         if (exists($migConst{$mig->{parent}})){
+            my $mc=$migConst{$mig->{parent}};
+            printf STDERR ("fifi mig %s p=%s\n",$mig->{fullname},$mig->{parent});
+            printf STDERR Dumper($mc);
+            my $grp2=$grp->Clone();
+            $grp2->SetFilter($mc);
+            my ($newprec,$msg)=$grp2->getOnlyFirst(qw(ALL));
+            if (defined($newprec)){
+               my $newparent=$newprec->{fullname};
+               my $op=$grp->Clone();
+               if ($op->ValidatedUpdateRecord(
+                     $mig, { parent=>$newparent },
+                     {grpid=>\$mig->{grpid}}
+                  )){
+               }
+            }
+         }
 
-    
+      }
+   }
 
-   
-
-#print STDERR Dumper(\@l);
-
-
-
-   
-
-
-
-#   print STDERR Dumper($oldrec);
-#   print STDERR Dumper($newrec);
-
-
-
-                   
- 
+   # Deaktivate old DTAG Groups
+   #
+   $grp->ResetFilter();
+   $grp->SetFilter({fullname=>'EC.*',cistatusid=>4});
+   my $n=$grp->CountRecords();
+   if ($n>3700){ # most of new EC groups exists
+      $grp->ResetFilter();
+      #$grp->SetFilter({fullname=>'DTAG.*',srcsys=>'CIAM',cistatusid=>4});
+      $grp->SetFilter({fullname=>'DTAG.*',cistatusid=>[4,5]});
+      my @l=$grp->getHashList(qw(ALL));
+      foreach my $rec (@l){
+         msg(INFO,"deaktivate $rec->{fullname}");
+         my $op=$grp->Clone();
+         if ($op->ValidatedUpdateRecord(
+               $rec, { cistatusid=>'6' },
+               {grpid=>\$rec->{grpid}}
+            )){
+         }
+      }
+   }
 
    return({exitcode=>0,msg=>'ok'});
 }
