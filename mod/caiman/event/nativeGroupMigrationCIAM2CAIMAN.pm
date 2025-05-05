@@ -359,8 +359,8 @@ sub nativeGroupMigrationCIAM2CAIMAN
       foreach my $mig (@l){
          if (exists($migConst{$mig->{parent}})){
             my $mc=$migConst{$mig->{parent}};
-            printf STDERR ("fifi mig %s p=%s\n",$mig->{fullname},$mig->{parent});
-            printf STDERR Dumper($mc);
+            #printf STDERR ("fifi mig %s p=%s\n",$mig->{fullname},$mig->{parent});
+            #printf STDERR Dumper($mc);
             my $grp2=$grp->Clone();
             $grp2->SetFilter($mc);
             my ($newprec,$msg)=$grp2->getOnlyFirst(qw(ALL));
