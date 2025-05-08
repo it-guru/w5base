@@ -210,7 +210,7 @@ sub nativeGroupMigrationCIAM2CAIMAN
     'DTAG.GHQ.VTI.DTIT'     =>{fullname=>'EC.DTIT'},
     'DTAG.TSY.INT.DTIT_SK'  =>{srcid=>'eae720f8-c543-4430-bdcb-fe68b4fd5174'},
     'DTAG.TSY.INT.DTIT_HU'  =>{srcid=>'27d1cf81-fb12-4acc-9f92-5c8fa3ff6e8e'},
-    'DTAG.TSY.INT.HU'       =>{srcid=>'e37ef74a-cf08-4aab-b925-1528a62b6aa9'},
+    'DTAG.TSY.INT.HU'       =>{fullname=>'EC.DT_HU'},
     'DTAG.TSY.INT.UKD'      =>{},
     'DTAG.GHQ.VTS.TSI'      =>{fullname=>'EC.TSI'},
     'DTAG.T-Mobile_AT'      =>{fullname=>'EC.TMA'},
