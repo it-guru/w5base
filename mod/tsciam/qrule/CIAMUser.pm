@@ -579,6 +579,13 @@ sub qcheckRecord
 
       foreach my $fld (@fieldlist){
           my $ciamdata={$fld=>$ciamrec->{$fld}};
+          if ($fld=~m/(_phone|_facsimile|_mobile)$/){
+             my $val=$ciamdata->{$fld};
+             $val=~s/[^0-9]//g;
+             if (length($val)>4 && length($val)<7){
+                $ciamdata->{$fld}=undef;
+             }
+          }
           if (ref($ciamdata->{$fld}) eq "ARRAY"){
              $ciamdata->{$fld}=$ciamdata->{$fld}->[0];
           }
