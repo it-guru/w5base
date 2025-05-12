@@ -244,6 +244,14 @@ sub nativeGroupMigrationCIAM2CAIMAN
        {srcid=>'2ab06b15-b1a6-4410-b061-b10ab9ae6e51'},
    );
 
+   foreach my $c (keys(%migConst)){
+      if (!in_array([map({$_->{old}} @lev1mig)],$c)){
+         push(@lev1mig,{old=>$c});
+      }
+   }
+
+  
+
    ######################################################################
    # pass 1 mapping
    $self->mapMigConstToLev1Mig(\%migConst,\@lev1mig,$oldrec,$newrec);
@@ -288,7 +296,7 @@ sub nativeGroupMigrationCIAM2CAIMAN
         msg(ERROR,"bad mapping from $src to $k");
       }
    }
-   
+
    #######################################################################
    if ($fail){
       return({exitcode=>1,exitmsg=>"bad $fail migConst entries"});
