@@ -1082,7 +1082,7 @@ sub unpackCertSignRequest
    eval('$pkcs=Crypt::PKCS10->new($sslcertfile,
             verifySignature=>0
    );');
-   if ($@ ne "") {
+   if ($@ ne "" || !defined($pkcs)) {
       printf STDERR ("Crypt::PKCS10 result: %s\n",$@);
       if (!$silent){
          $self->LastMsg(ERROR,"Unknown file format - PKCS10 required");
