@@ -18,11 +18,6 @@ NONE
 
 Checks Interviews-Answers on DR-Test topic. 
 
-A valid CR number from SM9 is to be filled into the answer field  last (/next) Disaster-Recovery test (Change-Number) . In this case the date of last DR test will be automatically taken from the entered change and it will be copied to the answer field last Disaster-Recovery Test (WorkflowEnd). The existing content will be herewith replaced.
-
-If no valid CR number from SM9 exists, this field must be left empty.
-Possible comments can be inserted into the dedicated comment field available by clicking on corresponding icon (bubble).
-
 A DataIssue is created if age of the last DR test (calculated based on the SLA guidelines) is too old.
 
 A DataIssue is created if the date of the planned DR test is set further in the future as the interval defined in the SLA guidelines.
@@ -47,10 +42,6 @@ mailto:DR_Disaster_Recovery_Test@telekom.de
 [de:]
 
 Prüft die Interview-Antworten im Themenblock DR-Test. 
-
-Im Antwortfeld letzter (bzw. nächster) Disaster-Recovery Test (Change-Nummer) ist eine gültige CR Nummer aus SM9 einzutragen. In diesem Fall wird das Datum des letzten DR Tests automatisch aus dem Change entnommen und in das Antwortfeld letzter Disaster-Recovery Test (WorkflowEnd) eingefügt. Bereits eingetragene Inhalte werden dadurch überschrieben. 
-
-Wenn keine gültige CR Nummer aus SM9 vorhanden ist, ist das Feld leer zu lassen. Kommentare können ggf. in dediziertes Kommentarfeld eingetragen werden.
 
 Über die SLA Vorgaben wird errechnet, wie alt der letzte DR Test maximal sein darf. Ist dieser zu alt, wird ein DataIssue erzeugt.
 
@@ -221,76 +212,76 @@ sub qcheckRecord
    my $interviewchanged=0;
    my $ChangeEndDate;
 
-   if (exists($iarec->{qtag}->{SOB_003}) &&
-       $iarec->{qtag}->{SOB_003}->{relevant} eq "1"){
-      $ChangeNeeded++;
-   }
-   if (exists($iarec->{qtag}->{SOB_003}) &&
-       $iarec->{qtag}->{SOB_003}->{relevant} eq "1" &&
-       $iarec->{qtag}->{SOB_003}->{answer} ne ""){
-      my $changenumber=$iarec->{qtag}->{SOB_003}->{answer};
-      if ($changenumber=~/^C\d+$/){
-         $ChangeNumber=$changenumber;
-         $wf->SetFilter({srcid=>\$changenumber,srcsys=>'*change'});
-         my ($wfrec,$msg)=$wf->getOnlyFirst(qw(eventend wffields.changeend 
-                                               invoicedate));
-         if (defined($wfrec)){
-            my $qtag="SOB_004";
-            my $day=$wfrec->{eventend};
-            if ($wfrec->{changeend} ne ""){
-               $ChangeEndDate=$wfrec->{changeend};
-            }
-            if ($day ne ""){
-               my $d=CalcDateDuration($day,NowStamp("en"));
-               #print STDERR "Delta workflowend ($day):".Dumper($d);
-               if (defined($d)){
-                  if ($d->{totaldays}>0){  # take workflow end, if it's in past
-                     $day=~s/ .*$//; # cut of time
-                     my ($y,$m,$d)=$day=~m/(\d+)-(\d+)-(\d+)/;
-                     $day="$y-$m-$d";
-                     if (!defined($iarec->{qtag}->{$qtag})){
-                        # insert new
-                        $tag->setTag($rec->{id},"DRTestNotify","");
-                        $ia->ValidatedInsertRecord({
-                            parentid=>$rec->{id},
-                            parentobj=>'itil::appl',
-                            interviewid=>$self->{intv}->{qtag}->{$qtag}->{id},
-                            relevant=>1,
-                            answer=>$day
-                        });
-                        $interviewchanged++;
-                     }
-                     else{
-                        # update old
-                        if ($iarec->{qtag}->{$qtag}->{relevant} ne "1" ||
-                            $iarec->{qtag}->{$qtag}->{answer} ne $day){
-                           $tag->setTag($rec->{id},"DRTestNotify","");
-                           $ia->ValidatedUpdateRecord($iarec->{qtag}->{$qtag},
-                              { relevant=>1, answer=>$day},
-                              {id=>$iarec->{qtag}->{$qtag}->{id}});
-                           $interviewchanged++;
-                        }
-                     }
-                  }
-                  else{
-                     my $msg="temporary skip take of workflow end from change";
-                     push(@qmsg,$msg);
-                  }
-               }
-            }
-         }
-         else{
-            if (exists($rec->{interviewst}->{qStat}->{activeQuestions}->
-                       {qtag}->{SOB_003})){
-               my $msg="not existing Disaster-Recovery change number";
-               push(@qmsg,$msg);
-               if (!$drRiskAcceptance){
-                  push(@dataissue,$msg);
-               }
-            }
-         }
-      }
-   }
+#   if (exists($iarec->{qtag}->{SOB_003}) &&
+#       $iarec->{qtag}->{SOB_003}->{relevant} eq "1"){
+#      $ChangeNeeded++;
+#   }
+#   if (exists($iarec->{qtag}->{SOB_003}) &&
+#       $iarec->{qtag}->{SOB_003}->{relevant} eq "1" &&
+#       $iarec->{qtag}->{SOB_003}->{answer} ne ""){
+#      my $changenumber=$iarec->{qtag}->{SOB_003}->{answer};
+#      if ($changenumber=~/^C\d+$/){
+#         $ChangeNumber=$changenumber;
+#         $wf->SetFilter({srcid=>\$changenumber,srcsys=>'*change'});
+#         my ($wfrec,$msg)=$wf->getOnlyFirst(qw(eventend wffields.changeend 
+#                                               invoicedate));
+#         if (defined($wfrec)){
+#            my $qtag="SOB_004";
+#            my $day=$wfrec->{eventend};
+#            if ($wfrec->{changeend} ne ""){
+#               $ChangeEndDate=$wfrec->{changeend};
+#            }
+#            if ($day ne ""){
+#               my $d=CalcDateDuration($day,NowStamp("en"));
+#               #print STDERR "Delta workflowend ($day):".Dumper($d);
+#               if (defined($d)){
+#                  if ($d->{totaldays}>0){  # take workflow end, if it's in past
+#                     $day=~s/ .*$//; # cut of time
+#                     my ($y,$m,$d)=$day=~m/(\d+)-(\d+)-(\d+)/;
+#                     $day="$y-$m-$d";
+#                     if (!defined($iarec->{qtag}->{$qtag})){
+#                        # insert new
+#                        $tag->setTag($rec->{id},"DRTestNotify","");
+#                        $ia->ValidatedInsertRecord({
+#                            parentid=>$rec->{id},
+#                            parentobj=>'itil::appl',
+#                            interviewid=>$self->{intv}->{qtag}->{$qtag}->{id},
+#                            relevant=>1,
+#                            answer=>$day
+#                        });
+#                        $interviewchanged++;
+#                     }
+#                     else{
+#                        # update old
+#                        if ($iarec->{qtag}->{$qtag}->{relevant} ne "1" ||
+#                            $iarec->{qtag}->{$qtag}->{answer} ne $day){
+#                           $tag->setTag($rec->{id},"DRTestNotify","");
+#                           $ia->ValidatedUpdateRecord($iarec->{qtag}->{$qtag},
+#                              { relevant=>1, answer=>$day},
+#                              {id=>$iarec->{qtag}->{$qtag}->{id}});
+#                           $interviewchanged++;
+#                        }
+#                     }
+#                  }
+#                  else{
+#                     my $msg="temporary skip take of workflow end from change";
+#                     push(@qmsg,$msg);
+#                  }
+#               }
+#            }
+#         }
+#         else{
+#            if (exists($rec->{interviewst}->{qStat}->{activeQuestions}->
+#                       {qtag}->{SOB_003})){
+#               my $msg="not existing Disaster-Recovery change number";
+#               push(@qmsg,$msg);
+#               if (!$drRiskAcceptance){
+#                  push(@dataissue,$msg);
+#               }
+#            }
+#         }
+#      }
+#   }
    #######################################################################
    #
    # Interview Antworten neu laden, falls diese durch das
