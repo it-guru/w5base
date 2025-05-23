@@ -479,10 +479,9 @@ sub addGrpLinkToUser
          my $bk=$grpuser->ValidatedUpdateRecord($lnkrec,\%newlnk,
                             {lnkgrpuserid=>$lnkrec->{lnkgrpuserid}});
          if (!in_array(\@origroles,$roles->[0])){
-         #   TEMP deactivated during dev phase
-         #   $self->NotifyNewTeamRelation($lnkrec->{lnkgrpuserid},
-         #                                $urec->{userid},$grpid2add,"Rchange",
-         #                                $roles);
+            $self->NotifyNewTeamRelation($lnkrec->{lnkgrpuserid},
+                                         $urec->{userid},$grpid2add,"Rchange",
+                                         $roles);
          }
       }
       else{
@@ -497,9 +496,8 @@ sub addGrpLinkToUser
          #printf STDERR ("fifi try to create lnk %s\n",Dumper(\%newlnk));
          my $bk=$grpuser->ValidatedInsertRecord(\%newlnk);
          if ($bk){
-         #   TEMP deactivated during dev phase
-         #   $self->NotifyNewTeamRelation($bk,$urec->{userid},$grpid2add,"Rnew",
-         #                                $roles)
+            $self->NotifyNewTeamRelation($bk,$urec->{userid},$grpid2add,"Rnew",
+                                         $roles)
          }
       }
    }
