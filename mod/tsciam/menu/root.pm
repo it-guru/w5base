@@ -71,11 +71,11 @@ sub Init
                       defaultacl=>['admin']);
 
 
+#   $self->RegisterObj("sysadm.grp.ciampfix",
+#                      "tsciam::orgarea",
+#                      func=>'ParentGroupFix',
+#                      defaultacl=>['admin']);
 
-   $self->RegisterObj("sysadm.grp.ciampfix",
-                      "tsciam::orgarea",
-                      func=>'ParentGroupFix',
-                      defaultacl=>['admin']);
 
    return(1);
 }
