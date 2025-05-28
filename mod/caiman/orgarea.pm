@@ -86,7 +86,7 @@ sub new
 
 #      new kernel::Field::TextDrop( name       =>'boss',
 #                                   label      =>'Boss (tOuMgr)',
-#                                   vjointo    =>'tsciam::user',
+#                                   vjointo    =>'caiman::user',
 #                                   depend     =>['toumgr'],
 #                                   vjoinon    =>['toumgr'=>'tcid'],
 #                                   vjoindisp  =>'id'),
@@ -95,7 +95,7 @@ sub new
 #                                   label      =>'Boss (surname)',
 #                                   htmldetail =>0,
 #                                   searchable =>0,
-#                                   vjointo    =>'tsciam::user',
+#                                   vjointo    =>'caiman::user',
 #                                   depend     =>['toumgr'],
 #                                   vjoinon    =>['toumgr'=>'tcid'],
 #                                   vjoindisp  =>'surname'),
@@ -105,7 +105,7 @@ sub new
 #                                   htmldetail =>0,
 #                                   searchable =>0,
 #                                   depend     =>['toumgr'],
-#                                   vjointo    =>'tsciam::user',
+#                                   vjointo    =>'caiman::user',
 #                                   vjoinon    =>['toumgr'=>'tcid'],
 #                                   vjoindisp  =>'givenname'),
 
@@ -114,7 +114,7 @@ sub new
 #                                   htmldetail =>0,
 #                                   searchable =>0,
 #                                   depend     =>['toumgr'],
-#                                   vjointo    =>'tsciam::user',
+#                                   vjointo    =>'caiman::user',
 #                                   vjoinon    =>['toumgr'=>'tcid'],
 #                                   vjoindisp  =>'email'),
 #
@@ -294,7 +294,7 @@ sub doParentFix
       print("ERROR: no grpid sumited");
       return();
    }
-   my $ciam=getModuleObject($self->Config,"tsciam::orgarea");
+   my $caiman=getModuleObject($self->Config,"caiman::orgarea");
    my $grp=getModuleObject($self->Config,"base::grp");
 
    #
@@ -312,13 +312,13 @@ sub doParentFix
       return();
    }
    #
-   # load current parent from ciam
+   # load current parent from caiman
    #
-   $ciam->SecureSetFilter({torgoid=>\$grprec->{srcid}});
-   my ($ciamrec)=$ciam->getOnlyFirst(qw(parentid));
+   $caiman->SecureSetFilter({torgoid=>\$grprec->{srcid}});
+   my ($caimanrec)=$caiman->getOnlyFirst(qw(parentid));
 
-   if ($ciamrec->{parentid} eq ""){
-      print("ERROR: no parentid found in ciam");
+   if ($caimanrec->{parentid} eq ""){
+      print("ERROR: no parentid found in caiman");
       return();
    }
 
@@ -326,14 +326,14 @@ sub doParentFix
    # find new parent fullname
    #
    $grp->ResetFilter();
-   $grp->SecureSetFilter({srcid=>\$ciamrec->{parentid},srcsys=>\'CIAM'});
+   $grp->SecureSetFilter({srcid=>\$caimanrec->{parentid},srcsys=>\'CAIMAN'});
    my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
    if (!defined($pgrprec)){
-      my $orgareaImport=$self->ModuleObject('tsciam::ext::orgareaImport');
-      $orgareaImport->processImport($ciamrec->{parentid},'srcid',{quiet=>1});
-      #$self->Import({importname=>$ciamrec->{parentid}});
+      my $orgareaImport=$self->ModuleObject('caiman::ext::orgareaImport');
+      $orgareaImport->processImport($caimanrec->{parentid},'srcid',{quiet=>1});
+      #$self->Import({importname=>$caimanrec->{parentid}});
       $grp->ResetFilter();
-      $grp->SecureSetFilter({srcid=>\$ciamrec->{parentid},srcsys=>\'CIAM'});
+      $grp->SecureSetFilter({srcid=>\$caimanrec->{parentid},srcsys=>\'CAIMAN'});
       my ($pgrprec)=$grp->getOnlyFirst(qw(fullname));
       if (!defined($pgrprec)){
          if (!$self->LastMsg()){

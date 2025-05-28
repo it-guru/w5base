@@ -51,10 +51,10 @@ sub Init
                       "caiman::organisation",
                       defaultacl=>['admin','support']);
 
-#   $self->RegisterObj("sysadm.grp.ciampfix",
-#                      "tsciam::orgarea",
-#                      func=>'ParentGroupFix',
-#                      defaultacl=>['admin']);
+   $self->RegisterObj("sysadm.grp.caimanpfix",
+                      "caiman::orgarea",
+                      func=>'ParentGroupFix',
+                      defaultacl=>['admin']);
 
    return(1);
 }
