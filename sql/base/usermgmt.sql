@@ -453,3 +453,5 @@ alter table contact add notifieddismissaldate datetime default NULL;
 alter table contact add office_sisnumber varchar(20) default NULL;
 alter table grp add accarea varchar(20) default NULL,add sisnumber varchar(20) default NULL, add nsin varchar(20) default NULL,add isin varchar(20) default NULL, add comregnum varchar(20) default NULL;
 alter table grp add srcurl varchar(256) default NULL;
+alter table grp add lorgchangedt datetime default NULL,add lrecertreqdt datetime default NULL,add lrecertdt datetime default NULL,add lrecertuser bigint(20) default NULL;
+alter table contact add lorgchangedt datetime default NULL;
