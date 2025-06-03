@@ -417,6 +417,13 @@ sub new
                 label         =>'Contact CI-Statusid',
                 dataobjattr   =>'contact.cistatus'),
 
+      new kernel::Field::Date(
+                name          =>'lastorgchangedt',
+                readonly      =>1,
+                htmldetail    =>'0',
+                label         =>'last organisational change',
+                dataobjattr   =>'contact.lorgchangedt'),
+
       new kernel::Field::DynWebIcon(
                 name          =>'userweblink',
                 searchable    =>0,
