@@ -442,7 +442,7 @@ sub addGrpLinkToUser
       $grpuser->SetFilter({userid=>\$urec->{userid},
                            grpid=>\$grpid2add});
       $grpuser->SetCurrentView(qw(grpid userid lnkgrpuserid roles 
-                                  srcsys srcid srcload));
+                                  srcsys srcid srcload mdate));
       my ($lnkrec,$msg)=$grpuser->getFirst();
       my $oldrolestring="";
       my $newrolestring="";
@@ -470,12 +470,19 @@ sub addGrpLinkToUser
             $newroles{$r}++;
          }
          $newrolestring=join(",",sort(keys(%newroles)));
+
          my %newlnk=(roles=>[keys(%newroles)],
                      expiration=>undef,
                      alertstate=>undef,
                      srcsys=>$self->{SRCSYS},
                      srcid=>"none",
                      srcload=>$nowstamp);
+         if ($lnkrec->{mdate} ne ""){ # preserve old mdate
+            $newlnk{mdate}=$lnkrec->{mdate};
+         }
+         if ($newrolestring ne $oldrolestring){
+            $newlnk{mdate}=$nowstamp;
+         }
          my $bk=$grpuser->ValidatedUpdateRecord($lnkrec,\%newlnk,
                             {lnkgrpuserid=>$lnkrec->{lnkgrpuserid}});
          if (!in_array(\@origroles,$roles->[0])){
@@ -502,7 +509,7 @@ sub addGrpLinkToUser
       }
    }
    else{
-      msg(ERROR,"Can't create group tOuCID='$caimanrec->{torgoid}' ".
+      msg(ERROR,"can not create caiman group tOuCID='$caimanrec->{torgoid}' ".
                 "for user '$urec->{email}'");
       msg(ERROR,$self->getParent->LastMsg());
    }
