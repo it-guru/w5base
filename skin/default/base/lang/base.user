@@ -172,3 +172,4 @@
 'relevant user query abort count'=>{de=>'relevante Abfragenabbrüche'},
 'IP-Address(es):'=>{de=>'IP-Adresse(n):'},
 'SIS Number'=>{de=>'Gesellschaftsnummer'},
+'last organisational change'=>{de=>'Zeitpunkt der letzten Organisationsänderung'}

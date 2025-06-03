@@ -113,7 +113,7 @@ sub new
                 vjoininhash   =>['userid','email','user',
                                  'posix','usertyp','roles',
                                  'srcsys','srcid','srcload',
-                                 'lnkgrpuserid']),
+                                 'lnkgrpuserid','lastorgchangedt']),
 
       new kernel::Field::Text(
                 name          =>'orgusers',
@@ -413,6 +413,53 @@ sub new
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'grp.lastqcheck'),
 
+      new kernel::Field::Date(
+                name          =>'lrecertreqdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request date',
+                dataobjattr   =>'grp.lrecertreqdt'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqnotify',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request notification date',
+                dataobjattr   =>'grp.lrecertreqnotify'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert date',
+                dataobjattr   =>'grp.lrecertdt'),
+
+      new kernel::Field::Interface(
+                name          =>'lrecertuser',
+                group         =>'qc',
+                label         =>'last recert userid',
+                htmldetail    =>'0',
+                dataobjattr   =>"grp.lrecertuser")
+
+
    );
    $self->{PhoneLnkUsage}=\&PhoneUsage;
    $self->{CI_Handling}={uniquename=>"fullname",
@@ -461,6 +508,19 @@ sub initSearchQuery
                   "\"!".$self->T("CI-Status(6)","base::cistatus")."\"");
    }
 }
+
+
+sub getReCertificationUserIDs
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my @orgadm=$self->getMembersOf($rec->{grpid},["RAdmin"],"up");
+
+   return(@orgadm);
+}
+
+
 
 
 

@@ -1227,6 +1227,18 @@ sub new
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'contact.lastqcheck'),
 
+      new kernel::Field::Date(
+                name          =>'lastorgchangedt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last organisational change',
+                dataobjattr   =>'contact.lorgchangedt')
    );
    $self->{CI_Handling}={uniquename=>"fullname",
                          activator=>["admin","w5base.base.user"],
@@ -1445,6 +1457,7 @@ sub postQualityCheckRecord
    my $userid=$rec->{userid};
 
    if ($userid ne ""){
+      my %upd;
       my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
       $lnk->SetFilter({
          userid=>\$userid,
@@ -1453,11 +1466,17 @@ sub postQualityCheckRecord
       });
       my @grp;
       my @orggroups=$lnk->getHashList(qw(grpid nativroles 
-                                         is_orggrp is_projectgrp)); 
+                                         is_orggrp is_projectgrp
+                                         mdate)); 
       my %grp;
       my $grpobj=getModuleObject($self->Config,"base::grp");
+      my $latestmdate;
       foreach my $lnkrec (@orggroups){
          my $roles=$lnkrec->{nativroles};
+         if (!defined($latestmdate) || $latestmdate eq "" ||
+             $latestmdate lt $lnkrec->{mdate}){
+            $latestmdate=$lnkrec->{mdate};
+         } 
          $roles=[$roles] if (ref($roles) ne "ARRAY");
          $roles=[map({$_->{nativrole}} @{$roles})];
          if (in_array($roles,"RBoss")){ # TL Handling
@@ -1479,6 +1498,9 @@ sub postQualityCheckRecord
                is_projectgrp=>$lnkrec->{is_projectgrp}
             }
          }
+      }
+      if ($rec->{lastorgchangedt} ne $latestmdate){
+         $upd{lastorgchangedt}=$latestmdate;
       }
 
       if ($#grp!=-1){
@@ -1525,7 +1547,6 @@ sub postQualityCheckRecord
          }                                   # boss verwendet (falls kein org
       }                                      # attribut gesetzt)
 
-      my %upd;
       my $oboss=trim(join(" ",sort(grep(!/^$userid$/,keys(%oboss)))));
       if (($oboss ne "")  && $oboss ne $rec->{lastknownbossid}){
          $oboss=undef if ($oboss eq "");

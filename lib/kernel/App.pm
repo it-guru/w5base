@@ -444,6 +444,20 @@ sub OpenByIdWindow
 }
 
 
+sub getReCertificationUserIDs
+{
+   my $self=shift;
+   my $rec=shift;
+
+   if (exists($rec->{databossid}) && $rec->{databossid} ne ""){
+      return($rec->{databossid});
+   }
+
+   return();
+
+}
+
+
 
 sub getMembersOf
 {
