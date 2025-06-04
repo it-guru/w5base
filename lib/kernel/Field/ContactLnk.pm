@@ -40,7 +40,7 @@ sub new
    if (!defined($self{'vjoininhash'})){
       $self{'vjoininhash'}=['mdate','id','target','targetid','targetname',
                             'roles','expiration','mdate','comments',
-                            'srcsys','srcid','srcload'];
+                            'srcsys','srcid','srcload','lastorgchangedt'];
    }
    if (!defined($self{'vjoinapidisp'})){
       $self{'vjoinapidisp'}=['mdate','id','target','targetid','targetname',
