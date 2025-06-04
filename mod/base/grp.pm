@@ -404,7 +404,7 @@ sub new
                 vjoinon       =>['grpid'=>'parentid'],
                 vjoindisp     =>['name','cistatus','sdescription'],
                 vjoininhash   =>['grpid','name','fullname','srcsys',
-                                 'description']),
+                                 'description','lastorgchangedt']),
 
       new kernel::Field::QualityText(),
       new kernel::Field::QualityState(),
@@ -412,6 +412,19 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'grp.lastqcheck'),
+
+      new kernel::Field::Date(
+                name          =>'lastorgchangedt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last organisational change',
+                dataobjattr   =>'grp.lorgchangedt'),
 
       new kernel::Field::Date(
                 name          =>'lrecertreqdt',
@@ -536,6 +549,57 @@ sub SecureValidate
    }
    return($self->SUPER::SecureValidate($oldrec,$newrec));
 }
+
+
+
+sub postQualityCheckRecord
+{
+   my $self=shift;
+   my $rec=shift;
+
+   my $grpid=$rec->{grpid};
+
+   if ($grpid ne ""){
+      my %upd;
+      my $lnk=getModuleObject($self->Config,"base::lnkgrpuser");
+      $lnk->SetFilter({
+         grpid=>\$grpid,
+         rawnativroles=>[orgRoles()], usercistatusid=>[3,4,5]
+      });
+      my @grp;
+      my @orggroups=$lnk->getHashList(qw(grpid nativroles mdate)); 
+      my $latestmdate;
+      foreach my $lnkrec (@orggroups){
+         my $roles=$lnkrec->{nativroles};
+         if (!defined($latestmdate) || $latestmdate eq "" ||
+             $latestmdate lt $lnkrec->{mdate}){
+            $latestmdate=$lnkrec->{mdate};
+         } 
+      }
+      foreach my $subrec (@{$rec->{subunits}}){
+         if ($subrec->{lastorgchangedt} ne ""){
+            if (!defined($latestmdate) || $latestmdate eq "" ||
+                $latestmdate lt $subrec->{lastorgchangedt}){
+               $latestmdate=$subrec->{lastorgchangedt};
+            } 
+         }
+      }
+
+      if ($rec->{lastorgchangedt} ne $latestmdate){
+         $upd{lastorgchangedt}=$latestmdate;
+      }
+
+
+      if (keys(%upd)){
+         $upd{mdate}=$rec->{mdate};
+         my $op=$self->Clone();
+         $op->ValidatedUpdateRecord($rec,\%upd,{grpid=>\$grpid});
+      }
+   }
+
+   return(1);
+}
+
 
 
 sub prepareToWasted
