@@ -265,6 +265,13 @@ sub new
                 name          =>'targetid',
                 dataobjattr   =>'targetid'),
 
+      new kernel::Field::Interface(
+                name          =>'lastorgchangedt',
+                readonly      =>1,
+                dataobjattr   =>"if (lnkcontact.target='base::grp',".
+                                "grp.lorgchangedt,contact.lorgchangedt)"),
+
+
       new kernel::Field::Creator(
                 name          =>'creator',
                 group         =>'source',
@@ -354,6 +361,27 @@ sub new
       ]
    };
    return($self);
+}
+
+sub getSqlFrom
+{
+   my $self=shift;
+   my $mode=shift;
+   my @filter=@_;
+
+   my ($worktable,$workdb)=$self->getWorktable();
+   my $from=$worktable;
+   if ($mode eq "select"){
+      $from="$worktable ".
+            "left outer join grp ".
+               "on $worktable.target='base::grp' and ".
+                  "$worktable.targetid=grp.grpid ".
+            "left outer join contact ".
+               "on $worktable.target='base::user' and ".
+                  "$worktable.targetid=contact.userid ";
+   }
+
+   return($from);
 }
 
 sub getFullname
