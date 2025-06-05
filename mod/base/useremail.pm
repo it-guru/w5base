@@ -79,7 +79,7 @@ sub new
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>'fullname'),
                                   
-      new kernel::Field::Link(
+      new kernel::Field::Interface(
                 name          =>'userid',
                 label         =>'UserID',
                 wrdataobjattr =>'contact.pcontact',
@@ -176,12 +176,38 @@ sub new
                 group         =>'source',
                 label         =>'real Editor Account',
                 dataobjattr   =>'contact.realeditor'),
+
+      new kernel::Field::Interface(
+                name          =>'replkeypri',
+                group         =>'source',
+                label         =>'primary sync key',
+                dataobjattr   =>"contact.modifydate"),
+
+      new kernel::Field::Interface(
+                name          =>'replkeysec',
+                group         =>'source',
+                label         =>'secondary sync key',
+                dataobjattr   =>"lpad(contact.userid,35,'0')"),
                                   
    );
    $self->setWorktable("contact");
    $self->setDefaultView(qw(email cistatus emailtyp contactfullname));
    return($self);
 }
+
+sub SecureSetFilter
+{
+   my $self=shift;
+   my @flt=@_;
+
+   if (!$self->isDirectFilter(@flt)){
+      my @addflt=({cistatusid=>"!7"});
+      push(@flt,\@addflt);
+
+   }
+   return($self->SetFilter(@flt));
+}
+
 
 sub allowHtmlFullList
 {
