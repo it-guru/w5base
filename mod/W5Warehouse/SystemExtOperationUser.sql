@@ -39,9 +39,15 @@ union
           adminteamid
    from "itil::system" system where cistatusid<6 and cistatusid>1
 ), u as (
-   select userid,email,dsid,posix 
+   select "base::user".userid,
+          "base::useremail".email,
+          "base::user".dsid,
+          "base::user".posix
    from "base::user"
-   where cistatusid=4
+       join "base::useremail" 
+          on "base::user".userid="base::useremail".userid and
+             "base::useremail".cistatusid='4'
+   where "base::user".cistatusid=4
 ), g as (
    select *
    from "base::grp"
