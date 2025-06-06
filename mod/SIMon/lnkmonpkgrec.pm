@@ -137,8 +137,11 @@ sub new
                 label         =>'need recalc flag',
                 readonly      =>1,
                 dataobjattr   =>"if (lnksimonpkgrec.id is not null AND ".
-                                "lnksimonpkgrec.modifydate<".
-                                "simonpkg.modifydate,".
+                                "(lnksimonpkgrec.modifydate<".
+                                "simonpkg.modifydate OR ".
+                                "(lnksimonpkgrec.modifydate<".
+                                "system.modifydate ".
+                                "AND system.cistatus='4')),".
                                 "if (system.cistatus>5 AND ". # prevent refresh
                                 "lnksimonpkgrec.reqtarget='NEDL'". # of deleted
                                 ",0,1)".                           # systems
