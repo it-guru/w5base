@@ -92,14 +92,53 @@ sub qcheckRecord
    my @preList=$amif->getHashList(qw(id child_applid parent 
                                      child type mdate parent_applid));
    my %uList;
+   my %uNames;
    foreach my $ifrec (@preList){
       my $k=$ifrec->{parent_applid}.":".$ifrec->{child_applid};
+      $uNames{$ifrec->{child}}++;
       if (!exists($uList{$k})){
          $uList{$k}=$ifrec;
       }
    }
-   my @l=values(%uList);
 
+   if (keys(%uNames)){
+      my %pApplidByChild;
+      $amif->ResetFilter();
+      $amif->SetFilter({
+         child=>[sort(keys(%uNames))],
+         deleted=>\'0',
+         type=>\'SAP'
+      });
+
+      my @chklist=$amif->getHashList(qw(id child_applid parent 
+                                        child type mdate parent_applid));
+      foreach my $chkrec (@chklist){
+         my $curNum=999999999999;
+         my $chkNum=$chkrec->{parent_applid};
+         $chkNum=~s/[^0-9]//g;
+         if (exists($pApplidByChild{$chkrec->{child}})){
+            $curNum=$pApplidByChild{$chkrec->{child}};
+            $curNum=~s/[^0-9]//g;
+         }
+         
+         if ($curNum>$chkNum){
+            $pApplidByChild{$chkrec->{child}}=$chkrec->{parent_applid};
+         }
+      }
+      foreach my $k (keys(%uList)){  # remove duplicates with lower applid
+         foreach my $childName (keys(%pApplidByChild)){
+            if ($uList{$k}->{child} eq $childName){
+               if ($uList{$k}->{parent_applid} ne $pApplidByChild{$childName}){
+                  msg(INFO,"drop instance ".$uList{$k}->{child}." ".
+                           "in faver of $pApplidByChild{$childName}");
+                  delete($uList{$k});
+               }
+            }
+         }
+      }
+   }
+
+   my @l=values(%uList);
 
    my %childapplid;
    my $cappldata={};
