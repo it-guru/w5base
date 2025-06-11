@@ -1659,18 +1659,20 @@ sub NotifyInterfaceContacts
          my $informationHash=md5_base64(join("\n",@lastmsg));
                                                   # reduce
                                                   # duped infos to ifpartners
-
-         $wfa->Notify("ERROR",$subject,$tmpl,
-            emailto=>\@notify_to,
-            emailcc=>\@notify_cc,
-            dataobj=>"itil::lnkapplappl",
-            dataobjid=>$ifrec->{id},
-            infoHash=>$informationHash,
-            emailcategory =>['W5BaseInterfaces'],
-            emailbcc=>[
-               11634953080001, # HV
-            ]
-         );
+         if (lc($self->Config->Param("W5BaseOperationMode")) eq "online" ||
+             lc($self->Config->Param("W5BaseOperationMode")) eq "prod"){
+            $wfa->Notify("ERROR",$subject,$tmpl,
+               emailto=>\@notify_to,
+               emailcc=>\@notify_cc,
+               dataobj=>"itil::lnkapplappl",
+               dataobjid=>$ifrec->{id},
+               infoHash=>$informationHash,
+               emailcategory =>['W5BaseInterfaces'],
+               emailbcc=>[
+                  11634953080001, # HV
+               ]
+            );
+         }
          $notifycnt++;
       }
    }
