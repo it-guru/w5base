@@ -997,8 +997,7 @@ EOF
    # recertifcation handling
    #
    if (exists($rec->{lrecertreqdt}) && $rec->{lrecertreqdt} ne "" && 
-       exists($rec->{lrecertdt}) && 
-       ($rec->{lrecertdt} eq "" || $rec->{lrecertreqdt} gt $rec->{lrecertdt})){
+       exists($rec->{lrecertdt})){
       if ($#{$editgroups}!=-1){
          my @certUserIds=$app->getReCertificationUserIDs($rec);
          my $userid=$app->getCurrentUserId();
@@ -1011,6 +1010,7 @@ EOF
             my $idfield=$app->IdField();
             my $idname=$idfield->Name();
             $op->ValidatedUpdateRecord($rec,{
+                 lrecertreqdt=>undef,
                  lrecertdt=>NowStamp("en"),
                  lrecertuser=>$userid,
                  mdate=>$rec->{mdate}
