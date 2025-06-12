@@ -3,4 +3,5 @@
    en=>'Employee recertification process',
 },
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'ReCert request'=>{de=>'ReZertification-Anforderung'},
 

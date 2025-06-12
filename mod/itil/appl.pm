@@ -2066,7 +2066,55 @@ sub new
                 dataobjattr   =>'appl.lastqcheck'),
       new kernel::Field::QualityResponseArea(),
       new kernel::Field::EnrichLastDate(
-                dataobjattr   =>'appl.lastqenrich')
+                dataobjattr   =>'appl.lastqenrich'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request date',
+                dataobjattr   =>'appl.lrecertreqdt'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqnotify',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request notification date',
+                dataobjattr   =>'appl.lrecertreqnotify'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert date',
+                dataobjattr   =>'appl.lrecertdt'),
+
+      new kernel::Field::Interface(
+                name          =>'lrecertuser',
+                group         =>'qc',
+                label         =>'last recert userid',
+                htmldetail    =>'0',
+                dataobjattr   =>"appl.lrecertuser")
+
+
    );
    $self->AddGroup("external",translation=>'itil::appl');
    $self->{history}={

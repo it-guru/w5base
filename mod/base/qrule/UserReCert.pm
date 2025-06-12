@@ -35,6 +35,7 @@ use strict;
 use vars qw(@ISA);
 use kernel;
 use kernel::QRule;
+use Digest::MD5 qw(md5_base64);
 @ISA=qw(kernel::QRule);
 
 sub new
@@ -74,9 +75,9 @@ sub qcheckRecord
    my $lrecertdt_FObj=$dataobj->getField("lrecertdt",$rec);
    my $lrecertuser_FObj=$dataobj->getField("lrecertuser",$rec);
 
+   my $latestOrgChange;
    if ($dataobj->Self() eq "base::grp"){
       printf STDERR ("UserReCert: base::grp Handling:\n");
-      my $latestOrgChange;
       foreach my $lnkrec (@{$rec->{users}}){
          if ($lnkrec->{lastorgchangedt} ne ""){
             if (in_array($lnkrec->{roles},[orgRoles()])){
@@ -88,50 +89,109 @@ sub qcheckRecord
             }
          }
       }
-      my $doNotify=0;
-      if (!defined($rec->{lrecertreqdt}) || $rec->{lrecertreqdt} eq "" ||
-          $rec->{lrecertreqdt} lt $latestOrgChange){
-         $forcedupd->{lrecertreqdt}=$latestOrgChange;
-         $doNotify++;
-      }
-      if ($rec->{lrecertreqdt} ne "" &&
-          $rec->{lrecertreqdt} gt $latestOrgChange){
-         printf STDERR ("\n\nreset recert date=$latestOrgChange!!!\n\n-\n");
-         $forcedupd->{lrecertreqdt}=$latestOrgChange;
-      }
-
-      # ignore lrecertreqnotify if it is to old
-      if (defined($rec->{lrecertreqnotify}) && 
-          $rec->{lrecertreqnotify} ne ""){
-         my $d=CalcDateDuration($rec->{lrecertreqnotify},NowStamp("en"));
-         if ($d->{totalminutes}>2){
-            $rec->{lrecertreqnotify}=undef;
+   }
+   else{
+      printf STDERR ("UserReCert: CI-Handling: %s\n",$dataobj->Self());
+      foreach my $lnkrec (@{$rec->{contacts}}){
+         if ($lnkrec->{lastorgchangedt} ne ""){
+            if (in_array($lnkrec->{roles},["write","read"])){
+               if (!defined($latestOrgChange) ||
+                    $latestOrgChange eq "" ||
+                    $latestOrgChange lt $lnkrec->{lastorgchangedt}){
+                  $latestOrgChange=$lnkrec->{lastorgchangedt};
+               }
+            }
          }
       }
 
-      #printf STDERR ("fifi forcedupd->{lrecertreqdt}: %s\n",$forcedupd->{lrecertreqdt});
-      #printf STDERR ("fifi rec->{lrecertreqdt}: %s\n",$rec->{lrecertreqdt});
-      #printf STDERR ("fifi rec->{lrecertdt}: %s\n",$rec->{lrecertdt});
-
-      if (!defined($rec->{lrecertreqnotify}) || 
-          $rec->{lrecertreqnotify} eq "" &&
-          ($forcedupd->{lrecertreqdt} ne "" ||
-           $rec->{lrecertreqdt} gt $rec->{lrecertdt})){ 
-         my @orgadm=$dataobj->getMembersOf($rec->{grpid},["RAdmin"],"up");
-         printf STDERR ("NOTIFY01: --- !!! reCertNotify -----\n");
-         printf STDERR ("orgadmin=%s\n",Dumper(\@orgadm));
-
-         printf STDERR ("\n\nnotify request recert ".
-                        "date=$latestOrgChange!!!\n\n-\n");
-         printf STDERR ("NOTIFY02: --- !!! reCertNotify -----\n");
-         $forcedupd->{lrecertreqnotify}=NowStamp("en");
+   }
+   my $doNotify=0;
+   my $openReCertReq=0;
+   my @certUids;
+   if (exists($rec->{lrecertreqdt}) &&
+       exists($rec->{lrecertdt})){
+      @certUids=$dataobj->getReCertificationUserIDs($rec);
+   }
+   if ($rec->{lrecertreqdt} eq "" && $latestOrgChange ne "" &&
+       ($rec->{lrecertdt} eq "" || $latestOrgChange gt $rec->{lrecertdt})){
+      if ($#certUids!=-1){
+         $forcedupd->{lrecertreqdt}=NowStamp("en");
+         $doNotify++;
       }
    }
-   else{
-      printf STDERR ("UserReCert: CI Handling:\n");
-      printf STDERR ("contacts=%s\n",Dumper($rec->{contacts}));
+
+   printf STDERR ("fifi 01: $doNotify - $rec->{lrecertreqdt} \n");
+   if ($doNotify || $rec->{lrecertreqdt} ne ""){ # we have now an open recert
+      $doNotify++;
+   }
+   printf STDERR ("fifi 02: $doNotify\n");
+
+   if ($doNotify){
+      if ($rec->{lrecertreqnotify} ne ""){
+         my $d=CalcDateDuration($rec->{lrecertreqnotify},NowStamp("en"));
+         if ($d->{totalminutes}<5){
+            msg(INFO,"last recert notify to short in the past - no new notify");
+            $doNotify=0;
+         }
+      }
+   }
+   printf STDERR ("fifi 03: $doNotify\n");
+
+   if ($doNotify){
+      if ($#certUids==-1){
+         $doNotify=0;
+      }
+   } 
+
+   if ($doNotify){
+      $forcedupd->{lrecertreqnotify}=NowStamp("en");
+      printf STDERR ("fifi 000: Notify\n");
+      printf STDERR ("fifi 000: Notify\n");
+      printf STDERR ("fifi 000: Notify\n");
+      printf STDERR ("fifi 000: Notify\n");
+      printf STDERR ("fifi 000: Notify\n");
+      my %notifyParam;
+
+      my $informationHash;
+      if ($dataobj->Self() eq "base::grp"){
+         $informationHash=md5_base64("UserReCert: base::grp".$rec->{grpid});
+         $notifyParam{emailto}=\@certUids;
+      }
+      else{
+         $informationHash=md5_base64("UserReCert: ".
+                                     $dataobj->Self().$rec->{id});
+      }
+      $notifyParam{infoHash}=$informationHash;
+                                             
+
+
+      $dataobj->NotifyWriteAuthorizedContacts($rec,{},
+                                              \%notifyParam,{},sub{
+         my ($subject,$ntext);
+         my $ciname;
+         if (exists($rec->{fullname})){
+            $ciname=$rec->{fullname};
+         }
+         else{
+            $ciname=$rec->{name};
+         }
+         my $subject=$self->T("ReCert request").": ".$ciname;
+         my $NotifyTempl="UserReCertCiNotify";
+         if ($dataobj->Self() eq "base::grp"){
+            $NotifyTempl="UserReCertGrpNotify";
+         }
+         my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
+            skinbase=>'base',
+            static=>{
+               NAME=>$rec->{name}
+            }
+         });
+
+         return($subject,$tmpl);
+      });
 
    }
+
 
    if (keys(%$forcedupd)){ # du the forcedupd silent
       $forcedupd->{mdate}=$rec->{mdate};
