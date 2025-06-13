@@ -351,7 +351,53 @@ sub new
       new kernel::Field::QualityOk(),
       new kernel::Field::QualityLastDate(
                 dataobjattr   =>'itclust.lastqcheck'),
-      new kernel::Field::QualityResponseArea()
+      new kernel::Field::QualityResponseArea(),
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request date',
+                dataobjattr   =>'itclust.lrecertreqdt'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqnotify',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request notification date',
+                dataobjattr   =>'itclust.lrecertreqnotify'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert date',
+                dataobjattr   =>'itclust.lrecertdt'),
+
+      new kernel::Field::Interface(
+                name          =>'lrecertuser',
+                group         =>'qc',
+                label         =>'last recert userid',
+                htmldetail    =>'0',
+                dataobjattr   =>"itclust.lrecertuser")
    );
    $self->{use_distinct}=1;
    $self->{workflowlink}={ };

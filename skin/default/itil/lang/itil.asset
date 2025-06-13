@@ -97,4 +97,8 @@
 'Asset Class'=>{de=>'Asset Klasse'},
 'fieldgroup.compassets'=>{en=>'compose assets',de=>'Teil-Assets'},
 'fieldgroup.passet'=>{en=>'parent asset',de=>'Übergeordnetes-Asset'},
-
+'last organisational change'=>{de=>'Zeitpunkt der letzten Organisationsänderung'},
+'last recert date'=>{de=>'Zeitpunkt der letzten ReZertifizierung'},
+'last recert userid'=>{de=>'UserID der der letzten ReZertifizierung'},
+'last recert request notification date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Benachrichtigung'},
+'last recert request date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Anforderung'},

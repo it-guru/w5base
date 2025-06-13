@@ -1701,7 +1701,52 @@ sub new
                 dataobjattr   =>'system.lastqcheck'),
       new kernel::Field::EnrichLastDate(
                 dataobjattr   =>'system.lastqenrich'),
-   # new kernel::Field::DatacareAssistant()
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request date',
+                dataobjattr   =>'system.lrecertreqdt'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqnotify',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request notification date',
+                dataobjattr   =>'system.lrecertreqnotify'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert date',
+                dataobjattr   =>'system.lrecertdt'),
+
+      new kernel::Field::Interface(
+                name          =>'lrecertuser',
+                group         =>'qc',
+                label         =>'last recert userid',
+                htmldetail    =>'0',
+                dataobjattr   =>"system.lrecertuser")
 
    );
    $self->{CI_Handling}={uniquename=>"name",

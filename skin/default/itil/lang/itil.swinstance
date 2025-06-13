@@ -94,3 +94,8 @@
 'RUNON.2'=>{de=>'CloudArea',en=>'CloudArea'},
 'CloudArea application and instance application does not match'=>{de=>'Anwendung der CloudArea stimmt nicht mit der Anwendung in der Software-Instanz überein'},
 'all ItemTags'=>{de=>'alle ItemTags'},
+'last organisational change'=>{de=>'Zeitpunkt der letzten Organisationsänderung'},
+'last recert date'=>{de=>'Zeitpunkt der letzten ReZertifizierung'},
+'last recert userid'=>{de=>'UserID der der letzten ReZertifizierung'},
+'last recert request notification date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Benachrichtigung'},
+'last recert request date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Anforderung'},

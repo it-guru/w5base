@@ -33,4 +33,8 @@
  en=>'Organisation-Domains'
 },
 'Organisation-Domains'=>{de=>'Organisations-Domains'},
-
+'last organisational change'=>{de=>'Zeitpunkt der letzten Organisationsänderung'},
+'last recert date'=>{de=>'Zeitpunkt der letzten ReZertifizierung'},
+'last recert userid'=>{de=>'UserID der der letzten ReZertifizierung'},
+'last recert request notification date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Benachrichtigung'},
+'last recert request date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Anforderung'},
