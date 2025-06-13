@@ -77,7 +77,7 @@ sub qcheckRecord
 
    my $latestOrgChange;
    if ($dataobj->Self() eq "base::grp"){
-      printf STDERR ("UserReCert: base::grp Handling:\n");
+      msg(INFO,sprintf("UserReCert: base::grp Handling:\n"));
       foreach my $lnkrec (@{$rec->{users}}){
          if ($lnkrec->{lastorgchangedt} ne ""){
             if (in_array($lnkrec->{roles},[orgRoles()])){
@@ -91,7 +91,7 @@ sub qcheckRecord
       }
    }
    else{
-      printf STDERR ("UserReCert: CI-Handling: %s\n",$dataobj->Self());
+      msg(INFO,sprintf("UserReCert: CI-Handling: %s\n",$dataobj->Self()));
       foreach my $lnkrec (@{$rec->{contacts}}){
          if ($lnkrec->{lastorgchangedt} ne ""){
             if (in_array($lnkrec->{roles},["write","read"])){
@@ -120,22 +120,19 @@ sub qcheckRecord
       }
    }
 
-   printf STDERR ("fifi 01: $doNotify - $rec->{lrecertreqdt} \n");
    if ($doNotify || $rec->{lrecertreqdt} ne ""){ # we have now an open recert
       $doNotify++;
    }
-   printf STDERR ("fifi 02: $doNotify\n");
 
    if ($doNotify){
       if ($rec->{lrecertreqnotify} ne ""){
          my $d=CalcDateDuration($rec->{lrecertreqnotify},NowStamp("en"));
-         if ($d->{totalminutes}<5){
+         if ($d->{totalminutes}<1){
             msg(INFO,"last recert notify to short in the past - no new notify");
             $doNotify=0;
          }
       }
    }
-   printf STDERR ("fifi 03: $doNotify\n");
 
    if ($doNotify){
       if ($#certUids==-1){
@@ -143,52 +140,88 @@ sub qcheckRecord
       }
    } 
 
-   if ($doNotify){
+   if ($doNotify && $rec->{lrecertreqdt} ne ""){
       $forcedupd->{lrecertreqnotify}=NowStamp("en");
-      printf STDERR ("fifi 000: Notify\n");
-      printf STDERR ("fifi 000: Notify\n");
-      printf STDERR ("fifi 000: Notify\n");
-      printf STDERR ("fifi 000: Notify\n");
-      printf STDERR ("fifi 000: Notify\n");
-      my %notifyParam;
-
-      my $informationHash;
-      if ($dataobj->Self() eq "base::grp"){
-         $informationHash=md5_base64("UserReCert: base::grp".$rec->{grpid});
-         $notifyParam{emailto}=\@certUids;
-      }
-      else{
-         $informationHash=md5_base64("UserReCert: ".
-                                     $dataobj->Self().$rec->{id});
-      }
-      $notifyParam{infoHash}=$informationHash;
-                                             
-
-
-      $dataobj->NotifyWriteAuthorizedContacts($rec,{},
-                                              \%notifyParam,{},sub{
-         my ($subject,$ntext);
-         my $ciname;
-         if (exists($rec->{fullname})){
-            $ciname=$rec->{fullname};
+      my $d=CalcDateDuration($rec->{lrecertreqdt},NowStamp("en"));
+      msg(INFO,sprintf ("age of lrecertreqdt = %s\n",Dumper($d)));
+      if ($dataobj->Self() ne "base::grp" && # no auto deactivation for base:grp
+          $d->{totaldays}>112){  # set CI to cistatusid=6 after 4 months
+         my $name;
+         my $id;
+         if ($dataobj->Self() eq "base::grp"){
+            $id=$rec->{grpid};
+            $name=$rec->{fullname};
          }
          else{
-            $ciname=$rec->{name};
+            $id=$rec->{id};
+            $name=$rec->{name};
          }
-         my $subject=$self->T("ReCert request").": ".$ciname;
-         my $NotifyTempl="UserReCertCiNotify";
-         if ($dataobj->Self() eq "base::grp"){
-            $NotifyTempl="UserReCertGrpNotify";
-         }
-         my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
-            skinbase=>'base',
-            static=>{
-               NAME=>$rec->{name}
+         msg(INFO,"setting CI $name($id) to cistatusid=6 - disposed of wasted");
+         $forcedupd->{cistatusid}="6";
+      }
+      else{
+         if (1 || $d->{totaldays}>28){  # wait 28 days bevor sending a real mail
+            my %notifyParam;
+            if ($dataobj->Self() eq "base::grp"){
+               $notifyParam{emailto}=\@certUids;
             }
-         });
+            if ($dataobj->Self() eq "base::grp"){
+               $dataobj->NotifyLangContacts($rec,{},
+                                                       \%notifyParam,{},sub{
+                  my ($subject,$ntext);
+                  my $ciname;
+                  if (exists($rec->{fullname})){
+                     $ciname=$rec->{fullname};
+                  }
+                  else{
+                     $ciname=$rec->{name};
+                  }
+                  my $subject=$self->T("ReCert request").": ".$ciname;
+                  my $NotifyTempl="UserReCertCiNotify";
+                  if ($dataobj->Self() eq "base::grp"){
+                     $NotifyTempl="UserReCertGrpNotify";
+                  }
+                  my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
+                     skinbase=>'base',
+                     static=>{
+                        NAME=>$rec->{name}
+                     }
+                  });
+                  return($subject,$tmpl);
+               });
 
-         return($subject,$tmpl);
-      });
+            }
+            else{
+               $dataobj->NotifyWriteAuthorizedContacts($rec,{},
+                                                       \%notifyParam,{},sub{
+                  my ($subject,$ntext);
+                  my $ciname;
+                  if (exists($rec->{fullname})){
+                     $ciname=$rec->{fullname};
+                  }
+                  else{
+                     $ciname=$rec->{name};
+                  }
+                  my $subject=$self->T("ReCert request").": ".$ciname;
+                  my $NotifyTempl="UserReCertCiNotify";
+                  if ($dataobj->Self() eq "base::grp"){
+                     $NotifyTempl="UserReCertGrpNotify";
+                  }
+                  my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
+                     skinbase=>'base',
+                     static=>{
+                        NAME=>$rec->{name}
+                     }
+                  });
+                  return($subject,$tmpl);
+               });
+            }
+         }
+         else{
+            msg(INFO,"preserve real Notification Mail - ".
+                     "because request is jung");
+         }
+      }
 
    }
 
