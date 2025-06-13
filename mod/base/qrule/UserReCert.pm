@@ -127,7 +127,7 @@ sub qcheckRecord
    if ($doNotify){
       if ($rec->{lrecertreqnotify} ne ""){
          my $d=CalcDateDuration($rec->{lrecertreqnotify},NowStamp("en"));
-         if ($d->{totalminutes}<1){
+         if ($d->{totalhours}<48){
             msg(INFO,"last recert notify to short in the past - no new notify");
             $doNotify=0;
          }
@@ -160,7 +160,7 @@ sub qcheckRecord
          $forcedupd->{cistatusid}="6";
       }
       else{
-         if (1 || $d->{totaldays}>28){  # wait 28 days bevor sending a real mail
+         if ($d->{totaldays}>28){  # wait 28 days bevor sending a real mail
             my %notifyParam;
             if ($dataobj->Self() eq "base::grp"){
                $notifyParam{emailto}=\@certUids;
