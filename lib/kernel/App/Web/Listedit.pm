@@ -1153,7 +1153,6 @@ sub ById
    my %param;
 
    my $FormatAs=Query->Param("FormatAs");
-
    if (lc($ENV{HTTP_ACCEPT}) eq "application/json" ||
        $FormatAs eq "nativeJSON"){
       $ENV{HTTP_ACCEPT}="application/json";
@@ -1166,6 +1165,9 @@ sub ById
          $self->SetCurrentOrder("NONE");
          my ($rec,$msg)=$self->getOnlyFirst(qw(ALL));
          if (defined($rec)){
+            if ($self->can("UserReCertHandling")){
+               $self->UserReCertHandling($rec);
+            }
             my @viewgroups=$self->isViewValid($rec,format=>"nativeJSON");
             my @fieldlist=$self->getFieldObjsByView(
                                    [qw(ALL)],

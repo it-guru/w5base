@@ -2328,6 +2328,38 @@ sub SecureValidatedUpdateRecord
    return(undef);
 }
 
+sub UserReCertHandling
+{
+   my $self=shift;
+   my $rec=shift;
+   my $editgroups=shift;
+
+   if (exists($rec->{lrecertreqdt}) && $rec->{lrecertreqdt} ne "" &&
+       exists($rec->{lrecertdt})){
+      if (!defined($editgroups) || $#{$editgroups}!=-1){
+         my @certUserIds=$self->getReCertificationUserIDs($rec);
+         my $userid=$self->getCurrentUserId();
+
+         # reCertification is only allowed from UserIds which are returned
+         # from getReCertificationUserIDs (on base::grp per Default OrgAdmins
+         # and on all other per Default the databoss)
+         if (in_array($userid,\@certUserIds)){
+            my $op=$self->Clone();
+            my $idfield=$self->IdField();
+            my $idname=$idfield->Name();
+            $op->ValidatedUpdateRecord($rec,{
+                 lrecertreqdt=>undef,
+                 lrecertdt=>NowStamp("en"),
+                 lrecertuser=>$userid,
+                 mdate=>$rec->{mdate}
+            },{$idname=>\$rec->{$idname}});
+         }
+
+      }
+   }
+}
+
+
 sub loadPrivacyAcl
 {
    my $self=shift;
@@ -2477,7 +2509,6 @@ sub getWriteAuthorizedContacts
       }
    }
 }
-
 
 sub NotifyLangContacts
 {

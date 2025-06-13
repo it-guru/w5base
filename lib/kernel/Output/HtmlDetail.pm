@@ -992,32 +992,8 @@ EOF
    if ($currentfieldgroup eq "" && $self->getParent->getParent->LastMsg()){
       $latelastmsg++;
    }
-
-   #
-   # recertifcation handling
-   #
-   if (exists($rec->{lrecertreqdt}) && $rec->{lrecertreqdt} ne "" && 
-       exists($rec->{lrecertdt})){
-      if ($#{$editgroups}!=-1){
-         my @certUserIds=$app->getReCertificationUserIDs($rec);
-         my $userid=$app->getCurrentUserId();
-
-         # reCertification is only allowed from UserIds which are returned
-         # from getReCertificationUserIDs (on base::grp per Default OrgAdmins
-         # and on all other per Default the databoss)
-         if (in_array($userid,\@certUserIds)){
-            my $op=$app->Clone();
-            my $idfield=$app->IdField();
-            my $idname=$idfield->Name();
-            $op->ValidatedUpdateRecord($rec,{
-                 lrecertreqdt=>undef,
-                 lrecertdt=>NowStamp("en"),
-                 lrecertuser=>$userid,
-                 mdate=>$rec->{mdate}
-            },{$idname=>\$rec->{$idname}});
-         }
-
-      }
+   if ($app->can("UserReCertHandling")){
+      $app->UserReCertHandling($rec,$editgroups);
    }
 
    foreach my $template (@blocks){
