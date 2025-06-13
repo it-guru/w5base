@@ -32,3 +32,8 @@
 'infrastructure application is not active'=>{de=>'Infrastruktur-Anwendung ist nicht aktiv'},
 'infrastructure application needed for this mode'=>{de=>'Für diesen Modus ist eine Infrastruktur-Anwendung notwendig'},
 'technical short name'=>{de=>'technischer Kurzname'},
+'last organisational change'=>{de=>'Zeitpunkt der letzten Organisationsänderung'},
+'last recert date'=>{de=>'Zeitpunkt der letzten ReZertifizierung'},
+'last recert userid'=>{de=>'UserID der der letzten ReZertifizierung'},
+'last recert request notification date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Benachrichtigung'},
+'last recert request date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Anforderung'},

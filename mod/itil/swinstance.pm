@@ -1092,6 +1092,53 @@ sub new
                 dataobjattr   =>'swinstance.lastqcheck'),
       new kernel::Field::EnrichLastDate(
                 dataobjattr   =>'swinstance.lastqenrich'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request date',
+                dataobjattr   =>'swinstance.lrecertreqdt'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertreqnotify',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert request notification date',
+                dataobjattr   =>'swinstance.lrecertreqnotify'),
+
+      new kernel::Field::Date(
+                name          =>'lrecertdt',
+                group         =>'qc',
+                searchable    =>sub{
+                   my $self=shift;
+                   my $app=$self->getParent;
+                   return(1) if ($app->IsMemberOf("admin"));
+                   return(0);
+                },
+                htmldetail    =>'0',
+                label         =>'last recert date',
+                dataobjattr   =>'swinstance.lrecertdt'),
+
+      new kernel::Field::Interface(
+                name          =>'lrecertuser',
+                group         =>'qc',
+                label         =>'last recert userid',
+                htmldetail    =>'0',
+                dataobjattr   =>"swinstance.lrecertuser")
+
    );
    $self->{history}={
       update=>[

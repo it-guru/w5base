@@ -15,3 +15,8 @@
 'Application TSMs'=>{de=>'Anwendungs TSMs'},
 'Application deputy TSMs'=>{de=>'Anwendungs TSM Vertreter'},
 'Application ApplicationManagers'=>{de=>'Anwendungs ApplicationManager'},
+'last organisational change'=>{de=>'Zeitpunkt der letzten Organisationsänderung'},
+'last recert date'=>{de=>'Zeitpunkt der letzten ReZertifizierung'},
+'last recert userid'=>{de=>'UserID der der letzten ReZertifizierung'},
+'last recert request notification date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Benachrichtigung'},
+'last recert request date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Anforderung'},
