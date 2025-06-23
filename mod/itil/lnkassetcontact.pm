@@ -56,19 +56,23 @@ sub new
    return($self);
 }
 
+
 sub getSqlFrom
 {
    my $self=shift;
    my $mode=shift;
    my @filter=@_;
-   my ($worktable,$workdb)=$self->getWorktable();
-   my $from="";
 
-   $from.="$worktable left outer join asset ".
+
+   my $from=$self->SUPER::getSqlFrom($mode,@filter);
+   my ($worktable,$workdb)=$self->getWorktable();
+
+   $from.=" left outer join asset ".
           "on ${worktable}.refid=asset.id ";
 
    return($from);
 }
+
 
 
 1;
