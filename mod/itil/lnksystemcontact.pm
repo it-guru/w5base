@@ -62,10 +62,12 @@ sub getSqlFrom
    my $self=shift;
    my $mode=shift;
    my @filter=@_;
-   my ($worktable,$workdb)=$self->getWorktable();
-   my $from="";
 
-   $from.="$worktable left outer join system ".
+
+   my $from=$self->SUPER::getSqlFrom($mode,@filter);
+   my ($worktable,$workdb)=$self->getWorktable();
+
+   $from.=" left outer join system ".
           "on ${worktable}.refid=system.id ";
 
    return($from);
