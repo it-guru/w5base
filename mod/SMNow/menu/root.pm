@@ -51,6 +51,10 @@ sub Init
                       "SMNow::sys_user_group",
                       defaultacl=>['valid_user']);
 
+   $self->RegisterObj("itu.proc.SMNow.krn.logsys",
+                      "SMNow::cmdb_ci_server",
+                      defaultacl=>['valid_user']);
+
    return($self);
 }
 
