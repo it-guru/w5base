@@ -119,26 +119,30 @@ sub qcheckRecord
          $doNotify++;
       }
    }
+   msg(INFO,"1 debug: doNotify=$doNotify latestOrgChange=$latestOrgChange");
 
    if ($doNotify || $rec->{lrecertreqdt} ne ""){ # we have now an open recert
       $doNotify++;
    }
+   msg(INFO,"2 debug: doNotify=$doNotify latestOrgChange=$latestOrgChange");
 
    if ($doNotify){
       if ($rec->{lrecertreqnotify} ne ""){
          my $d=CalcDateDuration($rec->{lrecertreqnotify},NowStamp("en"));
-         if ($d->{totalhours}<48){
+         if ($d->{totaldays}<2){
             msg(INFO,"last recert notify to short in the past - no new notify");
             $doNotify=0;
          }
       }
    }
 
+   msg(INFO,"3 debug: doNotify=$doNotify latestOrgChange=$latestOrgChange");
    if ($doNotify){
       if ($#certUids==-1){
          $doNotify=0;
       }
    } 
+   msg(INFO,"4 debug: doNotify=$doNotify latestOrgChange=$latestOrgChange");
 
    if ($doNotify && $rec->{lrecertreqdt} ne ""){
       $forcedupd->{lrecertreqnotify}=NowStamp("en");
@@ -158,9 +162,11 @@ sub qcheckRecord
          }
          msg(INFO,"setting CI $name($id) to cistatusid=6 - disposed of wasted");
          $forcedupd->{cistatusid}="6";
+         $forcedupd->{lrecertreqdt}=undef;
+         $forcedupd->{lrecertreqnotify}=undef;
       }
       else{
-         if ($d->{totaldays}>28){  # wait 28 days bevor sending a real mail
+         if ($d->{totaldays}>15){  # wait 14 days bevor sending a real mail
             my %notifyParam;
             if ($dataobj->Self() eq "base::grp"){
                $notifyParam{emailto}=\@certUids;
