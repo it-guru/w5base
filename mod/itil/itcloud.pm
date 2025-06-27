@@ -754,7 +754,7 @@ sub isViewValid
    my $rec=shift;
    return("header","default") if (!defined($rec));
    return(qw(header default history source areas contacts 
-             servicemodels
+             servicemodels qc
              attachments control rootcontrol phonenumbers inm misc));
 }
 
