@@ -9,3 +9,8 @@
 'Databoss'=>{de=>'Datenverantwortlicher'},
 "invalid applicationgroupname '%s'"=>{de=>"ungültiger Anwendungsgruppenname '%s'"},
 'responsible Organisation'=>{de=>"verantwortlicher Organisationsbereich"},
+'last recert date'=>{de=>'Zeitpunkt der letzten ReZertifizierung'},
+'last recert userid'=>{de=>'UserID der der letzten ReZertifizierung'},
+'last recert request notification date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Benachrichtigungsbehandlung'},
+'last recert request date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Anforderung'},
+
