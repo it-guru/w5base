@@ -158,7 +158,6 @@ sub new
                 label         =>'Contacts',
                 class         =>'mandator',
                 vjoinbase     =>[{'parentobj'=>\'itil::itcloud'}],
-                vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
 
       new kernel::Field::SubList(
