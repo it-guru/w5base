@@ -4,4 +4,7 @@
 },
 'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
 'ReCert request'=>{de=>'ReZertification-Anforderung'},
+'recertification is requested'=>{de=>'Rezertifizierung ist angefordert'},
+'recertification notification handling is active'=>{de=>'Rezertifizierungsbenachrichtigungshandling ist aktiv'},
+'recertification notification send as email'=>{de=>'Rezertifizierungsbenachrichtigung als E-Mail versandt'},
 

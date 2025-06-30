@@ -79,13 +79,32 @@ sub qcheckRecord
    if ($dataobj->Self() eq "base::grp"){
       msg(INFO,sprintf("UserReCert: base::grp Handling:\n"));
       foreach my $lnkrec (@{$rec->{users}}){
-         if ($lnkrec->{lastorgchangedt} ne ""){
-            if (in_array($lnkrec->{roles},[orgRoles()])){
-               if (!defined($latestOrgChange) ||
-                    $latestOrgChange eq "" ||
-                    $latestOrgChange lt $lnkrec->{lastorgchangedt}){
-                  $latestOrgChange=$lnkrec->{lastorgchangedt};
+         my $lnkmdate=$lnkrec->{mdate};
+         my $lnkcdate=$lnkrec->{cdate};
+         msg(INFO,"UserLnk: ".$lnkrec->{lnkgrpuserid}." lastorgchangedt='".
+                  $lnkrec->{lastorgchangedt}."' cdate='".$lnkcdate."' mdate='".
+                  $lnkmdate."'");
+         if ($lnkrec->{lastorgchangedt} ne "" &&
+             $lnkmdate ne "" && $lnkcdate ne ""){
+            my $md=CalcDateDuration($lnkrec->{lastorgchangedt},$lnkmdate);
+            my $cd=CalcDateDuration($lnkrec->{lastorgchangedt},$lnkcdate);
+      #printf STDERR ("fifi lastorgchangedt: %s\n",$lnkrec->{lastorgchangedt});
+      #printf STDERR ("fifi cdate: %s\n",$lnkcdate);
+      #printf STDERR ("fifi mdate: %s\n",$lnkmdate);
+      #printf STDERR ("fifi md   : %s\n",Dumper($md));
+      #printf STDERR ("fifi cd   : %s\n",Dumper($cd));
+            if (defined($cd) && $cd->{totalminutes}<0){ 
+               if (in_array($lnkrec->{roles},[orgRoles()])){
+                  if (!defined($latestOrgChange) ||
+                       $latestOrgChange eq "" ||
+                       $latestOrgChange lt $lnkrec->{lastorgchangedt}){
+                     $latestOrgChange=$lnkrec->{lastorgchangedt};
+                  }
                }
+            }
+            else{
+               msg(INFO,"ignore grp relation created after lastorgchangedt on ".
+                        "lnkrec id=$lnkrec->{lnkgrpuserid}");
             }
          }
       }
@@ -93,13 +112,40 @@ sub qcheckRecord
    else{
       msg(INFO,sprintf("UserReCert: CI-Handling: %s\n",$dataobj->Self()));
       foreach my $lnkrec (@{$rec->{contacts}}){
-         if ($lnkrec->{lastorgchangedt} ne ""){
-            if (in_array($lnkrec->{roles},["write","read"])){
-               if (!defined($latestOrgChange) ||
-                    $latestOrgChange eq "" ||
-                    $latestOrgChange lt $lnkrec->{lastorgchangedt}){
-                  $latestOrgChange=$lnkrec->{lastorgchangedt};
+         my $lnkmdate=$lnkrec->{mdate};
+         my $lnkcdate=$lnkrec->{cdate};
+         msg(INFO,"ContactLnk: ".$lnkrec->{id}." lastorgchangedt='".
+                  $lnkrec->{lastorgchangedt}."' cdate='".$lnkcdate."' mdate='".
+                  $lnkmdate."'");
+         if ($lnkrec->{lastorgchangedt} ne "" &&
+             $lnkmdate ne "" && $lnkcdate ne ""){
+            my $md=CalcDateDuration($lnkrec->{lastorgchangedt},$lnkmdate);
+            my $cd=CalcDateDuration($lnkrec->{lastorgchangedt},$lnkcdate);
+      #printf STDERR ("fifi lastorgchangedt: %s\n",$lnkrec->{lastorgchangedt});
+      #printf STDERR ("fifi cdate: %s\n",$lnkcdate);
+      #printf STDERR ("fifi mdate: %s\n",$lnkmdate);
+      #printf STDERR ("fifi md   : %s\n",Dumper($md));
+      #printf STDERR ("fifi cd   : %s\n",Dumper($cd));
+            if (defined($cd) && $cd->{totalminutes}<0){ 
+               if (defined($md) && $md->{totalminutes}<0){ 
+                  if (in_array($lnkrec->{roles},["write","read"])){
+                     if (!defined($latestOrgChange) ||
+                          $latestOrgChange eq "" ||
+                          $latestOrgChange lt $lnkrec->{lastorgchangedt}){
+                        $latestOrgChange=$lnkrec->{lastorgchangedt};
+                     }
+                  }
                }
+               else{
+                  msg(INFO,"ignore ci contact relation modified ".
+                           "after lastorgchangedt on ".
+                           "lnkrec id=$lnkrec->{id}");
+               }
+            }
+            else{
+               msg(INFO,"ignore ci contact relation created ".
+                        "after lastorgchangedt on ".
+                        "lnkrec id=$lnkrec->{id}");
             }
          }
       }
@@ -121,17 +167,28 @@ sub qcheckRecord
    }
    msg(INFO,"1 debug: doNotify=$doNotify latestOrgChange=$latestOrgChange");
 
+   if ($forcedupd->{lrecertreqdt} ne "" || $rec->{lrecertreqdt} ne ""){
+      push(@qmsg,"recertification is requested");
+   }
+
    if ($doNotify || $rec->{lrecertreqdt} ne ""){ # we have now an open recert
       $doNotify++;
+      push(@qmsg,"recertification notification handling is active")
    }
    msg(INFO,"2 debug: doNotify=$doNotify latestOrgChange=$latestOrgChange");
 
    if ($doNotify){
       if ($rec->{lrecertreqnotify} ne ""){
          my $d=CalcDateDuration($rec->{lrecertreqnotify},NowStamp("en"));
-         if ($d->{totaldays}<2){
-            msg(INFO,"last recert notify to short in the past - no new notify");
-            $doNotify=0;
+         if (!defined($d)){
+            msg(ERROR,"error in CalcDateDuration on rec=".Dumper($rec));
+         }
+         else{
+            if ($d->{totaldays}<2){
+               msg(INFO,"last recert notify to short in the past - ".
+                        "no new notify");
+               $doNotify=0;
+            }
          }
       }
    }
@@ -147,6 +204,9 @@ sub qcheckRecord
    if ($doNotify && $rec->{lrecertreqdt} ne ""){
       $forcedupd->{lrecertreqnotify}=NowStamp("en");
       my $d=CalcDateDuration($rec->{lrecertreqdt},NowStamp("en"));
+      if (!defined($d)){
+         msg(ERROR,"error in doNotify CalcDateDuration on rec=".Dumper($rec));
+      }
       msg(INFO,sprintf ("age of lrecertreqdt = %s\n",Dumper($d)));
       if ($dataobj->Self() ne "base::grp" && # no auto deactivation for base:grp
           $d->{totaldays}>112){  # set CI to cistatusid=6 after 4 months
@@ -167,6 +227,7 @@ sub qcheckRecord
       }
       else{
          if ($d->{totaldays}>15){  # wait 14 days bevor sending a real mail
+            push(@qmsg,"recertification notification send as email");
             my %notifyParam;
             if ($dataobj->Self() eq "base::grp"){
                $notifyParam{emailto}=\@certUids;

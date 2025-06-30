@@ -113,6 +113,7 @@ sub new
                 vjoininhash   =>['userid','email','user',
                                  'posix','usertyp','roles',
                                  'srcsys','srcid','srcload',
+                                 'mdate','cdate',
                                  'lnkgrpuserid','lastorgchangedt']),
 
       new kernel::Field::Text(
