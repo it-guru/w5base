@@ -550,7 +550,8 @@ sub Ping
    # könnte man noch verifizieren.
    #
    if (!defined($d) && !$self->LastMsg()){
-      $self->LastMsg(ERROR,"fail to REST Ping to TPC");
+      #$self->LastMsg(ERROR,"fail to REST Ping to $credentialN");
+      $self->Log(ERROR,"backlog","fail to REST Ping to $credentialN");
    }
    if (!$self->LastMsg()){
       if ($errors){
