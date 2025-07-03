@@ -3058,14 +3058,19 @@ sub QRuleSyncCloudSystem
                if ($piprec->{name} eq $currec->{name}){
                   # take over IP Rec to our srcsys
                   my $op=getModuleObject($par->Config,'itil::ipaddress');
-                  msg(WARN,"try to take over $currec->{name} ".
-                           "to $srcsystag at $rec->{name}");
+                  $self->Log(WARN,"backlog",
+                                  "try to take over $currec->{name} ".
+                                  "to $srcsystag at $rec->{name}");
                   my $bk=$op->ValidatedUpdateRecord(
                      $currec,{srcsys=>$srcsystag},
                      {id=>\$currec->{id}}
                   );
-                  msg(WARN,"result on $rec->{name} takeover was $bk");
-                  $currec->{srcsys}=$srcsystag;
+                  if ($bk ne "1"){
+                     $self->Log(WARN,"backlog",
+                                     "result on $rec->{name} ".
+                                     "takeover was bk=$bk");
+                     $currec->{srcsys}=$srcsystag;
+                  }
                }
             }
          }
