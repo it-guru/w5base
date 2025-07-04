@@ -819,6 +819,33 @@ sub nativProcess
             my $fullname=$UserCache->{$ENV{REMOTE_USER}}->{rec}->{fullname};
             $h->{initiatorname}=$fullname;
          }
+
+         if ($h->{forceinitiatorgroupid} ne ""){
+            my $grp=getModuleObject($self->getParent->Config,"base::grp");
+            $grp->SetFilter({grpid=>\$h->{forceinitiatorgroupid},cistatusid=>"<6"});
+            my ($grec)=$grp->getOnlyFirst(qw(grpid fullname));
+            if (defined($grec)){
+               $h->{initiatorgroupid}=$grec->{grpid};
+               $h->{initiatorgroup}=$grec->{fullname}
+            }
+         }
+         elsif($h->{forceinitiatorgroup} ne ""){
+            my $grp=getModuleObject($self->getParent->Config,"base::grp");
+            $grp->SetFilter({grpid=>\$h->{forceinitiatorgroup},cistatusid=>"<6"});
+            my ($grec)=$grp->getOnlyFirst(qw(grpid fullname));
+            if (defined($grec)){
+               $h->{initiatorgroupid}=$grec->{grpid};
+               $h->{initiatorgroup}=$grec->{fullname}
+            }
+         }
+         if ($h->{initiatorgroupid} eq "" || $h->{initiatorgroup} eq ""){
+            my @grplist=$self->getParent->getPosibleInitiatorGroups(); 
+            if ($#grplist!=-1){
+               $h->{initiatorgroupid}=$grplist[0];
+               $h->{initiatorgroup}=$grplist[1];
+            }
+         }
+
        
          my %groups=$self->getParent->getPosibleInitiatorGroups(); 
          if (keys(%groups)>0){
@@ -834,6 +861,8 @@ sub nativProcess
                $h->{initiatorgroup}=$groups{$k[0]};
             }
          }
+
+
       }
       if (!$self->addInitialParameters($h)){
          if (!$self->getParent->LastMsg()){
