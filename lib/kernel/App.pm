@@ -538,6 +538,8 @@ sub LoadGroups
                   grpid=>$grp,
                   grpcistatusid=>$grpcistatusid,
                   distance=>$distance,
+                  is_org=>$GroupCache->{grpid}->{$grp}->{is_org},
+                  is_projectgrp=>$GroupCache->{grpid}->{$grp}->{is_projectgrp},
                   direction=>$direction
             };
          }
@@ -695,9 +697,25 @@ sub getInitiatorGroupsOf
       $age{$grpid}=$a;
    }
    my @grplist;
-   foreach my $grpid (sort({$age{$a} <=> $age{$b}} keys(%groups))){
+   foreach my $grpid (sort({
+                              my $t=$groups{$b}->{is_projectgrp} <=> 
+                                    $groups{$a}->{is_projectgrp};
+                              if ($t==0){
+                                 $age{$a} <=> $age{$b};
+                              }
+                              $t;
+                           } keys(%groups))){
+      next if ($groups{$grpid}->{grpcistatusid}>5);
       push(@grplist,$grpid);
       push(@grplist,$groups{$grpid}->{fullname});
+   }
+   if ($#grplist==-1){ # if no active groups found - allow inactive too
+      foreach my $grpid (sort({
+                           $age{$a} <=> $age{$b}
+                         } keys(%groups))){
+         push(@grplist,$grpid);
+         push(@grplist,$groups{$grpid}->{fullname});
+      }
    }
    return(@grplist) if (wantarray());
    return($grplist[1]);
@@ -878,7 +896,9 @@ sub ValidateGroupCache
    if (!defined($self->Cache->{Group}->{Cache})){
       my $grp=$self->ModuleObject("base::grp");
       $grp->SetFilter({grpid=>'>-999999999'}); # prefend slow query entry
-      $grp->SetCurrentView(qw(grpid fullname parentid subid cistatusid));
+      $grp->SetCurrentView(qw(grpid fullname parentid 
+                              subid cistatusid
+                              is_org is_projectgrp));
       $grp->SetCurrentOrder("NONE");
       $self->Cache->{Group}->{Cache}=$grp->getHashIndexed(qw(grpid fullname));
       foreach my $grp (values(%{$self->Cache->{Group}->{Cache}->{grpid}})){
