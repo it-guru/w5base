@@ -1852,3 +1852,4 @@ alter table itclust add lorgchangedt datetime default NULL,add lrecertreqdt date
 alter table swinstance add lorgchangedt datetime default NULL,add lrecertreqdt datetime default NULL,add lrecertdt datetime default NULL,add lrecertuser bigint(20) default NULL,add lrecertreqnotify datetime default NULL;
 alter table itcloud add lorgchangedt datetime default NULL,add lrecertreqdt datetime default NULL,add lrecertdt datetime default NULL,add lrecertuser bigint(20) default NULL,add lrecertreqnotify datetime default NULL;
 alter table applgrp add lorgchangedt datetime default NULL,add lrecertreqdt datetime default NULL,add lrecertdt datetime default NULL,add lrecertuser bigint(20) default NULL,add lrecertreqnotify datetime default NULL;
+drop table riskmgmtbase;

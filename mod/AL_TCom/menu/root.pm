@@ -46,12 +46,6 @@ sub Init
                       param=>'WorkflowClass=AL_TCom::workflow::fastdiary',
                       defaultacl=>['admin']);
 
-   $self->RegisterObj('AL_TCom::workflow::riskmgmt$',
-                      "base::workflow",
-                      func=>'New',
-                      param=>'WorkflowClass=AL_TCom::workflow::riskmgmt',
-                      defaultacl=>['DTAG']);
-
    $self->RegisterObj('AL_TCom::MyW5Base::ChangeNotChmMgr$',
                       'AL_TCom::MyW5Base::ChangeNotChmMgr$',
                       func=>'Main',
@@ -705,10 +699,6 @@ sub Init
    $self->RegisterObj("AL_TCom.proc.mgmtitemgroup.lnkcontact",
                       "itil::lnkmgmtitemgroupcontact",
                       defaultacl=>['valid_user']);
-
-   $self->RegisterObj("AL_TCom.proc.riskmgmt",
-                      "itil::riskmgmtbase",
-                      defaultacl=>['admin']);
 
    $self->RegisterObj("AL_TCom.proc.vou",
                       "TS::vou",
