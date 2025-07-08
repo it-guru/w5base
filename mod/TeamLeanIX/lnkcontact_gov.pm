@@ -146,7 +146,7 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         print STDERR Dumper($data);
+         #print STDERR Dumper($data);
          my @resdata;
          if (ref($data) eq "HASH" && exists($data->{governanceUniqueId})){
             $data=[$data];

@@ -51,16 +51,37 @@ sub new
             ignorecase    =>1,
             label         =>'Name'),
 
+      new kernel::Field::Text(     
+            name          =>'ictoNumber',
+            dataobjattr   =>'ictoNumber',
+            label         =>'ictoNumber'),
+
+      new kernel::Field::Date(     
+            name          =>'lifecycle_active',
+            dataobjattr   =>'lifecycle.active',
+            searchable    =>0,
+            dayonly       =>1,
+            label         =>'Active'),
+
+      new kernel::Field::Text(     
+            name          =>'lifecycle_status',
+            dataobjattr   =>'lifecycle.status',
+            searchable    =>0,
+            ignorecase    =>1,
+            label         =>'Status'),
+
+      new kernel::Field::Date(     
+            name          =>'lifecycle_endOfLife',
+            dataobjattr   =>'lifecycle.endOfLife',
+            searchable    =>0,
+            dayonly       =>1,
+            label         =>'endOfLife'),
+
       new kernel::Field::Textarea(     
             name          =>'description',
             dataobjattr   =>'description',
             searchable    =>0,
             label         =>'description'),
-
-      new kernel::Field::Text(     
-            name          =>'ictoNumber',
-            dataobjattr   =>'ictoNumber',
-            label         =>'ictoNumber'),
 
       new kernel::Field::SubList(
             name          =>'contacts',
@@ -69,7 +90,7 @@ sub new
             group         =>'contacts',
             vjointo       =>'TeamLeanIX::lnkcontact_gov',
             vjoinon       =>['id'=>'id'],
-            vjoindisp     =>['name','role'],
+            vjoindisp     =>['email','name','role'],
             vjoininhash   =>['name','role','email']),
 
       new kernel::Field::SubList(
@@ -201,6 +222,14 @@ sub DataCollector
                                     T
                                     ([0-9]{2}):([0-9]{2}):([0-9]{2})\.[0-9]+Z$
                                    /$1-$2-$3 $4:$5:$6/x;
+            }
+            if (exists($_->{'lifecycle.active'}) && 
+                $_->{'lifecycle.active'} ne ""){
+               $_->{'lifecycle.active'}.=" 12:00:00";
+            }
+            if (exists($_->{'lifecycle.endOfLife'}) && 
+                $_->{'lifecycle.endOfLife'} ne ""){
+               $_->{'lifecycle.endOfLife'}.=" 12:00:00";
             }
          } @$data);
          #print STDERR Dumper($data);

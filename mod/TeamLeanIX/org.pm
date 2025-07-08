@@ -127,7 +127,6 @@ sub DataCollector
          my $apikey=shift;
          my $apipass=shift;
          my $dataobjurl=$baseurl.$restFinalAddr;
-printf STDERR ("URL=%s\n",$dataobjurl);
          return($dataobjurl);
       },
       onfail=>sub{
@@ -147,7 +146,7 @@ printf STDERR ("URL=%s\n",$dataobjurl);
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         print STDERR Dumper($data);
+         #print STDERR Dumper($data);
          if (ref($data) eq "HASH" && exists($data->{orgernanceUniqueId})){
             $data=[$data];
          }
