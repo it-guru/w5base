@@ -119,6 +119,10 @@ sub Init
                       "W5Warehouse::objectsnap",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("itu.W5Warehouse.krn.DBService",
+                      "W5Warehouse::dbservice",
+                      defaultacl=>['admin']);
+   
    return($self);
 }
 
