@@ -1160,7 +1160,8 @@ sub new
                 htmldetail    =>0,
                 readonly      =>1,
                 vjointo       =>'base::lnkgrpuserrole',
-                vjoinbase     =>['nativrole'=>[orgRoles()]],
+                vjoinbase     =>['nativrole'=>[orgRoles()],
+                                 'grpcistatusid'=>"4 5"],
                 vjoinon       =>['userid'=>'userid'],
                 vjoindisp     =>['grpfullname']),
 
