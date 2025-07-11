@@ -84,7 +84,11 @@ sub qcheckRecord
       if (!$aip->Ping()){
          return(undef);
       }
-      $aip->SetFilter({address=>\@ipl,usage=>\'LOADBALANCER'});
+      $aip->SetFilter({
+         address=>\@ipl,
+         usage=>\'LOADBALANCER',
+         scandate=>">now-14d"
+      });
       my @cis=$aip->getHashList(qw(ALL));
       my $srcsys=$aip->SelfAsParentObject();
 

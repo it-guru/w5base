@@ -39,75 +39,90 @@ sub new
                 name          =>'systemdiscoveryid',
                 group         =>'source',
                 label         =>'DiscoveryID',
-                dataobjattr   =>'"systemdiscoveryid"'),
+                dataobjattr   =>'autodiscsystem."systemdiscoveryid"'),
 
       new kernel::Field::Text(
                 name          =>'systemname',
                 ignorecase    =>1,
                 label         =>'Systemname',
-                dataobjattr   =>'"systemname"'),
+                dataobjattr   =>'autodiscsystem."systemname"'),
 
       new kernel::Field::Link(
                 name          =>'fullname',
                 label         =>'Systemname',
-                dataobjattr   =>'"fullname"'),
+                dataobjattr   =>'autodiscsystem."fullname"'),
 
       new kernel::Field::Text(
                 name          =>'systemid',
                 label         =>'SystemID',
-                dataobjattr   =>'"systemid"'),
+                dataobjattr   =>'autodiscsystem."systemid"'),
+
+#      new kernel::Field::Text(
+#                name          =>'systemstatus',
+#                readonly      =>1,
+#                htmldetail    =>'NotEmpty',
+#                label         =>'System: Status',
+#                dataobjattr   =>'system."status"'),
+#
+#      new kernel::Field::Boolean(
+#                name          =>'systemdeleted',
+#                readonly      =>1,
+#                htmldetail    =>'NotEmpty',
+#                label         =>'System: marked as delete',
+#                dataobjattr   =>'system."deleted"'),
+
 
       new kernel::Field::Text(
                 name          =>'model',
                 label         =>'Model',
-                dataobjattr   =>'"model"'),
+                dataobjattr   =>'autodiscsystem."model"'),
 
       new kernel::Field::Text(
                 name          =>'usage',
                 label         =>'Usage',
-                dataobjattr   =>'"usage"'),
+                dataobjattr   =>'autodiscsystem."usage"'),
 
       new kernel::Field::Text(
                 name          =>'osrelease',
                 label         =>'OS-Release',
-                dataobjattr   =>'"osrelease"'),
+                dataobjattr   =>'autodiscsystem."osrelease"'),
 
       new kernel::Field::Text(
                 name          =>'memory',
                 label         =>'Memory',
                 unit          =>'MB',
-                dataobjattr   =>'"memory"'),
+                dataobjattr   =>'autodiscsystem."memory"'),
 
       new kernel::Field::Text(
                 name          =>'physcpucount',
                 label         =>'phys CPU-Count',
-                dataobjattr   =>'"physcpucount"'),
+                dataobjattr   =>'autodiscsystem."physcpucount"'),
 
       new kernel::Field::Text(
                 name          =>'cputype',
                 label         =>'CPU-Type',
-                dataobjattr   =>'"cputype"'),
+                dataobjattr   =>'autodiscsystem."cputype"'),
 
       new kernel::Field::Text(
                 name          =>'cpuspeed',
                 label         =>'CPU-Speed',
                 unit          =>'MHz',
-                dataobjattr   =>'"cpuspeed"'),
+                dataobjattr   =>'autodiscsystem."cpuspeed"'),
 
       new kernel::Field::Text(
                 name          =>'independcpucount',
                 label         =>'indipendent CPU-Count',
-                dataobjattr   =>'"independcpucount"'),
+                dataobjattr   =>'autodiscsystem."independcpucount"'),
 
       new kernel::Field::Text(
                 name          =>'cpucount',
                 label         =>'CPU-Count',
-                dataobjattr   =>'"cpucount"'),
+                dataobjattr   =>'autodiscsystem."cpucount"'),
 
       new kernel::Field::Text(
                 name          =>'serialno',
                 label         =>'Serialnumber',
-                dataobjattr   =>'"serialno"'),
+                dataobjattr   =>'autodiscsystem."serialno"'),
 
       new kernel::Field::SubList(
                 name          =>'ipaddresses',
@@ -134,13 +149,13 @@ sub new
                 name          =>'scandate',
                 group         =>'source',
                 label         =>'Scandate',
-                dataobjattr   =>'"scandate"'),
+                dataobjattr   =>'autodiscsystem."scandate"'),
 
       new kernel::Field::Text(
                 name          =>'srcsys',
                 group         =>'source',
                 label         =>'Source-System',
-                dataobjattr   =>'"srcsys"'),
+                dataobjattr   =>'autodiscsystem."srcsys"'),
 
 
    );
@@ -229,6 +244,18 @@ sub initSearchQuery
      Query->Param("search_scandate"=>">now-14d");
    }
 }
+
+
+#sub getSqlFrom
+#{
+#   my $self=shift;
+#   my $from="autodiscsystem left outer join system  ".
+#            " on autodiscsystem.\"systemid\"=".
+#            "system.\"systemid\" ";
+#   return($from);
+#}
+
+
 
 
 sub getDetailBlockPriority
