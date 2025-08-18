@@ -60,6 +60,10 @@ sub qcheckRecord
    if ($rec->{cistatusid}==4){
       if ($rec->{srcsys} eq "CAIMAN"){
          my @qmsg;
+         if ($rec->{srcid} eq "00000000-0000-0000-0000-000000000000"){
+            push(@qmsg,"EC top Org-Entry detected");
+            return(0,{qmsg=>\@qmsg});
+         }
          if ($rec->{srcid} eq ""){
             push(@qmsg,"srcid is not defined");
             return(3,{qmsg=>\@qmsg,dataissue=>\@qmsg});
