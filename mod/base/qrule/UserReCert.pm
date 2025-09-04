@@ -184,7 +184,9 @@ sub qcheckRecord
             msg(ERROR,"error in CalcDateDuration on rec=".Dumper($rec));
          }
          else{
-            if ($d->{totaldays}<2){
+            msg(INFO,"2 debug: lrecertreqnotify=".$rec->{lrecertreqnotify});
+            msg(INFO,"2 debug: lrecertreqnotify age=".$d->{totaldays});
+            if ($d->{totaldays}<7){ # send a notify only once a week
                msg(INFO,"last recert notify to short in the past - ".
                         "no new notify");
                $doNotify=0;
@@ -199,13 +201,18 @@ sub qcheckRecord
          $doNotify=0;
       }
    } 
+   #$doNotify=1; # force notification
    msg(INFO,"4 debug: doNotify=$doNotify latestOrgChange=$latestOrgChange");
 
    if ($doNotify && $rec->{lrecertreqdt} ne ""){
       $forcedupd->{lrecertreqnotify}=NowStamp("en");
+      my $AgeOfReCertProcess=0;
       my $d=CalcDateDuration($rec->{lrecertreqdt},NowStamp("en"));
       if (!defined($d)){
          msg(ERROR,"error in doNotify CalcDateDuration on rec=".Dumper($rec));
+      }
+      else{
+         $AgeOfReCertProcess=$d->{totaldays};
       }
       msg(INFO,sprintf ("age of lrecertreqdt = %s\n",Dumper($d)));
       if ($dataobj->Self() ne "base::grp" && # no auto deactivation for base:grp
@@ -226,7 +233,7 @@ sub qcheckRecord
          $forcedupd->{lrecertreqnotify}=undef;
       }
       else{
-         if ($d->{totaldays}>15){  # wait 14 days bevor sending a real mail
+         if ($AgeOfReCertProcess>15){  # wait 14 days bevor sending a real mail
             push(@qmsg,"recertification notification send as email");
             my %notifyParam;
             if ($dataobj->Self() eq "base::grp"){
@@ -244,10 +251,7 @@ sub qcheckRecord
                      $ciname=$rec->{name};
                   }
                   my $subject=$self->T("ReCert request").": ".$ciname;
-                  my $NotifyTempl="UserReCertCiNotify";
-                  if ($dataobj->Self() eq "base::grp"){
-                     $NotifyTempl="UserReCertGrpNotify";
-                  }
+                  my $NotifyTempl="UserReCertGrpNotify";
                   my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
                      skinbase=>'base',
                      static=>{
@@ -259,29 +263,56 @@ sub qcheckRecord
 
             }
             else{
-               $dataobj->NotifyWriteAuthorizedContacts($rec,{},
-                                                       \%notifyParam,{},sub{
-                  my ($subject,$ntext);
-                  my $ciname;
-                  if (exists($rec->{fullname})){
-                     $ciname=$rec->{fullname};
-                  }
-                  else{
-                     $ciname=$rec->{name};
-                  }
-                  my $subject=$self->T("ReCert request").": ".$ciname;
-                  my $NotifyTempl="UserReCertCiNotify";
-                  if ($dataobj->Self() eq "base::grp"){
-                     $NotifyTempl="UserReCertGrpNotify";
-                  }
-                  my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
-                     skinbase=>'base',
-                     static=>{
-                        NAME=>$rec->{name}
+               if ($AgeOfReCertProcess<56){
+                  msg(INFO,"9 debug: send UserReCertCiNotify message");
+                  $dataobj->NotifyWriteAuthorizedContacts($rec,{},
+                                                          \%notifyParam,{},
+                                                          sub{
+                     my ($subject,$ntext);
+                     my $ciname;
+                     if (exists($rec->{fullname})){
+                        $ciname=$rec->{fullname};
                      }
+                     else{
+                        $ciname=$rec->{name};
+                     }
+                     my $subject=$self->T("ReCert request").": ".$ciname;
+                     my $NotifyTempl="UserReCertCiNotify";
+                     my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,
+                        {
+                           skinbase=>'base',
+                           static=>{
+                              NAME=>$rec->{name}
+                           }
+                        });
+                     return($subject,$tmpl);
                   });
-                  return($subject,$tmpl);
-               });
+               }
+               else{
+                  msg(INFO,"9 debug: send UserReCertCiNotifyWithCC message");
+                  my %notifyParam;
+                  $notifyParam{emailto}=[$rec->{databossid}];
+                  $dataobj->NotifyLangContacts($rec,{},
+                                               \%notifyParam,{},sub{
+                     my ($subject,$ntext);
+                     my $ciname;
+                     if (exists($rec->{fullname})){
+                        $ciname=$rec->{fullname};
+                     }
+                     else{
+                        $ciname=$rec->{name};
+                     }
+                     my $subject=$self->T("ReCert request").": ".$ciname;
+                     my $NotifyTempl="UserReCertCiNotifyWithCC";
+                     my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
+                        skinbase=>'base',
+                        static=>{
+                           NAME=>$rec->{name}
+                        }
+                     });
+                     return($subject,$tmpl);
+                  });
+               }
             }
          }
          else{
