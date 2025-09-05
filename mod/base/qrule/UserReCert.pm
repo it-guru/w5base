@@ -12,6 +12,19 @@ Recertivication of user assigments to CI-Contacts.
 
 NONE
 
+=head3 HINTS
+
+[de:]
+
+Rezertifizierung von Kontakten in CIs oder Gruppen die
+mit der Zuweisung von Rechten (lesen oder schreiben) verbunden
+sind.
+
+[en:]
+
+Recertification of contacts in CIs or groups that are
+associated with the assignment of rights (read or write).
+
 =cut
 #######################################################################
 #  W5Base Framework
