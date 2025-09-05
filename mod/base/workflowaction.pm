@@ -724,7 +724,7 @@ sub Notify
          dataobj=>$param{dataobj}
       });
       if (defined($url)){
-         $text.="\n";
+         $text.="\nDirectLink:\n";
          $text.=$url;
          $text.="\n\n";
       }

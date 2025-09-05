@@ -249,6 +249,7 @@ sub qcheckRecord
          if ($AgeOfReCertProcess>15){  # wait 14 days bevor sending a real mail
             push(@qmsg,"recertification notification send as email");
             my %notifyParam;
+            $notifyParam{faqkey}='QualityRule '.$self->Self();
             if ($dataobj->Self() eq "base::grp"){
                $notifyParam{emailto}=\@certUids;
             }
@@ -267,6 +268,7 @@ sub qcheckRecord
                   my $NotifyTempl="UserReCertGrpNotify";
                   my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
                      skinbase=>'base',
+                           faqkey=>'QualityRule '.$self->Self(),
                      static=>{
                         NAME=>$rec->{name}
                      }
@@ -278,9 +280,9 @@ sub qcheckRecord
             else{
                if ($AgeOfReCertProcess<56){
                   msg(INFO,"9 debug: send UserReCertCiNotify message");
-                  $dataobj->NotifyWriteAuthorizedContacts($rec,{},
-                                                          \%notifyParam,{},
-                                                          sub{
+                  $notifyParam{emailto}=[$rec->{databossid}];
+                  $dataobj->NotifyLangContacts($rec,{},
+                                               \%notifyParam,{},sub{
                      my ($subject,$ntext);
                      my $ciname;
                      if (exists($rec->{fullname})){
@@ -294,6 +296,7 @@ sub qcheckRecord
                      my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,
                         {
                            skinbase=>'base',
+                           faqkey=>'QualityRule '.$self->Self(),
                            static=>{
                               NAME=>$rec->{name}
                            }
@@ -303,10 +306,9 @@ sub qcheckRecord
                }
                else{
                   msg(INFO,"9 debug: send UserReCertCiNotifyWithCC message");
-                  my %notifyParam;
-                  $notifyParam{emailto}=[$rec->{databossid}];
-                  $dataobj->NotifyLangContacts($rec,{},
-                                               \%notifyParam,{},sub{
+                  $dataobj->NotifyWriteAuthorizedContacts($rec,{},
+                                                          \%notifyParam,{},
+                                                          sub{
                      my ($subject,$ntext);
                      my $ciname;
                      if (exists($rec->{fullname})){
@@ -370,7 +372,6 @@ sub qcheckRecord
                  \@qmsg,\@dataissue,\$errorlevel,$wfrequest,$forcedupd);
    return(@result);
 }
-
 
 
 
