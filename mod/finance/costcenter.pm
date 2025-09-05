@@ -573,6 +573,20 @@ sub isWriteValid
    return();
 }
 
+
+sub ValidateDelete
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(undef) if (!$self->globalOpValidate("ValidateDelete",$rec));
+
+   return($self->SUPER::ValidateDelete($rec));
+}
+
+
+
+
 sub SelfAsParentObject    # this method is needed because existing derevations
 {
    return("finance::costcenter");

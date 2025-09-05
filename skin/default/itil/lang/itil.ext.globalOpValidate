@@ -1,0 +1,3 @@
+'drop rejected due costobject referenced at %s rejected'=>{
+ de=>'Löschung nicht zulässig aufgrund einer Referenz in %s'
+}
