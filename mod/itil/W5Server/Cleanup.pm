@@ -47,7 +47,7 @@ sub process
             if ($joblog->Ping()){
                $jobid=$joblog->ValidatedInsertRecord(\%jobrec);
             }
-
+            $joblog->W5ServerCall("rpcCallEvent","ITIL_Cleanup");
             $self->CleanupIPEntries();
             if ($jobid ne ""){
                if ($joblog->Ping()){

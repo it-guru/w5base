@@ -35,9 +35,37 @@ sub Init
 {
    my $self=shift;
 
-   $self->RegisterEvent("CleanupServiceAndSupport","CleanupServiceAndSupport");
    $self->RegisterEvent("Cleanup","CleanupServiceAndSupport");
+
+   $self->RegisterEvent("ITIL_Cleanup","CleanupServiceAndSupport");
+   $self->RegisterEvent("CleanupServiceAndSupport","CleanupServiceAndSupport");
+
+   $self->RegisterEvent("CleanupMgmtItemGroup","CleanupMgmtItemGroup");
+   $self->RegisterEvent("ITIL_Cleanup","CleanupMgmtItemGroup");
    return(1);
+}
+
+
+sub CleanupMgmtItemGroup
+{
+   my $self=shift;
+   my $n=0;
+   msg(INFO,"CleanupMgmtItemGroup");
+   my $obj=getModuleObject($self->Config,"itil::lnkmgmtitemgroup");
+
+   $obj->SetFilter({lnkto=>'<now-3M'});
+   # drop Records with from and to older then three months
+   my @l=$obj->getHashList(qw(ALL));
+
+   my $n=$#l+1;
+   if ($n>0){
+      my $op=$obj->Clone();
+      foreach my $rec (@l){
+         $op->ValidatedDeleteRecord($rec);
+      }
+   }
+
+   return({exitcode=>0,exitmsg=>"CleanupMgmtItemGroup count=$n"});
 }
 
 
