@@ -48,6 +48,7 @@ sub new
       new kernel::Field::Text(     
             name          =>'name',
             dataobjattr   =>'name',
+            RestFilterType=>'SIMPLE',
             ignorecase    =>1,
             label         =>'Name'),
 
@@ -190,6 +191,7 @@ sub DataCollector
          my $apikey=shift;
          my $apipass=shift;
          my $dataobjurl=$baseurl.$restFinalAddr;
+         msg(INFO,"dataobjurl=$dataobjurl");
          return($dataobjurl);
       },
       onfail=>sub{
@@ -209,7 +211,7 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         #print STDERR Dumper($data);
+         print STDERR Dumper($data);
          if (ref($data) eq "HASH" && exists($data->{governanceUniqueId})){
             $data=[$data];
          }
@@ -232,7 +234,7 @@ sub DataCollector
                $_->{'lifecycle.endOfLife'}.=" 12:00:00";
             }
          } @$data);
-         #print STDERR Dumper($data);
+         print STDERR Dumper($data);
          return($data);
       }
    );
