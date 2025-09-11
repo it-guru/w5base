@@ -22,11 +22,12 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field;
 use kernel::App::Web::Listedit;
-use kernel::DataObj::REST;
+use kernel::DataObj::ElasticSearch;
 use tardis::lib::Listedit;
 use JSON;
 use MIME::Base64;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::REST tardis::lib::Listedit);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::ElasticSearch 
+        tardis::lib::Listedit);
 
 
 sub new
@@ -40,85 +41,99 @@ sub new
             name          =>'id',
             searchable    =>0,
             group         =>'source',
-            dataobjattr   =>'governanceUniqueId',
+            dataobjattr   =>'_id',
             label         =>'Id'),
 
       new kernel::Field::RecordUrl(),
 
+      new kernel::Field::Interface(     
+            name          =>'fullname',
+            dataobjattr   =>'_source.fullname',
+            ElasticType   =>'keyword',
+            ignorecase    =>1,
+            label         =>'Fullname'),
+
       new kernel::Field::Text(     
             name          =>'name',
-            dataobjattr   =>'name',
-            RestFilterType=>'SIMPLE',
+            ElasticType   =>'keyword',
+            dataobjattr   =>'_source.name',
             ignorecase    =>1,
             label         =>'Name'),
 
       new kernel::Field::Text(     
             name          =>'ictoNumber',
-            dataobjattr   =>'ictoNumber',
+            caseignore    =>1,
+            dataobjattr   =>'_source.ictoNumber',
             label         =>'ictoNumber'),
 
       new kernel::Field::Date(     
             name          =>'lifecycle_active',
-            dataobjattr   =>'lifecycle.active',
-            searchable    =>0,
+            dataobjattr   =>'_source.lifecycle.active',
             dayonly       =>1,
             label         =>'Active'),
 
       new kernel::Field::Text(     
             name          =>'lifecycle_status',
-            dataobjattr   =>'lifecycle.status',
+            dataobjattr   =>'_source.lifecycle.status',
             searchable    =>0,
             ignorecase    =>1,
             label         =>'Status'),
 
       new kernel::Field::Date(     
             name          =>'lifecycle_endOfLife',
-            dataobjattr   =>'lifecycle.endOfLife',
-            searchable    =>0,
+            dataobjattr   =>'_source.lifecycle.endOfLife',
             dayonly       =>1,
             label         =>'endOfLife'),
 
       new kernel::Field::Textarea(     
             name          =>'description',
-            dataobjattr   =>'description',
+            dataobjattr   =>'_source.description',
             searchable    =>0,
             label         =>'description'),
 
-      new kernel::Field::SubList(
-            name          =>'contacts',
-            label         =>'Contacts',
-            searchable    =>0,
-            group         =>'contacts',
-            vjointo       =>'TeamLeanIX::lnkcontact_gov',
-            vjoinon       =>['id'=>'id'],
-            vjoindisp     =>['email','name','role'],
-            vjoininhash   =>['name','role','email']),
-
-      new kernel::Field::SubList(
-            name          =>'orgs',
-            label         =>'Orgs',
-            group         =>'orgs',
-            searchable    =>0,
-            vjointo       =>'TeamLeanIX::org',
-            vjoinon       =>['relatedOrganizationIds'=>'id'],
-            vjoindisp     =>['name']),
-
+#      new kernel::Field::SubList(
+#            name          =>'contacts',
+#            label         =>'Contacts',
+#            searchable    =>0,
+#            group         =>'contacts',
+#            vjointo       =>'TeamLeanIX::lnkcontact_gov',
+#            vjoinon       =>['id'=>'id'],
+#            vjoindisp     =>['email','name','role'],
+#            vjoininhash   =>['name','role','email']),
+#
+#      new kernel::Field::SubList(
+#            name          =>'orgs',
+#            label         =>'Orgs',
+#            group         =>'orgs',
+#            searchable    =>0,
+#            vjointo       =>'TeamLeanIX::org',
+#            vjoinon       =>['relatedOrganizationIds'=>'id'],
+#            vjoindisp     =>['name']),
+#
       new kernel::Field::Text(     
             name          =>'relatedOrganizationIds',
-            dataobjattr   =>'relatedOrganizationIds',
+            searchable    =>0,
+            dataobjattr   =>'_source.relatedOrganizationIds',
             label         =>'relatedOrganizationIds'),
 
       new kernel::Field::Text(     
             name          =>'tags',
-            dataobjattr   =>'tags',
+            searchable    =>0,
+            dataobjattr   =>'_source.tags',
             label         =>'Tags'),
 
+      new kernel::Field::Date(
+            name          =>'srcload',
+            history       =>0,
+            group         =>'source',
+            label         =>'Source-Load',
+            dataobjattr   =>'_source.dtLastLoad'),
+
       new kernel::Field::MDate(
-            name              =>'mdate',
-            group             =>'source',
-            label             =>'Modification-Date',
-            searchable        =>0,  # das tut noch nicht
-            dataobjattr       =>'lastUpdated'),
+            name          =>'mdate',
+            group         =>'source',
+            label         =>'Modification-Date',
+            dataobjattr   =>'_source.lastUpdated'),
 
    );
    $self->setDefaultView(qw(id ictoNumber name mdate));
@@ -146,6 +161,126 @@ sub getCredentialName
 #   }
 #}
 
+sub ORIGIN_Load
+{
+   my $self=shift;
+
+   msg(INFO,"ORIGIN_Load: $self");
+   my $baseCredName=$self->getCredentialName();
+   my $credentialName="ORIGIN_".$baseCredName;
+   msg(INFO,"ORIGIN_Load: credentialName=$credentialName");
+
+   my $Authorization=$self->getTardisAuthorizationToken($credentialName);
+   msg(INFO,"ORIGIN_Load: Authorization=$Authorization");
+
+   my ($ESbaseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($baseCredName);
+   my ($baseurl,$apikey,$apiuser)=$self->GetRESTCredentials($credentialName);
+
+   if (($baseurl=~m#/$#)){
+      $baseurl=~s#/$##; 
+   }
+
+   msg(INFO,"ORIGIN_Load: baseurl=$baseurl");
+
+   my $restFinalAddr=$baseurl."/v1/govs";
+   msg(INFO,"ORIGIN_Load: restFinalAddr=$restFinalAddr");
+
+
+   my ($out,$emsg)=$self->ESdeleteIndex();
+   #printf STDERR ("out=%s\n",Dumper(\$out));
+
+   my $nowstamp=NowStamp("ISO");
+
+   my ($out,$emsg)=$self->ESensureIndex({
+     settings=>{
+        number_of_shards=>1,
+        number_of_replicas=>1,
+        analysis=>{
+           normalizer=> {
+             lowercase_normalizer=> {
+               type=>"custom",
+               filter=>["lowercase"]
+             }
+           }
+        }
+     },
+     mappings=>{
+        properties=>{
+           name    =>{type=>'text',
+                      fields=> {
+                          keyword=> {
+                            type=> "keyword",
+                            ignore_above=> 256
+                          }
+                        }
+                      },
+           fullname=>{type=>'text',
+                      fields=> {
+                          keyword=> {
+                            type=> "keyword",
+                            ignore_above=> 256
+                          }
+                        }
+                      },
+           ictoNumber=>{type=>'text',
+                      fields=> {
+                          keyword=> {
+                            type=> "keyword",
+                            ignore_above=> 256,
+                            normalizer=> "lowercase_normalizer"
+
+                          }
+                        }
+                      },
+           lastUpdated=>{type=>'date'},
+           dtLastLoad=>{type=>'date'}
+        }
+     }
+   });
+   if (ref($out) && $out->{acknowledged}){
+      my $indexname=$self->ESindexName();
+      msg(INFO,"ESIndex '$indexname' is online");
+
+      my $cmd="curl -s -H 'Authorization:$Authorization' ".
+                  " --max-time 300 ".
+           "'$restFinalAddr' ".
+           "| ".
+           "jq --arg now '$nowstamp' ".
+           "-c '.[] | { index: { _id: .governanceUniqueId } } , ".
+              "(. + {dtLastLoad: \$now, ".
+                "fullname: (.ictoNumber+\": \" +.name)})'".
+           "| ".
+           "curl -u '${ESuser}:${ESpass}' ".
+           "--output - -s ".
+           "-H 'Content-Type: application/x-ndjson' ".
+           "--data-binary \@- ".
+           "-X POST  '$ESbaseurl/$indexname/_bulk?refresh=wait_for' ".
+           '2>&1';
+      msg(INFO,"ORIGIN_Load: cmd=$cmd");
+      my $out=qx($cmd);
+      my $exit_code = $? >> 8;
+      if ($exit_code==0){
+         my $d;
+         eval('use JSON; $d=decode_json($out);');
+         if ($@ eq ""){
+            my ($out,$emsg)=$self->ESdeleteByQuery({
+               range=>{
+                  dtLastLoad=>{
+                     lt=>$nowstamp
+                  }
+               }
+            });
+            return($d);
+         }
+         else{
+            return(-1,$@);
+         }
+      }
+   }
+
+
+}
+
 
 sub DataCollector
 {
@@ -153,36 +288,36 @@ sub DataCollector
    my $filterset=shift;
 
    my $credentialName=$self->getCredentialName();
-   my $Authorization=$self->getTardisAuthorizationToken($credentialName);
-   return(undef) if (!defined($Authorization));
 
+   my $indexname=$self->ESindexName();
 
-   my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
-      ["/v1/govs/{id}",
-       "/v1/govs"],
-      $filterset,
-      {
-        initQueryParam=>{
-#          'none'=>"1"
-        }
-      }
+   my ($restFinalAddr,$requesttoken,$constParam,$data)=
+      $self->Filter2RestPath(
+         $indexname,$filterset
    );
-   msg(INFO,"restFinalAddr=$restFinalAddr");
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
          $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
       }
       return(undef);
    }
+   #printf STDERR ("ESquery=%s\n\n",$data);
 
    my $d=$self->CollectREST(
       dbname=>$credentialName,
+      requesttoken=>$requesttoken,
+      data=>$data,
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
          my $apiuser=shift;
-         my $headers=['Authorization'=>$Authorization];
+         my $headers=[
+            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
+         ];
+         if ($data ne ""){
+            push(@$headers,"Content-Type","application/json");
+         }
          return($headers);
       },
       url=>sub{
@@ -191,7 +326,7 @@ sub DataCollector
          my $apikey=shift;
          my $apipass=shift;
          my $dataobjurl=$baseurl.$restFinalAddr;
-         msg(INFO,"dataobjurl=$dataobjurl");
+         msg(INFO,"ESqueryURL=$dataobjurl");
          return($dataobjurl);
       },
       onfail=>sub{
@@ -211,30 +346,29 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         print STDERR Dumper($data);
-         if (ref($data) eq "HASH" && exists($data->{governanceUniqueId})){
-            $data=[$data];
+   #      print STDERR Dumper($data);
+         if (ref($data) eq "HASH"){
+            if (exists($data->{hits})){
+               if (exists($data->{hits}->{hits})){
+                  $data=$data->{hits}->{hits};
+               }
+            }
+            else{
+               $data=[$data]
+            }
          }
          #print STDERR Dumper($data->[0]);
          map({
             $_=FlattenHash($_);
-            if (exists($_->{lastUpdated}) && $_->{lastUpdated} ne ""){
-               $_->{lastUpdated}=~s/^
-                                    ([0-9]{4})-([0-9]{2})-([0-9]{2})
-                                    T
-                                    ([0-9]{2}):([0-9]{2}):([0-9]{2})\.[0-9]+Z$
-                                   /$1-$2-$3 $4:$5:$6/x;
-            }
-            if (exists($_->{'lifecycle.active'}) && 
-                $_->{'lifecycle.active'} ne ""){
-               $_->{'lifecycle.active'}.=" 12:00:00";
-            }
-            if (exists($_->{'lifecycle.endOfLife'}) && 
-                $_->{'lifecycle.endOfLife'} ne ""){
-               $_->{'lifecycle.endOfLife'}.=" 12:00:00";
+            foreach my $f (qw(_source.lifecycle.endOfLife 
+                              _source.lifecycle.phaseOut
+                              _source.lifecycle.active)){
+               if (exists($_->{$f}) && $_->{$f} ne ""){
+                  $_->{$f}.=" 12:00:00";
+               }
             }
          } @$data);
-         print STDERR Dumper($data);
+   #      print STDERR Dumper($data->[0]);
          return($data);
       }
    );

@@ -5450,7 +5450,12 @@ sub DoRESTcall
       my $RESTcallURL=$p{method}." ".$p{url};
       $reqtrace.="DoRESTcall: ".$RESTcallURL."\n";
       if ($p{method} eq "GET"){
-         $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+         if (exists($p{data}) && defined($p{data})){
+            $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
+         }
+         else{
+            $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+         }
       }
       if ($p{method} eq "POST"){
          $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
