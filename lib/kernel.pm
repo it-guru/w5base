@@ -1053,6 +1053,9 @@ sub CalcDateDuration
 
 sub NowStamp
 {
+   if ($_[0] eq "ISO"){
+      return(sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",Today_and_Now("GMT")));
+   }
    if ($_[0] eq "en"){
       return(sprintf("%04d-%02d-%02d %02d:%02d:%02d",Today_and_Now("GMT")));
    }
