@@ -797,8 +797,6 @@ sub ESdeleteByQuery
    my $out=qx($cmd);
    my $exit_code = $? >> 8;
 
-printf STDERR ("fifi cmd=$cmd exitcode=$exit_code out=$out\n");
-
    if ($exit_code==0){
       my $d;
       eval('use JSON; $d=decode_json($out);');
