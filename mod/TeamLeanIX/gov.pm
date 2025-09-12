@@ -136,7 +136,8 @@ sub new
             dataobjattr   =>'_source.lastUpdated'),
 
    );
-   $self->setDefaultView(qw(id ictoNumber name mdate));
+   $self->setDefaultView(qw(id ictoNumber name lifecycle_status 
+                            lifecycle_endOfLife mdate));
    return($self);
 }
 
@@ -161,109 +162,59 @@ sub getCredentialName
 #   }
 #}
 
-sub ORIGIN_Load
+
+sub ESrestETLload
 {
    my $self=shift;
+   my $ESindexDefinition=shift;
+   my $backcall=shift;
+   my $indexname=shift;
 
-   msg(INFO,"ORIGIN_Load: $self");
    my $baseCredName=$self->getCredentialName();
-   my $credentialName="ORIGIN_".$baseCredName;
-   msg(INFO,"ORIGIN_Load: credentialName=$credentialName");
-
-   my $Authorization=$self->getTardisAuthorizationToken($credentialName);
-   msg(INFO,"ORIGIN_Load: Authorization=$Authorization");
-
    my ($ESbaseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($baseCredName);
-   my ($baseurl,$apikey,$apiuser)=$self->GetRESTCredentials($credentialName);
 
-   if (($baseurl=~m#/$#)){
-      $baseurl=~s#/$##; 
-   }
-
-   msg(INFO,"ORIGIN_Load: baseurl=$baseurl");
-
-   my $restFinalAddr=$baseurl."/v1/govs";
-   msg(INFO,"ORIGIN_Load: restFinalAddr=$restFinalAddr");
-
-
-   my ($out,$emsg)=$self->ESdeleteIndex();
+   #my ($out,$emsg)=$self->ESdeleteIndex();
    #printf STDERR ("out=%s\n",Dumper(\$out));
 
    my $nowstamp=NowStamp("ISO");
 
-   my ($out,$emsg)=$self->ESensureIndex({
-     settings=>{
-        number_of_shards=>1,
-        number_of_replicas=>1,
-        analysis=>{
-           normalizer=> {
-             lowercase_normalizer=> {
-               type=>"custom",
-               filter=>["lowercase"]
-             }
-           }
-        }
-     },
-     mappings=>{
-        properties=>{
-           name    =>{type=>'text',
-                      fields=> {
-                          keyword=> {
-                            type=> "keyword",
-                            ignore_above=> 256
-                          }
-                        }
-                      },
-           fullname=>{type=>'text',
-                      fields=> {
-                          keyword=> {
-                            type=> "keyword",
-                            ignore_above=> 256
-                          }
-                        }
-                      },
-           ictoNumber=>{type=>'text',
-                      fields=> {
-                          keyword=> {
-                            type=> "keyword",
-                            ignore_above=> 256,
-                            normalizer=> "lowercase_normalizer"
+   my ($restOrignMethod,$restOriginFinalAddr,$restOriginHeaders,$ESjqTransform)=$backcall->();
 
-                          }
-                        }
-                      },
-           lastUpdated=>{type=>'date'},
-           dtLastLoad=>{type=>'date'}
-        }
-     }
-   });
+   my $i;
+   my $curlHeaderParam=join("",map({
+     $i++;
+     ($i % 2==0) ? "-H '".join(':',@$restOriginHeaders[$i-2],$_)."' ":()
+   } @$restOriginHeaders));
+
+
+   my ($out,$emsg)=$self->ESensureIndex($indexname,$ESindexDefinition);
    if (ref($out) && $out->{acknowledged}){
-      my $indexname=$self->ESindexName();
       msg(INFO,"ESIndex '$indexname' is online");
 
-      my $cmd="curl -s -H 'Authorization:$Authorization' ".
+
+      my $cmd="curl -N ".
+                  " -s ".$curlHeaderParam.
                   " --max-time 300 ".
-           "'$restFinalAddr' ".
-           "| ".
-           "jq --arg now '$nowstamp' ".
-           "-c '.[] | { index: { _id: .governanceUniqueId } } , ".
-              "(. + {dtLastLoad: \$now, ".
-                "fullname: (.ictoNumber+\": \" +.name)})'".
-           "| ".
-           "curl -u '${ESuser}:${ESpass}' ".
-           "--output - -s ".
-           "-H 'Content-Type: application/x-ndjson' ".
-           "--data-binary \@- ".
-           "-X POST  '$ESbaseurl/$indexname/_bulk?refresh=wait_for' ".
-           '2>&1';
-      msg(INFO,"ORIGIN_Load: cmd=$cmd");
+                  "'$restOriginFinalAddr' ".
+                  "| ".
+                  "jq --arg now '$nowstamp' ".
+                  "-c '".$ESjqTransform."'".
+                  "| ".
+                  "curl -u '${ESuser}:${ESpass}' ".
+                  "--output - -s ".
+                  "-H 'Content-Type: application/x-ndjson' ".
+                  "--data-binary \@- ".
+                  "-X POST  '$ESbaseurl/$indexname/_bulk?refresh=wait_for' ".
+                  '2>&1';
+
+      #msg(INFO,"ORIGIN_Load: cmd=$cmd");
       my $out=qx($cmd);
       my $exit_code = $? >> 8;
       if ($exit_code==0){
          my $d;
          eval('use JSON; $d=decode_json($out);');
          if ($@ eq ""){
-            my ($out,$emsg)=$self->ESdeleteByQuery({
+            my ($out,$emsg)=$self->ESdeleteByQuery($indexname,{
                range=>{
                   dtLastLoad=>{
                      lt=>$nowstamp
@@ -278,8 +229,92 @@ sub ORIGIN_Load
       }
    }
 
-
 }
+
+
+
+
+
+
+sub ORIGIN_Load
+{
+   my $self=shift;
+
+   my $credentialName="ORIGIN_".$self->getCredentialName();
+   my $indexname=$self->ESindexName();
+
+   $self->ESrestETLload({
+        settings=>{
+           number_of_shards=>1,
+           number_of_replicas=>1,
+           analysis=>{
+              normalizer=> {
+                lowercase_normalizer=> {
+                  type=>"custom",
+                  filter=>["lowercase"]
+                }
+              }
+           }
+        },
+        mappings=>{
+           properties=>{
+              name    =>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256
+                             }
+                           }
+                         },
+              fullname=>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256
+                             }
+                           }
+                         },
+              ictoNumber=>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256,
+                               normalizer=> "lowercase_normalizer"
+    
+                             }
+                           }
+                         },
+              lastUpdated=>{type=>'date'},
+              dtLastLoad=>{type=>'date'}
+           }
+        }
+      },sub {
+         my $loopCount=shift;
+    
+         my ($baseurl,$apikey,$apiuser)=$self->GetRESTCredentials($credentialName);
+         my $Authorization=$self->getTardisAuthorizationToken($credentialName);
+    
+         #msg(INFO,"ORIGIN_Load: Authorization=$Authorization");
+         if (($baseurl=~m#/$#)){
+            $baseurl=~s#/$##; 
+         }
+         #msg(INFO,"ORIGIN_Load: baseurl=$baseurl");
+         my $restOriginFinalAddr=$baseurl."/v1/govs";
+         msg(INFO,"ORIGIN_Load: restOriginFinalAddr=$restOriginFinalAddr");
+         
+         my @restOriginHeaders=(
+             'Authorization'=>$Authorization
+         );
+         my $ESjqTransform=".[] |".
+                         "{ index: { _id: .governanceUniqueId } } , ".
+                         "(. + {dtLastLoad: \$now, ".
+                         "fullname: (.ictoNumber+\": \" +.name)})";
+    
+         return("GET",$restOriginFinalAddr,\@restOriginHeaders,$ESjqTransform);
+   },$indexname);
+}
+
+
 
 
 sub DataCollector
