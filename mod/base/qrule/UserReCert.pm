@@ -268,7 +268,6 @@ sub qcheckRecord
                   my $NotifyTempl="UserReCertGrpNotify";
                   my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,{
                      skinbase=>'base',
-                           faqkey=>'QualityRule '.$self->Self(),
                      static=>{
                         NAME=>$rec->{name}
                      }
@@ -296,7 +295,6 @@ sub qcheckRecord
                      my $tmpl=$dataobj->getParsedTemplate("tmpl/".$NotifyTempl,
                         {
                            skinbase=>'base',
-                           faqkey=>'QualityRule '.$self->Self(),
                            static=>{
                               NAME=>$rec->{name}
                            }
