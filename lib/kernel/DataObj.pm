@@ -5402,8 +5402,11 @@ sub DoRESTcall
 
 
 
+   my $reqtrace="DoRESTcall: --- $self ---\n";
    RETRYLOOP: for(my $retry=0;$retry<=$retry_count;$retry++){
-      my $reqtrace="--- $self ---\n";
+
+      my $RESTcallURL=$p{method}." ".$p{url};
+      $reqtrace.="DoRESTcall: ".$RESTcallURL."\n";
 
       my $ua;
       if (!exists($p{verify_hostname})){
@@ -5447,8 +5450,6 @@ sub DoRESTcall
          }
       }
       my $req;
-      my $RESTcallURL=$p{method}." ".$p{url};
-      $reqtrace.="DoRESTcall: ".$RESTcallURL."\n";
       if ($p{method} eq "GET"){
          if (exists($p{data}) && defined($p{data})){
             $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
