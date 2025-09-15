@@ -36,8 +36,9 @@ sub TeamLeanIX_OriginLoad
 {
    my $self=shift;
 
+   my $o=getModuleObject($self->Config,"TeamLeanIX::app");
+   $o->ORIGIN_Load();
    my $o=getModuleObject($self->Config,"TeamLeanIX::gov");
-
    $o->ORIGIN_Load();
 
 

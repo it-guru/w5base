@@ -843,34 +843,32 @@ sub ESensureIndex
 
          my $vField="DefinitionHash";
          my $vValue=$definitionHash;
-         if (exists($meta->{version}) && $meta->{version} ne "" &&
-             exists($param->{mappings}) && 
+         if (exists($param->{mappings}) && 
              exists($param->{mappings}->{_meta}) &&
              exists($param->{mappings}->{_meta}->{version})){
             $vField="version";
             $vValue=$param->{mappings}->{_meta}->{version};;
+            msg(INFO,"ESensureIndex: using version mapping");
          }
 
-         if ($meta->{DefinitionHash} eq ""){
+         if ($meta->{$vField} eq ""){
             msg(INFO,"ESensureIndex: store missing $vField=$vValue");
             $self->ESmetaData({$vField=>$vValue});
          }
-         else{
-            if ($meta->{$vField} ne $vValue){
-               msg(INFO,"ESensureIndex: recreate index due $vField ".
-                        "change from '$meta->{$vField}' to '$vValue'");
-               my ($out,$emsg)=$self->ESdeleteIndex();
-               if (ref($out) ne "HASH"){
-                  return($out,$emsg);
-               }
-               my ($out,$emsg)=$self->EScreateIndex($indexname,$param);
-               if (ref($out) ne "HASH"){
-                  return($out,$emsg);
-               }
-               $self->ESmetaData({DefinitionHash=>$definitionHash});
+         if ($meta->{$vField} ne $vValue){
+            msg(INFO,"ESensureIndex: recreate index due $vField ".
+                     "change from '$meta->{$vField}' to '$vValue'");
+            my ($out,$emsg)=$self->ESdeleteIndex();
+            if (ref($out) ne "HASH"){
                return($out,$emsg);
-              
             }
+            my ($out,$emsg)=$self->EScreateIndex($indexname,$param);
+            if (ref($out) ne "HASH"){
+               return($out,$emsg);
+            }
+            $self->ESmetaData({DefinitionHash=>$definitionHash});
+            return($out,$emsg);
+           
          }
       }
       return({'acknowledged'=>bless( do{\(my $o = 1)},'JSON::PP::Boolean')});
@@ -1019,7 +1017,7 @@ sub ESrestETLload
                   " -s ".$curlHeaderParam.
                   " --max-time 300 ".
                   "'$restOriginFinalAddr' ".
-                  "| ".
+                  "| tee /tmp/Last.ElasticSearch.ESrestETLload | ".
                   "jq ".$jq_arg." ".        #--arg now '$nowstamp' ".
                   "-c '".$ESjqTransform."'".
                   "| ".
