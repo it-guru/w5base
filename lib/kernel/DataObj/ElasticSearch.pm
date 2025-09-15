@@ -829,10 +829,236 @@ sub ESensureIndex
          my ($out,$emsg)=$self->EScreateIndex($indexname,$param);
          return($out,$emsg);
       }
+      else{
+         my ($meta,$emsg)=$self->ESmetaData();
+         if (ref($meta) ne "HASH"){
+            return($meta,$emsg);
+         }
+         my $definitionHash;
+         my $json;
+         eval('use JSON;$json=new JSON;');
+         $json->utf8(1);
+         my $definitionHash=md5_base64($json->encode($param));
+
+
+         my $vField="DefinitionHash";
+         my $vValue=$definitionHash;
+         if (exists($meta->{version}) && $meta->{version} ne "" &&
+             exists($param->{mappings}) && 
+             exists($param->{mappings}->{_meta}) &&
+             exists($param->{mappings}->{_meta}->{version})){
+            $vField="version";
+            $vValue=$param->{mappings}->{_meta}->{version};;
+         }
+
+         if ($meta->{DefinitionHash} eq ""){
+            msg(INFO,"ESensureIndex: store missing $vField=$vValue");
+            $self->ESmetaData({$vField=>$vValue});
+         }
+         else{
+            if ($meta->{$vField} ne $vValue){
+               msg(INFO,"ESensureIndex: recreate index due $vField ".
+                        "change from '$meta->{$vField}' to '$vValue'");
+               my ($out,$emsg)=$self->ESdeleteIndex();
+               if (ref($out) ne "HASH"){
+                  return($out,$emsg);
+               }
+               my ($out,$emsg)=$self->EScreateIndex($indexname,$param);
+               if (ref($out) ne "HASH"){
+                  return($out,$emsg);
+               }
+               $self->ESmetaData({DefinitionHash=>$definitionHash});
+               return($out,$emsg);
+              
+            }
+         }
+      }
       return({'acknowledged'=>bless( do{\(my $o = 1)},'JSON::PP::Boolean')});
    }
    return($out,$emsg);
 }
+
+sub ESmetaData
+{
+   my $self=shift;
+   my $indexname=shift;
+   my $param;
+   if (ref($indexname) eq "HASH"){
+      $param=$indexname;
+      $indexname=$self->ESindexName();
+   }
+   else{
+      $param=shift;
+   }
+   if ($indexname eq ""){
+      $indexname=$self->ESindexName();
+   }
+
+   my $credentialName=$self->getCredentialName();
+   my ($baseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($credentialName);
+
+   my ($out,$emsg);
+   if (!defined($param)){
+     
+      my $cmd=join(" ",
+            "curl -u '${ESuser}:${ESpass}' ",
+            "--output - -s ",
+            "-X GET '$baseurl/$indexname/_mapping'",
+            "2>&1"
+      );
+      msg(INFO,"ESmeta query $indexname");
+      my $out=qx($cmd);
+      my $exit_code = $? >> 8;
+     
+      if ($exit_code==0){
+         my $d;
+         eval('use JSON; $d=decode_json($out);');
+         if ($@ eq ""){
+            if (!exists($d->{$indexname}->{mappings}->{_meta})){
+               $d->{$indexname}->{mappings}->{_meta}={};
+            }
+            return($d->{$indexname}->{mappings}->{_meta});
+         }
+         else{
+            return(-1,$@);
+         }
+      }
+   }
+   else{
+
+      my ($cparam,$emsg)=$self->ESmetaData($indexname);
+      if (ref($cparam) ne "HASH"){
+         return($cparam,$emsg);
+      }
+      foreach my $k (keys(%$param)){
+         $cparam->{$k}=$param->{$k};
+      }
+      my $strquery;
+      my $json;
+      eval('use JSON;$json=new JSON;');
+      $json->utf8(1);
+      msg(INFO,"ESmeta store at $indexname ".Dumper($cparam));
+      my $strquery=$json->encode({_meta=>$cparam});
+      my $cmd=join(" ",
+            "curl -u '${ESuser}:${ESpass}' ",
+            "--output - -s ",
+            "-d '$strquery' ",
+            "-H 'Content-Type: application/json' ",
+            "-X POST '$baseurl/$indexname/_mapping'",
+            "2>&1"
+      );
+      my $out=qx($cmd);
+      my $exit_code = $? >> 8;
+     
+      if ($exit_code==0){
+         my $d;
+         eval('use JSON; $d=decode_json($out);');
+         if ($@ eq ""){
+            return($d);
+         }
+         else{
+            return(-1,$@);
+         }
+      }
+   }
+
+
+#      my $strquery;
+#      my $json;
+#      eval('use JSON;$json=new JSON;');
+#      $json->utf8(1);
+#      my $strquery=$json->encode($query);
+     
+
+
+   return($out,$emsg);
+}
+
+
+sub ESrestETLload
+{
+   my $self=shift;
+   my $ESindexDefinition=shift;
+   my $backcall=shift;
+   my $indexname=shift;
+   my $param=shift;
+
+   my $session=$param->{session};
+   $session={} if (!defined($session));
+
+   my $baseCredName=$self->getCredentialName();
+   my ($ESbaseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($baseCredName);
+
+
+   my ($out,$emsg)=$self->ESensureIndex($indexname,$ESindexDefinition);
+
+
+   my ($meta,$metaemsg)=$self->ESmetaData();
+   if (ref($meta) ne "HASH"){
+      return($meta,$metaemsg);   
+   }
+
+   my ($restOrignMethod,$restOriginFinalAddr,$restOriginHeaders,$ESjqTransform)=$backcall->($session,$meta);
+
+   my $i;
+   my $curlHeaderParam=join("",map({
+     $i++;
+     ($i % 2==0) ? "-H '".join(':',@$restOriginHeaders[$i-2],$_)."' ":()
+   } @$restOriginHeaders));
+
+   my $jq_arg="";
+   if (exists($param->{jq}) && exists($param->{jq}->{arg})){
+      $jq_arg=join(" ",map({
+                             "--arg ".$_." '".$param->{jq}->{arg}->{$_}."'"
+                           } keys(%{$param->{jq}->{arg}}))); 
+   }
+
+   if (ref($out) && $out->{acknowledged}){
+      msg(INFO,"ESIndex '$indexname' is online starting import");
+      my $cmd="curl -N ".
+                  " -s ".$curlHeaderParam.
+                  " --max-time 300 ".
+                  "'$restOriginFinalAddr' ".
+                  "| ".
+                  "jq ".$jq_arg." ".        #--arg now '$nowstamp' ".
+                  "-c '".$ESjqTransform."'".
+                  "| ".
+                  "curl -u '${ESuser}:${ESpass}' ".
+                  "--output - -s ".
+                  "-H 'Content-Type: application/x-ndjson' ".
+                  "--data-binary \@- ".
+                  "-X POST  '$ESbaseurl/$indexname/_bulk?refresh=wait_for' ".
+                  '2>&1';
+
+      #msg(INFO,"ORIGIN_Load: cmd=$cmd");
+      my $out=qx($cmd);
+      my $exit_code = $? >> 8;
+      if ($exit_code==0){
+         my $d;
+         eval('use JSON; $d=decode_json($out);');
+         if ($@ eq ""){
+            # cleanup
+            if (exists($param->{jq}->{arg})){ # store all jq ars in meta
+               $self->ESmetaData($param->{jq}->{arg});
+            }
+            if (exists($session->{EScleanupIndex})){
+               msg(INFO,"ESIndex '$indexname' cleanup");
+               my ($out,$emsg)=$self->ESdeleteByQuery($indexname,{
+                  range=>$session->{EScleanupIndex}
+               });
+               $self->ESmetaData({lastEScleanupIndex=>NowStamp("ISO")});
+            }
+            return($d);
+         }
+         else{
+            return(-1,$@);
+         }
+      }
+   }
+
+}
+
+
 
 
 

@@ -151,90 +151,6 @@ sub getCredentialName
 
 
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_cidr"))){
-#     Query->Param("search_cidr"=>'10.161.62.20');
-#   }
-#   if (!defined(Query->Param("search_customer"))){
-#     Query->Param("search_customer"=>'CN-DTAG');
-#   }
-#}
-
-
-sub ESrestETLload
-{
-   my $self=shift;
-   my $ESindexDefinition=shift;
-   my $backcall=shift;
-   my $indexname=shift;
-
-   my $baseCredName=$self->getCredentialName();
-   my ($ESbaseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($baseCredName);
-
-   #my ($out,$emsg)=$self->ESdeleteIndex();
-   #printf STDERR ("out=%s\n",Dumper(\$out));
-
-   my $nowstamp=NowStamp("ISO");
-
-   my ($restOrignMethod,$restOriginFinalAddr,$restOriginHeaders,$ESjqTransform)=$backcall->();
-
-   my $i;
-   my $curlHeaderParam=join("",map({
-     $i++;
-     ($i % 2==0) ? "-H '".join(':',@$restOriginHeaders[$i-2],$_)."' ":()
-   } @$restOriginHeaders));
-
-
-   my ($out,$emsg)=$self->ESensureIndex($indexname,$ESindexDefinition);
-   if (ref($out) && $out->{acknowledged}){
-      msg(INFO,"ESIndex '$indexname' is online");
-
-
-      my $cmd="curl -N ".
-                  " -s ".$curlHeaderParam.
-                  " --max-time 300 ".
-                  "'$restOriginFinalAddr' ".
-                  "| ".
-                  "jq --arg now '$nowstamp' ".
-                  "-c '".$ESjqTransform."'".
-                  "| ".
-                  "curl -u '${ESuser}:${ESpass}' ".
-                  "--output - -s ".
-                  "-H 'Content-Type: application/x-ndjson' ".
-                  "--data-binary \@- ".
-                  "-X POST  '$ESbaseurl/$indexname/_bulk?refresh=wait_for' ".
-                  '2>&1';
-
-      #msg(INFO,"ORIGIN_Load: cmd=$cmd");
-      my $out=qx($cmd);
-      my $exit_code = $? >> 8;
-      if ($exit_code==0){
-         my $d;
-         eval('use JSON; $d=decode_json($out);');
-         if ($@ eq ""){
-            my ($out,$emsg)=$self->ESdeleteByQuery($indexname,{
-               range=>{
-                  dtLastLoad=>{
-                     lt=>$nowstamp
-                  }
-               }
-            });
-            return($d);
-         }
-         else{
-            return(-1,$@);
-         }
-      }
-   }
-
-}
-
-
-
-
-
 
 sub ORIGIN_Load
 {
@@ -242,6 +158,8 @@ sub ORIGIN_Load
 
    my $credentialName="ORIGIN_".$self->getCredentialName();
    my $indexname=$self->ESindexName();
+
+   my $opNowStamp=NowStamp("ISO");
 
    $self->ESrestETLload({
         settings=>{
@@ -257,6 +175,9 @@ sub ORIGIN_Load
            }
         },
         mappings=>{
+           _meta=>{
+              version=>3
+           },
            properties=>{
               name    =>{type=>'text',
                          fields=> {
@@ -289,17 +210,57 @@ sub ORIGIN_Load
            }
         }
       },sub {
-         my $loopCount=shift;
+         my $session=shift;
+         my $meta=shift;
     
          my ($baseurl,$apikey,$apiuser)=$self->GetRESTCredentials($credentialName);
          my $Authorization=$self->getTardisAuthorizationToken($credentialName);
     
-         #msg(INFO,"ORIGIN_Load: Authorization=$Authorization");
+         #msg(INFO,"ORIGIN_Load: Tardis Authorization=$Authorization");
+         my $dtLastLoad;
+         if (exists($meta->{dtLastLoad})){
+            $dtLastLoad=$self->ExpandTimeExpression($meta->{dtLastLoad},
+                                                    "en","GMT","GMT");
+         }
+         if ($dtLastLoad ne ""){
+            my $d=CalcDateDuration($dtLastLoad,NowStamp("en"));
+            if ($d->{totalminutes}>120){   # do a full load, if last load
+               $dtLastLoad=undef;          # is older then 120min.
+            }
+            my $MetalastEScleanupIndex=$meta->{lastEScleanupIndex};
+            my $lastEScleanupIndex=$self->ExpandTimeExpression($MetalastEScleanupIndex,
+                                                    "en","GMT","GMT");
+            if ($lastEScleanupIndex ne ""){ 
+               my $d=CalcDateDuration($lastEScleanupIndex,NowStamp("en"));
+               if (defined($d)){
+                  if ($d->{totalminutes}>240){   # do a full load, if last
+                     $dtLastLoad=undef;          # fullload is older then 4h
+                  }
+               }
+               msg(INFO,"lastEScleanupIndex=$lastEScleanupIndex - ".
+                         int($d->{totalminutes})."min. old");
+            }
+            else{
+               $dtLastLoad=undef;
+            }
+         }
          if (($baseurl=~m#/$#)){
             $baseurl=~s#/$##; 
          }
          #msg(INFO,"ORIGIN_Load: baseurl=$baseurl");
          my $restOriginFinalAddr=$baseurl."/v1/govs";
+         if ($dtLastLoad ne ""){
+            msg(INFO,"ESrestETLload: DeltaLoad since $meta->{dtLastLoad}");
+            $restOriginFinalAddr.="?lastUpdated=$meta->{dtLastLoad}";
+         }
+         else{
+            msg(INFO,"ESrestETLload: load with EScleanupIndex");
+            $session->{EScleanupIndex}={
+                dtLastLoad=>{
+                   lt=>$opNowStamp
+                } 
+            };
+         }
          msg(INFO,"ORIGIN_Load: restOriginFinalAddr=$restOriginFinalAddr");
          
          my @restOriginHeaders=(
@@ -307,11 +268,17 @@ sub ORIGIN_Load
          );
          my $ESjqTransform=".[] |".
                          "{ index: { _id: .governanceUniqueId } } , ".
-                         "(. + {dtLastLoad: \$now, ".
+                         "(. + {dtLastLoad: \$dtLastLoad, ".
                          "fullname: (.ictoNumber+\": \" +.name)})";
     
          return("GET",$restOriginFinalAddr,\@restOriginHeaders,$ESjqTransform);
-   },$indexname);
+   },$indexname,{
+     jq=>{
+       arg=>{
+          dtLastLoad=>$opNowStamp
+       }
+     }
+   });
 }
 
 
