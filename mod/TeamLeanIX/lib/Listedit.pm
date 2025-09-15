@@ -33,144 +33,75 @@ sub new
 }
 
 
-
-#sub decodeFilter2Query4neo
-#{
-#   my $self=shift;
-#   my $dbclass=shift;
-#   my $idfield=shift;
-#   my $map=shift;
-#   my $filter=shift;
-#   my $const={}; # for constances witch are derevided from query
-#   my $requesttoken="SEARCH.".time();
-#   my $query="";
-#   my %qparam;
-#
-#   if (ref($filter) eq "HASH"){
-#      my @andLst=();
-#      foreach my $filtername (keys(%{$filter})){
-#         my $f=$filter->{$filtername}->[0];
-#        
-#         foreach my $fn (keys(%{$f})){
-#            my $fld=$self->getField($fn);
-#            if (defined($fld)){
-#               if ($fn eq $idfield){  # Id Field handling
-#                  my $id; 
-#                  if (ref($f->{$fn}) eq "ARRAY" &&
-#                      $#{$f->{$fn}}==0){
-#                     $id=$f->{$fn}->[0];
-#                  }
-#                  elsif (ref($f->{$fn}) eq "SCALAR"){
-#                     $id=${$f->{$fn}};
-#                  }
-#                  else{
-#                     if ($f->{$fn}=~m/^\s*".+"\s*$/){
-#                        $f->{$fn}=~s/^\s*"//;
-#                        $f->{$fn}=~s/"\s*$//;
-#                     }
-#                     if (!($f->{$fn}=~m/[ *?]/)){
-#                        $id=$f->{$fn};
-#                     }
-#                  }
-#                  $const->{$fn}=$id;
-#                  if ($dbclass=~m/\{$idfield\}/){
-#                     $dbclass=~s/\{$idfield\}/$id/g;
-#                  }
-#                  else{
-#                     $dbclass=$dbclass."/".$id;
-#                  }
-#                  $requesttoken=$dbclass;
-#               }
-#               else{   # "normal" field handling
-#                  my $fieldname=$fn;
-#                  if (exists($fld->{dataobjattr})){
-#                     $fieldname=$fld->{dataobjattr};
-#                  }
-#                  my $fstr=$f->{$fn};
-#                  if (ref($fstr) eq "SCALAR"){
-#                     my @l=($$fstr);
-#                     $fstr=\@l;
-#                  }
-#                  if (ref($fstr) eq "ARRAY"){
-#                     $fstr=join(",",@$fstr);
-#                  }
-#                  $qparam{$fieldname}=$fstr;
-#                  $const->{$fieldname}=$fstr;
-#               }
-#            }
-#         }
-#      }
-#   }
-#   else{
-#      printf STDERR ("invalid Filterset in $self:%s\n",Dumper($filter));
-#      $self->LastMsg(ERROR,"invalid filterset for NEO query");
-#      return(undef);
-#   }
-#
-#   if (ref($map)){
-#      foreach my $k (keys(%$map)){
-#         if (!exists($const->{$k})){
-#            my @vl;
-#            foreach my $v (@{$map->{$k}}){
-#               push(@vl,$qparam{$v});
-#            }
-#            $const->{$k}=join('@',@vl);
-#         }
-#         else{
-#            delete($qparam{$k});
-#            my @l=split(/\@/,$const->{$k});
-#            for(my $c=0;$c<=$#{$map->{$k}};$c++){
-#               $qparam{$map->{$k}->[$c]}=$l[$c];
-#               $const->{$map->{$k}->[$c]}=$l[$c];
-#            }
-#         }
-#      }
-#   }
-#
-#
-#   my $qstr=kernel::cgi::Hash2QueryString(%qparam);
-#   if ($qstr ne ""){
-#      $dbclass.="?".$qstr;
-#      $requesttoken=$dbclass;
-#   }
-#   
-#   return($dbclass,$requesttoken,$const);
-#}
-
-
-
-sub onFailNeoHandler
+sub ORIGIN_Load_BackCall
 {
    my $self=shift;
-   my $code=shift;
-   my $statusline=shift;
-   my $content=shift;
-   my $reqtrace=shift;
+   my $originSubPath=shift;
+   my $credentialName=shift;
+   my $indexname=shift;
+   my $ESjqTransform=shift;
+   my $opNowStamp=shift;
 
-
-   my $jsoncontent;
-
-   if ($content=~m/^{/){
-      eval('use JSON;my $j=new JSON;$jsoncontent=$j->decode($content)');
+   my $session=shift;
+   my $meta=shift;
+   
+   my ($baseurl,$apikey,$apiuser)=$self->GetRESTCredentials($credentialName);
+   my $Authorization=$self->getTardisAuthorizationToken($credentialName);
+   
+   #msg(INFO,"ORIGIN_Load: Tardis Authorization=$Authorization");
+   my $dtLastLoad;
+   if (exists($meta->{dtLastLoad})){
+      $dtLastLoad=$self->ExpandTimeExpression($meta->{dtLastLoad},
+                                              "en","GMT","GMT");
    }
-
-   if ($code eq "400" || $code eq "500"){
-      if (defined($jsoncontent)){
-         $self->LastMsg(ERROR,"NEO call result: ".$jsoncontent->{errorMessage});
+   if ($dtLastLoad ne ""){
+      my $d=CalcDateDuration($dtLastLoad,NowStamp("en"));
+      if ($d->{totalminutes}>120){   # do a full load, if last load
+         $dtLastLoad=undef;          # is older then 120min.
+      }
+      my $MetalastEScleanupIndex=$meta->{lastEScleanupIndex};
+      my $lastEScleanupIndex=$self->ExpandTimeExpression(
+                         $MetalastEScleanupIndex,"en","GMT","GMT");
+      if ($lastEScleanupIndex ne ""){ 
+         my $d=CalcDateDuration($lastEScleanupIndex,NowStamp("en"));
+         if (defined($d)){
+            if ($d->{totalminutes}>240){   # do a full load, if last
+               $dtLastLoad=undef;          # fullload is older then 4h
+            }
+         }
+         msg(INFO,"lastEScleanupIndex=$lastEScleanupIndex - ".
+                   int($d->{totalminutes})."min. old");
       }
       else{
-         $self->LastMsg(ERROR,"NEO call result unspecific error");
+         $dtLastLoad=undef;
       }
-      return(undef,$code);
    }
-   msg(ERROR,$reqtrace);
-   $self->LastMsg(ERROR,"unexpected NEO response");
-   return(undef);
-
-
-
-
+   if (($baseurl=~m#/$#)){
+      $baseurl=~s#/$##; 
+   }
+   #msg(INFO,"ORIGIN_Load: baseurl=$baseurl");
+   my $restOriginFinalAddr=$baseurl.$originSubPath;
+   if ($dtLastLoad ne ""){
+      msg(INFO,"ESrestETLload: DeltaLoad since $meta->{dtLastLoad}");
+      $restOriginFinalAddr.="?lastUpdated=$meta->{dtLastLoad}";
+   }
+   else{
+      msg(INFO,"ESrestETLload: load with EScleanupIndex");
+      $session->{EScleanupIndex}={
+          dtLastLoad=>{
+             lt=>$opNowStamp
+          } 
+      };
+   }
+   msg(INFO,"ORIGIN_Load: restOriginFinalAddr=$restOriginFinalAddr");
+   
+   my @restOriginHeaders=(
+       'Authorization'=>$Authorization
+   );
+   return("GET",$restOriginFinalAddr,\@restOriginHeaders,$ESjqTransform);
 }
+
+
 
 
 

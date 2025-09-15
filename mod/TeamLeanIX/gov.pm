@@ -23,11 +23,11 @@ use kernel;
 use kernel::Field;
 use kernel::App::Web::Listedit;
 use kernel::DataObj::ElasticSearch;
-use tardis::lib::Listedit;
+use TeamLeanIX::lib::Listedit;
 use JSON;
 use MIME::Base64;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::ElasticSearch 
-        tardis::lib::Listedit);
+        TeamLeanIX::lib::Listedit);
 
 
 sub new
@@ -151,14 +151,12 @@ sub getCredentialName
 
 
 
-
 sub ORIGIN_Load
 {
    my $self=shift;
 
    my $credentialName="ORIGIN_".$self->getCredentialName();
    my $indexname=$self->ESindexName();
-
    my $opNowStamp=NowStamp("ISO");
 
    $self->ESrestETLload({
@@ -210,75 +208,24 @@ sub ORIGIN_Load
            }
         }
       },sub {
-         my $session=shift;
-         my $meta=shift;
-    
-         my ($baseurl,$apikey,$apiuser)=$self->GetRESTCredentials($credentialName);
-         my $Authorization=$self->getTardisAuthorizationToken($credentialName);
-    
-         #msg(INFO,"ORIGIN_Load: Tardis Authorization=$Authorization");
-         my $dtLastLoad;
-         if (exists($meta->{dtLastLoad})){
-            $dtLastLoad=$self->ExpandTimeExpression($meta->{dtLastLoad},
-                                                    "en","GMT","GMT");
-         }
-         if ($dtLastLoad ne ""){
-            my $d=CalcDateDuration($dtLastLoad,NowStamp("en"));
-            if ($d->{totalminutes}>120){   # do a full load, if last load
-               $dtLastLoad=undef;          # is older then 120min.
-            }
-            my $MetalastEScleanupIndex=$meta->{lastEScleanupIndex};
-            my $lastEScleanupIndex=$self->ExpandTimeExpression($MetalastEScleanupIndex,
-                                                    "en","GMT","GMT");
-            if ($lastEScleanupIndex ne ""){ 
-               my $d=CalcDateDuration($lastEScleanupIndex,NowStamp("en"));
-               if (defined($d)){
-                  if ($d->{totalminutes}>240){   # do a full load, if last
-                     $dtLastLoad=undef;          # fullload is older then 4h
-                  }
-               }
-               msg(INFO,"lastEScleanupIndex=$lastEScleanupIndex - ".
-                         int($d->{totalminutes})."min. old");
-            }
-            else{
-               $dtLastLoad=undef;
-            }
-         }
-         if (($baseurl=~m#/$#)){
-            $baseurl=~s#/$##; 
-         }
-         #msg(INFO,"ORIGIN_Load: baseurl=$baseurl");
-         my $restOriginFinalAddr=$baseurl."/v1/govs";
-         if ($dtLastLoad ne ""){
-            msg(INFO,"ESrestETLload: DeltaLoad since $meta->{dtLastLoad}");
-            $restOriginFinalAddr.="?lastUpdated=$meta->{dtLastLoad}";
-         }
-         else{
-            msg(INFO,"ESrestETLload: load with EScleanupIndex");
-            $session->{EScleanupIndex}={
-                dtLastLoad=>{
-                   lt=>$opNowStamp
-                } 
-            };
-         }
-         msg(INFO,"ORIGIN_Load: restOriginFinalAddr=$restOriginFinalAddr");
-         
-         my @restOriginHeaders=(
-             'Authorization'=>$Authorization
-         );
+         my ($session,$meta)=@_;
          my $ESjqTransform=".[] |".
                          "{ index: { _id: .governanceUniqueId } } , ".
                          "(. + {dtLastLoad: \$dtLastLoad, ".
                          "fullname: (.ictoNumber+\": \" +.name)})";
-    
-         return("GET",$restOriginFinalAddr,\@restOriginHeaders,$ESjqTransform);
-   },$indexname,{
-     jq=>{
-       arg=>{
-          dtLastLoad=>$opNowStamp
-       }
-     }
-   });
+
+         return($self->ORIGIN_Load_BackCall(
+             "/v1/govs",$credentialName,$indexname,$ESjqTransform,$opNowStamp,
+             $session,$meta)
+         );
+      },$indexname,{
+        jq=>{
+          arg=>{
+             dtLastLoad=>$opNowStamp
+          }
+        }
+      }
+   );
 }
 
 
