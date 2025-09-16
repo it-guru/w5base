@@ -1,7 +1,0 @@
-'leanix::Relation'=>{
-  de=>'LeanIX: FactSheet Relation',
-  en=>'LeanIX: FactSheet Relation'
-},
-'fieldgroup.from'=>{de=>'von FactSheet',en=>'from FactSheet'},
-'fieldgroup.to'=>{de=>'nach FactSheet',en=>'to FactSheet'},
-'State'=>{de=>'Status'},
