@@ -138,6 +138,7 @@ sub new
    );
    $self->setDefaultView(qw(id ictoNumber name lifecycle_status 
                             lifecycle_endOfLife mdate));
+   $self->LimitBackend(1000);
    return($self);
 }
 
