@@ -91,16 +91,16 @@ sub new
             searchable    =>0,
             label         =>'description'),
 
-#      new kernel::Field::SubList(
-#            name          =>'contacts',
-#            label         =>'Contacts',
-#            searchable    =>0,
-#            group         =>'contacts',
-#            vjointo       =>'TeamLeanIX::lnkcontact_gov',
-#            vjoinon       =>['id'=>'id'],
-#            vjoindisp     =>['email','name','role'],
-#            vjoininhash   =>['name','role','email']),
-#
+      new kernel::Field::SubList(
+            name          =>'contacts',
+            label         =>'Contacts',
+            searchable    =>0,
+            group         =>'contacts',
+            vjointo       =>'TeamLeanIX::lnkcontact_gov',
+            vjoinon       =>['id'=>'id'],
+            vjoindisp     =>['email','name','role'],
+            vjoininhash   =>['name','role','email']),
+
       new kernel::Field::SubList(
             name          =>'apps',
             label         =>'Apps',
