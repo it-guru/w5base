@@ -103,6 +103,7 @@ sub new
             label         =>'Tags'),
    );
    $self->setDefaultView(qw(id ictoNumber applicationType name));
+   $self->LimitBackend(1000);
    return($self);
 }
 
