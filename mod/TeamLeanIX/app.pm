@@ -40,6 +40,7 @@ sub new
       new kernel::Field::Id(     
             name          =>'id',
             searchable    =>0,
+            htmlwidth     =>'90px',  
             group         =>'source',
             dataobjattr   =>'_id',
             label         =>'Id'),
@@ -176,9 +177,14 @@ sub ORIGIN_Load
       },sub {
          my ($session,$meta)=@_;
          my $ESjqTransform=".[] |".
-                         "{ index: { _id: .applicationUniqueId } } , ".
-                         "(. + {dtLastLoad: \$dtLastLoad, ".
-                         "fullname: (.ictoNumber+\": \" +.name)})";
+                            "select(".
+                            " (.applicationUniqueId | type == \"string\") and ".
+                            " (.applicationUniqueId != null) and  ".
+                            " (.applicationUniqueId != \"\") ".
+                            ") |".
+                            "{ index: { _id: .applicationUniqueId } } , ".
+                            "(. + {dtLastLoad: \$dtLastLoad, ".
+                            "fullname: (.ictoNumber+\": \" +.name)})";
 
          return($self->ORIGIN_Load_BackCall(
              "/v1/apps",$credentialName,$indexname,$ESjqTransform,$opNowStamp,

@@ -101,6 +101,15 @@ sub new
 #            vjoindisp     =>['email','name','role'],
 #            vjoininhash   =>['name','role','email']),
 #
+      new kernel::Field::SubList(
+            name          =>'apps',
+            label         =>'Apps',
+            group         =>'apps',
+            searchable    =>0,
+            vjointo       =>'TeamLeanIX::app',
+            vjoinon       =>['ictoNumber'=>'ictoNumber'],
+            vjoindisp     =>['id','applicationType','name']),
+
 #      new kernel::Field::SubList(
 #            name          =>'orgs',
 #            label         =>'Orgs',
@@ -138,7 +147,7 @@ sub new
    );
    $self->setDefaultView(qw(id ictoNumber name lifecycle_status 
                             lifecycle_endOfLife mdate));
-   $self->LimitBackend(1000);
+   $self->LimitBackend(10000);
    return($self);
 }
 
@@ -175,7 +184,7 @@ sub ORIGIN_Load
         },
         mappings=>{
            _meta=>{
-              version=>3
+              version=>13
            },
            properties=>{
               name    =>{type=>'text',
@@ -210,15 +219,41 @@ sub ORIGIN_Load
         }
       },sub {
          my ($session,$meta)=@_;
-         my $ESjqTransform=".[] |".
-                         "{ index: { _id: .governanceUniqueId } } , ".
-                         "(. + {dtLastLoad: \$dtLastLoad, ".
-                         "fullname: (.ictoNumber+\": \" +.name)})";
 
-         return($self->ORIGIN_Load_BackCall(
-             "/v1/govs",$credentialName,$indexname,$ESjqTransform,$opNowStamp,
-             $session,$meta)
-         );
+         if ($session->{loopCount}==0){
+            $session->{LastRequest}=0;
+            my $ESjqTransform=".[] |".
+                            "{ index: { _id: .governanceUniqueId } } , ".
+                            "(. + {dtLastLoad: \$dtLastLoad, ".
+                            "fullname: (.ictoNumber+\": \" +.name)})";
+
+            return($self->ORIGIN_Load_BackCall(
+                "/v1/govs",$credentialName,$indexname,
+                           $ESjqTransform,$opNowStamp,
+                $session,$meta)
+            );
+         }
+         elsif ($session->{loopCount}==1){
+            $session->{LastRequest}=1;
+            my $ESjqTransform=".[] |".
+                            "select(".
+                            " (.externalId | type == \"string\") and ".
+                            " (.externalId | startswith(\"SPL-\")) ".
+                            ") |".
+                            "{ index: { _id: .platformUniqueId } } , ".
+                            "(. + {".
+                            "dtLastLoad: \$dtLastLoad, ".
+                            "fullname: (.externalId+\": \" +.name),".
+                            "ictoNumber: .externalId ".
+                            "})";
+
+            return($self->ORIGIN_Load_BackCall(
+                "/v1/platforms",$credentialName,$indexname,
+                           $ESjqTransform,$opNowStamp,
+                $session,$meta)
+            );
+         }
+         return(undef);
       },$indexname,{
         jq=>{
           arg=>{
@@ -335,7 +370,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default orgs contacts  source));
+   return(qw(header default orgs apps contacts  source));
 }
 
 
