@@ -19,14 +19,17 @@ package TeamLeanIX::lnkcontact_gov;
 use strict;
 use vars qw(@ISA);
 
+
+
 use kernel;
 use kernel::Field;
 use kernel::App::Web::Listedit;
-use kernel::DataObj::REST;
-use tardis::lib::Listedit;
+use kernel::DataObj::ElasticSearch;
+use TeamLeanIX::lib::Listedit;
 use JSON;
 use MIME::Base64;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::REST tardis::lib::Listedit);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::ElasticSearch 
+        TeamLeanIX::lib::Listedit);
 
 
 sub new
@@ -39,7 +42,7 @@ sub new
       new kernel::Field::Text(     
             name          =>'id',
             group         =>'source',
-            dataobjattr   =>'governanceUniqueId',
+            dataobjattr   =>'_id',
             label         =>'Id'),
 
       new kernel::Field::Text(     
@@ -83,42 +86,42 @@ sub getCredentialName
 #   }
 #}
 
-
 sub DataCollector
 {
    my $self=shift;
    my $filterset=shift;
 
    my $credentialName=$self->getCredentialName();
-   my $Authorization=$self->getTardisAuthorizationToken($credentialName);
-   return(undef) if (!defined($Authorization));
 
+   my $indexname="teamleanix__gov";
 
-   my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
-      ["/v1/govs/{id}"],
-      $filterset,
-      {
-        initQueryParam=>{
-#          'none'=>"1"
-        }
-      }
+   my ($restFinalAddr,$requesttoken,$constParam,$data)=
+      $self->Filter2RestPath(
+         $indexname,$filterset
    );
-   msg(INFO,"restFinalAddr=$restFinalAddr");
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
          $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
       }
       return(undef);
    }
+   #printf STDERR ("ESquery=%s\n\n",$data);
 
    my $d=$self->CollectREST(
       dbname=>$credentialName,
+      requesttoken=>$requesttoken,
+      data=>$data,
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
          my $apiuser=shift;
-         my $headers=['Authorization'=>$Authorization];
+         my $headers=[
+            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
+         ];
+         if ($data ne ""){
+            push(@$headers,"Content-Type","application/json");
+         }
          return($headers);
       },
       url=>sub{
@@ -127,6 +130,7 @@ sub DataCollector
          my $apikey=shift;
          my $apipass=shift;
          my $dataobjurl=$baseurl.$restFinalAddr;
+         msg(INFO,"ESqueryURL=$dataobjurl");
          return($dataobjurl);
       },
       onfail=>sub{
@@ -146,28 +150,34 @@ sub DataCollector
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         #print STDERR Dumper($data);
-         my @resdata;
-         if (ref($data) eq "HASH" && exists($data->{governanceUniqueId})){
-            $data=[$data];
+         if (ref($data) eq "HASH"){
+            if (exists($data->{hits})){
+               if (exists($data->{hits}->{hits})){
+                  $data=$data->{hits}->{hits};
+               }
+            }
+            else{
+               $data=[$data]
+            }
          }
-         #print STDERR Dumper($data->[0]);
+         my @result;
          map({
-            foreach my $rec (@{$_->{subscriptions}}){
-                my %frec=%$rec;
-                $frec{governanceUniqueId}=$_->{governanceUniqueId};
-                push(@resdata,\%frec);  
-            } 
+            $_=FlattenHash($_);
+            if (ref($_->{'_source.subscriptions'}) eq "ARRAY"){
+               foreach my $crec (@{$_->{'_source.subscriptions'}}){
+                  my %c=%{$crec};
+                  $c{_id}=$_->{_id};
+                  push(@result,\%c);
+               }
+            }
+            $_;
          } @$data);
-         #print STDERR Dumper($data);
-        
-         return(\@resdata);
+         return(\@result);
       }
    );
 
    return($d);
 }
-
 
 
 
