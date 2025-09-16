@@ -625,7 +625,10 @@ sub Filter2RestPath
       }
       $restFinalAddrString=$restFinalAddr->[$c];
       if ($restFinalAddrString=~m/_search$/){
-         $qparam{'size'}=9999;
+         my $LimitBackend=$self->LimitBackend();
+         $LimitBackend=10000  if ($LimitBackend==0);
+         $LimitBackend=10000  if ($LimitBackend>10000);
+         $qparam{'size'}=$LimitBackend;
       }
    }
 
