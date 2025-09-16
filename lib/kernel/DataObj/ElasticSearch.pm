@@ -998,65 +998,86 @@ sub ESrestETLload
    if (ref($meta) ne "HASH"){
       return($meta,$metaemsg);   
    }
-
-   my ($restOrignMethod,$restOriginFinalAddr,$restOriginHeaders,$ESjqTransform)=$backcall->($session,$meta);
-
-   my $i;
-   my $curlHeaderParam=join("",map({
-     $i++;
-     ($i % 2==0) ? "-H '".join(':',@$restOriginHeaders[$i-2],$_)."' ":()
-   } @$restOriginHeaders));
-
-   my $jq_arg="";
-   if (exists($param->{jq}) && exists($param->{jq}->{arg})){
-      $jq_arg=join(" ",map({
-                             "--arg ".$_." '".$param->{jq}->{arg}->{$_}."'"
-                           } keys(%{$param->{jq}->{arg}}))); 
-   }
-
    if (ref($out) && $out->{acknowledged}){
-      msg(INFO,"ESIndex '$indexname' is online starting import");
-      my $cmd="curl -N ".
-                  " -s ".$curlHeaderParam.
-                  " --max-time 300 ".
-                  "'$restOriginFinalAddr' ".
-                  "| tee /tmp/Last.ElasticSearch.ESrestETLload | ".
-                  "jq ".$jq_arg." ".        #--arg now '$nowstamp' ".
-                  "-c '".$ESjqTransform."'".
-                  "| ".
-                  "curl -u '${ESuser}:${ESpass}' ".
-                  "--output - -s ".
-                  "-H 'Content-Type: application/x-ndjson' ".
-                  "--data-binary \@- ".
-                  "-X POST  '$ESbaseurl/$indexname/_bulk?refresh=wait_for' ".
-                  '2>&1';
-
-      #msg(INFO,"ORIGIN_Load: cmd=$cmd");
-      my $out=qx($cmd);
-      my $exit_code = $? >> 8;
-      if ($exit_code==0){
-         my $d;
-         eval('use JSON; $d=decode_json($out);');
-         if ($@ eq ""){
-            # cleanup
-            if (exists($param->{jq}->{arg})){ # store all jq ars in meta
-               $self->ESmetaData($param->{jq}->{arg});
-            }
-            if (exists($session->{EScleanupIndex})){
-               msg(INFO,"ESIndex '$indexname' cleanup");
-               my ($out,$emsg)=$self->ESdeleteByQuery($indexname,{
-                  range=>$session->{EScleanupIndex}
-               });
-               $self->ESmetaData({lastEScleanupIndex=>NowStamp("ISO")});
-            }
-            return($d);
+      my $loopCount=0;
+      while(!exists($session->{loopBreak})){
+         $session->{loopCount}=$loopCount;
+       
+         my ($restOrignMethod,$restOriginFinalAddr,
+             $restOriginHeaders,$ESjqTransform)=$backcall->($session,$meta);
+         last if (!defined($restOrignMethod) || $restOrignMethod eq "BREAK");
+       
+         my $i;
+         my $curlHeaderParam=join("",map({
+           $i++;
+           ($i % 2==0) ? "-H '".join(':',@$restOriginHeaders[$i-2],$_)."' ":()
+         } @$restOriginHeaders));
+       
+         my $jq_arg="";
+         if (exists($param->{jq}) && exists($param->{jq}->{arg})){
+            $jq_arg=join(" ",map({
+                                   "--arg ".$_." '".$param->{jq}->{arg}->{$_}."'"
+                                 } keys(%{$param->{jq}->{arg}}))); 
          }
-         else{
-            return(-1,$@);
+       
+         msg(INFO,"ESIndex '$indexname' is OK start import - loop=$loopCount");
+         my $tmpLastRequestRawDump="last.ESrestETLload.$indexname.".
+                                   $loopCount.".raw.dump.tmp";
+         my $tmpLastRequestJqDump="last.ESrestETLload.$indexname.".
+                                   $loopCount.".jq.dump.tmp";
+         my $ESwaitfor="?refresh=wait_for";
+         if (exists($session->{LastRequest}) && $session->{LastRequest}==0){
+            $ESwaitfor="";
          }
+         my $cmd="curl -N ".
+                     " -s ".$curlHeaderParam.
+                     " --max-time 300 ".
+                     "'$restOriginFinalAddr' ".
+                     "| tee /tmp/".$tmpLastRequestRawDump." | ".
+                     "jq ".$jq_arg." ".        #--arg now '$nowstamp' ".
+                     "-c '".$ESjqTransform."'".
+                     "| tee /tmp/".$tmpLastRequestJqDump." | ".
+                     "curl -u '${ESuser}:${ESpass}' ".
+                     "--output - -s ".
+                     "-H 'Content-Type: application/x-ndjson' ".
+                     "--data-binary \@- ".
+                     "-X POST  '$ESbaseurl/$indexname/_bulk".$ESwaitfor."' ".
+                     '2>&1';
+       
+         msg(INFO,"ORIGIN_Load: cmd=$cmd");
+         my $out=qx($cmd);
+         my $exit_code = $? >> 8;
+         if ($exit_code!=0){
+            return($exit_code,$@);
+         }
+         if (!exists($session->{LastRequest})){  # LastRequest must be set to
+            last;                                # 0|1 if we want to do a loop
+         }
+         $session->{lastRequestRawDumpFile}=$tmpLastRequestRawDump;
+         $session->{lastRequestJqDumpFile}=$tmpLastRequestJqDump;
+         $loopCount++;
       }
    }
 
+   my $d;
+   eval('use JSON; $d=decode_json($out);');
+   if ($@ eq ""){
+      # cleanup
+      if (exists($param->{jq}->{arg})){ # store all jq ars in meta
+         $self->ESmetaData($param->{jq}->{arg});
+      }
+      if (exists($session->{EScleanupIndex})){
+         msg(INFO,"ESIndex '$indexname' cleanup");
+         my ($out,$emsg)=$self->ESdeleteByQuery($indexname,{
+            range=>$session->{EScleanupIndex}
+         });
+         $self->ESmetaData({lastEScleanupIndex=>NowStamp("ISO")});
+      }
+      return($d);
+   }
+   else{
+      return(-1,$@);
+   }
 }
 
 
