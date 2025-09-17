@@ -126,7 +126,7 @@ sub ORIGIN_Load
    my $indexname=$self->ESindexName();
    my $opNowStamp=NowStamp("ISO");
 
-   $self->ESrestETLload({
+   my ($res,$emsg)=$self->ESrestETLload({
         settings=>{
            number_of_shards=>1,
            number_of_replicas=>1,
@@ -141,7 +141,7 @@ sub ORIGIN_Load
         },
         mappings=>{
            _meta=>{
-              version=>9
+              version=>10
            },
            properties=>{
               name    =>{type=>'text',
@@ -176,7 +176,11 @@ sub ORIGIN_Load
         }
       },sub {
          my ($session,$meta)=@_;
-         my $ESjqTransform=".[] |".
+         my $ESjqTransform="if (length == 0) ".
+                           "then ".
+                           " { index: { _id: \"__noop__\" } }, ".
+                           " { fullname: \"noop\" } ".
+                           "else  .[] | ".
                             "select(".
                             " (.applicationUniqueId | type == \"string\") and ".
                             " (.applicationUniqueId != null) and  ".
@@ -184,7 +188,8 @@ sub ORIGIN_Load
                             ") |".
                             "{ index: { _id: .applicationUniqueId } } , ".
                             "(. + {dtLastLoad: \$dtLastLoad, ".
-                            "fullname: (.ictoNumber+\": \" +.name)})";
+                            "fullname: (.ictoNumber+\": \" +.name)}) ".
+                            "end";
 
          return($self->ORIGIN_Load_BackCall(
              "/v1/apps",$credentialName,$indexname,$ESjqTransform,$opNowStamp,
@@ -198,6 +203,12 @@ sub ORIGIN_Load
         }
       }
    );
+   if (ref($res) ne "HASH"){
+      Stacktrace(1);
+      msg(ERROR,"something ($emsg) went wrong '$res' in ".$self->Self());
+   }
+   return($res,$emsg);
+
 }
 
 
@@ -277,7 +288,7 @@ sub DataCollector
                $data=[$data]
             }
          }
-         print STDERR Dumper($data->[0]);
+         #print STDERR Dumper($data->[0]);
          map({
             $_=FlattenHash($_);
             foreach my $f (qw(_source.lifecycle.endOfLife 
@@ -341,13 +352,6 @@ sub isUploadValid
    return(0);
 }
 
-
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/ipaddress.jpg?".$cgi->query_string());
-#}
 
 
 1;

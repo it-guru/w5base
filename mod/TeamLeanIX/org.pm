@@ -22,11 +22,12 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field;
 use kernel::App::Web::Listedit;
-use kernel::DataObj::REST;
-use tardis::lib::Listedit;
+use kernel::DataObj::ElasticSearch;
+use TeamLeanIX::lib::Listedit;
 use JSON;
 use MIME::Base64;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::REST tardis::lib::Listedit);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::ElasticSearch
+        TeamLeanIX::lib::Listedit);
 
 
 sub new
@@ -39,25 +40,33 @@ sub new
       new kernel::Field::Id(     
             name          =>'id',
             searchable    =>0,
+            htmlwidth     =>'90px',  
             group         =>'source',
-            dataobjattr   =>'id',
+            dataobjattr   =>'_id',
             label         =>'Id'),
 
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Text(     
             name          =>'name',
-            dataobjattr   =>'name',
+            dataobjattr   =>'_source.name',
             ignorecase    =>1,
             label         =>'Name'),
 
       new kernel::Field::Text(     
             name          =>'parentId',
-            dataobjattr   =>'parentId',
+            dataobjattr   =>'_source.parentId',
+            ignorecase    =>1,
             label         =>'parentId'),
 
+      new kernel::Field::Textarea(
+            name          =>'description',
+            dataobjattr   =>'_source.description',
+            searchable    =>0,
+            label         =>'description'),
    );
    $self->setDefaultView(qw(id name parentId));
+   $self->LimitBackend(1000);
    return($self);
 }
 
@@ -71,16 +80,81 @@ sub getCredentialName
 
 
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_cidr"))){
-#     Query->Param("search_cidr"=>'10.161.62.20');
-#   }
-#   if (!defined(Query->Param("search_customer"))){
-#     Query->Param("search_customer"=>'CN-DTAG');
-#   }
-#}
+sub ORIGIN_Load
+{
+   my $self=shift;
+
+   my $credentialName="ORIGIN_".$self->getCredentialName();
+   my $indexname=$self->ESindexName();
+   my $opNowStamp=NowStamp("ISO");
+
+   my ($res,$emsg)=$self->ESrestETLload({
+        settings=>{
+           number_of_shards=>1,
+           number_of_replicas=>1
+        },
+        mappings=>{
+           _meta=>{
+              version=>9
+           },
+           properties=>{
+              name    =>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256
+                             }
+                           }
+                         },
+              fullname=>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256
+                             }
+                           }
+                         },
+              lastUpdated=>{type=>'date'},
+              dtLastLoad=>{type=>'date'}
+           }
+        }
+      },sub {
+         my ($session,$meta)=@_;
+         my $ESjqTransform="if (length == 0) ".
+                           "then ".
+                           " { index: { _id: \"__noop__\" } }, ".
+                           " { fullname: \"noop\" } ".
+                           "else .[] |".
+                           "select(".
+                           " (.id | type == \"string\") and ".
+                           " (.id != null) and  ".
+                           " (.id != \"\") ".
+                           ") |".
+                           "{ index: { _id: .id } } , ".
+                           "(. + {dtLastLoad: \$dtLastLoad, ".
+                           "fullname: (.id+\": \" +.name)}) ".
+                           "end";
+
+         return($self->ORIGIN_Load_BackCall(
+             "/v1/orgs",$credentialName,$indexname,$ESjqTransform,$opNowStamp,
+             $session,$meta)
+         );
+      },$indexname,{
+        jq=>{
+          arg=>{
+             dtLastLoad=>$opNowStamp
+          }
+        }
+      }
+   );
+   #print STDERR Dumper($res);
+   if (ref($res) ne "HASH"){
+      msg(ERROR,"something went wrong '$res' in ".$self->Self());
+   }
+   return($res,$emsg);
+}
+
+
 
 
 sub DataCollector
@@ -89,21 +163,13 @@ sub DataCollector
    my $filterset=shift;
 
    my $credentialName=$self->getCredentialName();
-   my $Authorization=$self->getTardisAuthorizationToken($credentialName);
-   return(undef) if (!defined($Authorization));
 
+   my $indexname=$self->ESindexName();
 
-   my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
-      ["/v1/orgs/{id}",
-       "/v1/orgs"],
-      $filterset,
-      {
-        initQueryParam=>{
-#          'none'=>"1"
-        }
-      }
+   my ($restFinalAddr,$requesttoken,$constParam,$data)=
+      $self->Filter2RestPath(
+         $indexname,$filterset
    );
-   msg(INFO,"restFinalAddr=$restFinalAddr");
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
          $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
@@ -113,12 +179,19 @@ sub DataCollector
 
    my $d=$self->CollectREST(
       dbname=>$credentialName,
+      requesttoken=>$requesttoken,
+      data=>$data,
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
          my $apiuser=shift;
-         my $headers=['Authorization'=>$Authorization];
+         my $headers=[
+            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
+         ];
+         if ($data ne ""){
+            push(@$headers,"Content-Type","application/json");
+         }
          return($headers);
       },
       url=>sub{
@@ -127,6 +200,7 @@ sub DataCollector
          my $apikey=shift;
          my $apipass=shift;
          my $dataobjurl=$baseurl.$restFinalAddr;
+         msg(INFO,"ESqueryURL=$dataobjurl");
          return($dataobjurl);
       },
       onfail=>sub{
@@ -147,36 +221,29 @@ sub DataCollector
          my $self=shift;
          my $data=shift;
          #print STDERR Dumper($data);
-         if (ref($data) eq "HASH" && exists($data->{orgernanceUniqueId})){
-            $data=[$data];
+         if (ref($data) eq "HASH"){
+            if (exists($data->{hits})){
+               if (exists($data->{hits}->{hits})){
+                  $data=$data->{hits}->{hits};
+               }
+            }
+            else{
+               $data=[$data]
+            }
          }
-#         print STDERR Dumper($data->[0]);
-#         map({
-#            $_=FlattenHash($_);
-#            if (exists($_->{active}) && $_->{active} ne ""){
-#               if ($_->{active} eq "1" || lc($_->{active}) eq "true"){
-#                  $_->{active}=1;
-#               }
-#               else{
-#                  $_->{active}=0;
-#               }
-#            }
-#            if (exists($_->{type}) && $_->{type} ne ""){
-#               $_->{type}=[split(/\s*,\s*/,$_->{type})];
-#            }
-#            foreach my $k (keys(%$constParam)){
-#               if (!exists($_->{$k})){
-#                  $_->{$k}=$constParam->{$k};
-#               }
-#            }
-#         } @$data);
-         #print STDERR Dumper($data);
+   #      print STDERR Dumper($data->[0]);
+         map({
+            $_=FlattenHash($_);
+         } @$data);
+   #      print STDERR Dumper($data->[0]);
          return($data);
       }
    );
 
    return($d);
 }
+
+
 
 
 

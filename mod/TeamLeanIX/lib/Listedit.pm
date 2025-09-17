@@ -84,12 +84,19 @@ sub ORIGIN_Load_BackCall
    if ($dtLastLoad ne ""){
       msg(INFO,"ESrestETLload: DeltaLoad since $meta->{dtLastLoad}");
       $restOriginFinalAddr.="?lastUpdated=$meta->{dtLastLoad}";
+      $session->{EScleanupIndex}={
+          term=>{
+           _id=>'__noop__'
+          }
+      };
    }
    else{
       msg(INFO,"ESrestETLload: load with EScleanupIndex");
       $session->{EScleanupIndex}={
-          dtLastLoad=>{
-             lt=>$opNowStamp
+          range=>{
+             dtLastLoad=>{
+                lt=>$opNowStamp
+             }
           } 
       };
    }
