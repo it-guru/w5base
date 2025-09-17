@@ -75,17 +75,6 @@ sub getCredentialName
 
 
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_cidr"))){
-#     Query->Param("search_cidr"=>'10.161.62.20');
-#   }
-#   if (!defined(Query->Param("search_customer"))){
-#     Query->Param("search_customer"=>'CN-DTAG');
-#   }
-#}
-
 sub DataCollector
 {
    my $self=shift;
