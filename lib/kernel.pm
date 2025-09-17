@@ -1205,7 +1205,7 @@ sub getModuleObject
    }
    if ($@ ne "" || !defined($o) || $o eq "InitERROR"){
       $msg=$@;
-      if ($ENV{SERVER_SOFTWARE} ne ""){
+      if ($ENV{SERVER_SOFTWARE} ne "" || $W5V2::Debug eq "1"){
          #print("Content-type:text/plain\n\n");
          msg(ERROR,"can't create object '%s'",$package); 
          if ($msg ne ""){ 
