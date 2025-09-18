@@ -299,7 +299,7 @@ sub new
                 group         =>'functional',
                 async         =>'1',
                 AllowEmpty    =>1,
-                vjointo       =>'tscape::archappl',
+                vjointo       =>'TeamLeanIX::gov',
                 vjoinon       =>['ictoid'=>'id'],
                 vjoindisp     =>'fullname'),
       insertbefore=>'applmgr'
@@ -980,19 +980,19 @@ sub Validate
        (defined($oldrec) && $oldrec->{ictono} eq "")) ||
        effChanged($oldrec,$newrec,"ictoid")){
       my $ictoid=effVal($oldrec,$newrec,"ictoid");
-      my $o=getModuleObject($self->Config,"tscape::archappl");
+      my $o=getModuleObject($self->Config,"TeamLeanIX::gov");
       if (!defined($o)){
-         $self->LastMsg(ERROR,"unable to connect cape");
+         $self->LastMsg(ERROR,"unable to connect T.EAM");
          return(undef);
       }
       if ($ictoid ne ""){
          $o->SetFilter({id=>\$ictoid});
-         my ($archrec,$msg)=$o->getOnlyFirst(qw(archapplid));
+         my ($archrec,$msg)=$o->getOnlyFirst(qw(ictoNumber));
          if (!defined($archrec)){
             $self->LastMsg(ERROR,"unable to identify archictecture record");
             return(undef);
          }
-         $newrec->{ictono}=$archrec->{archapplid};
+         $newrec->{ictono}=$archrec->{ictoNumber};
       }
       else{
          $newrec->{ictono}=undef;
