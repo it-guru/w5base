@@ -106,7 +106,7 @@ ICTO-ID, um den Eintrag in Darwin durchführen zu können.
 #######################################################################
 #
 #  W5Base Framework
-#  Copyright (C) 2013  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2025  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -147,7 +147,6 @@ sub qcheckRecord
    my $self=shift;
    my $dataobj=shift;
    my $rec=shift;
-   my $checksession=shift;
    my $checksession=shift;
    my $autocorrect=shift;
 
@@ -195,8 +194,8 @@ sub qcheckRecord
          if ($rec->{ictoid} ne $parrec->{id}){  # Migration from Cape to T.EAM
             $forcedupd->{ictoid}=$parrec->{id};
             $checksession->{EssentialsChangedCnt}++;
+            $checksession->{EssentialsChanged}->{ictoid}++;
          }
-print STDERR Dumper($parrec);
          if (lc($parrec->{lifecycle_status}) eq lc("EndOfLife")){
             my $retiredReached=1;
             if ($retiredReached){
