@@ -73,6 +73,30 @@ sub new
             label         =>'Active'),
 
       new kernel::Field::Text(
+            name          =>'applmgremail',
+            label         =>'Application Manager',
+            searchable    =>0,
+            depend        =>['contacts'],
+            onRawValue    =>sub{
+               my $self=shift;
+               my $current=shift;
+
+               my $fld=$self->getParent->getField("contacts",$current);
+               my $contacts=$fld->RawValue($current);
+
+               my $applmgremail;
+               if (ref($contacts) eq "ARRAY"){
+                  foreach my $c (@{$contacts}){
+                     if (lc($c->{role}) eq lc("Application Manager - Cape") ||
+                         lc($c->{role}) eq lc("Application Manager")){
+                        $applmgremail=lc($c->{email});
+                     }
+                  }
+               }
+               return($applmgremail);
+            }),
+
+      new kernel::Field::Text(
             name          =>'organisation',
             label         =>'Organisation',
             group         =>'orgs',
