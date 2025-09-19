@@ -1,0 +1,8 @@
+'TeamLeanIX::qrule::compareApplMgr2'=>{de=>'Überprüfung ob der ApplicationManager Vertreter Kontakt mit T.EAM übereinstimmt',en=>'Check if the ApplicationManager deputy contact matches T.EAM'},
+'removing applmgr2 role from contact %s'=>{de=>'Entfernung der Rolle ApplicationManager Vertreter vom Kontakt %s'},
+'removing applmgr2 contact %s'=>{de=>'Entfernung des ApplicationManager Vertreter Kontaktes %s'},
+'update roles of contact %s with applmgr2'=>{de=>'Aktualisierung des Kontaktes %s um Rolle ApplicationManager Vertreter'},
+'adding applmgr2 contact %s'=>{de=>'Hinzufügen des ApplicationManager Vertreter Kontaktes %s'},
+'different values stored in T.EAM:'=>{de=>'in T.EAM sind andere Inhalte gespeichert:'},
+'no applmgr2 role for'=>{de=>'fehlerhafte ApplicationManager Vertreter Rolle für'},
+'applmgr2'=>{de=>'ApplicationManager Vertreter'},
