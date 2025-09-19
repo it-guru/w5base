@@ -1,0 +1,5 @@
+'TeamLeanIX::qrule::BasedMandatorRules'=>{
+   de=>'T.EAM basierende Regel zur automatischen W5Base/Darwin Mandantenzuordnung',
+   en=>'T.EAM based rule for automatic W5Base/Darwin mandator mapping'
+},
+
