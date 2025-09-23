@@ -23,11 +23,11 @@ use kernel;
 use kernel::Field;
 use kernel::App::Web::Listedit;
 use kernel::DataObj::ElasticSearch;
-use tardis::lib::Listedit;
+use TeamLeanIX::lib::Listedit;
 use JSON;
 use MIME::Base64;
 @ISA=qw(kernel::App::Web::Listedit kernel::DataObj::ElasticSearch 
-        tardis::lib::Listedit);
+        TeamLeanIX::lib::Listedit);
 
 
 sub new
@@ -72,6 +72,81 @@ sub new
             dayonly       =>1,
             label         =>'Active'),
 
+      new kernel::Field::Text(
+            name          =>'applmgremail',
+            label         =>'Application Manager',
+            searchable    =>0,
+            depend        =>['contacts'],
+            onRawValue    =>sub{
+               my $self=shift;
+               my $current=shift;
+
+               my $fld=$self->getParent->getField("contacts",$current);
+               my $contacts=$fld->RawValue($current);
+
+               my $applmgremail;
+               if (ref($contacts) eq "ARRAY"){
+                  foreach my $c (@{$contacts}){
+                     if (lc($c->{role}) eq lc("Application Manager - Cape") ||
+                         lc($c->{role}) eq lc("Application Manager")){
+                        $applmgremail=lc($c->{email});
+                     }
+                  }
+               }
+               return($applmgremail);
+            }),
+
+      new kernel::Field::Text(
+            name          =>'organisation',
+            label         =>'Organisation',
+            group         =>'orgs',
+            depend        =>['orgs'],
+            onRawValue    =>sub{
+               my $self=shift;
+               my $current=shift;
+
+               my $fld=$self->getParent->getField("orgs",$current);
+               my $orgs=$fld->RawValue($current);
+
+               my @orgnames;
+               if (ref($orgs) eq "ARRAY"){
+                  foreach my $orgrec (@{$orgs}){
+                     push(@orgnames,$orgrec->{name});
+                  }
+               }
+               @orgnames=sort(@orgnames);
+               return($orgnames[0]);
+            }),
+
+      new kernel::Field::Group(
+            name          =>'orgarea',
+            readonly      =>1,
+            group         =>'orgs',
+            label         =>'mapped W5Base-OrgArea',
+            vjoinon       =>'orgareaid'),
+
+      new kernel::Field::Link(
+            name          =>'orgareaid',
+            label         =>'OrgAreaID',
+            group         =>'orgs',
+            depend        =>['organisation'],
+            onRawValue    =>sub{
+               my $self=shift;
+               my $current=shift;
+               my $grp=getModuleObject($self->getParent->Config,
+                                           "base::grp");
+               my $newrec={};
+               my $d;
+               $newrec->{fullname}=$current->{organisation};
+               my @grpid=$grp->getIdByHashIOMapped(
+                            $self->getParent->Self,
+                            $newrec,DEBUG=>\$d);
+               if ($#grpid>=0){
+                  return($grpid[0]);
+               }
+               return();
+            }),
+
       new kernel::Field::Text(     
             name          =>'lifecycle_status',
             dataobjattr   =>'_source.lifecycle.status',
@@ -91,25 +166,34 @@ sub new
             searchable    =>0,
             label         =>'description'),
 
-#      new kernel::Field::SubList(
-#            name          =>'contacts',
-#            label         =>'Contacts',
-#            searchable    =>0,
-#            group         =>'contacts',
-#            vjointo       =>'TeamLeanIX::lnkcontact_gov',
-#            vjoinon       =>['id'=>'id'],
-#            vjoindisp     =>['email','name','role'],
-#            vjoininhash   =>['name','role','email']),
-#
-#      new kernel::Field::SubList(
-#            name          =>'orgs',
-#            label         =>'Orgs',
-#            group         =>'orgs',
-#            searchable    =>0,
-#            vjointo       =>'TeamLeanIX::org',
-#            vjoinon       =>['relatedOrganizationIds'=>'id'],
-#            vjoindisp     =>['name']),
-#
+      new kernel::Field::SubList(
+            name          =>'contacts',
+            label         =>'Contacts',
+            searchable    =>0,
+            group         =>'contacts',
+            vjointo       =>'TeamLeanIX::lnkcontact_gov',
+            vjoinon       =>['id'=>'id'],
+            vjoindisp     =>['email','name','role'],
+            vjoininhash   =>['name','role','email']),
+
+      new kernel::Field::SubList(
+            name          =>'apps',
+            label         =>'Apps',
+            group         =>'apps',
+            searchable    =>0,
+            vjointo       =>'TeamLeanIX::app',
+            vjoinon       =>['ictoNumber'=>'ictoNumber'],
+            vjoindisp     =>['id','applicationType','name']),
+
+      new kernel::Field::SubList(
+            name          =>'orgs',
+            label         =>'Orgs',
+            group         =>'orgs',
+            searchable    =>0,
+            vjointo       =>'TeamLeanIX::org',
+            vjoinon       =>['relatedOrganizationIds'=>'id'],
+            vjoindisp     =>['name']),
+
       new kernel::Field::Text(     
             name          =>'relatedOrganizationIds',
             searchable    =>0,
@@ -136,7 +220,9 @@ sub new
             dataobjattr   =>'_source.lastUpdated'),
 
    );
-   $self->setDefaultView(qw(id ictoNumber name mdate));
+   $self->setDefaultView(qw(id ictoNumber name lifecycle_status 
+                            lifecycle_endOfLife mdate));
+   $self->LimitBackend(10000);
    return($self);
 }
 
@@ -150,136 +236,119 @@ sub getCredentialName
 
 
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_cidr"))){
-#     Query->Param("search_cidr"=>'10.161.62.20');
-#   }
-#   if (!defined(Query->Param("search_customer"))){
-#     Query->Param("search_customer"=>'CN-DTAG');
-#   }
-#}
-
 sub ORIGIN_Load
 {
    my $self=shift;
 
-   msg(INFO,"ORIGIN_Load: $self");
-   my $baseCredName=$self->getCredentialName();
-   my $credentialName="ORIGIN_".$baseCredName;
-   msg(INFO,"ORIGIN_Load: credentialName=$credentialName");
+   my $credentialName="ORIGIN_".$self->getCredentialName();
+   my $indexname=$self->ESindexName();
+   my $opNowStamp=NowStamp("ISO");
 
-   my $Authorization=$self->getTardisAuthorizationToken($credentialName);
-   msg(INFO,"ORIGIN_Load: Authorization=$Authorization");
-
-   my ($ESbaseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($baseCredName);
-   my ($baseurl,$apikey,$apiuser)=$self->GetRESTCredentials($credentialName);
-
-   if (($baseurl=~m#/$#)){
-      $baseurl=~s#/$##; 
-   }
-
-   msg(INFO,"ORIGIN_Load: baseurl=$baseurl");
-
-   my $restFinalAddr=$baseurl."/v1/govs";
-   msg(INFO,"ORIGIN_Load: restFinalAddr=$restFinalAddr");
-
-
-   my ($out,$emsg)=$self->ESdeleteIndex();
-   #printf STDERR ("out=%s\n",Dumper(\$out));
-
-   my $nowstamp=NowStamp("ISO");
-
-   my ($out,$emsg)=$self->ESensureIndex({
-     settings=>{
-        number_of_shards=>1,
-        number_of_replicas=>1,
-        analysis=>{
-           normalizer=> {
-             lowercase_normalizer=> {
-               type=>"custom",
-               filter=>["lowercase"]
-             }
+   my ($res,$emsg)=$self->ESrestETLload({
+        settings=>{
+           number_of_shards=>1,
+           number_of_replicas=>1,
+           analysis=>{
+              normalizer=> {
+                lowercase_normalizer=> {
+                  type=>"custom",
+                  filter=>["lowercase"]
+                }
+              }
+           }
+        },
+        mappings=>{
+           _meta=>{
+              version=>14
+           },
+           properties=>{
+              name    =>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256
+                             }
+                           }
+                         },
+              fullname=>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256
+                             }
+                           }
+                         },
+              ictoNumber=>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256,
+                               normalizer=> "lowercase_normalizer"
+    
+                             }
+                           }
+                         },
+              lastUpdated=>{type=>'date'},
+              dtLastLoad=>{type=>'date'}
            }
         }
-     },
-     mappings=>{
-        properties=>{
-           name    =>{type=>'text',
-                      fields=> {
-                          keyword=> {
-                            type=> "keyword",
-                            ignore_above=> 256
-                          }
-                        }
-                      },
-           fullname=>{type=>'text',
-                      fields=> {
-                          keyword=> {
-                            type=> "keyword",
-                            ignore_above=> 256
-                          }
-                        }
-                      },
-           ictoNumber=>{type=>'text',
-                      fields=> {
-                          keyword=> {
-                            type=> "keyword",
-                            ignore_above=> 256,
-                            normalizer=> "lowercase_normalizer"
+      },sub {
+         my ($session,$meta)=@_;
 
-                          }
-                        }
-                      },
-           lastUpdated=>{type=>'date'},
-           dtLastLoad=>{type=>'date'}
+         if ($session->{loopCount}==0){
+            $session->{LastRequest}=0;
+            my $ESjqTransform=".[] |".
+                            "{ index: { _id: .governanceUniqueId } } , ".
+                            "(. + {dtLastLoad: \$dtLastLoad, ".
+                            "fullname: (.ictoNumber+\": \" +.name)})";
+
+            return($self->ORIGIN_Load_BackCall(
+                "/v1/govs",$credentialName,$indexname,
+                           $ESjqTransform,$opNowStamp,
+                $session,$meta)
+            );
+         }
+         elsif ($session->{loopCount}==1){
+            $session->{LastRequest}=1;
+            my $ESjqTransform="if (length == 0) ".
+                              "then ".
+                              " { index: { _id: \"__noop__\" } }, ".
+                              " { fullname: \"noop\" } ".
+                              "else .[] |".
+                              "select(".
+                              " (.externalId | type == \"string\") and ".
+                              " (.externalId | startswith(\"SPL-\")) ".
+                              ") |".
+                              "{ index: { _id: .platformUniqueId } } , ".
+                              "(. + {".
+                              "dtLastLoad: \$dtLastLoad, ".
+                              "fullname: (.externalId+\": \" +.name),".
+                              "ictoNumber: .externalId ".
+                              "}) ".
+                              "end";
+
+            return($self->ORIGIN_Load_BackCall(
+                "/v1/platforms",$credentialName,$indexname,
+                           $ESjqTransform,$opNowStamp,
+                $session,$meta)
+            );
+         }
+         return(undef);
+      },$indexname,{
+        jq=>{
+          arg=>{
+             dtLastLoad=>$opNowStamp
+          }
         }
-     }
-   });
-   if (ref($out) && $out->{acknowledged}){
-      my $indexname=$self->ESindexName();
-      msg(INFO,"ESIndex '$indexname' is online");
-
-      my $cmd="curl -s -H 'Authorization:$Authorization' ".
-                  " --max-time 300 ".
-           "'$restFinalAddr' ".
-           "| ".
-           "jq --arg now '$nowstamp' ".
-           "-c '.[] | { index: { _id: .governanceUniqueId } } , ".
-              "(. + {dtLastLoad: \$now, ".
-                "fullname: (.ictoNumber+\": \" +.name)})'".
-           "| ".
-           "curl -u '${ESuser}:${ESpass}' ".
-           "--output - -s ".
-           "-H 'Content-Type: application/x-ndjson' ".
-           "--data-binary \@- ".
-           "-X POST  '$ESbaseurl/$indexname/_bulk?refresh=wait_for' ".
-           '2>&1';
-      msg(INFO,"ORIGIN_Load: cmd=$cmd");
-      my $out=qx($cmd);
-      my $exit_code = $? >> 8;
-      if ($exit_code==0){
-         my $d;
-         eval('use JSON; $d=decode_json($out);');
-         if ($@ eq ""){
-            my ($out,$emsg)=$self->ESdeleteByQuery({
-               range=>{
-                  dtLastLoad=>{
-                     lt=>$nowstamp
-                  }
-               }
-            });
-            return($d);
-         }
-         else{
-            return(-1,$@);
-         }
       }
+   );
+   if (ref($res) ne "HASH"){
+      msg(ERROR,"something went wrong '$res' in ".$self->Self());
    }
-
-
+   return($res,$emsg);
 }
+
+
 
 
 sub DataCollector
@@ -385,7 +454,7 @@ sub getDetailBlockPriority
    my $self=shift;
    my $grp=shift;
    my %param=@_;
-   return(qw(header default orgs contacts  source));
+   return(qw(header default orgs apps contacts  source));
 }
 
 
@@ -419,13 +488,6 @@ sub isUploadValid
    return(0);
 }
 
-
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/ipaddress.jpg?".$cgi->query_string());
-#}
 
 
 1;

@@ -22,11 +22,12 @@ use vars qw(@ISA);
 use kernel;
 use kernel::Field;
 use kernel::App::Web::Listedit;
-use kernel::DataObj::REST;
-use tardis::lib::Listedit;
+use kernel::DataObj::ElasticSearch;
+use TeamLeanIX::lib::Listedit;
 use JSON;
 use MIME::Base64;
-@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::REST tardis::lib::Listedit);
+@ISA=qw(kernel::App::Web::Listedit kernel::DataObj::ElasticSearch
+        TeamLeanIX::lib::Listedit);
 
 
 sub new
@@ -39,180 +40,71 @@ sub new
       new kernel::Field::Id(     
             name          =>'id',
             searchable    =>0,
+            htmlwidth     =>'90px',  
             group         =>'source',
-            dataobjattr   =>'applicationUniqueId',
+            dataobjattr   =>'_id',
             label         =>'Id'),
 
       new kernel::Field::RecordUrl(),
 
       new kernel::Field::Text(     
             name          =>'name',
-            dataobjattr   =>'name',
+            dataobjattr   =>'_source.name',
             ignorecase    =>1,
             label         =>'Name'),
 
+      new kernel::Field::Interface(
+            name          =>'fullname',
+            dataobjattr   =>'_source.fullname',
+            ElasticType   =>'keyword',
+            ignorecase    =>1,
+            label         =>'Fullname'),
+
+
+      new kernel::Field::Date(
+            name          =>'lifecycle_active',
+            dataobjattr   =>'_source.lifecycle.active',
+            dayonly       =>1,
+            label         =>'Active'),
+
+      new kernel::Field::Text(
+            name          =>'lifecycle_status',
+            dataobjattr   =>'_source.lifecycle.status',
+            searchable    =>0,
+            ignorecase    =>1,
+            label         =>'Status'),
+
+      new kernel::Field::Date(
+            name          =>'lifecycle_endOfLife',
+            dataobjattr   =>'_source.lifecycle.endOfLife',
+            dayonly       =>1,
+            label         =>'endOfLife'),
+
+      new kernel::Field::Textarea(
+            name          =>'description',
+            dataobjattr   =>'_source.description',
+            searchable    =>0,
+            label         =>'description'),
+
+
+
       new kernel::Field::Text(     
             name          =>'ictoNumber',
-            dataobjattr   =>'ictoNumber',
+            dataobjattr   =>'_source.ictoNumber',
             label         =>'ictoNumber'),
 
       new kernel::Field::Text(     
             name          =>'applicationType',
-            dataobjattr   =>'applicationType',
+            dataobjattr   =>'_source.applicationType',
             label         =>'applicationType'),
 
       new kernel::Field::Text(     
-            name          =>'externalId',
-            dataobjattr   =>'externalId',
-            label         =>'externalId'),
-
-      new kernel::Field::Text(     
             name          =>'tags',
-            dataobjattr   =>'tags',
+            dataobjattr   =>'source_tags',
             label         =>'Tags'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'customer',
-#            dataobjattr   =>'customer.name',
-#            ignorecase    =>1,
-#            label         =>'Customer'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'component_type',
-#            dataobjattr   =>'component.deviceType',
-#            group         =>'component',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'Component Type'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'component_dns',
-#            dataobjattr   =>'component.dnsName',
-#            group         =>'component',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'Component DNS'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'component_comment',
-#            dataobjattr   =>'component.comment',
-#            group         =>'component',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'Component Comment'),
-#
-#      new kernel::Field::Textarea(     
-#            name          =>'component_servicenumb',
-#            dataobjattr   =>'component.extendedServiceNumberComment',
-#            group         =>'component',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'ServiceNumberComment'),
-#
-#
-#      new kernel::Field::Text(     
-#            name          =>'network_cidr',
-#            dataobjattr   =>'network.cidr',
-#            group         =>'network',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'Network CIDR'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'network_contact',
-#            dataobjattr   =>'network.responsibleContact',
-#            group         =>'network',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'Network Contact'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'network_contact2',
-#            dataobjattr   =>'network.responsibleContact2',
-#            group         =>'network',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'Network Contact2'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'network_comment',
-#            dataobjattr   =>'network.comment',
-#            group         =>'network',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'Network Comment'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'subnet_cidr',
-#            dataobjattr   =>'subnet.cidr',
-#            group         =>'subnet',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'SubNet CIDR'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'subnet_contact',
-#            dataobjattr   =>'subnet.responsibleContact',
-#            group         =>'subnet',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'SubNet Contact'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'subnet_contact2',
-#            dataobjattr   =>'subnet.responsibleContact2',
-#            group         =>'subnet',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'SubNet Contact2'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'subnet_comment',
-#            dataobjattr   =>'subnet.comment',
-#            group         =>'subnet',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'SubNet Comment'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'vlan_id',
-#            dataobjattr   =>'vlan.vlanId',
-#            group         =>'vlan',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'VLAN ID'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'vlan_domain',
-#            dataobjattr   =>'vlan.vlanDomain.name',
-#            group         =>'vlan',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'VLAN Domain'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'vlan_contact',
-#            dataobjattr   =>'vlan.vlanDomain.contact',
-#            group         =>'vlan',
-#            ignorecase    =>1,
-#            label         =>'VLAN Contact'),
-#
-#      new kernel::Field::Text(     
-#            name          =>'vlan_comment',
-#            dataobjattr   =>'vlan.comment',
-#            group         =>'vlan',
-#            ignorecase    =>1,
-#            htmldetail    =>'NotEmpty',
-#            label         =>'VLAN Comment'),
-#
-#      new kernel::Field::Boolean(     
-#            name          =>'isdhcp',
-#            group         =>'source',
-#            dataobjattr   =>'dhcpRange',
-#            label         =>'DHCP Range'),
-
    );
-   $self->setDefaultView(qw(id ictoNumber name));
+   $self->setDefaultView(qw(id ictoNumber applicationType name));
+   $self->LimitBackend(1000);
    return($self);
 }
 
@@ -226,16 +118,100 @@ sub getCredentialName
 
 
 
-#sub initSearchQuery
-#{
-#   my $self=shift;
-#   if (!defined(Query->Param("search_cidr"))){
-#     Query->Param("search_cidr"=>'10.161.62.20');
-#   }
-#   if (!defined(Query->Param("search_customer"))){
-#     Query->Param("search_customer"=>'CN-DTAG');
-#   }
-#}
+sub ORIGIN_Load
+{
+   my $self=shift;
+
+   my $credentialName="ORIGIN_".$self->getCredentialName();
+   my $indexname=$self->ESindexName();
+   my $opNowStamp=NowStamp("ISO");
+
+   my ($res,$emsg)=$self->ESrestETLload({
+        settings=>{
+           number_of_shards=>1,
+           number_of_replicas=>1,
+           analysis=>{
+              normalizer=> {
+                lowercase_normalizer=> {
+                  type=>"custom",
+                  filter=>["lowercase"]
+                }
+              }
+           }
+        },
+        mappings=>{
+           _meta=>{
+              version=>10
+           },
+           properties=>{
+              name    =>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256
+                             }
+                           }
+                         },
+              fullname=>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256
+                             }
+                           }
+                         },
+              ictoNumber=>{type=>'text',
+                         fields=> {
+                             keyword=> {
+                               type=> "keyword",
+                               ignore_above=> 256,
+                               normalizer=> "lowercase_normalizer"
+    
+                             }
+                           }
+                         },
+              lastUpdated=>{type=>'date'},
+              dtLastLoad=>{type=>'date'}
+           }
+        }
+      },sub {
+         my ($session,$meta)=@_;
+         my $ESjqTransform="if (length == 0) ".
+                           "then ".
+                           " { index: { _id: \"__noop__\" } }, ".
+                           " { fullname: \"noop\" } ".
+                           "else  .[] | ".
+                            "select(".
+                            " (.applicationUniqueId | type == \"string\") and ".
+                            " (.applicationUniqueId != null) and  ".
+                            " (.applicationUniqueId != \"\") ".
+                            ") |".
+                            "{ index: { _id: .applicationUniqueId } } , ".
+                            "(. + {dtLastLoad: \$dtLastLoad, ".
+                            "fullname: (.ictoNumber+\": \" +.name)}) ".
+                            "end";
+
+         return($self->ORIGIN_Load_BackCall(
+             "/v1/apps",$credentialName,$indexname,$ESjqTransform,$opNowStamp,
+             $session,$meta)
+         );
+      },$indexname,{
+        jq=>{
+          arg=>{
+             dtLastLoad=>$opNowStamp
+          }
+        }
+      }
+   );
+   if (ref($res) ne "HASH"){
+      Stacktrace(1);
+      msg(ERROR,"something ($emsg) went wrong '$res' in ".$self->Self());
+   }
+   return($res,$emsg);
+
+}
+
+
 
 
 sub DataCollector
@@ -244,21 +220,13 @@ sub DataCollector
    my $filterset=shift;
 
    my $credentialName=$self->getCredentialName();
-   my $Authorization=$self->getTardisAuthorizationToken($credentialName);
-   return(undef) if (!defined($Authorization));
 
+   my $indexname=$self->ESindexName();
 
-   my ($restFinalAddr,$requesttoken,$constParam)=$self->Filter2RestPath(
-      ["/v1/apps/{id}",
-       "/v1/apps"],
-      $filterset,
-      {
-        initQueryParam=>{
-#          'none'=>"1"
-        }
-      }
+   my ($restFinalAddr,$requesttoken,$constParam,$data)=
+      $self->Filter2RestPath(
+         $indexname,$filterset
    );
-   msg(INFO,"restFinalAddr=$restFinalAddr");
    if (!defined($restFinalAddr)){
       if (!$self->LastMsg()){
          $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
@@ -268,12 +236,19 @@ sub DataCollector
 
    my $d=$self->CollectREST(
       dbname=>$credentialName,
+      requesttoken=>$requesttoken,
+      data=>$data,
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
          my $apikey=shift;
          my $apiuser=shift;
-         my $headers=['Authorization'=>$Authorization];
+         my $headers=[
+            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
+         ];
+         if ($data ne ""){
+            push(@$headers,"Content-Type","application/json");
+         }
          return($headers);
       },
       url=>sub{
@@ -282,7 +257,7 @@ sub DataCollector
          my $apikey=shift;
          my $apipass=shift;
          my $dataobjurl=$baseurl.$restFinalAddr;
-printf STDERR ("URL=%s\n",$dataobjurl);
+         msg(INFO,"ESqueryURL=$dataobjurl");
          return($dataobjurl);
       },
       onfail=>sub{
@@ -302,37 +277,37 @@ printf STDERR ("URL=%s\n",$dataobjurl);
       success=>sub{  # DataReformaterOnSucces
          my $self=shift;
          my $data=shift;
-         print STDERR Dumper($data);
-         if (ref($data) eq "HASH" && exists($data->{applicationUniqueId})){
-            $data=[$data];
-         }
-#         print STDERR Dumper($data->[0]);
-#         map({
-#            $_=FlattenHash($_);
-#            if (exists($_->{active}) && $_->{active} ne ""){
-#               if ($_->{active} eq "1" || lc($_->{active}) eq "true"){
-#                  $_->{active}=1;
-#               }
-#               else{
-#                  $_->{active}=0;
-#               }
-#            }
-#            if (exists($_->{type}) && $_->{type} ne ""){
-#               $_->{type}=[split(/\s*,\s*/,$_->{type})];
-#            }
-#            foreach my $k (keys(%$constParam)){
-#               if (!exists($_->{$k})){
-#                  $_->{$k}=$constParam->{$k};
-#               }
-#            }
-#         } @$data);
          #print STDERR Dumper($data);
+         if (ref($data) eq "HASH"){
+            if (exists($data->{hits})){
+               if (exists($data->{hits}->{hits})){
+                  $data=$data->{hits}->{hits};
+               }
+            }
+            else{
+               $data=[$data]
+            }
+         }
+         #print STDERR Dumper($data->[0]);
+         map({
+            $_=FlattenHash($_);
+            foreach my $f (qw(_source.lifecycle.endOfLife 
+                              _source.lifecycle.phaseOut
+                              _source.lifecycle.active)){
+               if (exists($_->{$f}) && $_->{$f} ne ""){
+                  $_->{$f}.=" 12:00:00";
+               }
+            }
+         } @$data);
+   #      print STDERR Dumper($data->[0]);
          return($data);
       }
    );
 
    return($d);
 }
+
+
 
 
 
@@ -377,13 +352,6 @@ sub isUploadValid
    return(0);
 }
 
-
-#sub getRecordImageUrl
-#{
-#   my $self=shift;
-#   my $cgi=new CGI({HTTP_ACCEPT_LANGUAGE=>$ENV{HTTP_ACCEPT_LANGUAGE}});
-#   return("../../../public/itil/load/ipaddress.jpg?".$cgi->query_string());
-#}
 
 
 1;

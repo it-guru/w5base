@@ -43,7 +43,7 @@ sub Init
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itu.cfm.teamleanix.appl",
-                      "TeamLeanIX::appl",
+                      "TeamLeanIX::app",
                       defaultacl=>['valid_user']);
 
    $self->RegisterObj("itu.cfm.teamleanix.org",

@@ -35,11 +35,29 @@ sub new
 sub TeamLeanIX_OriginLoad
 {
    my $self=shift;
+   my @param=@_;
 
-   my $o=getModuleObject($self->Config,"TeamLeanIX::gov");
+   if ($#param==-1){
+      @param=(
+         "TeamLeanIX::org",
+         "TeamLeanIX::app",
+         "TeamLeanIX::gov"
+      );
+   }
 
-   $o->ORIGIN_Load();
-
+   foreach my $objname (@param){
+      msg(INFO,"start loading $objname");
+      my $o=getModuleObject($self->Config,$objname);
+      if (!defined($o)){
+         my $exitmsg=msg(ERROR,"unamble to create $objname");
+         return({exitcode=>1,exitmsg=>$exitmsg});
+      }
+      if (!$o->can("ORIGIN_Load")){
+         my $exitmsg=msg(ERROR,"unamble to call ORIGIN_Load on $objname");
+         return({exitcode=>1,exitmsg=>$exitmsg});
+      }
+      $o->ORIGIN_Load();
+   }
 
 
    return({exitcode=>0,exitmsg=>'ok'});

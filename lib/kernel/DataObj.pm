@@ -4489,6 +4489,7 @@ sub getHtmlPagingLine
    my $limitstart=shift;
    my $d="";
 
+   my $LimitBackend=$self->LimitBackend();
    if (defined($records) && $pagelimit>0){
       my $totalpages=0;
       if ($pagelimit>0){
@@ -4522,7 +4523,16 @@ sub getHtmlPagingLine
                    "href=JavaScript:setLimitStart($prevpagestart)>".
                    $app->T("previous page")."</a>";
       }
-      my $recordstext="<b>".sprintf($app->T("Total: %d records"),$records)."</b>";
+      my $recordstext="<b>".
+                      sprintf($app->T("Total: %d records"),$records).
+                      "</b>";
+      if ($LimitBackend>0 && $records>$LimitBackend-1){
+         $recordstext="<b>".
+                      sprintf($app->T("Total: &gt;%d records"),$LimitBackend-1).
+                      "</b>";
+
+      }
+
       if (($records<500 || $app->IsMemberOf("admin")) && 
           $app->allowHtmlFullList() &&
           $currentlimit>0 && $records>$currentlimit){
@@ -4548,6 +4558,12 @@ sub getHtmlPagingLine
       if ($totalpages>1 && $currentlimit>0){
          $pagelist.="<table border=0><tr>";
          for(my $p=0;$p<=$#pages;$p++){
+            ###################################################################
+            # do not show last page, if BackendLimit is reached
+            if ($LimitBackend>0 && $records>$LimitBackend-1){
+               next if ($#pages==$p);
+            }
+            ###################################################################
             $pagelist.="<td>...</td>" if ($p==1 && $pages[$p]-1!=$pages[$p-1]);
             my $disppagesstr=$pages[$p];
             if ($currentpage+1==$pages[$p]){
@@ -4708,6 +4724,30 @@ sub Limit
    }
    return($self->{_Limit});
 }
+
+
+sub LimitBackend
+{
+   my $self=shift;
+
+   if (!exists($self->{_LimitBackend})){
+      $self->{_LimitBackend}=undef;
+   }
+   if (!defined($_[0])){
+      return($self->{_LimitBackend});
+   }
+   else{
+      if ($_[0]==0){
+         $self->{_LimitBackend}=undef;
+      }
+      else{
+         $self->{_LimitBackend}=$_[0];
+      }
+   }
+   return($self->{_LimitBackend});
+}
+
+
 
 sub DataObj_findtemplvar
 {
@@ -5402,8 +5442,11 @@ sub DoRESTcall
 
 
 
+   my $reqtrace="DoRESTcall: --- $self ---\n";
    RETRYLOOP: for(my $retry=0;$retry<=$retry_count;$retry++){
-      my $reqtrace="--- $self ---\n";
+
+      my $RESTcallURL=$p{method}." ".$p{url};
+      $reqtrace.="DoRESTcall: ".$RESTcallURL."\n";
 
       my $ua;
       if (!exists($p{verify_hostname})){
@@ -5447,8 +5490,6 @@ sub DoRESTcall
          }
       }
       my $req;
-      my $RESTcallURL=$p{method}." ".$p{url};
-      $reqtrace.="DoRESTcall: ".$RESTcallURL."\n";
       if ($p{method} eq "GET"){
          if (exists($p{data}) && defined($p{data})){
             $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});

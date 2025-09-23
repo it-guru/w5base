@@ -340,258 +340,6 @@ sub Filter2RestPath
    }
 
 
-#         if ($fld->{RestFilterType} eq "SYSPARMQUERY"){
-#            my $fieldname=$fn;
-#            $fieldname=$fld->{dataobjattr}  if (defined($fld->{dataobjattr}));
-#            my @data;
-#            my $fstr=$filter->{$fn};
-#            if ($fld->Type()=~m/Date/){
-#               $fstr=$self->PreParseTimeExpression($fstr,$fld->timezone());
-#            }
-#            $fstr=~s/\\\*/[|*|]/g;   # \* handling maybe wrong (02/2025)
-#            $fstr=~s/\\/\\\\/g;      # \  handling maybe wrong (02/2025)
-#            my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
-#            if ($fstr ne "" && $#words==-1){
-#               $self->LastMsg(ERROR,"parse error '$fstr'");
-#               return(undef);
-#            }
-#
-#            my @fieldQuery;
-#            for(my $c=0;$c<=$#words;$c++){
-#               my $sword=$words[$c];
-#               foreach my $cword (qw(AND OR)){
-#                  if ($sword eq $cword && $c>0 && $c<$#words){
-#                     $self->LastMsg(ERROR,"concatenation $cword is not ".
-#                                          "supported in sysparam_query ".
-#                                          "translation");
-#                     return(undef);
-#                  }
-#               }
-#               my $cmpop="="; 
-#               if ($sword=~m/^<=[^*?]+$/){
-#                  $sword=~s/^<=//;
-#                  $cmpop="<=";
-#               }
-#               elsif ($sword=~m/^>=[^*?]+$/){
-#                  $sword=~s/^>=//;
-#                  $cmpop=">=";
-#               }
-#               elsif ($sword=~m/^>[^*?]+$/){
-#                  $sword=~s/^>//;
-#                  $cmpop=">";
-#               }
-#               elsif ($sword=~m/^<[^*?]+$/){
-#                  $sword=~s/^<//;
-#                  $cmpop="<";
-#               }
-#               elsif ($sword=~m/^[^*?]+\*$/){
-#                  my $fstrmod=$sword;
-#                  $sword=~s/\*$//;
-#                  $cmpop=" STARTSWITH";
-#               }
-#               elsif ($sword=~m/^\*[^*?]+$/){
-#                  my $fstrmod=$sword;
-#                  $sword=~s/^\*//;
-#                  $cmpop=" ENDSWITH";
-#               }
-#               elsif ($sword=~m/^\*[^*?]+\*$/){
-#                  my $fstrmod=$sword;
-#                  $sword=~s/^\*//;
-#                  $sword=~s/\*$//;
-#                  $cmpop=" LIKE";
-#               }
-#               elsif ($sword=~m/[*?]/){
-#                  $self->LastMsg(ERROR,
-#                                 "selected wildcard filter can not be ".
-#                                 "translated to sysparam_query");
-#                  return(undef);
-#               }
-#
-#
-#               if ($fld->Type()=~m/Date/){
-#                  my $raw=$self->ExpandTimeExpression($sword);
-#
-#                  if (defined($raw)){
-#                     $raw=~s/ /','/;
-#                  }
-#                  else{
-#                     $self->LastMsg(ERROR,
-#                                    "selected date expression can not be ".
-#                                    "translated to sysparam_query");
-#                     return(undef);
-#                  }
-#                  $sword="javascript:gs.dateGenerate('${raw}.000Z')";
-#               } 
-#
-#               push(@fieldQuery,"${fieldname}${cmpop}${sword}");
-#            } 
-#            push(@SYSPARMQUERYandList,join("^OR",@fieldQuery));
-#
-#
-#
-#         }
-#         elsif ($fld->{RestFilterType} eq "SIMPLEQUERY"){
-#            my $fieldname=$fn;
-#            $fieldname=$fld->{dataobjattr}  if (defined($fld->{dataobjattr}));
-#            if (defined($fld->{RestFilterField})){
-#               $fieldname=$fld->{RestFilterField};
-#            }
-#
-#            my @data;
-#            my $fstr=$filter->{$fn};
-#            if (ref($fstr) eq "SCALAR"){
-#               my @l=($$fstr);
-#               $fstr=\@l;
-#            }
-#            elsif (ref($fstr) eq "ARRAY"){
-#               foreach my $word (@$fstr){
-#                  my $exp=$word;
-#                  my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-#                  push(@data," $e");
-#               }
-#            }
-#            else{
-#               $fstr=~s/\*//g;
-#               @data=($fstr);
-#            }
-#
-#            $qparam{$fieldname}=join(" ",@data);
-#
-#         }
-#         elsif ($fld->{RestFilterType} eq "SIMPLE"){
-#            my $fieldname=$fn;
-#            $fieldname=$fld->{dataobjattr}  if (defined($fld->{dataobjattr}));
-#            my @data;
-#            my $fstr=$filter->{$fn};
-#            if (ref($fstr) eq "SCALAR"){
-#               my @l=($$fstr);
-#               $fstr=\@l;
-#            }
-#            elsif (ref($fstr) eq "ARRAY"){
-#               foreach my $word (@$fstr){
-#                  my $exp="'".$word."'";
-#                  my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-#                  push(@data,"$v eq $e");
-#               }
-#            }
-#            else{
-#               @data=($fstr);
-#            }
-#
-#            $qparam{$fieldname}=join(" ",@data);
-#
-#         }
-#         elsif ($fld->{RestFilterType} eq "ODATA"){
-#            $isODATA++;
-#            my @ODATAorLst;
-#            my $fieldname=$fn;
-#            $fieldname=$fld->{dataobjattr}  if (defined($fld->{dataobjattr}));
-#            $fieldname=$fld->{ODATA_filter} if (defined($fld->{ODATA_filter}));
-#
-#            #
-#            # ToDo - in ODATA filters, SCALAR and ARRAY refs processing
-#            #
-#
-#            my $fstr=$filter->{$fn};
-#            if (ref($fstr) eq "SCALAR"){
-#               my @l=($$fstr);
-#               $fstr=\@l;
-#            }
-#            if (ref($fstr) eq "ARRAY"){
-#               foreach my $word (@$fstr){
-#                  my $exp="'".$word."'";
-#                  my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-#                  push(@ODATAorLst,"$v eq $e");
-#               }
-#            }
-#
-#
-#            my $isdate=0;
-#            if (grep(/kernel::Field::Date/,
-#                   Class::ISA::self_and_super_path($fld->Self))
-#                   >0) {
-#               $isdate=1;
-#            }
-#            if ($fld->{ODATA_constFilter}){
-#               my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
-#               $qparam{$fieldname}=join(",",@words);
-#            }
-#            else{
-#               my @words=parse_line('[,;]{0,1}\s+',0,$fstr);
-#               for(my $c=0;$c<=$#words;$c++){
-#                  if ($words[$c] eq "AND" || $words[$c] eq "OR"){
-#                     $self->LastMsg(ERROR,
-#                                    "no ODATA support for AND or OR");
-#                     return(undef);
-#                  }
-#                  if ($words[$c]=~m/'/){
-#                     $self->LastMsg(ERROR,
-#                                    "no ODATA support for ".
-#                                    "single quotes");
-#                     return(undef);
-#                  }
-#                  my $val=$words[$c];
-#                  my $compop="eq";
-#                  my $compopcount=0;
-#                  while($val=~m/^[<>]/){
-#                     if ($compopcount>0){
-#                        $self->LastMsg(ERROR,"illegal usage of ".
-#                                             "comparison operator");
-#                        return(undef);
-#                     }
-#                     if ($val=~m/^<=/){
-#                        $val=~s/^<=//;
-#                        $compop="le";
-#                     }
-#                     elsif ($val=~m/^</){
-#                        $val=~s/^<//;
-#                        $compop="lt";
-#                     }
-#                     elsif ($val=~m/^>=/){
-#                        $val=~s/^>=//;
-#                        $compop="ge";
-#                     }
-#                     elsif ($val=~m/^>/){
-#                        $val=~s/^>//;
-#                        $compop="gt";
-#                     }
-#
-#                     elsif ($val=~m/^</){
-#                        $val=~s/^<//;
-#                        $compop="lt";
-#                     }
-#                     if ($val=~m/^>/){
-#                        $val=~s/^>//;
-#                        $compop="tg";
-#                     }
-#                     $compopcount++;
-#                  }
-#                  if ($isdate){
-#                     my $tz=$fld->timezone();
-#                     my $usertz=$self->UserTimezone();
-#                     my $d=$self->ExpandTimeExpression(
-#                            $val,"EDM", $usertz, $tz);
-#                     return(undef) if (!defined($d));
-#                     $val=$d;
-#                  }
-#                     my $exp="'".$val."'";
-#                     my ($v,$e)=$self->caseHdl($fld,$fieldname,$exp);
-#                     push(@ODATAorLst,"$v $compop $e");
-#               }
-#            }
-#            if ($#ODATAorLst!=-1){
-#               push(@ODATAandLst,join(" or ",@ODATAorLst));
-#            }
-#         }
-#         elsif (ref($fld->{RestFilterType}) eq "CODE"){
-#            if ($const){  # works only with cons values (normaly IdField)
-#               my $bk=&{$fld->{RestFilterType}}($fld,$filter->{$fn},
-#                                                \%qparam,$constParam,$filter);
-#            }
-#         }
-#      }
-#   }
-
    my $restFinalAddrString=$restFinalAddr->[0];
    if (grep(/\{[^{}]+\}/,@$restFinalAddr)){
       my $c=0;
@@ -625,7 +373,10 @@ sub Filter2RestPath
       }
       $restFinalAddrString=$restFinalAddr->[$c];
       if ($restFinalAddrString=~m/_search$/){
-         $qparam{'size'}=9999;
+         my $LimitBackend=$self->LimitBackend();
+         $LimitBackend=10000  if ($LimitBackend==0);
+         $LimitBackend=10000  if ($LimitBackend>10000);
+         $qparam{'size'}=$LimitBackend;
       }
    }
 
@@ -776,6 +527,7 @@ sub ESdeleteByQuery
       $query=shift;
    }
 
+   msg(INFO,"ESdeleteByQuery start in $indexname");
    my $credentialName=$self->getCredentialName();
    my ($baseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($credentialName);
 
@@ -794,6 +546,7 @@ sub ESdeleteByQuery
          "-X POST '$baseurl/$indexname/_delete_by_query'",
          "2>&1"
    );
+   msg(INFO,"ESdeleteByQuery cmd=$cmd");
    my $out=qx($cmd);
    my $exit_code = $? >> 8;
 
@@ -801,6 +554,7 @@ sub ESdeleteByQuery
       my $d;
       eval('use JSON; $d=decode_json($out);');
       if ($@ eq ""){
+         msg(INFO,"ESdeleteByQuery finished $indexname OK");
          return($d);
       }
       else{
@@ -826,13 +580,272 @@ sub ESensureIndex
    my ($out,$emsg)=$self->ESgetAliases();
    if (ref($out)){
       if (!exists($out->{$indexname})){
+         msg(INFO,"try to create missing index $indexname");
          my ($out,$emsg)=$self->EScreateIndex($indexname,$param);
          return($out,$emsg);
+      }
+      else{
+         my ($meta,$emsg)=$self->ESmetaData();
+         if (ref($meta) ne "HASH"){
+            return($meta,$emsg);
+         }
+         my $definitionHash;
+         my $json;
+         eval('use JSON;$json=new JSON;');
+         $json->utf8(1);
+         my $definitionHash=md5_base64($json->encode($param));
+
+
+         my $vField="DefinitionHash";
+         my $vValue=$definitionHash;
+         if (exists($param->{mappings}) && 
+             exists($param->{mappings}->{_meta}) &&
+             exists($param->{mappings}->{_meta}->{version})){
+            $vField="version";
+            $vValue=$param->{mappings}->{_meta}->{version};;
+            msg(INFO,"ESensureIndex: using version mapping");
+         }
+
+         if ($meta->{$vField} eq ""){
+            msg(INFO,"ESensureIndex: store missing $vField=$vValue");
+            $self->ESmetaData({$vField=>$vValue});
+         }
+         if ($meta->{$vField} ne $vValue){
+            msg(INFO,"ESensureIndex: recreate index due $vField ".
+                     "change from '$meta->{$vField}' to '$vValue'");
+            my ($out,$emsg)=$self->ESdeleteIndex();
+            if (ref($out) ne "HASH"){
+               return($out,$emsg);
+            }
+            my ($out,$emsg)=$self->EScreateIndex($indexname,$param);
+            if (ref($out) ne "HASH"){
+               return($out,$emsg);
+            }
+            $self->ESmetaData({DefinitionHash=>$definitionHash});
+            return($out,$emsg);
+           
+         }
       }
       return({'acknowledged'=>bless( do{\(my $o = 1)},'JSON::PP::Boolean')});
    }
    return($out,$emsg);
 }
+
+sub ESmetaData
+{
+   my $self=shift;
+   my $indexname=shift;
+   my $param;
+   if (ref($indexname) eq "HASH"){
+      $param=$indexname;
+      $indexname=$self->ESindexName();
+   }
+   else{
+      $param=shift;
+   }
+   if ($indexname eq ""){
+      $indexname=$self->ESindexName();
+   }
+
+   my $credentialName=$self->getCredentialName();
+   my ($baseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($credentialName);
+
+   my ($out,$emsg);
+   if (!defined($param)){
+     
+      my $cmd=join(" ",
+            "curl -u '${ESuser}:${ESpass}' ",
+            "--output - -s ",
+            "-X GET '$baseurl/$indexname/_mapping'",
+            "2>&1"
+      );
+      msg(INFO,"ESmeta query $indexname");
+      my $out=qx($cmd);
+      my $exit_code = $? >> 8;
+     
+      if ($exit_code==0){
+         my $d;
+         eval('use JSON; $d=decode_json($out);');
+         if ($@ eq ""){
+            if (!exists($d->{$indexname}->{mappings}->{_meta})){
+               $d->{$indexname}->{mappings}->{_meta}={};
+            }
+            return($d->{$indexname}->{mappings}->{_meta});
+         }
+         else{
+            return(-1,$@);
+         }
+      }
+   }
+   else{
+
+      my ($cparam,$emsg)=$self->ESmetaData($indexname);
+      if (ref($cparam) ne "HASH"){
+         return($cparam,$emsg);
+      }
+      foreach my $k (keys(%$param)){
+         $cparam->{$k}=$param->{$k};
+      }
+      my $strquery;
+      my $json;
+      eval('use JSON;$json=new JSON;');
+      $json->utf8(1);
+      msg(INFO,"ESmeta store at $indexname ".Dumper($cparam));
+      my $strquery=$json->encode({_meta=>$cparam});
+      my $cmd=join(" ",
+            "curl -u '${ESuser}:${ESpass}' ",
+            "--output - -s ",
+            "-d '$strquery' ",
+            "-H 'Content-Type: application/json' ",
+            "-X POST '$baseurl/$indexname/_mapping'",
+            "2>&1"
+      );
+      my $out=qx($cmd);
+      my $exit_code = $? >> 8;
+     
+      if ($exit_code==0){
+         my $d;
+         eval('use JSON; $d=decode_json($out);');
+         if ($@ eq ""){
+            return($d);
+         }
+         else{
+            return(-1,$@);
+         }
+      }
+   }
+
+
+#      my $strquery;
+#      my $json;
+#      eval('use JSON;$json=new JSON;');
+#      $json->utf8(1);
+#      my $strquery=$json->encode($query);
+     
+
+
+   return($out,$emsg);
+}
+
+
+sub ESrestETLload
+{
+   my $self=shift;
+   my $ESindexDefinition=shift;
+   my $backcall=shift;
+   my $indexname=shift;
+   my $param=shift;
+
+   msg(INFO,"ESrestETLload: start load for $indexname");
+   my $session=$param->{session};
+   $session={} if (!defined($session));
+
+   my $baseCredName=$self->getCredentialName();
+   my ($ESbaseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($baseCredName);
+
+
+   my ($out,$emsg)=$self->ESensureIndex($indexname,$ESindexDefinition);
+
+   my @loopResults;
+   if (ref($out) && $out->{acknowledged}){
+      my ($meta,$metaemsg)=$self->ESmetaData();
+      if (ref($meta) ne "HASH"){
+         return($meta,$metaemsg);   
+      }
+      my $loopCount=0;
+      while(!exists($session->{loopBreak})){
+         $session->{loopCount}=$loopCount;
+       
+         my ($restOrignMethod,$restOriginFinalAddr,
+             $restOriginHeaders,$ESjqTransform)=$backcall->($session,$meta);
+         last if (!defined($restOrignMethod) || $restOrignMethod eq "BREAK");
+       
+         my $i;
+         my $curlHeaderParam=join("",map({
+           $i++;
+           ($i % 2==0) ? "-H '".join(':',@$restOriginHeaders[$i-2],$_)."' ":()
+         } @$restOriginHeaders));
+       
+         my $jq_arg="";
+         if (exists($param->{jq}) && exists($param->{jq}->{arg})){
+            $jq_arg=join(" ",map({
+                                   "--arg ".$_." '".$param->{jq}->{arg}->{$_}."'"
+                                 } keys(%{$param->{jq}->{arg}}))); 
+         }
+       
+         msg(INFO,"ESIndex '$indexname' is OK start import - loop=$loopCount");
+         my $tmpLastRequestRawDump="last.ESrestETLload.$indexname.".
+                                   $loopCount.".raw.dump.tmp";
+         my $tmpLastRequestJqDump="last.ESrestETLload.$indexname.".
+                                   $loopCount.".jq.dump.tmp";
+         my $ESwaitfor="?refresh=wait_for";
+         if (exists($session->{LastRequest}) && $session->{LastRequest}==0){
+            $ESwaitfor="";
+         }
+         my $cmd="curl -N ".
+                     " -s ".$curlHeaderParam.
+                     " --max-time 300 ".
+                     "'$restOriginFinalAddr' ".
+                     "| tee /tmp/".$tmpLastRequestRawDump." | ".
+                     "jq ".$jq_arg." ".        #--arg now '$nowstamp' ".
+                     "-c '".$ESjqTransform."'".
+                     "| tee /tmp/".$tmpLastRequestJqDump." | ".
+                     "curl -u '${ESuser}:${ESpass}' ".
+                     "--output - -s ".
+                     "-H 'Content-Type: application/x-ndjson' ".
+                     "--data-binary \@- ".
+                     "-X POST  '$ESbaseurl/$indexname/_bulk".$ESwaitfor."' ".
+                     '2>&1';
+       
+         msg(INFO,"ORIGIN_Load: cmd=$cmd");
+         my $out=qx($cmd);
+         my $exit_code = $? >> 8;
+         if ($exit_code!=0){
+            return($exit_code,$@);
+         }
+         my $d;
+         eval('use JSON; $d=decode_json($out);');
+         msg(INFO,"out=$out");
+         if ($@ eq ""){
+            if (ref($d) eq "HASH"){
+               my %localSession=%{$session};
+               $localSession{'acknowledged'}=
+                              bless( do{\(my $o = 1)},'JSON::PP::Boolean');
+               push(@loopResults,\%localSession);
+            }
+         }
+         else{
+           return(-1,"ERROR: $@");
+         }
+         if (!exists($session->{LastRequest})){  # LastRequest must be set to
+            last;                                # 0|1 if we want to do a loop
+         }
+         $session->{lastRequestRawDumpFile}=$tmpLastRequestRawDump;
+         $session->{lastRequestJqDumpFile}=$tmpLastRequestJqDump;
+         $loopCount++;
+      }
+   }
+   else{
+      return($out,$emsg);
+   }
+
+   if (exists($param->{jq}->{arg})){ # store all jq ars in meta
+      $self->ESmetaData($param->{jq}->{arg});
+   }
+   if (exists($session->{EScleanupIndex})){
+      msg(INFO,"ESIndex '$indexname' ESdeleteByQuery");
+      my ($out,$emsg)=$self->ESdeleteByQuery($indexname,
+         $session->{EScleanupIndex}
+      );
+      $self->ESmetaData({lastEScleanupIndex=>NowStamp("ISO")});
+   }
+   return({
+      'acknowledged'=>bless( do{\(my $o = 1)},'JSON::PP::Boolean'),
+      'session'=>\@loopResults
+   });
+}
+
+
 
 
 
