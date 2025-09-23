@@ -132,7 +132,7 @@ sub getDummyRequest
 
    my $d=$self->CollectREST(
       dbname=>$credentialName,
-      timeout=>5,
+      timeout=>15,
       retry_count=>3,
       retry_interval=>30,
       headers=>sub{
@@ -238,6 +238,9 @@ sub DataCollector
 
    my $d=$self->CollectREST(
       dbname=>$credentialName,
+      timeout=>30,
+      retry_count=>5,
+      retry_interval=>30,
       headers=>sub{
          my $self=shift;
          my $baseurl=shift;
