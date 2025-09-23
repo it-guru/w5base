@@ -68,9 +68,12 @@ sub ORIGIN_Load_BackCall
             if ($d->{totalminutes}>240){   # do a full load, if last
                $dtLastLoad=undef;          # fullload is older then 4h
             }
+            msg(INFO,"lastEScleanupIndex=$lastEScleanupIndex - ".
+                      int($d->{totalminutes})."min. old");
          }
-         msg(INFO,"lastEScleanupIndex=$lastEScleanupIndex - ".
-                   int($d->{totalminutes})."min. old");
+         else{
+            msg(WARN,"lastEScleanupIndex=$lastEScleanupIndex - broken!");
+         }
       }
       else{
          $dtLastLoad=undef;
@@ -84,11 +87,6 @@ sub ORIGIN_Load_BackCall
    if ($dtLastLoad ne ""){
       msg(INFO,"ESrestETLload: DeltaLoad since $meta->{dtLastLoad}");
       $restOriginFinalAddr.="?lastUpdated=$meta->{dtLastLoad}";
-      $session->{EScleanupIndex}={
-          term=>{
-           _id=>'__noop__'
-          }
-      };
    }
    else{
       msg(INFO,"ESrestETLload: load with EScleanupIndex");
