@@ -70,7 +70,7 @@ sub getVRealizeAuthorizationToken
          method=>'POST',
          dbname=>$credentialName,
          requesttoken=>'AuthLevel1',
-         retry_count=>3,
+         retry_count=>10,
          retry_interval=>10,
          url=>sub{
             my $self=shift;
@@ -149,7 +149,7 @@ sub getVRealizeAuthorizationToken
       if ($refresh_token ne ""){
          my $d=$self->CollectREST(
             method=>'POST',
-            retry_count=>3,
+            retry_count=>10,
             retry_interval=>10,
             dbname=>$credentialName,
             requesttoken=>'AuthLevel2',
@@ -193,7 +193,7 @@ sub getVRealizeAuthorizationToken
      
          my $Authorization=$d->{tokenType}." ".$d->{token};
      
-         if (exists($d->{expires_inx})){
+         if (exists($d->{expires_in})){
             $cacheTPCauthRec->{Expiration}=time()+$d->{expires_in}-600;
          }
          else{
