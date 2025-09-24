@@ -162,8 +162,8 @@ sub DataCollector
    my $d=$self->CollectREST(
       dbname=>$credentialName,
       requesttoken=>$requesttoken,
-      retry_count=>3,
-      retry_interval=>10,
+      retry_count=>6,
+      retry_interval=>15,
       url=>sub{
          my $self=shift;
          my $baseurl=shift;
