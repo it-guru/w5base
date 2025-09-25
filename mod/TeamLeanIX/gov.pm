@@ -46,7 +46,7 @@ sub new
 
       new kernel::Field::RecordUrl(),
 
-      new kernel::Field::Interface(     
+      new kernel::Field::Text(     
             name          =>'fullname',
             dataobjattr   =>'_source.fullname',
             ElasticType   =>'keyword',
@@ -220,7 +220,7 @@ sub new
             dataobjattr   =>'_source.lastUpdated'),
 
    );
-   $self->setDefaultView(qw(id ictoNumber name lifecycle_status 
+   $self->setDefaultView(qw(id fullname ictoNumber name lifecycle_status 
                             lifecycle_endOfLife mdate));
    $self->LimitBackend(10000);
    return($self);
