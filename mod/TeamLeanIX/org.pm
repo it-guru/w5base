@@ -50,6 +50,7 @@ sub new
       new kernel::Field::Text(     
             name          =>'name',
             dataobjattr   =>'_source.name',
+            ElasticType   =>'keyword',
             ignorecase    =>1,
             label         =>'Name'),
 
