@@ -854,7 +854,7 @@ sub ESrestETLload
             should=>[
                {
                  match=>{
-                    _id=>'_noop_'
+                    _id=>'__noop__'
                  }
                }
             ],
