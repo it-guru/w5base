@@ -93,13 +93,17 @@ sub ORIGIN_Load_BackCall
       $session->{EScleanupIndex}={
           bool=>{
             should=>[
-               range=>{
-                 dtLastLoad=>{
-                    lt=>$opNowStamp
+               {
+                 range=>{
+                    dtLastLoad=>{
+                       lt=>$opNowStamp
+                    }
                  }
                },
-               match=>{
-                 _id=>'_noop_'
+               {
+                 match=>{
+                    _id=>'_noop_'
+                 }
                }
             ],
             'minimum_should_match'=>'1'
