@@ -845,6 +845,24 @@ sub ESrestETLload
       );
       $self->ESmetaData({lastEScleanupIndex=>NowStamp("ISO")});
    }
+   else{
+      # generell cleanup removes _noop_ _id records (dummies while loading
+      # emtpy datasets with jq)
+      my ($out,$emsg)=$self->ESdeleteByQuery($indexname,
+         {
+          bool=>{
+            should=>[
+               {
+                 match=>{
+                    _id=>'_noop_'
+                 }
+               }
+            ],
+            'minimum_should_match'=>'1'
+          }
+        }
+      );
+   }
    return({
       'acknowledged'=>bless( do{\(my $o = 1)},'JSON::PP::Boolean'),
       'session'=>\@loopResults
