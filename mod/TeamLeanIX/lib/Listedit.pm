@@ -91,10 +91,18 @@ sub ORIGIN_Load_BackCall
    else{
       msg(INFO,"ESrestETLload: load with EScleanupIndex");
       $session->{EScleanupIndex}={
-          range=>{
-             dtLastLoad=>{
-                lt=>$opNowStamp
-             }
+          bool=>{
+            should=>[
+               range=>{
+                 dtLastLoad=>{
+                    lt=>$opNowStamp
+                 }
+               },
+               match=>{
+                 _id=>'_noop_'
+               }
+            ],
+            'minimum_should_match'=>'1'
           } 
       };
    }

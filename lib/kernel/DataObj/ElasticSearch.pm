@@ -56,7 +56,10 @@ sub ESHash2Flt
             $dataobjattr=$fld->{dataobjattr};
          }
          $dataobjattr=~s/^_source\.//;
-         #$dataobjattr.=".keyword";
+         if (exists($fld->{ElasticType}) && defined($fld->{ElasticType}) &&
+             $fld->{ElasticType} eq "keyword"){
+            $dataobjattr.=".keyword";
+         }
          if (!ref($filter->{$fn})){
             my $fstr=$filter->{$fn};
             if ($fld->Type()=~m/Date/){
@@ -71,6 +74,9 @@ sub ESHash2Flt
             my $const=1;
             if (($fstr=~m/[ *?]/) || ($fstr=~m/^[<>!]/)){
                $const=0;
+            }
+            if ($dataobjattr eq "_id"){ # On ElasicSearch on _id no wildcard
+               $const=1;                # filters posible
             }
             if ($const){
                push(@{$bool->{must}},{
