@@ -5619,7 +5619,8 @@ sub DoRESTcall
       else{
          my $statusline=$response->status_line;
          if (($retry<$retry_count) && 
-             ($code eq "500" || $code eq "503" || $code eq "504")){
+             ($code eq "500" || $code eq "502" || 
+              $code eq "503" || $code eq "504")){
             $self->Log(INFO,"restcall",$self->Self()." RETRY $code($retry) ".
                             $p{method}." ".$p{url}.
                             " REMOTE_USER=$ENV{REMOTE_USER}");
