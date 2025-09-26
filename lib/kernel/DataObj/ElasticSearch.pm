@@ -264,65 +264,14 @@ sub Filter2RestPath
    $json->property(pretty => 1);
    $json->property(utf8 => 1);
 
-   print STDERR Dumper({query=>{bool=>$fullQuery}});
 
    $postData=$json->encode({query=>{bool=>$fullQuery}});
-printf STDERR ("postData=%s\n",$postData);
 
-#   $postData='
-#
-#{
-#  "query": {
-#    "term": {
-#      "ictoNumber.keyword": "ICTO-21743"
-#    }
-#  }
-#}
-#
-#';
-
-
-
-
-   
-#   # ToDo: check if ODATA filtering - if yes, allow in simplifyFilterSet
-#   #       flat SCALAR and ARRAY values
-#
    my $simplifyParam=[];
 
    my ($filter,$queryToken)=$self->simplifyFilterSet($filterSet,$simplifyParam);
    return(undef) if (!defined($filter));
 
-
-#   foreach my $fn (keys(%{$filter})){  # paas1 loop
-#      my $fld=$self->getField($fn);
-#      if (defined($fld)){
-#         my $const=1;
-#         if ($filter->{$fn}=~m/[ *?]/){
-#            $const=0;
-#         }
-#         if (ref($fld->{RestFilterType}) eq "CODE"){
-#            if ($const){  # works only with cons values (normaly IdField)
-#               my $bk=&{$fld->{RestFilterType}}($fld,$filter->{$fn},
-#                                                \%qparam,$constParam,$filter);
-#            }
-#         }
-#         if (ref($fld->{RestFilterType}) eq "ARRAY"){  # idpath default handling
-#            my $RestFilterPathSep=$fld->{RestFilterPathSep};
-#            if ($RestFilterPathSep eq ""){
-#               $RestFilterPathSep='@';
-#            }
-#            if ($const){
-#               my @pathVar=split($RestFilterPathSep,$filter->{$fn});
-#               for(my $c=0;$c<=$#{$fld->{RestFilterType}};$c++){
-#                  my $pvar=$fld->{RestFilterType}->[$c];
-#                   $filter->{$pvar}=$pathVar[$c];
-#               }
-#               delete($filter->{$fn});
-#            }
-#         }
-#      }
-#   }
 
    # Handling Const-Parameters in restFinalAddr
    foreach my $fn (keys(%{$filter})){
@@ -1002,179 +951,213 @@ sub DataCollector
 }
 
 
+sub getFieldBackendName
+{
+   my $self=shift;
+   my $fobj=shift;
+   my $mode=shift;
+
+   my $dataobjattr=$fobj->{dataobjattr};
+   if ($dataobjattr=~m/^_source\./){
+       $dataobjattr=~s/^_source\.//;
+   }
+   return($dataobjattr);
+
+}
+
+
+sub QuoteHashData
+{
+   my $self=shift;
+   my $mode=shift;
+   my $workdb=shift;
+   my %param=@_;
+   my $newdata=$param{current};
+   my %raw;
+
+   foreach my $fobj ($self->getFieldObjsByView(["ALL"],%param)){
+      my $field=$fobj->Name();
+      next if (!exists($newdata->{$field}));
+      if (defined($fobj->{alias})){
+         $fobj=$self->getField($fobj->{alias});
+      }
+      if (!defined($fobj)){
+         printf STDERR ("ERROR: can't getField $field in $self\n");
+   #      exit(1);
+   #      return(undef);
+      }
+      my $dataobjattr=$self->getFieldBackendName($fobj,"insert");
+      if (defined($dataobjattr)){
+         my $rawname=$dataobjattr;
+         if (!defined($newdata->{$field})){ # and insert statements shorter
+            $raw{$rawname}="NULL";
+         }elsif (ref($newdata->{$field}) eq "SCALAR"){
+            $raw{$rawname}=${$newdata->{$field}};
+         }
+         else{
+            $raw{$rawname}=$newdata->{$field};
+         }
+      }
+   }
+   return(%raw);
+}
+
+
+
+
 sub InsertRecord
 {
    my $self=shift;
    my $newdata=shift;  # hash ref
-   print STDERR "InsertRecord:".Dumper($newdata)."\n";
 #   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+
+
    my $idobj=$self->IdField();
    my $idfield=$idobj->Name();
    my $id;
 
+   if (!defined($newdata->{$idfield})){
+      if ($idobj->autogen==1){
+         my $res=$self->W5ServerCall("rpcGetUniqueId");
+         my $retry=30;
+         while(!defined($res=$self->W5ServerCall("rpcGetUniqueId"))){
+            sleep(1);
+            last if ($retry--<=0);
+            # next lines are a test, to handle break of W5Server better
+            if (getppid()==1){  # parent (W5Server) killed in event context
+               msg(ERROR,"Parent Process is killed - not good in DB.pm !");
+               return();
+            }
+            msg(WARN,"W5Server problem for user $ENV{REMOTE_USER} ($retry)");
+         }
+         if (defined($res) && $res->{exitcode}==0){
+            $id=$res->{id};
+         }
+         else{
+            msg(ERROR,"InsertRecord: W5ServerCall returend %s",Dumper($res));
+            $self->LastMsg(ERROR,"W5Server unavailable ".
+                          "- can't get unique id - ".
+                          "please try later or contact the admin");
+            return(undef);
+         }
+         #$newdata->{$idfield}=$id;
+      }
+   }
+   else{
+      $id=$newdata->{$idfield};
+   }
+   my $indexname=$self->ESindexName();
+
+   $id=~s/\///g;
+
+   my %raw=$self->QuoteHashData("insert",$indexname,
+                                oldrec=>undef,current=>$newdata);
+
+   my $credentialName=$self->getCredentialName();
+
+   my $json;
+   eval('use JSON;$json=new JSON;');
+   $json->property(pretty => 1);
+   $json->property(utf8 => 1);
+
+   my $data=$json->encode(\%raw);
+
+   my $d=$self->CollectREST(
+      dbname=>$credentialName,
+      data=>$data,
+      method=>'PUT',
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apiuser=shift;
+         my $headers=[
+            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
+         ];
+         if ($data ne ""){
+            push(@$headers,"Content-Type","application/json");
+         }
+         return($headers);
+      },
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apipass=shift;
+         $baseurl=~s/\/$//;
+         my $dataobjurl=$baseurl.'/'.$indexname.'/_create/'.$id;
+         msg(INFO,"EScreateURL=$dataobjurl");
+         return($dataobjurl);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+         #print STDERR Dumper($data);
+         return($data);
+      }
+   );
+   if (ref($d) eq "HASH"){
+      return($id);
+   }
+
+
    return(undef);
 }
 
-#   my ($worktable,$workdb)=$self->getWorktable();
-#   $workdb=$self->{DB} if (!defined($workdb));
-#
-#   if (!defined($worktable) || $worktable eq ""){
-#      $self->LastMsg(ERROR,"can't InsertRecord in $self - no Worktable");
-#      return(undef);
-#   }
-#   if (!defined($workdb)){
-#      $self->LastMsg(ERROR,"can't InsertRecord in $self - no workdb");
-#      return(undef);
-#   }
-#   if (!defined($newdata->{$idfield})){
-#      if ($idobj->autogen==1){
-#         my $res=$self->W5ServerCall("rpcGetUniqueId");
-#         my $retry=30;
-#         while(!defined($res=$self->W5ServerCall("rpcGetUniqueId"))){
-#            sleep(1);
-#            last if ($retry--<=0);
-#            # next lines are a test, to handle break of W5Server better
-#            if (getppid()==1){  # parent (W5Server) killed in event context
-#               msg(ERROR,"Parent Process is killed - not good in DB.pm !");
-#               return();
-#            }
-#            msg(WARN,"W5Server problem for user $ENV{REMOTE_USER} ($retry)");
-#         }
-#         if (defined($res) && $res->{exitcode}==0){
-#            $id=$res->{id};
-#         }
-#         else{
-#            msg(ERROR,"InsertRecord: W5ServerCall returend %s",Dumper($res));
-#            $self->LastMsg(ERROR,"W5Server unavailable ".
-#                          "- can't get unique id - ".
-#                          "please try later or contact the admin");
-#            return(undef);
-#         }
-#         $newdata->{$idfield}=$id;
-#      }
-#   }
-#   else{
-#      $id=$newdata->{$idfield};
-#   }
-#   my %raw=$self->QuoteHashData("insert",$workdb,oldrec=>undef,
-#                                current=>$newdata);
-#   my $cmd;
-#   #   if ($self->{UseSqlReplace}==1){  # bisher kein alternatives Verhalten
-#   #                                    # im SQL Replace modus !!!
-#   #   }                                # Kann ansonsten probleme im Arikel
-#   {                                    # Katalog geben
-#      my @flist=keys(%raw);
-#      $cmd="insert into $worktable (".
-#           join(",",@flist).") ".
-#           "values(".join(",",map({$raw{$_}} @flist)).")";
-#   }
-#   #msg(INFO,"fifi InsertRecord data=%s into '$worktable'\n",Dumper($newdata));
-#   if (length($cmd)<65535){
-#      $self->Log(INFO,"sqlwrite",$cmd);
-#   }
-#   else{
-#      $self->Log(INFO,"sqlwrite","(long insert >64k)");
-#   }
-#   $workdb->{deadlockHandler}=1;
-#   my $bk=$workdb->do($cmd);
-#   if (!$bk){
-#      my $retrycnt=0;
-#      while(my $retryErrorNo=_checkCommonRetryErrors($workdb->getErrorMsg())){
-#        $retrycnt++;
-#        if ($retrycnt>1){
-#           if ($retryErrorNo==1){
-#              msg(ERROR,"found Deadlock - retry $retrycnt");
-#           }
-#        }
-#        sleep($retrycnt); # increase the sleep
-#        $bk=$workdb->do($cmd);
-#        last if ($bk);
-#        if ($retryErrorNo==1 && $retrycnt>4){
-#           msg(ERROR,"Deadlock problem - giving up");
-#           last;
-#        }
-#        if ($retryErrorNo==2 && $retrycnt>4){
-#           msg(ERROR,"readonly problem - giving up");
-#           last;
-#        }
-#        {
-#           msg(INFO,"do sleep for $retryErrorNo with $retrycnt*$retrycnt for:".
-#                    $cmd);
-#           sleep($retrycnt*$retrycnt); # 1 4 9 16 sleeps (in sum 30sec)
-#        }
-#      }
-#   }
-#   delete($workdb->{deadlockHandler});
-#   if ($bk){
-#      $workdb->finish();
-#      if (!defined($id)){
-#         # id was not created by w5base, soo we need to read it from the
-#         # table
-#         # getHashList
-#         my $cmd;
-#         my %q=();
-#         my @fieldlist=$self->getFieldList();
-#         foreach my $field (@fieldlist){
-#            my $fo=$self->getField($field);
-#            if ($fo->{id} && defined($fo->{dataobjattr})){
-#               if (defined($newdata->{$fo->{name}})){
-#                  $q{$fo->{dataobjattr}}=$workdb->quotemeta(
-#                                      $newdata->{$fo->{name}});
-#               }
-#               else{
-#                  $q{$fo->{dataobjattr}}="NULL";
-#               }
-#            }
-#         }
-#         if (defined($idobj->{dataobjattr}) &&          # id is automatic gen
-#             ref($idobj->{dataobjattr}) ne "ARRAY"){    # by the database 
-#            if (keys(%q)==0){     # SCOPE_IDENTIY should work on ODBC databases
-#               my @l;
-#               if (lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
-#                  @l=$workdb->getArrayList("select LAST_INSERT_ID()");
-#               }
-#               else{
-#                  @l=$workdb->getArrayList("select SCOPE_IDENTITY()");
-#               }
-#               my $rec=pop(@l);
-#               if (defined($rec)){
-#                  $id=$rec->[0];
-#               }
-#            }
-#            else{
-#               $cmd="select $idobj->{dataobjattr} from $worktable ".
-#                    "where ".join(" and ",map({$_.="=".$q{$_}} keys(%q)));
-#               msg(INFO,"reading id by=%s",$cmd);
-#               my @l=$workdb->getArrayList($cmd);
-#               my $rec=pop(@l);
-#               if (defined($rec)){
-#                  $id=$rec->[0];
-#               }
-#            }
-#         }
-#         if (defined($idobj->{dataobjattr}) &&          # no one simple unique
-#             ref($idobj->{dataobjattr}) eq "ARRAY"){    # ... id more fields
-#          #  $cmd="select $idobj->{dataobjattr} from $worktable ".
-#          #       "where ".join(" and ",map({$_.="=".$q{$_}} keys(%q)));
-#          #  msg(INFO,"reading id by=%s",$cmd);
-##
-##            my @l=$workdb->getArrayList($cmd);
-##            my $rec=pop(@l);
-##            if (defined($rec)){
-##               $id=$rec->[0];
-##            }
-#         }
-#         if (!defined($id)){
-#            $self->LastMsg(ERROR,"no record identifier returned by insert");
-#         }
-#      }
-#      return($id);
-#   }
-#   $self->LastMsg(ERROR,$self->preProcessDBmsg($workdb->getErrorMsg()));
-#   return(undef);
-#}
-#
-#
+
+sub DeleteRecord
+{
+   my $self=shift;
+   my $oldrec=shift;
+
+   my $idobj=$self->IdField();
+   my $idfield=$idobj->Name();
+
+   my $id=$oldrec->{$idfield};
+
+   my $indexname=$self->ESindexName();
+
+   my $credentialName=$self->getCredentialName();
+
+   $id=~s/\///g;
+
+
+   my $d=$self->CollectREST(
+      dbname=>$credentialName,
+      method=>'DELETE',
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apiuser=shift;
+         my $headers=[
+            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
+         ];
+         return($headers);
+      },
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apipass=shift;
+         $baseurl=~s/\/$//;
+         my $dataobjurl=$baseurl.'/'.$indexname.'/_doc/'.$id;
+         msg(INFO,"ESdeleteURL=$dataobjurl");
+         return($dataobjurl);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+         #print STDERR Dumper($data);
+         return($data);
+      }
+   );
+   if (ref($d) eq "HASH"){
+      return($id);
+   }
+   return(undef);
+}
+
 
 
 

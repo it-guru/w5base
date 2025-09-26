@@ -124,7 +124,15 @@ sub isWriteValid
 {
    my $self=shift;
    my $rec=shift;
-   return("ALL");
+   return("default");
+}
+
+sub isCopyValid
+{
+   my $self=shift;
+   my $rec=shift;
+
+   return(1);
 }
 
 sub isQualityCheckValid

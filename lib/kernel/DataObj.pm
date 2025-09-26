@@ -5505,7 +5505,12 @@ sub DoRESTcall
          $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
       }
       if ($p{method} eq "PUT"){
-         $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+         if (exists($p{data}) && defined($p{data})){
+            $req=HTTP::Request->new($p{method},$p{url},$p{headers},$p{data});
+         }
+         else{
+            $req=HTTP::Request->new($p{method},$p{url},$p{headers});
+         }
       }
       if ($p{method} eq "PATCH"){
          $req=HTTP::Request->new($p{method},$p{url},$p{headers});
