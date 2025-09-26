@@ -131,8 +131,15 @@ sub ESHash2Flt
                   if ($cmpop eq "="){
                      if ($sword=~m/[*?]/){
                         push(@{$bool->{should}},{
+#                          wildcard=>{
+#                             "$dataobjattr"=>$sword
+#                          }
                           wildcard=>{
-                             "$dataobjattr"=>$sword
+                             "$dataobjattr"=>{
+                                value=>$sword,
+                                case_insensitive=>
+                                  bless( do{\(my $o = 1)},'JSON::PP::Boolean')
+                             }
                           }
                         });
                      }
@@ -257,7 +264,10 @@ sub Filter2RestPath
    $json->property(pretty => 1);
    $json->property(utf8 => 1);
 
+   print STDERR Dumper({query=>{bool=>$fullQuery}});
+
    $postData=$json->encode({query=>{bool=>$fullQuery}});
+printf STDERR ("postData=%s\n",$postData);
 
 #   $postData='
 #
