@@ -24,6 +24,7 @@ use kernel::DataObj::REST;
 use JSON;
 use Text::ParseWords;
 use Digest::MD5 qw(md5_base64);
+use MIME::Base64;
 
 use POSIX ":sys_wait_h";
 
@@ -414,32 +415,49 @@ sub ESindexName
 sub ESgetAliases
 {
    my $self=shift;
-   msg(INFO,"Call ESgetAliases");
+
+   #msg(INFO,"Call ESgetAliases");
    my $credentialName=$self->getCredentialName();
-   my ($baseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($credentialName);
+   my ($baseurl,$ESuser,$ESpass)=$self->GetRESTCredentials($credentialName);
    if (($baseurl=~m#/$#)){
       $baseurl=~s#/$##;
    }
-   my $cmd=join(" ",
-         "curl -u '${ESuser}:${ESpass}' ",
-         "--output - -s ",
-         "-X GET '$baseurl/_alias'",
-         "2>&1"
-   );
-   my $out=qx($cmd);
-   my $exit_code = $? >> 8;
+   $baseurl.="/_alias";
+   my $headers=[
+      Authorization =>'Basic '.encode_base64($ESpass.':'.$ESuser)
+   ];
 
-   if ($exit_code==0){
-      my $d;
-      eval('use JSON; $d=decode_json($out);');
-      if ($@ eq ""){
-         return($d);
+   my @data;
+   my $errors;
+   if (1){
+      open local(*STDERR), '>', \$errors;
+      eval('
+         @data=$self->DoRESTcall(
+            method=>\'GET\',
+            headers=>$headers,
+            url=>$baseurl
+         );
+      ');
+      if (ref($data[0]) ne "HASH"){
+         if (!$self->LastMsg()){
+            $self->Log(ERROR,"backlog",
+                             "fail to Elasic Ping to $credentialName");
+         }
       }
-      else{
-         return(-1,$@);
+      if (!$self->LastMsg()){
+         if ($errors){
+            foreach my $emsg (split(/[\n\r]+/,$errors)){
+               $self->SilentLastMsg(ERROR,$emsg);
+            }
+         }
       }
    }
-   return($exit_code,$out);
+
+   if (ref($data[0]) eq "HASH"){
+      return($data[0]);
+   }
+   
+   return(-1,"HTTP Error $data[1] $data[2]");
 }
 
 sub EScreateIndex
@@ -868,6 +886,314 @@ sub ESrestETLload
       'session'=>\@loopResults
    });
 }
+
+
+sub getCredentialName
+{
+   my $self=shift;
+   my $mod=$self->Self();
+   $mod=~s/::.*$//;
+
+   return($mod);
+}
+
+
+
+
+# Default DataCollector for ElasicSearch 
+
+
+
+sub DataCollector
+{
+   my $self=shift;
+   my $filterset=shift;
+
+   my $credentialName=$self->getCredentialName();
+
+   my $indexname=$self->ESindexName();
+
+   my ($restFinalAddr,$requesttoken,$constParam,$data)=
+      $self->Filter2RestPath(
+         $indexname,$filterset
+   );
+   if (!defined($restFinalAddr)){
+      if (!$self->LastMsg()){
+         $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
+      }
+      return(undef);
+   }
+
+   my $d=$self->CollectREST(
+      dbname=>$credentialName,
+      requesttoken=>$requesttoken,
+      data=>$data,
+      headers=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apiuser=shift;
+         my $headers=[
+            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
+         ];
+         if ($data ne ""){
+            push(@$headers,"Content-Type","application/json");
+         }
+         return($headers);
+      },
+      url=>sub{
+         my $self=shift;
+         my $baseurl=shift;
+         my $apikey=shift;
+         my $apipass=shift;
+         my $dataobjurl=$baseurl.$restFinalAddr;
+         msg(INFO,"ESqueryURL=$dataobjurl");
+         return($dataobjurl);
+      },
+      onfail=>sub{
+         my $self=shift;
+         my $code=shift;
+         my $statusline=shift;
+         my $content=shift;
+         my $reqtrace=shift;
+
+         if ($code eq "404"){  # 404 bedeutet nicht gefunden
+            return([],"200");
+         }
+         msg(ERROR,$reqtrace);
+         $self->LastMsg(ERROR,"unexpected data from backend %s",$self->Self());
+         return(undef);
+      },
+      success=>sub{  # DataReformaterOnSucces
+         my $self=shift;
+         my $data=shift;
+         #print STDERR Dumper($data);
+         if (ref($data) eq "HASH"){
+            if (exists($data->{hits})){
+               if (exists($data->{hits}->{hits})){
+                  $data=$data->{hits}->{hits};
+               }
+            }
+            else{
+               $data=[$data]
+            }
+         }
+         #print STDERR Dumper($data->[0]);
+         map({
+            $_=FlattenHash($_);
+            if ($self->can("ESprepairRawRecord")){
+               $self->ESprepairRawRecord($_);
+            }
+         } @$data);
+         return($data);
+      }
+   );
+   return($d);
+}
+
+
+sub InsertRecord
+{
+   my $self=shift;
+   my $newdata=shift;  # hash ref
+   print STDERR "InsertRecord:".Dumper($newdata)."\n";
+#   $self->{isInitalized}=$self->Initialize() if (!$self->{isInitalized});
+   my $idobj=$self->IdField();
+   my $idfield=$idobj->Name();
+   my $id;
+
+   return(undef);
+}
+
+#   my ($worktable,$workdb)=$self->getWorktable();
+#   $workdb=$self->{DB} if (!defined($workdb));
+#
+#   if (!defined($worktable) || $worktable eq ""){
+#      $self->LastMsg(ERROR,"can't InsertRecord in $self - no Worktable");
+#      return(undef);
+#   }
+#   if (!defined($workdb)){
+#      $self->LastMsg(ERROR,"can't InsertRecord in $self - no workdb");
+#      return(undef);
+#   }
+#   if (!defined($newdata->{$idfield})){
+#      if ($idobj->autogen==1){
+#         my $res=$self->W5ServerCall("rpcGetUniqueId");
+#         my $retry=30;
+#         while(!defined($res=$self->W5ServerCall("rpcGetUniqueId"))){
+#            sleep(1);
+#            last if ($retry--<=0);
+#            # next lines are a test, to handle break of W5Server better
+#            if (getppid()==1){  # parent (W5Server) killed in event context
+#               msg(ERROR,"Parent Process is killed - not good in DB.pm !");
+#               return();
+#            }
+#            msg(WARN,"W5Server problem for user $ENV{REMOTE_USER} ($retry)");
+#         }
+#         if (defined($res) && $res->{exitcode}==0){
+#            $id=$res->{id};
+#         }
+#         else{
+#            msg(ERROR,"InsertRecord: W5ServerCall returend %s",Dumper($res));
+#            $self->LastMsg(ERROR,"W5Server unavailable ".
+#                          "- can't get unique id - ".
+#                          "please try later or contact the admin");
+#            return(undef);
+#         }
+#         $newdata->{$idfield}=$id;
+#      }
+#   }
+#   else{
+#      $id=$newdata->{$idfield};
+#   }
+#   my %raw=$self->QuoteHashData("insert",$workdb,oldrec=>undef,
+#                                current=>$newdata);
+#   my $cmd;
+#   #   if ($self->{UseSqlReplace}==1){  # bisher kein alternatives Verhalten
+#   #                                    # im SQL Replace modus !!!
+#   #   }                                # Kann ansonsten probleme im Arikel
+#   {                                    # Katalog geben
+#      my @flist=keys(%raw);
+#      $cmd="insert into $worktable (".
+#           join(",",@flist).") ".
+#           "values(".join(",",map({$raw{$_}} @flist)).")";
+#   }
+#   #msg(INFO,"fifi InsertRecord data=%s into '$worktable'\n",Dumper($newdata));
+#   if (length($cmd)<65535){
+#      $self->Log(INFO,"sqlwrite",$cmd);
+#   }
+#   else{
+#      $self->Log(INFO,"sqlwrite","(long insert >64k)");
+#   }
+#   $workdb->{deadlockHandler}=1;
+#   my $bk=$workdb->do($cmd);
+#   if (!$bk){
+#      my $retrycnt=0;
+#      while(my $retryErrorNo=_checkCommonRetryErrors($workdb->getErrorMsg())){
+#        $retrycnt++;
+#        if ($retrycnt>1){
+#           if ($retryErrorNo==1){
+#              msg(ERROR,"found Deadlock - retry $retrycnt");
+#           }
+#        }
+#        sleep($retrycnt); # increase the sleep
+#        $bk=$workdb->do($cmd);
+#        last if ($bk);
+#        if ($retryErrorNo==1 && $retrycnt>4){
+#           msg(ERROR,"Deadlock problem - giving up");
+#           last;
+#        }
+#        if ($retryErrorNo==2 && $retrycnt>4){
+#           msg(ERROR,"readonly problem - giving up");
+#           last;
+#        }
+#        {
+#           msg(INFO,"do sleep for $retryErrorNo with $retrycnt*$retrycnt for:".
+#                    $cmd);
+#           sleep($retrycnt*$retrycnt); # 1 4 9 16 sleeps (in sum 30sec)
+#        }
+#      }
+#   }
+#   delete($workdb->{deadlockHandler});
+#   if ($bk){
+#      $workdb->finish();
+#      if (!defined($id)){
+#         # id was not created by w5base, soo we need to read it from the
+#         # table
+#         # getHashList
+#         my $cmd;
+#         my %q=();
+#         my @fieldlist=$self->getFieldList();
+#         foreach my $field (@fieldlist){
+#            my $fo=$self->getField($field);
+#            if ($fo->{id} && defined($fo->{dataobjattr})){
+#               if (defined($newdata->{$fo->{name}})){
+#                  $q{$fo->{dataobjattr}}=$workdb->quotemeta(
+#                                      $newdata->{$fo->{name}});
+#               }
+#               else{
+#                  $q{$fo->{dataobjattr}}="NULL";
+#               }
+#            }
+#         }
+#         if (defined($idobj->{dataobjattr}) &&          # id is automatic gen
+#             ref($idobj->{dataobjattr}) ne "ARRAY"){    # by the database 
+#            if (keys(%q)==0){     # SCOPE_IDENTIY should work on ODBC databases
+#               my @l;
+#               if (lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+#                  @l=$workdb->getArrayList("select LAST_INSERT_ID()");
+#               }
+#               else{
+#                  @l=$workdb->getArrayList("select SCOPE_IDENTITY()");
+#               }
+#               my $rec=pop(@l);
+#               if (defined($rec)){
+#                  $id=$rec->[0];
+#               }
+#            }
+#            else{
+#               $cmd="select $idobj->{dataobjattr} from $worktable ".
+#                    "where ".join(" and ",map({$_.="=".$q{$_}} keys(%q)));
+#               msg(INFO,"reading id by=%s",$cmd);
+#               my @l=$workdb->getArrayList($cmd);
+#               my $rec=pop(@l);
+#               if (defined($rec)){
+#                  $id=$rec->[0];
+#               }
+#            }
+#         }
+#         if (defined($idobj->{dataobjattr}) &&          # no one simple unique
+#             ref($idobj->{dataobjattr}) eq "ARRAY"){    # ... id more fields
+#          #  $cmd="select $idobj->{dataobjattr} from $worktable ".
+#          #       "where ".join(" and ",map({$_.="=".$q{$_}} keys(%q)));
+#          #  msg(INFO,"reading id by=%s",$cmd);
+##
+##            my @l=$workdb->getArrayList($cmd);
+##            my $rec=pop(@l);
+##            if (defined($rec)){
+##               $id=$rec->[0];
+##            }
+#         }
+#         if (!defined($id)){
+#            $self->LastMsg(ERROR,"no record identifier returned by insert");
+#         }
+#      }
+#      return($id);
+#   }
+#   $self->LastMsg(ERROR,$self->preProcessDBmsg($workdb->getErrorMsg()));
+#   return(undef);
+#}
+#
+#
+
+
+
+sub Ping
+{
+   my $self=shift;
+
+   my $credentialN=$self->getCredentialName();
+
+   msg(INFO,"Ping-Start: $credentialN");
+   my ($out,$emsg)=$self->ESgetAliases();
+   if (ref($out) eq "HASH"){
+      my $indexname=$self->ESindexName();
+      if ($indexname ne ""){
+         if (!exists($out->{$indexname})){
+            if ($self->can("getESindexDefinition")){
+               my $indexDef=$self->getESindexDefinition();
+               my ($out,$emsg)=$self->EScreateIndex($indexname,$indexDef);
+               if (ref($out) ne "HASH"){
+                  return(0);
+               }
+            }
+         }
+      }
+      return(1);
+   }
+   return(0);
+}
+
 
 
 

@@ -5441,6 +5441,9 @@ sub DoRESTcall
    my $sseconds=Time::HiRes::time();
 
 
+   if (!exists($p{useproxy}) && exists($self->{useproxy})){
+      $p{useproxy}=$self->{useproxy};
+   }
 
    my $reqtrace="DoRESTcall: --- $self ---\n";
    RETRYLOOP: for(my $retry=0;$retry<=$retry_count;$retry++){

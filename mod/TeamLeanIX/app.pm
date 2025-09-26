@@ -116,6 +116,61 @@ sub getCredentialName
    return("TeamLeanIX");
 }
 
+sub getESindexDefinition
+{
+   my $self=shift;
+   my $indexDef={
+      settings=>{
+         number_of_shards=>1,
+         number_of_replicas=>1,
+         analysis=>{
+            normalizer=> {
+              lowercase_normalizer=> {
+                type=>"custom",
+                filter=>["lowercase"]
+              }
+            }
+         }
+      },
+      mappings=>{
+         _meta=>{
+            version=>11
+         },
+         properties=>{
+            name    =>{type=>'text',
+                       fields=> {
+                           keyword=> {
+                             type=> "keyword",
+                             ignore_above=> 256
+                           }
+                         }
+                       },
+            fullname=>{type=>'text',
+                       fields=> {
+                           keyword=> {
+                             type=> "keyword",
+                             ignore_above=> 256
+                           }
+                         }
+                       },
+            ictoNumber=>{type=>'text',
+                       fields=> {
+                           keyword=> {
+                             type=> "keyword",
+                             ignore_above=> 256,
+                             normalizer=> "lowercase_normalizer"
+    
+                           }
+                         }
+                       },
+            lastUpdated=>{type=>'date'},
+            dtLastLoad=>{type=>'date'}
+         }
+      }
+   };
+   return($indexDef);
+}
+
 
 
 sub ORIGIN_Load
@@ -126,55 +181,8 @@ sub ORIGIN_Load
    my $indexname=$self->ESindexName();
    my $opNowStamp=NowStamp("ISO");
 
-   my ($res,$emsg)=$self->ESrestETLload({
-        settings=>{
-           number_of_shards=>1,
-           number_of_replicas=>1,
-           analysis=>{
-              normalizer=> {
-                lowercase_normalizer=> {
-                  type=>"custom",
-                  filter=>["lowercase"]
-                }
-              }
-           }
-        },
-        mappings=>{
-           _meta=>{
-              version=>10
-           },
-           properties=>{
-              name    =>{type=>'text',
-                         fields=> {
-                             keyword=> {
-                               type=> "keyword",
-                               ignore_above=> 256
-                             }
-                           }
-                         },
-              fullname=>{type=>'text',
-                         fields=> {
-                             keyword=> {
-                               type=> "keyword",
-                               ignore_above=> 256
-                             }
-                           }
-                         },
-              ictoNumber=>{type=>'text',
-                         fields=> {
-                             keyword=> {
-                               type=> "keyword",
-                               ignore_above=> 256,
-                               normalizer=> "lowercase_normalizer"
-    
-                             }
-                           }
-                         },
-              lastUpdated=>{type=>'date'},
-              dtLastLoad=>{type=>'date'}
-           }
-        }
-      },sub {
+   my ($res,$emsg)=$self->ESrestETLload($self->getESindexDefinition(),
+      sub {
          my ($session,$meta)=@_;
          my $ESjqTransform="if (length == 0) ".
                            "then ".
