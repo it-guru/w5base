@@ -138,13 +138,17 @@ sub new
                my $newrec={};
                my $d;
                $newrec->{fullname}=$current->{organisation};
+               if (!defined($newrec->{fullname}) || $newrec->{fullname} eq ""){
+                  # allow IOMapping by ictofullname - if there is no org
+                  $newrec->{fullname}=$current->{fullname};
+               }
                my @grpid=$grp->getIdByHashIOMapped(
                             $self->getParent->Self,
                             $newrec,DEBUG=>\$d);
                if ($#grpid>=0){
                   return($grpid[0]);
                }
-               return();
+               return(undef);
             }),
 
       new kernel::Field::Text(     
