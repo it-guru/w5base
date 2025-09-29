@@ -80,11 +80,20 @@ sub ESHash2Flt
                $const=1;                # filters posible
             }
             if ($const){
-               push(@{$bool->{must}},{
-                 match=>{
-                    "$dataobjattr"=>$filter->{$fn}
-                 }
-               });
+               if (defined($filter->{$fn})){
+                  push(@{$bool->{must}},{
+                    match=>{
+                       "$dataobjattr"=>$filter->{$fn}
+                    }
+                  });
+               }
+               else{
+                  push(@{$bool->{must_not}},{
+                    exists=>{
+                       field=>"$dataobjattr"
+                    }
+                  });
+               }
             }
             else{
                foreach my $sword (@words){
@@ -285,6 +294,9 @@ sub Filter2RestPath
          }
          else{
             if ($constVal=~m/[ *?]/){
+               $const=0;
+            }
+            if (!defined($constVal) || $constVal eq ""){
                $const=0;
             }
          }
