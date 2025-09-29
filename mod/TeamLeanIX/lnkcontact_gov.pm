@@ -75,97 +75,35 @@ sub getCredentialName
 
 
 
-sub DataCollector
+sub ESindexName
 {
    my $self=shift;
-   my $filterset=shift;
 
-   my $credentialName=$self->getCredentialName();
+   my $indexname=lc($self->Self());
+   $indexname=~s/:/_/g;
+   return("teamleanix__gov");
+}
 
-   my $indexname="teamleanix__gov";
 
-   my ($restFinalAddr,$requesttoken,$constParam,$data)=
-      $self->Filter2RestPath(
-         $indexname,$filterset
-   );
-   if (!defined($restFinalAddr)){
-      if (!$self->LastMsg()){
-         $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
+
+sub ESprepairRawResult
+{
+   my $self=shift;
+   my $data=shift;
+
+   my @result;
+
+   map({
+      $_=FlattenHash($_);
+      if (ref($_->{'_source.subscriptions'}) eq "ARRAY"){
+         foreach my $crec (@{$_->{'_source.subscriptions'}}){
+            my %c=%{$crec};
+            $c{_id}=$_->{_id};
+            push(@result,\%c);
+         }
       }
-      return(undef);
-   }
-   #printf STDERR ("ESquery=%s\n\n",$data);
-
-   my $d=$self->CollectREST(
-      dbname=>$credentialName,
-      requesttoken=>$requesttoken,
-      data=>$data,
-      headers=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         my $apiuser=shift;
-         my $headers=[
-            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
-         ];
-         if ($data ne ""){
-            push(@$headers,"Content-Type","application/json");
-         }
-         return($headers);
-      },
-      url=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         my $apipass=shift;
-         my $dataobjurl=$baseurl.$restFinalAddr;
-         msg(INFO,"ESqueryURL=$dataobjurl");
-         return($dataobjurl);
-      },
-      onfail=>sub{
-         my $self=shift;
-         my $code=shift;
-         my $statusline=shift;
-         my $content=shift;
-         my $reqtrace=shift;
-
-         if ($code eq "404"){  # 404 bedeutet nicht gefunden
-            return([],"200");
-         }
-         msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data from backend %s",$self->Self());
-         return(undef);
-      },
-      success=>sub{  # DataReformaterOnSucces
-         my $self=shift;
-         my $data=shift;
-         if (ref($data) eq "HASH"){
-            if (exists($data->{hits})){
-               if (exists($data->{hits}->{hits})){
-                  $data=$data->{hits}->{hits};
-               }
-            }
-            else{
-               $data=[$data]
-            }
-         }
-         my @result;
-         map({
-            $_=FlattenHash($_);
-            if (ref($_->{'_source.subscriptions'}) eq "ARRAY"){
-               foreach my $crec (@{$_->{'_source.subscriptions'}}){
-                  my %c=%{$crec};
-                  $c{_id}=$_->{_id};
-                  push(@result,\%c);
-               }
-            }
-            $_;
-         } @$data);
-         return(\@result);
-      }
-   );
-
-   return($d);
+   } @$data);
+   return(\@result);
 }
 
 

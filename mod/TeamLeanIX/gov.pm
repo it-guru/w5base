@@ -161,6 +161,7 @@ sub new
       new kernel::Field::Date(     
             name          =>'lifecycle_endOfLife',
             dataobjattr   =>'_source.lifecycle.endOfLife',
+            htmldetail    =>'NotEmpty',
             dayonly       =>1,
             label         =>'endOfLife'),
 
@@ -355,98 +356,22 @@ sub ORIGIN_Load
 
 
 
-sub DataCollector
+sub ESprepairRawRecord
 {
    my $self=shift;
-   my $filterset=shift;
+   my $rec=shift;
 
-   my $credentialName=$self->getCredentialName();
-
-   my $indexname=$self->ESindexName();
-
-   my ($restFinalAddr,$requesttoken,$constParam,$data)=
-      $self->Filter2RestPath(
-         $indexname,$filterset
-   );
-   if (!defined($restFinalAddr)){
-      if (!$self->LastMsg()){
-         $self->LastMsg(ERROR,"unknown error while create restFinalAddr");
+   foreach my $f (qw(_source.lifecycle.endOfLife
+                     _source.lifecycle.phaseOut
+                     _source.lifecycle.active)){
+      if (exists($rec->{$f}) && $rec->{$f} ne ""){
+         $rec->{$f}.=" 12:00:00";
       }
-      return(undef);
    }
-   #printf STDERR ("ESquery=%s\n\n",$data);
+   if (exists($rec->{'_source.itOwnerIds'})){
+      $rec->{'_source.relatedOrganizationIds'}=$rec->{'_source.itOwnerIds'};
+   }
 
-   my $d=$self->CollectREST(
-      dbname=>$credentialName,
-      requesttoken=>$requesttoken,
-      data=>$data,
-      headers=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         my $apiuser=shift;
-         my $headers=[
-            Authorization =>'Basic '.encode_base64($apiuser.':'.$apikey)
-         ];
-         if ($data ne ""){
-            push(@$headers,"Content-Type","application/json");
-         }
-         return($headers);
-      },
-      url=>sub{
-         my $self=shift;
-         my $baseurl=shift;
-         my $apikey=shift;
-         my $apipass=shift;
-         my $dataobjurl=$baseurl.$restFinalAddr;
-         msg(INFO,"ESqueryURL=$dataobjurl");
-         return($dataobjurl);
-      },
-      onfail=>sub{
-         my $self=shift;
-         my $code=shift;
-         my $statusline=shift;
-         my $content=shift;
-         my $reqtrace=shift;
-
-         if ($code eq "404"){  # 404 bedeutet nicht gefunden
-            return([],"200");
-         }
-         msg(ERROR,$reqtrace);
-         $self->LastMsg(ERROR,"unexpected data from backend %s",$self->Self());
-         return(undef);
-      },
-      success=>sub{  # DataReformaterOnSucces
-         my $self=shift;
-         my $data=shift;
-   #      print STDERR Dumper($data);
-         if (ref($data) eq "HASH"){
-            if (exists($data->{hits})){
-               if (exists($data->{hits}->{hits})){
-                  $data=$data->{hits}->{hits};
-               }
-            }
-            else{
-               $data=[$data]
-            }
-         }
-         #print STDERR Dumper($data->[0]);
-         map({
-            $_=FlattenHash($_);
-            foreach my $f (qw(_source.lifecycle.endOfLife 
-                              _source.lifecycle.phaseOut
-                              _source.lifecycle.active)){
-               if (exists($_->{$f}) && $_->{$f} ne ""){
-                  $_->{$f}.=" 12:00:00";
-               }
-            }
-         } @$data);
-   #      print STDERR Dumper($data->[0]);
-         return($data);
-      }
-   );
-
-   return($d);
 }
 
 

@@ -874,6 +874,21 @@ sub getCredentialName
 # Default DataCollector for ElasicSearch 
 
 
+sub ESprepairRawResult
+{
+   my $self=shift;
+   my $data=shift;
+
+   map({
+      $_=FlattenHash($_);
+      if ($self->can("ESprepairRawRecord")){
+         $self->ESprepairRawRecord($_);
+      }
+   } @$data);
+   return($data);
+}
+
+
 
 sub DataCollector
 {
@@ -949,18 +964,14 @@ sub DataCollector
                $data=[$data]
             }
          }
-         #print STDERR Dumper($data->[0]);
-         map({
-            $_=FlattenHash($_);
-            if ($self->can("ESprepairRawRecord")){
-               $self->ESprepairRawRecord($_);
-            }
-         } @$data);
-         return($data);
+         return($self->ESprepairRawResult($data));
       }
    );
    return($d);
 }
+
+
+
 
 
 sub getFieldBackendName
