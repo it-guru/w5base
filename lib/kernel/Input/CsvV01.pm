@@ -19,6 +19,15 @@ sub new
    return($self);
 }
 
+sub getIconName
+{
+   my $self=shift;
+   return("icon_csv");
+}
+
+
+
+
 
 sub SetInput
 {
