@@ -742,6 +742,7 @@ sub ESrestETLload
    my ($out,$emsg)=$self->ESensureIndex($indexname,$ESindexDefinition);
 
    my @loopResults;
+   my $itemcount=0;
    if (ref($out) && $out->{acknowledged}){
       my ($meta,$metaemsg)=$self->ESmetaData();
       if (ref($meta) ne "HASH"){
@@ -777,20 +778,28 @@ sub ESrestETLload
          if (exists($session->{LastRequest}) && $session->{LastRequest}==0){
             $ESwaitfor="";
          }
-         my $cmd="curl -N ".
-                     " -s ".$curlHeaderParam.
-                     " --max-time 300 ".
-                     "'$restOriginFinalAddr' ".
-                     "| tee /tmp/".$tmpLastRequestRawDump." | ".
-                     "jq ".$jq_arg." ".        #--arg now '$nowstamp' ".
-                     "-c '".$ESjqTransform."'".
-                     "| tee /tmp/".$tmpLastRequestJqDump." | ".
-                     "curl -u '${ESuser}:${ESpass}' ".
-                     "--output - -s ".
-                     "-H 'Content-Type: application/x-ndjson' ".
-                     "--data-binary \@- ".
-                     "-X POST  '$ESbaseurl/$indexname/_bulk".$ESwaitfor."' ".
-                     '2>&1';
+         my $OriginPipeStart;
+         if ($restOrignMethod eq "SHELL"){
+            $OriginPipeStart="$restOriginFinalAddr ";
+
+         }
+         else{
+            $OriginPipeStart="curl -N ".
+                             " -s ".$curlHeaderParam.
+                             " --max-time 300 ".
+                             "'$restOriginFinalAddr' ";
+         }
+         my $cmd=$OriginPipeStart.
+                 "| tee /tmp/".$tmpLastRequestRawDump." | ".
+                 "jq ".$jq_arg." ".        #--arg now '$nowstamp' ".
+                 "-c '".$ESjqTransform."'".
+                 "| tee /tmp/".$tmpLastRequestJqDump." | ".
+                 "curl -u '${ESuser}:${ESpass}' ".
+                 "--output - -s ".
+                 "-H 'Content-Type: application/x-ndjson' ".
+                 "--data-binary \@- ".
+                 "-X POST  '$ESbaseurl/$indexname/_bulk".$ESwaitfor."' ".
+                 '2>&1';
        
          msg(INFO,"ORIGIN_Load: cmd=$cmd");
          my $out=qx($cmd);
@@ -800,10 +809,15 @@ sub ESrestETLload
          }
          my $d;
          eval('use JSON; $d=decode_json($out);');
-         msg(INFO,"out=$out");
+         #msg(INFO,"out=$out");
          if ($@ eq ""){
             if (ref($d) eq "HASH"){
                my %localSession=%{$session};
+               $localSession{'errors'}=$d->{errors};
+               if ($d->{errors}==0){
+                  $localSession{'items'}=$#{$d->{items}}+1;
+                  $itemcount+=$localSession{'items'};
+               }
                $localSession{'acknowledged'}=
                               bless( do{\(my $o = 1)},'JSON::PP::Boolean');
                push(@loopResults,\%localSession);
@@ -854,6 +868,7 @@ sub ESrestETLload
    }
    return({
       'acknowledged'=>bless( do{\(my $o = 1)},'JSON::PP::Boolean'),
+      'items'=>$itemcount,
       'session'=>\@loopResults
    });
 }
@@ -964,7 +979,18 @@ sub DataCollector
                $data=[$data]
             }
          }
-         return($self->ESprepairRawResult($data));
+         if ($#{$data}==0){
+            if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+               msg(INFO,"pre ESprepairRawResult: ".Dumper($data));
+            }
+         }
+         $self->ESprepairRawResult($data);
+         if ($#{$data}==0){
+            if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+               msg(INFO,"post ESprepairRawResult: ".Dumper($data));
+            }
+         }
+         return($data);
       }
    );
    return($d);
