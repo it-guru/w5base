@@ -1536,9 +1536,9 @@ sub doNotify
             $wfa->Notify($level,$subject,$tmpl, 
                emailto=>\@emailto, 
                emailcc=>\@emailcc, 
-               emailbcc=>[
-                  11634953080001,   # HV
-               ],
+#               emailbcc=>[
+#                  11634953080001,   # HV
+#               ],
                emailcategory =>['CRaS','CRaS.'.$mode]
             );
             $mailcnt++;
