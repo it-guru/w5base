@@ -96,7 +96,7 @@ sub ORIGIN_Load
         },
         mappings=>{
            _meta=>{
-              version=>9
+              version=>11
            },
            properties=>{
               name    =>{type=>'text',
@@ -148,10 +148,10 @@ sub ORIGIN_Load
         }
       }
    );
-   #print STDERR Dumper($res);
    if (ref($res) ne "HASH"){
       msg(ERROR,"something went wrong '$res' in ".$self->Self());
    }
+   msg(INFO,"ESrestETLload result=".Dumper($res));
    return($res,$emsg);
 }
 
