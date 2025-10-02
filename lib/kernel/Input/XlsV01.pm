@@ -21,6 +21,13 @@ sub new
 }
 
 
+sub getIconName
+{
+   my $self=shift;
+   return("icon_xls");
+}
+
+
 sub SetInput
 {
    my $self=shift;

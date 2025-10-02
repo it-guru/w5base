@@ -21,6 +21,9 @@ use vars qw(@ISA);
 use strict;
 use kernel;
 use kernel::Universal;
+use Fcntl 'SEEK_SET';
+use File::Temp(qw(tempfile));
+
 
 @ISA=qw(kernel::Universal);
 
@@ -31,9 +34,37 @@ sub new
    my $self=bless({@_},$type);
 
    $self->setParent($parent);
-   $self->{InpFormat}=[icon_xls=>'XlsV01',
-                       icon_xml=>'XMLV01',
-                       icon_csv=>'CsvV01'];
+   $self->{InpFormat}=[icon_xls=>'XlsV01',icon_xml=>'XMLV01'];
+
+   my $instdir=$parent->Config->Param("INSTDIR");
+   my $handlerdir=$instdir."/lib/kernel/Input";
+   if (opendir(DH,$handlerdir)){
+      my @mods=grep({ -f "$handlerdir/$_" &&
+                      $_=~m/\.pm$/ &&
+                      !($_=~m/^\./) } readdir(DH));
+      @mods=map({$_=~s/\.pm$//;$_} @mods);
+      $self->{InpFormat}=[];
+
+      foreach my $f (@mods){
+         my $o;
+         my $ico;
+         eval("use kernel::Input::$f;".
+              "\$o=new kernel::Input::$f(\$parent,{});".
+              "\$ico=\$o->getIconName();");
+         if ($@ ne ""){
+            msg(ERROR,"can't use module '%s'","kernel::Input::".$f);
+            printf STDERR ("%s\n",$@);
+            next;
+         }
+         if (!defined($o)){
+            msg(ERROR,"can't $o create object of '%s'","kernel::Input::".$f);
+            next;
+         }
+         push(@{$self->{InpFormat}},$ico=>$f);
+      }
+      closedir(DH);
+   }
+
    $self->{debug}=0 if (!defined($self->{debug}));
    return($self);
 }
@@ -68,6 +99,7 @@ sub isFormatUseable
          eval("use kernel::Input::$f;".
               "\$o=new kernel::Input::$f(\$self,debug=>\$self->{debug});");
          if ($@ eq ""){
+            sysseek($self->{IN},0,SEEK_SET);
             seek($self->{IN},0,0);
             if ($o->SetInput($self->{IN})){
                $self->{FORMAT}=$o;
