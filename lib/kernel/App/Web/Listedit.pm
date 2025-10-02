@@ -3759,6 +3759,7 @@ sub Upload
    if (trim($HistoryComments) ne ""){
       $W5V2::HistoryComments=$HistoryComments;
    }
+   my $countcallback=0;
    my $countok=0;
    my $countfail=0;
    if (defined($file) && $file ne "" && (ref($file) eq "Fh" ||
@@ -3785,6 +3786,7 @@ sub Upload
             if ($self->preUpload($inp)){
                $inp->SetCallback(sub{
                                    $self->FullContextReset();
+                                   $countcallback++;
                                    my $prec=shift;
                                    my $ptyp=shift;
                                    $ptyp=$p if (!defined($ptyp));
@@ -3850,8 +3852,16 @@ sub Upload
                                    return(1); 
                                  });
                $inp->Process();
-               print msg(INFO,"end upload processing user $ENV{REMOTE_USER} ".
-                              "(result: ok=$countok;fail=$countfail)");
+               if ($countcallback>0){
+                  print msg(INFO,"end upload processing ".
+                                 "user $ENV{REMOTE_USER} ".
+                                 "(result: ok=$countok;fail=$countfail)");
+               }
+               else{
+                  print msg(INFO,"end upload processing ".
+                                 "user $ENV{REMOTE_USER} ".
+                                 "(Process only load)");
+               }
             }
             $self->postUpload($inp);
          }
