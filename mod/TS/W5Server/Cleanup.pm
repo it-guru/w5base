@@ -20,10 +20,18 @@ sub process
    my $self=shift;
    my $nextrun;
 
+   my $opmode=$self->getParent->Config->Param("W5BaseOperationMode");
+   my $ro=0;
+   if ($opmode eq "readonly"){
+      $ro=1;
+   }
+
    while(1){
       if ((defined($nextrun) && $nextrun<=time()) || $self->{doForceCleanup}){
          $self->{doForceCleanup}=0;
-         $self->CleanupWorkflows();
+         if (!$ro){
+            $self->CleanupWorkflows();
+         }
          sleep(1);
       }
       my $current=time();
@@ -44,6 +52,7 @@ sub CleanupWorkflows
    my $wfop=getModuleObject($self->getParent->Config,"base::workflow");
 
 
+   return if (!defined($wf) || !defined($wfop));
 
    msg(DEBUG,"(%s) start cleanup",$self->Self);
    $wf->SetFilter({class=>[qw(
