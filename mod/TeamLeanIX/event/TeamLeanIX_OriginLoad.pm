@@ -45,6 +45,12 @@ sub TeamLeanIX_OriginLoad
       );
    }
 
+   my $reset=0;
+   if (lc($param[0]) eq "reset"){
+      shift(@param);
+      $reset=1;
+   }
+
    foreach my $objname (@param){
       msg(INFO,"start loading $objname");
       my $o=getModuleObject($self->Config,$objname);
@@ -56,7 +62,7 @@ sub TeamLeanIX_OriginLoad
          my $exitmsg=msg(ERROR,"unamble to call ORIGIN_Load on $objname");
          return({exitcode=>1,exitmsg=>$exitmsg});
       }
-      $o->ORIGIN_Load();
+      $o->ORIGIN_Load($reset);
    }
 
 

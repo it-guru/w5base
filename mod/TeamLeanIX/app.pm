@@ -176,6 +176,12 @@ sub getESindexDefinition
 sub ORIGIN_Load
 {
    my $self=shift;
+   my $reset=shift;
+
+   if ($reset){
+      $self->ESdeleteIndex();
+   }
+
 
    my $credentialName="ORIGIN_".$self->getCredentialName();
    my $indexname=$self->ESindexName();
@@ -215,6 +221,7 @@ sub ORIGIN_Load
       Stacktrace(1);
       msg(ERROR,"something ($emsg) went wrong '$res' in ".$self->Self());
    }
+   msg(INFO,"ESrestETLload result=".Dumper($res));
    return($res,$emsg);
 
 }
