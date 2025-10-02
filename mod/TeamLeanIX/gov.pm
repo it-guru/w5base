@@ -264,7 +264,7 @@ sub ORIGIN_Load
         },
         mappings=>{
            _meta=>{
-              version=>14
+              version=>15
            },
            properties=>{
               name    =>{type=>'text',
