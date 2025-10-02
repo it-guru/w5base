@@ -244,10 +244,15 @@ sub getCredentialName
 sub ORIGIN_Load
 {
    my $self=shift;
+   my $reset=shift;
 
    my $credentialName="ORIGIN_".$self->getCredentialName();
    my $indexname=$self->ESindexName();
    my $opNowStamp=NowStamp("ISO");
+
+   if ($reset){
+      $self->ESdeleteIndex();
+   }
 
    my ($res,$emsg)=$self->ESrestETLload({
         settings=>{
@@ -350,6 +355,7 @@ sub ORIGIN_Load
    if (ref($res) ne "HASH"){
       msg(ERROR,"something went wrong '$res' in ".$self->Self());
    }
+   msg(INFO,"ESrestETLload result=".Dumper($res));
    return($res,$emsg);
 }
 

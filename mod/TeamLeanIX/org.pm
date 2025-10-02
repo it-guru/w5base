@@ -84,6 +84,12 @@ sub getCredentialName
 sub ORIGIN_Load
 {
    my $self=shift;
+   my $reset=shift;
+
+   if ($reset){
+      $self->ESdeleteIndex();
+   }
+
 
    my $credentialName="ORIGIN_".$self->getCredentialName();
    my $indexname=$self->ESindexName();
