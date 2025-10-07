@@ -161,7 +161,7 @@ Abhängig von Ihren Rechten ist es möglich, dass der neue Datensatz von Ihnen nic
 '},
 
 
-"invalid character in key field '\%s'"=>{de=>"ungültiges Zeichen in Schlüsselfeld '\%s'"},
+"invalid character in key field '\%s'=>'\%s'"=>{de=>"ungültiges Zeichen in Schlüsselfeld '\%s'=>'\%s'"},
 'MSG010'=>{de=>'im Mandanten "%s" ',en=>'at mandator "%s" '},
 "Request to rundown '%s' in module '%s'"=>{de=>"Lösch-Anforderung für '%s' im Modul '%s'"},
 'MSG011'=>{en=>'%s: REJECT
