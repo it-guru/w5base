@@ -34,6 +34,9 @@
 },
 'Organisation-Domains'=>{de=>'Organisations-Domains'},
 'last organisational change'=>{de=>'Zeitpunkt der letzten Organisationsänderung'},
+'invalid hubid specified'=>{
+  de=>'ungültige HUB ID'
+},
 'last recert date'=>{de=>'Zeitpunkt der letzten ReZertifizierung'},
 'last recert userid'=>{de=>'UserID der der letzten ReZertifizierung'},
 'last recert request notification date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Benachrichtigungsbehandlung'},
