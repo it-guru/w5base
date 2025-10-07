@@ -209,7 +209,8 @@ sub HandleCIStatusModification
          my $primkeyval=effVal($oldrec,$newrec,$primarykey);
          if ($primkeyval=~m/\[.*\]\s*$/){
             $self->LastMsg(ERROR,
-                           "invalid character in key field '\%s'",$primarykey);
+                           "invalid character in key field ".
+                           "'\%s'=>'\%s'",$primarykey,$primkeyval);
             return(0);
          }
       }
