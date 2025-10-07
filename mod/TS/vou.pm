@@ -82,7 +82,14 @@ sub new
       new kernel::Field::Text(
                 name          =>'rampupid',
                 label         =>'Ramp-Up ID',
+                htmleditwidth =>'100px',
                 dataobjattr   =>'vou.rampupid'),
+
+      new kernel::Field::Text(
+                name          =>'hubid',
+                label         =>'HUB ID',
+                htmleditwidth =>'100px',
+                dataobjattr   =>'vou.hubid'),
 
       new kernel::Field::Select(
                 name          =>'responsibleorg',
@@ -476,7 +483,7 @@ sub new
          'local'
       ]
    };
-   $self->setDefaultView(qw(shortname name cistatus cdate mdate));
+   $self->setDefaultView(qw(shortname name hubid cistatus cdate mdate));
    $self->setWorktable("vou");
    $self->{CI_Handling}={
       uniquename=>"shortname",
@@ -524,6 +531,7 @@ sub Validate
    my $newrec=shift;
    my $comprec=shift;
 
+   my $outype=effVal($oldrec,$newrec,"outype");
    if (!defined($oldrec) || defined($newrec->{shortname})){
       my $newshortname=$newrec->{shortname};
       $newshortname=~s/\[\d+\]$//;
@@ -535,16 +543,45 @@ sub Validate
          return(0);
       }
    }
+   if (!defined($oldrec) || defined($newrec->{hubid})){
+      my $hubid=uc($newrec->{hubid});
+      if ($outype eq "HUB" || $outype eq "SERVICE"){
+         if (!($hubid=~m/^HUB-[A-Z0-9]{3,5}$/)){
+            $self->LastMsg(ERROR,"invalid hubid specified");
+            return(0);
+         }
+      }
+      else{
+         if (!($hubid=~m/^$/)){
+            $self->LastMsg(ERROR,"invalid hubid specified");
+            return(0);
+         }
+      }
+      my $oldhubid=effVal($oldrec,$newrec,"oldhubid");
+      if ($oldhubid ne "" && $oldhubid ne $hubid){
+         $newrec->{hubid}=$hubid;
+      }
+   }
    if (!defined($oldrec) || defined($newrec->{rampupid})){
       my $cistatusid=effVal($oldrec,$newrec,"cistatusid");
       if ($cistatusid>2 && $cistatusid<6){
          my $rampupid=$newrec->{rampupid};
-         if ($rampupid=~m/^\s*$/ || 
+         if (!($rampupid=~m/^\s*$/) && 
              !($rampupid=~m/^XH[0-9_]+$/)){
             $self->LastMsg(ERROR,"invalid Ramp-Up ID specified");
             return(0);
          }
       }
+   }
+   my $hubid=effVal($oldrec,$newrec,"hubid");
+   if ((defined($oldrec) && defined($oldrec->{hubid}) && $hubid eq "") ||
+       (defined($newrec) && defined($newrec->{hubid}) && $hubid eq "")){
+      $newrec->{hubid}=undef;
+   }
+   my $rampupid=effVal($oldrec,$newrec,"rampupid");
+   if ((defined($oldrec) && defined($oldrec->{rampupid}) && $rampupid eq "") ||
+       (defined($newrec) && defined($newrec->{rampupid}) && $rampupid eq "")){
+      $newrec->{rampupid}=undef;
    }
    my $ocistatusid=undef;
    $ocistatusid=$oldrec->{cistatusid} if (defined($oldrec));
@@ -599,6 +636,7 @@ sub Validate
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
+print STDERR Dumper($newrec);
    if (!$self->HandleRunDownRequests($oldrec,$newrec,$comprec,
                                      %{$self->{CI_Handling}})){
       return(0);
