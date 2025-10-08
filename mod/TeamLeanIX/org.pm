@@ -84,12 +84,7 @@ sub getCredentialName
 sub ORIGIN_Load
 {
    my $self=shift;
-   my $reset=shift;
-
-   if ($reset){
-      $self->ESdeleteIndex();
-   }
-
+   my $loadParam=shift;
 
    my $credentialName="ORIGIN_".$self->getCredentialName();
    my $indexname=$self->ESindexName();
@@ -147,6 +142,7 @@ sub ORIGIN_Load
              $session,$meta)
          );
       },$indexname,{
+        session=>{loadParam=>$loadParam},
         jq=>{
           arg=>{
              dtLastLoad=>$opNowStamp

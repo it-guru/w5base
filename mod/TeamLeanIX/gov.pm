@@ -244,15 +244,11 @@ sub getCredentialName
 sub ORIGIN_Load
 {
    my $self=shift;
-   my $reset=shift;
+   my $loadParam=shift;
 
    my $credentialName="ORIGIN_".$self->getCredentialName();
    my $indexname=$self->ESindexName();
    my $opNowStamp=NowStamp("ISO");
-
-   if ($reset){
-      $self->ESdeleteIndex();
-   }
 
    my ($res,$emsg)=$self->ESrestETLload({
         settings=>{
@@ -345,6 +341,7 @@ sub ORIGIN_Load
          }
          return(undef);
       },$indexname,{
+        session=>{loadParam=>$loadParam},
         jq=>{
           arg=>{
              dtLastLoad=>$opNowStamp

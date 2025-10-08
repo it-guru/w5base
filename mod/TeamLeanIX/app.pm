@@ -91,6 +91,8 @@ sub new
       new kernel::Field::Text(     
             name          =>'ictoNumber',
             dataobjattr   =>'_source.ictoNumber',
+            weblinkto     =>'TeamLeanIX::gov',
+            weblinkon     =>['ictoNumber'=>'ictoNumber'], 
             label         =>'ictoNumber'),
 
       new kernel::Field::Text(     
@@ -176,12 +178,7 @@ sub getESindexDefinition
 sub ORIGIN_Load
 {
    my $self=shift;
-   my $reset=shift;
-
-   if ($reset){
-      $self->ESdeleteIndex();
-   }
-
+   my $loadParam=shift;
 
    my $credentialName="ORIGIN_".$self->getCredentialName();
    my $indexname=$self->ESindexName();
@@ -210,6 +207,7 @@ sub ORIGIN_Load
              $session,$meta)
          );
       },$indexname,{
+        session=>{loadParam=>$loadParam},
         jq=>{
           arg=>{
              dtLastLoad=>$opNowStamp

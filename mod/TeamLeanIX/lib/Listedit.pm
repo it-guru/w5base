@@ -79,6 +79,12 @@ sub ORIGIN_Load_BackCall
          $dtLastLoad=undef;
       }
    }
+   if (exists($session->{loadParam}->{full}) &&
+       $session->{loadParam}->{full}==1){
+      msg(WARN,"inititiate full load by loadParam");
+      $dtLastLoad=undef;
+   }
+ 
    if (($baseurl=~m#/$#)){
       $baseurl=~s#/$##; 
    }
@@ -90,6 +96,16 @@ sub ORIGIN_Load_BackCall
    }
    else{
       msg(INFO,"ESrestETLload: load with EScleanupIndex");
+      msg(INFO,"ESrestETLload: EScleanupIndex 1: opNowStamp=$opNowStamp");
+
+      if (1){ # due problems in T.EAM, we delete records after 1 days 
+              # without  update
+         msg(INFO,"ESrestETLload: EScleanupIndex substract 1d from opNowStamp");
+         $opNowStamp=$self->ExpandTimeExpression($opNowStamp."-1d",
+                                                 "ISO","GMT","GMT");
+      }
+      msg(INFO,"ESrestETLload: EScleanupIndex 2: opNowStamp=$opNowStamp");
+
       $session->{EScleanupIndex}={
           bool=>{
             should=>[
