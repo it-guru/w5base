@@ -149,7 +149,7 @@ sub Date_to_String
       $d=POSIX::strftime("%a, %d %b %Y %H:%M:%S %z",localtime($uxt));
       _tzset($oldtz);
    }
-   elsif ($lang eq "SOAP"){
+   elsif ($lang eq "SOAP" || $lang eq "ISO"){
       $d=sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",$Y,$M,$D,$h,$m,$s);
    }
    elsif ($lang eq "EDM"){

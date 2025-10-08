@@ -738,6 +738,11 @@ sub ESrestETLload
    my $baseCredName=$self->getCredentialName();
    my ($ESbaseurl,$ESpass,$ESuser)=$self->GetRESTCredentials($baseCredName);
 
+   if ($param->{session}->{loadParam}->{reset}){
+      msg(WARN,"inititiate reset load by loadParam");
+      $self->ESdeleteIndex();
+   }
+
 
    my ($out,$emsg)=$self->ESensureIndex($indexname,$ESindexDefinition);
 
@@ -843,6 +848,7 @@ sub ESrestETLload
    }
    if (exists($session->{EScleanupIndex})){
       msg(INFO,"ESIndex '$indexname' ESdeleteByQuery");
+      msg(INFO,"ESdeleteByQuery: ".Dumper($session->{EScleanupIndex}));
       my ($out,$emsg)=$self->ESdeleteByQuery($indexname,
          $session->{EScleanupIndex}
       );

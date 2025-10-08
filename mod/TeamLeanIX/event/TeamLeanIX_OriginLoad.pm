@@ -37,6 +37,11 @@ sub TeamLeanIX_OriginLoad
    my $self=shift;
    my @param=@_;
 
+   my %loadParam=(
+      reset=>0,
+      full=>0
+   );
+
    if ($#param==-1){
       @param=(
          "TeamLeanIX::org",
@@ -48,7 +53,11 @@ sub TeamLeanIX_OriginLoad
    my $reset=0;
    if (lc($param[0]) eq "reset"){
       shift(@param);
-      $reset=1;
+      $loadParam{reset}=1;
+   }
+   if (lc($param[0]) eq "full"){
+      shift(@param);
+      $loadParam{full}=1;
    }
 
    foreach my $objname (@param){
@@ -62,7 +71,7 @@ sub TeamLeanIX_OriginLoad
          my $exitmsg=msg(ERROR,"unamble to call ORIGIN_Load on $objname");
          return({exitcode=>1,exitmsg=>$exitmsg});
       }
-      $o->ORIGIN_Load($reset);
+      $o->ORIGIN_Load(\%loadParam);
    }
 
 
