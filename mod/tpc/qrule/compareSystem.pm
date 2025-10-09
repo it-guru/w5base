@@ -159,27 +159,18 @@ sub qcheckRecord
          }
       }
    }
-   if (!defined($parrec)){
+   if (!defined($parrec) && $rec->{cistatusid}<6 && ($rec->{srcsys}=~m/^TPC\d+$/)){
       return(undef,undef) if (!$par->Ping());
       $forcedupd->{cistatusid}=6;
       push(@qmsg,
          'set system CI-Status to disposed of waste due missing on TPC');
    }
-
-
-
-   if (($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
-        $rec->{cistatusid}==5 ||
-        (exists($forcedupd->{cistatusid}) && $forcedupd->{cistatusid}==4)) &&
-       ($rec->{srcsys}=~m/^TPC\d+$/)){
-      if ($rec->{srcid} ne "" && $rec->{srcsys} eq $TPCenv){
-         if (!defined($parrec)){
-            return(undef,undef) if (!$par->Ping());
-            $forcedupd->{cistatusid}=6;
-            push(@qmsg,
-               'set system CI-Status to disposed of waste due missing on TPC');
-         }
-         else{
+   else{
+      if (($rec->{cistatusid}==4 || $rec->{cistatusid}==3 ||
+           $rec->{cistatusid}==5 ||
+           (exists($forcedupd->{cistatusid}) && $forcedupd->{cistatusid}==4)) &&
+          ($rec->{srcsys}=~m/^TPC\d+$/)){
+         if ($rec->{srcid} ne "" && $rec->{srcsys} eq $TPCenv){
             if ($parrec->{ismcos}){
                # ok, this record should be transfered to srcsys=AssetManager
                # because for MCOS always AssetManager(TSI) is datamaster
