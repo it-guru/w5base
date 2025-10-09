@@ -82,7 +82,25 @@ sub qcheckRecord
 
    my $cistatusid_FObj=$dataobj->getField("cistatusid",$rec);
 
-   return(0,undef) if (!defined($cistatusid_FObj) || $rec->{cistatusid}>5);
+   return(undef,undef) if (!defined($cistatusid_FObj) || $rec->{cistatusid}>5);
+
+   #########################################################################
+   # initiate ReCert process only if the CI is 6 weeks old, at least
+   #
+   my $crefdate=$rec->{cdate};
+   if (exists($rec->{instdate}) && $rec->{instdate} ne ""){
+      $crefdate=$rec->{instdate};
+   }
+   if ($crefdate ne ""){
+      my $crefd=CalcDateDuration($crefdate,NowStamp("en"));
+      print STDERR Dumper($crefd);
+      if (defined($crefd) && $crefd->{days}<(6*7)){ # 6 weeks 
+         return(undef,{qmsg=>['The config item is in the transient phase']});
+      }
+
+   }
+   #########################################################################
+
 
    my $lrecertreqdt_FObj=$dataobj->getField("lrecertreqdt",$rec);
    my $lrecertdt_FObj=$dataobj->getField("lrecertdt",$rec);
