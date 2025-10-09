@@ -79,8 +79,6 @@ sub ESindexName
 {
    my $self=shift;
 
-   my $indexname=lc($self->Self());
-   $indexname=~s/:/_/g;
    return("teamleanix__gov");
 }
 
@@ -103,7 +101,7 @@ sub ESprepairRawResult
          }
       }
    } @$data);
-   return(\@result);
+   @$data=@result;
 }
 
 
