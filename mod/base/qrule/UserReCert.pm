@@ -93,7 +93,6 @@ sub qcheckRecord
    }
    if ($crefdate ne ""){
       my $crefd=CalcDateDuration($crefdate,NowStamp("en"));
-      print STDERR Dumper($crefd);
       if (defined($crefd) && $crefd->{days}<(6*7)){ # 6 weeks 
          return(undef,{qmsg=>['The config item is in the transient phase']});
       }
