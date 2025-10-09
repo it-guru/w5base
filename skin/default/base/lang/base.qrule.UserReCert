@@ -7,4 +7,6 @@
 'recertification is requested'=>{de=>'Rezertifizierung ist angefordert'},
 'recertification notification handling is active'=>{de=>'Rezertifizierungsbenachrichtigungshandling ist aktiv'},
 'recertification notification send as email'=>{de=>'Rezertifizierungsbenachrichtigung als E-Mail versandt'},
-
+'The config item is in the transient phase'=>{
+de=>'Das Config-Item befindet sich in der Einschwingphase'
+},
