@@ -47,6 +47,17 @@ sub Process
    my $from=$mailHead->get("From");
    my $to=$mailHead->get("To");
 
+   $to=~s/[\n\r]/ /g;
+
+print STDERR "to0:".$to;
+
+   my @to=split(/\s*[;,]\s*/,$to);
+
+   @to=map { s/^.*<(.+)>\s*$/$1/gsr } @to;
+   @to=map { s/\s+//gsr } @to;
+   @to=map { s/\@.*$//gsr } @to;
+
+
    my $fromemail=lc($from);
    $fromemail=~s/^.*<(\S+)>$/$1/s;
    $fromemail=~s/\s*//gs;
@@ -61,9 +72,7 @@ sub Process
    my $mailtext;
    my $email;
    my $mailbody=$app->FindFirstMimePartWithType($parsedMail,"text/plain");
-   #printf STDERR ("found touser:%s in $self\n",$touser);
-   #printf STDERR ("found name:%s in $self\n",$name);
-   if ((lc($touser) eq lc("SharePointHubMaster") || lc($touser) eq "w5mail") ){
+   if (in_array(\@to,"SharePointHubMaster") ){
       my $exitcode=0;
       my $recordcount="?";
       msg(INFO,$self->Self().": Mailprocessing start");
