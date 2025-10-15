@@ -1,4 +1,4 @@
-package ElasticS::SharePointHubMaster;
+package TSharePoint::SharePointHubMaster;
 #  W5Base Framework
 #  Copyright (C) 2025  Hartmut Vogler (it@guru.de)
 #
@@ -121,6 +121,13 @@ sub new
             ignorecase    =>1,
             label         =>'Editor EMail'),
 
+      new kernel::Field::Date(
+            name          =>'srcload',
+            history       =>0,
+            group         =>'source',
+            label         =>'Source-Load',
+            dataobjattr   =>'_source.dtLastLoad'),
+
       new kernel::Field::CDate(
             name          =>'cdate',
             group         =>'source',
@@ -134,7 +141,7 @@ sub new
             dataobjattr   =>'_source.Modified'),
 
    );
-   $self->setDefaultView(qw(name hubid domainid sdcid fullname boit));
+   $self->setDefaultView(qw(shortname hubid domainid sdcid fullname boit));
    $self->LimitBackend(10000);
    return($self);
 }
@@ -279,11 +286,15 @@ sub JsonObjectLoad_FullLoad
    my $indexname=$self->ESindexName();
    my $opNowStamp=NowStamp("ISO");
 
-
-   my @wrgrp=$self->isWriteValid();
-   if (!in_array(\@wrgrp,[qw(ALL default)])){
-      printf("%s",msg(ERROR,"no write access to JsonObjectLoad_FullLoad"));
-      return(undef);
+   if ($W5V2::OperationContext ne "W5Server"){
+      my @wrgrp=$self->isWriteValid();
+      if (!in_array(\@wrgrp,[qw(ALL default)])){
+         printf("%s",msg(ERROR,"no write access to JsonObjectLoad_FullLoad"));
+         return(undef);
+      }
+   }
+   else{
+      msg(INFO,"allow access by W5V2::OperationContext");
    }
 
    my ($res,$emsg)=$self->ESrestETLload($self->getESindexDefinition(),
@@ -314,8 +325,15 @@ sub JsonObjectLoad_FullLoad
         }
       }
    );
-   print(msg(INFO,"_bulk ElasticSearch load ".$res->{items}.
-                  " items loaded from $orgFilename"));
+   if (ref($res) eq "HASH"){
+      msg(INFO,"ESrestETLload: ".Dumper($res));
+      print(msg(INFO,"_bulk ElasticSearch load ".$res->{items}.
+                     " items loaded from $orgFilename"));
+   }
+   else{
+      print(msg(ERROR,"_bulk ElasticSearch fail res=$res ;emsg=$emsg"));
+      return(undef);
+   }
    return($res->{items});
 }
 
