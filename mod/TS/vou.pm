@@ -636,7 +636,6 @@ sub Validate
    if (!$self->HandleCIStatus($oldrec,$newrec,%{$self->{CI_Handling}})){
       return(0);
    }
-print STDERR Dumper($newrec);
    if (!$self->HandleRunDownRequests($oldrec,$newrec,$comprec,
                                      %{$self->{CI_Handling}})){
       return(0);
