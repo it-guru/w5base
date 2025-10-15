@@ -449,6 +449,7 @@ sub EScreateIndex
 
    my $cmd=join(" ",
          "curl -u '${ESuser}:${ESpass}' ",
+         "--proxy '' ",
          "--output - -s ",
          "-d '$strparam' ",
          "-H 'Content-Type: application/json' ",
@@ -580,8 +581,10 @@ sub ESensureIndex
          return($out,$emsg);
       }
       else{
+         msg(INFO,"ESensureIndex: index $indexname OK");
          my ($meta,$emsg)=$self->ESmetaData();
          if (ref($meta) ne "HASH"){
+            msg(INFO,"ESensureIndex: ESmetaData failed");
             return($meta,$emsg);
          }
          my $definitionHash;
@@ -610,10 +613,12 @@ sub ESensureIndex
                      "change from '$meta->{$vField}' to '$vValue'");
             my ($out,$emsg)=$self->ESdeleteIndex();
             if (ref($out) ne "HASH"){
+               msg(INFO,"ESensureIndex: ESdeleteIndex failed for $indexname");
                return($out,$emsg);
             }
             my ($out,$emsg)=$self->EScreateIndex($indexname,$param);
             if (ref($out) ne "HASH"){
+               msg(INFO,"ESensureIndex: EScreateIndex failed for $indexname");
                return($out,$emsg);
             }
             $self->ESmetaData({DefinitionHash=>$definitionHash});
@@ -622,6 +627,9 @@ sub ESensureIndex
          }
       }
       return({'acknowledged'=>bless( do{\(my $o = 1)},'JSON::PP::Boolean')});
+   }
+   else{
+     msg(INFO,"ESensureIndex: ESgetAliases failed");
    }
    return($out,$emsg);
 }
@@ -650,6 +658,7 @@ sub ESmetaData
      
       my $cmd=join(" ",
             "curl -u '${ESuser}:${ESpass}' ",
+            "--proxy '' ",
             "--output - -s ",
             "-X GET '$baseurl/$indexname/_mapping'",
             "2>&1"
@@ -657,7 +666,7 @@ sub ESmetaData
       msg(INFO,"ESmeta query $indexname");
       my $out=qx($cmd);
       my $exit_code = $? >> 8;
-     
+
       if ($exit_code==0){
          my $d;
          eval('use JSON; $d=decode_json($out);');
@@ -751,14 +760,17 @@ sub ESrestETLload
    if (ref($out) && $out->{acknowledged}){
       my ($meta,$metaemsg)=$self->ESmetaData();
       if (ref($meta) ne "HASH"){
+         msg(INFO,"ESrestETLload: ESmetaData failed");
          return($meta,$metaemsg);   
       }
       my $loopCount=0;
       while(!exists($session->{loopBreak})){
          $session->{loopCount}=$loopCount;
+         msg(INFO,"ESrestETLload: loadLoop loopCount=$loopCount");
        
          my ($restOrignMethod,$restOriginFinalAddr,
              $restOriginHeaders,$ESjqTransform)=$backcall->($session,$meta);
+         msg(INFO,"ESrestETLload: next backcall OrignMethod=$restOrignMethod");
          last if (!defined($restOrignMethod) || $restOrignMethod eq "BREAK");
        
          my $i;
@@ -840,6 +852,7 @@ sub ESrestETLload
       }
    }
    else{
+      msg(INFO,"ESrestETLload: ESensureIndex failed");
       return($out,$emsg);
    }
 
