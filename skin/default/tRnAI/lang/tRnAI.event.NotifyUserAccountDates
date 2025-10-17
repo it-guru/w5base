@@ -1,8 +1,0 @@
-'exp expiration detected'=>{
-  de=>'SC-Verfallsdatum verfall erkannt',
-  en=>'SC-Expirationdate expiration detected'
-},
-'exit expiration detected'=>{
-  de=>'Austrittsdatum verfall erkannt',
-  en=>'Exit-Date expiration detected'
-}

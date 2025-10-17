@@ -1,5 +1,0 @@
-'tsotc::ipaddress'=>{
- de=>'OTC Integrated: IP-Adresse',
- en=>'OTC Integrated: IP-Address'
-},
-'Description'=>{de=>'Beschreibung'},
