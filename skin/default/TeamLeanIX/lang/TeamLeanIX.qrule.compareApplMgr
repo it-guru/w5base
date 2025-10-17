@@ -1,0 +1,4 @@
+'TeamLeanIX::qrule::compareApplMgr'=>{de=>'Überprüfung ob der ApplicationManager Kontakt mit T.EAM übereinstimmt',en=>'validate the ApplicationManager against T.EAM'},
+'different values stored in T.EAM'=>{de=>'in T.EAM sind andere Inhalte gespeichert'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+

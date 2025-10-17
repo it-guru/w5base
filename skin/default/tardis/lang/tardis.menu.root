@@ -1,0 +1,6 @@
+'itu.cfm.tardis'=>{de=>'Tardis',en=>'Tardis'},
+'itu.cfm.tardis.core'=>{de=>'Kernsystem',en=>'Kernel'},
+'itu.cfm.tardis.appl'=>{de=>'Application',en=>'Application'},
+'itu.cfm.tardis.appl.subs'=>{de=>'API Subscription',en=>'API Subscription'},
+'itu.cfm.tardis.appl.exp'=>{de=>'API Exposed',en=>'API Exposed'},
+'itu.cfm.tardis.appl.exp.subs'=>{de=>'Subscriped',en=>'Subscribed'},

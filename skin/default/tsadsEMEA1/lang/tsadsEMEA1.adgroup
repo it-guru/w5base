@@ -1,0 +1,8 @@
+'tsadsEMEA1::adgroup'=>{ de=>'Telekom ADS EMEA1 - Group',en=>'Telekom ADS EMEA1 - Group'},
+'fieldgroup.members'=>{ de=>'Mitglieder',en=>'Members'},
+'Fullname'=>{ de=>'vollqualifizierter Name'},
+'member'=>{ de=>'Mitglieder'},
+'members'=>{ de=>'Mitgliederliste'},
+'ObjectID'=>{ de=>'ObjektID'},
+
+

@@ -1,0 +1,5 @@
+'TPC2::project'=>{
+   de=>'TPC2: Projekt-Tag',
+   en=>'TPC2: Project-Tag'
+},
+'Value'=>{de=>'Inhalt'},

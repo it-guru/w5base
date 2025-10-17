@@ -1,0 +1,17 @@
+'FLEXERAatW5W::system'=>{de=>'FLEXERAatW5W: System',en=>'FLEXERAatW5W: System'},
+'fieldgroup.software'=>{de=>'Software',en=>'Software'},
+'fieldgroup.vm'=>{de=>'VM Eigenschaften',en=>'VM Properties'},
+'fieldgroup.w5basedata'=>{de=>'W5Base Verbindung',en=>'W5Base conjunction'},
+'Serialnumber'=>{de=>'Seriennummer'},
+'IP-Addresses'=>{de=>'IP-Adressen'},
+'CORE-Count'=>{de=>'Core-Anzahl'},
+'CPU-Count'=>{de=>'CPU-Anzahl'},
+'W5Base/Applications'=>{de=>'W5Base/Anwendungen'},
+'Inventory-Date'=>{de=>'Inventory-Datum'},
+'Services-Inventory-Date'=>{de=>'Services-Inventory-Datum'},
+'HW-Inventory-Date'=>{de=>'HW-Inventory-Datum'},
+'installed Packaged-Software'=>{de=>'installierte packetierte Software'},
+'is virtualized system'=>{de=>'ist virtualisiertes System'},
+'is virtualization host missing'=>{de=>'Virutalisierungs-Host nicht zuordenbar'},
+
+

@@ -1,0 +1,6 @@
+'itu.cloud.AWS'=>{de=>'AWS',en=>'AWS'},
+'itu.cloud.AWS.system'=>{de=>'EC2',en=>'EC2'},
+'itu.cloud.AWS.elb'=>{de=>'LoadBalancer',en=>'LoadBalancer'},
+'itu.cloud.AWS.NetIf'=>{de=>'NetworkInterface',en=>'NetworkInterface'},
+'itu.cloud.AWS.account'=>{de=>'Account',en=>'Account'},
+'itu.cloud.AWS.kern'=>{de=>'Stammdaten',en=>'Kernel'},

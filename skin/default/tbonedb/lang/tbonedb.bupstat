@@ -1,0 +1,9 @@
+'tbonedb::bupstat'=>{de=>'Backup-Status',en=>'Backup-Status'},
+'Check Date'=>{de=>'Überprüfungszeitpunkt'},
+'Check Exitcode'=>{de=>'Überprüfungsergebnis'},
+'Exit State'=>{de=>'Exit Status'},
+'is latest'=>{de=>'letzte Sicherung'},
+'fieldgroup.w5basedata'=>{de=>'W5Base Verbindung',en=>'W5Base conjunction'},
+'W5Base/Application'=>{de=>'W5Base/Anwendung'},
+
+

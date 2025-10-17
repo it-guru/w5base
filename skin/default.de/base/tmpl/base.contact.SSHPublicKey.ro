@@ -1,0 +1,15 @@
+<table border=0 style="width:100%;table-layout:fixed" cellpadding=2>
+<tr><td>
+Auf dieser Seite können Sie die SSH Public-Keys abgreifen, die der betreffende Kontakt veröffentlicht hat.
+</td></tr>
+<tr><td>
+SSH1 Key:
+<textarea name=ssh1publickey wrap=off
+          style="width:100%;height:100px">%ssh1publickey%</textarea>
+</td></tr>
+<tr><td>
+OpenSSH SSH2 Key:
+<textarea name=ssh2publickey wrap=off
+          style="width:100%;height:100px">%ssh2publickey%</textarea>
+</td></tr>
+</table>

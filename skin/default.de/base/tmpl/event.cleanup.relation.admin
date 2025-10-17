@@ -1,0 +1,4 @@
+Die Zuordnung von "<b>%user%</b>" zur Gruppe "<b>%group%</b>" mit den Rollen "<b>%roles(formated)%</b>" ist verfallen. 
+
+Wenn Sie (als Admin) nicht eingreifen, wird die Zuordnung in 8 Wochen gelöscht. Der betreffende User erhält in 2 Wochen eine entsprechende Information, dass diese Zuordnung verfallen ist.
+

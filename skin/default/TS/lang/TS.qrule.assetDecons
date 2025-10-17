@@ -1,0 +1,12 @@
+'TS::qrule::assetDecons'=>{
+de=>'Überwachung des geplanten Hardware-Rückbaus',
+en=>'Monitor planed hardware deconstruction'
+},
+'missing planned deconstruction date'=>{de=>'fehlender geplanter Rückbau Zeitpunkt'},
+'hint for deconstruction planning'=>{de=>'Hinweis zur Rückbauplanung'},
+'econstruction planning'=>{de=>'Hinweis zur Rückbauplanung'},
+'request for deconstruction date'=>{de=>'Anforderung Rückbauzeitpunkt'},
+'Exceeding "End of Hardware Support" without valid deconstruction planning'=>{de=>'Überschreitung des "Ende des Hardware-Supports" ohne gültige Rückbauplanung'},
+'Exceeding planned deconstruction date'=>{de=>'Überschreitung des geplanten Rückbauzeitpunktes'},
+'Justification for exceeding "End of Hardware Support" date not detailed enough'=>{de=>'Begründung für Überschreitung des "Ende des Hardware-Supports" nicht ausführlich genug'},
+'excluded hardware model'=>{de=>'ausgeschlossenes Hardware-Model'},

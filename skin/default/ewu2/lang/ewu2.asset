@@ -1,0 +1,17 @@
+'ewu2::asset'=>{
+  en=>'EWU2: Asset',
+  de=>'EWU2: Asset'
+},
+'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'Databoss'=>{de=>'Datenverantwortlicher'},
+'Serialnumber'=>{de=>'Seriennummer' },
+'full assetname'=>{de=>'vollständiger Assetname'},
+'Delivered At'=>{de=>'Inbetriebnahmedatum'},
+'Location'=>{de=>'Standort'},
+'Decommissioned At'=>{de=>'Außerbetriebnahmedatum'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+'Asset Owner'=>{de=>'Eigentümer'},
+'Asset Number'=>{de=>'Asset-Nummer'},
+'Part Number'=>{de=>'Teilenummer'},
+'Depreciation Period'=>{de=>'Abschreibungszeitraum'},
+'Payment Period'=>{de=>'Verrechnungszeitraum'},

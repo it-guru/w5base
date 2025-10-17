@@ -1,0 +1,11 @@
+Bitte bestätigen Sie für die abgebende Anwendung '%EAPPL%'
+das dieser Transfer durchgeführt werden darf.<br><br>
+
+<input type=checkbox name=doit>
+Ja, ich bestätige das der Transfer durchgeführt werden soll<br>
+<br>
+%LASTMSG%
+<center>
+<input type=submit style="cursor:pointer" name=save value="speichern">
+</center>
+

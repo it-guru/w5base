@@ -1,0 +1,6 @@
+'AL_TCom::qrule::ApplIface'=>{de=>'Prüfung ob Schnittstellenzuordnungen vorhanden sind',
+                             en=>'check if interface relations are valid'},
+'no interfaces defined'=>{de=>'keine Schnittstellen vorhanden'},
+'superfluous interfaces'=>{de=>'überzählige Schnittstellen vorhanden'},
+'loop interfaces to the current application are not allowed'=>{de=>'Schnittstellen auf die eingene Anwendung sind nicht erlaubt'},
+'invalid application in interface'=>{de=>'ungültige Anwendung in Schnittstelle'},

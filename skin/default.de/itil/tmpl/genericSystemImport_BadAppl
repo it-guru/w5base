@@ -1,0 +1,10 @@
+Der automatische Import von ...
+%SYSTEM%
+... aus der CloudArea %CLOUDAREA% wurde abgewiesen.
+
+Der Grund dafür ist, dass die Anwendung nicht aktiv ist. Aus CloudAreas, deren Anwendung nicht aktiv ist, sind Deployments NICHT zulässig.
+
+Als Datenverantwortlicher (oder Schreibberechtigter) der Anwendung %APPL%, können Sie den CI-Status auf installiert/aktiv ändern, wenn Sie das Deployment in der o.g. CloudArea für die Anwendung zulassen möchten.
+%URL%
+
+<b><font color=red>Deployments in CloudAreas mit nicht aktiven Anwendungen können zu Security-Probelmen führen!</font></b>

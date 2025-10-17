@@ -1,0 +1,8 @@
+'itu.W5Warehouse'=>{de=>'W5Warehouse',en=>'W5Warehouse'},
+'itu.W5Warehouse.system'=>{de=>'System',en=>'System'},
+'itu.W5Warehouse.krn'=>{de=>'Kernsystem',en=>'Kernel'},
+'itu.W5Warehouse.Rep'=>{de=>'Reports',en=>'Reports'},
+'itu.W5Warehouse.krn.views'=>{de=>'View',en=>'View'},
+'itu.W5Warehouse.krn.fields'=>{de=>'Field',en=>'Field'},
+'itu.W5Warehouse.krn.objectsnap'=>{de=>'ObjectSnap',en=>'ObjectSnap'},
+'itu.W5Warehouse.itemsummary'=>{de=>'Item-Summary Debug',en=>'Item summary debug'},

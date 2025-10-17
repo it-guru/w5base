@@ -1,0 +1,55 @@
+'AL_TCom::workflow::riskmgmt'=>{de=>'Telekom IT: Risikomanagement',en=>'Telekom IT: Riskmgmt'},
+'AL_TCom::workflow::riskmgmt::tip'=>{
+              de=>'<br>
+Hier werden alle IT Betriebsrisiken und Maﬂnahmen der DT IT erfasst.<br>
+IT Security Risiken bitte in CAPE erfassen!<br>
+<br>
+Risikomanagement leistet einen wesentlichen Beitrag um das Unternehmensziel nachhaltig zu sichern.<br>
+<br>
+Weiter Infos hier: <br>
+<a href="https://yam.telekom.de/groups/src-dt-it/projects/risk-management" target=_blank>Risikomanagement der DT IT</a><br>
+<br>
+Hilfedokumente finden Sie hier:<br>
+<a href="https://yam.telekom.de/docs/DOC-697124" target=_blank>https://yam.telekom.de/docs/DOC-697124</a><br>
+',
+              en=>'<br>
+All IT operational risks and measures of DT IT are recorded here.<br>
+Please record IT security risks in CAPE!<br>
+<br>
+Risk management makes a significant contribution to sustainably securing the corporate goal.<br>
+<br>
+More information here:<br>
+<a href="https://yam.telekom.de/groups/src-dt-it/projects/risk-management" target=_blank>Risikomanagement der DT IT</a><br>
+<br>
+You can find help documents at this location:<br>
+<a href="https://yam.telekom.de/docs/DOC-697124" target=_blank>https://yam.telekom.de/docs/DOC-697124</a><br>
+'
+                  },
+
+'DTAGMONIMP.'=>{de=>'',en=>''},
+'DTAGMONIMP.0'=>{de=>'bis 0,5 Mio EUR',en=>'till 0,5 Mio EUR'},
+'DTAGMONIMP.1'=>{de=>'0,5 Mio bis 2,0 Mio EUR',en=>'0,5 Mio to 2,0 EUR'},
+'DTAGMONIMP.2'=>{de=>'2,0 Mio bis 10,0 Mio EUR',en=>'2,0 Mio to 10,0 EUR'},
+'DTAGMONIMP.3'=>{de=>'>10,0 Mio EUR',en=>'>10,0 EUR'},
+'TELITMONIMP.'=>{de=>'',en=>''},
+'TELITMONIMP.0'=>{de=>'bis 1000 EUR',  en=>'till 1000 EUR'},
+'TELITMONIMP.1'=>{de=>'1T bis 5T EUR',  en=>'1T till 5T EUR'},
+'TELITMONIMP.2'=>{de=>'5T bis 10T EUR',  en=>'5T till 10T EUR'},
+'TELITMONIMP.3'=>{de=>'10T bis 50T EUR',  en=>'10T till 50T EUR'},
+'TELITMONIMP.4'=>{de=>'>50T EUR',  en=>'>50T EUR'},
+'Total damage within DTAG (form an estimate)'=>{
+  de=>'Schadensausmaﬂ DTAG (Sch‰tzung)'
+},
+'Total damage within TelIT (form an estimate)'=>{
+  de=>'Schadensausmaﬂ in der TelIT (Sch‰tzung)'
+},
+'no measure workflows'=>{de=>'keine Maﬂnahmen'},
+'incomplete risk data'=>{de=>'unvollst‰ndige Risikodaten'},
+'measure out of time'=>{de=>'Maﬂnahmenzeit¸berschreitung'},
+'risk level column number'=>{de=>'Riskio-Level Spaltennummer'},
+'risk level row number'=>{de=>'Risiko-Level Zeilennummer'},
+'days to rise'=>{de=>'Tage bis zum Eintritt'},
+'mitigation time'=>{de=>'Mitigationszeit'},
+'ITRM criticality'=>{de=>'ITRM Kritikalit‰t'},
+'risk of occurrency'=>{de=>'Risikoeintrittswahrscheinlichkeit'},
+'magic risk key'=>{de=>'Magischer Riskio-Key'},

@@ -1,0 +1,10 @@
+Sehr geehrter W5Base Nutzer,
+
+ihre Abfrage auf dem W5Base-System '%sitename()%' im Modul '%modlong()%' hatte eine Verarbeitungsdauer von %duration()% Sekunden. Die zeitliche Obergrenze für Abfragen ist auf %killtimeout()% Sekunden pro Anfrage begrenzt. Die Abfrage mit der id %apid% wurde vom Prozess-Controller jetzt abgebrochen!
+
+Diese Situation kann auftreten, wenn Sie eine Abfrage durchführen, die extrem große Ergebnislisten erzeugt. Desweiteren kann es sein, dass zum Zeitpunkt der Abfrage das Datenbank-Endsystem sehr träge geantwortet hat oder eine Fehlfunktion auf dem Datenbanksystem vorlag.
+
+Wenn ein Abfrage-Abbruch innerhalb von %UserQueryAbbortFocus% Stunden zu oft vorkommt, wird Ihr User-Account (Kontakt) vorübergehend gesperrt. Diese Sperre kann nicht aufgehoben werden, auch nicht von Admins.
+
+Um das Abbrechen von Abfragen zu vermeiden, wählen Sie bitte Ihre Abfrage Filter so, dass möglichst kleine Ergebnislisten erzeugt werden bzw. teilen Sie Ihre Anfrage in mehrere kleinere Anfragen auf.
+

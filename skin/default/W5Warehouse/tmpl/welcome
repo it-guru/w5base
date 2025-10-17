@@ -1,0 +1,24 @@
+<table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
+<tr><td align=center valign=top><br><br><br>
+<h1><u><font color=green>W5</font><font color=darkblue>Warehouse</font></u></h1>
+<br>
+<table><tr>
+<td>
+<img src="../../load/logo.jpg">
+</td>
+<td width=10>&nbsp;</td>
+<td width=210 valign=center>
+<hr>
+<div style="margin:10px">
+<b><font color=green>W5</font><font color=darkblue>Warehouse</font></b> ...<br><br>
+... is the reporting Datawarehouse system for W5Base/Darwin. In this area, many data are <u>not</u> mirrored in realtime, soo data latencies are normal and wanted.
+</div>
+<hr>
+<br>
+<br>
+</td></tr></table>
+</td></tr>
+<tr><td valign=bottom align=right height=1%>
+<font size=-2>
+</td></tr>
+</table>

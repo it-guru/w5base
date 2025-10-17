@@ -1,0 +1,5 @@
+'AL_TCom::appl'=>{de=>'Telekom IT Geschäftsanwendung',
+                  en=>'Telekom IT Businessapplication'},
+'fieldgroup.businessservices'=>{de=>'bereitgestellte Business-Services',en=>'provided Business-Services'},
+'allow to send for (Herbeiruf)'=>{de=>'Herbeiruf gestattet'},
+'fieldgroup.inm'=>{de=>'Incident-Management',en=>'Incident-Management'},

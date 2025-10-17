@@ -1,0 +1,21 @@
+'tsotc::system'=>{
+ de=>'OTC Integrated: System',
+ en=>'OTC Integrated: System'
+},
+'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'fieldgroup.iaascontacts'=>{de=>'IaaS Kontakte',en=>'IaaS Contacts'},
+'fieldgroup.iaccontacts'=>{de=>'IaC Kontakte',en=>'IaC Contacts'},
+'alternate Systemname'=>{de=>'alternativer Systemname'},
+'Contact email'=>{de=>'Kontakt E-Mail'},
+'CPU-Count'=>{de=>'CPU-Anzahl'},
+'Application'=>{de=>'Anwendung'},
+'Application W5BaseID'=>{de=>'Anwendung W5BaseID'},
+'Memory'=>{de=>'Arbeitsspeicher'},
+'Project'=>{de=>'Projekt'},
+'Description'=>{de=>'Beschreibung'},
+'Systemname not unique in OTC'=>{de=>'Angegebener Systemname nicht eindeutig in OTC'},
+'no contact email found in otc sysrec'=>{de=>'Keine Kontakt-Email im OTC Systemdatensatz'},
+'reimport only posible by current databoss'=>{de=>'Re-Import nur durch den aktuellen Datenverantwortlichen möglich'},
+"Systemname '\%s' already imported in W5Base"=>{
+de=>"Systemname '\%s' ist bereits in W5Base importiert"
+},

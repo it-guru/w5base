@@ -1,0 +1,13 @@
+Sehr geehrte Damen und Herren,
+
+hiermit informieren wir Sie über den o.g. Change.
+Sie erhalten diese Information, weil eine Anwendung aus Ihrem Verantwortungsbereich als TSM oder AM direkt oder über eine in W5Base/Darwin eingetragene Schnittstelle von diesem Change betroffen ist, Sie sich die Change-Benachrichtigung für eine der direkt betroffenen Anwendungen abonniert haben, oder Sie in einer direkt betroffenen Anwendung als 'Informationspartner' eingetragen sind.
+Bitte stellen Sie eine zeitnahe Bearbeitung sicher, falls von Ihnen Approvals bearbeitet werden müssen.
+
+<b>Ausstehende Approvals:</b>
+%pending%
+<b>Bereits bearbeitete Approvals:</b>
+%approved%
+Sollten Sie Einwände gegen die Maßnahme haben oder als Approver einzutragen sein, machen Sie dies bitte innerhalb von 2 Arbeitstagen geltend.
+%note%
+(Bitte beachten Sie, dass der beigefügte Direkt-Link die Information aus ServiceManager mit einer Verzögerung von bis zu 15Min. wiedergeben kann!)

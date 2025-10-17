@@ -1,0 +1,8 @@
+'MSG001'=>{de=>'
+Inoffizielles DARWIN-Interface für den Zugriff auf AssetManager.<br>
+Mit diesem Interface können Sie nur lesend auf Config-Informationen zugreifen.<br> <b>Wenn Sie Config-Items bearbeiten/pflegen möchten, so verwenden Sie bitte IT-Inventar.</b>
+',
+en=>'
+Unofficial DARWIN Interface for WEB-Access to AssetManager.<br>
+With this Interface only read access to AssetManager is granted.<br> If you want to modify Config-Items, you have to use IT-Inventar.
+'},

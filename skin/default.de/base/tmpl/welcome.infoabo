@@ -1,0 +1,23 @@
+<table width="100%" height="70%">
+<tr>
+<td align=center valign=center>
+
+
+<table border=0 cellspacing=5 cellpadding=5>
+<tr>
+<td valign=top>
+<img src="../../base/load/infoabo.jpg"
+      style="border-width:1px;border-style:solid;solid;border-color:black">
+</td>
+<td valign=center>
+<div style="border-width:1px;border-top-style:solid;border-bottom-style:solid;border-color:black;padding:3px;width:350px">
+In Info-Abos werden bestimmte Ereignisse beschrieben. Ist für Ihre Benutzerkennung ein bestimmtes Info-Abo vorhanden und aktiv, so erhalten Sie beim Auftreten des jeweiligen Ereignisses eine Mail vom System.<br>
+Globale Info-Abos werden u.U. automatisch vom System in Ihre Benutzerkennung eingetragen. Diese können Sie dann nur deaktiveren/aktiveren. Sie sollten diese nicht löschen, da ansonsten beim nächsten Auftreten des Ereignisses das entsprechende globale Info-Abo automatisch wieder mit default-Werten in Ihre Benutzerkennung eingetragen werden.
+</div>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>

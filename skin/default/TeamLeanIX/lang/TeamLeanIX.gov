@@ -1,0 +1,10 @@
+'TeamLeanIX::gov'=>{
+ de=>'T.EAM: gov - ICTO',
+ en=>'T.EAM: gov - ICTO'
+},
+'fieldgroup.orgs'=>{de=>'Organisationen',en=>'Organisations'},
+'fieldgroup.apps'=>{
+ de=>'apps - Anwendungen',
+ en=>'apps - Applications'
+},
+

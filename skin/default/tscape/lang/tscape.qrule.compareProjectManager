@@ -1,0 +1,8 @@
+'tscape::qrule::compareProjectManager'=>{de=>'Überprüfung ob der Projekt Manager Kontakt mit CAPE übereinstimmt',en=>'validate the ProjectManager against CAPE'},
+'removing projectmanager role from contact %s'=>{de=>'Entfernung der Rolle Projektmanager vom Kontakt %s'},
+'removing projectmanager contact %s'=>{de=>'Entfernung des Projektmanager Kontaktes %s'},
+'update roles of contact %s with projectmanager'=>{de=>'Aktualisierung des Kontaktes %s um Rolle Projektmanager'},
+'adding projectmanager contact %s'=>{de=>'Hinzufügen des Projektmanager Kontaktes %s'},
+'different values stored in CAPE:'=>{de=>'in CAPE sind andere Inhalte gespeichert:'},
+'no projectmanager role for'=>{de=>'fehlerhafte Projektmanager Rolle für'},
+'projectmanager'=>{de=>'Projektmanager'},

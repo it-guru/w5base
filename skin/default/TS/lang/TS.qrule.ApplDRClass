@@ -1,0 +1,11 @@
+'TS::qrule::ApplDRClass'=>{
+   de=>'Prüfung ob Disaster-Recovery Daten definiert sind',
+   en=>'check if Disaster-Recovery data are defined'},
+'no Disaster Recovery Class defined'=>{
+   de=>'keine Disaster Recovery Class definiert'},
+'no Application switch-over behaviour defined'=>{
+   de=>'keine Definitionen zur Umschalt/Schwenk/Recovery Strategie vorhanden'},
+"Minimum Disaster-Recovery test interval"=>{
+   de=>"Minimum Disaster-Recovery Test Intervall"
+},
+

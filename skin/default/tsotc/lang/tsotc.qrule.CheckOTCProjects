@@ -1,0 +1,3 @@
+'tsotc::qrule::CheckOTCProjects'=>{de=>'Prüfung der OTC Projekte in IT-Universum->OTC_Integrated',en=>'Check of OTC Projects in IT-Universum->OTC_Integrated'},
+'missing application in project'=>{de=>'fehlende Anwendung in Projekt'},
+'invalid application in project'=>{de=>'ungültige Anwendung in Projekt'},

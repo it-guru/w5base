@@ -1,0 +1,3 @@
+'SIMon::qrule::InstPackMonCheck'=>{de=>'Software-Installpackage-Monitoring',en=>'Software-Installpackage-Monitoring'},
+'missing installation package'=>{de=>'fehlendes Installationspaket'},
+

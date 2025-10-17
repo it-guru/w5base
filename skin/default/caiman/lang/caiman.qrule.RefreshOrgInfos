@@ -1,0 +1,4 @@
+'caiman::qrule::RefreshOrgInfos'=>{de=>'Abgleich von Gruppendaten mit CAIMAN',
+                                  en=>'sync of group informations from CAIMAN'},
+
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},

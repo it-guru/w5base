@@ -1,0 +1,2 @@
+'tsacinv::qrule::compareSystemSOX'=>{de=>'Überprüfung der SOX Einstellung gegen AssetManager',en=>'Check of SOX configuration against AssetManager hints available'},
+'SOX relevance does not match the AM presets! - please check your order'=>{de=>'SOX Relevanz entspricht nicht den AM Vorgaben! - Bitte prüfen Sie die Beauftragung'},

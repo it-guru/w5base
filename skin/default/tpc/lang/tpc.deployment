@@ -1,0 +1,6 @@
+'tpc::deployment'=>{
+  de=>'TelekomPrivateCloud: Deployment',
+  en=>'TelekomPrivateCloud: Deployment'
+},
+'fieldgroup.resources'=>{de=>'Resourcen',en=>'Resources'},
+

@@ -1,0 +1,5 @@
+'TS::qrule::ApplCostcenterSem'=>{
+   de=>'Prüfung des Kontierungsobjekts in AssetManager',
+   en=>'check costcenter object in AssetManager'},
+'no servicemanager entry in the costcenter object in AssetManager'=>{
+   de=>'kein Servicemanager-Eintrag im Kontierungsobjekt in AssetManager vorhanden'},

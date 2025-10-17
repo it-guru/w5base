@@ -1,0 +1,7 @@
+'itu.ds.caiman'=>{de=>'CAIMAN',en=>'CAIMAN'},
+'itu.ds.caiman.user'=>{de=>'Person',en=>'Person'},
+'itu.ds.caiman.orgarea'=>{de=>'Organisationseinheit',en=>'Org-Unit'},
+'itu.ds.caiman.org'=>{de=>'Organisation',en=>'Organisation'},
+'sysadm.user.caimanimport'=>{de=>'CAIMAN Import',en=>'CAIMAN Import'},
+'sysadm.grp.caimanimport'=>{de=>'CAIMAN Import',en=>'CAIMAN Import'},
+'sysadm.grp.caimanpfix'=>{de=>'CAIMAN ParentFix',en=>'CAIMAN ParentFix'},

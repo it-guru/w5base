@@ -1,0 +1,10 @@
+'based on informations from Cape (NOR Pass/VVZ of %s), the following attribute/s has/have been changed and a new NOR-Target document for the application %s  has been created:'=>{de=>"basierend auf Informationen aus CAPE (NOR-Pass/VVZ der %s), wurde/n folgende Attribute geändert und ein neues NOR-Vorgabedokument für die Anwendung %s erstellt:"},
+'new NOR-Target document:'=>{de=>'NOR-Vorgabe:'},
+'The former NOR-Target document'=>{de=>'Das bisherige NOR-Vorgabedokument'},
+'has been archived.'=>{de=>'wurde archiviert.'},
+'NOR-Target'=>{de=>'NOR-Lösungsmodel'},
+'Perosnal Data'=>{de=>'Personenbezogene Daten'},
+'Telecommunication Data'=>{de=>'TK-Daten'},
+
+
+

@@ -1,0 +1,7 @@
+'tsotc::qrule::compareSystem'=>{de=>'OTC Abgleich log. System',en=>'OTC compare of log. system'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'can not identify availability zone asset from OTC'=>{de=>'Availability-Zone Asset für OTC nicht auffindbar'},
+'given id not found in OTC'=>{de=>'die gegebene ID konnte in der OTC nicht gefunden werden'},
+'set system CI-Status to disposed of waste store due missing on OTC'=>{de=>'Setze CI-Status auf veraltet/gelöscht wegen Fehlen auf der OTC'},
+'systemname is not unique - please change the systemname in OTC'=>{de=>'Systemname ist nicht eindeutig - bitte ändern Sie den Systemnamen in der OTC'},
+'using alternate systemname with unique sufix'=>{de=>'verwende alternativen Systemnamen mit eindeutigem Sufix'},

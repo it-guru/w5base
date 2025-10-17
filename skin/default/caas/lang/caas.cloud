@@ -1,0 +1,6 @@
+'caas::cloud'=>{
+ de=>'CaaS: CloudEnvironment',
+ en=>'CaaS: CloudEnvironment',
+},
+'fieldgroup.projects'=>{de=>'Projekte',en=>'Projects'},
+'Projects'=>{de=>'Projekte'},

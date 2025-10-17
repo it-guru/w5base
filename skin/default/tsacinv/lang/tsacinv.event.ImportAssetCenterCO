@@ -1,0 +1,6 @@
+'There are no application relations in AssetManager'=>{de=>'Es bestehen keine Anwendungszuordnungen für diese SystemID im AssetManager'},
+'SystemID not found in W5Base/Darwin'=>{de=>'Die SystemID konnte in W5Base/Darwin nicht gefunden werden'},
+'SystemID not found in W5Base/CMDB'=>{de=>'Die SystemID konnte in W5Base/CMDB nicht gefunden werden'},
+'SystemID in W5Base/CMDB not installed/active'=>{de=>'SystemID in W5Base/CMDB ist nicht installiert/active'},
+'no applications assigned in W5Base/CMDB'=>{de=>'Es bestehen keine Anwendungszuordnungen in W5Base/CMDB'},
+'no application relations found in W5Base/Darwin'=>{de=>'Keine Anwendungszuordnungen in W5Base/Darwin gefunden'},

@@ -1,0 +1,16 @@
+'ewu2::qrule::compareSystem'=>{de=>'EWU2 Abgleich log. System',
+                                  en=>'EWU2 compare of log. system'},
+
+'no systemid specified'=>{de=>'keine SystemID definiert'},
+'given systemid not found as active in EWU2'=>{de=>'angegebene SystemID im EWU2 nicht aktiv'},
+'given DevLabSystemID not found as up in ewu2'=>{de=>'angegebene DevLabSystemID im EWU2 nicht aktiv(up)'},
+'no assetid specified'=>{de=>'keine AssetID definiert'},
+'given assetid not found as active in EWU2'=>{de=>'angegebene AssetID konnte im EWU2 nicht aktiv'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'different values stored in EWU2'=>{de=>'in EWU2 sind andere Inhalte gespeichert'},
+'systemname with whitespace in EWU2 - contact oss to fix this!'=>{de=>'Systemname mit Leerzeichen in EWU2 - kontaktieren Sie OSS um dies zu korrigieren!'},
+'systemname from EWU2 is already in use by an other system - contact OSS make the systemname unique!'=>{de=>'Systemname aus EWU2 ist bereits von einem anderen System in Verwendung - kontaktieren Sie OSS damit ein eindeutiger Systemname vergeben wird!'},
+'different data, but automatic update temporary deactivated'=>{
+   de=>'unterschiedliche Daten, aber automatisches Update vorübergehend deaktiviviert'
+},
+'auto deactivation of ewu2 logical system'=>{de=>'automatische Deaktivierung des EWU2 systems'},

@@ -1,0 +1,7 @@
+'TS::qrule::HubRelationFix'=>{
+   de=>'Zuordnungskorrektur in Hub-Gruppen',
+   en=>'relation fix in hub groups'
+},
+'move'=>{de=>'verschiebe'},
+'delete'=>{de=>'lösche'},
+

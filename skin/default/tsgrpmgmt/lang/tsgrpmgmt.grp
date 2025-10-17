@@ -1,0 +1,27 @@
+'tsgrpmgmt::grp'=>{de=>'Meta Assigmentgroup',en=>'Meta Assigmentgroup'},
+'fieldgroup.ref'=>{de=>'Referenzen',en=>'References'},
+'fieldgroup.grouptype'=>{de=>'Gruppentyp',en=>'Grouptype'},
+'fieldgroup.chk'=>{de=>'Prüf- und Import-Prozess',en=>'Check- and Import-Process'},
+'Fullname'=>{de=>'Assignmentgroup',en=>'Assignmentgroup'},
+'GroupID in ServiceManager'=>{de=>'GruppenID in ServiceManager'},
+'GroupID in ServiceCenter'=>{de=>'GruppenID in ServiceCenter'},
+'GroupID in AssetManager'=>{de=>'GruppenID in AssetManager'},
+'Group seen in AssetManager'=>{de=>'Gruppe in AssetManager gesehen am'},
+'Group seen in ServiceManager'=>{de=>'Gruppe in ServiceManager gesehen am'},
+'Group seen in ServiceCenter'=>{de=>'Gruppe in ServiceCenter gesehen am'},
+'Contact EMail'=>{de=>'Kontakt-EMailadresse'},
+'is change approver group'=>{de=>'ist Change Approvergroup'},
+'is change manager group'=>{de=>'ist Change Manager Group'},
+'is change coordinator group'=>{de=>'ist Change Coordinator Group'},
+'is change implementor group'=>{de=>'ist Change Implementor Group'},
+'is config assinment group'=>{de=>'ist Config-Assignmentgroup'},
+'is incident assinment group'=>{de=>'ist Incident-Assignmentgroup'},
+'is responsilbe for all'=>{de=>'ist verwendbar von allen'},
+'last check date'=>{de=>'Zeitpunkt der letzten Prüfung'},
+'Group Sys_Id in SMNow'=>{
+ de=>'Gruppen-Sys_Id in SMNow'
+},
+'Group seen in SMNow'=>{
+ de=>'Gruppe in SMNow gesehen am'
+},
+

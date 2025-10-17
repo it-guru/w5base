@@ -1,0 +1,15 @@
+'tsRMO::w5stat::base::AMR'=>{de=>'AMR',en=>'AMR'},
+'tsRMO::w5stat::base::AMR::LONG'=>{de=>'AMR - Application Management Report',en=>'AMR - Application Management Report'},
+'not acceptable'=>{de=>'nicht akzeptabel'},
+'justified or not relevant'=>{de=>'begründet oder nicht relevant'},
+'alright'=>{de=>'in Ordnung'},
+'problmeatic or soon problematic'=>{de=>'problematisch oder demnächst problematisch'},
+'unidentifiable'=>{de=>'nicht ermittelbar'},
+'APPISRELEVANT'=>{
+de=>'Die Anwendung %s ist RMO relevant und wird im Management-Report berücksichtig.',
+en=>'The Application %s is RMO relevant and will be reported in management views.'
+},
+'APPISNOTRELEVANT'=>{
+de=>'Die Anwendung %s ist nicht AMR relevant. Dieser Report dient nur zur Bewertung der Anwendung durch AM oder TSM.',
+en=>'The Application %s is not AMR relevant.'
+},

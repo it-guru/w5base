@@ -1,0 +1,98 @@
+'extdescriskimpact'=>{en=>'
+Describe what is happening on the occurrence of the risk, or what consequences occur on the customer side.<br>
+For example: Which business processes are impaired? How long can a failure be expected? What extra effort is required? Who is affected by the impairment etc.<br>
+From the description, it is also important to identify the assumptions underlying your estimate of the damage (for example: downtime for x days / weeks, increased support over x person days over x days / weeks)
+',de=>'
+Beschreiben Sie, was bei Eintritt des Risikos konkret passiert bzw. welche Folgewirkungen auf Kundenseite auftreten. <br>
+Z.B. Welche Geschäftsprozesse sind beeinträchtigt? Wie lange ist mit einem Ausfall zu rechnen? Welcher zusätzliche Aufwand ist notwendig? Wer ist von der Beeinträchtigung betroffen usw.<br>
+Aus der Beschreibung soll auch deutlich werden, welche Annahmen Ihrer Schätzung des Schadens zugrunde liegen (z.B. Ausfallzeit für x Tage/Wochen; erhöhter Support über x Personentage über x Tage/Wochen)
+'},
+
+'extdescriskdowntimedays'=>{en=>'
+Please estimate the amount of days the application will be down in case the described risk occurs.<br>
+A downtime of more than 30 minutes is considered as 1 day.<br>
+<br>
+The support category is not to be taken into consideration because in general the weekday (e.g. weekend or public holidays) of the occurrence of risks cannot be estimated.
+',de=>'
+Bitte schätzen Sie die Anzahl der Tage der Ausfallzeit, wenn dieses Risiko eintritt. <br>
+Ein Ausfall > 30 min. ist mit mind. 1 Tag anzugeben. <br>
+Die Unschärfe hinsichtlich Supportkategorie ist zu vernachlässigen, da der Wochentag (z.B. Werktag, Wochenende oder Feiertag) des Risikoeintritts nicht vorhergesehen werden kann. 
+'},
+
+'extdescriskoccurrency'=>{en=>'
+Probability of occurrence (also damage probability) means the statistical expectation value or the estimated probability for the occurrence of a particular event in a specific period in the future.<br>
+<br>
+Special Case:<br>
+0% : Risks that have been solved within a reporting cycle and which no longer exist (lessons learned).<br>
+100% : Risk has already occurred. Please describe measure implementation.<br>
+<br>
+Example:<br>
+A probability of occurrence of 70% means that in average on 255 of 365 days similar situations may occur.
+',de=>'
+Eintrittswahrscheinlichkeit (auch Schadenswahrscheinlichkeit) bezeichnet den statistischen Erwartungswert oder die geschätzte Wahrscheinlichkeit für das Eintreten eines bestimmten Ereignisses innerhalb der nächsten 12 Monate.<br>
+<br>
+Sonderfälle:<br>
+0% : Risiken, die innerhalb eines Reporting-Zyklus mitigiert wurden und nicht mehr bestehen (Lessons learned).<br>
+100% : Risiko ist bereits eingetreten. Bitte Maßnahmenumsetzung beschreiben.<br>
+<br>
+Beispiel:<br>
+Eine Eintrittswahrscheinlichkeit von 70 % bedeutet, dass es in durchschnittlich 255 Tagen <br>
+von 365 Tagen zu vergleichbaren Situationen kommen könnte.
+'},
+
+'extdescarisedate'=>{en=>'
+At which time the risk materializes.
+',de=>'
+Zu welchem Zeitpunkt materialisiert sich das Risiko. 
+'},
+
+'extdescdtagmonetaryimpact'=>{en=>'
+IT-Extent<br>
+As part of the extent of loss, the internal IT damage is quantified or estimated. This serves as internal additional information to record the immediate monetary impact within Telekom IT.<br>
+(E.g. Repairs / evasion solutions, replacement procurement, additional personnel costs, possible penal payments
+',de=>'
+Schadensausmaß: geschätzter finanzieller Impact innerhalb der DTAG bei Risikoeintritt.<br>
+Gesamtschaden innerhalb der DTAG z.B.: Summe aus IT-Schaden, Pönale, Imageschaden, Vertriebsausfall, Personalkosten, Geschäftsausfall<br>
+'},
+
+'extdesctelitmonetaryimpact'=>{en=>'
+IT-Extent<br>
+As part of the extent of loss, the internal IT damage is quantified or estimated. This serves as internal additional information to record the immediate monetary impact within Telekom IT.<br>
+(E.g. Repairs / evasion solutions, replacement procurement, additional personnel costs, possible penal payments<br>
+',de=>'
+IT-Ausmaß<br>
+Als Teil des Schadensausmaßes wird hier der interne IT-Schaden konkret beziffert bzw. geschätzt. Dies dient als interne Zusatzinformation, um die unmittelbare monetäre Auswirkung innerhalb von Telekom IT zu erfassen.<br>
+z.B. Reparaturen / Ausweichlösungen, Ersatzbeschaffungen, zusätzliche Personalkosten, eventuelle Strafzahlungen<br>
+'},
+'riskmgmtpoints'=>{de=>'
+Der nummerische Risikowert wird aus:<br>
+<br>
+1. ITRM Kritikalität (Strategische Relevanz & Risikoanfälligkeit, 0-5 Punkte) + <br>
+2. Risiko (Schadensausmaß & Eintrittswahrscheinlichkeit, 0-10 Punkte) + <br>
+3. Mitigationszeit (Der Verfügbaren Zeit zur Mitigation des Risikos, 0-3 Punkte)<br><br>
+addiert<br>
+<br>
+Die Ampelfarbe bedeutet und hat folgende Schwellwerte:<br>
+<br>
+Grün, 0-7 Punkte, Das Risiko hält sich in überschaubarem Rahmen. Das weitere Handling erfolgt ausschließlich im Applikationsmanagement.<br>
+<br>
+Gelb, 8-12 Punkte, Das Risiko ist erheblicher Natur. Das Handling erfolgt weiterhin im Applikationsmanagement, aber es gibt ein besonderes Monitoring durch das IT Risk Management ggf. auch mit zusätzlichen Eskalations- und Steuerungsaktivitäten.<br>
+<br>
+Rot, 13-18 Punkte, Das Risiko ist alarmierend und mit gravierenden Auswirkungen.  Es ist unmittelbare Managementattention erforderlich mit ggf. direktem Eingreifen. <br>
+',en=>'
+The numerical risk value is taken from:<br>
+1. ITRM criticality (strategic relevance & vulnerability, 0-5 points) + <br>
+2. risk (extent of damage & probability of occurrence, 0-10 points) + <br>
+3. mitigation time (The time available to mitigate the risk, 0-3 points)<br><br>
+Summed<br>
+<br>
+The traffic light color means and has the following threshold values:<br>
+<br>
+Green, 0-7 points, the risk is manageable. Further handling takes place exclusively in Application Management.<br>
+<br>
+Yellow, 8-12 points, the risk is considerable. Handling continues to take place in Application Management, but there is special monitoring by IT Risk Management, possibly with additional escalation and control activities.<br>
+<br>
+Red, 13-18 points, The risk is alarming and with serious consequences.  Immediate management attention is required with direct intervention if necessary.<br>
+'},
+
+

@@ -1,0 +1,10 @@
+'tsacinv::lnksystemsoftware'=>{de=>'AssetManager Software Installation',en=>'AssetManager Software installation'},
+'fieldgroup.useableby'=>{de=>'nutzbar durch',en=>'usable by'},
+
+'Quantity'=>{de=>'Einheiten'},
+'Folder'=>{de=>'Installationspfad'},
+'License'=>{de=>'Lizenz'},
+'useable by application'=>{de=>'nutzbar durch Anwendung'},
+'useable by applicationids'=>{de=>'nutzbar durch AnwendungIDs'},
+'useable by customer'=>{de=>'nutzbar durch Kunde'},
+'useable by customer contract'=>{de=>'nutzbar durch Kundenvertrag'},

@@ -1,0 +1,9 @@
+'itu.TasteOS.system'=>{
+  de=>'TSOS System',
+  en=>'TSOS System'
+},
+'itu.TasteOS.machine'=>{
+  de=>'TSOS Machine',
+  en=>'TSOS Machine'
+},
+

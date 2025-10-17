@@ -1,0 +1,8 @@
+'ElasticS::SharePointHubMaster'=>{
+   de=>'Telekom SharePoint: HUB MasterList',
+   en=>'Telekom SharePoint: HUB MasterList'
+},
+'fieldgroup.domain'=>{
+   de=>'Domain/SDC',
+   en=>'Domain/SDC'
+}

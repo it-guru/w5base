@@ -1,0 +1,11 @@
+'tsadopt::vfarm'=>{de=>'virtual Farm',en=>'virtual Farm'},
+'fieldgroup.vhosts'=>{de=>'virtualisation Hosts',en=>'virtualisation Hosts'},
+'fieldgroup.vhostassets'=>{de=>'virtualisation Host Assets',en=>'virtualisation Host Assets'},
+'fieldgroup.vsyss'=>{de=>'virtualisierte logische Systeme',en=>'virtualized logical systems'},
+'fieldgroup.state'=>{de=>'vFarm Status',en=>'vFarm state'},
+'Description'=>{de=>'Beschreibung'},
+'State'=>{de=>'Status'},
+'operational (deprecated)'=>{de=>'Farm ist funktionsfähig (veraltet)'},
+'virtualized system count'=>{de=>'Anzahl virtualisierter Systeme'},
+'virtualisation host count'=>{de=>'Anzahl virtualisierungs Hosts'},
+

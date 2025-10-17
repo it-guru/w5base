@@ -1,0 +1,6 @@
+'AL_TCom::custcontract'=>{de=>'Telekom IT Kundenvertrag',
+                          en=>'Telekom IT Customer Contract'},
+'Telekom concern standard operation mode'=>{de=>'Telekom Konzernstandard Betriebsart'},
+'KS.'=>{de=>'kein Konzernstandard Vertrag',en=>'no Concern standard'},
+'KS.prod'=>{de=>'Prod',en=>'Prod'},
+'KS.eta'=>{de=>'ETA',en=>'ETA'},

@@ -1,0 +1,14 @@
+'ewu2::project'=>{
+  en=>'EWU2: Project',
+  de=>'EWU2: Projekt'
+},
+'fieldgroup.contracts'=>{de=>'Verträge',en=>'Contracts'},
+'fieldgroup.contacts'=>{de=>'Kontakte',en=>'Contacts'},
+'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'Projectname'=>{de=>'Projektname'},
+'Longname'=>{de=>'Langname'},
+'Contracts'=>{de=>'Verträge'},
+'Deputy Manager'=>{de=>'Manager Vetreter'},
+'Systems'=>{de=>'Systeme'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+

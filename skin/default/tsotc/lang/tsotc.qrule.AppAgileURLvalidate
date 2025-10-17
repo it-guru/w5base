@@ -1,0 +1,5 @@
+'tsotc::qrule::AppAgileURLvalidate'=>{
+  de=>'AppAgile Namespace URL Prüfung',
+  en=>'AppAgile Namespace URL validate'
+},
+'removing URL due missing DNS-Route in AppAgile'=>{de=>'Entfernung der URL, da die DNS-Route in AppAgile nicht mehr existiert'},

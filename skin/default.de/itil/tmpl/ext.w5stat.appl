@@ -1,0 +1,4 @@
+
+ %chart1%
+
+Die Anzahl der Anwendungen bezieht sich auf die Anwendnungen, bei denen Betriebsteam oder Servicemanagement-Team der Gruppe '%statname%' oder einer deren Untergruppen zugewiesen ist. Es werden nur die Config-Items gezählt, bei denen der CI-Status auf "installiert/aktiv" eingestellt ist.

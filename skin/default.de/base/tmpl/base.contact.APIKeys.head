@@ -1,0 +1,15 @@
+<div style="float:right;margin: 3px;">
+<img border="0" alt="Help Icon" src="../../../public/base/load/help.gif" style="cursor:pointer"  onclick="parent.openwin('../../faq/QuickFind/globalHelp?stags=article&searchtext=W5Base%20API&AutoSearch=1','_help','height=570,width=680,toolbar=no,status=no,resizable=yes,scrollbars=auto');return(false);">
+</div>
+
+<div style="width:100%;margin:5px">
+API Keys erlauben einen technischen Zugriff mit den aktuellen Kontakt-Rechten
+über die Angabe des "X-API-Token" im HTTP-Header. 
+Es ist <font color=red><b>nicht gestattet</b></font>, über die API Keys an User-Kontakten, <font color=red><b>Anwendungsschnittstellen aufzubauen</b></font>. Derartige Daten&#8209;Schnitstellen müssen <b>immer</b> über Service-Kontakte erfolgen.<br>
+<br>
+Der API-Key Zugriff muss über /public/ auf das W5Base System erfolgen.<br>
+API Keys werden automatisch gelöscht, wenn diese länger als 10 Tage nicht
+verwendet werden.
+Ein API-Key benötigt immer eine IP-Zuordnung (max. 5 IP-Adressen) die bei
+der Erstellung des Keys angegeben werden muss.
+</div>

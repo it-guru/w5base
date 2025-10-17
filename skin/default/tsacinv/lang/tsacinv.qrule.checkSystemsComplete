@@ -1,0 +1,2 @@
+'tsacinv::qrule::checkSystemsComplete'=>{de=>'Überprüfung der vollständigen Erfassung aller logischen Systeme aus AM',en=>'Check of complete records of all logical systems from AM'},
+'missing logical system in it-inventory'=>{de=>'fehlendes logisches System in IT-Inventar'},

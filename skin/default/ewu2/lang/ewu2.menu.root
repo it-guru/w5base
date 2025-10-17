@@ -1,0 +1,8 @@
+'itu.EWU2'=>{de=>'EWU2-DevLab',en=>'EWU2-DevLab'},
+'itu.EWU2.project'=>{de=>'Projekt',en=>'Project'},
+'itu.EWU2.project.contact'=>{de=>'Vertrag',en=>'Contract'},
+'itu.EWU2.system'=>{de=>'System',en=>'System'},
+'itu.EWU2.system.ipaddress'=>{de=>'IP-Adresse',en=>'IP-Adresse'},
+'itu.EWU2.asset'=>{de=>'Hardware',en=>'Hardware'},
+'itu.EWU2.kernel'=>{de=>'Stammdaten',en=>'Basedata'},
+'itu.EWU2.kernel.contact'=>{de=>'Kontakt',en=>'Contact'},

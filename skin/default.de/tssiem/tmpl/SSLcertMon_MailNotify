@@ -1,0 +1,20 @@
+Sehr geehrte Damen und Herren,
+
+auf der ICTO-ID '%ICTONO%' wurden auf folgenden IP-Adressen 
+SSL Zertifikate gefunden, die in Kürze ungültig werden:
+
+%CERTLIST%
+
+Bitte stellen Sie sicher, das diese Zertifikate rechtzeitig
+erneuert/verlängert werden. Dies ist die erste und einzige
+Benachrichtigung zu diesem Thema.
+
+Wenn der Adressatenkreis für diese Benachrichtigung enger
+eingegrenzt werden soll, so erfassen Sie die betreffenden
+Zertifikate in W5Base/Darwin.
+
+siehe:
+https://darwin.telekom.de/darwin/auth/faq/article/ById/14818875910005
+
+%DEBUG%
+

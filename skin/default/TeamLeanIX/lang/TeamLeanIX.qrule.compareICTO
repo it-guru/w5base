@@ -1,0 +1,7 @@
+'TeamLeanIX::qrule::compareICTO'=>{de=>'Überprüfung und Vergleich mit dem angegebenen ICTO Objekt',en=>'validation and compare to the given ICTO Objekt'},
+'the given ICTO-ID does not exist anymore in T.EAM'=>{de=>'Das angegebene ICTO Objekt existiert in T.EAM nicht mehr'},
+'the given ICTO-ID is marked as EndOfLife in T.EAM'=>{de=>'Das angegebene ICTO Objekt ist in T.EAM als "veraltet" (EndOfLife) markiert'},
+'found ICTO-ID on an non architecture relevant application'=>{de=>'es wurde eine ICTO-ID bei einer nicht architekturrelevanten Anwendung erfasst'},
+'missing ICTO-ID'=>{de=>'keine ICTO-ID erfasst'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+

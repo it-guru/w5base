@@ -1,0 +1,9 @@
+'AL_TCom::inmbusinessarea'=>{
+  de=>'Anwendungs-BusinessArea',
+  en=>'Application-BusinessArea'
+},
+'fieldgroup.badata'=>{
+de=>'BusinessArea Daten',
+en=>'BusinessArea Data'
+}
+

@@ -1,0 +1,25 @@
+<style>
+body{
+   overflow:hidden;
+}
+</style>
+<table border=0 height=100% width=100%>
+<tr>
+<td valign=top align=center>
+<br>
+<br>
+<hr width=80%>
+<p>
+Willkommen im W5Base Framework.
+<br>
+<hr width=80%>
+<br><br>
+<p>Falls Sie sich abmelden möchten, so schließen Sie dazu bitte<br>
+einfach alle offenen WEB-Browser Fenster auf Ihrem Rechner.
+<br>
+<img src="../load/logo_320x240.jpg">
+
+
+</td>
+</tr>
+</table>

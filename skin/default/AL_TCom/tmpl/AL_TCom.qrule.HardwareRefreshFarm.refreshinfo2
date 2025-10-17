@@ -1,0 +1,10 @@
+Dear ServerFarm-databoss,
+
+the hardware %NAME% must be replaced by <b>%REFRESH%</b> according to the hardware refresh process.
+
+Please ensure all needed steps for a hardware refresh are done.
+
+Relevant systems: %SYSTEMS%
+
+Relevant applications: %APPLICATIONS%
+

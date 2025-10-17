@@ -1,0 +1,7 @@
+'tsacinv::user'=>{de=>'AssetManager User/Kontakt',en=>'AssetManager User/Contact'},
+'fieldgroup.default'=>{de=>'User/Kontaktdaten',en=>'User/Contact data'},
+'fieldgroup.sec'=>{de=>'Sicherheitsdaten',en=>'Security data'},
+'Fullname'=>{de=>'Vollständiger Name'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+'Tenant'=>{de=>'Instanz-Mieter'},
+'Tenant ID'=>{de=>'Instanz-Mieter ID'},

@@ -1,0 +1,5 @@
+'tscape::qrule::compareICTO'=>{de=>'Überprüfung und Vergleich mit dem angegebenen ICTO Objekt',en=>'validation and compare to the given ICTO Objekt'},
+'the given ICTO-ID does not exist anymore in CAPE'=>{de=>'Das angegebene ICTO Objekt existiert in CAPE nicht mehr'},
+'the given ICTO-ID is marked as retired in CAPE'=>{de=>'Das angegebene ICTO Objekt ist in CAPE als "veraltet" (retired) markiert'},
+'found ICTO-ID on an non architecture relevant application'=>{de=>'es wurde eine ICTO-ID bei einer nicht architekturrelevanten Anwendung erfasst'},
+'missing ICTO-ID'=>{de=>'keine ICTO-ID erfasst'},

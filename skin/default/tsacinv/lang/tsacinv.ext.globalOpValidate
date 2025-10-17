@@ -1,0 +1,2 @@
+'The chosen operation is invalid in case there are active services in AssetManager on the current system'=>{de=>'Änderung nicht zulässig, solange aktive Services in AssetManager mit dem System verknüpft sind'},
+'can not validate operation against AssetManager'=>{de=>'Zulässigkeit der Operation kann nicht gegenüber AssetManager geprüft werden'},

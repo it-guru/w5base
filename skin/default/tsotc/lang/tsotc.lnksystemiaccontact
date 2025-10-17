@@ -1,0 +1,12 @@
+'tsotc::lnksystemiaccontact'=>{
+ de=>'OTC Integrated: Verknüpfung IaC Kontakt',
+ en=>'OTC Integrated: Relation IaC Contact'
+},
+'Contact E-Mail'=>{de=>'Kontakt-EMail'},
+'W5Base Contact'=>{de=>'W5Base Kontakt'},
+'Description'=>{de=>'Beschreibung'},
+'WELCOME'=>{de=>'
+Bei Infrastructure as Code (IaC), manchmal auch als .programmierbare Infrastruktur. bezeichnet, wird die Konfiguration der Infrastruktur exakt so wie die Programmierung von Software behandelt. Dies hat zur Folge, dass die Grenzen zwischen dem Schreiben von Anwendungen und dem Erstellen der Umgebungen, auf denen sie ausgeführt werden, verschwimmen. Anwendungen können Skripte enthalten, die ihre eigenen virtuellen Maschinen erstellen und orchestrieren. Dies ist ein grundlegender Bestandteil von Cloud Computing und wesentlich für DevOps.
+',en=>'
+In Infrastructure as Code (IaC), sometimes referred to as .programmable infrastructure, the configuration of the infrastructure is treated exactly like the programming of software. As a result, the boundaries between writing applications and creating the environments on which they run become blurred. Applications can contain scripts that create and orchestrate their own virtual machines. This is a fundamental part of cloud computing and essential to DevOps.
+'},

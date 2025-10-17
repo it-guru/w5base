@@ -1,0 +1,32 @@
+<table width="100%" height="70%">
+<tr>
+<td align=center valign=center>
+
+
+<table border=0 cellspacing=5 cellpadding=5>
+<tr>
+<td valign=top>
+<img src="../../itil/load/certificate.jpg"
+      style="border-width:1px;border-style:solid;solid;border-color:black">
+</td>
+<td valign=center>
+<div style="border-width:1px;border-top-style:solid;border-bottom-style:solid;border-color:black;padding:3px;width:350px">
+
+<b>The service of central procurement of TeleSec Server.ID OV certificates will be discontinued summer 2025!</b><br>
+<br>
+Please switch to automated procedures by then. <br>
+<br>
+With Server.ID-DV, TeleSec offers a solution with ACME support.<br>
+Further information can be found on the YAMU page<br> 
+<a href="https://yam-united.telekom.com/pages/zertifikate-in-dtit-certificate-in-dtit/apps/content/home" target=_blank>
+yam-united.telekom.com/pages/zertifikate-in-dtit-certificate-in-dtit
+</a>
+
+</div>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>

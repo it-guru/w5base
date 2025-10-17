@@ -1,0 +1,8 @@
+'tsciam::qrule::CIAMUser'=>{de=>'CIAM Aktualisierung der Kontaktdaten',en=>'CIAM Interface of contact data'},
+'some fields has been updated'=>{de=>'einige Felder wurden aktualisiert'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'different values stored in CIAM'=>{de=>'in CIAM sind andere Inhalte gespeichert'},
+'dummy contact detected'=>{de=>'Dummy Kontakt erkannt'},
+'not unique email in CIAM'=>{de=>'uneindeutige E-Mail Adresse in CIAM'},
+'user not found'=>{de=>'CIAM Person nicht gefunden'},
+'reactivating russian colleague due land changed'=>{de=>'Reaktivierung des russischen Kollegen wegen Landeswechsel'},

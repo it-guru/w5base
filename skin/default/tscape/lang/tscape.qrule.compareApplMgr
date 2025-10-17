@@ -1,0 +1,3 @@
+'tscape::qrule::compareApplMgr'=>{de=>'Überprüfung ob der ApplicationManager Kontakt mit CAPE übereinstimmt',en=>'validate the ApplicationManager against CAPE'},
+'different values stored in CAPE'=>{de=>'in CAPE sind andere Inhalte gespeichert'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},

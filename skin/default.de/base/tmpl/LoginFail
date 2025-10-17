@@ -1,0 +1,21 @@
+<table width="100%" height="100%"><tr><td align="center" valign="center">
+<!------------------------------------------------------>
+<div style="width:400px;border-style:solid;border-color:red;border-widt:2px">
+<table width="100%" cellspacing=4 cellpadding=4>
+<tr><td colspan=2><font size=+3><b>Login fehlgeschlagen</b></td></tr>
+<tr>
+<td colspan=2>Ihr Benutzername oder Passwort ist nicht
+korrekt. Bitte überprüfen Sie Ihre Login-Daten. Nähere Information
+zum Anmeldeprozess finden Sie auf der Login-Seite.
+</td></tr>
+<tr>
+<td colspan=2 align=center><input type=button onclick="if (top.location.href!=document.location.href){top.location.href=top.location.href}else{document.location.href='/'};" value=" zurück zur Login-Seite "></td>
+</tr>
+</table>
+</div>
+<div style="text-align:left;width:400px;height:200px;overflow:auto">
+%LASTMSG(RAW)%
+</div>
+<!------------------------------------------------------>
+</td></tr></table>
+

@@ -1,0 +1,89 @@
+<span class="aria-only">
+<br>Erklärungen für die möglichen Ausdrücke im Suchfeld:<br>
+</span>
+Das Suchfeld '<b>%label%</b>' ist ein "Standard-Suchfeld".
+In diesem Fall können Sie folgende Ausdrücke und Wildcards verwenden:<br>
+<br>
+<table width="100%">
+
+<tr>
+<td nowrap valign=top><b>*</b></td>
+<td>... steht für eine beliebige Anzahl von Zeichen<br></td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>
+<span class="aria-only">Fragezeichen<br></span>
+<span aria-hidden="true">?</span>
+</b></td>
+<td>... steht für exakt ein beliebiges Zeichen<br>
+</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>
+<span class="aria-only">Ausrufezeichen<br></span>
+<span aria-hidden="true">!</span>
+</b></td>
+<td>... negiert den Ausruck. Falls Sie also <span aria-hidden=true>!</span><span class=aria-only>Ausrufezeichen</span>Hans eingeben, so erhalten
+    Sie alle Datensätze, bei denen "Hans" nicht in '%label%' eingetragen ist.
+<br></td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>
+<span class="aria-only">Der Ausdruck Anführungszeichen Hallo Welt Anführungszeichen<br></span>
+<span aria-hidden="true">
+"Hallo Welt"
+</span>
+</b></td>
+<td>... wenn Sie mehrere Ausdrücke Leerzeichen seperiert hintereinander
+    schreiben, so entspricht dies einer ODER Suche. Sollten Sie dies
+    verhindern wollen, so können Sie die Worte in Anführungszeichen 
+    einschliesen - dann wird im Beispiel exakt der Inhalt "Hallo Welt"
+    gesucht.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b>a* AND *s</b></td>
+<td>... mit einem großgeschriebenen AND können Sie mehrere Ausdrücke
+    "und" verknüpfen. Im Beispiel werden z.B. die Datensätze aufgelistet,
+    die mit a anfangen und gleichzeitig mit s aufhören.<br>
+    Es ist allerdings zu beachten, das nicht jedes Daten-Backend AND und
+    OR Verknüpfungen auswerten kann. Aus diesem Grund kann 
+    diese Funktion nicht über alle Datenobjekte hin garantiert werden.</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><span aria-hidden="true">[LEER]</span><span class="aria-only">Der Ausdruck eckige Klammer auf LEER eckige Klammer zu</span></b></td>
+<td>... bei bestimmten Datenbank einträgen gibt es einen Unterschied
+    zwischen "" und leer. Mit der Eingabe von <span aria-hidden="true">[LEER]</span><span class="aria-only">eckige Klammer auf LEER eckige Klammer zu</span> können Sie alle
+    Datensätze suchen, die im jeweiligen Feld "" oder NULL (leer) enthalten.
+    Bei verweisenden Felder (z.B. Unterlisten oder Listen) wird bei der Suche
+    nach [LEER] nicht danach gesucht, ob kleine Verweise in dem Feld vorhanden
+    sind, sondern es werden die Datensätze gesucht, die auf ein <span aria-hidden="true">[LEER]</span><span class="aria-only">eckige Klammer auf LEER eckige Klammer zu</span> Feld
+    verweisen. (was i.d.R. selten der Fall sein dürfte)</td>
+</tr>
+
+<tr>
+<td nowrap valign=top><b><span aria-hidden="true">[ICH]</span><span class="aria-only">Der Ausdruck eckige Klammer auf ICH eckige Klammer zu</span></b></td>
+<td>... dieser Ausdruck wird durch den eigenen, vollständigen 
+    Kontaktnamen ersetzt.
+    </td>
+</tr>
+
+</table>
+<script language="JavaScript">
+function SendData(t)
+{
+   if (parent){
+      parent.document.forms[0].elements['%field%'].value=t;
+   }
+   parent.hidePopWin(false);
+}
+</script>
+<style>
+body,html{
+  padding:5px;
+}
+</style>

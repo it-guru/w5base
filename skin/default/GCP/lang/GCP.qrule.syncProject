@@ -1,0 +1,4 @@
+'GCP::qrule::syncProject'=>{
+  de=>'GoogleCloudPlatform - Projekt-Sync',
+  en=>'GoogleCloudPlatform - project sync',
+},

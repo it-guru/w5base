@@ -1,0 +1,7 @@
+'GCP::system'=>{
+   de=>'GCP: System',
+   en=>'GCP: System'
+},
+'fieldgroup.tags'=>{de=>'Tags',en=>'Tags'},
+'Online-State'=>{de=>'Online-Status'},
+

@@ -1,0 +1,27 @@
+<style>
+p{margin-bottom:6px}
+ul{margin-bottom:6px}
+h2{margin-bottom:6px}
+body{margin:20px}
+</style>
+<h2>Hinweise für die Nutzung des CheckOfChanges:</h2>
+<p>Bei der Abfrage werden Changes und Betriebsmaßnahmen analysiert. Je nach dem, wie genau die "betroffene Anwendung" angegeben wird, um so länger darf das "Zeitfenster" sein, das abgefragt wird. Es spielt keine Rolle, ob das Abgefragte Zeitfentster in der Vergangenheit oder Zukunft liegt - bei Zeitfenstern in der Zukunft können natürlich nur geplante Aktionen ermittelt werden.</p>
+
+<p>Wird bei <b>"Schnittstellenbetrachtung"="keine"</b> gewählt und ist bei "betroffene Anwendung" eine oder mehrere Anwendungen angeben, so werden nur Changes/Maßnahmen aufgelistet, in denen die ausgewählten Anwendungen vorkommen.</p>
+
+<p>Wird bei <b>"Schnittstellenbetrachtung"="moderat"</b> gewählt und ist bei "betroffene Anwendung" eine oder mehrere Anwendungen angeben, so werden nur Changes/Maßnahmen aufgelistet, in denen die ausgewählten Anwendungen oder eine als "kritisch" markierte Schnittstelle dieser Anwendungen vorkommt.</p>
+
+<p>Wird bei <b>"Schnittstellenbetrachtung"="vollständig"</b> gewählt und ist bei "betroffene Anwendung" eine oder mehrere Anwendungen angeben, so werden nur Changes/Maßnahmen aufgelistet, in denen die ausgewählten Anwendungen oder eine beliebige Schnittstellen-Anwendung dieser Anwendungen vorkommt.</p>
+
+<p>Wird bei <b>"Schnittstellenbetrachtung"="exzessiv"</b> gewählt und ist bei "betroffene Anwendung" eine oder mehrere Anwendungen angeben, so werden <u>alle</u> das Zeitfenster tangierenden Changes/Maßnahmen aufgelistet und es erfolgt nur eine ensprechede Bewertung in der "Übereinstimmg". In diesem Modus wird quasi JEDE Anwendung als Schnittstelle angesehen. Bei derartigen Abfragen darf das Zeitfenster nicht länger als 24h sein.</p>
+
+<p>In der Ergebnisliste wird eine "Übereinstimmung" in Prozent errechnet. Hier wird eine Zuordnung errechnet, inwieweit die Changes/Maßnahmen den Abfragekriterien entsprechen. Dabei gilt:</p>
+<ul>
+<li>... es erfolgt eine Aufwertung, wenn der gefundene Workflow möglichst gleichzeitig mit dem abgefragen Zeitfenster beginnt.</li>
+<li>... wurden Stichworte angegben, erfolgt eine Aufwertung wenn diese mehrfach in einem Workflow vorkommen.</li>
+<li>... wurden nur Schnittstellen einer angegebenen Anwendung im Workflow gefunden, so erfolgt eine Abwertung</li>
+</ul>
+<p>Bei der Eingrenzung über Stichworte gilt, das keine Wildcards (*?) verwendet werden können. Werden mehrere Stichworte verwendet, dann müssen alle Sichtworte entwerden in der Kurzbeschreibung oder in der Langbeschreibung des Changes bzw. der Maßnahme vorkommen, damit der Workflow gelistet wird (bzw. aufgewertet wird, bei "exzensiv" Auswertungen).
+</p>
+<p>Bei den Zeitfenster Angaben kann zusätzlich zu den "normalen" Zeitausdrücken "start" und "end" als verwendet werden, um sich auf den jeweils anderen Teil des Teitfensters zu beziehen.</p>
+

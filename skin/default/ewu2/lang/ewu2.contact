@@ -1,0 +1,10 @@
+'ewu2::contact'=>{
+  en=>'EWU2: Contact',
+  de=>'EWU2: Kontakt'
+},
+'Surname'=>{ de=>'Nachname'},
+'Givenname'=>{ de=>'Vorname'},
+'Phonenumber'=>{ de=>'Telefonnummer'},
+'Phonenumber 2'=>{ de=>'Telefonnummer 2'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+

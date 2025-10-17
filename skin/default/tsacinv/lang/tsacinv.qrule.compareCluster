@@ -1,0 +1,17 @@
+'tsacinv::qrule::compareCluster'=>{de=>'AssetManager Abgleich Cluster',
+                                  en=>'AssetManager compare of cluster'},
+'given clusterid not found as active in AssetManager'=>{de=>'angegebene ClusterID ist im AssetManager nicht aktiv'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'different values stored in AssetManager'=>{de=>'in AssetManager sind andere Inhalte gespeichert'},
+'delete needed for'=>{de=>'Entfernen von'},
+'update needed for'=>{de=>'Aktualisierung von'},
+'insert needed for'=>{de=>'Hinzufügen von'},
+'cluster services needs correction'=>{de=>'Cluster-Services benötigen Korrekturen'},
+'cluster service list inconsistent to AssetManager'=>{de=>'Cluster Service Liste entspricht nicht den Vorgaben von AssetManager'},
+'cluster services invalid but automatic delete not posible (manual cleanup nessesary)'=>{de=>'Cluster-Service laut AssetManager nicht gültig aber automatische Bereinigung nicht möglich (manuelle Bereinigung notwendig!)'},
+'Multiple cluster services with same name found in AssetManager'=>{
+   de=>'Mehrere gleichnamige Cluster-Services in AssetManager gefunden'
+},
+"prohibited characters found in AssetManager Cluster name"=>{
+  de=>"Der Cluster-Name in AssetManager enthält unzulässige Zeichen"
+},

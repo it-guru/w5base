@@ -1,0 +1,29 @@
+'tsacinv::qrule::syncApplSystemsSAPInst'=>{
+   de=>'Abgleich Systeme mit SAP-Instanzen in AssetManager',
+   en=>'Syncronize systems with SAP-Instances in AssetManager'
+},
+"invalid system name detected"=>{de=>"ungültigen Systemnamen entdeckt"},
+"CI-State switched from %s to %s"=>{
+   de=>"CI-Status von %s auf %s geändert"
+},
+"switched CI-State to installed/active"=>{
+   de=>"CI-Status auf installiert/aktiv geändert"
+},
+"CI-State ambiguous"=>{de=>"CI-Status nicht eindeutig"},
+"Relation to system added"=>{de=>"Verknüpfung mit System hinzugefügt"},
+"Automatic relation with system failed"=>{
+   de=>"Automatische Verknüpfung mit System fehlgeschlagen"
+},
+"Relation to system removed"=>{de=>"Verknüpfung mit System entfernt"},
+"Automatic removal of relation to system failed"=>{
+   de=>"Automatisches Entfernen einer System-Verknüpfung fehlgeschlagen"
+},
+"System created"=>{de=>"System angelegt"},
+"Automatic creation of a System failed"=>{
+   de=>"Automatisches Anlegen eines Systems fehlgeschlagen"
+},
+"Asset created"=>{de=>"Asset angelegt"},
+"Automatic creation of an asset failed"=>{
+   de=>"Automatisches Anlegen eines Assets fehlgeschlagen"
+},
+

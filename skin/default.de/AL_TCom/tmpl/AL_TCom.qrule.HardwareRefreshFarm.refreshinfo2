@@ -1,0 +1,11 @@
+Sehr geehrter ServerFarm-Datenverantwortlicher,
+
+die Hardware %NAME%, muss gem‰ﬂ des Hardwarerefresh-Prozess bis zum <b>%REFRESH%</b> ersetzt werden.
+
+Stellen Sie bitte sicher, dass alle notwendigen Schritte zur Erneuerung der Hardware in die Wege geleitet wurden.
+
+
+Relevante Systeme: %SYSTEMS%
+
+Relevante Anwendungen: %APPLICATIONS%
+

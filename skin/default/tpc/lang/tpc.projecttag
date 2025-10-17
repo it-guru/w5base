@@ -1,0 +1,5 @@
+'tpc::project'=>{
+   de=>'TelekomPrivateCloud: Projekt-Tag',
+   en=>'TelekomPrivateCloud: Project-Tag'
+},
+'Value'=>{de=>'Inhalt'},

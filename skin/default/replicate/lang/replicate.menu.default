@@ -1,0 +1,5 @@
+'sysadm.repl'=>{de=>'Replikation',en=>'Replication'},
+'sysadm.repl.obj'=>{de=>'Objekt',en=>'Object'},
+'sysadm.repl.stat'=>{de=>'Statistik',en=>'Statistic'},
+'sysadm.repl.blacklist'=>{de=>'Blacklist',en=>'Blacklist'},
+'sysadm.repl.blacklist.new'=>{de=>'Neueingabe',en=>'New'},

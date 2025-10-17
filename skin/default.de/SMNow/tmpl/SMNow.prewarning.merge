@@ -1,0 +1,17 @@
+Sehr geehrter Datenverantwortlicher,
+
+die Incident-Assigmentgroup/Change-Approvergroups
+<b>%oldgroup%</b> in Ihren 
+ConfigItems (siehe unten) werden am <b>%ChangeDate%</b>
+auf die Gruppe <b>%newgroup%</b> 
+migriert.
+
+Bitte prüfen Sie, ob dies Ihren Erwartungen entspricht.
+
+Bei Rückfragen wenden Sie sich bitte direkt an SMNOW@telekom.de .
+
+<b>Items:</b>
+
+%ITEMS%
+
+
