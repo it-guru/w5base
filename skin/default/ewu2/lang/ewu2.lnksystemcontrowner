@@ -1,6 +1,0 @@
-'ewu2::lnksystemcontrowner'=>{
-  en=>'EWU2: Relation Vertragseigentümer',
-  de=>'EWU2: Verknüpfung Contract-Owner'
-},
-'contract owner'=>{de=>'Vertrags-Eigentümer'},
-

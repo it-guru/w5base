@@ -1,6 +1,0 @@
-'TPC6::machine'=>{
-   de=>'TPC6: Maschine',
-   en=>'TPC6: Machine'
-},
-'fieldgroup.tags'=>{de=>'Tags'},
-'generic name'=>{de=>'generischer Name'},

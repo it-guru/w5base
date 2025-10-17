@@ -1,8 +1,0 @@
-Dear %role%,
-
-
-%citype% <b>%ciname%</b> has been deleted from the
-managed item group <b>%mgmtitemgroup%</b>.
-
-The assignment ends on %lnkto%.
-
