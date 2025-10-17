@@ -1,4 +1,0 @@
-'tsacinv::Explore::appl'=>{de=>'TSAM Anwendung',en=>'TSAM Application'},
-'description'=>{de=>'Darstellung einer Business-Applikation auf Basis von AssetManager' ,en=>'Display an application based on AssetManager'},
-'sublabel'=>{de=>'TS AssetManager',en=>'TS AssetManager'},
-

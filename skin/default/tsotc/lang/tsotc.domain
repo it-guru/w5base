@@ -1,6 +1,0 @@
-'tsotc::domain'=>{
- de=>'OTC Integrated: Domain',
- en=>'OTC Integrated: Domain'
-},
-'fieldgroup.projects'=>{de=>'Projekte',en=>'Projects'},
-'Description'=>{de=>'Beschreibung'},
