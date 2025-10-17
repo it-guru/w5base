@@ -3188,6 +3188,9 @@ sub findNearestTargetDataObj
    }
    if ($dataobj ne "" && $m2 ne ""){
       my @instdirlist=reverse(split(/:/,$W5V2::INSTDIR));
+      if ($W5V2::INSTPATH ne ""){
+         @instdirlist=reverse(split(/:/,$W5V2::INSTPATH));
+      }
       foreach my $instdir (@instdirlist){
          if ( -f "$instdir/mod/$m2/$dataobj.pm"){
             my $nto="${m2}::${dataobj}";
