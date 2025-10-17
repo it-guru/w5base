@@ -3189,7 +3189,7 @@ sub findNearestTargetDataObj
    if ($dataobj ne "" && $m2 ne ""){
       my @instdirlist=reverse(split(/:/,$W5V2::INSTDIR));
       foreach my $instdir (@instdirlist){
-         if ( -f "$W5V2::INSTDIR/mod/$m2/$dataobj.pm"){
+         if ( -f "$instdir/mod/$m2/$dataobj.pm"){
             my $nto="${m2}::${dataobj}";
             eval("use $nto;"); # ensure all super objects are used
             my @tree=Class::ISA::super_path($nto); 
