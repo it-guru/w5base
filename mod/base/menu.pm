@@ -300,7 +300,7 @@ sub TableVersionProceedFile
    my $curline=0;
    my $cmdok=0;
    my $command="";
-   my $resetFOREIGN_KEY_CHECKS=0;
+   $workdb->do("set FOREIGN_KEY_CHECKS=0");   
    while(my $l=<F>){
       chomp($l);
       $curline++;
@@ -311,9 +311,6 @@ sub TableVersionProceedFile
       if ($command=~/^.*;\s*$/){
          $command=~s/;\s*$//;
          printf STDERR ("[notice] W5Base dbtool '%s'\n",$command);
-         if ($command=~m/FOREIGN_KEY_CHECKS/i){
-            $resetFOREIGN_KEY_CHECKS=1;
-         }
          if ($command=~m/^use \S+$/ || defined($workdb->do($command))){
             $cmdok++;
             $workdb->finish();
@@ -327,11 +324,9 @@ sub TableVersionProceedFile
                                    $curline,$rec->{filename});
             $rec->{msg}.=msg(ERROR,"Database error: '%s'",
                                    $workdb->getErrorMsg());
-            if ($resetFOREIGN_KEY_CHECKS){
-               printf STDERR ("[notice] W5Base dbtool - ".
-                              "reset FOREIGN_KEY_CHECKS\n");
-               $workdb->do("set FOREIGN_KEY_CHECKS=1");   
-            }
+            printf STDERR ("[notice] W5Base dbtool - ".
+                           "reset FOREIGN_KEY_CHECKS\n");
+            $workdb->do("set FOREIGN_KEY_CHECKS=1");   
             return(3);
          }
          $command="";
@@ -340,11 +335,9 @@ sub TableVersionProceedFile
    $rec->{msg}="OK";
    $rec->{linenumber}=$curline;
    close(F);
-   if ($resetFOREIGN_KEY_CHECKS){
-      printf STDERR ("[notice] W5Base dbtool - ".
-                     "reset FOREIGN_KEY_CHECKS\n");
-      $workdb->do("set FOREIGN_KEY_CHECKS=1");   
-   }
+   printf STDERR ("[notice] W5Base dbtool - ".
+                  "reset FOREIGN_KEY_CHECKS\n");
+   $workdb->do("set FOREIGN_KEY_CHECKS=1");   
    return(1);
 }
 
@@ -451,6 +444,13 @@ sub TableVersionModifications
                    $A=~tr/[A-Z][a-z]/[a-z][A-Z]/;
                    $B=~tr/[A-Z][a-z]/[a-z][A-Z]/;
                    $A cmp $B} keys(%c));
+
+   foreach my $keystring (qw( user master)){
+      @order = sort {
+          ($a =~m/$keystring/x ? 0 : 1) <=> ($b=~m/$keystring/x ? 0 : 1)
+      } @order;
+   }
+
    foreach my $sqlfile (@order){
       my $style;
       my $rec=$c{$sqlfile};

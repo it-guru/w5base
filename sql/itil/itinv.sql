@@ -1005,9 +1005,9 @@ create table appladv (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),key(docdate),
-  FOREIGN KEY fk_appl (appl)
+  FOREIGN KEY fk_appladvappl (appl)
               REFERENCES appl (id) ON DELETE CASCADE,
-  UNIQUE KEY `srcsys` (srcsys,srcid), unique(appl,isactive)
+  UNIQUE KEY `appladvsrcsys` (srcsys,srcid), unique(appl,isactive)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table applnor (
   id           bigint(20) NOT NULL,
@@ -1025,9 +1025,9 @@ create table applnor (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),key(docdate),
-  FOREIGN KEY fk_appl (appl)
+  FOREIGN KEY fk_applnorappl (appl)
               REFERENCES appl (id) ON DELETE CASCADE,
-  UNIQUE KEY `srcsys` (srcsys,srcid), unique(appl,isactive)
+  UNIQUE KEY `applnorsrcsys` (srcsys,srcid), unique(appl,isactive)
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table itnormodel (
   id           bigint(20) NOT NULL,
@@ -1107,7 +1107,7 @@ create table assetphyscore (
   asset      bigint(20) NOT NULL,
   cpu        bigint(20) default NULL,
   PRIMARY KEY  (id),
-  FOREIGN KEY fk_asset (asset)
+  FOREIGN KEY fk_assetphyscoreasset (asset)
               REFERENCES asset (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table assetphyscpu (
@@ -1115,7 +1115,7 @@ create table assetphyscpu (
   cpuid      int(4) NOT NULL,
   asset      bigint(20) NOT NULL,
   PRIMARY KEY  (id),
-  FOREIGN KEY fk_asset (asset)
+  FOREIGN KEY fk_assetphyscpu_asset (asset)
               REFERENCES asset (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table businessservice (
@@ -1138,8 +1138,8 @@ create table businessservice (
   PRIMARY KEY  (id),
   UNIQUE KEY name (appl,name),KEY(name),
   UNIQUE KEY `srcsys` (srcsys,srcid),
-  FOREIGN KEY fk_appl (appl)
-              REFERENCES appl (id) ON DELETE SET NUL
+  FOREIGN KEY fk_businessservice_appl (appl)
+              REFERENCES appl (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table appl add applmgr bigint(20) default NULL, add applowner bigint(20) default NULL;
 alter table lnkapplappl add monitor varchar(20) default NULL;
@@ -1162,7 +1162,7 @@ create table systemmonipoint (
   srcid       varchar(20) default NULL,
   srcload     datetime    default NULL,
   PRIMARY KEY  (id),UNIQUE KEY `nameing` (name,system),
-  FOREIGN KEY fk_system (system)
+  FOREIGN KEY fk_systemmonipoint_system (system)
               REFERENCES system (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table lnkbscomp (
@@ -1474,8 +1474,8 @@ drop table lnkbprocesssystem;
 rename table lnkbprocessappl to lnkbprocessbusinessservice;
 alter table lnkbprocessbusinessservice add businessservice bigint(20) NOT NULL;
 set FOREIGN_KEY_CHECKS=0;
-alter table lnkbprocessbusinessservice add FOREIGN KEY fk_bs (businessservice) REFERENCES businessservice (id) ON DELETE CASCADE; alter table lnkbprocessbusinessservice add unique key (bprocess,businessservice);
-set FOREIGN_KEY_CHECKS=1;
+alter table lnkbprocessbusinessservice add FOREIGN KEY fk_lnkbs_bs (businessservice) REFERENCES businessservice (id) ON DELETE CASCADE; 
+alter table lnkbprocessbusinessservice add unique key (bprocess,businessservice);
 alter table businessservice add databoss  bigint(20);
 alter table businessservice add mandator  bigint(20);
 alter table businessservice add nature  char(5) default '', add unique fullname(nature,name);
@@ -1536,7 +1536,7 @@ create table wallet (
    realeditor     varchar(100) NOT NULL default '',
    PRIMARY KEY (id),
    UNIQUE KEY uk_name (name),
-   FOREIGN KEY fk_appl (applid) REFERENCES appl (id) ON DELETE CASCADE
+   FOREIGN KEY fk_wallet_appl (applid) REFERENCES appl (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table itfarm (
   id         bigint(20) NOT NULL,
@@ -1583,8 +1583,8 @@ create table lnkitfarmasset (
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY asset (asset),
-  FOREIGN KEY fk_itfarm (itfarm) REFERENCES itfarm (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_asset (asset)   REFERENCES asset (id) ON DELETE RESTRICT,
+  FOREIGN KEY fk_itf_itfarm (itfarm) REFERENCES itfarm (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_itf_asset (asset)   REFERENCES asset (id) ON DELETE RESTRICT,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
 create table lnkassetasset (
@@ -1621,11 +1621,11 @@ create table lnkitclustsvcsyspolicy (
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   editor     varchar(100) NOT NULL default '',
   realeditor varchar(100) NOT NULL default '',
-  PRIMARY KEY  (refid),
-  FOREIGN KEY fk_itclustsvc (itclustsvc) 
+  PRIMARY KEY pkey_refid (refid),
+  FOREIGN KEY fk_lnkitclustsvcsyspolicy_itclustsvc (itclustsvc) 
   REFERENCES lnkitclustsvc (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_system (system) 
-  REFERENCES system (id) ON DELETE CASCADE
+  FOREIGN KEY fk_lnkitclustsvcsyspolicy_system (system) 
+  REFERENCES `system` (id) ON DELETE CASCADE
 );
 alter table itclust add defrunpolicy varchar(20) default 'allow';
 create table asset_tstamp (
@@ -1776,8 +1776,8 @@ create table addlnkapplgrpsystem (
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (id), UNIQUE KEY idtoken (idtoken),key(applgrp),key(system),
   UNIQUE KEY token (applgrp,system),
-  FOREIGN KEY fk_sys  (system) REFERENCES system (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_agrp (applgrp) REFERENCES applgrp (id) ON DELETE CASCADE
+  FOREIGN KEY fk_addgrpsys_sys  (system) REFERENCES system (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_addgrpsys_agrp (applgrp) REFERENCES applgrp (id) ON DELETE CASCADE
 ) ENGINE=INNODB;
 alter table appl add respmethod varchar(40) default 'ROLEBASED';
 alter table swinstance add software bigint(20) default NULL,add version varchar(30) default NULL,add ipaddress bigint(20) default NULL;
@@ -1803,9 +1803,9 @@ create table lnkadditionalci (
   KEY appl (appl),
   KEY system (system),
   KEY swinstance (swinstance),
-  FOREIGN KEY fk_system (system) REFERENCES system (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_appl   (appl)   REFERENCES appl (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_swinstace (swinstance) REFERENCES swinstance (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_lnkadditionalci_system (system) REFERENCES system (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_lnkadditionalci_appl   (appl)   REFERENCES appl (id) ON DELETE CASCADE,
+  FOREIGN KEY fk_lnkadditionalci_swinstace (swinstance) REFERENCES swinstance (id) ON DELETE CASCADE,
   UNIQUE KEY `srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table asset add eohsd datetime default NULL;
@@ -1832,10 +1832,10 @@ create table lnkapplappltag (
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
   KEY name (name),
-  FOREIGN KEY lnkapplappl (lnkapplappl) 
+  FOREIGN KEY lnkapplappltag_lnkapplappl (lnkapplappl) 
   REFERENCES lnkapplappl (id) ON DELETE CASCADE,
   KEY lnkapplappl (lnkapplappl),               
-  UNIQUE KEY `srcsys` (srcsys,srcid)
+  UNIQUE KEY `lnkapplappltagsrcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 alter table asset add plandecons datetime default NULL;
 alter table accessurl add ssl_certissuerdn varchar(256) default null;

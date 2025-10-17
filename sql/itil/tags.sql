@@ -44,11 +44,11 @@ create table tag_system (
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
   KEY name (name),
-  UNIQUE KEY `uname` (uname,refid),
-  FOREIGN KEY refrecord (refid)
+  UNIQUE KEY `tag_system_uname` (uname,refid),
+  FOREIGN KEY tag_system_refrecord (refid)
   REFERENCES system (id) ON DELETE CASCADE,
-  KEY refid (refid),
-  UNIQUE KEY `srcsys` (srcsys,srcid)
+  KEY tag_systemrefid (refid),
+  UNIQUE KEY `tag_systemsrcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table tag_swinstance (
   id           bigint(20) NOT NULL,
@@ -68,9 +68,9 @@ create table tag_swinstance (
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
   PRIMARY KEY  (id),
-  KEY name (name),
-  UNIQUE KEY `uname` (uname,refid),
-  FOREIGN KEY refrecord (refid)
+  KEY tag_swinstance_name (name),
+  UNIQUE KEY `tag_swinstance_uname` (uname,refid),
+  FOREIGN KEY tag_swinstance_refrecord (refid)
   REFERENCES swinstance (id) ON DELETE CASCADE,
   KEY refid (refid),
   UNIQUE KEY `srcsys` (srcsys,srcid)

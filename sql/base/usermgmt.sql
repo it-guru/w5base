@@ -424,8 +424,8 @@ CREATE TABLE lnkuserw5plug (
   UNIQUE KEY u (userid,plugid),
   KEY plutg (plugid),
   key(createdate),
-  FOREIGN KEY fk_user (userid) REFERENCES contact (userid) ON DELETE CASCADE,
-  FOREIGN KEY fk_user (plugid) REFERENCES w5plug (id) ON DELETE CASCADE
+  FOREIGN KEY fk_user1 (userid) REFERENCES contact (userid) ON DELETE CASCADE,
+  FOREIGN KEY fk_user2 (plugid) REFERENCES w5plug (id) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table grpindivfld (
   id         bigint(20) NOT NULL,

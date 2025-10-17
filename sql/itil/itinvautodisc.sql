@@ -46,11 +46,11 @@ create table autodiscent (
   PRIMARY KEY  (id),
   UNIQUE KEY disc_on_system (engine,discon_system),
   UNIQUE KEY disc_on_swinstance (engine,discon_swinstance),
-  FOREIGN KEY fk_autodiscengine (engine)
+  FOREIGN KEY fk_autodiscent_autodiscengine (engine)
               REFERENCES autodiscengine (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_swinstance (discon_swinstance)
+  FOREIGN KEY fk_autodiscent_swinstance (discon_swinstance)
               REFERENCES swinstance (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_system (discon_system)
+  FOREIGN KEY fk_autodiscent_system (discon_system)
               REFERENCES system (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table autodiscrec (
@@ -102,17 +102,17 @@ create table autodiscmap (
   srcid      varchar(20) default NULL,
   srcload    datetime    default NULL,
   PRIMARY KEY  (id),
-  UNIQUE KEY `srcsys` (srcsys,srcid),key(engine,scanname),
-  UNIQUE KEY `sname` (software,engine,scanname),
-  UNIQUE KEY `osname` (osrelease,engine,scanname),
-  UNIQUE KEY `hwname` (hwmodel,engine,scanname),
-  FOREIGN KEY fk_autodiscengine (engine)
+  UNIQUE KEY `autodiscmapsrcsys` (srcsys,srcid),key(engine,scanname),
+  UNIQUE KEY `autodiscmapsname` (software,engine,scanname),
+  UNIQUE KEY `autodiscmaposname` (osrelease,engine,scanname),
+#  UNIQUE KEY `autodiscmaphwname` (hwmodel,engine,scanname),
+  FOREIGN KEY fk_autodiscmap_autodiscengine (engine)
               REFERENCES autodiscengine (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_software (software)
+  FOREIGN KEY fk_autodiscmap_software (software)
               REFERENCES software (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_osrelease (osrelease)
-              REFERENCES osrelease (id) ON DELETE CASCADE,
-#  FOREIGN KEY fk_hwmodel (hwmodel)
+  FOREIGN KEY fk_autodiscmap_osrelease (osrelease)
+              REFERENCES osrelease (id) ON DELETE CASCADE
+#  FOREIGN KEY fk_autodiscmap_hwmodel (hwmodel)
 #              REFERENCES hwmodel (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
