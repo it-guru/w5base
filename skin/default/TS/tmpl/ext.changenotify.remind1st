@@ -1,0 +1,10 @@
+Dear Ladies and Gentlemen,
+
+at %submit% the above mentioned change has been submitted (Phase 40 Change Approval).
+The responsible TSM and AM already got information at %approverequest%.
+
+<b>Unfortunately, these approvals are still pending:</b>
+%pending%
+If you have given your approval in the meantime, please see this mail to be unfounded.
+%note%
+(Please note, the attached direct link can give the information from ServiceManager with a delay of up to 15min!)

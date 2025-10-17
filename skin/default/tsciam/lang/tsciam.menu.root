@@ -1,0 +1,8 @@
+'itu.ds.ciam'=>{de=>'CIAM',en=>'CIAM'},
+'itu.ds.ciam.user'=>{de=>'Person',en=>'Person'},
+'itu.ds.ciam.orgarea'=>{de=>'Organisationseinheit',en=>'Org-Unit'},
+'itu.ds.ciam.org'=>{de=>'Organisation',en=>'Organisation'},
+'itu.ds.ciam.location'=>{de=>'Standort',en=>'Location'},
+'sysadm.user.ciamimport'=>{de=>'CIAM Import',en=>'CIAM Import'},
+'sysadm.grp.ciamimport'=>{de=>'CIAM Import',en=>'CIAM Import'},
+'sysadm.grp.ciampfix'=>{de=>'CIAM ParentFix',en=>'CIAM ParentFix'},

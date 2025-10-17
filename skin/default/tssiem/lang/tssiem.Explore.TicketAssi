@@ -1,0 +1,4 @@
+'tssiem::Explore::TicketAssi'=>{de=>'PRM Ticket Assistent',en=>'PRM Ticket Assistent'},
+'description'=>{de=>'Schablonen für die Qualys PRM Ticket-Erstellung' ,en=>'Template Assistent for Qualys PRM Tickets'},
+'sublabel'=>{de=>'Qualys',en=>'Qualys'},
+

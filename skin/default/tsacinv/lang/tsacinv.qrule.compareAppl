@@ -1,0 +1,9 @@
+'tsacinv::qrule::compareAppl'=>{de=>'AssetManager Abgleich Anwendung',
+                                  en=>'AssetManager compare of application'},
+
+'no applicationid specified'=>{de=>'keine AnwendungsID definiert (wird u.U. nach Export nach AM nachgeliefert)'},
+'given applicationid not found as active in AssetManager'=>{de=>'angegebene AnwendungsID im AssetManager nicht aktiv'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'can not create relation to not existing/active system'=>{de=>'Zuordnung zu nicht vorhandenen/aktivem System kann nicht automatisch erzeugt werden'},
+'different values stored in AssetManager'=>{de=>'in AssetManager sind andere Inhalte gespeichert'},
+'invalid or not importable value'=>{de=>'ungültiger oder nicht importierbarer Inhalt'},

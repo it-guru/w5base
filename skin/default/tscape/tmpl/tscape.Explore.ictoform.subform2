@@ -1,0 +1,29 @@
+<div style="margin:10px">
+<div class="detailframe">
+<div class="detailheadline">
+
+<table width="100%" cellspacing="0" cellpadding="0">
+ <tbody><tr>
+ <td class="detailheadline" align="left">
+ <h3 class="grouplabel">Step2: Second Part</h3>
+ </td>
+ </tr>
+ </tbody>
+</table>
+
+</div>
+<table class="detailframe" border=1>
+<tbody>
+
+<tr class="fline">
+<td class="fname" valign=top colspan=1 width=20%>W5Base/Darwin - Applicationname:</td>
+<td valign=top style="width:300px"><input style="width:100%" type=text name=w5appl id=w5appl value=""></td>
+<td><div class=noticeText data-type=template data-template="tscape.Explore.ictoform.subform2.w5appl.help"></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+</div>
+

@@ -1,0 +1,12 @@
+'caiman::qrule::ParentOrgUnit'=>{de=>'Prüfung der Elterneinheit und Gruppenstatus über CAIMAN',
+                                en=>'Check the parent orgunit and group state by CAIMAN'},
+"orgunit id not found in CAIMAN"=>{de=>'Org-Einheit ID (srcid) konnte in CAIMAN nicht gefunden werden'},
+"parent unit in CAIMAN doesn't matches"=>{de=>'Elterneinheit ist nicht mit CAIMAN Struktur identisch'},
+'parent group is not from CAIMAN - disabling parent sync'=>{de=>'Elterngruppe ist nicht aus CAIMAN - Sync deaktiviert'},
+'orphaned orgunit group in CAIMAN'=>{de=>'verwaiste Org-Gruppe aus CAIMAN - Gruppe sollte "veraltet/gelöscht" werden'},
+'orphaned orgunit group in CAIMAN but within 90d'=>{de=>'verwaiste Org-Gruppe aus CAIMAN aber innerhalb 90d Frist'},
+'parent group as of CAIMAN is'=>{
+  de=>'Elterngruppe laut CAIMAN ist'
+},
+'EC top Org-Entry detected'=>{de=>'EC Top-Orgeintrag erkannt'},
+

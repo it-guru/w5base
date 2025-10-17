@@ -1,0 +1,5 @@
+'TeamLeanIX::org'=>{
+ de=>'T.EAM: org - Organisation',
+ en=>'T.EAM: org - Organisation'
+},
+

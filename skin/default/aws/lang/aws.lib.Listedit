@@ -1,0 +1,4 @@
+'mandatary filter not specifed'=>{de=>'Zwingendes Filterkriterium nicht angegeben'},
+'requested filter not supported by REST backend'=>{de=>'angegebener Filter nicht vom REST Backend unterstützt'},
+'mandatary search parameter missing: %s'=>{de=>'Zwingend notwendiger Suchparameter fehlt: %s'},
+

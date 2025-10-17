@@ -1,0 +1,72 @@
+'CRaS::csr'=>{
+  de=>'CRaS: Zertifikats-Request',
+  en=>'CRaS: Certificate-Request'
+},
+'fieldgroup.default'=>{
+  de=>'CRaS: Zertifikat',
+  en=>'CRaS: Certificate'
+},
+'fieldgroup.request'=>{
+  de=>'Zertifikats-Request',
+  en=>'Certificate-request'
+},
+'fieldgroup.caref'=>{
+  de=>'CA Referenz',
+  en=>'CA Reference'
+},
+'fieldgroup.detail'=>{
+  de=>'Zertifikat',
+  en=>'Certificate'
+},
+'fieldgroup.followupcsr'=>{
+  de=>'Nachfolge-Zertifikat',
+  en=>'Followup-Certificate'
+},
+'related application'=>{de=>'zugeordnete Anwendung'},
+'certificate request'=>{de=>'Zertifikats Request'},
+'Certificate state'=>{de=>'Zertifikats-Status'},
+'SSL-Certificate begin'=>{de=>'SSL-Zertifikat Laufzeitbegin'},
+'SSL-Certificate end'=>{de=>'SSL-Zertifikat gültig bis'},
+'SSL-Certificate Serial No.'=>{de=>'SSL-Zertifikat Seriennr.'},
+'CA Reference No.'=>{de=>'CA Referenznummer'},
+'CA replaced Ref. No.'=>{de=>'CA ersetzende Referenznummer'},
+'CSRSTATE.1'=>{de=>'erfasst',en=>'captured'},
+'CSRSTATE.2'=>{en=>'accepted',de=>'angenommen'},
+'CSRSTATE.3'=>{de=>'signieren',en=>'sign in progress'},
+'CSRSTATE.4'=>{de=>'signiert',en=>'signed'},
+'CSRSTATE.5'=>{de=>'Erneuerung angefordert',en=>'renewal requested'},
+'CSRSTATE.6'=>{en=>'disposed of wasted',de=>'veraltet/gelöscht'},
+'process'=>{de=>'Mailtext verarbeiten/behandeln',en=>'process mailtext'},
+'no csr file specified'=>{de=>'kein CSR angegeben'},
+'no write access on specified application'=>{de=>'kein Schreibzurgriff auf die angegebene Anwendung'},
+'signed certificate'=>{de=>'signiertes Zertifikat'},
+'unable to find csr by CommonName'=>{de=>'csr kann per CommonName nicht gefunden werden'},
+'unable to find Certificate-Service Team for selected application'=>{de=>'kein Zertifikats-Service Team für die gewählte Anwendung auffindbar'},
+'CRaS certificate service'=>{de=>'CRaS Zertifikats-Service'},
+'CRaS new CSR to process'=>{de=>'CRaS neuer CSR zur Bearbeitung'},
+'CRaS certificate signed'=>{de=>'CRaS Zertifikat signiert'},
+'CRaS check for renew'=>{de=>'CRaS Prüfung der Erneuerung/Verlängerung'},
+'CRaS expiration extremly near'=>{de=>'CRaS Verfall extrem nahe'},
+'sigend state only allowed with singed cert file'=>{de=>'signiert Status nur zulässig mit signiertem Zertifikat'},
+'new record would be out of a serviceteam scope'=>{de=>'neuer Datensatz wäre nicht im Fokus eines ServiceTeams'},
+'sign request CA'=>{de=>'gewünschte CA'},
+'no target CA identifiable'=>{de=>'keine Ziel CA identifizierbar'},
+'can not identify desired CA for renewal'=>{de=>'CA für Erneuerung nicht identifizierbar'},
+'no CSR detail informations for renewal'=>{de=>'kein CSR für Erneuerung vorhanden'},
+'can not decode CSR detail informations for renewal'=>{de=>'CSR für Erenuerung kann nicht decodiert werden'},
+"common name '%s' not allowed for requested CA"=>{de=>"Common name (%s) kann für die gewünschte CA nicht verwendet werden"},
+"country '%s' not allowed for requested CA"=>{de=>"Country (%s) kann für die gewünschte CA nicht verwendet werden"},
+"location '%s' not allowed for requested CA"=>{de=>"Location (%s) kann für die gewünschte CA nicht verwendet werden"},
+"state '%s' not allowed for requested CA"=>{de=>"State (%s) kann für die gewünschte CA nicht verwendet werden"},
+"organisation '%s' not allowed for requested CA"=>{de=>"Organisation (%s) ist für die geforderte CA nicht zulässig"},
+'OU needs to be empty'=>{de=>'OU darf nicht gewüllt/verwendet werden'},
+'SSL Cert W5Ref'=>{de=>'SSL-Zertifikat W5Ref'},
+"altname '%s' not allowed for requested CA"=>{de=>"Alternativer CN/Subject (%s) ist für die geforderte CA nicht zulässig"},
+"existing CSRs with the same CN - please ensure cleanup (maybe through service team)"=>{de=>'Bestehende CSRs mit demselben CN - bitte für Bereinigung sorgen (eventuell Serviceteam einschalten)'},
+'RSA keylen with less than 3000 bit is insecure'=>{
+de=>'RSA Schlüssellänge von weniger als 3000 Bits ist unsicher'
+},
+'CSR with RSA keylen less than 3000 bit can not renewal'=>{
+de=>'CSR mit RSA Schlüssellänge von weniger als 3000 Bit kann nicht erneuert werden'
+}
+

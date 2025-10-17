@@ -1,0 +1,10 @@
+'ewu2::contract'=>{
+  de=>'EWU2: Vertrag',
+  en=>'EWU2: Contract'
+},
+'fieldgroup.systems'=>{de=>'Systeme',en=>'Systems'},
+'Fullname'=>{de=>'Vertragsbezeichnung'},
+'Deputy Owner'=>{de=>'Eigentümer Vertreter'},
+'Owner'=>{de=>'Eigentümer'},
+'marked as delete'=>{de=>'gelöscht markiert'},
+

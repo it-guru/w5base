@@ -1,0 +1,6 @@
+'TS::custappl'=>{de=>'TS Kundensicht Anwendung - Deutsche Telekom Kunde einer Anwendung',
+               en=>'TS Customerview Application'},
+'fieldgroup.custtscontact'=>{de=>'Deutsche Telekom Kontakte (aus Kundensicht)',
+                         en=>'Deutsche Telekom Contacts Deutsche Telekom is customer'},
+'fieldgroup.default'=>{de=>'allgemeine Anwendungsdaten',
+                       en=>'Application data'},

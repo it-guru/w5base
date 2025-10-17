@@ -1,0 +1,6 @@
+'tsciam::orgarea'=>{de=>'CIAM Organisationseinheit',en=>'CIAM Org-Unit'},
+'fieldgroup.userro'=>{ de=>'Mitarbeiter',en=>'Employees'},
+'fieldgroup.subunits'=>{ de=>'Untereinheiten',en=>'SubUnits'},
+'Users'=>{ de=>'Mitarbeiter'},
+'Boss (tOuMgr)'=>{ de=>'Leiter (tOuMgr)'},
+'Boss'=>{ de=>'Leiter'},

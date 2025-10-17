@@ -1,0 +1,8 @@
+'tsacinv::group'=>{de=>'AssetManager Gruppe',en=>'AssetManager Group'},
+'fieldgroup.default'=>{de=>'Gruppendaten',en=>'Groupinformations'},
+'Supervisor'=>{de=>'Leiter'},
+'Parentgroup'=>{de=>'Elterngruppe'},
+'Phone'=>{de=>'Telefonnummer'},
+'Supervisor LDAPID'=>{de=>'Leiter LDAPID'},
+'Supervisor E-Mail'=>{de=>'Leiter E-Mail'},
+'marked as delete'=>{de=>'gelöscht markiert'},

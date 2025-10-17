@@ -1,0 +1,12 @@
+'caas::project'=>{
+ de=>'CaaS: Project',
+ en=>'CaaS: Projekt',
+},
+'fieldgroup.urls'=>{
+ de=>'Kommunikations-URLs',
+ en=>'Communication-URLs',
+},
+'requestor account'=>{de=>'Anforderer Account'},
+'HTTP 503 - incomplete result from backend system'=>{
+de=>'HTTP 503 - unvollständiges Ergebnis vom Backend-System'
+}

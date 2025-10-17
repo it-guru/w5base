@@ -1,0 +1,12 @@
+'TS::interview'=>{de=>'Deutsche Telekom Config-Item-Interview',
+                  en=>'Deutsche Telekom Config-Item-Interview'},
+'fieldgroup.attr'=>{de=>'Frage-Attribute',
+                    en=>'Question-Attributes'},
+'effects on MTTR'=>{de=>'beeinflusst MTTR'},
+'effects on MTBF'=>{de=>'beeinflusst MTBF'},
+'question cluster'=>{de=>'Frage-Cluster'},
+'response group'=>{de=>'Verantwortungsbereich'},
+'RGROUP.itservice'=>{de=>'IT Dienstleister',en=>'IT Service'},
+'RGROUP.customer'=>{de=>'IT-/Anwendungs-Auftraggeber',en=>'IT-Customer'},
+
+                  

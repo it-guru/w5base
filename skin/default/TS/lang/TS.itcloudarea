@@ -1,0 +1,4 @@
+'TS::itcloudarea'=>{de=>'Telekom CloudArea',en=>'Telekom CloudArea'},
+'fieldgroup.appl'=>{de=>'Anwendungs-Informationen',en=>'Application informations'},
+'fieldgroup.inm'=>{de=>'Incident Management',en=>'Incident Management'},
+'Applications ICTO-ID'=>{de=>'Anwendungs ICTO-ID'},

@@ -1,0 +1,25 @@
+<table width="100%" height="100%"><tr><td align=center valign=center>
+<!------------------------------------------------------>
+<div class=dialog style="width:500px">
+<table width="100%" cellpadding=4 cellspacing=4>
+<tr><td colspan=2><b>SAP P01 CostCenter Import Tool</b></td></tr>
+<tr>
+<td colspan=2>With this tool, it is posible to import a costcenter or PSP
+from T-Systems SAP P01 system into the W5Base CostCenter
+database. The user you want to import can be specified
+by costcenter or PSP (Top element).<br>
+If the costcenter can be found, it will be automaticly create as
+installed/active costcenter entry.</td></tr>
+<tr><td width=1% nowrap>Name (PSP Top-Element or costcenter):</td>
+<td><input type=text class=finput name=importname value="%importname%"></td></tr>
+<tr>
+<td colspan=2 align=center><input name=DOIT type=submit value=" import "></td>
+</tr>
+</table>
+</div>
+<div style="text-align:left;width:500px;height:200px;overflow:auto">
+%LASTMSG(RAW)%
+</div>
+<!------------------------------------------------------>
+</td></tr></table>
+

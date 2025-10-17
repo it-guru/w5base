@@ -1,0 +1,7 @@
+'TS::system'=>{de=>'Deutsche Telekom log. System',
+               en=>'Deutsche Telekom log. System'},
+
+'fieldgroup.amrel'=>{de=>'AssetManager Zuordnung',en=>'AssetManager Relation'},
+'fieldgroup.tsinmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
+'automatic system import'=>{de=>'automatischer System Import'},
+'effective Exposure Level'=>{de=>'effektives Exposure Level'},

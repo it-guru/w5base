@@ -1,0 +1,7 @@
+'tsotc::appagilenamespace'=>{
+ de=>'OTC Integrated: AppAgile: Namespace',
+ en=>'OTC Integrated: AppAgile: Namespace'
+},
+'last monitor date'=>{de=>'Letzter Monitoring Zeitpunkt'},
+'first monitor date'=>{de=>'Erster Monitoring Zeitpunkt'},
+'Application'=>{de=>'Anwendung'},

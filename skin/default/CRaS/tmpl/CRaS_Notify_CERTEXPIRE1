@@ -1,0 +1,8 @@
+Hello,
+
+the below linked certificate record will soon expire.
+Please set the state to "renewal requested", if you still need the 
+certificate with the same parameters and a renewal should be initiated.
+If you do not need the certificate anymore, please set the
+record state to "disposed of waste".
+

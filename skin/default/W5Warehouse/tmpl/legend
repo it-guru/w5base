@@ -1,0 +1,15 @@
+<table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
+<tr><td align=center valign=top><br><br><br>
+<h1><u><font color=green>W5</font><font color=darkblue>Warehouse</font></u></h1>
+<br>
+<table><tr>
+<td width=410 valign=center>
+<div style="margin:10px">
+W5Warehouse ist ein Datawarehouse System! - Alle Daten stehen mit einer <b>Zeitverzögerung von bis zu 24h</b> (und bei vereinzelten Datenobjekten noch länger) bereit. Der u.U. angebbare Abfragezeitpunkt bezieht sich auf das vorhanden sein der Daten im W5Warhouse-System (also nicht auf den Zeitpunkt des Datenstandes des dem Warehouse zuliefernden Datenhaltungssystems.
+</div>
+</td></tr></table>
+</td></tr>
+<tr><td valign=bottom align=right height=1%>
+<font size=-2>
+</td></tr>
+</table>

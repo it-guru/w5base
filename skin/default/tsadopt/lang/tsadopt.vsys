@@ -1,0 +1,7 @@
+'tsadopt::vsys'=>{de=>'virtualisiertes System',en=>'virtualized system'},
+'operating system type'=>{de=>'Betriebssystemtyp'},
+'operating system'=>{de=>'Betriebssystem'},
+'slices'=>{de=>'Slices'},
+'DR slices'=>{de=>'DR Slices'},
+'system state'=>{de=>'Status'},
+'landscape'=>{de=>'Landscape'},

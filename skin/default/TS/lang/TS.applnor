@@ -1,0 +1,4 @@
+'TS::applnor'=>{de=>'Deutsche Telekom NOR-Nachweis',en=>'Deutsche Telekom NOR-Verification'},
+'dynamic determined NOR model'=>{de=>'ermitteltes NOR Model'},
+'applied NOR model'=>{de=>'verwendetes NOR Model'},
+'summary AssetManager Security Flag'=>{de=>'Zusammenfassung AssetManager Security Flag'},

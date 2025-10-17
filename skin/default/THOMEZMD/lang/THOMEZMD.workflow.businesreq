@@ -1,0 +1,4 @@
+'THOMEZMD::workflow::businesreq'=>{de=>'T-Home ZMD: Anfrage/Auftrag an den Anwendungsbetrieb oder an die Anwendungsbetreuung Telekom IT',en=>'T-Home ZMD: Question or request to applications businessteam Telekom IT'},
+'THOMEZMD::workflow::businesreq::tip'=>{de=>'Dieser Workflow nimmt speziell Aufträge des Kunden <b>T-Home ZMD</b> an, die dann von <b>Telekom IT</b> Anwendungsbetreuung bearbeitet werden. Der Workflow wird automatisch an den Auftragseingang der jeweiligen Anwendung weitergeleitet.<br>Sollte bei der ausgewählten Anwendung kein Kundenauftragseingang registriert sein, so wird die Weiterleitung des Workflows nicht gestattet.'},
+'ZMD Article number'=>{de=>'ZMD Aktikelnummer'},
+'no article number selected'=>{de=>'keine Artikelnummer ausgewählt'},

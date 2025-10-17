@@ -1,0 +1,72 @@
+'acinmassingmentgroup'=>{
+   de=>'
+Geben Sie die Incident Assignmentgroup an, die im ServiceManager(SM9) bei 
+Incidents für diese Anwendung verwendet werden soll.
+Die Assignmentgroup muss in ServiceManager(SM9) so angelegt sein, 
+dass diese nach AssetManager übertragen wird. 
+Nur dann ist sie hier auswählbar.
+', en=>'
+Enter the Incident Assignmentgroup which is used in ServiceManager(SM9) for 
+Incident Tickets regarding this application. 
+The Assignmentgroup must be available in ServiceManager(SM9) and the group 
+has to have been transferred to Asset Manager. 
+Only then is the group selectable.
+'},
+'scapprgroup'=>{
+   de=>'
+Wählen Sie hier die Approvergroup, die bei Changes für diese Anwendung 
+aus technischer Sicht verwendet werden muss. 
+Dies ist in der Regel die Approvergroup des betreffenden Betriebsteams.
+', en=>'
+Enter the Approvergroup which has to be used for Changes on this application 
+from the technical point of view. 
+Generally it is the Approvergroup of the respective Business Team.
+'},
+'scapprgroup2'=>{
+   de=>'
+Wählen Sie hier die Approvergroup, die bei Changes für diese Anwendung 
+aus fachlicher Sicht verwendet werden muss. 
+Dies ist in der Regel die Approvergroup des betreffenden Application Managers.
+', en=>'
+Enter the Approvergroup which should be used for Changes on this application 
+from the business point of view. 
+Generally it is the Approvergroup of the respective Application Manager.
+'},
+'controlcenter'=>{
+   de=>'
+Geben Sie die Bezeichnung des Teams ein, das für die Bearbeitung der Events 
+im First Level Support zuständig ist. 
+In der Regel ist das das Application Control Center. 
+Wenn die Events von einem Betriebsteam bearbeitet werden, 
+tragen sie diese Team-Bezeichnung ein.
+', en=>'
+Enter the team, which is responsible for handling events in 
+first level support. Normally is this the application control center.
+If the events will be handled from an business team, enter this team.
+'},
+'icto'=>{
+   de=>'
+Der Wert wird bei der Anlage eines Architektur Objektes in Cape 
+erzeugt und für weitere Verweise an der Applikation 
+in W5Base/Darwin zur Verfügung gestellt. 
+Lässt sich die ICTO-ID oder Plattform-ID Default nicht eintragen 
+bitte die Freigabe bei FMB XAMSHelp anfordern.
+', en=>'
+The value is generated when an architecture object is 
+created in Cape and made available for further references 
+to the application in W5Base/Darwin. 
+If you are unable to enter the ICTO-ID or Plattform-ID Default, 
+please request the release at "FMB XAMSHelp".
+'},
+'rtolevel'=>{
+   de=>'
+Der Wert besteht aus RTO Level (0 bis 40) und der RTO Zeit in Stunden. Die Beschreibung steht in "<a target=_blank href=https://telekom.sharepoint.de/sites/mydms/System/default.aspx?deeplink=true&docid=85025>SCM Dokument myMDS 85025</a>".
+', en=>'
+The value consists of RTO level (0 to 40) and the RTO time in hours. The description is in "<a target=_blank href=https://telekom.sharepoint.de/sites/mydms/System/default.aspx?deeplink=true&docid=85025>SCM Dokument myMDS 85025</a>".
+'},
+'rpolevel'=>{
+   de=>'
+Der Wert besteht aus RPO Level (0 bis 50) und der RPO Zeit in Stunden. Die Beschreibung steht in "<a target=_blank href=https://telekom.sharepoint.de/sites/mydms/System/default.aspx?deeplink=true&docid=85025>SCM Dokument myMDS 85025</a>".
+', en=>'
+The value consists of RPO level (0 to 5) and the RPO time in hours. The description is in "<a target=_blank href=https://telekom.sharepoint.de/sites/mydms/System/default.aspx?deeplink=true&docid=85025>SCM Dokument myMDS 85025</a>".
+'},

@@ -1,0 +1,8 @@
+'caiman::qrule::CaimanUser'=>{de=>'CAIMAN Aktualisierung der Kontaktdaten',en=>'CAIMAN Interface of contact data'},
+'some fields has been updated'=>{de=>'einige Felder wurden aktualisiert'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'different values stored in CAIMAN'=>{de=>'in CAIMAN sind andere Inhalte gespeichert'},
+'dummy contact detected'=>{de=>'Dummy Kontakt erkannt'},
+'not unique email in CAIMAN'=>{de=>'uneindeutige E-Mail Adresse in CAIMAN'},
+'user not found'=>{de=>'CAIMAN Person nicht gefunden'},
+'reactivating russian colleague due land changed'=>{de=>'Reaktivierung des russischen Kollegen wegen Landeswechsel'},

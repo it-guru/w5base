@@ -1,0 +1,21 @@
+#######################################################################
+'fieldgroup.w5basedata'=>{de=>'
+Diese Informationen wurden aus W5Base/Darwin zu den AssetManager
+Daten verknüpft.
+',en=>'
+This Informations are linked from W5Base/Darwin to the AssetManager data.
+'},
+'installdate'=>{de=>'
+Datum der Installation. Falls beim logischen System kein
+Installationsdatum gesetzt ist, wir das Installationsdatum
+des Assets verwendet.
+',en=>'
+Installationdate. If there is no installationdate
+documented on the logical system, the installationdate
+of the asset will be used.
+'},
+'systemcpucount'=>{de=>'
+Die CPU Anzahl gibt die Anzahl der logischen CPUs wieder, die das Betriebssystem "sieht". Dies kann z.B. unter Unix mit dem top Komando abgefragt werden. In der AssetManager Oberfläche wird dies als "total number of cores" bezeichnet.'},
+'isprotnetdev'=>{de=>'
+Geräte die als geschütztes Netzwerk System markiert sind, dürfen keine Anwendungszuordnung erhalten (Vorgabe von T-Systems)
+'},

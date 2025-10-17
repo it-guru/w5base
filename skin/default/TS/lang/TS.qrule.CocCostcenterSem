@@ -1,0 +1,5 @@
+'TS::qrule::CocCostcenterSem'=>{
+   de=>'Prüfung CBM in SAP P01',
+   en=>'check CBM in SAP P01'},
+'no CBM (Customer Business Manager) defined in the costcenter object in SAP P01'=>{
+   de=>'kein CBM (Customer Business Manager) im Kontierungsobjekt in SAP P01 eingetragen'},

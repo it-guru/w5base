@@ -1,0 +1,13 @@
+Dear databoss respectively application manager,
+
+the hardware %NAME% must be replaced by <b>%REFRESH%</b> according to the hardware refresh process.
+
+If there are reasons against a renewal, please document this in the hardware data record over the link
+below.
+
+In other way, ensure all needed steps for a hardware refresh are done.
+
+Relevant systems: %SYSTEMS%
+
+Relevant applications: %APPLICATIONS%
+

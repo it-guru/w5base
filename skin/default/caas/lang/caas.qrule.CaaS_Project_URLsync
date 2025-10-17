@@ -1,0 +1,8 @@
+'caas::qrule::CaaS_Project_URLsync'=>{
+  de=>'CaaS Projekt URL sync',
+  en=>'CaaS Project URL sync'
+},
+'this URL is already registed by outer application'=>{
+  de=>'diese URL ist bereits by einer anderen Anwendung registriert'
+},
+'invalid CloudArea or application state for import'=>{de=>'ungültiger CloudArea oder Anwendungs CI-Status für AutoImport'},

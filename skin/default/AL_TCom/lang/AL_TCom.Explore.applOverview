@@ -1,0 +1,4 @@
+'AL_TCom::Explore::applOverview'=>{de=>'RMO Anwendungsübersicht',en=>'RMO Application overview'},
+'description'=>{de=>'Übersicht der ItemSummary für das Anwendungsobjekt' ,en=>'Display data from itemsummary'},
+'sublabel'=>{de=>'RMO-Test',en=>'RMO-Test'},
+

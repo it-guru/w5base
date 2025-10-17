@@ -1,0 +1,12 @@
+'tssapp01::psp'=>{de=>'PSP Element',en=>'PSP Element'},
+'Description'=>{de=>'Beschreibung'},
+'Projectmanager'=>{de=>'Projektleiter'},
+'Projectmanager EMail'=>{de=>'Projektleiter EMail'},
+'Projectmanager WIW ID'=>{de=>'Projektleiter WIW ID'},
+'SAP hierarchy'=>{de=>'SAP Hierarchie'},
+'OFI Entity'=>{de=>'OFI Element'},
+'fieldgroup.saphier'=>{de=>'SAP Hierarchie',en=>'SAP hierarchy'},
+'is deleted'=>{de=>'gelöscht markiert'},
+'Accounting Area'=>{de=>'Buchungskreis'},
+'Bussinessprocess mark'=>{de=>'Geschäftsprozesskenner'},
+

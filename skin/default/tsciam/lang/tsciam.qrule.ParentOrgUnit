@@ -1,0 +1,7 @@
+'tsciam::qrule::ParentOrgUnit'=>{de=>'Prüfung der Elterneinheit und Gruppenstatus über CIAM',
+                                en=>'Check the parent orgunit and group state by CIAM'},
+"orgunit id not found in CIAM"=>{de=>'Org-Einheit ID (srcid) konnte in CIAM nicht gefunden werden'},
+"parent unit in CIAM doesn't matches"=>{de=>'Elterneinheit ist nicht mit CIAM Struktur identisch'},
+'parent group is not from CIAM - disabling parent sync'=>{de=>'Elterngruppe ist nicht aus CIAM - Sync deaktiviert'},
+'orphaned orgunit group in CIAM'=>{de=>'verwaiste Org-Gruppe aus CIAM - Gruppe sollte "veraltet/gelöscht" werden'},
+'orphaned orgunit group in CIAM but within 90d'=>{de=>'verwaiste Org-Gruppe aus CIAM aber innerhalb 90d Frist'},

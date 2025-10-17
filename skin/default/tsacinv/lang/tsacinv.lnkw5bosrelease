@@ -1,0 +1,11 @@
+'tsacinv::lnkw5bosrelease'=>{de=>'Betriebssystem Mapping',en=>'OS Release mapping'},
+'fieldgroup.acentry'=>{de=>'AssetManager Eintrag', en=>'AssetManager Entry'},
+'direction'=>{de=>'Verknüpfung'},
+'DIR.1'=>{de=>'primär',en=>'primary'},
+'DIR.'=>{de=>'alernativ',en=>'alternate'},
+'WELCOME'=>{de=>'
+Eine Verbingung ist als "primär" anzusehen, wenn es 
+eine 1:1 Kopplung gibt. Bestehen alternative Darstellungen
+für die gleiche Information in AssetManager, dann sind 
+diese Alternativen als "alternativ" zu kennzeichnen, wobei 
+eine von diesen dann als "primär" zu definieren ist.',en=>'Welcome'},

@@ -1,0 +1,138 @@
+<script language="JavaScript">
+
+function sendForm(form){
+   $.ajax({
+       type: "POST",
+       data: form,
+       dataType: "json",
+       url: window.location.pathname,
+       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+       contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+       success: function(data) {
+          console.log("data=",data);
+          var t=JSON.stringify(data,undefined,2);
+          t=t.replace(/\\n/g,"\n      ");
+          $("#result").text(t);
+          $("#msgbox").show();
+          var exitmsg=data.exitmsg;
+          if (data.exitcode!=0){
+             exitmsg="ERROR: <font color=red>"+exitmsg+"</font>";
+          }
+          else{
+             exitmsg="<font color=green>"+exitmsg+"</font>";
+          }
+          $("#exitmsg").html("<b>"+exitmsg+"</b>");
+       },
+       error: function(e) {
+           console.log("e=",e);
+       //    alert('error handling here');
+       }
+   });
+}
+
+$(document).ready(function(){
+   $("#mailtext").focus();
+   $("#doPost").click(function(){
+      var form=$("#form");
+      console.log("form="+form.serialize());
+
+      $("#resultset").height(100);
+      $("#resultset").show();
+      $("#result").text("");
+
+      // var formobj=new FormData(form[0]);
+      // console.log("formobj",formobj);
+
+      var mailtext=$('#mailtext').val();
+      var certfile=$('#certfile')[0].files[0];
+
+      if (certfile){
+         var reader = new FileReader();
+
+         console.log("fifi indirect send");
+         reader.onload = function(e){
+                console.log("f=",e.target.result);
+            sendForm({mailtext:mailtext,certfile:e.target.result});
+         };
+         reader.readAsText(certfile);
+      }
+      else{
+         console.log("fifi direct send");
+         sendForm({mailtext:mailtext});
+      }
+   });
+});
+
+</script>
+<style>
+fieldset{
+   background:#eee;
+}
+legend{
+  margin-top: 19px;
+  font-weight: bold;
+  background: #ddd;
+  border: 1px solid #999;
+}
+xlabel{
+   display: inline-block;
+   text-align: right;
+   float: left;
+   width:200px;
+}
+
+#form input{  
+    xdisplay: inline-block;
+    text-align: left;
+    xfloat: left;
+    xwidth:200px;
+    xmargin-left:10px;
+}
+
+form{
+   width:540px;
+   margin: 0 auto;
+}
+fieldset > div{
+   margin:5px;
+}
+
+</style>
+<form id=form>
+<h1>CA Response Handler</h1>
+
+<fieldset>
+<legend>Mail</legend>
+<div>
+<label for="mailtext">Mailtext:</label>
+<textarea rows=8 id=mailtext name=mailtext style="width:100%">
+
+
+</textarea>
+</div>
+ 
+<div>
+<label for="certfile">CertFile:</label>
+<input type=file id=certfile name=certfile>
+</div>
+</fieldset>
+ 
+<br>
+<input id=doPost type=button style="text-align:center;width:100%;margin:0px" value="%TRANSLATE(process,CRaS::csr)%">
+<br>
+<br>
+</form>
+
+<center>
+<fieldset id=msgbox style="display:none;width:400px">
+<legend>Message</legend>
+<div id=exitmsg style="text-align:left"></div>
+</fieldset>
+<fieldset id=resultset style="display:none;overflow-y:auto;width:80%;text-align:left">
+<legend>Result</legend>
+<xmp id=result style="width:600px">
+</xmp>
+</fieldset>
+</center>
+
+

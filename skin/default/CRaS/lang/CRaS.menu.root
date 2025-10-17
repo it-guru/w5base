@@ -1,0 +1,5 @@
+'Tools.CRaS.new'=>{de=>'CSR Neueingabe',en=>'CSR New'},
+'Tools.CRaS.csteam'=>{de=>'ServiceTeam',en=>'ServiceTeam'},
+'Tools.CRaS.csteam.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.CRaS.ca'=>{de=>'Certificate Authority',en=>'Certificate Authority'},
+

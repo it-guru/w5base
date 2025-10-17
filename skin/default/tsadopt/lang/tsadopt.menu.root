@@ -1,0 +1,4 @@
+'itu.tsadopt'=>{de=>'ADOP-T',en=>'ADOP-T'},
+'itu.tsadopt.vfarm'=>{de=>'virtual Farm',en=>'virtual Farm'},
+'itu.tsadopt.vhost'=>{de=>'virtualisation Host',en=>'virtualisation Host'},
+'itu.tsadopt.vsys'=>{de=>'virtualized System',en=>'virtualized System'},

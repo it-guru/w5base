@@ -1,0 +1,33 @@
+<script language=JavaScript>
+DetailAddTitle("%name(formated)%");
+</script>
+<div class=detailtopline>
+   <table width="100%" cellspacing=0 cellpadding=0><tr>
+      <td class=detailtopline align=left>IP: %addr(formated)%</td>
+      <td class=detailtopline align=right>%DETAILFUNCTIONS%</td>
+   </table>
+</div>
+
+<div class=detailframe>
+<div class=detailheadline>
+<table width="100%" cellspacing=0 cellpadding=0><tr>
+<td class=detailheadline align=left>%DETAILLABEL%</td>
+<td class=detailheadline align=right>%DETAILGROUPFUNCTIONS%</td>
+</table>
+</div>
+   <table class=detailframe>
+      <tr class=fline>
+         <td class=fname>%name(label)%:</td>
+         <td class=finput>%name(detail)%</td>
+         <td class=fname>%app(label)%:</td>
+         <td class=finput>%app(detail)%</td>
+      </tr>
+      <tr class=fline>
+         <td class=fname>%system(label)%:</td>
+         <td class=finput>%system(detail)%</td>
+      </tr>
+   </table>
+</div>
+
+
+

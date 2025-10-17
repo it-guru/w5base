@@ -1,0 +1,31 @@
+'neo::ipaddressAnalyse'=>{
+ de=>'NEO: IP-Adress-Analyse',
+ en=>'NEO: IP-Address Analyse',
+},
+'fieldgroup.component'=>{
+  de=>'Komponente',
+  en=>'Component'
+},
+'fieldgroup.network'=>{
+  de=>'Netzwerk (IP-SubNet-Gruppe)',
+  en=>'Network (IP-SubNet-Group)'
+},
+'fieldgroup.subnet'=>{
+  de=>'IP-SubNet',
+  en=>'IP-SubNet'
+},
+'fieldgroup.vlan'=>{
+  de=>'VLAN',
+  en=>'VLAN'
+},
+'Network Comment'=>{de=>'Netzwerk Bemerkungen'},
+'SubNet Comment'=>{de=>'SubNet Bemerkungen'},
+'VLAN Comment'=>{de=>'VLAN Bemerkungen'},
+'Network Contact'=>{de=>'Netzwerk Kontakt'},
+'SubNet Contact'=>{de=>'SubNet Kontakt'},
+'VLAN Contact'=>{de=>'VLAN Kontakt'},
+'Network Contact2'=>{de=>'Netzwerk Kontakt2'},
+'SubNet Contact2'=>{de=>'SubNet Kontakt2'},
+'VLAN Contact2'=>{de=>'VLAN Kontakt2'},
+'Customer'=>{de=>'Kunde'},
+'IP-Address'=>{de=>'IP-Adresse'},

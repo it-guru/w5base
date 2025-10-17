@@ -1,0 +1,7 @@
+'tsacinv::schain'=>{de=>'Servicekette',en=>'ServiceChain'},
+'Service Chain Name'=>{de=>'Servicekettenname'},
+'Tenant'=>{de=>'Instanz-Mieter'},
+'Tenant ID'=>{de=>'Instanz-Mieter ID'},
+'fieldgroup.items'=>{de=>'Serviceketten-Items',en=>'ServiceChain Items'},
+'ServiceChain Code'=>{de=>'ServicekettenID'},
+

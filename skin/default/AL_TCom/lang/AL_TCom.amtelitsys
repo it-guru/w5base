@@ -1,0 +1,13 @@
+'AL_TCom::amtelitsys'=>{de=>'AssetManager: TelIT System',en=>'AssetManager: TelIT System'},
+'System found in IT-Inventar'=>{de=>'System in IT-Inventar gefunden'},
+'WELCOME'=>{de=>'
+Dieser Report beinhaltet alle "in operation/hibernate" Systeme
+aus AssetManager die dem SAP Bereich 9TS_ES.9DTIT
+zugeordnet sind. Diese sind per Defintion als 
+"TelekomIT Systeme" anzusehen.
+',en=>'
+This report contains all "in operation/hibernate" systems
+from AssetManager which are related to the SAP
+area 9TS_ES.9DTIT .
+These system are defined as "TelekomIT systems".
+'},

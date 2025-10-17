@@ -1,0 +1,3 @@
+'RAdmin'=>{ de=>'Org-Administrator', en=>'Org-Administrator'},
+'role Stability Owner cannot be assigned to groups'=>{de=>'Rolle Stability Owner kann nicht an Gruppen zugewiesen werden'},
+

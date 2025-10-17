@@ -1,0 +1,10 @@
+<div class=editframe>
+   <table class=editframe>
+      <tr>
+         <td class=finput width=20%>%fullname(sublistedit)%</td>
+         <td class=fname width=10%>%system(label)%:</td>
+         <td class=finput>%system(sublistedit)%</td>
+      </tr>
+   </table>
+</div>
+%StdButtonBar(subsave,subcancel)%

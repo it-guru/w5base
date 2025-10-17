@@ -1,0 +1,75 @@
+[tRnAI::system]
+ fieldgroup.default  VDI logical system    VDI logisches System
+ ==================
+ name                Systemname            Systemname
+ serviceid           Service ID            ServiceID
+ opmode              operation mode        Betriebsart         (prod|nonprod)  
+ ipaddress           IP-Address            IP-Adresse
+ costcenter          Costcenter/Acc. Area  KostSt/BKr  
+ costcentermgr       Costcenter/Manager    KostV
+ comments            Comments              Bemerkungen
+                     
+ fieldgroup.cust     Customer              Kunde
+ ==================                      
+ customer            Customer              Kunde 
+ department          Department            Abteilung
+                     
+ fieldgroup.add      Additional Infos      Zusatzinformationen
+ ==================  
+ contactemail        Contact E-Mail        Kontakt E-Mailaddresse
+ tools               Tools                 Tools
+ bpver               BP-Version            BP-Version
+ addsoft             Additional Software   Zusätzliche Software
+
+ fieldgroup.source   Source informations   Quellinformation
+ ==================  
+ createdate          Creation-Date         Erstellungszeitpunkt
+ modifydate          Modification-Date     Bearbeitungszeitpunkt
+ createuser          Creator               Ersteller
+ modifyuser          last Editor           letzter Bearbeiter
+ editor              Editor Account        Bearbeiterkennung
+ realeditor          real Editor Account   echte Bearbeiterkennung
+
+
+[tRnAI::usbsrv]
+ fieldgroup.default  USB-Server            USB-Server
+ ==================
+ name                USB-Servername        USB-Servername         
+ contact             Contact               Ansprechpartner       
+ contact2            deputy Contact        Ansprechp. Vertreter  
+ utnport             UTN-Port              UTN-Port              (default:9200)
+ admuser             Admin-Useraccount     Admin-Useraccount
+ admpass             Admin-Password        Admin-Passwort
+ 
+ fieldgroup.source   Source informations   Quellinformation
+ ==================  
+ createdate          Creation-Date         Erstellungszeitpunkt
+ modifydate          Modification-Date     Bearbeitungszeitpunkt
+ createuser          Creator               Ersteller
+ modifyuser          last Editor           letzter Bearbeiter
+ editor              Editor Account        Bearbeiterkennung
+ realeditor          real Editor Account   echte Bearbeiterkennung
+
+
+
+[tRnAI::useraccount]
+ fieldgroup.default  User-Account          User-Account
+ ==================
+ system              VDI-Systemname        VDI-Systemname
+ name                AD-Account            AD-Account
+ email               E-Mail                E-Mail
+ expdate             SC Expireing Date     SC Verfallsdatum
+ comments            Comments              Bemerkungen              (einzeilig)
+
+ fieldgroup.source   Source informations   Quellinformation
+ ==================  
+ createdate          Creation-Date         Erstellungszeitpunkt
+ modifydate          Modification-Date     Bearbeitungszeitpunkt
+ createuser          Creator               Ersteller
+ modifyuser          last Editor           letzter Bearbeiter
+ editor              Editor Account        Bearbeiterkennung
+ realeditor          real Editor Account   echte Bearbeiterkennung
+
+
+
+

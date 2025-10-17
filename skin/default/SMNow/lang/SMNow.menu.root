@@ -1,0 +1,6 @@
+'itu.proc.SMNow'=>{de=>'SM.Now',en=>'SM.Now'},
+'itu.proc.SMNow.krn'=>{de=>'Stammdaten',en=>'Kernel'},
+'itu.proc.SMNow.krn.grpmig'=>{de=>'Gruppen Migr.',en=>'Group Migr.'},
+'itu.proc.SMNow.krn.grp'=>{de=>'Gruppen',en=>'Groups'},
+'itu.proc.SMNow.krn.logsys'=>{de=>'log. Systeme',en=>'log. Systems'},
+

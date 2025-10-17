@@ -1,0 +1,6 @@
+'TS::lnkcanvas'=>{de=>'Canvas Verknüpfung',en=>'Canvas relation'},
+'ICTO Objectname'=>{de=>'ICTO Objektname'},
+'Fraction'=>{de=>'Anteil'},
+'results in not unique ICTO->virtual Org relation'=>{de=>'resultiert in einer uneindeutige ICTO->virtual Org Zuordnung'},
+'results in more then 100% ICTO relation'=>{de=>'resultiert in eine mehr als 100%ige ICTO Zuordnung'},
+'no write access to specified canvas object'=>{de=>'kein Schreibzugriff auf das angegebene Canvas-Objekt'},

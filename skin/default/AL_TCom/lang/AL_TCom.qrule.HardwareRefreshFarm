@@ -1,0 +1,4 @@
+'AL_TCom::qrule::HardwareRefreshFarm'=>{de=>'Überwachung des Hardware-Alters in Serverfarmen',en=>'monitor of hardware age in serverfarms'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'hardware is out of date - refresh is necessary'=>{de=>'Hardware ist veraltet',en=>'hardware is out of date'},
+'Hardware %s needs to be refreshed in %d months'=>{de=>'Hardware %s muss in %d Monaten erneuert werden'},

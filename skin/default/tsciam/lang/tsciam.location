@@ -1,0 +1,5 @@
+'tsciam::location'=>{de=>'CIAM Standort',en=>'CIAM Location'},
+'Street'=>{de=>'Strasse und Hausnummer'},
+'ZIP Code'=>{de=>'Postleitzahl'},
+'Location'=>{de=>'Ort'},
+'Country'=>{de=>'Land'},

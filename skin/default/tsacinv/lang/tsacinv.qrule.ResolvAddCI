@@ -1,0 +1,3 @@
+'tsacinv::qrule::ResolvAddCI'=>{de=>'Auffinden zusätzlicher Config-Items aus AssetManager',en=>'find additional config itmes from AssetManager'},
+'add'=>{de=>'hinzugefügt'},
+'remove'=>{de=>'entfernt'},

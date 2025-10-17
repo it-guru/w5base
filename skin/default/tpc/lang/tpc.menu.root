@@ -1,0 +1,5 @@
+'itu.cloud.tpc'=>{de=>'TelekomPrivatCloud',en=>'TelekomPrivatCloud'},
+'itu.cloud.tpc.project'=>{de=>'Projekt',en=>'Project'},
+'itu.cloud.tpc.machine'=>{de=>'Maschine',en=>'Machine'},
+'itu.cloud.tpc.kernel'=>{de=>'Kern',en=>'Kernel'},
+'itu.cloud.tpc.kernel.depl'=>{de=>'Deployment',en=>'Deployment'},

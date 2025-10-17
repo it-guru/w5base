@@ -1,0 +1,6 @@
+'tsacinv::accountno'=>{de=>'AssetManager Account Nummer',
+                       en=>'AssetManager Account Number'},
+'fieldgroup.default'=>{de=>'Account Daten',en=>'Account Data'},
+'Account Number'=>{de=>'Account Nummer'},
+'Application'=>{de=>'Anwendung'},
+'CO-Number'=>{de=>'Kostenstelle'},

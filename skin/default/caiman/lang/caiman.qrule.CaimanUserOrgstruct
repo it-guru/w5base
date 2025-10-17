@@ -1,0 +1,11 @@
+'caiman::qrule::CaimanUserOrgstruct'=>{
+   de=>'CAIMAN Aktualisierung der Org-Zuorndung',
+   en=>'CAIMAN Refresh of Org-Relations',
+},
+'MAILTEXT.UPDATE'=>{de=>'Ihre%s Rollenzuordnung zur Gruppe <b>%s</b> wurde automatisch aktualisiert. W5Base/Darwin liest diese Informationen automatisch über CAIMAN aus dem Personalsystem (EC=Employee Central). Sollte die Zuordnung nicht korrekt sein, so wenden Sie sich bitte an Ihren zuständigen HR-Betreuer um den Sachverhalt klären zu lassen.<br><br>Die Details zu Ihrer aktuellen Zuordnung können Sie über den unten aufgeführten Link abfragen.',en=>'Your%s role relation to the group <b>%s</b> has been changed. Details to your new role relation can be viewed by the link below.'},
+'MAILTEXT.NEW'=>{de=>'Sie%s wurden neu der Gruppe <b>%s</b> zugeordnet. W5Base/Darwin liest diese Informationen automatisch über CAIMAN aus dem Personalsystem (EC=Employee Central). Sollte die Zuordnung nicht korrekt sein, so wenden Sie sich bitte an Ihren zuständigen HR-Betreuer um den Sachverhalt klären zu lassen.<br><br>Die Details zu Ihrer aktuellen Zuordnung können Sie über den unten aufgeführten Link abfragen.',en=>'You%s are new assigned to group <b>%s</b>. Details to your new role relation can be viewed by the link below'},
+'new org relation to'=>{de=>'Neue Organisationszuordnung zu'},
+'role update to'=>{de=>'Rollenaktualisierung innerhalb von'},
+'added roles'=>{de=>'hinzugefügte Rollen'},
+'double workrelation to the same org unit in CAIMAN'=>{de=>'doppeltes Arbeitsverhältnis zur gleichen Org-Einheit in CAIMAN'},
+

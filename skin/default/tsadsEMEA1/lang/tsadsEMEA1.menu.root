@@ -1,0 +1,4 @@
+'itu.ds.ad'=>{de=>'ActiveDirectory',en=>'ActiveDirectory'},
+'itu.ds.ad.tsadsEMEA1'=>{de=>'EMEA1',en=>'EMEA1'},
+'itu.ds.ad.tsadsEMEA1.user'=>{de=>'Person',en=>'Person'},
+'itu.ds.ad.tsadsEMEA1.group'=>{de=>'Gruppe',en=>'Group'},

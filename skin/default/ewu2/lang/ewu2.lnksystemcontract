@@ -1,0 +1,8 @@
+'ewu2::lnksystemcontract'=>{
+  en=>'EWU2: Relation System-Contract',
+  de=>'EWU2: Verknüpfung System-Vertrag'
+},
+'Contract name'=>{de=>'Vertragsbezeichnung'},
+'Project name'=>{de=>'Projektbezeichnung'},
+'System status'=>{de=>'Systemstatus'},
+

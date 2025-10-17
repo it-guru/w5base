@@ -1,0 +1,12 @@
+'tscape::applver'=>{de=>'Anwendungsversion',en=>'Applicationversion'},
+'description'=>{de=>'Beschreibung'},
+'planed retirement'=>{de=>'geplante Außerbetriebnahme'},
+'planed activation'=>{de=>'geplante Inbetriebnahme'},
+'application version'=>{de=>'Anwendungsversion'},
+'shortname'=>{de=>'Kurzname'},
+'fullname'=>{de=>'Anwendungsversion'},
+'Retirement Date'=>{de=>"Retirement Datum"},
+'Retirement Type'=>{de=>"Retirement Typ"},
+'Applicationversion ID'=>{de=>"AnwendungsversionsID"},
+
+
