@@ -15,7 +15,7 @@ create table custcontrcrono (
   PRIMARY KEY  (id),
   KEY(name),
   UNIQUE KEY `srcsys` (srcsys,srcid),key(modifydate),
-  FOREIGN KEY fk_custcontract (custcontract)
+  FOREIGN KEY fk_custcontrcrono_custcontract (custcontract)
               REFERENCES custcontract (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table mgmtitemgroup (
@@ -63,15 +63,15 @@ create table lnkmgmtitemgroup(
   UNIQUE (businessservice,mgmtitemgroup),
   UNIQUE (location,mgmtitemgroup),
   UNIQUE KEY `srcsys` (srcsys,srcid),
-  FOREIGN KEY fk_mgmtitemgroup (mgmtitemgroup)
+  FOREIGN KEY fk_lnkmgmtitemgroup_mgmtitemgroup (mgmtitemgroup)
               REFERENCES mgmtitemgroup (id) ON DELETE CASCADE,
-  FOREIGN KEY fk_appl (appl)
+  FOREIGN KEY fk_lnkmgmtitemgroup_appl (appl)
               REFERENCES appl (id) ON DELETE RESTRICT,
-  FOREIGN KEY fk_businessprocess (businessprocess)
+  FOREIGN KEY fk_lnkmgmtitemgroup_businessprocess (businessprocess)
               REFERENCES businessprocess (id) ON DELETE RESTRICT,
-  FOREIGN KEY fk_businessservice (businessservice)
+  FOREIGN KEY fk_lnkmgmtitemgroup_businessservice (businessservice)
               REFERENCES businessservice (id) ON DELETE RESTRICT,
-  FOREIGN KEY fk_location (location)
+  FOREIGN KEY fk_lnkmgmtitemgroup_location (location)
               REFERENCES location (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 set FOREIGN_KEY_CHECKS=1;
