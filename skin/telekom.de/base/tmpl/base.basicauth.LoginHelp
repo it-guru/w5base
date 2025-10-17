@@ -1,8 +1,7 @@
 <b>W5Base-Standard-Login:</b><br>
 In der Anwendung W5Base/Darwin können Sie sich mit Ihrer ...
 <ul>
-<li>... EMEA Kennung, oder</li>
-<li>... CIAM-Kennung</li>
+<li>... EMEA Kennung</li>
 </ul>
 ... anmelden. Verwenden Sie dazu dann Ihr Passwort aus dem betreffendem (Authentifikations-) System.<br>
 
@@ -13,5 +12,4 @@ Falls Sie noch nicht für die Nutzung von W5Base/Darwin registriert sind, melden 
 Account Mueller.Hans, Domäne:EMEA1<br>
 <br>
 EMEA1 Account: emea1/a???????<br>
-CIAM: ciam/mueller.hans@telekom.de<br>
 
