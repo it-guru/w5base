@@ -124,7 +124,7 @@ print STDERR "to0:".$to;
          }
       }
       my $exitmsg="length:".length($mailtext)." reccount:".$recordcount;
-      sleep(5);
+      sleep(1);
       if ($jobid ne ""){
          if ($joblog->Ping()){
             $joblog->ValidatedUpdateRecord(
