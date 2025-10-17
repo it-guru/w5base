@@ -1,0 +1,4 @@
+'AL_TCom::qrule::ApplAttachSystemOverview'=>{de=>'Prüfung auf SystemOverview Anlage',en=>'Check for SystemOverview Attachment'},
+'no SystemOverview attachment found / no valid naming for SystemOverview attachment'=>{de=>'keine SystemOverview Anlage gefunden / keine gültige Benamung der SystemOverview Anlage'},
+'requested SystemOverview name'=>{de=>'geforderter SystemOverview Name'},
+'it is not allowed to mark SystemOverview attachment as privacy'=>{de=>'es ist nicht erlaubt, die SystemOverview Anlage als vertraulich zu markieren'},

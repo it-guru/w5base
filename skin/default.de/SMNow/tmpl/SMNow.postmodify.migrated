@@ -1,0 +1,14 @@
+Sehr geehrter Datenverantwortlicher,
+
+die Incident-Assigmentgroup/Change-Approvergroups
+<b>%oldgroup%</b> aus ihren 
+ConfigItems (siehe unten) wurden auf die neue
+Gruppe <b>%newgroup%</b> umgestellt.
+
+Bitte prüfen Sie, ob dies Ihren Erwartungen entspricht.
+
+Bei Rückfragen wenden Sie sich bitte direkt an SMNOW@telekom.de .
+
+<b>Items:</b>
+
+%ITEMS%

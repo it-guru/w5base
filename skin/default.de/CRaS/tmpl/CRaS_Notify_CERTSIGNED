@@ -1,0 +1,10 @@
+Sehr geehrte Damen und Herren,
+
+der von Ihnen erfasste CSR '%SSLCERTCOMMON%' wurde erfolgreich signiert.
+
+Er kann über den folgenden Link aus W5Base/Darwin heruntergeladen werden.
+
+%SIGCERT%
+(Link startet - nach Anmeldung in Darwin - den Download des Zertifikates)
+
+

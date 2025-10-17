@@ -1,0 +1,115 @@
+'notifyrejectall'=>{de=>'Absage an direkte Kontakte und alle Schnittstellen',
+                 en=>'Rejection to direct contacts and all interfaces'},
+'notifyrejectcritical'=>{de=>'Absage an direkte Kontakte und kritische Schnittstellen',
+                 en=>'Rejection to direct contacts and critical interfaces'},
+'notifyrejectdirect'=>{de=>'Absage an direkte Kontakte',
+                 en=>'Rejection to direct contacts'},
+'notifyconfirm'=>{de=>"Confirm-Aufforderung an offene Implementer-Gruppen",
+                  en=>'Confirm request to pending implementer groups'},
+'notifyapprove'=>{de=>"Approve-Aufforderung an offene Approver-Gruppen",
+                  en=>'Approve request to pending approver groups'},
+'notifyapproveall'=>{de=>"Approve-Aufforderung an direkte Kontakte und alle Schnittstellen",
+                     en=>'Approve request to direct contacts and all interfaces'},
+'notifyapprovecritical'=>{de=>"Approve-Aufforderung an direkte Kontakte und kritische Schnittstellen",
+                          en=>'Approve request to direct contacts and critical interfaces'},
+'notifyapprovedirect'=>{de=>"Approve-Aufforderung an direkte Kontakte",
+                          en=>'Approve request to direct contacts'},
+'notifyremind'=>{de=>"Erinnerung an 'approve' versenden",
+                 en=>'Send reminder of approve'},
+'notifyreschedule'=>{de=>"Aufforderung zum 'approve' nach Änderung versenden",
+                     en=>'Send approve request after modification'},
+'helpnotifyall'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>AM, TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
+        "<li>Alle Schnittstellenpartner der direkt betroffenen Anwendungen</li>".
+        "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
+            "zu direkt betroffenen Anwendungen bestehen</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+        "<li>Kontakte mit der Rolle 'Informationspartner'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>AM, TSM and TSM deputies of direct affected applications</li>".
+        "<li>All interface partner of direct affected applications</li>".
+        "<li>Inteface partner with critical interfaces on their part ".
+            "to direct affected applications".
+        "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+        "<li>Contacts with role 'Information contact'</li>".
+       "</ul>"
+},
+'helpnotifycritical'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>AM, TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
+        "<li>Alle kritischen Schnittstellenpartner der direkt betroffenen Anwendungen</li>".
+        "<li>Schnittstellenpartner, auf dessen Seite kritische Schnittstellen ".
+            "zu direkt betroffenen Anwendungen bestehen</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+        "<li>Kontakte mit der Rolle 'Informationspartner'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>AM, TSM and TSM deputies of direct affected applications</li>".
+        "<li>All critical interface partner of direct affected applications</li>".
+        "<li>Interface partner with critical interfaces on their part ".
+            "to direct affected applications".
+        "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+        "<li>Contacts with role 'Information contact'</li>".
+       "</ul>"
+},
+'helpnotifydirect'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>AM, TSM und TSM-Vertreter der direkt betroffenen Anwendungen</li>".
+        "<li>Abonnenten des InfoAbos 'Changebenachrichtigung'</li>".
+        "<li>Kontakte mit der Rolle 'Informationspartner'</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>AM, TSM and TSM deputies of direct affected applications</li>".
+        "<li>Subscriber of InfoAbo 'Changenotification'</li>".
+        "<li>Contacts with role 'Information contact'</li>".
+       "</ul>"
+},
+
+'helpnotifyconfirm'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>Mitglieder der ServiceManager Implementer-Gruppen ".
+            "von noch nicht confirmed Tasks</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>Members of ServiceManager implementer groups ".
+            "of not yet confirmed tasks.</li>".
+       "</ul>"
+},
+
+'helpnotifyapprove'=>{
+   de=>"Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>Mitglieder der ServiceManager Approver-Gruppen ".
+            "mit offenen Approvals</li>".
+       "</ul>",
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>Members of ServiceManager approver groups ".
+            "with pending approval.</li>".
+       "</ul>"
+},
+'helpnotifyremind'=>{
+   de=>"Erinnerung an ausstehende Approvals<br /><br />".
+       "Mail-Benachrichtigung an".
+       "<ul>".
+        "<li>Mitglieder der ServiceManager Approver-Gruppen ".
+            "mit offenen Approvals</li>".
+       "</ul>",
+   en=>"Reminder of pending approvals<br /><br />".
+   en=>"Mail notification to".
+       "<ul>".
+        "<li>Members of ServiceManager approver groups ".
+            "with pending approval.</li>".
+       "</ul>"
+},
+

@@ -1,0 +1,44 @@
+'AL_TCom::qrule::checkInterviewDR'=>{
+  de=>'Prüfung der Interview-Antworten im DR Thema',
+  en=>'Check Interview Answers at DR topic'
+},
+'Disaster-Recovery Test plan date is bevor last test'=>{
+  de=>'Disaster-Recovery Test Plan-Termin liegt vor dem letzten Test'
+},
+'Disaster-Recovery Test plan date is in the past'=>{
+ de=>'Disaster-Recovery Test Plan-Termin liegt in der Vergangenheit'
+},
+'Disaster-Recovery Test plan date is to far in the future'=>{
+ de=>'Disaster-Recovery Testdatum ist zu weit in der Zukunft'
+},
+'not existing Disaster-Recovery change number'=>{
+ de=>'nicht existierende Disaster-Recovery Changenummer'
+},
+'age of Disaster-Recovery Test violates SLA definition'=>{
+ de=>'Alter des letzten Disaster-Recovery Tests verletzt SLA-Vorgaben'
+},
+'temporary skip take of workflow end from change'=>{
+ de=>'zeitweises übergehen der Workflow-Ende-Übernahme aus Change'
+},
+'missing valid plan date for next DR test'=>{
+ de=>'fehlender gültiger Plantermin für nächsten DR Test'
+},
+'Calculation base for this mail'=>{
+ de=>'Berechnungsbasis für diese Info-Mail'
+},
+'request to plan next DR Test for'=>{
+ de=>'Aufforderung zur Planung des nächsten DR-Tests für'
+},
+'DR-Test checking deactivated or automated'=>{
+ de=>'DR-Test Prüfung deaktiviert oder automatisiert'
+},
+'found change planning without ChangeNumber'=>{
+ de=>'Change-Planung ohne ChangeNummer gefunden'
+},
+'Disaster-Recovery last test is to far in the future'=>{
+ de=>'DR-Test Prüfung - letzter Test ist zu weit in der Zukunft'
+},
+'missing last DR-Test date'=>{
+ de=>'fehlender letzter DR-Test Zeitpunkt',
+}
+

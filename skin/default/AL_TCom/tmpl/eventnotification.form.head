@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<body marginheight="0" marginwidth="0" 
+            topmargin="15" leftmargin="15" 
+            rightmargin="15" bgcolor="#F3F3F3">
+<style type="text/css">
+body    {
+            font-family:Arial,Helvetica;
+            text-decoration:none;
+            color:#000000;
+          }
+a:link    {
+            font-family:Arial,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+a:visited {
+            font-family:Arial,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+a:active  {
+            font-family:Arial,Helvetica;
+            text-decoration:none;
+            color:#006666;
+          }
+pre.text {
+            margin: 0px;
+            padding: 4px;
+            padding-bottom: 6px;
+            font-family:Courier New,Courier;
+            font-size:15px;
+            white-space: pre-wrap;       /* css-3 should we be so lucky... */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 ?? */
+            white-space: -o-pre-wrap;    /* Opera 7 ?? */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+         }
+td.MAILpconnectlist{
+   padding:3px;
+   background:#efefef;
+}
+ul.workflowrelations{
+   margin:6px;
+   padding:6px; 
+}  
+li.workflowrelations{
+   margin:0px;  
+   padding:0px; 
+}  
+
+.tabelle { 
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 14px;
+   background-color: #ffffff;
+   margin: 0px;
+   padding: 0px;
+   border: 0px;
+   table-layout: fixed;
+}
+
+td.col1   { width:121; }
+td.col2   { width:530; }
+td.col3   { width:103; }
+div.timestamp {
+   vertical-align: top;
+   margin: 0px;
+   padding: 4px;
+   font-size: 13px;
+   overflow:hidden;
+}
+</style>
+
+<table width="640" border=0 cellspacing=0 cellpadding=0>
+<tr><td valign=bottom align=left>
+<font face="Adobe Helvetica,Helvetica,Arial" style="font-size:10px">
+<br>
+%creationtime%
+<br>
+</td>
+<td valign=top nowrap width=1%><img src="cid:eventnotification.bild1.jpg"></td>
+</tr>
+<tr><td valign=bottom align=left colspan=2><hr><font face="Adobe Helvetica,Helvetica,Arial"></td></tr>
+<!------------------------------------------------------------------------>
+</table>
+
+
+<table width="640" style="border-style:solid;border-width:1px;" bgcolor=white >
+<tr><td valign=top bgcolor=%headcolor%>
+<table width="100%" cellspacing=0 cellpadding=0 border=0><tr>
+<td align=left><font face="Adobe Helvetica,Helvetica,Arial"><b>%workflowlabel%</b> - %headtext% </b></td>
+<td align=right><font face="Adobe Helvetica,Helvetica,Arial">ID:%headid%</td>
+</tr>
+</table>
+</td></tr></table>
+
+<table border=0 cellspacing=3 cellpadding=3 width=640>
+<tr><td height=100 valign=top>
+<table cellspacing=0 cellpadding=0 width=640>
+<tr><td valign=top><font face="Courier New,Courier"><pre class="text">%salutation%</pre>
+</font>
+</td></tr>
+</table>
+</td>
+</tr>
+
+<tr><td>
+
+
+

@@ -1,0 +1,13 @@
+Sehr geehrter Datenverantwortlicher bzw. Application Manager,
+
+die Hardware %NAME% muss gemäß des Hardwarerefresh-Prozess bis zum <b>%REFRESH%</b> ersetzt werden.
+
+Sollten Gründe gegen eine Erneuerung sprechen, dokumentieren Sie dies bitte im Hardware-Datensatz über den unten aufgeführten Link.
+
+Diese Information erhalten Sie zum letzten Mal, bitte dringend Refresh in die Wege leiten.
+
+
+Relevante Systeme: %SYSTEMS%
+
+Relevante Anwendungen: %APPLICATIONS%
+

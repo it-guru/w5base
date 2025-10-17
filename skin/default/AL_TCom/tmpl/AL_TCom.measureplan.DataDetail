@@ -1,0 +1,536 @@
+function onPopWinClose(sendReturnVal,isbreak){
+   if (!isbreak){
+      $('#calendar').fullCalendar('refetchEvents');
+   }
+}
+
+
+function newTimespanHandler(){
+   var target="../../temporal/tspan/ModalNew?";
+   target+="Formated_subsys=MGMTITEMGRP&Formated_planname=plan";
+   showPopWin(target,500,430,onPopWinClose);
+}
+
+
+function doEdit(entity){
+   var arec=jQuery.data($("#ExData")[0],"analyseRecord");
+   if (arec){
+      if (arec.ev){
+         var target="../../temporal/tspan/ModalEdit?id="+arec.ev.id;
+         target+="&CurrentFieldGroupToEdit=default&CurrentIdToEdit="+arec.ev.id;
+         showPopWin(target,500,430,onPopWinClose);
+      }
+   }
+}
+
+function listWorkflowRecords(Level1Flt,Level2Flt){
+   console.log("start listWorkflowRecords",Level1Flt,Level2Flt);
+   var o=getModuleObject(W5Base,"base::workflow");
+   o.SetFilter(Level1Flt);
+   o.findRecord("eventstart,eventend,id,srcid,name,affectedapplicationid",
+                function(data){
+      console.log("result listWorkflowRecords 1:",data);
+      var d="";
+      var srcid=new Array();
+      console.log("search result=",data);
+      var t="<table width=100%>";
+      var cnt=0;
+      for(c=0;c<data.length;c++){
+         if (Level2Flt.checkrec(data[c])){
+            cnt++;
+            srcid.push(data[c].srcid);
+            t+=formatDetailRec(data[c],Level2Flt.start,Level2Flt.end);
+         }
+      }
+      t+="</table>";
+   
+      var fooder="";
+      var header="";
+      if (srcid.length){
+         var target="../../tssm/chm/NativResult?AutoSearch=1"; 
+         target+="&search_plannedend=&search_changenumber="+srcid.join("%20"); 
+        
+         var cmd="showPopWin('"+target+"',null,null);";
+        
+         fooder+="<div class=forwardSearch>SM9:"+
+                 "<img border=0 onclick=\""+cmd+"\" "+
+                 "src=\"../../../public/base/load/directlink.gif\"></div>";
+        
+         var target="../../base/workflow/NativResult?AutoSearch=1"; 
+         target+="&search_mdate=%21[EMPTY]"; 
+         target+="&search_srcid="+srcid.join("%20"); 
+        
+         var cmd="showPopWin('"+target+"',null,null);";
+        
+         fooder+="<div class=forwardSearch>W5B:"+
+                 "<img border=0 onclick=\""+cmd+"\" "+
+                 "src=\"../../../public/base/load/directlink.gif\"></div>";
+         header="<center><font size=-1>- "+srcid.length+" Changes -</font></center>";
+      }
+      else{
+         fooder="<center>no matching records</center>";
+      }
+   
+      $("#ExData").html(header+t+fooder);
+      $(".tssm_chm_link, .base_workflow_link").click(function(e){
+         var id=$(this).text();
+         var myClass = $(this).attr("class");
+         var basei;
+         if (myClass=="base_workflow_link"){
+            base="../../base/workflow/ById/";
+         }
+         if (myClass=="tssm_chm_link"){
+            base="../../tssm/chm/ById/";
+         }
+         openwin(base+id,"_blank",
+                 "height=450,width=650,toolbar=no,status=no,"+
+                 "resizable=yes,scrollbars=auto");
+      });
+      resizeLevel0();
+   });
+}
+
+
+function listWorkflowRecordsPreStep2(Level1Flt,Level2Flt){
+   console.log("start listWorkflowRecordsPreStep2",Level1Flt,Level2Flt);
+   if (Level2Flt.cidown){
+      var o=getModuleObject(W5Base,"base::workflow");
+      o.SetFilter(Level1Flt);
+      o.findRecord("srcid",function(data){
+         console.log("result listWorkflowRecordsPreStep2 1:",data);
+         var srcid=new Array();
+         for(c=0;c<data.length;c++){
+            srcid.push(data[c].srcid);
+         }
+         if (!srcid.length){  // ensure a minimal filter!
+            srcid.push("-99");
+         }
+         var t=getModuleObject(W5Base,"tssm::chmtask");
+         var filter={
+            changenumber:srcid.join(", "),
+            cidown:Level2Flt.cidown
+         };
+         t.SetFilter(filter);
+         t.findRecord("changenumber",function(data){
+            console.log("result listWorkflowRecordsPreStep2 2:",data);
+            var chm=new Object();
+            for(c=0;c<data.length;c++){
+               chm[data[c].changenumber]=1;
+            }
+            var changes=Object.keys(chm);
+            if (!changes.length){  // ensure a minimal filter!
+               changes.push("-99");
+            }
+            var Level1Flt={ srcid:changes.join(", ") };
+            listWorkflowRecords(Level1Flt,Level2Flt);
+         });
+      });
+   }
+   else{
+      listWorkflowRecords(Level1Flt,Level2Flt);
+   }
+}
+
+
+function listWorkflowRecordsPreStep1(Level1Flt,Level2Flt){
+   console.log("start listWorkflowRecordsPreStep1",Level1Flt,Level2Flt);
+   if (Level2Flt.mgmtitemgroupid){
+      var o=getModuleObject(W5Base,"itil::lnkmgmtitemgroup");
+      o.SetFilter({
+          mgmtitemgroupid:Level2Flt.mgmtitemgroupid,
+          mgmtitemgroupcistatusid:"4",
+          lnkfrom:"<\""+Level2Flt.end.format("yyyy-mm-dd hh:mm:ss")+
+                  "\"",
+          lnkto:">\""+Level2Flt.start.format("yyyy-mm-dd hh:mm:ss")+
+                "\" OR [EMPTY]"
+      });
+      o.findRecord("applid,locationid",function(data){
+         Level2Flt.affectedapplicationid={};
+         console.log("result listWorkflowRecordsPreStep1 1:",data);
+         for(c=0;c<data.length;c++){
+            if (data[c].applid && data[c].applid!=""){
+               Level2Flt.affectedapplicationid[""+data[c].applid]="1";
+            }
+         }
+         listWorkflowRecordsPreStep2(Level1Flt,Level2Flt);
+      });
+    }
+    else{
+      listWorkflowRecordsPreStep2(Level1Flt,Level2Flt);
+    }
+}
+
+
+
+function doSearch(entity){
+   $("#ExData").html("...");
+   var arec=jQuery.data($("#ExData")[0],"analyseRecord");
+   if (arec){
+      var mgmtitemgroupid=$('#mgmtitemgroupid').val();   
+      var cidown=$('#cidown').val();   
+      var startdate=arec.s.format("yyyy-mm-dd hh:mm:ss");
+      startdate=startdate.replace(/ .*$/," 00:00:00");
+      var enddate=arec.e.format("yyyy-mm-dd hh:mm:ss");
+      enddate=enddate.replace(/ .*$/," 23:59:59");
+     
+      var range="\""+startdate+"/"+enddate+"\"";
+
+      var target = document.getElementById('ExData');
+      var spinner = new Spinner({}).spin(target);
+
+      var Level1Flt={
+         trange:range,
+         class:'*::change'
+      };
+      var Level2Flt={
+          start:arec.s,
+          end:arec.e,
+          checkrec:function(rec){
+             if (rec.eventstart<arec.e && rec.eventend>arec.s){
+                if (this.affectedapplicationid){
+                   var applid=rec.affectedapplicationid.split(/[,; ]+/);
+                   for(ii=0;ii<applid.length;ii++){
+                      if (this.affectedapplicationid[""+applid[ii]]){
+                         return(true);
+                      }
+                   }
+                }
+                else{
+                   return(true);
+                }
+             }
+             return(false);
+          }
+      };
+      if (mgmtitemgroupid!=""){
+         Level2Flt.mgmtitemgroupid=mgmtitemgroupid;
+      }
+      if (cidown!=""){
+         Level2Flt.cidown=cidown;
+      }
+      console.log("range=",range," Level2Flt=",Level2Flt);
+      listWorkflowRecordsPreStep1(Level1Flt,Level2Flt);
+   }
+
+}
+
+function doDelete(entity){
+   var arec=jQuery.data($("#ExData")[0],"analyseRecord");
+   if (arec){
+      if (arec.ev){
+         var target="../../temporal/tspan/DeleteRec?CurrentIdToEdit="+
+                    arec.ev.id;
+         showPopWin(target,500,200,onPopWinClose);
+      }
+   }
+}
+
+
+function formatDetailRec(rec,s,e){
+   var t="";
+   var p=calculatePercentBar(s,e,rec.eventstart,rec.eventend);
+   t+="<tr><td><div style='margin:5px'>";
+
+   t+="<table class=ExDataRec>";
+   t+="<tr><td width=80><span class=tssm_chm_link>";
+   t+=rec.srcid;
+   t+="</span></td><td>";
+   t+=escapeHTML(rec.name);
+   t+="<td width=80 align=right><span class=base_workflow_link>";
+   t+=rec.id;
+   t+="</span></td>";
+   t+="</tr>";
+   t+="<tr><td colspan=3>";
+
+   t+="<table width=100% border=0 cellspacing=0 cellpadding=0>";
+   t+="<tr><td width=50%>";
+   t+=rec.eventstart.frontendFormat();
+   t+="</td><td width=50% align=right>";
+   t+=rec.eventend.frontendFormat();
+   t+="</tr>";
+   t+="<tr>";
+   t+="<td colspan=2>";
+   t+="<div class=bar>";
+   var p1char="&nbsp;";
+   var p2char="";
+   if (p[3]){
+      p2char="<div style='float:left'>&laquo;</div>"+p2char;
+   }
+   if (p[4]){
+      p2char=p2char+"<div style='float:right'>&raquo;</div>";
+   }
+   if (p2char==""){
+      p2char="&nbsp;";
+   }
+   var p3char="&nbsp;";
+   
+
+   t+="<div class=baroff style='width:"+p[0]+"%'>"+p1char+"</div>";
+   t+="<div class=baron style='width:"+p[1]+"%'>"+p2char+"</div>";
+   t+="<div class=baroff style='width:"+p[2]+"%'>"+p3char+"</div>";
+
+   t+="</td>";
+   t+="</tr></table>";
+
+   t+="</td></tr>";
+   t+="</table></div>";
+
+   t+="</td></tr>";
+   return(t);
+}
+
+
+
+function fillCIGroupBoxCached(){
+   console.log("App.CIGroups",App.CIGroups);
+   for (var i=0; i<App.CIGroups.list.length; i++) {
+      $('#mgmtitemgroupid').append(
+         '<option value="'+
+         App.CIGroups.list[i].id+
+         '">'+
+         App.CIGroups.list[i].name+
+         '</option>');
+   }
+}
+
+function fillCIGroupBox(){
+   if (!App.CIGroups){
+      var o=getModuleObject(W5Base,"itil::mgmtitemgroup");
+      o.SetFilter({cistatusid:4,grouptype:'PCONTROL CFGROUP'});
+      o.findRecord("name,id",function(data){
+         App.CIGroups=new Object({
+            byid:new Object(),
+         });
+         App.CIGroups.list=data;
+         for(c=0;c<data.length;c++){
+            App.CIGroups.byid[String(data[c].id)]=data[c].name;
+         }
+         fillCIGroupBoxCached();
+      });
+   }
+   else{
+      fillCIGroupBoxCached();
+   }
+}
+
+function showExDataDetail(range,s,e,flt){
+   var o=getModuleObject(W5Base,"base::workflow");
+   o.SetFilter({trange:range,class:'*::change'});
+   o.findRecord("eventstart,eventend,id,srcid,name,affectedapplicationid",
+                function(data){
+      var d="";
+      var srcid=new Array();
+      var t="<table width=100%>";
+      var cnt=0;
+      for(c=0;c<data.length;c++){
+         if (flt.checkrec(data[c])){
+            cnt++;
+            srcid.push(data[c].srcid);
+            t+=formatDetailRec(data[c],s,e);
+         }
+      }
+      t+="</table>";
+
+      var fooder="";
+     
+      var target="../../tssm/chm/NativResult?AutoSearch=1"; 
+      target+="&search_changenumber="+srcid.join("%20"); 
+
+      var cmd="showPopWin('"+target+"',null,null);";
+
+      fooder+="<div class=forwardSearch>SM9:<img border=0 onclick=\""+cmd+"\" "+
+              "src=\"../../../public/base/load/directlink.gif\"></div>";
+
+      var target="../../base/workflow/NativResult?AutoSearch=1"; 
+      target+="&search_mdate=%21[EMPTY]"; 
+      target+="&search_srcid="+srcid.join("%20"); 
+
+      var cmd="showPopWin('"+target+"',null,null);";
+
+      fooder+="<div class=forwardSearch>W5B:<img border=0 onclick=\""+cmd+"\" "+
+              "src=\"../../../public/base/load/directlink.gif\"></div>";
+
+      $("#ExData").html(t+fooder);
+      resizeLevel0();
+   });
+}
+
+function showRangeAnalyticMask(s,e,ev){
+   var d="";
+
+   d+="<div><div class=ExDataDiv></div><form";
+   if (ev){
+      d+=" evid='"+ev.id+"'";
+   }
+   d+=">";
+   d+="<table class=ExHead style='";
+   //if (ev){
+   //   d+=";background-color:"+ev.color;
+   //   d+=";color:white";
+   //}
+   d+="'>";
+   if (ev){
+      d+="<tr><td colspan=3><b>"+escapeHTML(ev.title)+"</b>";
+   }
+   else{
+      d+="<tr><td colspan=3>";
+   }
+   d+="<div style='float:right'>";
+   if (ev){
+      if (ev.recordDelete){
+         d+="<span class=actionButton onclick='doDelete(this);'>Delete</span>";
+         d+=" &bull; ";
+      }
+      if (ev.recordWrite){
+         d+="<span class=actionButton onclick='doEdit(this);'>Edit</span>";
+         d+=" &bull; ";
+      }
+      d+="<span class=actionButton  onclick='doExpand(this);'>Expand</span>";
+   }
+   d+="</div>";
+   d+="</td></tr>";
+   if (ev){
+      if (ev.comments!=''){
+         d+="<tr><td colspan=3>"+
+            "<div style='height:24px;overflow:auto'>"+
+            "<pre>"+escapeHTML(ev.comments)+"</pre>"+
+            "</div></td></tr>";
+      }
+   }
+   d+="<tr><td align=center colspan=3>";
+   d+="<table class=ExHeadForm border=0 width=80%>";
+   d+="<tr>";
+   d+="<td>";
+   d+="<i><u>Filter Restriktionen:</u></i>";
+   d+="</td>";
+   d+="<td align=right>von: "+s.frontendFormat();
+   d+="&nbsp;&nbsp; - &nbsp;&nbsp; ";
+   d+="( "+formatSeconds((e-s)/1000)+" )";
+   d+="&nbsp;&nbsp; - &nbsp;&nbsp; ";
+   d+="bis: "+e.frontendFormat()+"</td>";
+   d+="</tr>";
+   d+="<tr><td colspan=1>";
+   d+="CI-Group:<select id=mgmtitemgroupid>";
+   if (ev && ev.mgmtitemgroupid){
+      d+="<option value='"+ev.mgmtitemgroupid+"'>"+
+         ev.mgmtitemgroupname+
+         "</option>";
+   }
+   else{
+      d+="<option value=''></option>";
+   }
+   d+="</select>";
+   d+="&nbsp;";
+   d+="&nbsp;";
+   d+="&nbsp;";
+   d+="PSO:<select id=cidown>";
+   d+="<option value=''>egal</option>";
+   d+="<option value='1'>ja</option>";
+   d+="<option value='0'>nein</option>";
+   d+="</select>";
+   d+="&nbsp;";
+   d+="<td align=right>";
+   d+="<span class=actionButton  onclick='doExpand(this);'>Expand</span>";
+   d+=" &bull; ";
+   d+="<span class=actionButton onclick='doPrint(this);'>Print</span>";
+   d+=" &bull; ";
+   d+="<span class=actionButton onclick='doSearch(this);'>Suchen</span>";
+   d+="</td></tr>";
+
+   d+="</table>";
+   d+="</td></tr></table>";
+   d+="</form></div>";
+   $("#ExData").html("");
+   $("#ExHead").html(d);
+   if (!(ev && ev.mgmtitemgroupid)){
+      fillCIGroupBox();
+   }
+   if (ev){  // attach the event element
+      jQuery.data($("#ExData")[0],"analyseRecord",{s:s,e:e,ev:ev});
+   }
+   else{
+      jQuery.data($("#ExData")[0],"analyseRecord",{s:s,e:e});
+   }
+}
+
+
+
+
+
+
+
+function setDefaultExData(){
+   var start=$('#calendar').fullCalendar('getView').start;
+   var end=$('#calendar').fullCalendar('getView').end;
+   console.log("fifi 1: start:",start," end:",end);
+   console.log("fifi 2: start:",start.toDate()," end:",end.toDate());
+   console.log("fifi 3: start:",start.toDate().frontendFormat()," end:",end.toDate().frontendFormat());
+
+   var ranges=start.toDate();
+   var rangee=end.toDate();
+   showRangeAnalyticMask(ranges,rangee);
+   resizeLevel0();
+}
+
+
+
+
+
+
+
+function showDataDetail(e){
+   var d="";
+
+   ranges=e.start.toDate();
+   rangee=e.end.toDate();
+   showRangeAnalyticMask(ranges,rangee,e);
+
+   var target = document.getElementById('ExData');
+//   var spinner = new Spinner(opts).spin(target);
+
+   var flt={
+       checkrec:function(rec){
+          if (rec.eventstart<rangee && rec.eventend>ranges){
+             return(true);
+          }
+          return(false);
+       }
+   };
+
+//   if (e.subsys=='MGMTITEMGRP'){
+//      flt.checkrec=function(rec){
+//          if (rec.eventstart<rangee && rec.eventend>ranges){
+//             if (rec.affectedapplicationid!=""){
+//                var applid=rec.affectedapplicationid.split(/[,; ]+/);
+//                for(ii=0;ii<applid.length;ii++){
+//                   if (this.data[""+applid[ii]]=="1"){
+//                      return(true);
+//                   }
+//                }
+//             }
+//          }
+//          return(false);
+//      }
+//      var o=getModuleObject(W5Base,"itil::lnkmgmtitemgroup");
+//      o.SetFilter({
+//          mgmtitemgroupid:e.mgmtitemgroupid,
+//          mgmtitemgroupcistatusid:"4",
+//          lnkfrom:"<\""+e.end_formated+"\"",
+//          lnkto:">\""+e.start_formated+"\" OR [EMPTY]"
+//      });
+//      o.findRecord("applid,locationid",function(data){
+//         flt.data={};
+//         for(c=0;c<data.length;c++){
+//            if (data[c].applid && data[c].applid!=""){
+//               flt.data[""+data[c].applid]="1";
+//            }
+//         }
+//         showExDataDetail(range,ranges,rangee,flt);
+//      });
+//   }
+//   else{
+//      showExDataDetail(range,ranges,rangee,flt);
+//   }
+
+}
+

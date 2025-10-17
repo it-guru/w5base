@@ -1,0 +1,24 @@
+<!------------------------------------------------------------------------>
+<table class=tabelle width="640" border="0" cellspacing="0" cellpadding="0">
+  <tr><td bgcolor=silver valign=top colspan=2><b>%emailsubtitle%</b></td></tr>
+</table>
+<table class=tabelle width="640" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width=160 nowrap valign=top>
+      <div class=timestamp>
+      %emailprefix%&nbsp;
+      </div>
+    </td>
+    <td valign=top width=480>
+      <pre class=text>%emailtext%</pre>
+    </td>
+  </tr>
+  <tr height=2></tr>
+</table>
+<!------------------------------------------------------------------------>
+
+
+
+
+
+

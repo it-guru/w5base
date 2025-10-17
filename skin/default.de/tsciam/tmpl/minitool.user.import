@@ -1,0 +1,26 @@
+<table width="100%" height="100%"><tr><td align="center" valign="center">
+<!------------------------------------------------------>
+<div class=dialog style="width:400px">
+<table width="100%" cellpadding=4 cellspacing=4>
+<tr><td colspan=2><b>CIAM User Import Tool</b></td></tr>
+<tr>
+<td colspan=2>Mit diesem Tool können Sie Kontakte aus CIAM
+in die W5Base Kontakteverwaltung importieren. Der Kontakt
+den Sie Importieren möchten, müssen Sie entweder über
+die <b>CIAMID</b> oder die <b>E-Mailadresse</b> spezifizieren.
+Wenn der Kontakt identifizert werden kann, und der Kontakt
+noch nicht existiert, dann wird dieser automatisch als "installiert/aktiv"
+erzeugt.</td></tr>
+<tr><td width=1% nowrap>Name (E-Mail oder ID):</td>
+<td><input type=text class=finput name=importname value="%importname%"></td></tr>
+<tr>
+<td colspan=2 align=center><input name=DOIT type=submit value=" importieren "></td>
+</tr>
+</table>
+</div>
+<div style="text-align:left;width:400px;height:200px;overflow:auto">
+%LASTMSG(RAW)%
+</div>
+<!------------------------------------------------------>
+</td></tr></table>
+

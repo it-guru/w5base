@@ -1,0 +1,32 @@
+<center>
+<table width=30%>
+<tr><td nowrap>
+ApplExtOperationUser:
+
+<xmp>
+ACCESSLEVEL Mapping:
+====================
+Appl ApplMgr                100
+Appl ApplMgr2                95
+Appl techapprove             92
+Appl TSM                     90
+Appl TSM2                    85
+Appl OPM                     70
+Appl OPM2                    65
+Appl techpriv                55
+Appl businessemployee        36
+
+Instance Admin          25
+Instance Admin2         24
+
+            Appl BusinesTeam   Instance InstanceTeam
+RBoss                39                  19
+RBoss2               38                  18
+REmployee            37                  17
+RFreelancer          12                  11
+RApprentice           2                   1
+</xmp>
+</td></tr>
+</table>
+
+

@@ -1,0 +1,121 @@
+<div style="margin:10px">
+<div class="detailframe">
+<div class="detailheadline">
+
+<table width="100%" cellspacing="0" cellpadding="0">
+ <tbody><tr>
+ <td class="detailheadline" align="left">
+ <h3 class="grouplabel">Step1: ICT Object (Application) %TRANSLATE(order)%</h3>
+ </td>
+ </tr>
+ </tbody>
+</table>
+
+</div>
+<table class="detailframe" border=1>
+<tbody>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>%TRANSLATE(Applicationname)%:</td>
+<td style="width:300px" valign=top>
+<input style="width:100%" type=text autocomplete="off" name=applname id=applname
+></td>
+<td><div class=noticeText data-type=template data-template="tscape.Explore.ictoform.subform1.applname.help"></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>%TRANSLATE(Shortname)%:</td>
+<td style="width:300px"><input size=20 autocomplete="off" type=text name=shortname id=shortname value=""></td>
+<td><div class=noticeText data-type=template data-template="tscape.Explore.ictoform.subform1.shortname.help"></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>%TRANSLATE(current state)%:</td>
+<td style="width:300px"><select id=state name=state>
+<option>plan</option>
+<option>active</option>
+</select></td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>%TRANSLATE(start date)%:</td>
+<td style="width:300px">
+<input type=text id=startdate name=startdate>
+</td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>%TRANSLATE(end date)%:</td>
+<td style="width:300px">
+<input type=text id=enddate name=enddate>
+</td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>ApplicationManager:</td>
+<td style="width:300px">
+<input type=text readonly=1 tabindex=-1 id=applmgr name=applmgr style="width:100%">
+<input type=hidden id=applmgrid name=applmgrid>
+</td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>responsible organisational specialized:</td>
+<td style="width:300px">
+<input type=text id=applmgr name=applmgr style="width:100%">
+<input type=hidden id=applmgrid name=applmgrid>
+</td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>usergroup organisational specialized:</td>
+<td style="width:300px">
+<input type=text id=userorg name=userorgapplmgr style="width:100%">
+</td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>responsible canvas element:</td>
+<td style="width:300px">
+<input type=text id=canvas name=canvasapplmgr style="width:100%">
+</td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>responsible organisational IT:</td>
+<td style="width:300px">
+<select id=resporgit name=resporgit style="width:100%">
+<option>initializing ...</option>
+</select>
+</td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=1 width=20%>Project Manager IT:</td>
+<td style="width:300px">
+<input type=text id=projectmgr name=projectmgr style="width:100%">
+<input type=hidden id=projectmgrid name=projectmgrid>
+</td>
+<td></div></td>
+</tr>
+
+<tr class="fline">
+<td class="fname" colspan=2>%TRANSLATE(Description)%:<br>
+<textarea style="width:100%;height:50px" name=description id=description>
+</textarea></td>
+<td></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+</div>

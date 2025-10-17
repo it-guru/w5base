@@ -1,0 +1,4 @@
+'itu.cloud.tpc.TPC3.project'=>{de=>'Projekt',en=>'Project'},
+'itu.cloud.tpc.TPC3.machine'=>{de=>'Maschine',en=>'Machine'},
+'itu.cloud.tpc.TPC3.kernel'=>{de=>'Kern',en=>'Kernel'},
+'itu.cloud.tpc.TPC3.kernel.depl'=>{de=>'Deployment',en=>'Deployment'},

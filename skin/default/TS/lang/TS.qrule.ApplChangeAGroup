@@ -1,0 +1,8 @@
+'TS::qrule::ApplChangeAGroup'=>{
+   de=>'Prüfung ob eine technische Change Approver-Gruppe eingetragen ist',
+   en=>'check if there is a technical change approvergroup defined'},
+'there is no technical change approvergroup defined'=>{
+   de=>'es wurde keine technische Change Approvergroup eingetragen'},
+'there is more than one technical change approvergroup defined'=>{
+   de=>'es wurde mehr als eine technische Change Approvergroup eingetragen'},
+

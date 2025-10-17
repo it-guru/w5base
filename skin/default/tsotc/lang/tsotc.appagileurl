@@ -1,0 +1,7 @@
+'tsotc::appagileurl'=>{
+ de=>'OTC Integrated: AppAgile: URL',
+ en=>'OTC Integrated: AppAgile: URL'
+},
+'last monitor date'=>{de=>'Letzter Monitoring Zeitpunkt'},
+'first monitor date'=>{de=>'Erster Monitoring Zeitpunkt'},
+'is DNS-Name valid'=>{de=>'ist DNS-Name gültig'},

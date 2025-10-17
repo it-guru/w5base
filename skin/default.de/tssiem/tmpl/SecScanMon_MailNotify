@@ -1,0 +1,9 @@
+Sehr geehrte Damen und Herren,
+
+für  '%ITSCANOBJECTNAME%' stehen die folgenden neuen Qualys SecurityScans bereit:
+
+%SCANLIST%
+
+Bitte kümmern Sie sich um die Beseitigung der aufgeführten Issues.
+%DEBUG%
+

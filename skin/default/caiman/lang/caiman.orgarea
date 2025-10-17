@@ -1,0 +1,8 @@
+'caiman::orgarea'=>{de=>'CAIMAN Organisationseinheit',en=>'CAIMAN Org-Unit'},
+'fieldgroup.userro'=>{ de=>'Mitarbeiter',en=>'Employees'},
+'fieldgroup.subunits'=>{ de=>'Untereinheiten',en=>'SubUnits'},
+'Users'=>{ de=>'Mitarbeiter'},
+'Subunits'=>{ de=>'Untereinheiten'},
+'Boss (tOuMgr)'=>{ de=>'Leiter (tOuMgr)'},
+'Boss'=>{ de=>'Leiter'},
+'SIS Number'=>{ de=>'Gesellschaftsnummer'},

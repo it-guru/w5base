@@ -1,0 +1,9 @@
+'tbonedb::bupjob'=>{de=>'Backup-Job',en=>'Backup-Job'},
+'fieldgroup.w5basedata'=>{de=>'W5Base Verbindung',en=>'W5Base conjunction'},
+'fieldgroup.lastjobs'=>{de=>'letzte Jobs',en=>'last jobs'},
+'is deleted'=>{de=>'gelöscht markiert'},
+'Active'=>{de=>'Aktiv'},
+'W5Base/Application'=>{de=>'W5Base/Anwendung'},
+'Retention'=>{de=>'Aufbewahrung'},
+'Quantity'=>{de=>'Menge'},
+

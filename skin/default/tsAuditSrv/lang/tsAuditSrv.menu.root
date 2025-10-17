@@ -1,0 +1,4 @@
+'itu.auditsrv'=>{de=>'AuditServer',en=>'AuditServer'},
+'itu.auditsrv.system'=>{de=>'System',en=>'System'},
+'itu.auditsrv.system.auditmsg'=>{de=>'Meldung',en=>'Message'},
+'itu.auditsrv.dbdict'=>{de=>'Data-Dictionary',en=>'Data-Dictionary'},

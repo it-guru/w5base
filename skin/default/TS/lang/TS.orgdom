@@ -1,0 +1,15 @@
+'TS::orgdom'=>{
+  de=>'Organisations-Domain',
+  en=>'Organisational-Domain'
+},
+'fieldgroup.ictorelations'=>{
+ de=>'Verknüpfungen',
+ en=>'Relations'
+},
+'fieldgroup.orgdoms'=>{
+ de=>'Organisations-Domains',
+ en=>'Organisation-Domains'
+},
+'Organisation Domain'=>{de=>'Organisations-Domain'},
+'Organisation-Domains'=>{de=>'Organisations-Domains'},
+

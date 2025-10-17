@@ -1,0 +1,20 @@
+Ladies and Gentlemen,
+
+on the ICTO-ID '%ICTONO%' the following IP addresses have
+SSL certificates found that will soon become invalid:
+
+%CERTLIST%
+
+Please make sure that these certificates are 
+be renewed/extended in time. This is the first and only
+notification regarding this topic.
+
+If the circle of addressees for this notification needs
+to be restricted, you may enter the relevant
+certificates in W5Base/Darwin.
+
+see:
+https://darwin.telekom.de/darwin/auth/faq/article/ById/14818875910005
+
+%DEBUG%
+

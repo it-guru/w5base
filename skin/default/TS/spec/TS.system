@@ -1,0 +1,13 @@
+'exposurelevel'=>{
+de=>'Netzwerk-Zone, aus der das System erreichbar ist. Wenn ein System aus mehreren Zonen erreichbar ist, ist die öffentlichste bzw. sicherheitstechnisch kritischste Zone (Reihenfolge: Internet  CNDTAG  Backend) auszuwählen.',
+en=>'The network zone from which the system can be reached. If a system can be reached from multiple zones pick the most public or critical one in terms of security (Order: internet  CNDTAG  backend).'
+},
+'autoexposurelevel'=>{
+de=>'automatisch ermittelteltes Exposure Level'
+en=>'automatic calculated Exposure Level'
+},
+'effexposurelevel'=>{
+de=>'effectives Exposure Level auf das alle weiteren Verarbeitungen basieren',
+en=>'effective Exposure Level which is the base for all further processes'
+}
+

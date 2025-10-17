@@ -1,0 +1,6 @@
+'ewu2::lnksystemcontact'=>{
+  en=>'EWU2: Relation System-Contact',
+  de=>'EWU2: Verknüpfung System-Kontakt'
+},
+'Contact Fullname'=>{de=>'Kontaktbezeichnung'},
+'Comments'=>{de=>'Bemerkungen'},

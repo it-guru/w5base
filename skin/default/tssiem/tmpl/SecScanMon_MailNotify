@@ -1,0 +1,9 @@
+Ladies and Gentlemen,
+
+on  '%ITSCANOBJECTNAME%' the following Qualys SecurityScans are available:
+
+%SCANLIST%
+
+Please fix the issues descripted in the Reports.
+%DEBUG%
+

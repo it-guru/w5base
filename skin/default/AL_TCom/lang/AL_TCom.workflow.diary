@@ -1,0 +1,12 @@
+'AL_TCom::workflow::diary'=>{de=>'Telekom IT: Betriebstagebuch',
+                             en=>'Telekom IT: Diary'},
+'AL_TCom::workflow::diary::tip'=>{
+              de=>'Das Betriebstagebuch dient zur Dokumentation von '.
+                  'Projektarbeiten oder allgemeinen Veränderungen '.
+                  'in bestimmten Anwendungen.'
+                  },
+
+'Application'=>{de=>'Anwendung'},
+'Worktime'=>{de=>'Arbeitszeit'},
+'Workflow invoice'=>{de=>'Workflow fakturieren'},
+

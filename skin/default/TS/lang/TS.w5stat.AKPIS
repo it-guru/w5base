@@ -1,0 +1,439 @@
+'TS::w5stat::AKPIS::AKPIS'=>{de=>'AppKPIs',en=>'AppKPIs'},
+'AKPIS.app.all.acinmassingmentgroup.filled'=>{
+ de=>'Anzahl Anwendungen, bei denen Incident-Assigmentgroup ausgefüllt ist',
+ en=>'application count with filled Incident-Assigmentgroup'
+},
+'AKPIS.app.ibi.acinmassingmentgroup.filled'=>{
+ de=>'Anzahl IBI-relevanter Anwendungen, bei denen Incident-Assigmentgroup ausgefüllt ist',
+ en=>'ibi application count with filled Incident-Assigmentgroup'
+},
+'AKPIS.app.top.acinmassingmentgroup.filled'=>{
+ de=>'Anzahl Top-Anwendungen, bei denen Incident-Assigmentgroup ausgefüllt ist',
+ en=>'top application count with filled Incident-Assigmentgroup'
+},
+'AKPIS.app.prod.acinmassingmentgroup.filled'=>{
+ de=>'Anzahl Produktions-Anwendungen, bei denen Incident-Assigmentgroup ausgefüllt ist',
+ en=>'production application count with filled Incident-Assigmentgroup'
+},
+'AKPIS.app.nonprod.acinmassingmentgroup.filled'=>{
+ de=>'Anzahl Non-Produktions-Anwendungen, bei denen Incident-Assigmentgroup ausgefüllt ist',
+ en=>'non-production application count with filled Incident-Assigmentgroup'
+},
+'AKPIS.app.all.applmgr.filled'=>{
+ de=>'Anzahl Anwendungen, bei denen ApplicationManager ausgefüllt ist',
+ en=>'application count with filled ApplicationManager'
+},
+'AKPIS.app.all.businessteam.filled'=>{
+ de=>'Anzahl Anwendungen mit ausgefülltem Betriebsteam. Der CI-Status des Betriebsteams ist dabei nicht relevant',
+ en=>'application count with filled businessteam'
+},
+'AKPIS.app.ibi.businessteam.filled'=>{
+ de=>'Anzahl IBI-relevanter Anwendungen mit ausgefülltem Betriebsteam. Der CI-Status des Betriebsteams ist dabei nicht relevant',
+ en=>'ibi application count with filled businessteam'
+},
+'AKPIS.app.top.businessteam.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit ausgefülltem Betriebsteam. Der CI-Status des Betriebsteams ist dabei nicht relevant',
+ en=>'top application count with filled businessteam'
+},
+'AKPIS.app.prod.businessteam.filled'=>{
+ de=>'Anzahl Produktions-Anwendungen mit ausgefülltem Betriebsteam. Der CI-Status des Betriebsteams ist dabei nicht relevant',
+ en=>'production application count with filled businessteam'
+},
+'AKPIS.app.nonprod.businessteam.filled'=>{
+ de=>'Anzahl Non-Produktions-Anwendungen mit ausgefülltem Betriebsteam. Der CI-Status des Betriebsteams ist dabei nicht relevant',
+ en=>'nonproduction application count with filled businessteam'
+},
+'AKPIS.app.all.contacts.filled'=>{
+ de=>'Anzahl Anwendungen mit gefüllten Kontakten',
+ en=>'application count with filled contacts'
+},
+'AKPIS.app.ibi.contacts.filled'=>{
+ de=>'Anzahl IBI Anwendungen mit gefüllten Kontakten',
+ en=>'IBI application count with filled contacts'
+},
+'AKPIS.app.top.contacts.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit gefüllten Kontakten',
+ en=>'top application count with filled contacts'
+},
+'AKPIS.app.prod.contacts.filled'=>{
+ de=>'Anzahl Produktions-Anwendungen mit gefüllten Kontakten',
+ en=>'production application count with filled contacts'
+},
+'AKPIS.app.nonprod.contacts.filled'=>{
+ de=>'Anzahl Non-Produktions-Anwendungen mit gefüllten Kontakten',
+ en=>'non-production application count with filled contacts'
+},
+'AKPIS.app.all.count'=>{
+ de=>'Anzahl aller Anwendungen im Focus (CI-Status=installiert/aktiv)',
+ en=>'overall count of all application in focus (CI-Status=installed/active)'
+},
+'AKPIS.app.all.dataissue.exists'=>{
+ de=>'Anzahl Anwendungen mit aktivem DataIssue',
+ en=>'count of application with active DataIssue'
+},
+'AKPIS.app.ibi.dataissue.exists'=>{
+ de=>'Anzahl IBI-relevanter Anwendungen mit aktivem DataIssue',
+ en=>'count of ibi application with active DataIssue'
+},
+'AKPIS.app.top.dataissue.exists'=>{
+ de=>'Anzahl Top-Anwendungen mit aktivem DataIssue',
+ en=>'count of top application with active DataIssue'
+},
+'AKPIS.app.prod.dataissue.exists'=>{
+ de=>'Anzahl Produktions-Anwendungen mit aktivem DataIssue',
+ en=>'count of production application with active DataIssue'
+},
+'AKPIS.app.nonprod.dataissue.exists'=>{
+ de=>'Anzahl Non-Produktions-Anwendungen mit aktivem DataIssue',
+ en=>'count of non production application with active DataIssue'
+},
+'AKPIS.app.all.description.filled'=>{
+ de=>'Anzahl Anwendungen mit befüllter Anwendungsbeschreibung. Die länge der Beschreibung ist dabei nicht relevant',
+ en=>'count of application with filled description'
+},
+'AKPIS.app.ibi.description.filled'=>{
+ de=>'Anzahl IBI relevanter Anwendungen mit befüllter Anwendungsbeschreibung. Die länge der Beschreibung ist dabei nicht relevant',
+ en=>'count of ibi application with filled description'
+},
+'AKPIS.app.prod.description.filled'=>{
+ de=>'Anzahl Produmktions Anwendungen mit befüllter Anwendungsbeschreibung. Die länge der Beschreibung ist dabei nicht relevant',
+ en=>'count of production application with filled description'
+},
+'AKPIS.app.nonprod.description.filled'=>{
+ de=>'Anzahl Non-Produmktions Anwendungen mit befüllter Anwendungsbeschreibung. Die länge der Beschreibung ist dabei nicht relevant',
+ en=>'count of non-production application with filled description'
+},
+'AKPIS.app.top.description.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit befüllter Anwendungsbeschreibung. Die länge der Beschreibung ist dabei nicht relevant',
+ en=>'count of top-production application with filled description'
+},
+'AKPIS.app.all.interfaces.filled'=>{
+ de=>'Anzahl Anwendungen mit vorhandenen Schnittstellen - oder ohne Schnittstellen aber das Flag "Anwendung hat keine Schnittstellen" ist gesetzt',
+ en=>'count of application with filled interfaces'
+},
+'AKPIS.app.all.opmode.filled'=>{
+ de=>'Anzahl Anwendungen bei denen die "vorwiegende Betriebsart" gesetzt ist',
+ en=>'count of application with filled operation mode'
+},
+'AKPIS.app.ibi.opmode.filled'=>{
+ de=>'Anzahl IBI relevanter Anwendungen bei denen die "vorwiegende Betriebsart" gesetzt ist',
+ en=>'count of ibi application with filled operation mode'
+},
+'AKPIS.app.top.opmode.filled'=>{
+ de=>'Anzahl Top-Anwendungen bei denen die "vorwiegende Betriebsart" gesetzt ist',
+ en=>'count of top application with filled operation mode'
+},
+'AKPIS.app.prod.opmode.filled'=>{
+ de=>'Anzahl Produktions-Anwendungen bei denen die "vorwiegende Betriebsart" gesetzt ist',
+ en=>'count of production application with filled operation mode'
+},
+'AKPIS.app.nonprod.opmode.filled'=>{
+ de=>'Anzahl non-Produktions-Anwendungen bei denen die "vorwiegende Betriebsart" gesetzt ist',
+ en=>'count of non-production application with filled operation mode'
+},
+'AKPIS.app.all.systems.filled'=>{
+ de=>'Anzahl Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
+ en=>'count of application with filled systems or CloudAreas'
+},
+'AKPIS.app.all.techchmapprgroup.filled'=>{
+ de=>'Anzahl Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of application with min. one techical change approvergroup'
+},
+'AKPIS.app.all.tsm.filled'=>{
+ de=>'Anzahl Anwendungen mit ausgefülltem TSM (technical solution manager)',
+ en=>'count of application with filled tsm'
+},
+'AKPIS.app.ibi.interfaces.filled'=>{
+ de=>'Anzahl IBI relevanter Anwendungen mit vorhandenen Schnittstellen - oder ohne Schnittstellen aber das Flag "Anwendung hat keine Schnittstellen" ist gesetzt',
+ en=>'count of ibi application with filled interfaces'
+},
+'AKPIS.app.top.interfaces.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit vorhandenen Schnittstellen - oder ohne Schnittstellen aber das Flag "Anwendung hat keine Schnittstellen" ist gesetzt',
+ en=>'count of top application with filled interfaces'
+},
+'AKPIS.app.prod.interfaces.filled'=>{
+ de=>'Anzahl Produktions-Anwendungen mit vorhandenen Schnittstellen - oder ohne Schnittstellen aber das Flag "Anwendung hat keine Schnittstellen" ist gesetzt',
+ en=>'count of production application with filled interfaces'
+},
+'AKPIS.app.nonprod.interfaces.filled'=>{
+ de=>'Anzahl Non-Produktions-Anwendungen mit vorhandenen Schnittstellen - oder ohne Schnittstellen aber das Flag "Anwendung hat keine Schnittstellen" ist gesetzt',
+ en=>'count of non production application with filled interfaces'
+},
+'AKPIS.app.ibi.applmgr.filled'=>{
+ de=>'Anzahl IBI relevanter Anwendungen, bei denen ApplicationManager ausgefüllt ist',
+ en=>'ibi application count with filled ApplicationManager'
+},
+'AKPIS.app.top.applmgr.filled'=>{
+ de=>'Anzahl Top-Anwendungen, bei denen ApplicationManager ausgefüllt ist',
+ en=>'top application count with filled ApplicationManager'
+},
+'AKPIS.app.prod.applmgr.filled'=>{
+ de=>'Anzahl Produktions-Anwendungen, bei denen ApplicationManager ausgefüllt ist',
+ en=>'production application count with filled ApplicationManager'
+},
+'AKPIS.app.nonprod.applmgr.filled'=>{
+ de=>'Anzahl Non-Produktions-Anwendungen, bei denen ApplicationManager ausgefüllt ist',
+ en=>'non production application count with filled ApplicationManager'
+},
+'AKPIS.app.top.systems.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
+ en=>'count of top application with filled systems or CloudAreas'
+},
+'AKPIS.app.ibi.systems.filled'=>{
+ de=>'Anzahl IBI relevanter Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
+ en=>'count of ibi application with filled systems or CloudAreas'
+},
+'AKPIS.app.prod.systems.filled'=>{
+ de=>'Anzahl Produktions-Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
+ en=>'count of production application with filled systems or CloudAreas'
+},
+'AKPIS.app.nonprod.systems.filled'=>{
+ de=>'Anzahl Non-Produktions-Anwendungen mit vorhandenen logischen Systemen oder CloudAreas - oder keins von beiden aber mit dem Flag "Anwendung hat keine Systeme oder CloudAreas" ist gesetzt',
+ en=>'count of non-production application with filled systems or CloudAreas'
+},
+'AKPIS.app.ibi.techchmapprgroup.filled'=>{
+ de=>'Anzahl IBI-Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of IBI-application with min. one techical change approvergroup'
+},
+'AKPIS.app.top.techchmapprgroup.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of Top-application with min. one techical change approvergroup'
+},
+'AKPIS.app.prod.techchmapprgroup.filled'=>{
+ de=>'Anzahl Prod-Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of Prod-application with min. one techical change approvergroup'
+},
+'AKPIS.app.nonprod.techchmapprgroup.filled'=>{
+ de=>'Anzahl NonProd-Anwendungen mit min. einer technischen Change-Approvergroup',
+ en=>'count of NonProd-application with min. one techical change approvergroup'
+},
+'AKPIS.app.techchmapprgroup.filled'=>{
+ de=>'technischen Change-Approvergroup erfasst',
+ en=>'techical change approvergroup documented'
+},
+'AKPIS.app.applid.filled'=>{
+ de=>'Anwendungen hat AnwendungsID (ApplID)',
+ en=>'application has ApplicationID'
+},
+'AKPIS.app.all.applid.filled'=>{
+ de=>'Anzahl Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of application with filled ApplicationID'
+},
+'AKPIS.app.top.applid.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of top application with filled ApplicationID'
+},
+'AKPIS.app.prod.applid.filled'=>{
+ de=>'Anzahl Prod-Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of prod application with filled ApplicationID'
+},
+'AKPIS.app.nonprod.applid.filled'=>{
+ de=>'Anzahl NonProd-Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of nonprod application with filled ApplicationID'
+},
+'AKPIS.app.ibi.applid.filled'=>{
+ de=>'Anzahl IBI relevanter Anwendungen mit ausgefüllter AnwendungsID (ApplID)',
+ en=>'count of ibi application with filled ApplicationID'
+},
+'AKPIS.app.ibi.tsm.filled'=>{
+ de=>'Anzahl IBI relevanter Anwendungen mit ausgefülltem TSM (technical solution manager)',
+ en=>'count of ibi application with filled tsm'
+},
+'AKPIS.app.top.tsm.filled'=>{
+ de=>'Anzahl Top-Anwendungen mit ausgefülltem TSM (technical solution manager)',
+ en=>'count of top application with filled tsm'
+},
+'AKPIS.app.prod.tsm.filled'=>{
+ de=>'Anzahl Produktions-Anwendungen mit ausgefülltem TSM (technical solution manager)',
+ en=>'count of production application with filled tsm'
+},
+'AKPIS.app.nonprod.tsm.filled'=>{
+ de=>'Anzahl Non-Produktions-Anwendungen mit ausgefülltem TSM (technical solution manager)',
+ en=>'count of non production application with filled tsm'
+},
+'AKPIS.app.prod.count'=>{
+ de=>'Gesamtanzahl Produktions Anwendungen',
+ en=>'overall count of production application'
+},
+'AKPIS.app.nonprod.count'=>{
+ de=>'Gesamtanzahl Non-Produktions Anwendungen',
+ en=>'overall count of non-production application'
+},
+'AKPIS.app.ibi.count'=>{
+ de=>'Gesamtanzahl IBI relevanter Anwendungen',
+ en=>'overall count of ibi application'
+},
+'AKPIS.app.top.count'=>{
+ de=>'Gesamtanzahl Top-Anwendungen',
+ en=>'overall count of top application'
+},
+
+
+'AKPIS.asset.in_all_app.count'=>{
+ de=>'Gesamtanzahl Asset in allen Anwendungen',
+ en=>'overall count of assets in applications'
+},
+'AKPIS.asset.in_all_app.dataissue.exists'=>{
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in allen Anwendungen',
+ en=>'overall count of assets with active DataIssue in all applications'
+},
+'AKPIS.asset.in_all_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in allen Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in all applications'
+},
+'AKPIS.asset.in_all_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in allen Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in all applications'
+},
+'AKPIS.asset.in_all_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in allen Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in all applications'
+},
+'AKPIS.asset.in_all_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in allen Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in all applications'
+},
+'AKPIS.asset.in_ibi_app.count'=>{
+ de=>'Gesamtanzahl Asset in IBI Anwendungen',
+ en=>'overall count of assets in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.dataissue.exists'=>{
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in IBI Anwendungen',
+ en=>'overall count of assets with active DataIssue in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in IBI Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in IBI Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in IBI Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in IBI applications'
+},
+'AKPIS.asset.in_ibi_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in IBI Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in IBI applications'
+},
+'AKPIS.asset.in_nonprod_app.count'=>{
+ de=>'Gesamtanzahl Asset in NonProduktions-Anwendungen',
+ en=>'overall count of assets in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.dataissue.exists'=>{
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in NonProduktions-Anwendungen',
+ en=>'overall count of assets with active DataIssue in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in NonProduktions-Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in NonProduktions-Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in NonProduktions-Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in non-production applications'
+},
+'AKPIS.asset.in_nonprod_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in NonProduktions-Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in non-production applications'
+},
+'AKPIS.asset.in_prod_app.count'=>{
+ de=>'Gesamtanzahl Asset in Produktions-Anwendungen',
+ en=>'overall count of assets in production applications'
+},
+'AKPIS.asset.in_prod_app.dataissue.exists'=>{
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in Produktions-Anwendungen',
+ en=>'overall count of assets with active DataIssue in production applications'
+},
+'AKPIS.asset.in_prod_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in Produktions-Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in production applications'
+},
+'AKPIS.asset.in_prod_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in Produktions-Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in production applications'
+},
+'AKPIS.asset.in_prod_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in Produktions-Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in production applications'
+},
+'AKPIS.asset.in_prod_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in Produktions-Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in production applications'
+},
+'AKPIS.asset.in_top_app.count'=>{
+ de=>'Gesamtanzahl Asset in Top-Anwendungen',
+ en=>'overall count of assets in top applications'
+},
+'AKPIS.asset.in_top_app.dataissue.exists'=>{
+ de=>'Gesamtanzahl Asset mit aktivem DataIssue in Top-Anwendungen',
+ en=>'overall count of assets with active DataIssue in top applications'
+},
+'AKPIS.asset.in_top_app.eohs.count'=>{
+ de=>'Asset mit eingetragenem Ende des Hardware-Support in Top-Anwendungen',
+ en=>'overall count of assets with end of hardware-support filled in top applications'
+},
+'AKPIS.asset.in_top_app.eohs.exceeded'=>{
+ de=>'Asset mit überschrittenem Ende des Hardware-Support in Top-Anwendungen',
+ en=>'overall count of assets with exceeded end of hardware-support in top applications'
+},
+'AKPIS.asset.in_top_app.plandecons.count'=>{
+ de=>'Asset mit eingetragenem geplantem Rückbauzeitpunkt in Top-Anwendungen',
+ en=>'overall count of assets with planned decostruction date filled in top applications'
+},
+'AKPIS.asset.in_top_app.plandecons.exceeded'=>{
+ de=>'Asset mit überschrittenen geplantem Rückbauzeitpunkt in Top-Anwendungen',
+ en=>'overall count of assets with exceeded planned decostruction date in top applications'
+},
+'AKPIS.app.acinmassingmentgroup.filled'=>{
+ de=>'Anwendung wird mit Incident-Assigmentgroup ausgefüllt berücksichtig',
+ en=>'application will be counted as incidentassigmentgroup is filled'
+},
+'AKPIS.app.applmgr.filled'=>{
+ de=>'Anwendung wird mit ApplicationManager ausgefüllt berücksichtig',
+ en=>'application will be counted as ApplicationManager is filled'
+},
+'AKPIS.app.tsm.filled'=>{
+ de=>'Anwendung wird mit TSM ausgefüllt berücksichtig',
+ en=>'application will be counted as TSM is filled'
+},
+'AKPIS.app.contacts.filled'=>{
+ de=>'Anwendung wird mit Kontakte ausgefüllt berücksichtig',
+ en=>'application will be counted as contacts is filled'
+},
+'AKPIS.app.systems.filled'=>{
+ de=>'Anwendung wird mit Systeme ausgefüllt berücksichtig',
+ en=>'application will be counted as systems is filled'
+},
+'AKPIS.app.interfaces.filled'=>{
+ de=>'Anwendung wird mit Schnittstellen ausgefüllt berücksichtig',
+ en=>'application will be counted as interfaces is filled'
+},
+'AKPIS.app.businessteam.filled'=>{
+ de=>'Anwendung wird mit Betriebsteam ausgefüllt berücksichtig',
+ en=>'application will be counted as businessteam is filled'
+},
+'AKPIS.app.opmode.filled'=>{
+ de=>'Anwendung wird mit vorwiegender Betriebsart ausgefüllt berücksichtig',
+ en=>'application will be counted as operation mode is filled'
+},
+'AKPIS.app.description.filled'=>{
+ de=>'Anwendung wird mit Beschreibung ausgefüllt berücksichtig',
+ en=>'application will be counted as description is filled'
+},
+'AKPIS.asset.dataissue.exists'=>{
+ de=>'Anwendung wird als DataIssue existierend gezählt',
+ en=>'application will be counted as DataIssue existing'
+},
+'AKPIS.asset.eohs.count'=>{
+ de=>'Anwendung wird als Ende Hardware-Support bei min. einem Asset definiert gezählt',
+ en=>'application will be counted end of hardware support defined at least by one asset'
+},
+'AKPIS.asset.plandecons.count'=>{
+ de=>'Anwendung wird als geplanter Rückbauzeitpunkt bei min. einem Asset definiert gezählt',
+ en=>'application will be counted planned deconstruction defined at least by one asset'
+},

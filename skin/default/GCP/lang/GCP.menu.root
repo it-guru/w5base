@@ -1,0 +1,13 @@
+'itu.cloud.gcp'=>{
+ de=>'GoogleCloudPlatform',
+ en=>'GoogleCloudPlatform'
+},
+'itu.cloud.gcp.project'=>{
+ de=>'Projekt',
+ en=>'Project'
+},
+'itu.cloud.gcp.system'=>{
+ de=>'System',
+ en=>'System'
+},
+

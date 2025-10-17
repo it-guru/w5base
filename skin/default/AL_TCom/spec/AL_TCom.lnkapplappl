@@ -1,0 +1,18 @@
+'ifrel'=>{de=><<EOF,
+Bei Schnittstellen-Beziehung=indirekt
+muss die Gateway-Anwendung angegeben
+werden, über die der Datenaustausch
+erfolgt.
+Die Schnittstellenvereinbarung ist auch
+in diesem Fall mit der "nach Anwendung"
+zu erstellen.
+EOF
+en=><<EOF},
+If the Interface-Relation is set to indirect,
+the Gateway-Application needs to
+be specified via which the data exchange
+takes place.
+The Interface-Agreement must be created
+with the "to application".
+EOF
+

@@ -1,0 +1,4 @@
+'Tools.SIMon.monpkg'=>{de=>'Installationspaket',en=>'Installationpackage'},
+'Tools.SIMon.monpkg.new'=>{de=>'Neueingabe',en=>'New'},
+'Tools.SIMon.monpkg.lnksoftware'=>{de=>'Software Zuordnung',en=>'Software-Assigments'},
+'Tools.SIMon.monpkgrec'=>{de=>'Inst-Monitoring',en=>'Inst-Monitoring'},

@@ -1,0 +1,6 @@
+'tpc::machine'=>{
+   de=>'TelekomPrivateCloud: Maschine',
+   en=>'TelekomPrivateCloud: Machine'
+},
+'fieldgroup.tags'=>{de=>'Tags'},
+'generic name'=>{de=>'generischer Name'},

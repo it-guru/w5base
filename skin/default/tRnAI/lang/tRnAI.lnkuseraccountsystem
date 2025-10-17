@@ -1,0 +1,6 @@
+'tRnAI::lnkuseraccountsystem'=>{de=>'Verkn. User-Account VDI-System',en=>'Link User-Account VDI-System'},
+'fieldgroup.accountinfo'=>{de=>'User-Account Informationen',en=>'User-Account Infos'},
+'Comments'=>{de=>'Bemerkungen'},
+'relation type'=>{de=>'Zuordnungstyp'},
+'PRIM'=>{de=>'Primär',en=>'primary'},
+'SEC'=>{de=>'Sekundär',en=>'secondary'},

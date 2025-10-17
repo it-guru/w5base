@@ -1,0 +1,4 @@
+'tsacinv::autodiscsystem'=>{de=>'AssetManager-AutoDiscovery: System',
+                            en=>'AssetManager-AutoDiscovery: System'},
+'fieldgroup.ipaddresses'=>{de=>'IP-Adressen',en=>'IP-Addresses'},
+'fieldgroup.softwareinstallations'=>{de=>'Softwareinstallationen',en=>'Softwareinstallations'},

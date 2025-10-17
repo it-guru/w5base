@@ -1,0 +1,5 @@
+'TS::qrule::MandatorRules'=>{
+   de=>'Deutsche Telekom Regel zur automatischen W5Base/Darwin Mandantenzuordnung',
+   en=>'Deutsche Telekom rule for automatic W5Base/Darwin mandator mapping'
+},
+

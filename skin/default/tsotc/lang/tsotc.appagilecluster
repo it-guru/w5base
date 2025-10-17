@@ -1,0 +1,8 @@
+'tsotc::appagilecluster'=>{
+ de=>'OTC Integrated: AppAgile: Cluster',
+ en=>'OTC Integrated: AppAgile: Cluster'
+},
+'fieldgroup.namespaces'=>{
+de=>'Namespaces',
+en=>'Namespaces'
+},

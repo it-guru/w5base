@@ -1,0 +1,4 @@
+'TSharePoint::qrule::FillMissedIds'=>{
+  de=>'Auffüllen fehlender IDs',
+  en=>'Fillup missing IDs'
+},

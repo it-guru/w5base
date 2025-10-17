@@ -1,0 +1,18 @@
+'AL_TCom::qrule::NORcheck'=>{de=>'Prüfung des NOR-Nachweises und NOR-Vorgabe',
+                             en=>'Check for NOR-target and NOR-Verification'},
+'Necessity to creation of NOR-Verification'=>{
+  de=>'Notwendigkeit der Erstellung eines NOR-Nachweises'
+},
+'Necessity to creation of NOR-Verification'=>{
+  de=>'Notwendigkeit der Erstellung eines NOR-Nachweises'
+},
+'Necessity to creation of NOR-Target'=>{
+  de=>'Notwendigkeit der Erstellung einer NOR-Vorgabe'
+},
+'The current NOR-Target %s is out of date.'=>{
+  de=>'Die aktuelle NOR-Vorgabe %s ist veraltet.'
+},
+'The current NOR-Verification %s is out of date.'=>{
+  de=>'Der aktuelle NOR-Nachweis %s ist veraltet.'
+},
+

@@ -1,0 +1,106 @@
+#######################################################################
+'applid'=>{de=>'
+Bei T-Systems wird dieses Feld automatisch durch die ApplicationID 
+aus AssetManager aufgefüllt. Wenn die Anwendung in W5Base/Darwin 
+erzeugt wird, dann ist dieses Feld leer zu lassen.
+',en=>'
+At T-Systems is this field automatically filled with the ApplicationID 
+from AssetManager. If the application is in W5Base/Darwin created, then 
+this is to leave blank.
+'},
+#######################################################################
+'applnumber'=>{de=>'
+Diese Nummer ist die Nummer, unter der die Anwendung in KOMPAS
+registriert ist.
+',en=>'
+This is the number under witch the current application is
+registered in KOMPAS.
+'},
+
+'drclass'=>{de=>'
+Disaster Recovery Class, welche für diese 
+Anwendung implementiert ist.
+
+Die Definition und der Zusammenhang der 
+einzelnen Klasse ist in dem ...<br>
+<a href="https://telekom.sharepoint.de/sites/mydms/System/default.aspx?deeplink=true&docid=85025"
+ target="_blank">SCM Dokument myMDS 85025</a><br>
+... beschrieben.
+',en=>'
+Disaster Recovery class, which is implemented 
+for this application. 
+
+The definition and relationship of each class 
+is described in the ...
+<a href="https://telekom.sharepoint.de/sites/mydms/System/default.aspx?deeplink=true&docid=85025"
+ target="_blank">SCM Dokument myMDS 85025</a><br>
+'},
+'usetimes'=>{
+'de'=>'
+<b>Hauptnutzungszeit</b><br>
+<br>
+Die Angabe bezieht sich immer auf die Businessapplikation, 
+nicht auf einzelne Bereiche/Funktionen.<br>
+<br>
+Die Freigabe für einen Change der diesen Zeitbereich 
+betrifft (egal ob ganz oder nur teilweise) kann nur 
+über eine Eskalation innerhalb des CAB+ erwirkt werden. 
+Ausgenommen hiervon sind E-Changes.<br>
+<br>
+<br>
+<b>Nebennutzungszeit</b><br>
+<br>
+Die Angabe bezieht sich immer auf die Businessapplikation, 
+nicht auf einzelne Bereiche/Funktionen.<br>
+<br>
+Innerhalb der Zeiten werden Changes, nach Vorliegen der 
+erforderlichen Approvals, über den Regelprozess freigegeben.<br>
+<br>
+Nutzungszeiten sind im Format VON-BIS zu erfassen. Es können pro
+Tag mehrere Zeitblöcke definiert werden. Jedem Zeitblock ist sein
+Typ voranzustellen. Die möglichen Typen sind in der Legende
+aufgeführt. z.B.<br>
+X07:00-08:00,X10:00-11:00,Z22:00-24:00
+',
+'en'=>'
+<b>Main use time</b><br>
+<br>
+The information always refers to the business application, 
+not the individual area / function.<br>
+<br>
+The release for a Change taking place in this time 
+period (whether wholly or partially) can only be obtained 
+through an escalation within the CAB+. This does 
+not include e-Changes.<br>
+<br>
+ <br>
+<br>
+<b>Secondary use time</b><br>
+<br>
+The information always refers to the business application, 
+not the individual area / function.<br>
+<br>
+The changes which take place during this time are 
+released according to the usual process, after presenting 
+the necessary approvals.<br>
+<br>
+The use times need to be in format "from-to". Multiple time blocks can be defined per day. Each time block is preceded by its type. All possible types are listed in the legend e.g.:<br>
+X07:00-08:00,Y10:00-11:00,Z22:00-24:00
+'
+},
+'itnormodel'=>{de=>'
+Für TelekomIT Anwendungen gilt, das bei Änderungen des zu
+verwendenen NOR-Lösungsmodels, diese in Cape im NOR-Pass
+eingetragen werden müssen.<br>
+Diese Änderung des NOR-Lösungsmodels in Cape wird dann
+automatisch per Schnittstelle innerhalb weniger Stunden
+nach W5Base/Darwin übernommen (durch die automatische
+Erstellung eines neuen NOR-Vorgabe Dokumentes).
+',en=>'
+For TelekomIT Applications are modifications on the
+NOR-Model need to done in Cape (NOR-Pass).<br>
+These changes will be transfert by an interface
+to W5Base/Darwin within a few hours. 
+'},
+
+

@@ -1,0 +1,5 @@
+'TS::qrule::CheckINMinW5BaseSrcSys'=>{
+  de=>'Überprüfung der Notwendigkeit einer Incident-Assignmentgroup',
+  en=>'check the necessity of an incident assignmentgroup'},
+'missing valid incident assignmentgroup'=>{de=>'keine gültige Incident-Assignmentgroup erfasst'},
+'refered incident assignmentgroup is deleted'=>{de=>'die angegebene Incident-Assignmentgroup ist gelöscht oder als gelöscht markiert'},

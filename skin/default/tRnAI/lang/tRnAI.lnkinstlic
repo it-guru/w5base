@@ -1,0 +1,6 @@
+'tRnAI::lnkinstlic'=>{de=>'Lizenz-Instanz Relation',en=>'License-Instance Relation'},
+'fieldgroup.system'=>{de=>'System',en=>'System'},
+'fieldgroup.instance'=>{de=>'Instanz',en=>'Instance'},
+'fieldgroup.license'=>{de=>'Lizenz',en=>'License'},
+'License'=>{de=>'Lizenz'},
+'Instance'=>{de=>'Instanz'},

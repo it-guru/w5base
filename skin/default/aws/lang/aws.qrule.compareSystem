@@ -1,0 +1,4 @@
+'aws::qrule::compareSystem'=>{de=>'AWS Abgleich log. System',en=>'AWS compare of log. system'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'can not identify availability zone asset from AWS - please contact Cloud-Admins'=>{de=>'Asset für AvailabilityZone kann nicht identifiziert werden - bitte kontaktieren Sie die Cloud-Admins'},
+'can not assign network area to'=>{de=>'Netzbereich kann nicht zugewiesen werden'},

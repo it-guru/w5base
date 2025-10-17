@@ -1,0 +1,10 @@
+'AL_TCom::qrule::checkInterviewCS'=>{
+  de=>'Prüfung der Interview-Antworten im ClusterServiceSwitch Thema',
+  en=>'Check Interview Answers at ClusterServiceSwitch topic'
+},
+'not existing ClusterServiceSwitch change number'=>{
+ de=>'nicht existierende ClusterServiceSwitch Changenummer'
+},
+'age of ClusterServiceSwitch Test violates SLA definition'=>{
+ de=>'Alter des letzten ClusterService-Switch Tests verletzt SLA-Vorgaben'
+},

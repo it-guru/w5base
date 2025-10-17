@@ -1,0 +1,4 @@
+'tardis::echo'=>{
+   de=>'TARDIS: Grundlegender ECHO Service /eni/echo/v1',
+   en=>'TARDIS: generic ECHO Service /eni/echo/v1',
+},

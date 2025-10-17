@@ -1,0 +1,8 @@
+'TS::qrule::AccessUrlResolver'=>{de=>'Überprüfung des Hostnames in der URL',
+                                 en=>'Validation of the hostname in the URL'},
+'unable to resolv hostname part of url in DNS'=>{de=>'Hostname kann nicht im DNS aufgelöst werden'},
+'can not resolv hostname'=>{de=>'Host-Name kann im DNS nicht aufgelöst werden'},
+'Application inactive'=>{de=>'Anwendung nicht aktiv'},
+'URL deleted'=>{de=>'URL gelöscht'},
+'invalid hostname'=>{de=>'ungültiger hostname'},
+'can not identify hostname in'=>{de=>'hostname nicht identifizierbar'},

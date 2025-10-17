@@ -1,0 +1,18 @@
+'FLEXERAatW5W::instpkgsoftware'=>{de=>'FLEXERA: installierte packetierte Sofware',en=>'FLEXERA: installed packaged software'},
+'fieldgroup.support'=>{de=>'Support und Lifecycle',en=>'Support and Lifecyle'},
+'fieldgroup.evidence'=>{de=>'Software Beweise',en=>'Software evidences'},
+'Publisher'=>{de=>'Hersteller'},
+'full version string'=>{de=>'vollständiger Versionsstring'},
+'Product Title'=>{de=>'Software-Produkt'},
+'SoftwareTitleVersion'=>{de=>'Version'},
+'Inst-Date'=>{de=>'Installationsdatum'},
+'Classification'=>{de=>'Klassifikation'},
+'release date'=>{de=>'Veröffentlichungsdatum'},
+'start of life date'=>{de=>'Beginn Lifecycle'},
+'end of life date'=>{de=>'Ende Lifecycle'},
+'end of sales date'=>{de=>'Verkaufsende'},
+'supported until'=>{de=>'Support bis'},
+'extended support until'=>{de=>'Extended-Support bis'},
+'Scan-Date'=>{de=>'Scan-Datum'},
+
+

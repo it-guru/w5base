@@ -1,0 +1,11 @@
+Dear ServerFarm-databoss,
+
+the hardware %NAME% must be replaced by <b>%REFRESH%</b> according to the hardware refresh process.
+
+You will receive this information for the last time, please urgently initiate a refresh.
+
+
+Relevant systems: %SYSTEMS%
+
+Relevant applications: %APPLICATIONS%
+

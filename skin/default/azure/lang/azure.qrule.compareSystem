@@ -1,0 +1,3 @@
+'azure::qrule::compareSystem'=>{de=>'AZURE Abgleich log. System',en=>'AZURE compare of log. system'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
+'can not identify availability zone asset from AZURE - please contact Cloud-Admins'=>{de=>'Asset für AvailabilityZone kann nicht identifiziert werden - bitte kontaktieren Sie die Cloud-Admins'},

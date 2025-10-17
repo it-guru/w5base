@@ -1,0 +1,15 @@
+########################################################################
+'clusterid'=>{de=>'
+Bei T-Systems ist in diesem Feld die ClusterID aus AssetManager
+einzutragen. Wenn der Cluster nur in W5Base/Darwin erzeugt wird, dann
+ist dieses Feld leer zu lassen - es sei den Sie wollen den
+neuen Cluster mit einer bereits in AssetManager vorhandenen Cluster
+"verbinden", d.h. es soll kein neuer Cluster in AssetManager
+hinzugefügt werden.',en=>'
+At T-Systems is this field the ClusterID from Asset Center 
+Indicated. If the cluster in W5Base/Darwin created, then 
+this is let to be blank, but if you want to link to  
+an already available Asset Center Cluster, 
+ie it will be not a new cluster in Asset Center 
+Added.
+'}

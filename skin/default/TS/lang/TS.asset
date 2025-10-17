@@ -1,0 +1,3 @@
+'TS::asset'=>{de=>'Deutsche Telekom physisches System/Hardware',en=>'Deutsche Telekom Asset-Hardware'},
+'fieldgroup.amrel'=>{de=>'AssetManager Zuordnung',en=>'AssetManager Relation'},
+'fieldgroup.inmchm'=>{de=>'Incident und Change-Management',en=>'Incident and Change-Management'},
