@@ -1000,13 +1000,13 @@ sub DataCollector
          }
          if ($#{$data}==0){
             if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-               msg(INFO,"pre ESprepairRawResult: ".Dumper($data));
+               #msg(INFO,"pre ESprepairRawResult: ".Dumper($data));
             }
          }
          $self->ESprepairRawResult($data);
          if ($#{$data}==0){
             if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-               msg(INFO,"post ESprepairRawResult: ".Dumper($data));
+               #msg(INFO,"post ESprepairRawResult: ".Dumper($data));
             }
          }
          return($data);

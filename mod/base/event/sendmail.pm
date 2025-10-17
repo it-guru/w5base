@@ -302,8 +302,7 @@ sub Sendmail
             @emailto=map({my $m=$_;
                           my $qm=quotemeta($m);
                           if (!grep(/^$qm$/i,@mailallow)){
-                             $m=~s/\@.*$//;
-                             $m=~s/\@.*$/\@null.com/;
+                             $m=~s/\@.*$/\@trash.w5base.net/;
                           }
                           $m;
                          } @emailto);
@@ -317,8 +316,7 @@ sub Sendmail
             @emailcc=map({my $m=$_;
                           my $qm=quotemeta($m);
                           if (!grep(/^$qm$/i,@mailallow)){
-                             $m=~s/\@.*$//;
-                             $m=~s/\@.*$/\@null.com/;
+                             $m=~s/\@.*$/\@trash.w5base.net/;
                           }
                           $m;
                          } @emailcc);
@@ -334,8 +332,7 @@ sub Sendmail
             @emailbcc=map({my $m=$_;
                           my $qm=quotemeta($m);
                           if (!grep(/^$qm$/i,@mailallow)){
-                             $m=~s/\@.*$//;
-                             $m=~s/\@.*$/\@null.com/;
+                             $m=~s/\@.*$/\@trash.w5base.net/;
                           }
                           $m;
                          } @emailbcc);

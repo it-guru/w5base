@@ -63,8 +63,8 @@ sub process
       die('lost my parent W5Server process - not good') if (getppid()==1);
       my $targettime=time()+$sleep;
       do{
-        msg(DEBUG,"sleep ".time()." target=$targettime ".
-                  "doForceMailSpool $self->{doForceMailSpool}");
+#        msg(DEBUG,"sleep ".time()." target=$targettime ".
+#                  "doForceMailSpool $self->{doForceMailSpool}");
         sleep(1);
       }while((time()<$targettime) && !$self->{doForceMailSpool});
    }

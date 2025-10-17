@@ -69,4 +69,5 @@
 'Additionalinformations'=>{de=>'Zusatzinformationen'},
 'URL of record'=>{de=>'URL des Datensatzes'},
 'enrichment only rule'=>{de=>'Datenanreicherungsregel'},
+'all desired fields has been updated'=>{de=>'alle geforderten Felder wurden aktualisiert'},
 
