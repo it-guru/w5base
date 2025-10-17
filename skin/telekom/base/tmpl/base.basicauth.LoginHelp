@@ -1,8 +1,7 @@
 <b>W5Base-Standard-Login:</b><br>
 To log in to W5Base/Darwin you can use your ...
 <ul>
-<li>... EMEA account, or</li>
-<li>... CIAM account, or</li>
+<li>... EMEA account</li>
 </ul>
 Please use your password from the corresponding authentication system.
 <br>
@@ -13,4 +12,3 @@ If you are not already a registered user, please log in with your new credential
 Account Mueller.Hans, Domäne: EMEA1<br>
 
 EMEA1 Account: emea1/a???????<br>
-CIAM Account: ciam/hans.mueller@telekom.de<br>
