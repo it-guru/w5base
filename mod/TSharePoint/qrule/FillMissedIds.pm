@@ -121,20 +121,23 @@ sub qcheckRecord
    if (!defined($parrec) && $rec->{leaderitid} ne ""){
       # check, if more then 50 VOUs have a HUB-ID
       $dataobj->ResetFilter();
-      $dataobj->SetFilter({hubid=>'![EMPTY]');
+      $dataobj->SetFilter({hubid=>'![EMPTY]'});
+      my $n=$dataobj->CountRecords();
 
-      # try to find a unique relation over BO-IT 
-      my $o=getModuleObject($self->getParent->Config(),"base::user");
-      $o->SetFilter({userid=>\$rec->{leaderitid},cistatusid=>4});
-      my ($urec,$msg)=$o->getOnlyFirst(qw(cistatusid fullname email));
-      if (defined($urec)){
-         $par->ResetFilter();
-         msg(INFO,$self->Self()." search by $urec->{email}");
-         $par->SetFilter({boit_email=>$urec->{email}});
-         my @l=$par->getHashList(qw(ALL));
-         if ($#l==0){
-            msg(INFO,$self->Self()." found unique parrec by BO-IT");
-            $parrec=$l[0];
+      if ($n>50){
+         # try to find a unique relation over BO-IT 
+         my $o=getModuleObject($self->getParent->Config(),"base::user");
+         $o->SetFilter({userid=>\$rec->{leaderitid},cistatusid=>4});
+         my ($urec,$msg)=$o->getOnlyFirst(qw(cistatusid fullname email));
+         if (defined($urec)){
+            $par->ResetFilter();
+            msg(INFO,$self->Self()." search by $urec->{email}");
+            $par->SetFilter({boit_email=>$urec->{email}});
+            my @l=$par->getHashList(qw(ALL));
+            if ($#l==0){
+               msg(INFO,$self->Self()." found unique parrec by BO-IT");
+               $parrec=$l[0];
+            }
          }
       }
       if (defined($parrec)){
