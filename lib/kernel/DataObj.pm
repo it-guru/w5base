@@ -3187,21 +3187,25 @@ sub findNearestTargetDataObj
       }
    }
    if ($dataobj ne "" && $m2 ne ""){
-      if ( -f "$W5V2::INSTDIR/mod/$m2/$dataobj.pm"){
-         my $nto="${m2}::${dataobj}";
-         eval("use $nto;"); # ensure all super objects are used
-         my @tree=Class::ISA::super_path($nto); 
-         #msg(INFO,"check from $to to $nto in $requestedfor");
-         if (in_array(\@tree,$to)){
-            #msg(INFO,"rewrite for target of $requestedfor from $to to $nto");
-            return($nto);
-         }
-         else{
-            if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
-               msg(WARN,"unable findNearestTargetDataObj in '$s' ".
-                        "from '$to' to '$nto' ".
-                        "requested for ".$requestedfor." needs SCALAR ref ".
-                        "because not unique dataobject names");
+      my @instdirlist=reverse(split(/:/,$W5V2::INSTDIR));
+      foreach my $instdir (@instdirlist){
+         if ( -f "$W5V2::INSTDIR/mod/$m2/$dataobj.pm"){
+            my $nto="${m2}::${dataobj}";
+            eval("use $nto;"); # ensure all super objects are used
+            my @tree=Class::ISA::super_path($nto); 
+            #msg(INFO,"check from $to to $nto in $requestedfor");
+            if (in_array(\@tree,$to)){
+               #msg(INFO,"rewrite for target of $requestedfor ".
+               #         "from $to to $nto");
+               return($nto);
+            }
+            else{
+               if ($self->Config->Param("W5BaseOperationMode") eq "dev"){
+                  msg(WARN,"unable findNearestTargetDataObj in '$s' ".
+                           "from '$to' to '$nto' ".
+                           "requested for ".$requestedfor." needs SCALAR ref ".
+                           "because not unique dataobject names");
+               }
             }
          }
       }
