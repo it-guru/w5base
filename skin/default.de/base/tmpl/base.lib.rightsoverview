@@ -1,4 +1,0 @@
-<h1>Berechtigungs-/Referenz Übersicht</h1>
-In dieser Auflistung wird eine Übersicht zusammengestellt, an welchen Stellen  <b>%target%</b> reverenziert ist. Aus technischen Gründen kann an dieser Stelle keine detaillierte Erklärung stattfinden, welche funktionellen Rechte sich durch die Referenzen im Einzelnen ableiten. <br><br>
-Korrekturen an den Verweisen/Berechnungen können bei Menüzugriffsregeln nur die Admins durchführen. Bei WebFS Einträgen hängt dies vom jeweiligen Verzeichnis ab, da u.U. Administratoren für einzelnen Pfade definiert sind. Bei allen anderen Datenobjekten sind immer die jeweiligen Datenverantwortlichen die korrekten Ansprechpartner bei gewünschten Änderungen. <br>
-<br>

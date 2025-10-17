@@ -1,4 +1,0 @@
-
- %chart1%
-
-Die Anzahl der Software Instanzen (z.B. Datenbanken oder Applikationsserver) bezieht sich auf die Instanzen, bei denen das Betreuungs-Team der Gruppe '%statname%' oder einer deren Untergruppen zugewiesen ist. Es werden nur die Config-Items gezählt, bei denen der CI-Status auf "installiert/aktiv" eingestellt ist.

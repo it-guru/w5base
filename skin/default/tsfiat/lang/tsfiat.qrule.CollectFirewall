@@ -1,4 +1,0 @@
-'tsfiat::qrule::CollectFirewall'=>{
-   de=>'FIAT Firewalldatenabfrage',
-   en=>'FIAT Firewalldataquery'
-},

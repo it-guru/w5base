@@ -1,4 +1,0 @@
-
- %chart1%
-
-Die Anzahl der Kundenverträge bezieht sich auf die Verträge, bei denen Servicemanagement-Team der Gruppe '%statname%' oder einer deren Untergruppen zugewiesen ist. Es werden nur die Config-Items gezählt, bei denen der CI-Status auf "installiert/aktiv" eingestellt ist.

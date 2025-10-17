@@ -1,5 +1,0 @@
-
- %chart2%
-
-Die Anzahl betrieblich betreuter logische Systeme bezieht sich auf die Systeme, bei denen bei der zugehörigen Anwendung das Betriebsteam der Gruppe '%statname%' oder einer deren Untergruppen zugewiesen ist. Es werden nur die Config-Items gezählt, bei denen der CI-Status auf "installiert/aktiv" eingestellt ist.
-

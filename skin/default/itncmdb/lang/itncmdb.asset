@@ -1,9 +1,0 @@
-'itncmdb::asset'=>{
-  de=>'ITENOS cmdb: physisches System (Hardware)',
-  en=>'ITENOS cmdb: physical System (Hardware)',
-},
-'fieldgroup.w5baselocation'=>{
-  de=>'W5Base Standort',
-  en=>'W5Base Location'
-},
-'original source record'=>{de=>'original Datensatz'},

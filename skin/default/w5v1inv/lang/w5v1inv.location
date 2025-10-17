@@ -1,3 +1,0 @@
-'Callname'   => {de=>'Standortname'},
-'fieldgroup.default'   => {de=>'Standortdaten',en=>'Locationinformations'},
-'w5v1inv::location'   => {de=>'Standort',en=>'Location'},
