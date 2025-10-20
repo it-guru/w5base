@@ -1,4 +1,4 @@
-use w5base;
+use w5base;  # DEPEND itil/itinv.sql  
 create table grpindivsystem (
   id         varchar(40) NOT NULL,
   grpindivfld bigint(20) NOT NULL,

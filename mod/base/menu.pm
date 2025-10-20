@@ -425,7 +425,7 @@ sub TableVersionLoadSqlFileData
              =~m/^use\s+([a-z0-9A-Z]+);(\s*#\s*(depend|DEPEND)\s+(.+))?\s*$/m){
             $rec->{dataobj}=$dataobj;
             if ($depend ne ""){
-               $rec->{depend}=[split(/\s*[,;]\s*/,$depend)];
+               $rec->{depend}=[map({trim($_)} split(/\s*[,;]\s*/,$depend))];
             }
          }
          $rec->{lines}=$#l+1;
@@ -446,7 +446,7 @@ sub TableVersionLoadSqlFileData
               push(@chkD,$dk);
            }
            else{
-              msg(ERROR,"unkown dependency $dk in $c{$k}->{sqlfile}");
+              msg(ERROR,"unkown dependency '$dk' in $c{$k}->{sqlfile}");
            }
         }
         my $curnum=$c{$k}->{num};
@@ -459,6 +459,12 @@ sub TableVersionLoadSqlFileData
      }
    }
    my @order=sort({ $c{$a}->{num} <=> $c{$b}->{num} } keys(%c));
+   foreach my $k (@order){
+      msg(DEBUG,"check $k -> num:".$c{$k}->{num}.
+                "\n $k -> linenumber:".$c{$k}->{linenumber}.
+                "\n $k -> file lines:".$c{$k}->{lines}.
+                "\n---");
+   }
 
    return(%c);
 }
