@@ -450,7 +450,13 @@ min number of cores               : 1
  verify the integrity of your installation. With this tool most of
  mistakes can be checked.
 
-  
+ It is recommended, to create a hole database not by the web interface (as
+ admin) rather than doing it by ...
+
+ sbin/W5Event -c yourConfig -s -d -v TableVersionCheck
+
+ If you do this by normal Web-Frontend access, it is posible to run into
+ a Web-Server timeout.
 
 
 

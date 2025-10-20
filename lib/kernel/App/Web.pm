@@ -152,6 +152,11 @@ sub RunWebApp
    my $bk=$W5V2::ObjCache{$objectkey}->{Obj}->Run();
    if ($W5V2::InvalidateGroupCache){
       $W5V2::ObjCache{$objectkey}->{Obj}->InvalidateGroupCache();
+      $W5V2::InvalidateGroupCache=undef;
+   }
+   if ($W5V2::InvalidateMenuCache){
+      $W5V2::ObjCache{$objectkey}->{Obj}->InvalidateMenuCache();
+      $W5V2::InvalidateMenuCache=undef;
    }
 
    if ($havestate ne ""){

@@ -1,4 +1,4 @@
-use w5base;
+use w5base; # DEPEND base/usermgmt.sql
 create table location (
   id         bigint(20) NOT NULL,
   name       varchar(255) NOT NULL,
@@ -855,6 +855,6 @@ create table interviewtodocache (
   createdate datetime NOT NULL default '0000-00-00 00:00:00',
   modifydate datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (id),
-  KEY name (dataobject,dataobjectid),key userid(userid),
-  FOREIGN KEY (userid) REFERENCES contact (userid) ON DELETE CASCADE
+  KEY interviewtodocache_name (dataobject,dataobjectid),key interviewtodocache_userid(userid),
+  FOREIGN KEY interviewtodocache_fk_userid (userid) REFERENCES contact (userid) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

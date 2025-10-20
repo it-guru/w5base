@@ -976,7 +976,8 @@ sub FinishDelete
                       });
    }
 
-   $self->InvalidateGroupCache();
+   #$self->InvalidateGroupCache();
+   $W5V2::InvalidateGroupCache++;
    if (!$self->HandleCIStatus($oldrec,undef,%{$self->{CI_Handling}})){
       return(0);
    }

@@ -208,7 +208,8 @@ sub FinishWrite
    my $oldrec=shift;
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
-   $self->InvalidateMenuCache();
+   #$self->InvalidateMenuCache();
+   $W5V2::InvalidateMenuCache++;
    return($bak);
 }
 
@@ -217,7 +218,8 @@ sub FinishDelete
    my $self=shift;
    my $oldrec=shift;
    my $bak=$self->SUPER::FinishDelete($oldrec);
-   $self->InvalidateMenuCache();
+   #$self->InvalidateMenuCache();
+   $W5V2::InvalidateMenuCache++;
    return($bak);
 }
 
@@ -271,15 +273,14 @@ sub TableVersionProceedFile
 
    my $db=$self->InitTableVersionChecker();
    if ($rec->{tventry} eq "no"){
-      $db->do("insert into tableversion(filename) values('$rec->{filename}')");
+      $db->do("insert into tableversion(filename) values('$rec->{sqlfilename}')");
    }
    my $workdb=new kernel::database($self,$rec->{dataobj});
    if (!$workdb->Connect()){
       $rec->{msg}="ERROR: ".$workdb->getErrorMsg(); 
       return(undef);
    }
-   my $f=$self->Config->Param("INSTDIR");
-   $f="$f/sql/$rec->{filename}";
+   my $f=$rec->{filename};
    if (!open(F,"<$f")){
       $rec->{msg}="ERROR: can't open '$f'";
       return(undef);
@@ -307,16 +308,29 @@ sub TableVersionProceedFile
       next if ($curline <= $rec->{linenumber});
       next if ($l=~/^\s*$/ || $l=~/^\s*#.*$/);
       $l=~s/^\s+/ /g;
+      $l=~s/#.*$//;
       $command=$command.$l;
       if ($command=~/^.*;\s*$/){
-         $command=~s/;\s*$//;
-         printf STDERR ("[notice] W5Base dbtool '%s'\n",$command);
-         if ($command=~m/^use \S+$/ || defined($workdb->do($command))){
+         $command=~s/;\s*(#.*)?$//;
+         printf STDERR ("[notice] W5Base dbtool(%s) '%s'\n",$rec->{sqlfilename},$command);
+         # 
+         # use lines are NOT processed at now! - maybe the can be handled
+         # in the future
+         # 
+         my $doresult;
+         if ($command=~m/^use\s+\S+.*$/){
+            $doresult=1;
+         }
+         else{
+            $doresult=$workdb->do($command);
+         }
+     
+         if (defined($doresult)){
             $cmdok++;
             $workdb->finish();
             $db->do("update  tableversion ".
                     "set linenumber='$curline' ".
-                    "where filename='$rec->{filename}' ");
+                    "where filename='$rec->{sqlfilename}' ");
          }
          else{
             $rec->{msg}.=msg(ERROR,"Command '%s'",$command);
@@ -346,6 +360,7 @@ sub TableVersionIsInconsistent
    my $self=shift;
    my %c=$self->TableVersionLoadSqlFileData();
 
+
    foreach my $rec (values(%c)){
       next if (!defined($rec->{dataobj}));
       return(1) if ($rec->{linenumber}<$rec->{lines});
@@ -357,16 +372,37 @@ sub TableVersionLoadSqlFileData
 {
    my $self=shift;
    my $db=$self->InitTableVersionChecker();
-   my $instdir=$self->Config->Param("INSTDIR");
-   my $pat="$instdir/sql/*/*.sql";
-   my @sublist=glob($pat);
+
    my %c=();
-   map({my $qi=quotemeta($instdir);
-        $_=~s/^$instdir//;
-        $_=~s/\/sql\///; $_=~s/\.pm$//;
-        $c{$_}={filename=>$_};
-       } @sublist);
+   my @fullinstpath;
+   my $num=0;
+
+   push(@fullinstpath,$W5V2::INSTDIR);
+
+   if (ref($W5V2::INSTPATH) eq "ARRAY" && $#{$W5V2::INSTPATH}!=-1){
+      push(@fullinstpath,@{$W5V2::INSTPATH});
+   }
+
+ 
+   foreach my $instdir (@fullinstpath){
+      my $pat="$instdir/sql/*/*.sql";
+      my @sublist=glob($pat);
+      map({my $qi=quotemeta($instdir);
+           $_=~s/^$instdir//;
+           $_=~s/\/sql\///; $_=~s/\.pm$//;
+           if (!exists($c{$_})){
+              $c{$_}={
+                 sqlfilename=>$_,
+                 filename=>$instdir.'/sql/'.$_,
+                 num=>$num++
+              };
+           }
+      } @sublist);
+   }
+
+
    my @tv=$db->getHashList("select * from tableversion where id>0");
+
 
    foreach my $rec (values(%c)){
       $rec->{tventry}="no";
@@ -374,24 +410,56 @@ sub TableVersionLoadSqlFileData
       $rec->{readable}="no";
       $rec->{lines}=undef;
       $rec->{dataobj}=undef;
+
       map({
-           if ($rec->{filename} eq $_->{filename}){
+           if ($rec->{sqlfilename} eq $_->{filename}){
               $rec->{tventry}="yes";
               $rec->{linenumber}=$_->{linenumber};
               $rec->{id}=$_->{id};
               $rec->{linenumber}=0 if (!defined($rec->{linenumber}));
            }
           } @tv);
-      if (open(F,"<$instdir/sql/$rec->{filename}")){
+      if (open(F,"<".$rec->{filename})){
          my @l=<F>;
-         if (my ($dataobj)=join("",@l)=~m/^use\s+([a-z0-9A-Z]+);$/m){
+         if (my ($dataobj,$dstring,$dstrcmd,$depend)=join("",@l)
+             =~m/^use\s+([a-z0-9A-Z]+);(\s*#\s*(depend|DEPEND)\s+(.+))?\s*$/m){
             $rec->{dataobj}=$dataobj;
+            if ($depend ne ""){
+               $rec->{depend}=[split(/\s*[,;]\s*/,$depend)];
+            }
          }
          $rec->{lines}=$#l+1;
          $rec->{readable}="yes";
          close(F);
       }
    }
+   # reorder with depend handling ToDo!
+   my $changed=0;
+
+
+   my @order=sort({ $c{$a}->{num} <=> $c{$b}->{num} } keys(%c));
+   foreach my $k (@order){
+     if (exists($c{$k}->{depend})){
+        my @chkD;
+        foreach my $dk (@{$c{$k}->{depend}}){
+           if (exists($c{$dk})){
+              push(@chkD,$dk);
+           }
+           else{
+              msg(ERROR,"unkown dependency $dk in $c{$k}->{sqlfile}");
+           }
+        }
+        my $curnum=$c{$k}->{num};
+        foreach my $dk (@chkD){
+           if ($c{$dk}->{num}>$curnum){
+              $c{$k}->{num}=$c{$dk}->{num}+1;
+              $changed++;
+           }
+        }
+     }
+   }
+   my @order=sort({ $c{$a}->{num} <=> $c{$b}->{num} } keys(%c));
+
    return(%c);
 }
 
@@ -439,17 +507,8 @@ sub TableVersionModifications
    $op.="<th width=1%>processed</th>";
    $op.="<th>lines</th>";
    $op.="</tr>\n";
-   my @order=sort({my $A=$a;
-                   my $B=$b;
-                   $A=~tr/[A-Z][a-z]/[a-z][A-Z]/;
-                   $B=~tr/[A-Z][a-z]/[a-z][A-Z]/;
-                   $A cmp $B} keys(%c));
 
-   foreach my $keystring (qw( user master)){
-      @order = sort {
-          ($a =~m/$keystring/x ? 0 : 1) <=> ($b=~m/$keystring/x ? 0 : 1)
-      } @order;
-   }
+   my @order=sort({ $c{$a}->{num} <=> $c{$b}->{num} } keys(%c));
 
    foreach my $sqlfile (@order){
       my $style;
@@ -519,11 +578,13 @@ sub TableVersionModifications
 sub TableVersionCreate
 {
    my $self=shift;
+   my $unattented=shift;
+
    my $db=$self->InitTableVersionChecker();
    my $style="nolog";
    my $errormsg;
    my $loghead="&nbsp;";
-   if (Query->Param("do")){
+   if ($unattented="unattented" || Query->Param("do")){
       $style="log";
       $loghead="<font color=red>Database problem:</font>";
       my $cmd=<<EOF;
@@ -595,7 +656,7 @@ sub TableVersionCheck
 
    my $db=$self->InitTableVersionChecker();
    if (!$self->TableVersionExists()){
-      $self->TableVersionCreate();
+      $self->TableVersionCreate("unattended");
    }
    if ($self->TableVersionIsInconsistent()){
       return($self->TableVersionModifications("unattended"));
@@ -1138,7 +1199,7 @@ sub msel
 {
    my $self=shift;
    my $mt=$self->Cache->{Menu}->{Cache};
-   #printf STDERR ("fifi mtab=%s\n",Dumper($mt));
+
    my $fp=Query->Param("FunctionPath"); 
    my $originalMenuSelection=$fp;
    $fp=~s/^\///;
