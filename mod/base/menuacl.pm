@@ -86,7 +86,8 @@ sub FinishWrite
    my $oldrec=shift;
    my $newrec=shift;
    my $bak=$self->SUPER::FinishWrite($oldrec,$newrec);
-   $self->InvalidateMenuCache();
+   #$self->InvalidateMenuCache();
+   $W5V2::InvalidateMenuCache++;
    return($bak);
 }
 
@@ -95,7 +96,8 @@ sub FinishDelete
    my $self=shift;
    my $oldrec=shift;
    my $bak=$self->SUPER::FinishDelete($oldrec);
-   $self->InvalidateMenuCache();
+   #$self->InvalidateMenuCache();
+   $W5V2::InvalidateMenuCache++;
    return($bak);
 }
 
