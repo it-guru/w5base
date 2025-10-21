@@ -28,7 +28,7 @@ associated with the assignment of rights (read or write).
 =cut
 #######################################################################
 #  W5Base Framework
-#  Copyright (C) 2015  Hartmut Vogler (it@guru.de)
+#  Copyright (C) 2025  Hartmut Vogler (it@guru.de)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

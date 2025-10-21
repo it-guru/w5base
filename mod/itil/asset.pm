@@ -746,7 +746,6 @@ sub new
                 name          =>'contacts',
                 label         =>'Contacts',
                 vjoinbase     =>[{'parentobj'=>\'itil::asset'}],
-                vjoininhash   =>['targetid','target','roles'],
                 group         =>'contacts'),
 
       new kernel::Field::PhoneLnk(
