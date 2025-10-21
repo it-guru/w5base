@@ -462,10 +462,10 @@ sub TableVersionLoadSqlFileData
    }
    my @order=sort({ $c{$a}->{num} <=> $c{$b}->{num} } keys(%c));
    foreach my $k (@order){
-      msg(DEBUG,"check $k -> num:".$c{$k}->{num}.
-                "\n $k -> linenumber:".$c{$k}->{linenumber}.
-                "\n $k -> file lines:".$c{$k}->{lines}.
-                "\n---");
+      my $dstring=sprintf("%3d %-30s %-18s",
+                          $c{$k}->{num},$k,
+                          "f:".$c{$k}->{lines}."/proc:".$c{$k}->{linenumber});
+      msg(DEBUG,$dstring);
    }
 
    return(%c);
