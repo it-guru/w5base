@@ -205,6 +205,10 @@ sub findtemplvar
             $d.=$opt;
             $n++;
          }
+         my $templtext=$self->getTemplate("tmpl/LoginNotice","base");
+         if ($templtext ne ""){
+            $d.=$templtext;
+         }
          $d.="</div>";
          $d.="<div id=LOGINHELP ".
             "class=\"LoginHelpMainFrame\">";
