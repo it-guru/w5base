@@ -627,11 +627,32 @@ sub new
                 dataobjattr   =>'system.is_webserver'),
 
       new kernel::Field::Boolean(
+                name          =>'isrouter',
+                group         =>'systemclass',
+                htmlhalfwidth =>1,
+                label         =>'Router/Networkrouter',
+                dataobjattr   =>'system.is_router'),
+
+      new kernel::Field::Boolean(
                 name          =>'isnetswitch',
                 group         =>'systemclass',
                 htmlhalfwidth =>1,
                 label         =>'Switch/Networkswitch',
                 dataobjattr   =>'system.is_netswitch'),
+
+      new kernel::Field::Boolean(
+                name          =>'isfirewall',
+                group         =>'systemclass',
+                htmlhalfwidth =>1,
+                label         =>'Firewall',
+                dataobjattr   =>'system.is_firewall'),
+
+      new kernel::Field::Boolean(
+                name          =>'isproxyportfw',
+                group         =>'systemclass',
+                htmlhalfwidth =>1,
+                label         =>'Proxy/PortForwarder',
+                dataobjattr   =>'system.is_proxyportfw'),
 
       new kernel::Field::Boolean(
                 name          =>'isembedded',
