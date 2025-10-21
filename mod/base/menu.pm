@@ -311,8 +311,13 @@ sub TableVersionProceedFile
       $l=~s/#.*$//;
       $command=$command.$l;
       if ($command=~/^.*;\s*$/){
-         $command=~s/;\s*(#.*)?$//;
-         printf STDERR ("[notice] W5Base dbtool(%s) '%s'\n",$rec->{sqlfilename},$command);
+         $command=~s/;\s*(#.*)?$//;   # remove comments
+         #######################################################################
+         # some cleanups in command
+         $command=~s/\s\s+/ /g;
+         #######################################################################
+         printf STDERR ("[notice] W5Base dbtool(%s) '%s'\n",
+                        $rec->{sqlfilename},$command);
          # 
          # use lines are NOT processed at now! - maybe the can be handled
          # in the future
@@ -433,10 +438,7 @@ sub TableVersionLoadSqlFileData
          close(F);
       }
    }
-   # reorder with depend handling ToDo!
    my $changed=0;
-
-
    my @order=sort({ $c{$a}->{num} <=> $c{$b}->{num} } keys(%c));
    foreach my $k (@order){
      if (exists($c{$k}->{depend})){
