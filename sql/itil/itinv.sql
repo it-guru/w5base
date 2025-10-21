@@ -33,10 +33,10 @@ create table appl (
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(512) default NULL,
   srcload    datetime    default NULL,
-  PRIMARY KEY  (id),
-  UNIQUE KEY applid (applid),
-  UNIQUE KEY name (name),KEY(mandator),key(conumber),
-  UNIQUE KEY `srcsys` (srcsys,srcid)
+  PRIMARY KEY appl_id (id),
+  UNIQUE KEY appl_applid (applid),
+  UNIQUE KEY appl_name (name),KEY appl_mandator(mandator),key appl_conumber (conumber),
+  UNIQUE KEY `appl_srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
 create table lnkapplcustcontract (
   id           bigint(20) NOT NULL,
@@ -52,10 +52,10 @@ create table lnkapplcustcontract (
   srcsys       varchar(100) default 'w5base',
   srcid        varchar(20) default NULL,
   srcload      datetime    default NULL,
-  PRIMARY KEY  (id),
-  KEY appl (appl),
-  KEY custcontract (custcontract),
-  UNIQUE KEY `srcsys` (srcsys,srcid)
+  PRIMARY KEY lnkapplcustcontract_id (id),
+  KEY lnkapplcustcontract_appl (appl),
+  KEY lnkapplcustcontract_custcontract (custcontract),
+  UNIQUE KEY `lnkapplcustcontract_srcsys` (srcsys,srcid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table system (
   id         bigint(20) NOT NULL,
@@ -105,11 +105,11 @@ create table system (
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(512) default NULL,
   srcload    datetime    default NULL,
-  PRIMARY KEY  (id),
-  UNIQUE KEY systemid (systemid),key itcloudarea(itcloudarea),
-  KEY adm (adm),KEY adm2 (adm2), KEY admteam (admteam),
-  UNIQUE KEY name (name),KEY(mandator),key assetid(asset),
-  UNIQUE KEY `srcsys` (srcsys,srcid)
+  PRIMARY KEY system_id (id),
+  UNIQUE KEY system_systemid (systemid),key system_itcloudarea(itcloudarea),
+  KEY system_adm (adm),KEY system_adm2 (adm2), KEY system_admteam (admteam),
+  UNIQUE KEY system_name (name),KEY system_mandator(mandator),key system_assetid(asset),
+  UNIQUE KEY `system_srcsys` (srcsys,srcid)
 ) ENGINE=INNODB;
 create table asset (
   id         bigint(20) NOT NULL,
@@ -141,12 +141,12 @@ create table asset (
   srcsys     varchar(100) default 'w5base',
   srcid      varchar(512) default NULL,
   srcload    datetime    default NULL,
-  PRIMARY KEY  (id),
-  UNIQUE KEY assetid (assetid),
-  UNIQUE KEY name (name),KEY(mandator),
-  KEY guardian (guardian),KEY guardian2 (guardian2), 
-  KEY guardianteam (guardianteam),
-  UNIQUE KEY `srcsys` (srcsys,srcid),key(location),key(hwmodel)
+  PRIMARY KEY asset_id (id),
+  UNIQUE KEY asset_assetid (assetid),
+  UNIQUE KEY asset_name (name),KEY asset_mandator(mandator),
+  KEY asset_guardian (guardian),KEY asset_guardian2 (guardian2), 
+  KEY asset_guardianteam (guardianteam),
+  UNIQUE KEY `asset_srcsys` (srcsys,srcid),key asset_location(location),key asset_hwmodel(hwmodel)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 create table platform (
   id         bigint(20) NOT NULL,
@@ -1853,3 +1853,4 @@ alter table swinstance add lorgchangedt datetime default NULL,add lrecertreqdt d
 alter table itcloud add lorgchangedt datetime default NULL,add lrecertreqdt datetime default NULL,add lrecertdt datetime default NULL,add lrecertuser bigint(20) default NULL,add lrecertreqnotify datetime default NULL;
 alter table applgrp add lorgchangedt datetime default NULL,add lrecertreqdt datetime default NULL,add lrecertdt datetime default NULL,add lrecertuser bigint(20) default NULL,add lrecertreqnotify datetime default NULL;
 drop table riskmgmtbase;
+alter table system add is_firewall bool default '0',add is_proxyportfw bool default '0';
