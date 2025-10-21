@@ -887,8 +887,6 @@ sub new
                 name          =>'contacts',
                 label         =>'Contacts',
                 vjoinbase     =>[{'parentobj'=>\'itil::swinstance'}],
-                vjoininhash   =>['mdate','targetid','target','roles',
-                                 'srcsys','srcid'],
                 group         =>'contacts'),
 
 #      new kernel::Field::PhoneLnk(
