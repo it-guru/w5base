@@ -103,14 +103,22 @@ sub new
                    my $self=shift;
                    my $current=shift;
                    my $id=$current->{id};
-                   my $instdir=$self->getParent->Config->Param("INSTDIR");
                    $id=~s/::/\//g;
+
+                   my @instdirlist=split(/:/,$W5V2::INSTDIR);
+                   if (ref($W5V2::INSTPATH) eq "ARRAY" && 
+                       $#{$W5V2::INSTPATH}!=-1){
+                      push(@instdirlist,@{$W5V2::INSTPATH});
+                   }
                    my $d="?";
-                   my $file="$instdir/mod/$id.pm";
-                   if (-f $file){
-                      if (open(F,"<$file")){
-                         $d=join("",<F>);
-                         close(F);
+                   foreach my $instdir (@instdirlist){
+                      my $file="$instdir/mod/$id.pm";
+                      if (-f $file){
+                         if (open(F,"<$file")){
+                            $d=join("",<F>);
+                            close(F);
+                         }
+                         last;
                       }
                    }
                    return($d);
