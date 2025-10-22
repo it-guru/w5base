@@ -64,6 +64,7 @@
 'sysadm.user.email'=>{de=>'E-Mail',en=>'E-Mail'},
 'sysadm.user.advice'=>{de=>'Hinweis',en=>'Hint'},
 'sysadm.user.querybreak'=>{de=>'Abfrageabbruch',en=>'Query break'},
+'sysadm.user.usermodusage'=>{de=>'Modul-Verwendung',en=>'Module-Usage'},
 'sysadm.itemizedlist'=>{de=>'Auswahlliste',en=>'Itemized list'},
 'sysadm.menu'=>{de=>'Menü-Verwaltung',en=>'Menu-Administration'},
 'sysadm.menu.new'=>{de=>'Neueingabe',en=>'New'},

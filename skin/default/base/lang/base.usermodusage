@@ -1,0 +1,8 @@
+'base::usermodusage'=>{
+  de=>"Modul Verwendung",
+  en=>"Module Usage"
+},
+'Logon Month'=>{de=>'Logon Monat'},
+'Count'=>{de=>'Anzahl'},
+'Contact'=>{de=>'Kontakt'},
+'Module'=>{de=>'Modul'},
