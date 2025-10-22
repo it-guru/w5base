@@ -89,6 +89,18 @@ sub Self
    return($self);
 }
 
+
+sub SelfFilename
+{
+   my ($self)=@_;
+   my $pfile=$self->Self().".pm";
+   $pfile=~s/::/\//g;
+   if (exists($INC{$pfile})){
+      return($INC{$pfile});
+   }
+   return(undef); 
+}
+
 sub SelfAsParentObject
 {
    my $self=shift;

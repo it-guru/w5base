@@ -104,21 +104,14 @@ sub new
                    my $current=shift;
                    my $id=$current->{id};
                    $id=~s/::/\//g;
-
-                   my @instdirlist=split(/:/,$W5V2::INSTDIR);
-                   if (ref($W5V2::INSTPATH) eq "ARRAY" && 
-                       $#{$W5V2::INSTPATH}!=-1){
-                      push(@instdirlist,@{$W5V2::INSTPATH});
-                   }
+                   my $filename=$self->getParent->SelfFilename();
                    my $d="?";
-                   foreach my $instdir (@instdirlist){
-                      my $file="$instdir/mod/$id.pm";
-                      if (-f $file){
-                         if (open(F,"<$file")){
+                   if (defined($filename)){
+                      if (-f $filename){
+                         if (open(F,"<$filename")){
                             $d=join("",<F>);
                             close(F);
                          }
-                         last;
                       }
                    }
                    return($d);
