@@ -60,7 +60,23 @@ sub getDescription
    my $instdir=$self->getParent->Config->Param("INSTDIR");
    my $selfname=$self->Self();
    $selfname=~s/::/\//g;
-   my $filename=$instdir."/mod/${selfname}.pm";
+
+   my $filename;
+
+   my @instdirlist=split(/:/,$W5V2::INSTDIR);
+   if (ref($W5V2::INSTPATH) eq "ARRAY" &&
+       $#{$W5V2::INSTPATH}!=-1){
+      push(@instdirlist,@{$W5V2::INSTPATH});
+   }
+
+   foreach my $instdir (@instdirlist){
+      my $f=$instdir."/mod/${selfname}.pm";
+      if (-f $f){
+         $filename=$f;
+      }
+   }
+
+
    my $html=`cd /tmp && 
              pod2html --title none --noheader --noindex --infile=$filename`;
    ($html)=$html=~m/<body[^>]*>(.*)<\/body>/smi;
@@ -78,7 +94,26 @@ sub getHints
    my $selfname=$self->Self();
    my $h;
    $selfname=~s/::/\//g;
-   my $filename=$instdir."/mod/${selfname}.pm";
+
+
+   my $filename;
+
+   my @instdirlist=split(/:/,$W5V2::INSTDIR);
+   if (ref($W5V2::INSTPATH) eq "ARRAY" &&
+       $#{$W5V2::INSTPATH}!=-1){
+      push(@instdirlist,@{$W5V2::INSTPATH});
+   }
+
+   foreach my $instdir (@instdirlist){
+      my $f=$instdir."/mod/${selfname}.pm";
+      if (-f $f){
+         $filename=$f;
+      }
+   }
+
+
+
+
    if (open(F,"<$filename")){
       my $inhints=0;
       while(my $l=<F>){
