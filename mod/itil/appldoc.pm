@@ -532,6 +532,7 @@ sub SecureSetFilter
        #          {sectargetid=>\@grpids,sectarget=>\'base::grp',
        #           secroles=>"*roles=?write?=roles* *roles=?privread?=roles* ".
        #                     "*roles=?read?=roles*"},
+                 {databossid=>$userid},
                  {applmgrid=>$userid},
                  {tsmid=>$userid},
                  {tsm2id=>$userid},
