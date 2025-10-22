@@ -154,6 +154,10 @@ sub new
                 dataobjattr   =>'appl.mandator'),
 
       new kernel::Field::Link(
+                name          =>'databossid',
+                dataobjattr   =>'appl.databoss'),
+
+      new kernel::Field::Link(
                 name          =>'applmgrid',
                 group         =>'sem',
                 dataobjattr   =>'appl.applmgr'),
