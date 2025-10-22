@@ -333,6 +333,7 @@ sub InitRequest
          my $db=$self->Cache->{W5Base};
          my $now=NowStamp();
          my $loghour=substr($now,0,10);
+         my $logymonth=substr($now,0,6);
          my $user=$ENV{REMOTE_USER};
          my $site=$ENV{SCRIPT_URI};
          if ($ENV{REMOTE_USER} ne ""){
@@ -364,9 +365,24 @@ sub InitRequest
             my $vallst="'$user','$loghour','$now',".
                        "'$HTTP_USER_AGENT','$ipaddr','$lang',".
                        "'$site'"; 
-            my $cmd="replace delayed into userlogon";
-            $cmd.=" ($fldlst)";
-            $cmd.=" values($vallst)";
+
+            ########################################################
+            # replace delayed into variante (not supported anymore)
+            my $cmd="replace delayed into userlogon ".
+                    "($fldlst) ".
+                    "values ".
+                    "($vallst)";
+            $cmd="insert into userlogon ".
+                 "($fldlst) ".
+                 "values ".
+                 "($vallst) ".
+                 "ON DUPLICATE KEY UPDATE".
+                 " logondate = VALUES(logondate),".
+                 " logonbrowser = VALUES(logonbrowser),".
+                 " logonip = VALUES(logonip),".
+                 " lang = VALUES(lang),".
+                 " site = VALUES(site)";
+            ########################################################
             if (lc($db->DriverName()) eq "oracle"){
                $cmd="MERGE INTO userlogon a ".
                     "USING (select '$loghour' loghour,
@@ -419,6 +435,39 @@ sub InitRequest
                    $substuser,$self->Self);
       }
    }
+
+   if (defined($self->Cache->{W5Base})){
+      if ($self->Self() ne "base::load"){
+         my $db=$self->Cache->{W5Base};
+         my $now=NowStamp();
+         my $logymonth=substr($now,0,6);
+         my $site=$ENV{SCRIPT_URI};
+         if ($self->Config->Param("W5BaseOperationMode") ne "readonly"){
+            if (lc($db->DriverName()) ne "oracle"){
+               my $module=$self->Module();
+               my $userid=$self->getCurrentUserId();
+               if ($userid>0){
+                  ##########################################################
+                  # replace delayed into variante (not supported anymore)
+                  my $logusagecmd="replace delayed into usermodusage ".
+                                  "(module,userid,ymonth) ".
+                                  "values ".
+                                  "('$module','$userid','$logymonth')";
+                  $logusagecmd="insert into usermodusage ".
+                               "(module, userid, ymonth, cnt) ".
+                               "values ".
+                               "('$module','$userid','$logymonth',1) ".
+                               "ON DUPLICATE KEY UPDATE cnt = cnt + 1";
+                  ##########################################################
+                  #msg(INFO,"logusagecmd=$logusagecmd");
+                  $db->do($logusagecmd);
+               }
+            }
+            ################################################################
+         }
+      }
+   }
+
    $self->Log(INFO,"query","$ENV{REMOTE_USER} %s query:%s",
                    $self->Self,Query->QueryString());
    ######################

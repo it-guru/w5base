@@ -455,3 +455,10 @@ alter table grp add accarea varchar(20) default NULL,add sisnumber varchar(20) d
 alter table grp add srcurl varchar(256) default NULL;
 alter table grp add lorgchangedt datetime default NULL,add lrecertreqdt datetime default NULL,add lrecertdt datetime default NULL,add lrecertuser bigint(20) default NULL,add lrecertreqnotify datetime default NULL;
 alter table contact add lorgchangedt datetime default NULL;
+create table usermodusage (
+  module varchar(40) NOT NULL,
+  userid bigint(20) NOT NULL,
+  ymonth char(6) NOT NULL,
+  cnt    bigint NOT NULL default 1,
+  PRIMARY KEY (module,userid,ymonth)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;

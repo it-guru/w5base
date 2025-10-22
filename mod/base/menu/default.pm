@@ -157,6 +157,10 @@ sub Init
                       func=>'MainWithNew',
                       defaultacl=>['admin']);
 
+   $self->RegisterObj("sysadm.user.usermodusage",
+                      "base::usermodusage",
+                      defaultacl=>['valid_user']);
+
    $self->RegisterObj("sysadm.useraccount",
                       "base::useraccount",
                       defaultacl=>['admin']);
