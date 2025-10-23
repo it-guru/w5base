@@ -154,16 +154,21 @@ sub getData
    my $self=shift;
    my $c=$self->Context;
    if (!defined($c->{data})){
-      my $instdir=$self->Config->Param("INSTDIR");
+      my @sublist;
       my $cachedir=$self->Config->Param("DataObjCacheStore");
       $cachedir.="/" if (!($cachedir=~m/\/$/));
       my $DataObjCacheFile=$cachedir.$self->Self.".cache.db.tmp";
-      my $pat="$instdir/mod/*/*.pm";
-      my @sublist=glob($pat);
+
       my $maxmtime=0;
-      map({ my $mtime = (stat($_))[9];
-               $maxmtime=$mtime if ($maxmtime<$mtime);
-      } @sublist);
+      foreach my $modname ($self->globalObjectList()){
+         my $o=getModuleObject($self->Config,$modname);
+         if (defined($o)){
+            my $filename=$o->SelfFilename();
+            my $mtime = (stat($filename))[9];
+            $maxmtime=$mtime if ($maxmtime<$mtime);
+         }
+      }
+
       if ((stat($DataObjCacheFile))[9]>$maxmtime){
          if (open(F,"<",$DataObjCacheFile)){
             my $VAR1;

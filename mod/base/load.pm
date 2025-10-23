@@ -35,7 +35,6 @@ sub Run
 {
    my $self=shift;
    my $func=Query->Param("FUNC");
-   my $instdir=$self->Config->Param("INSTDIR");
    my $skin=Query->Param("SKIN");
    my $content;
    my $filename;
@@ -101,10 +100,9 @@ sub Run
    }
    elsif ($func=~m/^scriptpool\//){
       my ($script)=$func=~m/^scriptpool\/(.*)$/;
-      my $instdirlist=$self->Config->Param("INSTDIR");
       $script=~s/[^a-z,0-9]//g;
       my $found=0;
-      foreach my $instdir (split(/:/,$instdirlist)){
+      foreach my $instdir (@{W5BaseInstPath()}){
          if ( -f "$instdir/static/scriptpool/$script"){
             $found=1;
             print $self->HttpHeader("text/plain",filename=>$script);
@@ -135,12 +133,14 @@ sub Run
          if (-f $virtualfile){  # virtual file extension is primary to handle
             $filename=[];       # packing of multiple files in one js file
             if (open(VF,"<$virtualfile")){
+               # workaround to make $instdir available while virtual parsing
+               my $instdir=W5BaseInstDir();
                while(my $f=<VF>){ 
                   $f=trim($f);
                   if ($f ne ""){
                      $f.=";" if (!$f=~m/;$/);
                      eval("\$f=$f");
-                     if ($@ eq ""){
+                     if ($@ eq "" && $f ne ""){
                         push(@$filename,$f);
                      }
                   }
@@ -185,14 +185,20 @@ sub Run
          if ($ext eq "js"){
             $content="text/javascript";
             if (!ref($filename)){
-               $filename=$instdir."/lib/javascript/".$func; 
+               foreach my $instdir (reverse(@{W5BaseInstPath()})){
+                  my $f=$instdir."/lib/javascript/".$func;
+                  $filename=$f if (-f $f);
+               }
             }
             $param{cache}=3600;
          }
          if ($ext eq "map"){
             $content="text/javascript";
             if (!ref($filename)){
-               $filename=$instdir."/lib/javascript/".$func; 
+               foreach my $instdir (reverse(@{W5BaseInstPath()})){
+                  my $f=$instdir."/lib/javascript/".$func;
+                  $filename=$f if (-f $f);
+               }
             }
             $param{cache}=3600;
          }

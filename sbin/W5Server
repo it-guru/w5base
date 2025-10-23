@@ -1297,7 +1297,7 @@ if ($ENV{W5BASEINSTDIR} ne ""){
    $W5V2::INSTDIR=shift(@w5instpath);
    $W5V2::INSTPATH=\@w5instpath;
 }
-foreach my $path (map({$_."/mod",$_."/lib"} $W5V2::INSTDIR,@w5instpath)){
+foreach my $path (map({$_."/mod",$_."/lib"} @{W5BaseInstPath()})){
    my $qpath=quotemeta($path);
    unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
 }
