@@ -383,9 +383,7 @@ sub Validate
    my $oldrec=shift;
    my $newrec=shift;
 
-
-
-   if (effChanged($oldrec,$newrec,"state")){   # statuswechsel auf
+   if (effChanged($oldrec,$newrec,"state")){            # state change
       my $s=$newrec->{state}; 
       if ($s eq "10" || $s eq "20"){   # einmalig oder auto
          $self->doTakeAutoDiscData($oldrec,$newrec);
@@ -455,6 +453,7 @@ sub doTakeAutoDiscData
 
    #printf STDERR ("doTakeAutoDiscData handling for autodiscrec '%s'\n",
    #               effVal($oldrec,$newrec,"id"));
+   my $userid=$self->getCurrentUserId();
    my $systemid=effVal($oldrec,$newrec,"lnkto_system");
    if (defined($initrelrec)){  # in this case, the adrec is not yet linked
       $systemid=$oldrec->{disc_on_systemid};
@@ -473,8 +472,32 @@ sub doTakeAutoDiscData
    #  SYSTEMNAME Handling  (direct record handling)
    #######################################################################
    if ($section eq "SYSTEMNAME"){
+      my $nix;
 
-
+   }
+   elsif ($section eq "OSRELEASE"){   
+      if (defined($sysrec)){
+         my $osrelease=effVal($oldrec,$newrec,"scanname");
+         if (defined($initrelrec)){  # create a new related record for update
+            if ($o->SecureValidatedUpdateRecord($sysrec,
+                    {osrelease=>$osrelease},
+                    {id=>\$sysrec->{id}})){
+               if (!$self->ValidatedUpdateRecord($oldrec,{
+                      state=>$newrec->{state},
+                      lnkto_lnksoftware=>undef,
+                      lnkto_asset=>undef,
+                      lnkto_system=>$systemid,
+                      approve_date=>NowStamp("en"),
+                      approve_user=>$userid
+                    },{id=>\$oldrec->{id}})){
+                  return(98,"ERROR: fail to link autodiscrecord to system");
+               }
+               else{
+                  return(0);
+               }
+            }
+         }
+      }
    }
    #######################################################################
    #  SOFTWARE Handling     (related record handling)
@@ -592,7 +615,6 @@ sub doTakeAutoDiscData
                   #          Das wird über die Validate in autodiscrec
                   #          getriggert!
                   if ($exitcode eq "0"){
-                     my $userid=$self->getCurrentUserId();
                      if (!$self->ValidatedUpdateRecord($oldrec,{
                             state=>$newrec->{state},
                             lnkto_lnksoftware=>$mapsel,
@@ -918,6 +940,7 @@ sub AutoDiscFormatEntry
    $d.="</div>";
 
    if ($adrec->{state} eq "1"){
+      my $takeable="disabled";
       if ($adrec->{section} eq "SOFTWARE"){
          if (!exists($control->{software})){
             $control->{software}={byid=>{}};
@@ -1074,13 +1097,16 @@ sub AutoDiscFormatEntry
          $d.="</table>";
          $d.="</div>";
       }
+      elsif ($adrec->{section} eq "OSRELEASE"){
+         $takeable="";
+      }
 
       $d.="<div class='AutoDiscOpLine'>";
       $d.="<div class='AutoDiscStatus' id='AutoDiscStatus$adrec->{id}'>";
       $d.="</div>";
       $d.="<div class='AutoDiscButtonBar'>";
       $d.="<input type='image' src='../../itil/load/autodisc_once.jpg' ".
-          "title='".$self->T('One time import of data')."' disabled ".
+          "title='".$self->T('One time import of data')."' $takeable ".
           "adid='$adrec->{id}' id='LoadOnce$adrec->{id}' ".
           "class='LoadOnce AutoDiscButton'>";
       $d.="<input type='image' src='../../itil/load/autodisc_bad.jpg' ".
@@ -1089,7 +1115,7 @@ sub AutoDiscFormatEntry
           "class='BadScan AutoDiscButton'>";
       $d.="<input type='image' src='../../itil/load/autodisc_auto.jpg' ".
         "title='".$self->T('Import data with automatic updates in the future')."' ".
-          "adid='$adrec->{id}' disabled id='LoadAuto$adrec->{id}' ".
+          "adid='$adrec->{id}' $takeable id='LoadAuto$adrec->{id}' ".
           "class='LoadAuto AutoDiscButton'>";
       $d.="</div>"; # end of AutoDiscButtonBar
       $d.="</div>"; # end of AutoDiscOpLine
