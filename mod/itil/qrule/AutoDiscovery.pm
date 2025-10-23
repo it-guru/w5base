@@ -107,9 +107,11 @@ sub qcheckRecord
       my @AdPreData=();
       my %engines;
       $ade->ResetFilter();
-      $ade->SetFilter({localdataobj=>\$dataobjname,
-                   #    addataobj=>\'HPSA::system',
-                       cistatusid=>\'4'});
+      $ade->SetFilter({
+         localdataobj=>\$dataobjname,
+         #addataobj=>\'HPSA::system',
+         cistatusid=>\'4'
+      });
       foreach my $engine ($ade->getHashList(qw(ALL))){  # found aktive Engine
          $engines{$engine->{id}}={
             id=>$engine->{id},
@@ -276,7 +278,25 @@ sub MapAutoDiscoveryPreData
 
    foreach my $ad (@{$AdPreData}){
       $ad->{valid}=1;
-      if ($ad->{section} eq "SOFTWARE"){
+      if ($ad->{section} eq "OSRELEASE"){
+         if ($ad->{scanname} eq $rec->{osrelease}){
+            if ($rec->{allowifupdate}){
+               $ad->{state}="20";
+            }
+            else{
+               $ad->{state}="10";  # tread as handled once
+            }
+         }
+         else{
+            if ($rec->{allowifupdate}){
+               $ad->{state}="20";
+            }
+         }
+         # The question is, how are already existing autodiscrecords with
+         # state=20 are correct handled, if allowifupdate is changed to false
+         # ???
+      }
+      elsif ($ad->{section} eq "SOFTWARE"){
          if ($ad->{scanextra1}=~m#^/mnt/#){
             $ad->{valid}=0;  # ignore software on /mnt mount point
          }
@@ -445,7 +465,18 @@ sub DiscoverData
    $ad->SetFilter($flt);
    my @l=$ad->getHashList(qw(ALL));
    if ($#l==-1){
-      $ad->ValidatedInsertRecord($newrec);
+      my $autotake=0;
+      if (defined($adrec->{state})){
+         $autotake++;
+      }
+      my $adrecid=$ad->ValidatedInsertRecord($newrec);
+
+      if ($autotake){  # state=20 set while insert
+         $ad->ResetFilter();
+         $ad->SetFilter({id=>\$adrecid});
+         my ($newadrec)=$ad->getOnlyFirst(qw(ALL));
+         $ad->doTakeAutoDiscData($newadrec,{state=>$adrec->{state}},{});
+      }
    }
    else{
       my $cnt=0;
