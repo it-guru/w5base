@@ -84,6 +84,7 @@ use charnames ':full';
              &globalContext &NowStamp &CalcDateDuration
              &trim &rtrim &ltrim &limitlen &rmNonLatin1 &rmAnyNonLatin1
              &in_array &array_insert
+             &W5BaseInstDir &W5BaseInstPath
              &first_index
              &base36
              &hash2xml &xml2hash &effVal &effChanged &effChangedVal 
@@ -183,6 +184,16 @@ sub Dumper
    #$Data::Dumper::Deepcopy = 1;
    
    return(Data::Dumper::Dumper(@_));
+}
+
+sub W5BaseInstDir
+{
+   return($W5V2::INSTDIR);
+}
+
+sub W5BaseInstPath
+{
+   return([W5BaseInstDir,@{$W5V2::INSTPATH}]);
 }
 
 sub is_POSIXmktime_Clean

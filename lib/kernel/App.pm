@@ -140,17 +140,20 @@ sub ModuleObject
 sub globalObjectList
 {
    my $self=shift;
-   my $instdir=$self->Config->Param("INSTDIR");
-   my $pat="$instdir/mod/*/*.pm";
-   my @objlist=map({
-      my $qi=quotemeta($instdir);
-      $_=~s/^$instdir//;
-      $_=~s/\/mod\///; $_=~s/\.pm$//;
-      $_=~s/\//::/g;
-      $_;
-   } grep({
-     -s $_;
-   } glob($pat)));
+   my @objlist;
+   foreach my $instdir (@{W5BaseInstPath()}){ 
+      my $pat="$instdir/mod/*/*.pm";
+      push(@objlist,map({
+            my $qi=quotemeta($instdir);
+            $_=~s/^$instdir//;
+            $_=~s/\/mod\///; $_=~s/\.pm$//;
+            $_=~s/\//::/g;
+            $_;
+         } grep({
+           -s $_;
+         } glob($pat)))
+      );
+   }
    return(@objlist);
 }
 
@@ -1395,7 +1398,6 @@ sub getSkinFile
    my $self=shift;
    my $conftag=shift;
    my %param=@_;
-   my $baseskindir=$self->getSkinDir();
    my @skin;
  
    $conftag=~s/\.\./\./g;              # security hack
@@ -1411,10 +1413,16 @@ sub getSkinFile
    if (defined($param{addskin})){
       unshift(@skin,$param{addskin});
    }
-   my @skindir=($baseskindir);
-   if ($#{$W5V2::INSTPATH}!=-1){
-      push(@skindir,map({$_."/skin"} @{$W5V2::INSTPATH}));
-   }
+
+
+#   my @skindir=($baseskindir);
+#   if ($#{$W5V2::INSTPATH}!=-1){
+#      push(@skindir,map({$_."/skin"} @{$W5V2::INSTPATH}));
+#   }
+   my @skindir;
+   push(@skindir,map({$_."/skin"} @{W5BaseInstPath()}));
+
+
    my $modpath=$self->Config->Param("MODPATH");
    if ($modpath ne ""){
       foreach my $path (split(/:/,$modpath)){
@@ -2134,8 +2142,7 @@ sub LoadSubObjs
    my $hashkey=shift;
    $hashkey="SubDataObj" if (!defined($hashkey));
    if (!defined($self->{$hashkey})){
-      my $instdir=$self->Config->Param("INSTDIR");
-      my @path=($instdir);
+      my @path;
       my @pat;
       my $modpath=$self->Config->Param("MODPATH");
       if ($modpath ne ""){
@@ -2147,7 +2154,7 @@ sub LoadSubObjs
       my @sublist;
       my @disabled;
 
-      foreach my $path (@path,@{$W5V2::INSTPATH}){
+      foreach my $path (@path,@{W5BaseInstPath()}){
          my $pat="$path/mod/*/$extender/*.pm";
          if ($extender=~m/\//){
             $pat="$path/mod/*/$extender.pm";
@@ -2220,8 +2227,7 @@ sub LoadSubObjsOnDemand
    my $hashkey=shift;
    $hashkey="SubDataObj" if (!defined($hashkey));
    if (!defined($self->{$hashkey})){
-      my $instdir=$self->Config->Param("INSTDIR");
-      my @path=($instdir);
+      my @path;
       my @pat;
       my $modpath=$self->Config->Param("MODPATH");
       if ($modpath ne ""){
@@ -2233,7 +2239,7 @@ sub LoadSubObjsOnDemand
       my @sublist;
       my @disabled;
 
-      foreach my $path (@path){
+      foreach my $path (@path,@{W5BaseInstPath()}){
          my $pat="$path/mod/*/$extender/*.pm";
          if ($extender=~m/\//){
             $pat="$path/mod/*/$extender.pm";
@@ -2241,20 +2247,30 @@ sub LoadSubObjsOnDemand
          unshift(@sublist,glob($pat)); 
          unshift(@disabled,glob($pat.".DISABLED")); 
       }
-
-      @sublist=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$qi//;
-                    $_=~s/\/mod\///; 
-                    $_;
+      @sublist=map({ $_=~s/^\/.*\/mod\///; 
+                     $_;
                    } @sublist);
 
-      @disabled=map({my $qi=quotemeta($instdir);
-                    $_=~s/^$qi//;
-                    $_=~s/\/mod\///; 
+      @disabled=map({
+                    $_=~s/^\/.*\/mod\///; 
                     $_=~s/\.DISABLED//; 
                     $_."/" if (!($_=~m/\.pm$/));
                     $_;
                    } @disabled);
+
+#      @sublist=map({my $qi=quotemeta($instdir);
+#                    $_=~s/^$qi//;
+#                    $_=~s/\/mod\///; 
+#                    $_;
+#                   } @sublist);
+#
+#      @disabled=map({my $qi=quotemeta($instdir);
+#                    $_=~s/^$qi//;
+#                    $_=~s/\/mod\///; 
+#                    $_=~s/\.DISABLED//; 
+#                    $_."/" if (!($_=~m/\.pm$/));
+#                    $_;
+#                   } @disabled);
 
       foreach my $dis (@disabled){
          @sublist=grep(!/^$dis/,@sublist);
@@ -2274,7 +2290,6 @@ sub LoadSubObjsOnDemand
    }
    return(keys(%{$self->{$hashkey}}));
 }
-
 
 
 
@@ -2301,6 +2316,7 @@ sub FETCH
    my $self=shift;
    if (!exists($self->{obj})){
       $self->{obj}=$self->{parent}->ModuleObject($self->{name});
+
       return(undef) if (!defined($self->{obj}));
       if (defined($self->{obj})){
          if ($self->{obj}->can("setParent")){

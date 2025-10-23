@@ -170,6 +170,9 @@ sub DisplayMaintenanceWindow
    my $self=shift;
    my $file=$ENV{SCRIPT_URI};
    $file=~s/^.*\///;
+
+   # TODO: rewrite needed to handle W5BaseInstPath() !
+
    my $skindir=$W5V2::INSTDIR."/skin/";
    my $skin="default";
    $skin="default.de" if ($self->LowLevelLang() eq "de");

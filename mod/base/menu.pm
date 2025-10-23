@@ -379,17 +379,9 @@ sub TableVersionLoadSqlFileData
    my $db=$self->InitTableVersionChecker();
 
    my %c=();
-   my @fullinstpath;
    my $num=0;
 
-   push(@fullinstpath,$W5V2::INSTDIR);
-
-   if (ref($W5V2::INSTPATH) eq "ARRAY" && $#{$W5V2::INSTPATH}!=-1){
-      push(@fullinstpath,@{$W5V2::INSTPATH});
-   }
-
- 
-   foreach my $instdir (@fullinstpath){
+   foreach my $instdir (@{W5BaseInstPath()}){
       my $pat="$instdir/sql/*/*.sql";
       my @sublist=glob($pat);
       map({my $qi=quotemeta($instdir);

@@ -117,7 +117,7 @@ sub ProcessLine
          "border-style:solid;border-width:1px\">";
    if (!defined($self->Cache->{OutputHandlerCache})){
       $self->Cache->{OutputHandlerCache}={};
-      my $instdir=$app->Config->Param("INSTDIR");
+      my $instdir=W5BaseInstDir();
       my $handlerdir=$instdir."/lib/kernel/Output";
       if (opendir(DH,$handlerdir)){
          my @mods=grep({ -f "$handlerdir/$_" &&

@@ -3187,10 +3187,7 @@ sub findNearestTargetDataObj
       }
    }
    if ($dataobj ne "" && $m2 ne ""){
-      my @instdirlist=reverse(split(/:/,$W5V2::INSTDIR));
-      if (ref($W5V2::INSTPATH) eq "ARRAY" && $#{$W5V2::INSTPATH}!=-1){
-         @instdirlist=(@{$W5V2::INSTPATH},@instdirlist);
-      }
+      my @instdirlist=reverse(@{W5BaseInstPath()});
       foreach my $instdir (@instdirlist){
          if ( -f "$instdir/mod/$m2/$dataobj.pm"){
             my $nto="${m2}::${dataobj}";

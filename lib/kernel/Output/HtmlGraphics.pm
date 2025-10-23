@@ -103,7 +103,7 @@ sub ProcessHead
       }
       else{
          foreach my $js (@load){
-            my $instdir=$self->getParent->getParent->Config->Param("INSTDIR");
+            my $instdir=W5BaseInstDir();
             my $filename=$instdir."/lib/javascript/".$js;
             if (open(F,"<$filename")){
                $d.="<script language=\"JavaScript\">\n";
