@@ -32,6 +32,7 @@
 'phys. Memory'=>{de=>'phys. Arbeitsspeicher'},
 'Name'=>{de=>'Systemname'},
 'OS-Release'=>{de=>'Betriebssystemversion'},
+'AutoDisc OS-Release'=>{de=>'AutoDisc Betriebssystemversion'},
 'logical system type'=>{de=>'log. Systemtyp'},
 'Location'=>{de=>'Standort'},
 'Producer'=>{de=>'Hersteller'},

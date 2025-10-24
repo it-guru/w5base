@@ -529,6 +529,13 @@ sub new
                 vjoinon       =>['osreleaseid'=>'id'],
                 vjoindisp     =>'name'),
 
+      new kernel::Field::Boolean(
+                name          =>'autodiscrecosrelease',
+                group         =>'logsys',
+                label         =>'AutoDisc OS-Release',
+                htmldetail    =>0,
+                dataobjattr   =>"if (autodiscrecosrelease.id is null,0,1)"),
+
       new kernel::Field::Interface(
                 name          =>'osreleaseid',
                 label         =>'OSReleaseID',
@@ -2379,7 +2386,11 @@ sub getSqlFrom
           "left outer join asset on system.asset=asset.id ".
           "left outer join system as vsystem on system.vhostsystem=vsystem.id ".
           "left outer join asset as vasset on vsystem.asset=vasset.id ".
-
+          "left outer join autodiscrec as autodiscrecosrelease ".
+          "on system.id=autodiscrecosrelease.lnkto_system and ".
+          "autodiscrecosrelease.section='OSRELEASE' and ".
+          "(autodiscrecosrelease.state='10' or ".
+          "autodiscrecosrelease.state='20') ".
           "left outer join lnkapplsystem as secsystemlnkapplsystem ".
           "on $worktable.id=secsystemlnkapplsystem.system ".
           "left outer join appl as secsystemappl ".
