@@ -1,1 +1,4 @@
 'itil::qrule::AutoDiscovery'=>{de=>'AutoDiscovery collector',en=>'AutoDiscovery collector'},
+'entries loaded from'=>{
+   de=>"geladene Einträge von Engine"
+},
