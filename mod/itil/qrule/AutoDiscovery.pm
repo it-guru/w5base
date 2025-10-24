@@ -76,6 +76,7 @@ sub qcheckRecord
    my $rec=shift;
    my $checksession=shift;
    my $dataobjname=$dataobj->SelfAsParentObject();
+   my @qmsg;
 
    return(0) if ($rec->{cistatusid}==6);
 
@@ -133,11 +134,18 @@ sub qcheckRecord
                      $ado->SetFilter({
                         $engine->{adkey}=>\$rec->{$engine->{localkey}}
                      });
-                     push(@AdPreData,map({
+
+                     my @EngineData=map({
                         $_->{engineid}=$engine->{id};
                         $_;
-                     } $ado->extractAutoDiscData()));
-                  #   }
+                     } $ado->extractAutoDiscData());
+                     if ($#EngineData!=-1){
+                        push(@qmsg,($#EngineData+1).
+                                   " ".
+                                   $self->T("entries loaded from").
+                                   " ".$engine->{name});
+                        push(@AdPreData,@EngineData);
+                     }
                   }
                }
                else{
@@ -264,7 +272,7 @@ sub qcheckRecord
 
       #printf STDERR ("AdPreData:%s\n",Dumper(\@AdPreData));
    }
-   return(0);
+   return(0,{qmsg=>\@qmsg});
 }
 
 sub MapAutoDiscoveryPreData
