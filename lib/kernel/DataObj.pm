@@ -2133,7 +2133,11 @@ sub SecureValidatedInsertRecord
 
    $self->isDataInputFromUserFrontend(1);
    my @groups=$self->isWriteValid();
-   if ($#groups>-1 && defined($groups[0])){
+   my $wrok=0;
+   if ($W5V2::OperationContext eq "QualityCheck"){ # generall allow
+      $wrok=1;                                     # QualityCheck data
+   }                                               # modifications
+   if ($wrok==1 || ($#groups>-1 && defined($groups[0]))){
       if ($self->SecureValidateFieldAccess(undef,$newrec,\@groups)){
          return($self->ValidatedInsertRecord($newrec));
       }
@@ -2311,6 +2315,10 @@ sub SecureValidatedUpdateRecord
          }
       }
    }
+   if ($W5V2::OperationContext eq "QualityCheck"){ # generall allow
+      $wrok=1;                                     # QualityCheck data
+   }                                               # modifications
+
    my @groups=$self->isWriteValid($oldrec);
    if (($#groups>-1 && defined($groups[0])) || $wrok){
       if ($self->SecureValidateFieldAccess($oldrec,$newrec,\@groups)){
