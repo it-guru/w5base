@@ -61,7 +61,7 @@ sub new
 
       new kernel::Field::Boolean(
                 name          =>'isapplmgr',
-                label         =>'is databoos',
+                label         =>'is applmgr',
                 dataobjattr   =>'isapplmgr'),
 
       new kernel::Field::Number(
