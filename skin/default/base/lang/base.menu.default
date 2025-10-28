@@ -91,6 +91,7 @@
 'Tools.teamtools.forms'=>{de=>'Formulare',en=>'Forms'},
 'Tools.filemgmt.new'=>{de=>'Neuer Upload',en=>'New'},
 'Tools.filebrowser'=>{de=>'WebFS',en=>'WebFS'},
+'Tools.analytics.rolerep'=>{de=>'Rollen Report',en=>'role report'},
 'Tools.analytics.w5stat'=>{de=>'Statistiken',en=>'Statistics'},
 'Tools.analytics.w5stat.master'=>{de=>'Master',en=>'Master'},
 'Tools.analytics.w5stat.master.new'=>{de=>'Neueingabe',en=>'New'},

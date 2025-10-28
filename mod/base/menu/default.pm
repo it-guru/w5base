@@ -503,6 +503,10 @@ sub Init
                       "base::reflexion_translation",
                       defaultacl=>['admin']);
    
+   $self->RegisterObj("Tools.analytics.rolerep",
+                      "base::reflexion_rolereport",
+                      defaultacl=>['admin','support']);
+   
    $self->RegisterObj("Tools.XLSExpand",
                       "base::XLSExpand",
                       defaultacl=>['admin']);
