@@ -789,6 +789,8 @@ sub ESrestETLload
          msg(INFO,"ESIndex '$indexname' is OK start import - loop=$loopCount");
          my $tmpLastRequestRawDump="last.ESrestETLload.$indexname.".
                                    $loopCount.".raw.dump.tmp";
+         my $tmpLastRequestCmdDump="last.ESrestETLload.$indexname.".
+                                   $loopCount.".cmdpipe.dump.tmp";
          my $tmpLastRequestJqDump="last.ESrestETLload.$indexname.".
                                    $loopCount.".jq.dump.tmp";
          my $ESwaitfor="?refresh=wait_for";
@@ -808,7 +810,7 @@ sub ESrestETLload
          }
          my $cmd=$OriginPipeStart.
                  "| tee /tmp/".$tmpLastRequestRawDump." | ".
-                 "jq ".$jq_arg." ".        #--arg now '$nowstamp' ".
+                 "jq -R ".$jq_arg." ".        #--arg now '$nowstamp' ".
                  "-c '".$ESjqTransform."'".
                  "| tee /tmp/".$tmpLastRequestJqDump." | ".
                  "curl -u '${ESuser}:${ESpass}' ".
@@ -817,6 +819,10 @@ sub ESrestETLload
                  "--data-binary \@- ".
                  "-X POST  '$ESbaseurl/$indexname/_bulk".$ESwaitfor."' ".
                  '2>&1';
+         if (open(CMDF,">/tmp/$tmpLastRequestCmdDump")){
+            print CMDF $cmd;
+            close(CMDF);
+         }
        
          msg(INFO,"ORIGIN_Load: cmd=$cmd");
          my $out=qx($cmd);
