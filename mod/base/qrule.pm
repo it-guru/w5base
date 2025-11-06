@@ -103,14 +103,15 @@ sub new
                    my $self=shift;
                    my $current=shift;
                    my $id=$current->{id};
-                   $id=~s/::/\//g;
-                   my $filename=$self->getParent->SelfFilename();
                    my $d="?";
-                   if (defined($filename)){
-                      if (-f $filename){
-                         if (open(F,"<$filename")){
-                            $d=join("",<F>);
-                            close(F);
+                   if (defined($self->getParent->{qrule}->{$id})){
+                      my $filename=$self->getParent->{qrule}->{$id}->SelfFilename();
+                      if (defined($filename)){
+                         if (-f $filename){
+                            if (open(F,"<$filename")){
+                               $d=join("",<F>);
+                               close(F);
+                            }
                          }
                       }
                    }
