@@ -193,6 +193,9 @@ sub W5BaseInstDir
 
 sub W5BaseInstPath
 {
+   if (ref($W5V2::INSTPATH) ne "ARRAY"){
+      return([W5BaseInstDir()]);
+   }
    return([W5BaseInstDir,@{$W5V2::INSTPATH}]);
 }
 
