@@ -21,6 +21,21 @@ if (grep(/^-v$/,@ARGV) || grep(/^--verbose$/,@ARGV)){
 }
 my $count=0;
 my $failcount=0;
+
+$W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
+my @w5instpath;
+if ($ENV{W5BASEINSTDIR} ne ""){
+   @w5instpath=split(/:/,$ENV{W5BASEINSTDIR});
+   $W5V2::INSTDIR=shift(@w5instpath);
+   $W5V2::INSTPATH=\@w5instpath;
+}
+foreach my $path (map({$_."/mod",$_."/lib"} $W5V2::INSTDIR),
+                  map({$_."/mod"} @w5instpath)){
+   my $qpath=quotemeta($path);
+   unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
+}
+
+
 print("\n");
 sub ysleep{Time::HiRes::usleep(80000);}
 
@@ -40,7 +55,7 @@ foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
                        Spreadsheet::ParseExcel
                        Spreadsheet::ParseExcel::SaveParser
                        Net::Server XML::Smart Data::Dumper RPC::Smart)){
-   printf("INFO:  check module %-33s        ... ","'$module'");
+   printf("INFO:  check module %-38s   ... ","'$module'");
    eval("use $module;"); 
    ysleep if ($module ne "Time::HiRes"); 
    printResult($@,$module);
