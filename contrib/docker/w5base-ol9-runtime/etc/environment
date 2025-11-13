@@ -1,0 +1,10 @@
+umask 0002
+test -z "$W5BRANCH"         && W5BRANCH="master"
+test -z "$W5BASEINSTDIR"    && W5BASEINSTDIR="/opt/w5base"
+test -z "$W5BASECONFIGNAME" && W5BASECONFIGNAME="w5base"
+
+test -z "$W5DBHOST" && W5DBHOST=$(/sbin/ip route | awk '/default/ { print $3 }')
+test -z "$W5DBNAME" && W5DBNAME="w5db"
+test -z "$W5DBUSER" && W5DBUSER="w5app"
+test -z "$W5DBPASS" && W5DBPASS="w5app"
+test -z "$W5DBPORT" && W5DBPORT="3306"

@@ -1,0 +1,7 @@
+[w5svn.OracleLinux9]
+baseurl = https://w5svn.telekom.de/rpm/OracleLinux9/
+gpgcheck = 0
+name = W5SVN-OracleLinux9
+sslverify = 1
+proxy = _none_
+
