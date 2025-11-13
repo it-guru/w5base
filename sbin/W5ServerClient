@@ -10,7 +10,35 @@ use Getopt::Long;
 use vars qw($opt_v $opt_h $opt_s $opt_c $opt_n $opt_nwin $configname
             $W5ServerHost $W5ServerPort);
 
-
+#######################################################################
+#   STD procedure for every Shell entry point to W5Base environment
+#            Init of global W5V2::INSTDIR and W5V2::INSTPATH
+#
+if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/environment"){
+   exec('bash','-lc','/etc/environment',$0,$^X,$0,@ARGV);
+}
+if (!defined($W5V2::INSTDIR)){
+   if (defined(&{FindBin::again})){
+      eval('FindBin::again();');
+      if (!defined($@)){
+         $W5V2::INSTDIR="$FindBin::Bin/..";
+      }
+   }
+}
+$W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
+$W5V2::INSTPATH=[];
+my @w5instpath;
+if ($ENV{W5BASEINSTDIR} ne ""){
+   @w5instpath=split(/:/,$ENV{W5BASEINSTDIR});
+   $W5V2::INSTDIR=shift(@w5instpath);
+   $W5V2::INSTPATH=\@w5instpath;
+}
+foreach my $path (map({$_."/mod",$_."/lib"} $W5V2::INSTDIR),
+                  map({$_."/mod"} @w5instpath)){
+   my $qpath=quotemeta($path);
+   unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
+}
+#######################################################################
 $0="W5ServerClient ".join(" ",@ARGV);
 
 exit(1) if (!GetOptions('verbose'=>\$opt_v,

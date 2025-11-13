@@ -1,6 +1,9 @@
 #!/usr/bin/env perl
 package W5InstallCheckApp;
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../mod";
 use vars qw(@ISA);
 
 @ISA=("kernel::App");
@@ -15,14 +18,24 @@ sub new
 package main;
 use strict;
 use vars qw($opt_v $opt_h $opt_c $configname);
-my $opt_v=0;
-if (grep(/^-v$/,@ARGV) || grep(/^--verbose$/,@ARGV)){
-   $opt_v=1;
-}
-my $count=0;
-my $failcount=0;
 
+#######################################################################
+#   STD procedure for every Shell entry point to W5Base environment
+#            Init of global W5V2::INSTDIR and W5V2::INSTPATH
+#
+if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/environment"){
+   exec('bash','-lc','/etc/environment',$0,$^X,$0,@ARGV);
+}
+if (!defined($W5V2::INSTDIR)){
+   if (defined(&{FindBin::again})){
+      eval('FindBin::again();');
+      if (!defined($@)){
+         $W5V2::INSTDIR="$FindBin::Bin/..";
+      }
+   }
+}
 $W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
+$W5V2::INSTPATH=[];
 my @w5instpath;
 if ($ENV{W5BASEINSTDIR} ne ""){
    @w5instpath=split(/:/,$ENV{W5BASEINSTDIR});
@@ -34,12 +47,24 @@ foreach my $path (map({$_."/mod",$_."/lib"} $W5V2::INSTDIR),
    my $qpath=quotemeta($path);
    unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
 }
+#######################################################################
+
+my $opt_v=0;
+if (grep(/^-v$/,@ARGV) || grep(/^--verbose$/,@ARGV)){
+   $opt_v=1;
+}
+my $count=0;
+my $failcount=0;
+
 
 
 print("\n");
 sub ysleep{Time::HiRes::usleep(80000);}
 
 #######################################################################
+printf("INFO:  W5V2::INSTDIR=%s\n",$W5V2::INSTDIR);
+printf("INFO:  W5V2::INSTPATH=%s\n",join(";",@{$W5V2::INSTPATH}));
+printf("\n");
 printf("INFO:  W5InstallCheck Pass 1: low level check started ...\n");
 $|=1;
 foreach my $module (qw(Time::HiRes Digest::SHA1 Data::HexDump
