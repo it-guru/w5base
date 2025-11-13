@@ -591,10 +591,10 @@ sub TableVersionCreate
 create table tableversion(
    id int(11) not null auto_increment,
    filename   varchar(128) not null,
-   filedate   datetime not null,
-   linenumber int(11) not null,
+   filedate   datetime  DEFAULT '0000-00-00 00:00:00',
+   linenumber int(11) not null default 0,
    primary key(id)
-)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
 EOF
       if ($db->do($cmd)){
          $errormsg="OK\n";
