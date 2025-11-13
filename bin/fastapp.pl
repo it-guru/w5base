@@ -68,14 +68,17 @@ eval('use Proc::ProcessTable;');  # try to load Proc::ProcessTabel if exists
 
 
 #######################################################################
-# ENV Init $W5V2::*
-if (!defined($W5V2::INSTDIR)){
-   if (defined(&{FindBin::again})){
-      FindBin::again();
-      $W5V2::INSTDIR="$FindBin::Bin/..";
-   }
-}
+#   STD procedure for every Shell entry point to W5Base environment
+#            Init of global W5V2::INSTDIR and W5V2::INSTPATH
+#
+
+# exec not needed, becaus apache env should be validatet
+#if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/environment"){
+#   exec('bash','-lc','/etc/environment',$0,$^X,$0,@ARGV);
+#}
+
 $W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
+$W5V2::INSTPATH=[];
 my @w5instpath;
 if ($ENV{W5BASEINSTDIR} ne ""){
    @w5instpath=split(/:/,$ENV{W5BASEINSTDIR});
@@ -88,6 +91,7 @@ foreach my $path (map({$_."/mod",$_."/lib"} $W5V2::INSTDIR),
    unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
 }
 #######################################################################
+
 
 
 

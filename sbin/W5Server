@@ -1257,6 +1257,37 @@ use Getopt::Long;
 use Net::Server::Daemonize qw(daemonize);
 use kernel;
 use kernel::config;
+
+#######################################################################
+#   STD procedure for every Shell entry point to W5Base environment
+#            Init of global W5V2::INSTDIR and W5V2::INSTPATH
+#
+if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/environment"){
+   exec('bash','-lc','/etc/environment',$0,$^X,$0,@ARGV);
+}
+if (!defined($W5V2::INSTDIR)){
+   if (defined(&{FindBin::again})){
+      eval('FindBin::again();');
+      if (!defined($@)){
+         $W5V2::INSTDIR="$FindBin::Bin/..";
+      }
+   }
+}
+$W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
+$W5V2::INSTPATH=[];
+my @w5instpath;
+if ($ENV{W5BASEINSTDIR} ne ""){
+   @w5instpath=split(/:/,$ENV{W5BASEINSTDIR});
+   $W5V2::INSTDIR=shift(@w5instpath);
+   $W5V2::INSTPATH=\@w5instpath;
+}
+foreach my $path (map({$_."/mod",$_."/lib"} $W5V2::INSTDIR),
+                  map({$_."/mod"} @w5instpath)){
+   my $qpath=quotemeta($path);
+   unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
+}
+#######################################################################
+
 $ENV{PATH}="/usr/bin:/bin:/usr/contrib/bin:/usr/sbin:/sbin:".
            "/usr/local/bin:/usr/local/sbin:/opt/openssh/bin:".
            "/opt/ssh/bin/usr/local/ssh/bin";
@@ -1282,26 +1313,6 @@ if ($opt_c eq ""){
 }
 $configname=$opt_c;
 
-#######################################################################
-# ENV Init $W5V2::*
-if (!defined($W5V2::INSTDIR)){
-   if (defined(&{FindBin::again})){
-      FindBin::again();
-      $W5V2::INSTDIR="$FindBin::Bin/..";
-   }
-}
-$W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
-my @w5instpath;
-if ($ENV{W5BASEINSTDIR} ne ""){
-   @w5instpath=split(/:/,$ENV{W5BASEINSTDIR});
-   $W5V2::INSTDIR=shift(@w5instpath);
-   $W5V2::INSTPATH=\@w5instpath;
-}
-foreach my $path (map({$_."/mod",$_."/lib"} @{W5BaseInstPath()})){
-   my $qpath=quotemeta($path);
-   unshift(@INC,$path) if (!grep(/^$qpath$/,@INC));
-}
-#######################################################################
 
 
 
