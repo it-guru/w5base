@@ -40,7 +40,7 @@ use vars qw($opt_v $opt_h $opt_m $opt_c $opt_t $opt_p $opt_f
 if ($ENV{W5BASEINSTDIR} eq "" &&
     ($ENV{ETC_ENVIRONMENT_SOURCED} eq "" && -f "/etc/environment")){
    my @ecmd=('bash','-c',". /etc/environment && ETC_ENVIRONMENT_SOURCED=1 ".
-             join(" ",$0,$^X,$0,@ARGV));
+             join(" ",$0,@ARGV));
    exec(@ecmd);
 }
 if (!defined($W5V2::INSTDIR)){

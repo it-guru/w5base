@@ -20,7 +20,7 @@ use vars qw($opt_v $opt_h $opt_c $configname);
 #            Init of global W5V2::INSTDIR and W5V2::INSTPATH
 #
 if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/environment"){
-   exec('bash','-lc','/etc/environment',$0,$^X,$0,@ARGV);
+   exec('bash','-lc','/etc/environment',$0,@ARGV);
 }
 if (!defined($W5V2::INSTDIR)){
    if (defined(&{FindBin::again})){
