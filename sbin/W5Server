@@ -840,6 +840,7 @@ sub run_dequeue
          $self->server_close(); 
       }
    }
+
    
    my $bk=$self->{EventController}->ProcessTimer();
    if (time() % 120 == 0){ # check only ever 120s
@@ -1250,7 +1251,7 @@ sub MakeAllDBHsForkSafe {
 
 #######################################################################
 package main;
-use vars qw($opt_v $opt_h $opt_c $configname);
+use vars qw($opt_v $opt_h $opt_c $opt_f $configname);
 use Getopt::Long;
 use Net::Server::Daemonize qw(daemonize);
 use kernel;
@@ -1295,6 +1296,7 @@ $ENV{PATH}="/usr/bin:/bin:/usr/contrib/bin:/usr/sbin:/sbin:".
 my @ARGV_bak=@ARGV;
 exit(1) if (!GetOptions('verbose'=>\$opt_v,
                         'debug'=>\$opt_v,
+                        'foreground'=>\$opt_f,
                         'help'=>\$opt_h,
                         'config=s'=>\$opt_c));
 if ($opt_v){
@@ -1373,18 +1375,24 @@ $statedir.="/" if (!($statedir=~m/^\/$/));
 }
 
 $ServerParam{'no_close_by_child'}=1;
+if (defined($opt_h) || defined($opt_f)){
+   $ServerParam{'foreground'}=1;
+}
+
 
 if ($W5V2::Debug==0){
-   $ServerParam{'setsid'}=1;
-   {
-      my $logfile="${statedir}W5Server.${configname}.log";
-      $ServerParam{'log_file'}=$logfile;
-   }
-   my $logTarget=$curconfig->Param("LogTarget");
-   if ($logTarget ne ""){
-      if ($logTarget=~m/^\//){  # LogTarget on W5Server only useable for files
-         $logTarget=~s/\%f/NetW5Server/g;
-         $ServerParam{'log_file'}=$logTarget;
+   if (!defined($opt_f)){
+      $ServerParam{'setsid'}=1;
+      {
+         my $logfile="${statedir}W5Server.${configname}.log";
+         $ServerParam{'log_file'}=$logfile;
+      }
+      my $logTarget=$curconfig->Param("LogTarget");
+      if ($logTarget ne ""){
+         if ($logTarget=~m/^\//){  # LogTarget on W5Server only useable for files
+            $logTarget=~s/\%f/NetW5Server/g;
+            $ServerParam{'log_file'}=$logTarget;
+         }
       }
    }
    #printf STDERR ("W5ServerLogFile:%s\n",$ServerParam{'log_file'});
@@ -1397,6 +1405,7 @@ $W5V2::OperationContext="W5Server";
 $W5V2::HistoryComments=undef;
 @ARGV=@ARGV_bak;
 #$0="W5Server";  # brings problems while HUP
+#print STDERR "ServerParam=".Dumper(\%ServerParam);
 W5Server->run(%ServerParam);
 
 
@@ -1406,6 +1415,7 @@ sub help
    printf STDERR ("\n");
    printf STDERR (" -c sets the name of the config (default:w5server.conf)\n");
    printf STDERR (" -v activates verbose mode\n");
+   printf STDERR (" -f start in foreground mode (not as background!)\n");
    printf STDERR (" -d starts the W5Server in debug mode (not as background!)\n");
    printf STDERR ("\n");
 }
