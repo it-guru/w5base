@@ -15,18 +15,15 @@ RUN update-ca-trust extract
 
 RUN dnf config-manager --enable ol9_appstream
 COPY repos/ /etc/yum.repos.d/
-COPY supervisord.d/ /etc/supervisord.d/
-COPY bin/ /bin/
-COPY etc/ /etc/
-COPY acache/ /etc/acache/
-COPY w5base/ /etc/w5base/
 
 RUN dnf makecache
 
 
-RUN dnf -y install supervisor httpd busybox postfix net-tools 
-
-RUN dnf -y install curl jq wget git netcat \
+RUN dnf -y install \
+      supervisor httpd busybox postfix net-tools \
+      httpd httpd-devel httpd-tools \
+      mod_fcgid mod_ssl mod_auth_openidc mod_auth_ae \
+      curl jq wget git netcat \
       expect libaio patch s-nail \
       perl openssl-devel gd gd-devel \
       unixODBC unixODBC-devel \
@@ -34,6 +31,7 @@ RUN dnf -y install curl jq wget git netcat \
       python3  python3-devel  \
       perl-libwww-perl \
       perl-JSON \
+      perl-FCGI \
       perl-Env-C \
       perl-Time-HiRes \
       perl-IO-stringy \
@@ -88,40 +86,42 @@ RUN dnf -y install curl jq wget git netcat \
       perl-Text-CSV_XS \
       perl-Crypt-OpenSSL-Random \
       perl-Crypt-OpenSSL-RSA \
-      perl-Crypt-OpenSSL-Bignum 
-
-RUN dnf -y install \
+      perl-Crypt-OpenSSL-Bignum \
       perl-DateTime \
       perl-DateTime-Set \
       perl-DateTime-Format-Strptime \
       perl-DateTime-Locale \
       perl-DateTime-Format-ISO8601 \
       perl-Data-Dumper \
-      perl-Date-Calc 
-
-RUN dnf -y install \
-         perl-DTP \
-         perl-Class-ISA \
-         perl-RPC-Smart \
-         perl-HTML-TagFilter \
-         perl-HTTP-Daemon \
-         perl-LWP-Protocol-connect \
-         perl-Net-SFTP-Foreign \
-         perl-Object-MultiType \
-         perl-PDF-Reuse \
-         perl-SOAP-Lite \
-         perl-Spreadsheet-ParseExcel \
-         perl-Spreadsheet-WriteExcel \
-         perl-XML-Smart \
-         perl-URL-Encode \
-         perl-MooseX-ClassAttribute \
-         perl-JSON-MaybeXS \
-         perl-URI-Template \
-         perl-Paws \
-         perl-Net-Amazon-Signature-V4 \
-         perl-DBD-Oracle 
+      perl-Date-Calc \
+      perl-DTP \
+      perl-Class-ISA \
+      perl-RPC-Smart \
+      perl-HTML-TagFilter \
+      perl-HTTP-Daemon \
+      perl-LWP-Protocol-connect \
+      perl-Net-SFTP-Foreign \
+      perl-Object-MultiType \
+      perl-PDF-Reuse \
+      perl-SOAP-Lite \
+      perl-Spreadsheet-ParseExcel \
+      perl-Spreadsheet-WriteExcel \
+      perl-XML-Smart \
+      perl-URL-Encode \
+      perl-MooseX-ClassAttribute \
+      perl-JSON-MaybeXS \
+      perl-URI-Template \
+      perl-Paws \
+      perl-Net-Amazon-Signature-V4 \
+      perl-DBD-Oracle 
 
 
+COPY apache.conf.d/ /etc/httpd/conf.d/
+COPY supervisord.d/ /etc/supervisord.d/
+COPY bin/ /bin/
+COPY etc/ /etc/
+COPY acache/ /etc/acache/
+COPY w5base/ /etc/w5base/
 
 # Dummy-Verzeichnisse und Datei nur zur Klarstellung
 RUN mkdir -p /etc/w5base \
