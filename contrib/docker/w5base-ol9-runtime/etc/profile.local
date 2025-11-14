@@ -1,3 +1,4 @@
+# do not use /etc/environment - there are no test calls allowed
 umask 0002
 test -z "$W5BRANCH"         && W5BRANCH="master"
 test -z "$W5BASEINSTDIR"    && W5BASEINSTDIR="/opt/w5base"
