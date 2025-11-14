@@ -73,8 +73,8 @@ eval('use Proc::ProcessTable;');  # try to load Proc::ProcessTabel if exists
 #
 
 # exec not needed, becaus apache env should be validatet
-#if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/environment"){
-#   exec('bash','-lc','/etc/environment',$0,$^X,$0,@ARGV);
+#if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/profile.local"){
+#   exec('bash','-lc','/etc/profile.local',$0,$^X,$0,@ARGV);
 #}
 
 $W5V2::INSTDIR="/opt/w5base" if (!defined($W5V2::INSTDIR));
