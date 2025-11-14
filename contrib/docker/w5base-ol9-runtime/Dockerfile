@@ -24,8 +24,7 @@ COPY w5base/ /etc/w5base/
 RUN dnf makecache
 
 
-RUN dnf -y install supervisor httpd \
-      net-tools 
+RUN dnf -y install supervisor httpd busybox postfix net-tools 
 
 RUN dnf -y install curl jq wget git netcat \
       expect libaio patch s-nail \

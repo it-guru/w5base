@@ -36,15 +36,19 @@ fi
 
 
 
-if [! -d /etc/w5base/container ]; then  # if container is not started with
-   mkdir /etc/w5base/container          # tmpfs option /etc/w5base/container
+if [ ! -d /etc/container ]; then  # if container is not started with
+   mkdir /etc/container          # tmpfs option /etc/w5base/container
 fi
 
-cat << EOF > /etc/w5base/container/maindb.conf
+cat << EOF > /etc/container/maindb.conf
 DATAOBJCONNECT[w5base] ="dbi:mysql:$W5DBNAME:host=$W5DBHOST;port=$W5DBPORT"
 DATAOBJUSER[w5base]    ="$W5DBUSER"
 DATAOBJPASS[w5base]    ="$W5DBPASS"
 EOF
+
+install -d -m 2770 -o w5base -g w5adm /etc/container/var/opt/w5base/state
+install -d -m 2770 -o w5base -g w5adm /etc/container/var/w5base
+install -d -m 2770 -o w5base -g w5adm /etc/container/var/run/w5base
 
 
 CURW5BRANCH=$(su w5adm -c "cd /opt/w5base && git rev-parse --abbrev-ref HEAD")
@@ -55,10 +59,10 @@ if [ "$W5BRANCH" != "$CURW5BRANCH" ]; then
 fi
 
 # ensure repo is fresh
-su w5adm -c "cd /opt/w5base && git fetch && git reset --hard origin/$W5BRANCH"
+#su w5adm -c "cd /opt/w5base && git fetch && git reset --hard origin/$W5BRANCH"
 
-
-
+# ensure aliases.db is fresh
+/usr/bin/newaliases
 
 
 /usr/bin/supervisord -n -u root -c   /etc/supervisord.conf
