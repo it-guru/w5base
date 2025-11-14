@@ -19,8 +19,8 @@ use vars qw($opt_v $opt_h $opt_c $configname);
 #   STD procedure for every Shell entry point to W5Base environment
 #            Init of global W5V2::INSTDIR and W5V2::INSTPATH
 #
-if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/environment"){
-   exec('bash','-lc','/etc/environment',$0,@ARGV);
+if ($ENV{W5BASEINSTDIR} eq "" && -f "/etc/profile.local"){
+   exec('bash','-lc','/etc/profile.local',$0,@ARGV);
 }
 if (!defined($W5V2::INSTDIR)){
    if (defined(&{FindBin::again})){
