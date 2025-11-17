@@ -9,3 +9,5 @@ test -z "$W5DBNAME" && W5DBNAME="w5db"
 test -z "$W5DBUSER" && W5DBUSER="w5app"
 test -z "$W5DBPASS" && W5DBPASS="w5app"
 test -z "$W5DBPORT" && W5DBPORT="3306"
+
+PATH="/opt/w5base/bin:$PATH:/opt/w5base/sbin"

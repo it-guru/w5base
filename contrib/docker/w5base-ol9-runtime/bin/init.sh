@@ -1,6 +1,10 @@
 #!/bin/bash
 echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') INFO pre config /bin/init.sh"
+
 if [ -f /etc/profile.local ]; then
+   chown root:root /etc/profile.local
+   chmod +x /etc/profile.local
+   ln -sf /etc/profile.local /etc/profile.d/profile.local.sh
    . /etc/profile.local
 fi
 if [ -z "$W5BRANCH" ]; then

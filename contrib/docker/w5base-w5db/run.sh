@@ -6,5 +6,5 @@ docker run --name w5db \
   -v $PWD/conf.d:/etc/mysql/conf.d \
   -v $PWD/init.sql:/docker-entrypoint-initdb.d/init.sql \
   -v /var/lib/mysql:/var/lib/mysql:Z \
-  -d --rm mariadb:latest
+  --rm mariadb:latest
 

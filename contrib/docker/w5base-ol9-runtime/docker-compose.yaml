@@ -1,15 +1,26 @@
-version: "3.9"
 services:
-  w5base_ol9_runtime:
-    build: .
-    image: it9000/w5base-ol9-runtime:latest
-    container_name: w5base_ol9_runtime
+  w5db:
+    image: mariadb:latest
+    container_name: w5db
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: w5base
+      MYSQL_USER: w5user
+      MYSQL_PASSWORD: w5pass
     volumes:
-      - /srv/w5base/etc_w5base:/etc/w5base
-      - /srv/w5base/etc_oracle:/etc/oracle
-      - /srv/w5base/opt_w5base:/opt/w5base
-      - /srv/w5base/opt_w5darwin:/opt/w5darwin
-      - /srv/w5base/var_log_httpd:/var/log/httpd
-      - /srv/w5base/var_log_w5base:/var/log/w5base
-      - /srv/w5base/etc_odbc.ini:/etc/odbc.ini
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mariadb/conf.d:/etc/mysql/conf.d 
+      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql 
+      - /var/lib/mysql:/var/lib/mysql
+    restart: always
 
+  w5base-runtime:
+    container_name: w5base
+    build:
+      context: .
+    depends_on:
+      - w5db
+    environment:
+      W5BRANCH: master
+      W5DBHOST: w5db
+    restart: always
