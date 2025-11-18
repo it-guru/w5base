@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') INFO pre config /bin/init.sh"
 
 if [ -f /etc/profile.local ]; then
@@ -44,28 +45,32 @@ if [ ! -d /etc/container ]; then  # if container is not started with
    mkdir /etc/container          # tmpfs option /etc/w5base/container
 fi
 
-cat << EOF > /etc/container/maindb.conf
-EventJobBaseUrl="https://$W5BASESITENAME/$W5BASECONFIGNAME/"
+
+cat <<EOFX >/etc/container/maindb.conf
+EventJobBaseUrl="https://${W5BASESITENAME}/${W5BASECONFIGNAME}/"
 SKIN="default:tsystems:wikipedia:DarkNight:integts"
 
-DATAOBJCONNECT[w5base] ="dbi:mysql:$W5DBNAME:host=$W5DBHOST;port=$W5DBPORT"
-DATAOBJUSER[w5base]    ="$W5DBUSER"
-DATAOBJPASS[w5base]    ="$W5DBPASS"
-EOF
+DATAOBJCONNECT[w5base]="dbi:mysql:${W5DBNAME};host=${W5DBHOST}:port=${W5DBPORT}"
+DATAOBJUSER[w5base]="${W5DBUSER}"
+DATAOBJPASS[w5base]="${W5DBPASS}"
+EOFX
 
-cat << EOF > /etc/container/httpd.site.conf
-ServerName $W5BASESITENAME
-Alias /$W5BASECONFIGNAME/auth/     /opt/w5base/bin/
-Alias /$W5BASECONFIGNAME/public/   /opt/w5base/bin/
-Alias /$W5BASECONFIGNAME/static/   /opt/w5base/static/
-Alias /$W5BASECONFIGNAME/index/    /var/www/html/
+
+
+
+cat <<EOF >/etc/container/httpd.site.conf
+ServerName ${W5BASESITENAME}
+Alias /${W5BASECONFIGNAME}/auth/     /opt/w5base/bin/
+Alias /${W5BASECONFIGNAME}/public/   /opt/w5base/bin/
+Alias /${W5BASECONFIGNAME}/static/   /opt/w5base/static/
+Alias /${W5BASECONFIGNAME}/index/    /var/www/html/
 
 ErrorDocument 401 /w5base/public/base/menu/LoginFail
 
 DirectoryIndex index.html
 
-RewriteRule ^/favicon.ico$ /$W5BASECONFIGNAME/public/base/load/icon_w5base.ico
-RewriteRule ^/($W5BASECONFIGNAME)/(public|auth)/([^/]+)/([^/]+)/(.+)$ /\$1/\$2/fastapp.sh?MOD=\$3::\$4&FUNC=\$5 [QSA,PT]
+RewriteRule ^/favicon.ico$ /${W5BASECONFIGNAME}/public/base/load/icon_w5base.ico
+RewriteRule ^/(${W5BASECONFIGNAME})/(public|auth)/([^/]+)/([^/]+)/(.+)\$ /\$1/\$2/fastapp.sh?MOD=\$3::\$4&FUNC=\$5 [QSA,PT]
 
 RewriteEngine on
 
@@ -79,13 +84,13 @@ AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javasc
 </Directory>
 
 
-<Location /$W5BASECONFIGNAME/public>
+<Location /${W5BASECONFIGNAME}/public>
          Options -Indexes -FollowSymLinks +ExecCGI -Includes
          SetHandler fcgid-script
          Require all granted
 </Location>
 
-<Location /$W5BASECONFIGNAME/static>
+<Location /${W5BASECONFIGNAME}/static>
          Options -Indexes -FollowSymLinks +ExecCGI -Includes
          Require all granted
 </Location>
@@ -93,7 +98,7 @@ AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javasc
 #
 # The authentification if mod_auth_ae is used (BasicAuth)
 #
-<Location /$W5BASECONFIGNAME/auth>
+<Location /${W5BASECONFIGNAME}/auth>
         Options -Indexes -FollowSymLinks +ExecCGI -Includes
         SetHandler fcgid-script
 
@@ -115,10 +120,6 @@ AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javasc
 
 EOF
 
-DATAOBJCONNECT[w5base] ="dbi:mysql:$W5DBNAME:host=$W5DBHOST;port=$W5DBPORT"
-DATAOBJUSER[w5base]    ="$W5DBUSER"
-DATAOBJPASS[w5base]    ="$W5DBPASS"
-EOF
 
 install -d -m 2770 -o w5base -g w5adm /etc/container/var/opt/w5base/state
 install -d -m 2770 -o w5base -g w5adm /etc/container/var/w5base
@@ -130,6 +131,8 @@ install -d -m 2770 -o w5base -g w5base /var/log/w5base
 
 # ensure stale pid is removed
 rm -f /etc/container/var/opt/w5base/state/W5Server.w5server.pid 2>/dev/null
+rm -f /var/run/httpd/httpd.pid 2>/dev/null
+rm -f /var/run/httpd/cgi* 2>/dev/null
 
 
 CURW5BRANCH=$(su w5adm -c "cd /opt/w5base && git rev-parse --abbrev-ref HEAD")
