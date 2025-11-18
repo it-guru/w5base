@@ -18,11 +18,14 @@ services:
     container_name: w5base
     build:
       context: .
+    image: it9000/w5base-ol9-runtime:beta
     depends_on:
       - w5db
     environment:
       W5BRANCH: master
       W5DBHOST: w5db
+      W5BASESITENAME:   ${W5BASEDOCKERSITENAME}
+      W5BASECONFIGNAME: ${W5BASEDOCKERCONFIGNAME}
     volumes:
       - /opt/w5base:/opt/w5base
     restart: always
