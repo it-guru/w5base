@@ -7,6 +7,10 @@ services:
       MYSQL_DATABASE: w5base
       MYSQL_USER: w5user
       MYSQL_PASSWORD: w5pass
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       - ./mariadb/conf.d:/etc/mysql/conf.d 
