@@ -46,6 +46,7 @@ fi
 
 cat << EOF > /etc/container/maindb.conf
 EventJobBaseUrl="https://$W5BASESITENAME/$W5BASECONFIGNAME/"
+SKIN="default:tsystems:wikipedia:DarkNight:integts"
 
 DATAOBJCONNECT[w5base] ="dbi:mysql:$W5DBNAME:host=$W5DBHOST;port=$W5DBPORT"
 DATAOBJUSER[w5base]    ="$W5DBUSER"
