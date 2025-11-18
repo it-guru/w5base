@@ -23,4 +23,6 @@ services:
     environment:
       W5BRANCH: master
       W5DBHOST: w5db
+    volumes:
+      - /opt/w5base:/opt/w5base
     restart: always
