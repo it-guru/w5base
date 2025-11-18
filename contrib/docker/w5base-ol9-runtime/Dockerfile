@@ -11,6 +11,9 @@ ENV http_proxy=${http_proxy}
 ENV https_proxy=${https_proxy}
 
 COPY certs/tls-ca-bundle.pem /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+COPY certs/apache-selfsigned.crt /etc/pki/tls/certs/apache-selfsigned.crt
+COPY certs/apache-selfsigned.key /etc/pki/tls/private/apache-selfsigned.key
+
 RUN update-ca-trust extract
 
 RUN dnf config-manager --enable ol9_appstream

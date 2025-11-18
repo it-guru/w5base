@@ -62,10 +62,10 @@ echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') INFO /opt/w5base is '$CURW5BRANCH'"
 
 if [ "$W5BRANCH" != "$CURW5BRANCH" ]; then
    su w5adm -c "cd /opt/w5base && git checkout $W5BRANCH"
-fi
+   # ensure repo is fresh
+   #su w5adm -c "cd /opt/w5base && git fetch && git reset --hard origin/$W5BRANCH"
 
-# ensure repo is fresh
-#su w5adm -c "cd /opt/w5base && git fetch && git reset --hard origin/$W5BRANCH"
+fi
 
 # ensure aliases.db is fresh
 /usr/bin/newaliases

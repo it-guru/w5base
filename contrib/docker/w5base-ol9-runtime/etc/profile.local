@@ -10,4 +10,10 @@ test -z "$W5DBUSER" && W5DBUSER="w5app"
 test -z "$W5DBPASS" && W5DBPASS="w5app"
 test -z "$W5DBPORT" && W5DBPORT="3306"
 
-PATH="/opt/w5base/bin:$PATH:/opt/w5base/sbin"
+PATH="/opt/w5base/bin:$PATH"
+
+W5Event()
+{
+   /opt/w5base/sbin/W5Event "$@"
+}
+
