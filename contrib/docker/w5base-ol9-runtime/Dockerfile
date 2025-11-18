@@ -11,9 +11,6 @@ ENV http_proxy=${http_proxy}
 ENV https_proxy=${https_proxy}
 
 COPY certs/tls-ca-bundle.pem /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
-COPY certs/apache-selfsigned.crt /etc/pki/tls/certs/apache-selfsigned.crt
-COPY certs/apache-selfsigned.key /etc/pki/tls/private/apache-selfsigned.key
-
 RUN update-ca-trust extract
 
 RUN dnf config-manager --enable ol9_appstream
@@ -127,6 +124,8 @@ COPY acache/ /etc/acache/
 COPY w5base/ /etc/w5base/
 
 # Dummy-Verzeichnisse und Datei nur zur Klarstellung
+RUN sed -i -e 's#^Listen.*#Listen 0.0.0.0:80#' /etc/httpd/conf/httpd.conf
+
 RUN mkdir -p /etc/w5base \
     && mkdir -p /etc/oracle \
     && mkdir -p /opt/w5base \
@@ -134,6 +133,18 @@ RUN mkdir -p /etc/w5base \
     && mkdir -p /var/log/httpd \
     && mkdir -p /var/log/w5base \
     && touch /etc/odbc.ini
+
+COPY certs/apache-selfsigned.crt /etc/pki/tls/certs/apache-selfsigned.crt
+COPY certs/apache-selfsigned.key /etc/pki/tls/private/apache-selfsigned.key
+
+LABEL org.opencontainers.image.authors="Hartmut Vogler" \
+      org.opencontainers.image.title="W5Base Runtime" \
+      org.opencontainers.image.description="W5Base OL9 Runtime" \
+      org.opencontainers.image.documentation="https://hub.docker.com/_/mariadb/" \
+      org.opencontainers.image.base.name="docker.io/library/ubuntu:%%SUITE%%" \
+      org.opencontainers.image.licenses="GPL-2.0" \
+      org.opencontainers.image.source="https://github.com/it-guru/w5base/tree/master/contrib/docker/w5base-ol9-runtime" \
+      org.opencontainers.image.url="https://github.com/it-guru/w5base"
 
 CMD ["/bin/init.sh"]
 
