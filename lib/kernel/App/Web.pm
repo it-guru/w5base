@@ -754,6 +754,9 @@ sub ValidateCaches
 sub GTCverification
 {
    my $self=shift;
+
+   $self->FixupHttpEnvOnForwards();
+
    my $gtc=$self->getParsedTemplate("tmpl/gtc",{skinbase=>'base'});
    if (Query->Param("GTCSURE") eq "OK"){
       my $txt=Query->Param("GTCTEXT");
@@ -772,9 +775,6 @@ sub GTCverification
                                              {userid=>\$userid})){
                msg(INFO,"activation of user account $userid ok");
                my $currenturl=$ENV{SCRIPT_URI};
-               if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
-                  $currenturl=~s/^http:/https:/;
-               }
                $currenturl=~
                   s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
                $self->HtmlGoto($currenturl);
@@ -1136,6 +1136,28 @@ sub ValidateUserCache
    return(1);
 }
 
+sub FixupHttpEnvOnForwards
+{
+   my $self=shift;
+
+   if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+      $ENV{SCRIPT_URI}=~s/^http:/https:/;
+      $ENV{REQUEST_SCHEME}="https";
+   }
+   my $EventJobBaseUrl=$self->Config->Param("EventJobBaseUrl");
+   if ($EventJobBaseUrl ne ""){
+      my ($sname)=$EventJobBaseUrl=~m#^http.*?://(.+?)[:/]#;
+      if ($sname ne ""){
+         $ENV{SERVER_NAME}=$sname;
+      }
+      if (!($EventJobBaseUrl=~m/\/$/)){
+         $EventJobBaseUrl.="/"; 
+      }
+      $ENV{SCRIPT_URI}=~s#^http[s]{0,1}://[^/]+?/[^/]+?/##;
+      $ENV{SCRIPT_URI}=$EventJobBaseUrl.$ENV{SCRIPT_URI};
+   }
+}
+
 sub HandleNewUser
 {
    my $self=shift;
@@ -1185,12 +1207,12 @@ sub HandleNewUser
       }
    }
    if (!defined($uarec->{userid})){
-      if (!($ENV{REQUEST_URI}=~m#/base/menu/root$#)){
-         $self->HtmlGoto("/w5base/auth/base/menu/root");
+      $self->FixupHttpEnvOnForwards();
+      if (!($ENV{SCRIPT_URL}=~m#/base/menu/root$#)){
+         my ($curconfig)=$ENV{SCRIPT_URL}=~m#^/(.+?)/#;
+         $self->HtmlGoto("/$curconfig/auth/base/menu/root");
          return(0);
       }
-
-
       if (defined(Query->Param("verify"))){
          my $code=Query->Param("code");
          if ($code ne "" && $code eq $uarec->{requestcode}){
@@ -1385,12 +1407,18 @@ sub HandleNewUser
                   if ($sitename ne ""){
                      $subject=$sitename.": ".$subject;
                   }
+
                   my $currenturl=$ENV{SCRIPT_URI};
-                  if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
-                     $currenturl=~s/^http:/https:/;
-                  }
+                  my $rscheme=$ENV{REQUEST_SCHEME};
+
+                  #$currenturl=~
+                  #   s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
+                  #
+                  # it is better to use /auth/base/menu/root as initial path
                   $currenturl=~
-                     s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
+                     s/\/(auth|public)\/.*/\/auth\/base\/menu\/root/;
+                  my $initialsite=$ENV{SERVER_NAME};
+
                   my $fromemail=$em;
                   my $uobj=getModuleObject($self->Config,"base::user");
                   $uobj->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
@@ -1415,7 +1443,8 @@ sub HandleNewUser
                                       { static=>{ email=>$em,
                                                   id=>$id,
                                                   requestcode=>$requestcode,
-                                                  initialsite=>$ENV{SERVER_NAME},
+                                                  initialsite=>$initialsite,
+                                                  rscheme=>$rscheme,
                                                   currenturl=>$currenturl,
                                                   account=>$ENV{REMOTE_USER}
                                                 },

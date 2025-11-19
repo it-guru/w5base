@@ -77,7 +77,7 @@ EOF
 'MSG401'=>{de=><<EOF,
 Sehr geehrter Nutzer,
 
-mit der Kennung '%account%' wurde erstmalig eine Anmeldung auf der Site 'http://%initialsite%' durchgeführt, wobei Ihre E-Mail Adresse angegeben wurde.
+mit der Kennung '%account%' wurde erstmalig eine Anmeldung auf der Site '%rscheme%://%initialsite%' durchgeführt, wobei Ihre E-Mail Adresse angegeben wurde.
 
 Wurde diese Anmeldung von Ihnen persönlich durchgeführt, so bestätigen Sie diese E-Mail Adresse bitte durch klick auf diesen Link ...
 
@@ -92,7 +92,7 @@ EOF
            en=><<EOF,
 Dear User,
 
-with the account '%account%' there was done an initial logon at site 'http://%initialsite%' and at this operation, your email address was been specified.
+with the account '%account%' there was done an initial logon at site '%rscheme%://%initialsite%' and at this operation, your email address was been specified.
 
 If you have done this personally, you must verificate the email by click at thisLink ...
 
