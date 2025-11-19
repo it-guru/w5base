@@ -110,6 +110,7 @@ sub new
                 vjoindisp     =>['acltargetname','aclmode']),
    );
    $self->{defaultlimit}=999999;
+   $self->{dontSendRemoteEvent}=1;  # It makes menu create process slow!
    $self->setDefaultView(qw(linenumber fullname target func config useobjacl));
    $self->setWorktable("menu");
    return($self);

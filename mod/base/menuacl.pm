@@ -53,6 +53,7 @@ sub new
                 label         =>'menu fullname'),
       insertafter=>'id'
    );
+   $self->{dontSendRemoteEvent}=1;  # It makes menu create process slow!
    $self->setDefaultView(qw(aclid menufullname acltargetname));
 
 
