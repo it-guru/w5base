@@ -1185,6 +1185,12 @@ sub HandleNewUser
       }
    }
    if (!defined($uarec->{userid})){
+      if (!($ENV{REQUEST_URI}=~m#/base/menu/root$#)){
+         $self->HtmlGoto("/w5base/auth/base/menu/root");
+         return(0);
+      }
+
+
       if (defined(Query->Param("verify"))){
          my $code=Query->Param("code");
          if ($code ne "" && $code eq $uarec->{requestcode}){
