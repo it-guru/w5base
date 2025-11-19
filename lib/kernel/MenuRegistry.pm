@@ -94,7 +94,6 @@ sub RegisterObj
    }
 
    if (!defined($mc->{fullname}->{$name})){
-      #printf STDERR ("fifi insert $name\n");
       if (my $mid=$p->ValidatedInsertRecord(\%rec)){
          $p->{MenuIsChanged}=1;
          msg(INFO,"new inserted menu entry for $name at id $mid\n");
@@ -131,7 +130,6 @@ sub RegisterObj
           $rec{func} ne $mc->{fullname}->{$name}->{func} ||
           $rec{param} ne $mc->{fullname}->{$name}->{param} ||
           ($mc->{fullname}->{$name}->{target} eq "" && $rec{tranlation} ne "")){
-printf STDERR ("r=%s\n",Dumper(\%rec));
          my $oldstate=$p->isDataInputFromUserFrontend();
          $p->isDataInputFromUserFrontend(0);
          if ($p->ValidatedUpdateRecord(
