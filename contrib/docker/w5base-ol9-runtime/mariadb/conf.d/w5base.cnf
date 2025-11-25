@@ -4,4 +4,11 @@ skip-name-resolve=ON
 query_cache_limit       = 2M
 query_cache_size        = 256M
 
+wait_timeout            = 345600
+interactive_timeout     = 3456000
+
+net_read_timeout        = 3600
+net_write_timeout       = 3600
+
+
 
