@@ -510,7 +510,7 @@ create table swinstance (
   fullname   varchar(128) NOT NULL,
   cistatus   int(2)       NOT NULL,
     mandator       bigint(20)  default NULL,
-    name           varchar(40) NOT NULL,
+    name           varchar(50) NOT NULL,
     addname        varchar(40) NOT NULL,
     swnature       varchar(40) NOT NULL,
     swtype         varchar(10) NOT NULL,

@@ -26,11 +26,12 @@ sub new
 {
    my $type=shift;
    my %param=@_;
-   $param{name}='databoss'       if (!defined($param{name}));
-   $param{label}='Databoss'      if (!defined($param{label}));
-   $param{vjoinon}='databossid'  if (!defined($param{vjoinon}));
-   $param{AllowEmpty}='0'        if (!defined($param{AllowEmpty}));
-   $param{SoftValidate}='1'      if (!defined($param{SoftValidate}));
+   $param{name}='databoss'             if (!defined($param{name}));
+   $param{label}='Databoss'            if (!defined($param{label}));
+   $param{vjoinon}='databossid'        if (!defined($param{vjoinon}));
+   $param{AllowEmpty}='0'              if (!defined($param{AllowEmpty}));
+   $param{SoftValidate}='1'            if (!defined($param{SoftValidate}));
+   $param{htmldetail}='NotEmptyOrEdit' if (!defined($param{htmldetail}));
    if (!defined($param{vjoineditbase})){
       $param{vjoineditbase}={
          'cistatusid'=>[3,4,5],
