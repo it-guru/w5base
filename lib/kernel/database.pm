@@ -139,14 +139,20 @@ sub Connect
          my $private_foo_cachekey=$dbname."-".$$.".".$BackendSessionName;
          my @connectParam=(
             $self->{dbconnect},$self->{dbuser},$self->{dbpass},{
-               mysql_enable_utf8 => 0,
-               mysql_auto_reconnect=>1,
                AutoCommit=>1,
                RaiseError=>0,            
                PrintError=>0,            
                private_foo_cachekey=>$private_foo_cachekey
             }
          );
+         if ($self->{dbconnect}=~m/dbd:mysql:/i){
+            $connectParam[3]->{mysql_auto_reconnect}=1;
+            $connectParam[3]->{mysql_enable_utf8}=0;
+         }
+         if ($self->{dbconnect}=~m/dbd:mariadb:/i){
+            $connectParam[3]->{mariadb_auto_reconnect}=1;
+            $connectParam[3]->{mariadb_enable_utf8}=0;
+         }
          $self->{'db'}=DBI->connect_cached(@connectParam);
          if (!defined($self->{'db'})){
             my $sRetry=1;
