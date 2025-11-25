@@ -21,14 +21,14 @@ RUN dnf makecache
 
 RUN dnf -y install \
       supervisor httpd busybox postfix net-tools \
+      MariaDB-shared MariaDB-client MariaDB-devel \
       httpd httpd-devel httpd-tools \
       mod_fcgid mod_ssl mod_auth_openidc mod_auth_ae \
       curl jq wget git netcat \
       expect libaio patch s-nail \
       perl openssl-devel gd gd-devel \
       unixODBC unixODBC-devel \
-      MariaDB-shared MariaDB-client MariaDB-devel \
-      python3  python3-devel  \
+      python3 \
       perl-libwww-perl \
       perl-JSON \
       perl-FCGI \
@@ -47,10 +47,10 @@ RUN dnf -y install \
       perl-Crypt-OpenSSL-RSA \
       perl-Unicode-String \
       perl-Data-HexDump \
-      perl-DBD-MySQL \
       perl-DBD-Pg \
       perl-DBI \
       perl-Digest-MD5 \
+      perl-DBD-mysql \
       perl-ExtUtils-CBuilder \
       perl-ExtUtils-Install \
       perl-ExtUtils-MakeMaker \
