@@ -112,7 +112,7 @@ sub URLValidate
       return(\%uri);
    }
 
-   my @nonStdSchema=qw(oracle net8 mssql mysql informix scp 
+   my @nonStdSchema=qw(oracle net8 mssql mysql mariadb informix scp 
                        ssh pesit sftp 
                        smtp imap imaps
                        tcp udp);

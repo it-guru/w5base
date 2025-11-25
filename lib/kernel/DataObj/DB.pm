@@ -460,7 +460,7 @@ sub getSqlSelect
          $limitstart=1 if ($limitstart eq "");
          $limitstart=1 if ($limitstart<1);
          # LimitStart=1 means starting with the 1st record
-         if ($drivername eq "mysql"){
+         if ($drivername eq "mysql" || $drivername eq "mariadb"){
             $limitstart--;    # MySQL starts with record 0
             my $limitstring=$limitstart.",".$limitnum;
             $cmd.=" limit $limitstring";
@@ -488,7 +488,7 @@ sub getSqlSelect
    }
    if ($#cmd>0){
       map({$_="(".$_.")"} @cmd);
-      if ($drivername eq "mysql"){
+      if ($drivername eq "mysql" || $drivername eq "mariadb"){
          my $cmd=join(" union ",@cmd);
          $cmd.=" limit $limitnum" if ($limitnum>0 && !$self->{_UseSoftLimit});
          return($cmd);
@@ -538,7 +538,8 @@ sub getSqlCount
       #
       if ($limitnum>0 && !$self->{_UseSoftLimit}){
          if (defined($self->{DB}->{db}) &&
-             lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+             (lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql" ||
+              lc($self->{DB}->{db}->{Driver}->{Name}) eq "mariadb")){
             $cmd.=" limit $limitnum";
          }
          if (defined($self->{DB}->{db}) &&
@@ -950,7 +951,8 @@ sub InsertRecord
              ref($idobj->{dataobjattr}) ne "ARRAY"){    # by the database 
             if (keys(%q)==0){     # SCOPE_IDENTIY should work on ODBC databases
                my @l;
-               if (lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql"){
+               if (lc($self->{DB}->{db}->{Driver}->{Name}) eq "mysql" ||
+                   lc($self->{DB}->{db}->{Driver}->{Name}) eq "mariadb"){
                   @l=$workdb->getArrayList("select LAST_INSERT_ID()");
                }
                else{
@@ -1170,7 +1172,8 @@ sub getNext
    if (defined($self->Context->{CurrentLimit})){
       $self->Context->{CurrentLimit}--;
       if ($self->Context->{CurrentLimit}<=0){
-         if (lc($self->{DB}->{db}->{Driver}->{Name}) ne "mysql"){
+         if (lc($self->{DB}->{db}->{Driver}->{Name}) ne "mysql" ||
+             lc($self->{DB}->{db}->{Driver}->{Name}) ne "mariadb"){
             while(my ($temprec,$dberr)=$self->{DB}->fetchrow()){ 
                last if (!defined($temprec));      # on oracle DBD
             }                                     # we must read to the end
