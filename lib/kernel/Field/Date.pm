@@ -409,7 +409,7 @@ sub getBackendName
       if ($db->can("DriverName")){
          $_=$db->DriverName();
          case: {
-            /^mysql$/i and do {
+            /^(mysql|mariadb)$/i and do {
                return("date_add($self->{dataobjattr},interval 0 second)");
             };
             /^oracle$/i and do {

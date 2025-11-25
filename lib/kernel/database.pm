@@ -106,9 +106,16 @@ sub Connect
    my $BackendSessionName=$self->getParent->BackendSessionName();
    $BackendSessionName="default" if (!defined($BackendSessionName));
    if (defined($Apache::DBI::VERSION)){
-      $self->{'db'}=DBI->connect($self->{dbconnect},
-                                 $self->{dbuser},
-                                 $self->{dbpass},{mysql_enable_utf8 => 0});
+      if ($self->{dbconnect}=~m/dbd:mysql:/i){
+         $self->{'db'}=DBI->connect($self->{dbconnect},
+                                    $self->{dbuser},
+                                    $self->{dbpass},{mysql_enable_utf8 => 0});
+      }
+      if ($self->{dbconnect}=~m/dbd:mariadb:/i){
+         $self->{'db'}=DBI->connect($self->{dbconnect},
+                                    $self->{dbuser},
+                                    $self->{dbpass},{mariadb_enable_utf8 => 0});
+      }
       if (defined($self->{'db'})){
          if ($self->{'db'}->{private_inW5Transaction}){
             $self->{'db'}->{AutoCommit}=0;
@@ -374,6 +381,18 @@ sub execute
       }
       else{
          $attr->{mysql_use_result}=0;
+      }
+   }
+   if (lc($self->DriverName()) eq "mariadb"){
+      if ($ENV{REMOTE_USER} ne ""){  # ATTETION: MariaDB produces some errors
+         $statement.=" /* W5BaseUser: $ENV{REMOTE_USER}($$) ".  # with
+                     "$self->{parentlabel} */";                 # comments!
+      }
+      if ($attr->{unbuffered}){
+         $attr->{mariadb_use_result}=1;
+      }
+      else{
+         $attr->{mariadb_use_result}=0;
       }
    }
    delete($attr->{unbuffered});

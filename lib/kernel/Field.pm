@@ -936,7 +936,7 @@ sub getBackendName     # returns the name/function to place in select
       if (ref($self->{dataobjattr}) eq "ARRAY"){
          $_=$db->DriverName();
          case: {
-            /^mysql$/i and do {
+            /^(mysql|mariadb)$/i and do {
                return("concat(".join(",'-',",@{$self->{dataobjattr}}).")");
                return(undef); # noch todo
             };
@@ -972,7 +972,7 @@ sub getBackendName     # returns the name/function to place in select
          if (defined($self->{altdataobjattr})){
             $_=$db->DriverName();
             case: {
-               /^mysql$/i and do {
+               /^(mysql|mariadb)$/i and do {
                   my $f="if ($self->{altdataobjattr} is null,".
                         "$self->{dataobjattr},$self->{altdataobjattr})";
                   return($f); # noch todo
