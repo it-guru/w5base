@@ -1,4 +1,4 @@
-Zeile 1 git commit/rebase Test
+Zeile 1 git commit/rebase Test (add edit)
 Zeile 2
 Zeile 3
 
