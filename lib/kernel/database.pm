@@ -425,7 +425,8 @@ sub execute
        if ($self->{sth}->execute(@bind_values)){
           return($self->{sth});
        }
-       if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev"){
+       if ($self->getParent->Config->Param("W5BaseOperationMode") eq "dev" ||
+           $self->getParent->Config->Param("W5BaseOperationMode") eq "test"){
           printf STDERR ("ERROR: execute='%s'\n",$statement);
           printf STDERR ("ERROR database::execute '%s'\n",$DBI::errstr);
        }
