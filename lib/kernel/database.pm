@@ -106,12 +106,12 @@ sub Connect
    my $BackendSessionName=$self->getParent->BackendSessionName();
    $BackendSessionName="default" if (!defined($BackendSessionName));
    if (defined($Apache::DBI::VERSION)){
-      if ($self->{dbconnect}=~m/dbd:mysql:/i){
+      if ($self->{dbconnect}=~m/dbi:mysql:/i){
          $self->{'db'}=DBI->connect($self->{dbconnect},
                                     $self->{dbuser},
                                     $self->{dbpass},{mysql_enable_utf8 => 0});
       }
-      if ($self->{dbconnect}=~m/dbd:mariadb:/i){
+      if ($self->{dbconnect}=~m/dbi:mariadb:/i){
          $self->{'db'}=DBI->connect($self->{dbconnect},
                                     $self->{dbuser},
                                     $self->{dbpass},{mariadb_enable_utf8 => 0});
@@ -152,14 +152,15 @@ sub Connect
                private_foo_cachekey=>$private_foo_cachekey
             }
          );
-         if ($self->{dbconnect}=~m/dbd:mysql:/i){
+         if ($self->{dbconnect}=~m/dbi:mysql:/i){
             $connectParam[3]->{mysql_auto_reconnect}=1;
             $connectParam[3]->{mysql_enable_utf8}=0;
          }
-         if ($self->{dbconnect}=~m/dbd:mariadb:/i){
+         if ($self->{dbconnect}=~m/dbi:mariadb:/i){
             $connectParam[3]->{mariadb_auto_reconnect}=1;
             $connectParam[3]->{mariadb_enable_utf8}=0;
          }
+         #printf STDERR ("DEBUG: connect_cached=%s\n",Dumper(\@connectParam));
          $self->{'db'}=DBI->connect_cached(@connectParam);
          if (!defined($self->{'db'})){
             my $sRetry=1;
