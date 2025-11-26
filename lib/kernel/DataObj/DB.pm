@@ -1103,6 +1103,11 @@ sub getFirst
       return($temprec);
    }
    $self->LastMsg(ERROR,$self->{DB}->getErrorMsg());
+   if ($self->Config->Param("W5BaseOperationMode") eq "dev" ||
+       $self->Config->Param("W5BaseOperationMode") eq "test"){
+      printf STDERR ("ERROR: select='%s'\n",Dumper(\@sqlcmd));
+      printf STDERR ("ERROR: database::execute '%s'\n",$DBI::errstr);
+   }
    return(undef,$self->{DB}->getErrorMsg());
 }
 
