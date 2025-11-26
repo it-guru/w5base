@@ -19,11 +19,11 @@ services:
       - /var/lib/mysql:/var/lib/mysql
     restart: always
 
-  w5base-runtime:
+  w5base:
     container_name: w5base
     build:
       context: .
-    image: it9000/w5base-ol9-runtime:beta
+    image: it9000/w5base-ol9-runtime:latest
     depends_on:
       w5db:
         condition: service_healthy

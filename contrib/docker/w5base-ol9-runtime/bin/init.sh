@@ -147,7 +147,10 @@ fi
 # ensure aliases.db is fresh
 /usr/bin/newaliases
 
-/opt/w5base/sbin/W5Event -s TableVersionCheck # ensure DB is up to date
+if (( ${DISABLE_W5S:-0} )); then # Any Value non zero
+   /opt/w5base/sbin/W5Event -s TableVersionCheck # ensure DB is up to date
+fi
+
 
 
 /usr/bin/supervisord -n -u root -c   /etc/supervisord.conf
