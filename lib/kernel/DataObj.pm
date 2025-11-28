@@ -1982,11 +1982,25 @@ sub getIdByHashIOMapped
       $$debug.="\nFlt: ".Dumper(\%flt),"\n" if ($debug);
    }
    $self->SetFilter(\%flt);
+
    my $idfield=$self->IdField();
    my @l=$self->getVal($idfield->Name());
    $$debug.="\nResult ".$idfield->Name()." = ".join(", ",@l) if ($debug);
 
    return() if ($#l==-1);
+   if ($#l==0){
+      if ($param{ForceLikeSearch} eq "1" && exists($param{iomapped})){
+         # on ForceLikeSearch the target (iomapped) needs to be reread becaus
+         # posible Case "Effekts" (iomapped can have diffrent cases as realrec)
+         $self->ResetFilter();
+         $self->SetFilter({$idfield->Name()=>\@l});
+         my ($realrec,$msg)=$self->getOnlyFirst(keys(%{$param{iomapped}}));
+         if (defined($realrec)){
+            ObjectRecordCodeResolver($realrec);
+            %{$param{iomapped}}=%$realrec;
+         }
+      }
+   }
 
    if (wantarray()){
       return(@l);
