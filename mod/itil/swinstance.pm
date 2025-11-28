@@ -122,6 +122,7 @@ sub new
                 SoftValidate  =>1,          # check only - if changed
                 vjoineditbase =>{cistatusid=>">1 AND <6"},
                 vjoinon    =>['applid'=>'id'],
+                dataobjattr   =>'appl.name',
                 vjoindisp  =>'name'),
 
       new kernel::Field::Interface(
@@ -595,7 +596,7 @@ sub new
       new kernel::Field::TextDrop(
                 name          =>'system',
                 label         =>'System',
-                #group         =>'systems',
+                dataobjattr   =>'system.name',
                 group         =>'runon',
                 htmldetail    =>sub{
                    my $self=shift;
