@@ -1854,3 +1854,4 @@ alter table itcloud add lorgchangedt datetime default NULL,add lrecertreqdt date
 alter table applgrp add lorgchangedt datetime default NULL,add lrecertreqdt datetime default NULL,add lrecertdt datetime default NULL,add lrecertuser bigint(20) default NULL,add lrecertreqnotify datetime default NULL;
 drop table riskmgmtbase;
 alter table system add is_firewall bool default '0',add is_proxyportfw bool default '0';
+alter table autodiscrec add key `autodiscreckeylnkto_system` (lnkto_system,section,state);
