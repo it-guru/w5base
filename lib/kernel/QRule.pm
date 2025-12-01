@@ -540,6 +540,7 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
       }
       else{
          my $idfield=$dataobj->IdField();
+         my $updref=$dataobj->Self();
          if (defined($idfield)){
             my $idname=$idfield->Name();
             my %notifycontrol=(
@@ -547,19 +548,23 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
                datasource=>$partnerlabel
             );
             my $bk=undef;
-            if (defined($partnerlabel)){
-               $bk=$dataobj->NotifiedValidatedUpdateRecord(\%notifycontrol,
-                   $rec,$forcedupd,
-                   {$idname=>\$rec->{$idname}}
-               );
+            $updref.="::".$rec->{$idname};
+            my $UpdERRORS;
+            {
+               open local(*STDERR), '>', \$UpdERRORS;
+               if (defined($partnerlabel)){
+                  $bk=$dataobj->NotifiedValidatedUpdateRecord(\%notifycontrol,
+                      $rec,$forcedupd,
+                      {$idname=>\$rec->{$idname}}
+                  );
+               }
+               else{
+                  $bk=$dataobj->ValidatedUpdateRecord(
+                      $rec,$forcedupd,
+                      {$idname=>\$rec->{$idname}}
+                  );
+               }
             }
-            else{
-               $bk=$dataobj->ValidatedUpdateRecord(
-                   $rec,$forcedupd,
-                   {$idname=>\$rec->{$idname}}
-               );
-            }
-
             if ($bk){
                my @updfields=grep(!/^(srcload|mdate)$/,keys(%$forcedupd));
                if ($#updfields!=-1){
@@ -575,7 +580,21 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
                }
             }
             else{
-               push(@$qmsg,$self->getParent->LastMsg());
+               my @lastMsg=$self->getParent->LastMsg();
+               if ($#lastMsg!=-1){
+                  $dataobj->Log(ERROR,"basedata",
+                                      "qrule ".$self->Self().
+                                      " failed forcedupd in ".$updref);
+                  foreach my $msg (@lastMsg){
+                     $dataobj->Log(ERROR,"basedata",$msg);
+                  }
+                  push(@$qmsg,@lastMsg);
+               }
+               else{
+                  if ($UpdERRORS ne ""){
+                     msg(ERROR,"unhandled errors: $UpdERRORS");
+                  }
+               }
                $$errorlevel=3 if ($$errorlevel<3);
             }
          }
