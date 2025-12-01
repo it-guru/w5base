@@ -10,3 +10,6 @@
 'The config item is in the transient phase'=>{
 de=>'Das Config-Item befindet sich in der Einschwingphase'
 },
+'ignoring the recertification requires a forced deactivation'=>{
+ de=>'Ignorieren der ReZertifizierung erfordert eine Zwangs-Deaktivierung'
+},

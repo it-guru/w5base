@@ -261,6 +261,9 @@ sub qcheckRecord
          $forcedupd->{cistatusid}="6";
          $forcedupd->{lrecertreqdt}=undef;
          $forcedupd->{lrecertreqnotify}=undef;
+         $errorlevel=3 if ($errorlevel<3);
+         push(@qmsg,
+              "ignoring the recertification requires a forced deactivation");
       }
       else{
          if ($AgeOfReCertProcess>15){  # wait 14 days bevor sending a real mail
@@ -353,34 +356,22 @@ sub qcheckRecord
 
    }
 
-
    if (keys(%$forcedupd)){ # du the forcedupd silent
-      $forcedupd->{mdate}=$rec->{mdate};
-      my $idfield=$dataobj->IdField();
-      my $idname=$idfield->Name();
-      if ($dataobj->ValidatedUpdateRecord($rec,$forcedupd,
-                                          {$idname=>\$rec->{$idname}})){
-         msg(INFO,"upd ok");
-         $forcedupd={};
-      }
+      if (!exists($forcedupd->{cistatusid})){ # if cistatusid is not changed,
+         $forcedupd->{mdate}=$rec->{mdate};   # do NOT update the mdate, because
+      }                                       # it is only a interal update
       else{
-         push(@qmsg,$self->getParent->LastMsg());
-         $errorlevel=3 if ($errorlevel<3);
+         my $ref=$dataobj->Self();
+         if (exists($rec->{urlofcurrentrec})){
+            $ref=$rec->{urlofcurrentrec};
+         }
+         if ($forcedupd->{cistatusid}>4){
+            $dataobj->Log(WARN,"basedata",
+                          "try to deactivate CI in ".$ref.
+                          " due missing reCert");
+         }
       }
    }
-
-
-
-
-
-
-
-#   if ($urlswi>0 && $#{$rec->{applurl}}==-1){
-#      $errorlevel=3;
-#      my $msg="missing communication urls in application documentation";
-#      push(@dataissue,$msg);
-#      push(@qmsg,$msg);
-#   }
 
    my @result=$self->HandleQRuleResults(undef,
                  $dataobj,$rec,$checksession,
