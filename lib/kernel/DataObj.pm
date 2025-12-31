@@ -2393,7 +2393,6 @@ sub UserReCertExceptionParameters
       DeactivationHandling  => 112,   # deactivate CI after n days (0=NO)
       PostponNotification   => 15,    # wait days bevor start notification
       LimitedNotifyTargets  => 56,    # reduce notify targetes days
-
    );
    return(\%param);
 }
