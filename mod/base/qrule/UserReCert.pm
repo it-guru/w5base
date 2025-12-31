@@ -245,8 +245,18 @@ sub qcheckRecord
          $AgeOfReCertProcess=$d->{totaldays};
       }
       msg(INFO,sprintf ("age of lrecertreqdt = %s\n",Dumper($d)));
-      if ($dataobj->Self() ne "base::grp" && # no auto deactivation for base:grp
-          $d->{totaldays}>112){  # set CI to cistatusid=6 after 4 months
+      my $reCertParam=$dataobj->UserReCertExceptionParameters($rec,$d);
+
+      if ($reCertParam->{CreateDataIssue}>0 &&
+          $d->{totaldays}>$reCertParam->{CreateDataIssue}){ 
+         my $msg="existing and ignored recertification request";
+         push(@qmsg,$msg);
+         push(@dataissue,$msg);
+         $errorlevel=3 if ($errorlevel<3);
+      }
+
+      if ($reCertParam->{DeactivationHandling}>0 &&
+          $d->{totaldays}>$reCertParam->{DeactivationHandling}){ 
          my $name;
          my $id;
          if ($dataobj->Self() eq "base::grp"){
@@ -266,7 +276,7 @@ sub qcheckRecord
               "ignoring the recertification requires a forced deactivation");
       }
       else{
-         if ($AgeOfReCertProcess>15){  # wait 14 days bevor sending a real mail
+         if ($AgeOfReCertProcess>$reCertParam->{PostponNotification}){
             push(@qmsg,"recertification notification send as email");
             my %notifyParam;
             $notifyParam{faqkey}='QualityRule '.$self->Self();
@@ -297,7 +307,7 @@ sub qcheckRecord
 
             }
             else{
-               if ($AgeOfReCertProcess<56){
+               if ($AgeOfReCertProcess<$reCertParam->{LimitedNotifyTargets}){ 
                   msg(INFO,"9 debug: send UserReCertCiNotify message");
                   $notifyParam{emailto}=[$rec->{databossid}];
                   $dataobj->NotifyLangContacts($rec,{},
