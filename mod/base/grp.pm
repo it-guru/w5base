@@ -535,8 +535,16 @@ sub getReCertificationUserIDs
 }
 
 
+sub UserReCertExceptionParameters
+{
+   my $self=shift;
 
+   my $param=$self->SUPER::UserReCertExceptionParameters(@_);
 
+   $param->{CreateDataIssue}=0;
+   $param->{DeactivationHandling}=0;
+   return($param);
+}
 
 
 sub SecureValidate

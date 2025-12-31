@@ -566,16 +566,24 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
                }
             }
             if ($bk){
+               #
+               # if ($forcedupd->{mdate}) exists, it is a silend update
+               # which means no EssentialsChanged is done and no messages
+               # are need to displayed. (silent updates are NOT effecting
+               # on replication!
+               #
                my @updfields=grep(!/^(srcload|mdate)$/,keys(%$forcedupd));
-               if ($#updfields!=-1){
+               if (!exists($forcedupd->{mdate}) && ($#updfields!=-1)){
                   push(@$qmsg,"all desired fields has been updated: ".
                              join(", ",@updfields));
                }
                foreach my $k (keys(%$forcedupd)){
                   $rec->{$k}=$forcedupd->{$k};
-                  if ($k ne "srcload" && $k ne "mdate"){
-                     $checksession->{EssentialsChangedCnt}++;
-                     $checksession->{EssentialsChanged}->{$k}++
+                  if (!exists($forcedupd->{mdate})){
+                     if ($k ne "srcload" && $k ne "mdate"){
+                        $checksession->{EssentialsChangedCnt}++;
+                        $checksession->{EssentialsChanged}->{$k}++
+                     }
                   }
                }
             }

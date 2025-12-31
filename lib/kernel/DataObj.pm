@@ -2382,6 +2382,23 @@ sub UserReCertHandling
 }
 
 
+sub UserReCertExceptionParameters
+{
+   my $self=shift;
+   my $rec=shift;
+   my $recertAge=shift;
+
+   my %param=(
+      CreateDataIssue       => 0,     # create DataIssue after n days (0=NO)
+      DeactivationHandling  => 112,   # deactivate CI after n days (0=NO)
+      PostponNotification   => 15,    # wait days bevor start notification
+      LimitedNotifyTargets  => 56,    # reduce notify targetes days
+
+   );
+   return(\%param);
+}
+
+
 sub loadPrivacyAcl
 {
    my $self=shift;
