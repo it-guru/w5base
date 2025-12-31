@@ -589,6 +589,8 @@ sub HandleQRuleResults    # dies muß der Nachfolger von HandleWfRquest werden
                      $dataobj->Log(ERROR,"basedata",$msg);
                   }
                   push(@$qmsg,@lastMsg);
+                  # reset LastMsg - all messages are logged to basedata
+                  $self->getParent->LastMsg("");
                }
                else{
                   if ($UpdERRORS ne ""){
