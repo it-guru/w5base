@@ -970,7 +970,10 @@ sub FinishWrite
    }
    elsif (effChanged($oldrec,$newrec,'cistatusid')) {
       $mode='InterfaceUpdate';
-      $newrec->{id}=$oldrec->{id} if (!defined($newrec->{id}));
+   }
+   if (ref($newrec) eq "HASH" && !defined($newrec->{id}) &&
+       defined($oldrec) && ref($oldrec) eq "HASH" && defined($oldrec->{id})){
+      $newrec->{id}=$oldrec->{id};
    }
 
    if ($mode ne "") {
@@ -1036,8 +1039,12 @@ sub NotifyIfPartner
 
    my $lnkobj=getModuleObject($self->Config,'itil::lnkapplappl');
 
-   $lnkobj->SetFilter({id=>$rec{id}});
-   my ($ifurl,$msg)=$lnkobj->getOnlyFirst('urlofcurrentrec');
+
+   my ($ifurl,$msg);
+   if (defined($rec{id}) && $rec{id} ne ""){
+      $lnkobj->SetFilter({id=>$rec{id}});
+      ($ifurl,$msg)=$lnkobj->getOnlyFirst('urlofcurrentrec');
+   }
 
    # key = contype of fromappl
    # val = possible contypes of toappl
@@ -1059,8 +1066,10 @@ sub NotifyIfPartner
    $ifparam.=$rec{conmode}."\n";
    $ifparam.=$self->T('Interface-State').': ';
    $ifparam.=$rec{cistatus}."\n\n";
-   $ifparam.="Details:\n";
-   $ifparam.=$ifurl->{urlofcurrentrec};
+   if (defined($ifurl)){
+      $ifparam.="Details:\n";
+      $ifparam.=$ifurl->{urlofcurrentrec};
+   }
 
    my $todomsg=sprintf($self->T("If necessary, please perform any ".
                                 "needed modifications of the ".
