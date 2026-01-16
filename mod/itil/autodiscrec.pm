@@ -472,8 +472,28 @@ sub doTakeAutoDiscData
    #  SYSTEMNAME Handling  (direct record handling)
    #######################################################################
    if ($section eq "SYSTEMNAME"){
-      my $nix;
-
+      if (defined($sysrec)){
+         my $systemname=effVal($oldrec,$newrec,"scanname");
+         if (defined($initrelrec)){  # create a new related record for update
+            if ($o->SecureValidatedUpdateRecord($sysrec,
+                    {name=>$systemname},
+                    {id=>\$sysrec->{id}})){
+               if (!$self->ValidatedUpdateRecord($oldrec,{
+                      state=>$newrec->{state},
+                      lnkto_lnksoftware=>undef,
+                      lnkto_asset=>undef,
+                      lnkto_system=>$systemid,
+                      approve_date=>NowStamp("en"),
+                      approve_user=>$userid
+                    },{id=>\$oldrec->{id}})){
+                  return(98,"ERROR: fail to link autodiscrecord to system");
+               }
+               else{
+                  return(0);
+               }
+            }
+         }
+      }
    }
    elsif ($section eq "OSRELEASE"){   
       if (defined($sysrec)){
@@ -1096,6 +1116,9 @@ sub AutoDiscFormatEntry
          $d.="</select></td>";
          $d.="</table>";
          $d.="</div>";
+      }
+      elsif ($adrec->{section} eq "SYSTEMNAME"){
+         $takeable="";
       }
       elsif ($adrec->{section} eq "OSRELEASE"){
          $takeable="";

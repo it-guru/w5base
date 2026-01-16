@@ -533,8 +533,17 @@ sub new
                 name          =>'autodiscrecosrelease',
                 group         =>'logsys',
                 label         =>'AutoDisc OS-Release',
+                readonly      =>1,
                 htmldetail    =>0,
                 dataobjattr   =>"if (autodiscrecosrelease.id is null,0,1)"),
+
+      new kernel::Field::Boolean(
+                name          =>'autodiscrecsystemname',
+                group         =>'logsys',
+                readonly      =>1,
+                label         =>'AutoDisc Systemname',
+                htmldetail    =>0,
+                dataobjattr   =>"autodiscrecsystemname.scanname"),
 
       new kernel::Field::Interface(
                 name          =>'osreleaseid',
@@ -2391,6 +2400,11 @@ sub getSqlFrom
           "autodiscrecosrelease.section='OSRELEASE' and ".
           "(autodiscrecosrelease.state='10' or ".
           "autodiscrecosrelease.state='20') ".
+          "left outer join autodiscrec as autodiscrecsystemname ".
+          "on system.id=autodiscrecsystemname.lnkto_system and ".
+          "autodiscrecsystemname.section='SYSTEMNAME' and ".
+          "(autodiscrecsystemname.state='10' or ".
+          "autodiscrecsystemname.state='20') ".
           "left outer join lnkapplsystem as secsystemlnkapplsystem ".
           "on $worktable.id=secsystemlnkapplsystem.system ".
           "left outer join appl as secsystemappl ".
@@ -2937,7 +2951,16 @@ sub QRuleSyncCloudSystem
 
       my $parsysname;
       my $parshortdesc;
-      NAMECHK: foreach my $orgsysname (@$sysnamelist){
+
+      my @checksysnamelist=@$sysnamelist;
+
+      if (exists($rec->{autodiscrecsystemname}) &&
+          $rec->{autodiscrecsystemname} ne "" && 
+          $rec->{name} eq $rec->{autodiscrecsystemname}){
+         unshift(@checksysnamelist,$rec->{autodiscrecsystemname});
+      }
+
+      NAMECHK: foreach my $orgsysname (@checksysnamelist){
          if (!defined($parshortdesc)){
             $parshortdesc=UTF8toLatin1($orgsysname);
             $parshortdesc=~s/[^a-z0-9_\@ -]//gi; # remove non ASC Char
