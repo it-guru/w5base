@@ -830,6 +830,28 @@ sub ESrestETLload
          if ($exit_code!=0){
             return($exit_code,$@);
          }
+
+         # RawDump parser
+         delete($session->{RawDump});
+         if ($session->{decodeRawDump}){
+            if (open(F,"</tmp/$tmpLastRequestRawDump")){
+               my $json_text=join("",<F>);
+               my $data;
+               eval('use JSON; $data=decode_json($json_text);');
+               $session->{RawDump}=$data;
+            }
+         }
+         # RawDump parser
+         delete($session->{JqDump});
+         if ($session->{decodeJqDump}){
+            if (open(F,"</tmp/$tmpLastRequestJqDump")){
+               my $json_text=join("",<F>);
+               my $data;
+               eval('use JSON; $data=decode_json($json_text);');
+               $session->{JqDump}=$data;
+            }
+         }
+
          my $d;
          eval('use JSON; $d=decode_json($out);');
          #msg(INFO,"out=$out");
