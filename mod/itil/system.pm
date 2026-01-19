@@ -1957,6 +1957,28 @@ sub initSearchQuery
 }
 
 
+sub UserReCertExceptionParameters
+{
+   my $self=shift;
+   my $rec=shift;
+   my $recertAge=shift;
+   my $crefdate=shift;
+
+   my %param=%{
+      $self->SUPER::UserReCertExceptionParameters($rec,$recertAge,$crefdate)
+   };
+
+   if (exists($rec->{itcloudareaid}) && $rec->{itcloudareaid} ne ""){
+      $param{CreateDataIssue}=112;
+      $param{DeactivationHandling}=0;
+   }
+
+   return(\%param);
+}
+
+
+
+
 sub getFieldObjsByView
 {
    my $self=shift;

@@ -2387,8 +2387,10 @@ sub UserReCertExceptionParameters
    my $self=shift;
    my $rec=shift;
    my $recertAge=shift;
+   my $crefdate=shift;
 
    my %param=(
+      TransitionPhase       => 6*7,   # Wait n days after create or inst( 0=NO)
       CreateDataIssue       => 0,     # create DataIssue after n days (0=NO)
       DeactivationHandling  => 154,   # deactivate CI after n days (0=NO)
       PostponNotification   => 57,    # wait days bevor start notification

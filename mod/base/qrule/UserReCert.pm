@@ -85,19 +85,47 @@ sub qcheckRecord
    return(undef,undef) if (!defined($cistatusid_FObj) || $rec->{cistatusid}>5);
 
    #########################################################################
-   # initiate ReCert process only if the CI is 6 weeks old, at least
-   #
    my $crefdate=$rec->{cdate};
    if (exists($rec->{instdate}) && $rec->{instdate} ne ""){
       $crefdate=$rec->{instdate};
    }
+
+
+   my $lrecertreqdtD;
+   if (exists($rec->{lrecertreqdt}) && $rec->{lrecertreqdt} ne ""){
+      $lrecertreqdtD=CalcDateDuration($rec->{lrecertreqdt},NowStamp("en"));
+      if (!defined($lrecertreqdtD)){
+         msg(ERROR,"error in doNotify CalcDateDuration on rec=".Dumper($rec));
+      }
+   }
+
+   my $crefdateD;
    if ($crefdate ne ""){
-      my $crefd=CalcDateDuration($crefdate,NowStamp("en"));
-      if (defined($crefd) && $crefd->{days}<(6*7)){ # 6 weeks 
+      $crefdateD=CalcDateDuration($crefdate,NowStamp("en"));
+   }
+
+   my $reCertParam=$dataobj->UserReCertExceptionParameters(
+      $rec,$lrecertreqdtD,$crefdateD
+   );
+   msg(INFO,sprintf ("used UserReCertExceptionParameters = %s\n",
+            Dumper($reCertParam)));
+
+
+
+
+   if (defined($crefdate)){
+      if (defined($crefdateD) && 
+          $crefdateD->{days}<$reCertParam->{'TransitionPhase'}){ 
          return(undef,{qmsg=>['The config item is in the transient phase']});
       }
-
    }
+
+
+
+
+
+
+
    #########################################################################
 
 
@@ -209,18 +237,12 @@ sub qcheckRecord
 
    if ($doNotify){
       if ($rec->{lrecertreqnotify} ne ""){
-         my $d=CalcDateDuration($rec->{lrecertreqnotify},NowStamp("en"));
-         if (!defined($d)){
-            msg(ERROR,"error in CalcDateDuration on rec=".Dumper($rec));
-         }
-         else{
-            msg(INFO,"2 debug: lrecertreqnotify=".$rec->{lrecertreqnotify});
-            msg(INFO,"2 debug: lrecertreqnotify age=".$d->{totaldays});
-            if ($d->{totaldays}<7){ # send a notify only once a week
-               msg(INFO,"last recert notify to short in the past - ".
-                        "no new notify");
-               $doNotify=0;
-            }
+         msg(INFO,"2 debug: lrecertreqnotify=".$rec->{lrecertreqnotify});
+         msg(INFO,"2 debug: lrecertreqnotify age=".$lrecertreqdtD->{totaldays});
+         if ($lrecertreqdtD->{totaldays}<7){ # send a notify only once a week
+            msg(INFO,"last recert notify to short in the past - ".
+                     "no new notify");
+            $doNotify=0;
          }
       }
    }
@@ -234,29 +256,19 @@ sub qcheckRecord
    #$doNotify=1; # force notification
    msg(INFO,"4 debug: doNotify=$doNotify latestOrgChange=$latestOrgChange");
 
+   if (defined($lrecertreqdtD)){
+      msg(INFO,sprintf ("age of lrecertreqdtD = %s\n",Dumper($lrecertreqdtD)));
+   }
+
    if ($doNotify && $rec->{lrecertreqdt} ne ""){
       $forcedupd->{lrecertreqnotify}=NowStamp("en");
       my $AgeOfReCertProcess=0;
-      my $d=CalcDateDuration($rec->{lrecertreqdt},NowStamp("en"));
-      if (!defined($d)){
-         msg(ERROR,"error in doNotify CalcDateDuration on rec=".Dumper($rec));
-      }
-      else{
-         $AgeOfReCertProcess=$d->{totaldays};
-      }
-      msg(INFO,sprintf ("age of lrecertreqdt = %s\n",Dumper($d)));
-      my $reCertParam=$dataobj->UserReCertExceptionParameters($rec,$d);
-
-      if ($reCertParam->{CreateDataIssue}>0 &&
-          $d->{totaldays}>$reCertParam->{CreateDataIssue}){ 
-         my $msg="existing and ignored recertification request";
-         push(@qmsg,$msg);
-         push(@dataissue,$msg);
-         $errorlevel=3 if ($errorlevel<3);
+      if (defined($lrecertreqdtD)){
+         $AgeOfReCertProcess=$lrecertreqdtD->{totaldays};
       }
 
       if ($reCertParam->{DeactivationHandling}>0 &&
-          $d->{totaldays}>$reCertParam->{DeactivationHandling}){ 
+          $lrecertreqdtD->{totaldays}>$reCertParam->{DeactivationHandling}){ 
          my $name;
          my $id;
          if ($dataobj->Self() eq "base::grp"){
@@ -365,6 +377,15 @@ sub qcheckRecord
       }
 
    }
+
+   if (defined($lrecertreqdtD) && $reCertParam->{CreateDataIssue}>0 &&
+       $lrecertreqdtD->{totaldays}>$reCertParam->{CreateDataIssue}){ 
+      my $msg="existing and ignored recertification request";
+      push(@qmsg,$msg);
+      push(@dataissue,$msg);
+      $errorlevel=3 if ($errorlevel<3);
+   }
+
 
    if (keys(%$forcedupd)){ # du the forcedupd silent
       if (!exists($forcedupd->{cistatusid})){ # if cistatusid is not changed,
