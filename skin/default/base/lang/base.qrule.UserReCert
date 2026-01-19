@@ -13,3 +13,6 @@ de=>'Das Config-Item befindet sich in der Einschwingphase'
 'ignoring the recertification requires a forced deactivation'=>{
  de=>'Ignorieren der ReZertifizierung erfordert eine Zwangs-Deaktivierung'
 },
+'existing and ignored recertification request'=>{
+ de=>'Existierende und Ignorierte ReZertifizierungsanforderung'
+}

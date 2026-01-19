@@ -426,8 +426,23 @@ sub SelfAsParentObject    # this method is needed because existing derevations
 }
 
 
+sub UserReCertExceptionParameters
+{
+   my $self=shift;
+   my $rec=shift;
+   my $recertAge=shift;
+   my $crefdate=shift;
 
-         
+   my %param=%{
+      $self->SUPER::UserReCertExceptionParameters($rec,$recertAge,$crefdate)
+   };
+
+   $param{CreateDataIssue}=112;
+   $param{DeactivationHandling}=0;
+
+   return(\%param);
+}
+
 
 sub getSqlFrom
 {
