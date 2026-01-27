@@ -121,18 +121,22 @@ sub BorderChangeHandling
          # calculation of contacts to notify
          if (keys(%{$border{'itil::businessservice'}})){
             my $o=getModuleObject($self->Config,"itil::businessservice");
-            $o->SetFilter({id=>[keys(%{$border{'itil::businessservice'}})],
-                           cistatusid=>"<6"});
+            $o->SetFilter({id=>[keys(%{$border{'itil::businessservice'}})]});
             foreach my $lrec ($o->getHashList(qw(id fullname databossid))){
-               if ($lrec->{databossid} ne ""){
-                  $u{emailto}->{$lrec->{databossid}}++;
+               if ($lrec->{cistatusid}<6){
+                  if ($lrec->{databossid} ne ""){
+                     $u{emailto}->{$lrec->{databossid}}++;
+                  }
+                  $border{'itil::businessservice'}->{$lrec->{id}}=
+                     $lrec->{fullname};
+                  $ia->LoadTargets($u{emailcc},\'itil::businessservice',
+                                   \'genborderchange',\$lrec->{id},
+                                    undef,                  
+                                    load=>'userid');
                }
-               $border{'itil::businessservice'}->{$lrec->{id}}=
-                  $lrec->{fullname};
-               $ia->LoadTargets($u{emailcc},\'itil::businessservice',
-                                \'genborderchange',\$lrec->{id},
-                                 undef,                  
-                                 load=>'userid');
+               else{
+                  delete($border{'itil::businessservice'}->{$lrec->{id}});
+               }
             }
          }
          #################################################################
@@ -255,6 +259,11 @@ sub BorderChangeHandling
                      }
                      else{
                         my $baseurl=$self->Config->Param("EventJobBaseUrl");
+                        if ($baseurl eq ""){
+                           msg(ERROR,"EventJobBaseUrl empty ".
+                                     "at BorderChangeHandling");
+                           Stacktrace(1);
+                        }
                         $baseurl.="/" if (!($baseurl=~m/\/$/));
                      }
                      if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
@@ -264,7 +273,11 @@ sub BorderChangeHandling
                      my $p=$dataobj;
                      $p=~s/::/\//g;
                      $baseurl.="/auth/$p/ById/$id";
-
+                     if (!($baseurl=~m/^http/)){
+                        msg(ERROR,"BorderChangeHandling missing http prefix ".
+                                  "in $baseurl");
+                        Stacktrace(1);
+                     }
                      $text.=" - ".quoteHtml($border{$dataobj}->{$id})."\n".
                             "   $baseurl\n\n";
                   }
