@@ -238,8 +238,9 @@ sub qcheckRecord
    if ($doNotify){
       if ($rec->{lrecertreqnotify} ne ""){
          msg(INFO,"2 debug: lrecertreqnotify=".$rec->{lrecertreqnotify});
-         msg(INFO,"2 debug: lrecertreqnotify age=".$lrecertreqdtD->{totaldays});
-         if ($lrecertreqdtD->{totaldays}<7){ # send a notify only once a week
+         my $lNotify=CalcDateDuration($rec->{lrecertreqnotify},NowStamp("en"));
+         msg(INFO,"2 debug: lrecertreqnotify age=".$lNotify->{totaldays});
+         if ($lNotify->{totaldays}<7){ # send a notify only once a week
             msg(INFO,"last recert notify to short in the past - ".
                      "no new notify");
             $doNotify=0;
