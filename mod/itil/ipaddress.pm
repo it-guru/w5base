@@ -844,11 +844,13 @@ sub Validate
       $newrec->{type}=1;
       $type=1;
    }
-   if ($type eq "0" && $is_primary ne "1"){
-      $newrec->{is_primary}=1;
-   }
-   if ($type ne "0" && $is_primary ne ""){
-      $newrec->{is_primary}=undef;
+   if (effChanged($oldrec,$newrec,"type")){
+      if ($type eq "0" && $is_primary ne "1"){
+         $newrec->{is_primary}=1;
+      }
+      if ($type ne "0" && $is_primary ne ""){
+         $newrec->{is_primary}=undef;
+      }
    }
    if ($cistatusid<=5 && $is_notdeleted ne "1"){
       $newrec->{is_notdeleted}=1;

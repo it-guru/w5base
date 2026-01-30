@@ -105,7 +105,7 @@ sub qcheckRecord
          my $dnshostpart=$rec->{dnsname};
          $dnshostpart=~s/\..*$//;
          if (lc($dnshostpart) eq lc($rec->{system})){
-            if ($rec->{addresstyp} ne "0"){ # should be prim - but we check 
+            if ($rec->{type} ne "0"){ # should be prim - but we check 
                                             # if there others already primary
                my $sys=getModuleObject($dataobj->Config,"itil::system");
                $sys->SetFilter({id=>\$rec->{systemid}});
@@ -113,28 +113,46 @@ sub qcheckRecord
                my $foundprim=0;
                if (defined($sysrec) && exists($sysrec->{ipaddresses})){
                   foreach my $iprec (@{$sysrec->{ipaddresses}}){
-                    if ($iprec->{addresstyp} eq "0"){
+                    if ($iprec->{type} eq "0"){
                        $foundprim=1;
                        last;
                     }
                   }
                   if (!$foundprim){
-                     $forcedupd->{addresstyp}="0";
+                     $forcedupd->{type}="0";
                   }
                }
             }
          }
       }
    }
-   if (keys(%$forcedupd) && exists($forcedupd->{dnsname})){
+   if (keys(%$forcedupd) && 
+       (exists($forcedupd->{dnsname}) || exists($forcedupd->{type}))){
       $forcedupd->{mdate}=$rec->{mdate};
       $forcedupd->{editor}=$rec->{editor};
       $forcedupd->{owner}=$rec->{owner};
       my $swop=$dataobj->Clone();
-      $swop->SetFilter({id=>\$rec->{id}}); 
-      my ($oldrec,$msg)=$swop->getOnlyFirst(qw(ALL)); 
-      if ($swop->ValidatedUpdateRecord($oldrec,$forcedupd,{id=>\$rec->{id}})){
-         push(@qmsg,"DNS Name updated to: ".$forcedupd->{dnsname});
+      my $UpdERRORS;
+      {
+         open local(*STDERR), '>', \$UpdERRORS;
+         $swop->SetFilter({id=>\$rec->{id}}); 
+         my ($oldrec,$msg)=$swop->getOnlyFirst(qw(ALL)); 
+         if ($swop->ValidatedUpdateRecord($oldrec,$forcedupd,{
+                                             id=>\$rec->{id}
+                                          })){
+            if (exists($forcedupd->{dnsname})){
+               push(@qmsg,"DNS Name updated to: ".$forcedupd->{dnsname});
+            }
+         }
+         $swop->LastMsg("");
+      }
+      if ($UpdERRORS ne ""){
+         if ($dataobj->Config->Param("W5BaseOperationMode") eq "dev"){
+            printf STDERR ("%s\n",$UpdERRORS);
+         }
+         $UpdERRORS=~s/\n/ /g;
+         push(@qmsg,"something went wrong on update: ".
+                    join(",",keys(%$forcedupd)));
       }
       $forcedupd={};
    }
