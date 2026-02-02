@@ -3120,6 +3120,17 @@ sub QRuleSyncCloudSystem
          $netarea=$net->getTaggedNetworkAreaId();
       }
 
+      my @validatedIPrecords;
+      foreach my $reqIPrec (@{$parrec->{ipaddresses}}){
+         next if (trim($reqIPrec->{name}) eq "");
+         my $msg;
+         if (!$self->IPValidate($reqIPrec->{name},\$msg)){
+            msg(INFO,"skip '$reqIPrec->{name}' due '$msg'");
+            next;
+         }
+         push(@validatedIPrecords,$reqIPrec);
+      }
+      $parrec->{ipaddresses}=\@validatedIPrecords;
 
       foreach my $currec (@{$rec->{ipaddresses}}){
          if ($currec->{srcsys} ne $srcsystag){
