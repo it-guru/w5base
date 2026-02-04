@@ -3236,8 +3236,13 @@ sub QRuleSyncCloudSystem
                           # entries
                           $oprec->{DATA}->{networkid}=$networkid;
                        }
-                       if ($mode eq "update"){ # on update, do not change type
-                          delete($oprec->{DATA}->{type});
+                       if ($mode eq "update"){ 
+                          # on change of ip-record alwas set type=1 (secondary)
+                          # to prevent 'PrimaryUniqueCheck' errors
+                          $oprec->{DATA}->{type}=1;
+                          # my 1st thinking was "do not change type" - but 
+                          # this was bad/wrong.
+                          #delete($oprec->{DATA}->{type});
                        }
                        return($oprec);
                     }
