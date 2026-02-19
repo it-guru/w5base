@@ -772,6 +772,7 @@ sub ESrestETLload
              $restOriginHeaders,$ESjqTransform)=$backcall->($session,$meta);
          msg(INFO,"ESrestETLload: next backcall OrignMethod=$restOrignMethod");
          last if (!defined($restOrignMethod) || $restOrignMethod eq "BREAK");
+         last if (!defined($restOrignMethod) || $restOrignMethod eq "ERROR");
        
          my $i;
          my $curlHeaderParam=join("",map({
