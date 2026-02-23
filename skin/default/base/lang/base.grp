@@ -53,3 +53,4 @@
 'last recert userid'=>{de=>'UserID der der letzten ReZertifizierung'},
 'last recert request notification date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Benachrichtigungsbehandlung'},
 'last recert request date'=>{de=>'Zeitpunkt der letzten ReZertifizierung-Anforderung'},
+'Mandator entry point'=>{de=>'Mandaten-Knoten'},

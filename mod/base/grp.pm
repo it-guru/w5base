@@ -149,6 +149,15 @@ sub new
                 vjoinon       =>['parentid'=>'grpid'],
                 vjoindisp     =>'fullname'),
 
+      new kernel::Field::TextDrop(
+                name          =>'mandatorentry',
+                label         =>'Mandator entry point',
+                htmldetail    =>'NotEmpty',
+                readonly      =>1,
+                vjointo       =>'base::mandator',
+                vjoinon       =>['grpid'=>'grpid'],
+                vjoindisp     =>'name'),
+
       new kernel::Field::Textarea(
                 name          =>'comments',
                 group         =>'misc',
