@@ -1778,7 +1778,7 @@ sub ExpandTimeExpression
    my $dsttimezone=shift;
    my %param=@_;
    my $result="";
-   my ($Y,$M,$D,$h,$m,$s);
+   my ($Y,$M,$D,$h,$m,$s,$forceTS);
    my $found=0;
    my $fail=1;
    my $time;
@@ -1796,10 +1796,6 @@ sub ExpandTimeExpression
    $format="en" if (!defined($format));
    if (!defined($srctimezone)){
       $srctimezone=$self->UserTimezone();
-   }
-   if ($val=~m/ GMT$/ || $val=~m/ UTC$/){
-      $val=~s/ (GMT|UTC)$//;
-      $srctimezone="GMT";
    }
    ####################################################################
    my $monthbase=$self->T("monthbase");
@@ -1956,9 +1952,12 @@ sub ExpandTimeExpression
       $found=1;
       $fail=0;
    }
-   elsif (($D,$M,$Y,$h,$m,$s)=$val=~
-          m/^(\d+)\.(\d+)\.(\d+)\s+(\d+):(\d+):(\d+)/){
-      $val=~s/^(\d+)\.(\d+)\.(\d+)\s+(\d+):(\d+):(\d+)//;
+   elsif (($D,$M,$Y,$h,$m,$s,$forceTS)=$val=~
+          m/^(\d+)\.(\d+)\.(\d+)\s+(\d+):(\d+):(\d+)( (\S{3})){0,1}/){
+      $val=~s/^(\d+)\.(\d+)\.(\d+)\s+(\d+):(\d+):(\d+)( (\S{3})){0,1}//;
+      if ($forceTS ne ""){
+         $srctimezone=uc(trim($forceTS));
+      }
       $Y+=2000 if ($Y<50);
       $Y+=1900 if ($Y>=50 && $Y<=99);
       $Y=1971 if ($Y<1971);
