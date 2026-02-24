@@ -229,6 +229,9 @@ sub CheckFilter
       foreach my $k (keys(%{$filter})){
          my $fld=$self->getField($k);
          next if (exists($fld->{RestSoftFilter}) && !$fld->{RestSoftFilter});
+
+
+
          if (exists($filter->{$k}) && !defined($filter->{$k})){ # compare on 
             if (!(!defined($rec->{$k}) && exists($rec->{$k}))){ # null entrys
                $failcount=1;
@@ -274,6 +277,7 @@ sub CheckFilter
          }
          else{
             my $chk=$filter->{$k};
+
             my @words=parse_line('[,;]{0,1}\s+',0,$chk);
             if (!($chk=~m/^\s*$/) && $#words==-1){  # maybe an invalid " struct
                $failcount=1;
@@ -281,7 +285,7 @@ sub CheckFilter
             }
             else{
                my $wordschkok=0;
-               my $conjunction; # AND relation
+               my $conjunction=0; # OR relation
 
                my @dataval=($rec->{$k});
                if (ref($rec->{$k}) eq "ARRAY"){
@@ -303,9 +307,42 @@ sub CheckFilter
 
                   my $recok;
                   DATACHK: foreach my $dataval (@dataval){
-                     if ($chk=~m/^>/){
-                        $chk=~s/^>//;
-                        if (!($dataval>$chk)){
+                     my $cmpOp="eq";
+                     my $preChk=$chk;
+                     do{
+                        $preChk=$chk; 
+                        if ($chk=~m/^>/){
+                           $chk=~s/^>//;
+                           $cmpOp="gt";
+                        }
+                        elsif ($chk=~m/^</){
+                           $chk=~s/^<//;
+                           $cmpOp="lt";
+                        }
+                        elsif ($chk=~m/^!/){
+                           $chk=~s/^!//;
+                           $cmpOp="not";
+                        }
+                     }while($preChk ne $chk);
+
+                     ##########################################################
+                     # datatype specific preprocessing of chk
+                     if ($fld->Type()=~m/^.{0,1}Date$/){
+                        my $exp=$self->ExpandTimeExpression($chk,"en");
+                        $chk=$exp;
+                     }
+                     else{
+                        # translate for string (regex) operation
+                        if ($cmpOp eq "eq" || $cmpOp eq "not"){
+                           $chk=~s/\./\\./g;
+                           $chk=~s/\?/\./g;
+                           $chk=~s/\*/\.*/g;
+                        }
+                     }
+                     ##########################################################
+
+                     if ($cmpOp eq "gt"){
+                        if (!($dataval gt $chk)){
                            $recok=0 if (!defined($recok));
                            if ($conjunction) {
                               # skip all words with AND relation
@@ -314,14 +351,18 @@ sub CheckFilter
                               }
                            }
                         }
-                        elsif ($conjunction) {
-                           $recok=0 if (!defined($recok));
-                           $i+=1; # skip next word. It's AND
+                        else{
+                           if ($conjunction) {
+                              $recok=0 if (!defined($recok));
+                              $i+=1;
+                           }
+                           else {
+                              $recok++;
+                           }
                         }
                      }
-                     elsif ($chk=~m/^</){
-                        $chk=~s/^<//;
-                        if (!($dataval<$chk)){
+                     elsif ($cmpOp eq "lt"){
+                        if (!($dataval lt $chk)){
                            $recok=0 if (!defined($recok));
                            if ($conjunction) {
                               while ($i<$#words && $words[$i+1] eq 'AND') {
@@ -329,15 +370,17 @@ sub CheckFilter
                               }
                            }
                         }
-                        elsif ($conjunction) {
-                           $recok=0 if (!defined($recok));
-                           $i+=1;
+                        else{
+                           if ($conjunction) {
+                              $recok=0 if (!defined($recok));
+                              $i+=1;
+                           }
+                           else {
+                              $recok++;
+                           }
                         }
                      }
-                     elsif ($chk=~m/^!/){
-                        $chk=~s/^!//;
-                        $chk=~s/\?/\./g;
-                        $chk=~s/\*/\.*/g;
+                     elsif ($cmpOp eq "not"){
                         if (($dataval=~m/^$chk$/i)){
                            $recok=0 if (!defined($recok));
                            if ($conjunction) {
@@ -352,9 +395,6 @@ sub CheckFilter
                         }
                      }
                      else{
-                        $chk=~s/\./\\./g;
-                        $chk=~s/\?/\./g;
-                        $chk=~s/\*/\.*/g;
                         if (!($dataval=~m/^$chk$/i)){
                            $recok=0 if (!defined($recok));
                            if ($conjunction) {

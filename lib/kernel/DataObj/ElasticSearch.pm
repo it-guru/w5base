@@ -114,6 +114,10 @@ sub ESHash2Flt
                      $sword=~s/^<//;
                      $cmpop="lt";
                   }
+                  elsif ($sword=~m/^!/){
+                     $sword=~s/^!//;
+                     $cmpop="not";
+                  }
 
                   if ($fld->Type()=~m/Date/){
                      my $raw=$self->ExpandTimeExpression($sword);
@@ -133,9 +137,6 @@ sub ESHash2Flt
                           }
                        }
                      });
-
-
-
                   } 
                   if ($cmpop eq "="){
                      if ($sword=~m/[*?]/){
@@ -154,6 +155,26 @@ sub ESHash2Flt
                      }
                      else{
                         push(@{$bool->{should}},{
+                          match=>{
+                             "$dataobjattr"=>$sword
+                          }
+                        });
+                     }
+                  }
+                  if ($cmpop eq "not"){
+                     if ($sword=~m/[*?]/){
+                        push(@{$bool->{must_not}},{
+                          wildcard=>{
+                             "$dataobjattr"=>{
+                                value=>$sword,
+                                case_insensitive=>
+                                  bless( do{\(my $o = 1)},'JSON::PP::Boolean')
+                             }
+                          }
+                        });
+                     }
+                     else{
+                        push(@{$bool->{not}},{
                           match=>{
                              "$dataobjattr"=>$sword
                           }
@@ -272,7 +293,6 @@ sub Filter2RestPath
    eval('use JSON;$json=new JSON;');
    $json->property(pretty => 1);
    $json->property(utf8 => 1);
-
 
    $postData=$json->encode({query=>{bool=>$fullQuery}});
 
