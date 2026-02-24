@@ -1797,6 +1797,10 @@ sub ExpandTimeExpression
    if (!defined($srctimezone)){
       $srctimezone=$self->UserTimezone();
    }
+   if ($val=~m/ GMT$/ || $val=~m/ UTC$/){
+      $val=~s/ (GMT|UTC)$//;
+      $srctimezone="GMT";
+   }
    ####################################################################
    my $monthbase=$self->T("monthbase");
    my $todaylabel=$self->T("today");
