@@ -311,7 +311,15 @@ sub CheckFilter
                      my $preChk=$chk;
                      do{
                         $preChk=$chk; 
-                        if ($chk=~m/^>/){
+                        if ($chk=~m/^>=/){
+                           $chk=~s/^>=//;
+                           $cmpOp="ge";
+                        }
+                        elsif ($chk=~m/^<=/){
+                           $chk=~s/^<=//;
+                           $cmpOp="le";
+                        }
+                        elsif ($chk=~m/^>/){
                            $chk=~s/^>//;
                            $cmpOp="gt";
                         }
@@ -361,8 +369,47 @@ sub CheckFilter
                            }
                         }
                      }
+                     elsif ($cmpOp eq "ge"){
+                        if (!($dataval ge $chk)){
+                           $recok=0 if (!defined($recok));
+                           if ($conjunction) {
+                              # skip all words with AND relation
+                              while ($i<$#words && $words[$i+1] eq 'AND') {
+                                 $i+=2;
+                              }
+                           }
+                        }
+                        else{
+                           if ($conjunction) {
+                              $recok=0 if (!defined($recok));
+                              $i+=1;
+                           }
+                           else {
+                              $recok++;
+                           }
+                        }
+                     }
                      elsif ($cmpOp eq "lt"){
                         if (!($dataval lt $chk)){
+                           $recok=0 if (!defined($recok));
+                           if ($conjunction) {
+                              while ($i<$#words && $words[$i+1] eq 'AND') {
+                                 $i+=2;
+                              }
+                           }
+                        }
+                        else{
+                           if ($conjunction) {
+                              $recok=0 if (!defined($recok));
+                              $i+=1;
+                           }
+                           else {
+                              $recok++;
+                           }
+                        }
+                     }
+                     elsif ($cmpOp eq "le"){
+                        if (!($dataval le $chk)){
                            $recok=0 if (!defined($recok));
                            if ($conjunction) {
                               while ($i<$#words && $words[$i+1] eq 'AND') {
