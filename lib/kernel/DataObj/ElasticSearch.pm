@@ -814,6 +814,18 @@ sub ESrestETLload
                                    "--arg ".$_." '".$param->{jq}->{arg}->{$_}."'"
                                  } keys(%{$param->{jq}->{arg}}))); 
          }
+         my $curl_arg="";
+         my $curl_env="";
+         if (exists($param->{curl}) && exists($param->{curl}->{arg})){ 
+            $curl_arg=join(" ",map({
+                                   $_." '".$param->{curl}->{arg}->{$_}."'"
+                                 } keys(%{$param->{curl}->{arg}}))); 
+         }
+         if (exists($param->{curl}) && exists($param->{curl}->{ignore_no_proxy}) &&
+             $param->{curl}->{ignore_noproxy}==1){ 
+            $curl_env.=" NO_PROXY='' no_proxy='' ";
+
+         }
        
          msg(INFO,"ESIndex '$indexname' is OK start import - loop=$loopCount");
          my $tmpLastRequestRawDump="last.ESrestETLload.$indexname.".
@@ -832,9 +844,9 @@ sub ESrestETLload
 
          }
          else{
-            $OriginPipeStart="curl -N ".
+            $OriginPipeStart=$curl_env."curl -N ".
                              " -s ".$curlHeaderParam.
-                             " --max-time 300 ".
+                             " --max-time 300 ".$curl_arg." ".
                              "'$restOriginFinalAddr' ";
          }
          my $cmd=$OriginPipeStart.
@@ -843,7 +855,7 @@ sub ESrestETLload
                  "-c '".$ESjqTransform."'".
                  "| tee /tmp/".$tmpLastRequestJqDump." | ".
                  "curl -u '${ESuser}:${ESpass}' ".
-                 "--output - -s ".
+                 "--output - -s ". # "--noproxy '*' ".
                  "-H 'Content-Type: application/x-ndjson' ".
                  "--data-binary \@- ".
                  "-X POST  '$ESbaseurl/$indexname/_bulk".$ESwaitfor."' ".
