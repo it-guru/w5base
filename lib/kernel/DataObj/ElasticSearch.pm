@@ -821,8 +821,9 @@ sub ESrestETLload
                                    $_." '".$param->{curl}->{arg}->{$_}."'"
                                  } keys(%{$param->{curl}->{arg}}))); 
          }
-         if (exists($param->{curl}) && exists($param->{curl}->{ignore_no_proxy}) &&
-             $param->{curl}->{ignore_noproxy}==1){ 
+         if (exists($param->{curl}) && 
+             exists($param->{curl}->{ignore_no_proxy}) &&
+             $param->{curl}->{ignore_no_proxy}==1){ 
             $curl_env.=" NO_PROXY='' no_proxy='' ";
 
          }
