@@ -80,12 +80,8 @@ sub UserVerified
    my $mainuser=getModuleObject($self->Config,"base::user");
    my $grp=getModuleObject($self->Config,"base::grp");
    my $grpuser=getModuleObject($self->Config,"base::lnkgrpuser");
-   my $ciamusr=getModuleObject($self->Config,"tsciam::user");
-   my $ciamorg=getModuleObject($self->Config,"tsciam::orgarea");
 
-   if (!defined($ciamusr) ||
-       !defined($ciamorg) ||
-       !defined($grpuser)||
+   if (!defined($grpuser)||
        !defined($user)   ||
        !defined($mainuser)   ||
        !defined($grp)){
