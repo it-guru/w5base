@@ -52,6 +52,10 @@ sub ESHash2Flt
       my $bool={must=>[],should=>[],minimum_should_match=>1};
       my $fld=$self->getField($fn);
       if (defined($fld)){
+         if (exists($fld->{ElasticType}) && defined($fld->{ElasticType}) &&
+             $fld->{ElasticType} eq "none"){
+            next;
+         }
          my $dataobjattr=$fn;
          if (defined($fld->{dataobjattr})){
             $dataobjattr=$fld->{dataobjattr};
