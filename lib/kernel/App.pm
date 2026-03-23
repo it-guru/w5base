@@ -1399,7 +1399,7 @@ sub getSkinFile
    my $conftag=shift;
    my %param=@_;
    my @skin;
- 
+
    $conftag=~s/\.\./\./g;              # security hack
    $conftag=~s/^\///g;                 # security hack
 
@@ -1432,8 +1432,8 @@ sub getSkinFile
       }
    }
 
-   foreach my $skindir (@skindir){
-      foreach my $skin (@skin){
+   foreach my $skin (@skin){
+      foreach my $skindir (@skindir){
          my $chkname=$skindir."/".$skin."/".$conftag;
          if ($conftag=~m/\*/){
             my @flist=glob($chkname);
