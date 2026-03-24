@@ -498,6 +498,19 @@ sub doTakeAutoDiscData
    elsif ($section eq "OSRELEASE"){   
       if (defined($sysrec)){
          my $osrelease=effVal($oldrec,$newrec,"scanname");
+
+         ####################################################################
+         # make storeable osrelease caseinsensitiv
+         my $chkobj=getModuleobject($self->Config,"itil::osrelease");
+         if (defined($chkobj)){
+            $chkobj->SetFilter({name=>"\"$osrelease\"",cistatusid=>4});
+            my @l=$chkobj->getHashList(qw(name id));
+            if ($#l==0){
+               $osrelease=$l[0]->{name};
+            }
+         }
+         ####################################################################
+
          if (defined($initrelrec)){  # create a new related record for update
             if ($o->SecureValidatedUpdateRecord($sysrec,
                     {osrelease=>$osrelease},
@@ -515,6 +528,9 @@ sub doTakeAutoDiscData
                else{
                   return(0);
                }
+            }
+            else{
+               return(97,"ERROR: fail to store $osrelease");
             }
          }
       }
