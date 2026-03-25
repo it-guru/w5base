@@ -501,7 +501,7 @@ sub doTakeAutoDiscData
 
          ####################################################################
          # make storeable osrelease caseinsensitiv
-         my $chkobj=getModuleobject($self->Config,"itil::osrelease");
+         my $chkobj=getModuleObject($self->Config,"itil::osrelease");
          if (defined($chkobj)){
             $chkobj->SetFilter({name=>"\"$osrelease\"",cistatusid=>4});
             my @l=$chkobj->getHashList(qw(name id));
