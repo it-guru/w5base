@@ -1246,6 +1246,35 @@ sub initSearchQuery
 }
 
 
+sub UserReCertExceptionParameters
+{
+   my $self=shift;
+   my $rec=shift;
+   my $recertAge=shift;
+   my $crefdate=shift;
+
+   my %param=%{
+      $self->SUPER::UserReCertExceptionParameters($rec,$recertAge,$crefdate)
+   };
+   if (ref($recertAge) eq "HASH" && $recertAge->{totaldays}>100){
+      my $id=$rec->{id};
+      my $o=getModuleObject($self->Config,"itil::system");
+
+      if (defined($o) && $id ne ""){
+         $o->SetFilter({assetid=>\$id,cistatusid=>"<6"});
+         my @l=$o->getHashList(qw(id));
+         if ($#l!=-1){
+            $param{CreateDataIssue}=112;
+            $param{DeactivationHandling}=0;
+         }
+      }
+   }
+   return(\%param);
+}
+
+
+
+
 
 
 sub SecureSetFilter
