@@ -48,7 +48,6 @@ sub Run
    if (defined(Query->Param("HTTP_FORCE_LANGUAGE"))){
       $ENV{HTTP_FORCE_LANGUAGE}=Query->Param("HTTP_FORCE_LANGUAGE");
    }
-   #printf STDERR ("fifi load file: $func\n");
 
    if ($func=~m/^tmpl\//){
       my $title=Query->Param("TITLE");
@@ -128,6 +127,7 @@ sub Run
       return(0);
    }
    else{
+      $func=~s/(\.+\/)+//g;
       if (my ($ext)=$func=~m/\.([a-z]{2,3})$/){
          my $virtualfile=$self->getSkinFile($self->Module."/virtual/".$func);
          if (-f $virtualfile){  # virtual file extension is primary to handle
