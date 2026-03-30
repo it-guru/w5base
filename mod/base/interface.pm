@@ -126,40 +126,6 @@ sub io
             print $self->XmlBottom();
             return();
          }
-         ####################################################################
-         ################ create a debug copy of request ####################
-         ####################################################################
-         my $requestdebug="io:".$ENV{REMOTE_USER};
-         $requestdebug=~s/\//_/g;
-         $requestdebug="/tmp/".$requestdebug.'.%02d.xml';
-         my $requestdebugfile;
-         for(my $c=9;$c>=0;$c--){
-            $requestdebugfile=sprintf($requestdebug,$c);
-            my $f2=sprintf($requestdebug,$c+1);
-            if (-f $requestdebugfile){
-               rename($requestdebugfile,$f2);
-            }
-         }
-         my $oldumask=umask(0007);
-         if (open(my $F,">$requestdebugfile")){
-            binmode($F);
-            if (open(my $FI,"<$filename")){
-               binmode($FI);
-               my $bsize=1024;
-               my $data;
-               while(1){
-                 my $nread = read($FI, $data, $bsize);
-                 last if (!$nread);
-                 syswrite($F,$data,$nread);
-               }
-               close($FI);
-            }
-            close($F);
-         }
-         umask($oldumask);
-         ####################################################################
-         ####################################################################
-         ####################################################################
       }
       if (!defined($filename)){
          print hash2xml({exitcode=>2,
@@ -259,6 +225,42 @@ EOF
                                message =>msg(ERROR,'XML::Parser error')});
                $failcount++;
 
+            }
+            else{
+               #################################################################
+               ################ create a debug copy of request #################
+               #################################################################
+               my $requestdebug="io:".$ENV{REMOTE_USER};
+               $requestdebug=~s/\//_/g;
+               $requestdebug="/tmp/".$requestdebug.'.%02d.xml';
+               my $requestdebugfile;
+               for(my $c=9;$c>=0;$c--){
+                  $requestdebugfile=sprintf($requestdebug,$c);
+                  my $f2=sprintf($requestdebug,$c+1);
+                  if (-f $requestdebugfile){
+                     rename($requestdebugfile,$f2);
+                  }
+               }
+               my $oldumask=umask(0007);
+               if (open(my $F,">$requestdebugfile")){
+                  binmode($F);
+                  if (open(my $FI,"<$filename")){
+                     binmode($FI);
+                     my $bsize=1024;
+                     my $data;
+                     while(1){
+                       my $nread = read($FI, $data, $bsize);
+                       last if (!$nread);
+                       syswrite($F,$data,$nread);
+                     }
+                     close($FI);
+                  }
+                  close($F);
+               }
+               umask($oldumask);
+               #################################################################
+               #################################################################
+               #################################################################
             }
             $exitcode+=10000 if ($exitcode!=0);
             print hash2xml({exitcode=>$exitcode,
