@@ -217,6 +217,12 @@ sub Result
    
    my $userid=$self->getParent->getCurrentUserId();
 
+   if (!($year=~m/^[0-9]+$/) || !($mon=~m/^[0-9]+$/)){
+      $self->getParent->LastMsg(ERROR,"invalid search_mon paramter");
+      return(undef);
+   }
+
+
    my ($Y1,$M1,$D1);
    eval('($Y1,$M1,$D1)=Add_Delta_YM("GMT",$year,$mon,1,0,1);');
    if ($@ ne ""){
