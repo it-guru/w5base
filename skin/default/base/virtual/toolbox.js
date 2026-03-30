@@ -1,12 +1,12 @@
-"${instdir}/lib/javascript/toolbox.kernel.COMPRESSED.js"
+"%W5BASEINSTDIR%/lib/javascript/toolbox.kernel.COMPRESSED.js"
 
-"${instdir}/lib/javascript/utf8.COMPRESSED.js"
+"%W5BASEINSTDIR%/lib/javascript/utf8.COMPRESSED.js"
 
-"${instdir}/lib/javascript/url.COMPRESSED.js"
+"%W5BASEINSTDIR%/lib/javascript/url.COMPRESSED.js"
 
-"${instdir}/lib/javascript/base64.COMPRESSED.js"
+"%W5BASEINSTDIR%/lib/javascript/base64.COMPRESSED.js"
 
-"${instdir}/lib/javascript/sprintf.COMPRESSED.js"
+"%W5BASEINSTDIR%/lib/javascript/sprintf.COMPRESSED.js"
 
-"${instdir}/lib/javascript/transformElement.js"
+"%W5BASEINSTDIR%/lib/javascript/transformElement.js"
 

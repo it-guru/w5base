@@ -132,20 +132,32 @@ sub Run
          my $virtualfile=$self->getSkinFile($self->Module."/virtual/".$func);
          if (-f $virtualfile){  # virtual file extension is primary to handle
             $filename=[];       # packing of multiple files in one js file
+            my $instdir=W5BaseInstDir();
+            my $W5BASEINSTDIR=W5BaseInstDir();
+            my %ParsingOptions=();
+            $ParsingOptions{static}={
+               W5BASEINSTDIR=>$W5BASEINSTDIR
+            };
             if (open(VF,"<$virtualfile")){
-               # workaround to make $instdir available while virtual parsing
-               my $instdir=W5BaseInstDir();
                while(my $f=<VF>){ 
+                  $f=~s/\$\{instdir\}/%W5BASEINSTDIR%/g;  # compat layer
+                  $self->ParseTemplateVars(\$f,\%ParsingOptions);
                   $f=trim($f);
                   if ($f ne ""){
-                     $f.=";" if (!$f=~m/;$/);
-                     eval("\$f=$f");
-                     if ($@ eq "" && $f ne ""){
+                     $f=~s/^"//;
+                     $f=~s/"$//;
+                     if (-f $f){
                         push(@$filename,$f);
+                     }
+                     else{
+                        msg(WARN,"invalid virtual ref in $virtualfile to '$f'");
                      }
                   }
                }
                close(VF);
+            }
+            if ($#{$filename}==-1){
+               msg(WARN,"empty result from virtual $virtualfile");
             }
          }
          if ($ext eq "jpg"){
