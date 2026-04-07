@@ -844,7 +844,8 @@ sub Validate
       $newrec->{type}=1;
       $type=1;
    }
-   if (effChanged($oldrec,$newrec,"type")){
+   if (effChanged($oldrec,$newrec,"type") ||
+       effChanged($oldrec,$newrec,"cistatusid")){
       if ($type eq "0" && $is_primary ne "1"){
          $newrec->{is_primary}=1;
       }
