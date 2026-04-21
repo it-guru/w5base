@@ -520,6 +520,11 @@ sub getAppTitleBar
    my $prefix=$param{prefix};
 
    my $user=$ENV{REMOTE_USER};
+   if (length($user)>70){  # remove sub path on OpenID long IDs (f.e. EntraID)
+      if ($user=~m/\@.*\//){
+         $user=~s/\/.*$//;
+      }
+   }
    my $onclick=" id=LoggedInAs onclick=\"return(UserMask());\" ";
    if ($ENV{REMOTE_USER} ne $ENV{REAL_REMOTE_USER} &&
        $ENV{REMOTE_USER} ne "anonymous"){
@@ -1752,7 +1757,15 @@ sub HtmlGoto
    my $self=shift;
    my $target=shift;
    my %param=@_;
-   print $self->HttpHeader("text/html");
+
+
+   my %HeaderParam=();
+
+   if (exists($param{cookies})){
+      $HeaderParam{cookies}=$param{cookies};
+   }
+   print STDERR $self->HttpHeader("text/html",%HeaderParam);
+   print $self->HttpHeader("text/html",%HeaderParam);
    my $method="POST";
    if (exists($param{get})){
       $method="GET";

@@ -81,12 +81,22 @@ sub Main
       
 
       if ($iss eq ""){
+         $iss=Query->Cookie("openidc_iss");
+         $iss=~s/^"+//;
+         $iss=~s/"+$//;
+         if ($iss ne ""){
+            Query->Param("iss"=>$iss);
+         }
+
+      }
+      if ($iss eq ""){
          print $self->HttpHeader("text/html");
          my $loginopenidc=$self->Config->Param("LOGINOPENIDC");
          my @OIDCMetadataDir;
          foreach my $k (keys(%$loginopenidc)){
-            if (-d $loginopenidc->{$k}){
-               push(@OIDCMetadataDir,$loginopenidc->{$k});
+            my $providerfile=$loginopenidc->{$k};
+            if (-r $providerfile){
+               push(@OIDCMetadataDir,$providerfile);
             }
          }
          printf ("<a href=\"../menu/root\">Back</a><br>");
@@ -94,7 +104,8 @@ sub Main
          printf ("found OIDCMetadataDir=%s<br>\n",join(";",@OIDCMetadataDir));
          return(0);
       }
-      $self->HtmlGoto($callback,get=>{Query->MultiVars()});
+      my @cookies=("openidc_iss=\"$iss\"; SameSite=None; Secure; Path=/");
+      $self->HtmlGoto($callback,get=>{Query->MultiVars()},cookies=>\@cookies);
 
       return(0);
    }
@@ -170,16 +181,29 @@ sub findtemplvar
       my $loginicon=$self->Config->Param("LOGINICON");
       my $loginhandler=$self->Config->Param("LOGINHANDLER");
       my $loginhelp=$self->Config->Param("LOGINHELP");
+      my $loginopenidc=$self->Config->Param("LOGINOPENIDC");
+      my $current_openidc_iss=Query->Cookie("openidc_iss");
+      $current_openidc_iss=~s/^"+//; 
+      $current_openidc_iss=~s/"+$//; 
+
       if (ref($loginname) eq "HASH"){
          $d="";
          $d.="<div id=\"LOGINTOP\">";
          $d.="<div id=\"LOGINHANDLER\" class=\"LoginHandlerMainFrame\">\n";
          my $n=0;
          foreach my $k (sort(keys(%$loginname))){
-            my $opt="<div id=\"loginframe$k\" class=\"LoginFrame\">";
+            my $openidcproviderfile=$loginopenidc->{$k};
             my $name=$loginname->{$k};
             my $handler=$loginhandler->{$k};
             my $iconpath=$loginicon->{$k};
+            if ($current_openidc_iss ne ""){
+               if ("?".$current_openidc_iss ne 
+                   substr($handler, -1*(length($current_openidc_iss)+1))) {
+                  next;
+               }
+
+            }
+            my $opt="<div id=\"loginframe$k\" class=\"LoginFrame\">";
             if ($n==0){
                $opt.="<button type=\"submit\" ".
                      "aria-labelledby=\"StdHiddenLoginHelp\" ".
