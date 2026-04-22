@@ -1158,7 +1158,8 @@ sub FixupHttpEnvOnForwards
       if (!($EventJobBaseUrl=~m/\/$/)){
          $EventJobBaseUrl.="/"; 
       }
-      $ENV{SCRIPT_URI}=~s#^http[s]{0,1}://[^/]+?/[^/]+?/##;
+      my ($configname)=$ENV{'SCRIPT_URI'}=~m#/([^/]+?)/(auth|public)#;
+      $ENV{SCRIPT_URI}=~s#^http[s]{0,1}://.*?/$configname/##;
       $ENV{SCRIPT_URI}=$EventJobBaseUrl.$ENV{SCRIPT_URI};
    }
 }
@@ -1255,255 +1256,267 @@ sub HandleNewUser
                                        body=>1,form=>1,action=>$SCRIPT_URI,
                                        refresh=>5,
                                        title=>'W5Base - account verification');
-                  print $self->getParsedTemplate("tmpl/accountverificationdeny",
-                        { static=>{ 
-                               email=>$uarec->{requestemail},
-                               account=>$ENV{REMOTE_USER}},
-                         translation=>'base::accountverification',
-                         skinbase=>'base'
-                        });
-                  return(0);
-               }
-               $ua->ValidatedUpdateRecord($uarec,{userid=>$urec->{userid},
-                                                  requestemailwf=>undef,
-                                                  requestcode=>undef},
-                                   {account=>$ENV{REMOTE_USER}});
-               #
-               # update user record because the user is inactive or
-               # it already exists as an external user
-               #
-               my $updrec={usertyp=>'user',creator=>$urec->{userid}};
-               $updrec->{cistatusid}=3 if ($urec->{cistatusid}<4);
-               if ($urec->{gtctxt} eq ""){ # if no gtc act - we request it
-                  $updrec->{cistatusid}=3;
-               }
-               
-               $user->ValidatedUpdateRecord($urec,$updrec,
-                                   {userid=>\$urec->{userid}});
-               if (defined($uerec)){
-                  $useremail->ValidatedUpdateRecord($uerec,{cistatusid=>4},
-                                   {id=>\$uerec->{id}});
-               }
-            }
-            else{
-               my $userid=undef;
-               my $res;
-               if (defined($res=$self->W5ServerCall("rpcGetUniqueId")) &&
-                   $res->{exitcode}==0){
-                  $userid=$res->{id};
-               }
-               my $id;
-               if (defined($userid)){
-                  $id=$user->ValidatedInsertRecord(
-                                    {email=>$uarec->{requestemail},
-                                     userid=>$userid,
-                                     allowifupdate=>1,
-                                     owner=>$userid,
-                                     creator=>$userid,
-                                     cistatusid=>3});
-               }
-               if (!defined($id)){
-                  printf("Content-type:text/plain\n\n".
-                         "ERROR: can't insert User\n");
-                  return(0);
-               }
-               else{
-                  $ua->ValidatedUpdateRecord($uarec,{userid=>$id},
-                                   {account=>$ENV{REMOTE_USER}});
-               }
-            }
-            $user->SetFilter({accounts=>\$ENV{REMOTE_USER}});
-            my ($urec,$msg)=$user->getFirst();
-            if (defined($uarec)){
-               if ($uarec->{posturi} ne ""){
-                  $self->HtmlGoto($uarec->{posturi});
-               }
-               else{
-                  print $self->HttpHeader("text/html");
-                  my $SCRIPT_URI=$ENV{SCRIPT_URI};
-                  if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
-                     $SCRIPT_URI=~s/^http:/https:/;
+                     print $self->getParsedTemplate("tmpl/accountverificationdeny",
+                           { static=>{ 
+                                  email=>$uarec->{requestemail},
+                                  account=>$ENV{REMOTE_USER}},
+                            translation=>'base::accountverification',
+                            skinbase=>'base'
+                           });
+                     return(0);
                   }
-                  print $self->HtmlHeader(
-                     style=>['default.css','work.css'],
-                     body=>1,
-                     form=>1,
-                     action=>$SCRIPT_URI,
-                     title=>'W5Base - account verification'
-                  );
-                  print $self->getParsedTemplate("tmpl/accountverificationok",{
-                     static=>{ 
-                           email=>$uarec->{requestemail},
-                           account=>$ENV{REMOTE_USER}},
-                     translation=>'base::accountverification',
-                     skinbase=>'base'
-                  });
+                  $ua->ValidatedUpdateRecord($uarec,{userid=>$urec->{userid},
+                                                     requestemailwf=>undef,
+                                                     requestcode=>undef},
+                                      {account=>$ENV{REMOTE_USER}});
+                  #
+                  # update user record because the user is inactive or
+                  # it already exists as an external user
+                  #
+                  my $updrec={usertyp=>'user',creator=>$urec->{userid}};
+                  $updrec->{cistatusid}=3 if ($urec->{cistatusid}<4);
+                  if ($urec->{gtctxt} eq ""){ # if no gtc act - we request it
+                     $updrec->{cistatusid}=3;
+                  }
+                  
+                  $user->ValidatedUpdateRecord($urec,$updrec,
+                                      {userid=>\$urec->{userid}});
+                  if (defined($uerec)){
+                     $useremail->ValidatedUpdateRecord($uerec,{cistatusid=>4},
+                                      {id=>\$uerec->{id}});
+                  }
                }
-               my %p=(eventname=>'UserVerified',
-                      spooltag=>'UserVerified-'.$ENV{REMOTE_USER},
-                      redefine=>'1',
-                      retryinterval=>600,
-                      firstcalldelay=>30,
-                      eventparam=>$ENV{REMOTE_USER},
-                      userid=>11634953080001);
-               $self->W5ServerCall("rpcCallSpooledEvent",%p);
-             #  $self->W5ServerCall("rpcCallEvent","UserVerified",
-             #                      $ENV{REMOTE_USER});
-               $self->W5ServerCall("rpcCacheInvalidate","User",
-                                   $ENV{REMOTE_USER});
-               return(0);
+               else{
+                  my $userid=undef;
+                  my $res;
+                  if (defined($res=$self->W5ServerCall("rpcGetUniqueId")) &&
+                      $res->{exitcode}==0){
+                     $userid=$res->{id};
+                  }
+                  my $id;
+                  if (defined($userid)){
+                     $id=$user->ValidatedInsertRecord(
+                                       {email=>$uarec->{requestemail},
+                                        userid=>$userid,
+                                        allowifupdate=>1,
+                                        owner=>$userid,
+                                        creator=>$userid,
+                                        cistatusid=>3});
+                  }
+                  if (!defined($id)){
+                     printf("Content-type:text/plain\n\n".
+                            "ERROR: can't insert User\n");
+                     return(0);
+                  }
+                  else{
+                     $ua->ValidatedUpdateRecord($uarec,{userid=>$id},
+                                      {account=>$ENV{REMOTE_USER}});
+                  }
+               }
+               $user->SetFilter({accounts=>\$ENV{REMOTE_USER}});
+               my ($urec,$msg)=$user->getFirst();
+               if (defined($uarec)){
+                  if ($uarec->{posturi} ne ""){
+                     $self->HtmlGoto($uarec->{posturi});
+                  }
+                  else{
+                     print $self->HttpHeader("text/html");
+                     my $SCRIPT_URI=$ENV{SCRIPT_URI};
+                     if (lc($ENV{HTTP_FRONT_END_HTTPS}) eq "on"){
+                        $SCRIPT_URI=~s/^http:/https:/;
+                     }
+                     print $self->HtmlHeader(
+                        style=>['default.css','work.css'],
+                        body=>1,
+                        form=>1,
+                        action=>$SCRIPT_URI,
+                        title=>'W5Base - account verification'
+                     );
+                     print $self->getParsedTemplate("tmpl/accountverificationok",{
+                        static=>{ 
+                              email=>$uarec->{requestemail},
+                              account=>$ENV{REMOTE_USER}},
+                        translation=>'base::accountverification',
+                        skinbase=>'base'
+                     });
+                  }
+                  my %p=(eventname=>'UserVerified',
+                         spooltag=>'UserVerified-'.$ENV{REMOTE_USER},
+                         redefine=>'1',
+                         retryinterval=>600,
+                         firstcalldelay=>30,
+                         eventparam=>$ENV{REMOTE_USER},
+                         userid=>11634953080001);
+                  $self->W5ServerCall("rpcCallSpooledEvent",%p);
+                #  $self->W5ServerCall("rpcCallEvent","UserVerified",
+                #                      $ENV{REMOTE_USER});
+                  $self->W5ServerCall("rpcCacheInvalidate","User",
+                                      $ENV{REMOTE_USER});
+                  return(0);
+               }
+               else{
+                  $self->LastMsg(ERROR,"verification failed - unknown error");
+               }
             }
             else{
-               $self->LastMsg(ERROR,"verification failed - unknown error");
+               $self->LastMsg(ERROR,"the verification code is not correct");
             }
          }
-         else{
-            $self->LastMsg(ERROR,"the verification code is not correct");
+         if (defined(Query->Param("correction"))){
+            $ua->ValidatedUpdateRecord($uarec,{requestemailwf=>undef},
+                                      {account=>$ENV{REMOTE_USER}});
+            ($uarec,$msg)=$ua->getFirst();
          }
-      }
-      if (defined(Query->Param("correction"))){
-         $ua->ValidatedUpdateRecord($uarec,{requestemailwf=>undef},
-                                   {account=>$ENV{REMOTE_USER}});
-         ($uarec,$msg)=$ua->getFirst();
-      }
-      if (defined(Query->Param("save"))){
-         my $em=lc(trim(Query->Param("email")));
-         my $id;
-         my $requestcode;
-         my $ok=1;
-         if (!($em=~m/^\S+\@\S+$/)){
-            $ok=0;
-            $self->LastMsg(ERROR,"looks not like an email address");
-         }
-         if ($ok){
-            my $user=getModuleObject($self->Config,"base::user");
-            $user->ResetFilter();
-            $user->SetFilter({emails=>\$em});
-            my ($chkrec,$msg)=$user->getOnlyFirst(qw(cistatusid usertyp));
-            if (defined($chkrec)){
-               if ($chkrec->{usertyp} eq "service"){
-                  $self->LastMsg(ERROR,"nice try, email belongs to a service");
-                  $ok=0; 
-               }
-               if ($ok){
-                  if ($chkrec->{cistatusid}>4){
-                     $self->LastMsg(ERROR,"The email belongs to a deleted ".
-                                          "or blocked contact! ".
-                                          "Please contact the ".
-                                          "1st Level Support.");
+         if (defined(Query->Param("save"))){
+            my $em=lc(trim(Query->Param("email")));
+            my $id;
+            my $requestcode;
+            my $ok=1;
+            if (!($em=~m/^\S+\@\S+$/)){
+               $ok=0;
+               $self->LastMsg(ERROR,"looks not like an email address");
+            }
+            if ($ok){
+               my $user=getModuleObject($self->Config,"base::user");
+               $user->ResetFilter();
+               $user->SetFilter({emails=>\$em});
+               my ($chkrec,$msg)=$user->getOnlyFirst(qw(cistatusid usertyp));
+               if (defined($chkrec)){
+                  if ($chkrec->{usertyp} eq "service"){
+                     $self->LastMsg(ERROR,"nice try, email belongs to a service");
                      $ok=0; 
                   }
+                  if ($ok){
+                     if ($chkrec->{cistatusid}>4){
+                        $self->LastMsg(ERROR,"The email belongs to a deleted ".
+                                             "or blocked contact! ".
+                                             "Please contact the ".
+                                             "1st Level Support.");
+                        $ok=0; 
+                     }
+                  }
                }
             }
-         }
-         if ($ok){
-            if ($ua->ValidatedUpdateRecord($uarec,{requestemail=>$em},
-                                           {account=>$ENV{REMOTE_USER}})){
-               my $res;
-               if (defined($res=$self->W5ServerCall("rpcGetUniqueId")) &&
-                   $res->{exitcode}==0){
-                  $id=$res->{id};
+            if ($ok){
+               if ($ua->ValidatedUpdateRecord($uarec,{requestemail=>$em},
+                                              {account=>$ENV{REMOTE_USER}})){
+                  my $res;
+                  if (defined($res=$self->W5ServerCall("rpcGetUniqueId")) &&
+                      $res->{exitcode}==0){
+                     $id=$res->{id};
+                  }
+                  if (defined($id)){
+                     my $wf=getModuleObject($self->Config,"base::workflow");
+                     my $subject=$self->T("MSG400",'base::accountverification').
+                                 " ".$ENV{REMOTE_USER};
+                     my $sitename=$self->Config->Param("SITENAME");
+                     if ($sitename ne ""){
+                        $subject=$sitename.": ".$subject;
+                     }
+
+                     my $currenturl=$ENV{SCRIPT_URI};
+                     my $rscheme=$ENV{REQUEST_SCHEME};
+
+                     #$currenturl=~
+                     #   s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
+                     #
+                     # it is better to use /auth/base/menu/root as initial path
+                     $currenturl=~
+                        s/\/(auth|public)\/.*/\/auth\/base\/menu\/root/;
+                     my $initialsite=$ENV{SERVER_NAME};
+
+                     my $fromemail=$em;
+                     my $uobj=getModuleObject($self->Config,"base::user");
+                     $uobj->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
+                     my ($urec)=$uobj->getOnlyFirst(qw(email));
+                     if (ref($urec) eq "HASH" && $urec->{email} ne ""){
+                        $fromemail=$urec->{email};
+                     }
+
+                     my @chars=("a".."z","0".."9");
+                     $requestcode="";
+                     $requestcode.=$chars[rand @chars] for 1..10;
+
+                     if ($id=$wf->Store(undef,{
+                            id       =>$id,
+                            class    =>'base::workflow::mailsend',
+                            step     =>'base::workflow::mailsend::dataload',
+                            name     =>$subject,
+                            emailfrom=>$fromemail,
+                            emailto  =>$em,
+                            emailtext=>$self->getParsedTemplate(
+                                         "tmpl/accountverificationmail",
+                                         { static=>{ email=>$em,
+                                                     id=>$id,
+                                                     requestcode=>$requestcode,
+                                                     initialsite=>$initialsite,
+                                                     rscheme=>$rscheme,
+                                                     currenturl=>$currenturl,
+                                                     account=>$ENV{REMOTE_USER}
+                                                   },
+                                           translation=>'base::accountverification',
+                                           skinbase=>'base'
+                                         }),
+                           })){
+                        my %d=(step=>'base::workflow::mailsend::waitforspool');
+                        my $r=$wf->Store($id,%d);
+
+                        my $newreq={
+                           requestemailwf=>$id,
+                           requestcode=>$requestcode
+                        };
+                        $ua->ValidatedUpdateRecord($uarec,$newreq,
+                                                   {account=>$ENV{REMOTE_USER}});
+                     }
+                  }
                }
-               if (defined($id)){
-                  my $wf=getModuleObject($self->Config,"base::workflow");
-                  my $subject=$self->T("MSG400",'base::accountverification').
-                              " ".$ENV{REMOTE_USER};
-                  my $sitename=$self->Config->Param("SITENAME");
-                  if ($sitename ne ""){
-                     $subject=$sitename.": ".$subject;
-                  }
-
-                  my $currenturl=$ENV{SCRIPT_URI};
-                  my $rscheme=$ENV{REQUEST_SCHEME};
-
-                  #$currenturl=~
-                  #   s/\/(auth|public)\/.*/\/auth\/base\/menu\/msel\/MyW5Base/;
-                  #
-                  # it is better to use /auth/base/menu/root as initial path
-                  $currenturl=~
-                     s/\/(auth|public)\/.*/\/auth\/base\/menu\/root/;
-                  my $initialsite=$ENV{SERVER_NAME};
-
-                  my $fromemail=$em;
-                  my $uobj=getModuleObject($self->Config,"base::user");
-                  $uobj->SetFilter({cistatusid=>\'4',isw5support=>\'1'});
-                  my ($urec)=$uobj->getOnlyFirst(qw(email));
-                  if (ref($urec) eq "HASH" && $urec->{email} ne ""){
-                     $fromemail=$urec->{email};
-                  }
-
-                  my @chars=("a".."z","0".."9");
-                  $requestcode="";
-                  $requestcode.=$chars[rand @chars] for 1..10;
-
-                  if ($id=$wf->Store(undef,{
-                         id       =>$id,
-                         class    =>'base::workflow::mailsend',
-                         step     =>'base::workflow::mailsend::dataload',
-                         name     =>$subject,
-                         emailfrom=>$fromemail,
-                         emailto  =>$em,
-                         emailtext=>$self->getParsedTemplate(
-                                      "tmpl/accountverificationmail",
-                                      { static=>{ email=>$em,
-                                                  id=>$id,
-                                                  requestcode=>$requestcode,
-                                                  initialsite=>$initialsite,
-                                                  rscheme=>$rscheme,
-                                                  currenturl=>$currenturl,
-                                                  account=>$ENV{REMOTE_USER}
-                                                },
+               ($uarec,$msg)=$ua->getFirst();
+               msg(INFO,"  ---------------------------------------------------".
+                        "---------------------------");
+               msg(INFO,"  --- Account request code %s has been sent to '%s' ".
+                        "---",$requestcode,$ENV{REMOTE_USER});
+               msg(INFO,"  ---------------------------------------------------".
+                        "---------------------------");
+             }
+         }
+         my $em=$uarec->{requestemail};
+         if (defined(Query->Param("email"))){
+            $em=Query->Param("email"); 
+         }
+         print $self->HttpHeader("text/html");
+         print $self->HtmlHeader(style=>['default.css','work.css'],
+                                 body=>1,form=>1,
+                                 title=>'W5Base - account verification');
+         if (!defined($uarec->{requestemailwf})){
+            if ($self->Config->Param("W5BaseOperationMode") eq "test"){
+               print $self->getParsedTemplate("tmpl/accountverificationtestmode",{
+                                        static=>{ email=>$em,
+                                                  account=>$ENV{REMOTE_USER}},
                                         translation=>'base::accountverification',
                                         skinbase=>'base'
-                                      }),
-                        })){
-                     my %d=(step=>'base::workflow::mailsend::waitforspool');
-                     my $r=$wf->Store($id,%d);
-
-                     my $newreq={
-                        requestemailwf=>$id,
-                        requestcode=>$requestcode
-                     };
-                     $ua->ValidatedUpdateRecord($uarec,$newreq,
-                                                {account=>$ENV{REMOTE_USER}});
+                                         });
+            }
+            else{
+               if ($em eq ""){
+                  my $HeaderField=$self->Config->Param("InitialEMailHeaderFetch");
+                  if ($HeaderField ne "" && exists($ENV{$HeaderField})){
+                     $em=$ENV{$HeaderField};
                   }
                }
+               if ($em eq ""){
+                  if ($ENV{OIDC_CLAIM_email} ne ""){  # If OpenID is used with
+                  $em=lc($ENV{OIDC_CLAIM_email});     # scope email (use of 
+               }                                      # email direct from OID)
             }
-            ($uarec,$msg)=$ua->getFirst();
-            msg(INFO,"  ---------------------------------------------------".
-                     "---------------------------");
-            msg(INFO,"  --- Account request code %s has been sent to '%s' ".
-                     "---",$requestcode,$ENV{REMOTE_USER});
-            msg(INFO,"  ---------------------------------------------------".
-                     "---------------------------");
-          }
-      }
-      my $em=$uarec->{requestemail};
-      if (defined(Query->Param("email"))){
-         $em=Query->Param("email"); 
-      }
-      print $self->HttpHeader("text/html");
-      print $self->HtmlHeader(style=>['default.css','work.css'],
-                              body=>1,form=>1,
-                              title=>'W5Base - account verification');
-      if (!defined($uarec->{requestemailwf})){
-         if ($self->Config->Param("W5BaseOperationMode") eq "test"){
-            print $self->getParsedTemplate("tmpl/accountverificationtestmode",{
-                                     static=>{ email=>$em,
-                                               account=>$ENV{REMOTE_USER}},
-                                     translation=>'base::accountverification',
-                                     skinbase=>'base'
-                                      });
-         }
-         else{
-            if ($em eq ""){
-               my $HeaderField=$self->Config->Param("InitialEMailHeaderFetch");
-               if ($HeaderField ne "" && exists($ENV{$HeaderField})){
-                  $em=$ENV{$HeaderField};
+            my $shortedaccount=$ENV{REMOTE_USER};
+            if (length($shortedaccount)>70){ 
+               if ($shortedaccount=~m/\@.*\//){
+                  $shortedaccount=~s/\/.*$//;
                }
             }
             print $self->getParsedTemplate("tmpl/accountverification",{
                                      static=>{ email=>$em,
+                                               shortedaccount=>$shortedaccount,
                                                account=>$ENV{REMOTE_USER}},
                                      translation=>'base::accountverification',
                                      skinbase=>'base'
@@ -1764,7 +1777,6 @@ sub HtmlGoto
    if (exists($param{cookies})){
       $HeaderParam{cookies}=$param{cookies};
    }
-   print STDERR $self->HttpHeader("text/html",%HeaderParam);
    print $self->HttpHeader("text/html",%HeaderParam);
    my $method="POST";
    if (exists($param{get})){
