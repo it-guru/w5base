@@ -68,17 +68,24 @@ sub Main
       my $callback=Query->Param("oidc_callback");
       my $target_link_uri=Query->Param("target_link_uri");
       my $iss;
-      ($iss)=$target_link_uri=~m/\?(https:\/\/.*)$/;
-      $target_link_uri=~s/\?.*$//;
-      Query->Param("target_link_uri"=>$target_link_uri);
+
+      if ($target_link_uri=~m/_FORCE_OIDC_ISS_/){
+         my ($forceISS)=$target_link_uri=~m/_FORCE_OIDC_ISS_=([^&;]+)/;
+         if ($forceISS ne ""){
+            $iss=$forceISS;
+            $target_link_uri=~s/_FORCE_OIDC_ISS_=[^&;]+//;
+            $target_link_uri=~s/\?$//; # remove ? if query string is empty
+         }
+      }
+
+
       Query->Delete("oidc_iss");
       Query->Delete("oidc_callback");
       Query->Delete("MOD");
       Query->Delete("FUNC");
-      Query->Param("iss"=>$iss);
-      my $qs=Query->QueryString();
-      $qs=~s/;/&/g;
-      
+      if ($iss ne ""){
+         Query->Param("iss"=>$iss);
+      }
 
       if ($iss eq ""){
          $iss=Query->Cookie("openidc_iss");
@@ -89,6 +96,28 @@ sub Main
          }
 
       }
+      if ($iss eq ""){
+         if ($ENV{REMOTE_USER} ne "" &&
+             ($ENV{REMOTE_USER}=~m/[a-z]{3,10}/i)){  
+            # try to find iss over remote_user
+            my $logintoken=$ENV{REMOTE_USER};
+            my $loginhandler=$self->Config->Param("LOGINHANDLER");
+            foreach my $k (keys(%$loginhandler)){
+               my $lh=$loginhandler->{$k};
+               $lh=~s/^.*\?//;
+               if ($k=~m/$logintoken/i){
+                  $iss=$lh;
+                  Query->Param("iss"=>$iss);
+               }
+            }
+         }
+      }
+      if ($target_link_uri=~m/\?$iss$/){
+         $target_link_uri=~s/\?.*$//;
+      }
+
+      Query->Param("target_link_uri"=>$target_link_uri);
+
       if ($iss eq ""){
          print $self->HttpHeader("text/html");
          my $loginopenidc=$self->Config->Param("LOGINOPENIDC");
@@ -104,7 +133,7 @@ sub Main
          printf ("found OIDCMetadataDir=%s<br>\n",join(";",@OIDCMetadataDir));
          return(0);
       }
-      my @cookies=("openidc_iss=\"$iss\"; SameSite=None; Secure; Path=/");
+      my @cookies=("openidc_iss=$iss; SameSite=None; Secure; Path=/");
       $self->HtmlGoto($callback,get=>{Query->MultiVars()},cookies=>\@cookies);
 
       return(0);
