@@ -68,6 +68,12 @@ sub Main
       my $callback=Query->Param("oidc_callback");
       my $target_link_uri=Query->Param("target_link_uri");
       my $iss;
+      msg(INFO,"target_link_uri= '$target_link_uri'\n");
+
+      ($iss)=$target_link_uri=~m/\?(https:\/\/.*)$/;
+      if ($iss){
+         $target_link_uri=~s/\?.*$//;
+      }
 
       if ($target_link_uri=~m/_FORCE_OIDC_ISS_/){
          my ($forceISS)=$target_link_uri=~m/_FORCE_OIDC_ISS_=([^&;]+)/;
