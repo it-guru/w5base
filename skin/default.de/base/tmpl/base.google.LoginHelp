@@ -1,2 +1,8 @@
 <b>GoogleCloud OpenID</b><br>
 Sie können sich mit jedem existierenden GoogleCloud Account anmelden (über OpenID). Es sind auch Google-Workspace Accounts verwendbar.
+<br>
+<br>
+Wenn auf direkt Links (z.B. aus E-Mails) geklickt wird und noch kein Login durchgeführt wurde, wird der "normale" Browser-Login Dialog angezeigt (BasicAuth). An dieser Stelle kann "google" als Loginname (Passwort ist egal) angegeben werden und damit dann ein Google-OpenID Login initiiert werden.<br>
+<br>
+Ist ein Google-OpenID Login durchgeführt, so kann der Login nicht mehr geändert werden, solange der Web-Browser nicht vollständig beendet wurde. Auch für Google-OpenID Logins gilt, dass das Abmelden nur durch vollständiges Beenden des Web-Browsers durchgeführt werden kann.
+

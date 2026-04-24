@@ -180,10 +180,16 @@ function onLoad(){
          e.classList.add("HelpFrameVisible");
       }
    }
+   var CleanupHelpFrame=new Array(); 
    function onMouseOver(e){
+      for (var i=0;i<CleanupHelpFrame.length;i++){
+         CleanupHelpFrame[i].classList.remove("HelpFrameVisible");
+      }
+      CleanupHelpFrame=[];
       var id=e.id;
       var helpid=id+"Help";
       var e=document.getElementById(helpid);
+
       if (e){
          e.classList.add("HelpFrameVisible");
       }
@@ -193,7 +199,8 @@ function onLoad(){
       var helpid=id+"Help";
       var e=document.getElementById(helpid);
       if (e){
-         e.classList.remove("HelpFrameVisible");
+         CleanupHelpFrame.push(e);
+     //    e.classList.remove("HelpFrameVisible");
       }
    }
 </script>

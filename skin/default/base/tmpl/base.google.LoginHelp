@@ -1,2 +1,13 @@
 <b>Google Cloud Login</b><br>
-You can use any account from the GoogleCloud universion (incl. Google Workspace accounts).
+You can use any account from the GoogleCloud universion (incl. Google Workspace accounts).<br>
+<br>
+If you click on direct links (e.g., from emails) and haven't yet logged in,
+the "normal" browser login dialog (BasicAuth) will appear. At this point,
+you can enter "google" as the login name (password is irrelevant)
+and thus initiate an Google-OpenID login.<br>
+<br>
+Once an Google-OpenID login has been initiated, the login cannot be changed
+until the web browser is completely closed. Similarly, for
+Google logins, logging out can only be accomplished by completely
+closing the web browser.
+
