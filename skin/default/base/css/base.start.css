@@ -22,7 +22,8 @@
    line-height: 35px;
    vertical-align:middle;
    margin-right:30px;
-   white-space:nowrap
+   white-space:nowrap;
+   overflow:hidden;
 }
 
 .StdHiddenLoginButton, .StdHiddenLoginButton:hover, .StdHiddenLoginButton:focus{
