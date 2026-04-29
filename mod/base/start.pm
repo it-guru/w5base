@@ -158,6 +158,34 @@ sub Main
    print <<EOF;
 <script language="JavaScript">
 
+
+
+function toggleLabelVisibility() {
+  var labels = Array.from(document.querySelectorAll('label'));
+  var breakpoint = 640; 
+
+//console.log("window.innerWidth="+window.innerWidth);
+//console.log("labels=",labels);
+//console.log("document=",document);
+
+  labels.forEach(label => {
+     if (window.innerWidth < breakpoint) {
+       label.style.display = 'none'; 
+     } else {
+       label.style.display = 'inline';
+     }
+   });
+   var n = Array.from(document.querySelectorAll('#LoginNotice'));
+   n.forEach(label => {
+     if (window.innerWidth < breakpoint) {
+       label.style.display = 'none'; 
+     } else {
+       label.style.display = 'block';
+     }
+   });
+}
+
+
 function onLoad(){
    var focusable=document.querySelectorAll(
      'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -165,6 +193,8 @@ function onLoad(){
    if (focusable && focusable[0]){
       focusable[0].focus();
    }
+   toggleLabelVisibility();
+window.addEventListener('resize', toggleLabelVisibility);
 }
 
    function onFocus(e){
@@ -203,6 +233,8 @@ function onLoad(){
      //    e.classList.remove("HelpFrameVisible");
       }
    }
+
+
 </script>
 EOF
    print $self->getParsedTemplate($tmpl,{});
@@ -262,7 +294,8 @@ sub findtemplvar
 
             $opt.="<img style=\"vertical-align: middle;cursor:pointer;\" ".
                   "src=\"$iconpath\">\n";
-            $opt.="<label style=\"vertical-align:middle;cursor:pointer;".
+            $opt.="<label style=\"display:none;".
+                  "vertical-align:middle;cursor:pointer;".
                   "white-space:nowrap;padding-right:20px\">\n";
             $opt.="$name\n";
             $opt.="</label>\n";
