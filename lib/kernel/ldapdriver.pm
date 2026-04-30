@@ -114,12 +114,22 @@ sub Connect
       }
    }
    if (!($self->{ldap}=Net::LDAP->new($self->{ldapserv},
-                                      timeout=>10,
+                                      timeout=>15,
                                       keepalive=>1,
                                       version=>'3',
                                       async=>0))){
-      my $msg=sprintf("ldapbind '%s' while connect '%s'",$@,$self->{ldapserv});
-      msg(ERROR,$msg);
+      my $msg;
+      if ($@ eq ""){
+         $msg=sprintf("unknown error while ldap->new for connect ".
+                      "'%s' at %s UTC",
+                      $self->{ldapserv},NowStamp("en"));
+         msg(ERROR,$msg);
+      }
+      else{
+         $msg=sprintf("ldap->new returned '%s' while connect '%s' at %s UTC",
+                      $@,$self->{ldapserv},NowStamp("en"));
+         msg(ERROR,$msg);
+      }
       return(undef,$msg);
    }
    my $res=$self->{ldap}->bind($self->{ldapuser},password =>$self->{ldappass});
