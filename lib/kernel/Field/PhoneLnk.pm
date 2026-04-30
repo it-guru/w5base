@@ -35,7 +35,8 @@ sub new
       $self{vjoindisp}=['phonenumber','name','shortedcomments'];
    }
    if (!defined($self{vjoininhash})){
-      $self{vjoininhash}=['phonenumber','name','shortedcomments','showpublic'];
+      $self{vjoininhash}=['phonenumber','name','shortedcomments','showpublic',
+                          'comments'];
    }
 
    my $self=bless($type->SUPER::new(%self),$type);
