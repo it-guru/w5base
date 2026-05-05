@@ -789,7 +789,7 @@ sub FullView
    $self->SecureSetFilter(\%flt);
    my ($rec,$msg)=$self->getOnlyFirst(qw(name data attachments viewcount faqid
                                          furtherkeys kwords viewfreq viewlast
-                                         owner owneremail
+                                         owner owneremail urlofcurrentrec
                                          mdate editor realeditor));
 
    if (defined($rec)){
@@ -834,10 +834,18 @@ sub FullView
    }
    print("<div class=fullview style=\"padding-bottom:10px\">".
          "<a target=_blank class=WindowTitle ".
-         "href=\"ById/$rec->{faqid}\" ".
+         "href=\"$rec->{urlofcurrentrec}\" ".
+         "onclick=\"copyToClipboard('detailtoplinecliptext');return(false);\" ".
          "title=\"".$self->T("use this link to reference this ".
          "record (f.e. in mail)")."\"><div id=WindowTitle>".
          $rec->{name}."</div></a></div>");
+
+   print("<div style=\"display:none;visibility:hidden\" ".
+         "id=detailtoplinecliptext>".
+         "<font face=\"Courier;Courier New\">".
+         "<font color=\"black\">$rec->{name}</font>\n<br>".
+         "$rec->{urlofcurrentrec}</font>\n<br></div>");
+
    my $fo=$self->getField("data",$rec);
    my $d=$fo->FormatedResult($rec,"HtmlV01"); # get HTML Code without scrollbar
    $d=ExpandW5BaseDataLinks($self,"HtmlDetail",$d);
