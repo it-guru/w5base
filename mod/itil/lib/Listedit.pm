@@ -462,6 +462,36 @@ sub _probeUrl
    if (!($url=~m#^[a-z0-9]+://#)){
       $url="tcp://".$url;
    }
+   # check for valid url names
+   my ($hostpart)=$url=~m#^[^/]+//([^/]+).*$#;
+   if ($hostpart ne ""){
+      if ($hostpart=~m/\@/){
+         $d->{exitcode}=1301;
+         $d->{exitmsg}="username or password specification in url not suppored";
+         return($d);
+      }
+      $hostpart=~s/:.*$//;
+      my @hostpart=split(/\./,$hostpart);
+ 
+      foreach my $domainlabel (@hostpart){
+         if (length($domainlabel)>63){
+            $d->{exitcode}=1302;
+            $d->{exitmsg}=
+                "at least on domain label illegal longer than 63 characters";
+            return($d);
+         }
+      }
+   }
+   else{
+      $d->{exitcode}=1300;
+      $d->{exitmsg}="malformed url";
+      return($d);
+   }
+
+
+
+
+
  
    if ($probeipurl ne ""){
       my $ua;
