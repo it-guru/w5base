@@ -284,15 +284,11 @@ sub SampleEvent2
    my $self=shift;
 
    my $user=getModuleObject($self->Config,"itil::system");
-   $user->SetFilter({systemid=>[qw(S06705023 S19907575)]});
-   my @l=$user->getHashList(qw(systemname applications customer));
+   $user->SetFilter({name=>[qw(ede188 ede55m)]});
+   my @l=$user->getHashList(qw(name applications customer ipaddresses));
 
-   $user->Log(WARN,'backlog',"SampleEvent2 just for fun and test");
+   print STDERR JsonDumper(\@l);
 
-   for my $rec (@l){
-      print STDERR hash2xml({'struct'=>{'entry'=>$rec->{customer}}});
-
-   }
    return({exitcode=>-1});
 }
 

@@ -92,7 +92,7 @@ use charnames ':full';
              &Debug &UTF8toLatin1 &Html2Latin1
              &Datafield2Hash &Hash2Datafield &CompressHash &FlattenHash
              &unHtml &quoteHtml &quoteSOAP &quoteWap &quoteQueryString &XmlQuote
-             &Dumper &CSV2Hash &ObjectRecordCodeResolver
+             &Dumper &JsonDumper &CSV2Hash &ObjectRecordCodeResolver
              &FancyLinks &ExpandW5BaseDataLinks &mkInlineAttachment 
              &FormatJsDialCall &HashExtr
              &mkMailInlineAttachment &haveSpecialChar
@@ -182,6 +182,18 @@ sub Dumper
 {
    $Data::Dumper::Sortkeys = 1;
    #$Data::Dumper::Deepcopy = 1;
+   
+   return(Data::Dumper::Dumper(@_));
+}
+
+
+sub JsonDumper
+{
+   local $Data::Dumper::Pair = ' : ';
+   local $Data::Dumper::Quotekeys = 1;
+   local $Data::Dumper::Useqq = 1;
+   local $Data::Dumper::Terse = 1;
+   local $Data::Dumper::Sortkeys=1;
    
    return(Data::Dumper::Dumper(@_));
 }
