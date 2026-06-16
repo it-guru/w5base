@@ -35,9 +35,6 @@ APINAME="/it4tel-it/sm-now/config-api/v1"
 SNMODULE="cmdb_ci_server"
 FIELDS="company,correlation_id,cost_center,discovery_source,used_for,life_cycle_stage,life_cycle_stage_status,location,name,object_id,sys_class_name,sys_id,sys_updated_on"
 
-
-
-
 #
 # getTardisAccessToken: gets a valid Tardis AccessToken with BasicAuth
 #                       processing over .netrc .
@@ -47,7 +44,7 @@ getTardisAccessToken()
    # We always create a new access token, to ensure it's valid also 
    # in long paging request sequences
 
-   TOKENPATH="/auth/realms/default/protocol/openid-connect/token"
+   TOKENPATH="auth/realms/default/protocol/openid-connect/token"
    _ACCESS_TOKEN=$(curl -n -s -X POST "${TOKENBASE}/${TOKENPATH}" \
                        -H 'Content-Type: application/x-www-form-urlencoded' \
                        -d "grant_type=client_credentials" \
@@ -91,11 +88,11 @@ while true; do
        [$headers[] as $col | .[$col] // ""] |
        @csv
     ' | tr ',' ';'
-    #echo -ne "\n\n-----------------------------------\n"
-    #echo "currentPage        = ${currentPage} of ${maxPages}"
-    #echo "resultCharCount    = ${N}"
-    #echo "nextPage           = ${nextPage}"
-    #echo "-----------------------------------"
+    echo -ne "\n\n-----------------------------------\n" >&2
+    echo "currentPage        = ${currentPage} of ${maxPages}" >&2
+    echo "resultCharCount    = ${N}" >&2
+    echo "nextPage           = ${nextPage}" >&2
+    echo "-----------------------------------" >&2
     ####################################################################
 
 
