@@ -1,4 +1,4 @@
 'itil::qrule::ApplSystems'=>{de=>'Prüfung ob Systemzuordnungen vorhanden sind',
                              en=>'check if System relations are valid'},
-'no system or cloud relations'=>{de=>'keine System- oder Cloud-Zuordnungen vorhanden'},
-'superfluous system or cloud relations'=>{de=>'überzählige System- oder Cloud-Zuordnungen vorhanden'},
+'no system/RESLNK or cloud relations'=>{de=>'keine System-/RESLNK- oder Cloud-Zuordnungen vorhanden'},
+'superfluous system/RESLNK or cloud relations'=>{de=>'überzählige System-/RESLNK- oder Cloud-Zuordnungen vorhanden'},
