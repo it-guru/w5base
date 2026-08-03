@@ -46,3 +46,6 @@ No further actions are necessary for you for the time being.
 You can simply select another item in the menu or close the browser window.
 The current forwarding target has already been informed about this new workflow by mail.
 '},
+'Yes, I am sure that I want to approve this request.'=>{
+de=>'Ja, ich bin sicher, dass ich diese Anforderung genehmigen möchte.'
+},
