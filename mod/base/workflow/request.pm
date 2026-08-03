@@ -1128,8 +1128,10 @@ sub generateWorkspacePages
       my $d="<table width=\"100%\" border=0 cellspacing=0 cellpadding=0><tr>".
          "<td colspan=2><textarea name=note style=\"width:100%;height:70px\">".
          unHtml($note)."</textarea></td></tr>";
-      $d.="<tr><td colspan=2>Ja, ich bin sicher, dass ich diese Anforderung ".
-          "genehmigen möchte <input name=VERIFY type=checkbox></td></tr>";
+      $d.="<tr><td colspan=2>".
+          $self->getParent->T(
+              "Yes, I am sure that I want to approve this request.",$tr
+          )."<input name=VERIFY type=checkbox></td></tr>";
       $d.="</table>";
       $$divset.="<div id=OPwfapprovok class=\"$class\">$d</div>";
    }
