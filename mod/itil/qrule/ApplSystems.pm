@@ -21,7 +21,8 @@ NONE
 
 [en:]
 
-An application usually runs on at least one logical system or CloudArea. 
+An application usually runs on at least one logical system or 
+CloudArea (or has additionally used CIs of type RESLNK). 
 
 Step 1: Please make sure that the logical systems are already created in W5Base/Darwin.
 
@@ -46,7 +47,8 @@ https://darwin.telekom.de/darwin/auth/base/user/ById/12390966050001
 [de:]
 
 Eine Anwendung läuft im Regelfall auf mindestens einem 
-logischen System oder einer CloudArea.
+logischen System oder einer CloudArea (oder hat zusätzlich verwendete CIs 
+vom Typ RESLNK).
 
 Schritt 1: Überprüfen Sie bitte, ob die Systeme in W5Base/Darwin bereits angelegt sind.
 
@@ -54,9 +56,9 @@ Schritt 2: Verknüpfen Sie das logische System mit der Anwendung,
 indem Sie im Block 'Systeme' an der Anwendung den Namen des Systems 
 hinterlegen und mit 'hinzufügen' bestätigen.
 
-Achtung: Falls es keine logischen Systeme zu dieser Anwendung gibt, 
-bitte unter 'Steuerungs-/Automationsdaten' 
-'Anwendung hat keine System Komponenten' auf 'ja' setzen. 
+Achtung: Falls es keine logischen Systeme (und CloudAreas/RESLNKs) zu 
+dieser Anwendung gibt, bitte unter 'Steuerungs-/Automationsdaten' 
+'Anwendung hat keine System oder Cloud Komponenten' auf 'ja' setzen. 
 Das Feld darf nur auf 'ja' gesetzt werden, wenn die Anwendung keine Systeme 
 hinterlegt hat! Der technische Verantwortliche der Anwendung (TSM) 
 weiß in der Regel welche Systeme beauftragt wurden.
@@ -119,6 +121,7 @@ sub qcheckRecord
 
    my $systemcnt=0;
    my $cloudacnt=0;
+   my $reslnkcnt=0;
    if (ref($rec->{systems}) eq "ARRAY" && $#{$rec->{systems}}!=-1){
       $systemcnt=$#{$rec->{systems}}+1;
    }
@@ -129,17 +132,24 @@ sub qcheckRecord
          }
       }
    }
+   if (ref($rec->{"addcis"}) eq "ARRAY" && $#{$rec->{"addcis"}}!=-1){
+      foreach my $reslnk (@{$rec->{addcis}}){
+         if ($reslnk->{ciusage}=="RESLNK"){
+            $reslnkcnt++;
+         }
+      }
+   }
 
    if (!$rec->{isnosysappl}){
-      if ($systemcnt==0 && $cloudacnt==0){
-         return(3,{qmsg=>['no system or cloud relations'],
-                   dataissue=>['no system or cloud relations']});
+      if ($systemcnt==0 && $cloudacnt==0 && $reslnkcnt==0){
+         return(3,{qmsg=>['no system/RESLNK or cloud relations'],
+                   dataissue=>['no system/RESLNK or cloud relations']});
       }
    }
    else{
-      if ($systemcnt!=0 || $cloudacnt!=0){
-         return(3,{qmsg=>['superfluous system or cloud relations'],
-                   dataissue=>['superfluous system or cloud relations']});
+      if ($systemcnt!=0 || $cloudacnt!=0 || $reslnkcnt!=0){
+         return(3,{qmsg=>['superfluous system/RESLNK or cloud relations'],
+                   dataissue=>['superfluous system/RESLNK or cloud relations']});
       }
    }
    return(0,undef);
