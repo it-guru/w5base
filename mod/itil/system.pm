@@ -3184,6 +3184,7 @@ sub QRuleSyncCloudSystem
                     if ($mode eq "insert" || $mode eq "update"){
                        my $networkid=$netarea->{ISLAND};
                        my $identifyby=undef;
+                       my $oldrecReact=undef;
                        if ($mode eq "insert"){
                           $ip->ResetFilter();
                           $ip->SetFilter({
@@ -3199,6 +3200,7 @@ sub QRuleSyncCloudSystem
                                                     srcsys networktag));
                           if ($#l==0){
                              $oldrec=$l[0];
+                             $oldrecReact=$l[0];
                              $mode="update";
                           }
                        }
@@ -3237,12 +3239,9 @@ sub QRuleSyncCloudSystem
                           $oprec->{DATA}->{networkid}=$networkid;
                        }
                        if ($mode eq "update"){ 
-                          # on change of ip-record alwas set type=1 (secondary)
-                          # to prevent 'PrimaryUniqueCheck' errors
-                          $oprec->{DATA}->{type}=1;
-                          # my 1st thinking was "do not change type" - but 
-                          # this was bad/wrong.
-                          #delete($oprec->{DATA}->{type});
+                          if (!defined($oldrecReact)){
+                             delete($oprec->{DATA}->{type});
+                          }
                        }
                        return($oprec);
                     }
