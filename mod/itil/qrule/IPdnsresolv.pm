@@ -146,9 +146,9 @@ sub qcheckRecord
          }
          $swop->LastMsg("");
       }
-      if ($UpdERRORS ne ""){
+      if ($UpdERRORS ne "" && $UpdERRORS=~m/ERROR/){
          if ($dataobj->Config->Param("W5BaseOperationMode") eq "dev"){
-            printf STDERR ("%s\n",$UpdERRORS);
+            printf STDERR ("UpdERROR: %s\n",$UpdERRORS);
          }
          $UpdERRORS=~s/\n/ /g;
          push(@qmsg,"something went wrong on update: ".
