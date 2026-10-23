@@ -64,6 +64,7 @@ sub FormatedResult
    if ($mode eq "JSON"){
       return(undef) if (!defined($d));
       return(\'1') if ($d);
+      return(undef) if ($d eq "");
       return(\'0');
    }
    if ($mode=~m/Html/i){
